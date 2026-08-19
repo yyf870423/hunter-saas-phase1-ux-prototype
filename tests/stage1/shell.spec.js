@@ -9,12 +9,29 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("导航展开状态被记忆", async ({ page }) => {
-  await page.getByRole("button", { name: "展开导航" }).click();
+  const sidebar = page.locator(".s1-sidebar");
+  const toggle = page.getByRole("button", { name: "展开导航" });
+  const collapsedSidebarBox = await sidebar.boundingBox();
+  const collapsedToggleBox = await toggle.boundingBox();
+  expect(collapsedToggleBox.y).toBeGreaterThan(collapsedSidebarBox.height / 2);
+  expect(collapsedToggleBox.x).toBeGreaterThanOrEqual(collapsedSidebarBox.x);
+  expect(collapsedToggleBox.x + collapsedToggleBox.width).toBeLessThanOrEqual(
+    collapsedSidebarBox.x + collapsedSidebarBox.width,
+  );
+
+  await toggle.click();
   await expect(page.locator(".s1-app")).toHaveClass(/nav-expanded/);
   await page.reload();
   await expect(page.locator(".s1-app")).toHaveClass(/nav-expanded/);
   await page.getByRole("button", { name: "收起导航" }).click();
   await expect(page.locator(".s1-app")).toHaveClass(/nav-collapsed/);
+});
+
+test("通知计数使用正圆标记", async ({ page }) => {
+  const badge = page.getByRole("button", { name: "打开通知" }).locator("em");
+  const box = await badge.boundingBox();
+  expect(box.width).toBe(box.height);
+  await expect(badge).toHaveCSS("border-radius", "50%");
 });
 
 test("全局搜索支持结果、详情和无结果", async ({ page }) => {

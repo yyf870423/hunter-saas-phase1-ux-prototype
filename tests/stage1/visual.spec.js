@@ -34,3 +34,13 @@ test("截取桌面深色工作台", async ({ page }) => {
     fullPage: true,
   });
 });
+
+test("截取桌面展开导航", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("#/home");
+  await page.getByRole("button", { name: "展开导航" }).click();
+  await page.screenshot({
+    path: `${output}/desktop-home-nav-expanded.png`,
+    fullPage: true,
+  });
+});

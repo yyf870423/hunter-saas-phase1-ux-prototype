@@ -387,12 +387,6 @@ export function Stage1Shell() {
         >
           <Brand expanded={expanded} />
         </button>
-        <IconButton
-          className="s1-sidebar-toggle"
-          icon={expanded ? "panelLeft" : "panelRight"}
-          label={expanded ? "收起导航" : "展开导航"}
-          onClick={() => setExpanded((current) => !current)}
-        />
         <div className="s1-sidebar-scroll">
           {navSections.map((section) => (
             <section className="s1-nav-section" key={section.label}>
@@ -468,6 +462,16 @@ export function Stage1Shell() {
               </button>
             </div>
           ) : null}
+          <button
+            type="button"
+            className="s1-sidebar-toggle"
+            aria-label={expanded ? "收起导航" : "展开导航"}
+            title={expanded ? undefined : "展开导航"}
+            onClick={() => setExpanded((current) => !current)}
+          >
+            <Icon name={expanded ? "panelLeft" : "panelRight"} />
+            <span>{expanded ? "收起导航" : "展开导航"}</span>
+          </button>
         </div>
       </aside>
 
