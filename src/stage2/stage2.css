@@ -1958,22 +1958,22 @@
   gap: 8px;
 }
 
-/* New mainline and side task */
-.s2-new-workstream {
+/* Unified work creation */
+.s2-new-work {
   min-height: calc(100vh - 126px);
   display: grid;
   place-items: center;
 }
-.s2-new-workstream-inner {
+.s2-new-work-inner {
   width: min(800px, 100%);
   padding: 30px 0 70px;
 }
-.s2-new-workstream-inner > header {
+.s2-new-work-inner > header {
   max-width: 620px;
   margin: 0 auto 24px;
   text-align: center;
 }
-.s2-new-workstream-inner > header > span {
+.s2-new-work-inner > header > span {
   display: grid;
   width: 42px;
   height: 42px;
@@ -1984,12 +1984,12 @@
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 112, 247, 0.22);
 }
-.s2-new-workstream-inner > header h1 {
+.s2-new-work-inner > header h1 {
   margin: 0;
   font-size: 24px;
   letter-spacing: 0;
 }
-.s2-new-workstream-inner > header p {
+.s2-new-work-inner > header p {
   margin: 8px auto 0;
   color: var(--s1-muted);
   font-size: 13px;
@@ -2032,8 +2032,7 @@
 .s2-starter-prompts button svg {
   width: 13px;
 }
-.s2-new-workstream-inner > footer,
-.s2-side-task-boundary {
+.s2-new-work-inner > footer {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -2042,24 +2041,100 @@
   font-size: 12px;
   line-height: 18px;
 }
-.s2-new-workstream-inner > footer svg,
-.s2-side-task-boundary > svg {
+.s2-new-work-inner > footer svg {
   width: 15px;
   flex: 0 0 15px;
   margin-top: 1px;
   color: var(--s1-accent);
 }
-.s2-side-task-boundary {
+.s2-new-work-inner.has-conversation {
+  padding-top: 18px;
+}
+.s2-new-work-inner.has-conversation > header {
+  margin-bottom: 18px;
+}
+.s2-new-work-conversation {
+  display: grid;
+  gap: 16px;
+  max-height: min(45vh, 430px);
+  margin: 0 0 16px;
+  padding: 4px 6px 4px 2px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.s2-new-work-conversation .s2-user-message {
+  margin-left: auto;
+}
+.s2-new-work-conversation .s2-local-error {
+  margin: 0;
+}
+.s2-new-work-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.s2-new-work-choices button {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
   padding: 12px;
+  color: var(--s1-ink);
+  font: inherit;
+  text-align: left;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease;
+}
+.s2-new-work-choices button:hover,
+.s2-new-work-choices button:focus-visible {
   background: var(--s1-accent-soft);
-  border: 1px solid color-mix(in srgb, var(--s1-accent) 15%, transparent);
+  border-color: color-mix(in srgb, var(--s1-accent) 35%, var(--s1-line));
+  outline: none;
+  transform: translateY(-1px);
+}
+.s2-new-work-choices b {
+  font-size: 13px;
+  line-height: 19px;
+}
+.s2-new-work-choices small {
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+.s2-new-work-limited {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: var(--s1-warning-soft);
+  border: 1px solid color-mix(in srgb, var(--s1-warning) 24%, transparent);
   border-radius: 8px;
 }
-.s2-side-task-boundary b {
-  font-size: 12px;
+.s2-new-work-limited > svg {
+  width: 16px;
+  flex: 0 0 16px;
+  margin-top: 2px;
+  color: var(--s1-warning);
 }
-.s2-side-task-boundary p {
-  margin: 3px 0 0;
+.s2-new-work-limited span {
+  display: grid;
+  gap: 2px;
+}
+.s2-new-work-limited b {
+  font-size: 13px;
+  line-height: 19px;
+}
+.s2-new-work-limited small {
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
 }
 
 /* Module pages and task tables */
@@ -3125,15 +3200,22 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
   }
-  .s2-new-workstream {
+  .s2-new-work {
     min-height: calc(100vh - 156px);
     place-items: start center;
   }
-  .s2-new-workstream-inner {
+  .s2-new-work-inner {
     padding: 20px 0 60px;
   }
   .s2-starter-prompts > div {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .s2-new-work-choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .s2-new-work-conversation {
+    max-height: none;
+    overflow: visible;
   }
   .s2-module-page,
   .s2-signals-page {

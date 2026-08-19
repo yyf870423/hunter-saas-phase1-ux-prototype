@@ -21,7 +21,7 @@ export function SignalsPage() {
   const [selectedId, setSelectedId] = useState(initialSignals[0].id);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [convertOpen, setConvertOpen] = useState(false);
-  const [convertType, setConvertType] = useState("mainline");
+  const [convertType, setConvertType] = useState("new");
   const selected =
     signals.find((signal) => signal.id === selectedId) || signals[0];
   const visible = useMemo(() => {
@@ -291,14 +291,17 @@ export function SignalsPage() {
                 setConvertOpen(false);
                 updateStatus(
                   "已转化",
-                  convertType === "mainline"
-                    ? "信号已转化为客户开发主线"
-                    : convertType === "task"
-                      ? "信号已转化为独立支线任务"
-                      : "信号已关联现有业务主线",
+                  convertType === "new"
+                    ? "信号已作为新工作的已知信息"
+                    : "信号已关联现有业务主线",
                 );
-                if (convertType === "mainline") navigate("/workstreams/new");
-                else if (convertType === "task") navigate("/tasks/new");
+                if (convertType === "new") {
+                  sessionStorage.setItem(
+                    "hunter-new-work-signal",
+                    `根据信号“${selected.title}”继续处理，先判断最合适的推进方式。`,
+                  );
+                  navigate("/new");
+                }
               }}
             >
               继续
@@ -313,11 +316,10 @@ export function SignalsPage() {
         >
           {[
             [
-              "mainline",
-              "新建业务主线",
-              "适合需要持续推进的客户开发、招聘或人才摸排。",
+              "new",
+              "启动新工作",
+              "Hunter 根据目标判断直接处理、创建支线任务或建立业务主线。",
             ],
-            ["task", "新建支线任务", "适合一次核验、补充调研或身份消歧。"],
             [
               "existing",
               "关联现有工作",

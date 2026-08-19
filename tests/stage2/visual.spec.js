@@ -67,6 +67,32 @@ test("截取候选人审核、支线任务和信号中心", async ({ page }) => 
   });
 });
 
+test("截取统一新建工作及关键状态", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const [state, filename] of [
+    ["", "desktop-new-work.png"],
+    ["?state=clarify", "desktop-new-work-clarify.png"],
+    ["?state=direct", "desktop-new-work-direct.png"],
+    ["?state=error", "desktop-new-work-error.png"],
+    ["?state=limited", "desktop-new-work-limited.png"],
+  ]) {
+    await page.goto(`#/new${state}`);
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `${output}/${filename}`,
+      fullPage: true,
+    });
+  }
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/new?state=clarify");
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/iphone-new-work-clarify.png`,
+    fullPage: true,
+  });
+});
+
 test("截取阶段二异常状态和移动端详情", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/workstreams/position-vla?state=stream-error");

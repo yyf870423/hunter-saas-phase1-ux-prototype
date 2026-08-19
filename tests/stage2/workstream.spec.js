@@ -189,16 +189,17 @@ test("授权切换、暂停、终止与删除确认可用", async ({ page }) => 
   ).toBeVisible();
 });
 
-test("新建业务主线通过自然语言进入统一工作区", async ({ page }) => {
-  await page.goto("#/workstreams/new");
-  const input = page.getByPlaceholder(/例如：帮我摸排/);
-  await input.fill("帮我找星澜机器人 VLA 算法负责人候选人");
+test("新建工作判断为业务主线后进入主线工作区", async ({ page }) => {
+  await page.goto("#/new");
+  const input = page.getByPlaceholder(/例如：为星澜机器人/);
+  await input.fill("为星澜机器人 VLA 算法负责人岗位持续寻找合适候选人");
   await input.press("Enter");
+  await expect(page.getByText(/我会建立一条岗位招聘业务主线/)).toBeVisible();
   await expect(page).toHaveURL(/#\/workstreams\/position-vla$/, {
     timeout: 5_000,
   });
   await expect(
-    page.getByText("帮我找星澜机器人 VLA 算法负责人候选人"),
+    page.getByText("为星澜机器人 VLA 算法负责人岗位持续寻找合适候选人"),
   ).toBeVisible();
 });
 

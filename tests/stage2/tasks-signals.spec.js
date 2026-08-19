@@ -65,6 +65,49 @@ test("支线任务详情支持补充资料、恢复和结果回流", async ({ pa
   await expect(page.getByText("计划已完成", { exact: true })).toBeVisible();
 });
 
+test("统一新建入口可进入支线任务或直接完成", async ({ page }) => {
+  await page.goto("#/new");
+  const input = page.getByPlaceholder(/例如：为星澜机器人/);
+  await input.fill("核验人才版图中的两位周明远是不是同一个人");
+  await input.press("Enter");
+  await expect(page.getByText(/我会创建独立支线任务/)).toBeVisible();
+  await expect(page).toHaveURL(/#\/tasks\/task-hand-team$/, {
+    timeout: 5_000,
+  });
+  await expect(page.getByText(/两位周明远是不是同一个人/)).toBeVisible();
+
+  await page.goto("#/new");
+  await input.fill("把这三条面试反馈整理为候选人跟进摘要");
+  await input.press("Enter");
+  await expect(
+    page.getByRole("heading", { name: "候选人跟进摘要" }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/#\/new$/);
+});
+
+test("统一新建入口覆盖歧义、失败、权限受限和旧路由", async ({ page }) => {
+  await page.goto("#/new?state=clarify");
+  await expect(page.getByText(/还缺少一个会改变推进方式的信息/)).toBeVisible();
+  await page.getByRole("button", { name: /只整理当前信息/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "云脉芯能公开信息摘要" }),
+  ).toBeVisible();
+
+  await page.goto("#/new?state=error");
+  await expect(page.getByText("暂时无法判断推进方式")).toBeVisible();
+  await page.getByRole("button", { name: "重新判断" }).click();
+  await expect(page.getByText(/我正在判断这项工作/)).toBeVisible();
+
+  await page.goto("#/new?state=limited");
+  await expect(page.getByText("当前工作空间不能创建新工作")).toBeVisible();
+  await expect(page.locator(".s2-composer textarea")).toBeDisabled();
+
+  await page.goto("#/workstreams/new");
+  await expect(page).toHaveURL(/#\/new$/);
+  await page.goto("#/tasks/new");
+  await expect(page).toHaveURL(/#\/new$/);
+});
+
 test("信号中心支持合并来源、观察和转化", async ({ page }) => {
   await page.goto("#/signals");
   await expect(
@@ -94,9 +137,12 @@ test("信号中心支持合并来源、观察和转化", async ({ page }) => {
   await expect(page.getByText(/信号已加入观察/)).toBeVisible();
   await page.getByRole("button", { name: "转化或启动工作" }).click();
   await expect(page.getByRole("heading", { name: "转化信号" })).toBeVisible();
-  await page.getByRole("radio", { name: /新建支线任务/ }).click();
+  await page.getByRole("radio", { name: /启动新工作/ }).click();
   await page.getByRole("button", { name: "继续" }).click();
-  await expect(page).toHaveURL(/#\/tasks\/new$/);
+  await expect(page).toHaveURL(/#\/new$/);
+  await expect(page.locator(".s2-composer textarea")).toHaveValue(
+    /云脉芯能正在组建机器人芯片团队/,
+  );
 });
 
 test("移动端可以从信号列表进入详情并返回", async ({ page }) => {

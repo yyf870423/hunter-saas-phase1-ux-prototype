@@ -495,7 +495,7 @@ export function WorkstreamHistory({
       <header>
         {collapsed ? null : <b>业务主线</b>}
         <div>
-          <IconButton icon="plus" label="新建业务主线" onClick={onCreate} />
+          <IconButton icon="plus" label="新建工作" onClick={onCreate} />
           <IconButton
             icon={collapsed ? "panelRight" : "panelLeft"}
             label={collapsed ? "展开主线列表" : "收起主线列表"}

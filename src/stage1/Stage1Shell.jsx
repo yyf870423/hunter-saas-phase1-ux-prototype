@@ -375,7 +375,7 @@ function NewMenu({ open, close, onSelect }) {
   return (
     <div className="s1-new-menu" role="menu" ref={ref}>
       {[
-        ["route", "新建业务主线", "客户开发、岗位招聘、人才摸排或候选人求职"],
+        ["route", "新建工作", "直接说明目标，Hunter 会选择合适的推进方式"],
         ["upload", "导入数据", "导入简历、岗位、公司、论文、专利或人才版图"],
         ["plus", "手动新建资产", "进入对应业务资产创建正式记录"],
       ].map(([icon, title, description]) => (
@@ -666,7 +666,7 @@ export function Stage1Shell() {
                 close={() => setNewOpen(false)}
                 onSelect={(label) => {
                   setNewOpen(false);
-                  if (label === "新建业务主线") navigate("/workstreams/new");
+                  if (label === "新建工作") navigate("/new");
                   else notify(`已选择“${label}”入口`, "info");
                 }}
               />
@@ -687,7 +687,7 @@ export function Stage1Shell() {
           </div>
         </header>
         <main
-          className={`s1-main ${location.pathname.startsWith("/workstreams") || location.pathname.startsWith("/tasks/") ? "s1-main-workspace" : ""}`}
+          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/workstreams") || location.pathname.startsWith("/tasks/") ? "s1-main-workspace" : ""}`}
         >
           <Outlet />
         </main>

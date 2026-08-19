@@ -63,12 +63,8 @@ export function SideTasksPage() {
             主线内部任务只在所属主线中查看，这里仅显示能够独立运行和交付结果的任务。
           </p>
         </div>
-        <Button
-          tone="primary"
-          icon="plus"
-          onClick={() => navigate("/tasks/new")}
-        >
-          新建支线任务
+        <Button tone="primary" icon="plus" onClick={() => navigate("/new")}>
+          新建工作
         </Button>
       </header>
       <section className="s2-list-panel">
@@ -361,7 +357,8 @@ export function SideTaskDetail() {
         <section className="s2-task-conversation">
           <div className="s2-task-timeline">
             <UserMessage time="今天 08:54">
-              核验人才版图中两位“周明远”是不是同一个人，只给身份建议，不要自动合并。
+              {sessionStorage.getItem("hunter-new-task-prompt") ||
+                "核验人才版图中两位“周明远”是不是同一个人，只给身份建议，不要自动合并。"}
             </UserMessage>
             <HunterReply>
               <p>
@@ -485,54 +482,6 @@ export function SideTaskDetail() {
           <p>人才版图中已经确认的正式人物记录不会删除。</p>
         </div>
       </Modal>
-    </div>
-  );
-}
-
-export function NewSideTask() {
-  const navigate = useNavigate();
-  const [value, setValue] = useState("");
-  const [authMode, setAuthMode] = useState("confirm");
-  const [attachments, setAttachments] = useState([]);
-  const [sending, setSending] = useState(false);
-  return (
-    <div className="s2-page s2-new-workstream">
-      <section className="s2-new-workstream-inner">
-        <header>
-          <span>
-            <Icon name="task" />
-          </span>
-          <h1>新建支线任务</h1>
-          <p>
-            支线任务用于目标独立、范围有限且有明确交付的探索工作；长期业务推进应新建业务主线。
-          </p>
-        </header>
-        <Composer
-          value={value}
-          onChange={setValue}
-          onSend={(text) => {
-            setSending(true);
-            window.setTimeout(() => navigate("/tasks/task-hand-team"), 600);
-          }}
-          authMode={authMode}
-          onAuthChange={setAuthMode}
-          attachments={attachments}
-          onAttachmentsChange={setAttachments}
-          placeholder="例如：核验人才版图中两位同名负责人是否为同一个人"
-          streaming={sending}
-          onStop={() => setSending(false)}
-          disabled={sending}
-        />
-        <div className="s2-side-task-boundary">
-          <Icon name="info" />
-          <span>
-            <b>什么时候使用支线任务</b>
-            <p>
-              一次身份核验、公开资料调研、联系人探索或论文作者消歧适合作为支线任务；持续招聘、客户开发和长期人才摸排应使用业务主线。
-            </p>
-          </span>
-        </div>
-      </section>
     </div>
   );
 }

@@ -468,7 +468,7 @@ export function AutomationWorkspace() {
         collapsed={historyCollapsed}
         currentId="position-vla"
         onToggle={() => setHistoryCollapsed((value) => !value)}
-        onCreate={() => navigate("/workstreams/new")}
+        onCreate={() => navigate("/new")}
         onSelect={(item) =>
           item.id === "position-vla"
             ? null
@@ -774,75 +774,6 @@ export function AutomationWorkspace() {
           <p>已确认写入的候选人、岗位和其他正式业务资产不会删除。</p>
         </div>
       </Modal>
-    </div>
-  );
-}
-
-export function NewWorkstream() {
-  const navigate = useNavigate();
-  const [value, setValue] = useState("");
-  const [authMode, setAuthMode] = useState("confirm");
-  const [attachments, setAttachments] = useState([]);
-  const [sending, setSending] = useState(false);
-  const suggestions = [
-    "帮我判断云脉芯能是否有新的招聘需求，并找到可以联系的人",
-    "为星澜机器人的 VLA 算法负责人岗位找合适候选人",
-    "摸排国内灵巧手方向的公司、团队、关键人物和关系",
-    "林昊可能在看机会，帮我匹配系统内适合他的岗位",
-  ];
-  const send = (text) => {
-    if (!text.trim()) return;
-    setSending(true);
-    sessionStorage.setItem("hunter-new-workstream-prompt", text.trim());
-    window.setTimeout(() => navigate("/workstreams/position-vla"), 650);
-  };
-  return (
-    <div className="s2-page s2-new-workstream">
-      <section className="s2-new-workstream-inner">
-        <header>
-          <span>
-            <Icon name="sparkles" />
-          </span>
-          <h1>新建业务主线</h1>
-          <p>
-            用自然语言说明目标和已知信息。Hunter
-            会先理解范围，再形成可以随过程调整的执行计划。
-          </p>
-        </header>
-        <Composer
-          value={value}
-          onChange={setValue}
-          onSend={(text) => send(text)}
-          authMode={authMode}
-          onAuthChange={setAuthMode}
-          attachments={attachments}
-          onAttachmentsChange={setAttachments}
-          placeholder="例如：帮我摸排国内灵巧手方向的公司、团队、关键人物和关系"
-          streaming={sending}
-          onStop={() => setSending(false)}
-          disabled={sending}
-        />
-        <div className="s2-starter-prompts">
-          <small>可以从这些真实目标开始</small>
-          <div>
-            {suggestions.map((suggestion) => (
-              <button
-                type="button"
-                key={suggestion}
-                onClick={() => setValue(suggestion)}
-              >
-                {suggestion}
-                <Icon name="chevronRight" />
-              </button>
-            ))}
-          </div>
-        </div>
-        <footer>
-          <Icon name="info" />
-          默认由 Hunter
-          处理信息和生成建议；写入正式数据或产生外部影响前，仍按当前授权和强制门禁执行。
-        </footer>
-      </section>
     </div>
   );
 }

@@ -293,6 +293,10 @@ export function Dashboard() {
   const notify = useToast();
   const state = params.get("state") || "normal";
   const openPlaceholder = (title) => {
+    if (title === "新建工作") {
+      navigate("/new");
+      return;
+    }
     if (title === "全部业务主线" || title === "具身智能 VLA 算法负责人") {
       navigate("/workstreams/position-vla");
       return;
@@ -327,9 +331,9 @@ export function Dashboard() {
             <Button
               tone="primary"
               icon="plus"
-              onClick={() => openPlaceholder("新建业务主线")}
+              onClick={() => openPlaceholder("新建工作")}
             >
-              新建业务主线
+              新建工作
             </Button>
           }
         />
@@ -352,9 +356,9 @@ export function Dashboard() {
         <Button
           tone="primary"
           icon="plus"
-          onClick={() => openPlaceholder("新建业务主线")}
+          onClick={() => openPlaceholder("新建工作")}
         >
-          新建业务主线
+          新建工作
         </Button>
       </header>
 

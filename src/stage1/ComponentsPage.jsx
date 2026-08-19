@@ -89,7 +89,7 @@ export function ComponentsPage() {
             icon="route"
             title="还没有业务主线"
             description="从一个真实目标开始，Hunter 会整理后续工作。"
-            action={<Button tone="primary">新建业务主线</Button>}
+            action={<Button tone="primary">新建工作</Button>}
           />
         </article>
         <article className="s1-permission-sample">
