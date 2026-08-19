@@ -28,7 +28,8 @@ function CandidateReviewEntry({ onOpen }) {
         打开候选人审核（18）
       </Button>
       <small>
-        也可以直接输入处理规则，例如“联系 85 分以上的人，但排除赵星羽”。
+        也可以直接输入筛选规则，例如“将 85
+        分以上的人加入岗位储备，但不选赵星羽”。
       </small>
     </div>
   );
@@ -309,10 +310,10 @@ export function AutomationWorkspace() {
       setPlanAdjusted(true);
       setLatestPlanRequirement(`${text}${attachmentText}`);
     } else if (/85|八十五/.test(text)) {
-      const excluded = /赵星羽/.test(text);
+      const omitted = /赵星羽/.test(text);
       completeDecision(
         `${text}${attachmentText}`,
-        `已按同一审核命令处理：${excluded ? "排除赵星羽后，" : ""}4 位候选人加入联系名单；其余候选人保留在本轮审核结果中。正式外部联系尚未执行，下一步仍会检查对象、渠道和授权范围。`,
+        `已按同一审核规则处理：${omitted ? "未选择赵星羽，" : ""}4 位候选人已加入岗位储备；其余候选人继续保留在本轮审核结果中。下一步可以继续指定需要联系的人选。`,
       );
     } else {
       setUserDecisions((items) => [
@@ -420,14 +421,10 @@ export function AutomationWorkspace() {
         <CandidateReviewWorkspace
           candidates={candidates}
           onClose={() => setReviewOpen(false)}
-          onApply={({ selected, action }) => {
-            const labels = {
-              contact: "加入联系名单",
-              reserve: "加入岗位储备",
-            };
+          onApply={({ selected }) => {
             completeDecision(
-              `将已选择的 ${selected.length} 位候选人${labels[action]}。`,
-              `已应用审核决定：${selected.length} 位候选人已${labels[action]}。未选择的人选继续保留在本轮审核结果中；正式外部联系尚未执行。`,
+              `将已选择的 ${selected.length} 位候选人加入岗位储备。`,
+              `已应用审核决定：${selected.length} 位候选人已加入岗位储备。未选择的人选继续保留在本轮审核结果中；下一步可以继续指定需要联系的人选。`,
             );
           }}
         />
@@ -665,8 +662,7 @@ export function AutomationWorkspace() {
               <HunterReply>
                 <h2>已从当前检查点继续</h2>
                 <p>
-                  审核结果已经保留，执行计划已更新。由于本轮要求“不直接联系”，主线停在联系前检查点，不会消耗
-                  Agent 用量；你可以随时补充候选人信息或改变处理范围。
+                  审核结果和岗位储备关系已经保存，执行计划已更新。下一步可以直接告诉我需要联系哪些候选人；联系前仍会检查对象、渠道和授权范围。
                 </p>
               </HunterReply>
             ) : null}

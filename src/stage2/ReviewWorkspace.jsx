@@ -399,7 +399,7 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
             <h2>建议动作</h2>
             <p>
               {current.score >= 85
-                ? "优先加入联系名单，先核实求职意愿、到岗时间和薪酬预期。"
+                ? "优先加入岗位储备，后续再决定联系范围并核实求职意愿。"
                 : current.score >= 75
                   ? "加入岗位储备，补全风险项后再决定是否联系。"
                   : "本轮不建议推进，保留匹配记录供后续参考。"}
@@ -416,24 +416,13 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
         </div>
         <div className="s2-review-direct-actions" aria-label="批量处理动作">
           <small>
-            点击后直接应用于已勾选候选人并返回业务主线；未勾选候选人继续保留在本轮结果中，不会自动联系候选人。
+            点击后为已勾选候选人建立岗位储备关系并返回业务主线；未勾选候选人继续保留在本轮结果中，不会自动联系候选人。
           </small>
           <div>
             <Button
               tone="primary"
               disabled={!selected.size}
-              onClick={() =>
-                onApply({ selected: Array.from(selected), action: "contact" })
-              }
-            >
-              加入联系名单
-            </Button>
-            <Button
-              tone="secondary"
-              disabled={!selected.size}
-              onClick={() =>
-                onApply({ selected: Array.from(selected), action: "reserve" })
-              }
+              onClick={() => onApply({ selected: Array.from(selected) })}
             >
               加入岗位储备
             </Button>

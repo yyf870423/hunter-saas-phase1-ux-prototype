@@ -105,8 +105,14 @@ test("大型候选人审核支持筛选、详情和结构化决定", async ({ pa
   await expect(page.getByText(/批量处理已选/)).toBeVisible();
   await expect(page.getByText(/不会自动联系候选人/)).toBeVisible();
   await expect(page.getByRole("button", { name: "本轮排除" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "加入联系名单" })).toHaveCount(
+    0,
+  );
   await page.getByRole("button", { name: "加入岗位储备" }).click();
   await expect(page.getByText(/已应用审核决定/)).toBeVisible();
+  await expect(
+    page.getByText(/下一步可以继续指定需要联系的人选/),
+  ).toBeVisible();
   await expect(page.getByText("已从当前检查点继续")).toBeVisible();
 });
 
@@ -130,15 +136,17 @@ test("候选人审核支持排序并在刷新后恢复未提交状态", async ({
   await expect(composer).toHaveValue("稍后还要核实异地意愿");
 });
 
-test("自然语言批量决定与审核工作区使用同一语义", async ({ page }) => {
+test("自然语言筛选与审核工作区使用同一入储备语义", async ({ page }) => {
   await waitForReview(page);
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
-  await input.fill("联系 85 分以上的人，但赵星羽虽然分高也不适合，排除他");
+  await input.fill("将 85 分以上的人加入岗位储备，但不要选择赵星羽");
   await input.press("Enter");
   await expect(
-    page.getByText(/排除赵星羽后，4 位候选人加入联系名单/),
+    page.getByText(/未选择赵星羽，4 位候选人已加入岗位储备/),
   ).toBeVisible();
-  await expect(page.getByText(/正式外部联系尚未执行/)).toBeVisible();
+  await expect(
+    page.getByText(/下一步可以继续指定需要联系的人选/),
+  ).toBeVisible();
 });
 
 test("授权切换、暂停、终止与删除确认可用", async ({ page }) => {
