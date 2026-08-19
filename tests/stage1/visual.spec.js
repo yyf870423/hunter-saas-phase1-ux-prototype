@@ -45,6 +45,17 @@ test("截取桌面展开导航", async ({ page }) => {
   });
 });
 
+test("截取桌面用户菜单", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("#/home");
+  await page.getByRole("button", { name: "展开导航" }).click();
+  await page.getByRole("button", { name: "打开用户菜单" }).click();
+  await page.screenshot({
+    path: `${output}/desktop-home-account-menu.png`,
+    fullPage: true,
+  });
+});
+
 test("截取桌面业务资产导航", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/home");

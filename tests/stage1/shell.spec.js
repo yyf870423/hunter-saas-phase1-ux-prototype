@@ -106,8 +106,22 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
     page.getByRole("heading", { name: "本月 Agent 用量" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "知道了" }).click();
-  await page.locator(".s1-profile-entry").click();
-  await expect(page.getByRole("button", { name: "账号设置" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "设置", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "打开用户菜单" }).click();
+  const accountMenu = page.getByRole("menu", { name: "用户菜单" });
+  await expect(accountMenu).toBeVisible();
+  await expect(
+    accountMenu.getByRole("menuitem", { name: /设置/ }),
+  ).toBeVisible();
+  await accountMenu.getByRole("menuitem", { name: /设置/ }).click();
+  await expect(page.getByText("已打开设置")).toBeVisible();
+  await expect(accountMenu).toBeHidden();
+
+  await page.getByRole("button", { name: "打开用户菜单" }).click();
+  await page.keyboard.press("Escape");
+  await expect(accountMenu).toBeHidden();
 });
 
 test("桌面页面没有横向溢出或控制台错误", async ({ page }) => {

@@ -266,7 +266,7 @@ const planStatus = {
   pending: { label: "待开始", className: "is-pending" },
 };
 
-export function PlanList({ steps }) {
+export function PlanList({ steps, showRequirements = false }) {
   return (
     <ol className="s2-plan-list">
       {steps.map((step, index) => {
@@ -285,7 +285,7 @@ export function PlanList({ steps }) {
             <span>
               <b>{step.title}</b>
               <small>{step.detail}</small>
-              {step.requirement ? (
+              {showRequirements && step.requirement ? (
                 <small className="s2-plan-requirement">
                   <span>对应要求</span>
                   {step.requirement}
@@ -301,7 +301,7 @@ export function PlanList({ steps }) {
   );
 }
 
-export function PlanUpdate({ update }) {
+export function PlanUpdate({ update, detailed = false }) {
   if (!update) return null;
   return (
     <div className={`s2-plan-update tone-${update.tone || "info"}`}>
@@ -309,13 +309,13 @@ export function PlanUpdate({ update }) {
       <span>
         <b>{update.title}</b>
         <small>{update.detail}</small>
-        {update.requirement ? (
+        {detailed && update.requirement ? (
           <q className="s2-plan-update-requirement">
             <span>你的补充要求</span>
             {update.requirement}
           </q>
         ) : null}
-        {update.changes?.length ? (
+        {detailed && update.changes?.length ? (
           <ul className="s2-plan-update-changes">
             {update.changes.map((change) => (
               <li key={change.title}>
@@ -325,7 +325,7 @@ export function PlanUpdate({ update }) {
             ))}
           </ul>
         ) : null}
-        {update.unchanged ? (
+        {detailed && update.unchanged ? (
           <small className="s2-plan-update-unchanged">
             <b>保持不变</b>
             {update.unchanged}
@@ -347,6 +347,8 @@ export function RuntimeBar({
   paused = false,
   docked = false,
 }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [tasksOpen, setTasksOpen] = useState(false);
   const done = plan.filter((step) => step.status === "done").length;
   const waiting = plan.some((step) => step.status === "waiting-user");
   const adjusted = plan.some((step) => step.status === "adjusted");
@@ -369,6 +371,19 @@ export function RuntimeBar({
       : done === plan.length
         ? "已完成"
         : "推进中";
+  const completedTasks = tasks.filter((task) => task.status === "完成").length;
+  const waitingTasks = tasks.filter(
+    (task) => task.status === "等待用户",
+  ).length;
+  const taskSummary = [
+    completedTasks ? `${completedTasks} 项完成` : null,
+    waitingTasks ? `${waitingTasks} 项等待用户` : null,
+    tasks.length - completedTasks - waitingTasks > 0
+      ? `${tasks.length - completedTasks - waitingTasks} 项处理中`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <section
       className={`s2-runtime ${docked ? "is-docked" : ""} ${open ? "is-open" : ""}`}
@@ -403,37 +418,58 @@ export function RuntimeBar({
       </button>
       {open ? (
         <div className="s2-runtime-body">
-          <div>
-            <header>
-              <b>动态计划</b>
-              <small>计划会随新信息更新，不代表固定流水线</small>
+          <div className="s2-runtime-plan">
+            <header className="s2-runtime-plan-header">
+              <span>
+                <b>计划步骤</b>
+                <small>
+                  {done} / {plan.length} 项已完成
+                </small>
+              </span>
+              <button
+                type="button"
+                aria-expanded={detailsOpen}
+                onClick={() => setDetailsOpen((value) => !value)}
+              >
+                {detailsOpen ? "收起依据" : "查看计划依据"}
+                <Icon name={detailsOpen ? "chevronUp" : "chevronDown"} />
+              </button>
             </header>
-            <PlanUpdate update={planUpdate} />
-            <PlanList steps={plan} />
+            <PlanUpdate update={planUpdate} detailed={detailsOpen} />
+            <PlanList steps={plan} showRequirements={detailsOpen} />
           </div>
-          <div>
-            <header>
-              <b>相关内部任务</b>
-              <small>只属于当前主线，不进入支线任务列表</small>
-            </header>
-            <div className="s2-internal-tasks">
-              {tasks.map((task) => (
-                <button
-                  type="button"
-                  key={task.id}
-                  onClick={() => onInspectTask(task)}
-                >
-                  <span>
-                    <b>{task.title}</b>
-                    <small>{task.action}</small>
-                  </span>
-                  <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
-                  <time>{task.duration}</time>
-                  <Icon name="chevronRight" />
-                </button>
-              ))}
-            </div>
-          </div>
+          <section className="s2-runtime-tasks">
+            <button
+              type="button"
+              aria-expanded={tasksOpen}
+              onClick={() => setTasksOpen((value) => !value)}
+            >
+              <span>
+                <b>相关任务</b>
+                <small>{taskSummary || `${tasks.length} 项任务`}</small>
+              </span>
+              <Icon name={tasksOpen ? "chevronUp" : "chevronDown"} />
+            </button>
+            {tasksOpen ? (
+              <div className="s2-internal-tasks">
+                {tasks.map((task) => (
+                  <button
+                    type="button"
+                    key={task.id}
+                    onClick={() => onInspectTask(task)}
+                  >
+                    <span>
+                      <b>{task.title}</b>
+                      <small>{task.action}</small>
+                    </span>
+                    <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
+                    <time>{task.duration}</time>
+                    <Icon name="chevronRight" />
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </section>
         </div>
       ) : null}
     </section>

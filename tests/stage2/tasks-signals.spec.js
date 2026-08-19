@@ -26,7 +26,8 @@ test("支线任务列表支持分类、搜索、详情和删除", async ({ page 
 
 test("支线任务详情支持补充资料、恢复和结果回流", async ({ page }) => {
   await page.goto("#/tasks/task-hand-team");
-  await expect(page.getByText("身份核验需要决定")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "当前判断" })).toBeVisible();
+  await expect(page.locator(".s2-markdown-table")).toBeVisible();
   await expect(page.getByText("查看技术信息")).toHaveCount(0);
   await expect(page.locator(".s2-task-timeline .s2-task-plan")).toHaveCount(0);
   const planDock = await page.locator(".s2-task-plan").boundingBox();

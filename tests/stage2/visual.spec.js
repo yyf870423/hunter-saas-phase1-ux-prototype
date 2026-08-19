@@ -44,7 +44,7 @@ test("截取候选人审核、支线任务和信号中心", async ({ page }) => 
     fullPage: true,
   });
   await page.getByRole("button", { name: /执行计划/ }).click();
-  await page.getByRole("button", { name: "打开完整审核" }).click();
+  await page.getByRole("button", { name: /打开候选人审核/ }).click();
   await page.screenshot({
     path: `${output}/desktop-candidate-review.png`,
     fullPage: true,

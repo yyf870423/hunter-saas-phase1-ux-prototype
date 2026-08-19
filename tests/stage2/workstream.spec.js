@@ -36,7 +36,12 @@ test("业务主线从第一条输入渐进推进到审核节点", async ({ page 
   expect(composer).not.toBeNull();
   expect(planDock.y + planDock.height).toBeLessThanOrEqual(composer.y);
   await page.getByRole("button", { name: /执行计划/ }).click();
-  await expect(page.getByText("相关内部任务")).toBeVisible();
+  await expect(page.getByText("对应要求")).toHaveCount(0);
+  await page.getByRole("button", { name: "查看计划依据" }).click();
+  await expect(page.getByText("对应要求").first()).toBeVisible();
+  const relatedTasks = page.getByRole("button", { name: /相关任务/ });
+  await expect(relatedTasks).toContainText("3 项完成 · 1 项等待用户");
+  await relatedTasks.click();
   await expect(
     page.locator(".s2-runtime .s2-plan-list li.is-complete"),
   ).toHaveCount(4);
@@ -86,14 +91,16 @@ test("执行计划持续标记进度并显示新信息造成的调整", async ({
 
 test("大型候选人审核支持筛选、详情和结构化决定", async ({ page }) => {
   await waitForReview(page);
-  await page.getByRole("button", { name: "打开完整审核" }).click();
+  await page.getByRole("button", { name: /打开候选人审核/ }).click();
   await expect(
     page.getByRole("heading", { name: "具身智能 VLA 算法负责人" }),
   ).toBeVisible();
   await page.getByPlaceholder("搜索姓名、公司、职位或技能").fill("林昊");
   await expect(page.getByRole("button", { name: /林昊/ })).toBeVisible();
   await page.getByRole("radio", { name: "加入岗位储备" }).click();
-  await page.getByRole("button", { name: "应用决定并继续" }).click();
+  await expect(page.getByText(/批量处理已选/)).toBeVisible();
+  await expect(page.getByText(/不会自动联系候选人/)).toBeVisible();
+  await page.getByRole("button", { name: "确认加入岗位储备并返回" }).click();
   await expect(page.getByText(/已应用审核决定/)).toBeVisible();
   await expect(page.getByText("已从当前检查点继续")).toBeVisible();
 });
@@ -102,7 +109,7 @@ test("候选人审核支持排序并在刷新后恢复未提交状态", async ({
   await waitForReview(page);
   const composer = page.getByPlaceholder("输入补充信息、决定或新的要求");
   await composer.fill("稍后还要核实异地意愿");
-  await page.getByRole("button", { name: "打开完整审核" }).click();
+  await page.getByRole("button", { name: /打开候选人审核/ }).click();
   const rows = page.locator(".s2-candidate-table > button");
   await expect(rows.first()).toContainText("林昊");
   await page.getByRole("button", { name: "匹配分从高到低" }).click();
@@ -195,7 +202,7 @@ test("附件格式失败使用局部反馈且可以关闭", async ({ page }) => 
 test("移动端候选人审核可以查看详情并返回列表", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await waitForReview(page);
-  await page.getByRole("button", { name: "打开完整审核" }).click();
+  await page.getByRole("button", { name: /打开候选人审核/ }).click();
   await page.getByRole("button", { name: /林昊/ }).click();
   await expect(page.getByRole("heading", { name: "推荐理由" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "风险提示" })).toBeVisible();

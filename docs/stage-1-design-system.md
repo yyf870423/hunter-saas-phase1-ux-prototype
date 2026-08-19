@@ -29,7 +29,7 @@
 1. `AppShell`：桌面导航、顶栏、移动顶栏和底部导航。
 2. `SidebarNav`：核心工作导航、收起/展开、Tooltip 和底部固定区。
 3. `AssetNavigationPanel`：桌面侧向资产导航，按招聘、人才和研究分组直接进入八类正式资产。
-4. `Topbar`：搜索、创建、主题、通知和账号。
+4. `Topbar`：搜索、创建、主题和通知。
 5. `Button` / `IconButton`：主、次、幽灵、危险和加载状态。
 6. `StatusBadge`：运行、等待、异常、完成、观察和普通状态。
 7. `SearchDialog`：搜索输入、最近访问、分组结果、无结果和键盘关闭。
@@ -42,6 +42,7 @@
 14. `SignalFeed`：少量高优先级信号摘要。
 15. `ActionQueue`：默认收起的人工行动摘要。
 16. `Skeleton` / `EmptyState` / `ErrorState` / `PermissionState`：全局状态组件。
+17. `UserMenu`：显示当前用户和工作空间，并承载设置、切换工作空间和退出登录；支持外部点击与 `Escape` 关闭。
 
 ## 四、复用约束
 

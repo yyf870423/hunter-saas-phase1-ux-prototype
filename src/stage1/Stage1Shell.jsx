@@ -411,6 +411,7 @@ export function Stage1Shell() {
   const [assetNavigationOpen, setAssetNavigationOpen] = useState(false);
   const [mobileMode, setMobileMode] = useState(null);
   const assetTriggerRef = useRef(null);
+  const accountRef = useRef(null);
   const [notificationItems, setNotificationItems] =
     useState(initialNotifications);
   const unread = notificationItems.filter((item) => item.unread).length;
@@ -431,6 +432,21 @@ export function Stage1Shell() {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
+  useEffect(() => {
+    if (!accountOpen) return undefined;
+    const closeOnPointerDown = (event) => {
+      if (!accountRef.current?.contains(event.target)) setAccountOpen(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setAccountOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOnPointerDown);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnPointerDown);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [accountOpen]);
 
   const selectNavigation = (item) => {
     const routes = {
@@ -526,53 +542,84 @@ export function Stage1Shell() {
           triggerRef={assetTriggerRef}
         />
         <div className="s1-sidebar-foot">
-          <button
-            type="button"
-            className="s1-settings-entry"
-            aria-label="设置"
-            title={expanded ? undefined : "设置"}
-            onClick={() => selectNavigation({ id: "settings", label: "设置" })}
-          >
-            <Icon name="settings" />
-            <span>设置</span>
-          </button>
           <UsageRing expanded={expanded} onClick={() => setUsageOpen(true)} />
-          <button
-            type="button"
-            className="s1-profile-entry"
-            onClick={() => setAccountOpen((current) => !current)}
-          >
-            <i>SL</i>
-            <span>
-              <b>沈岚</b>
-              <small>个人工作空间</small>
-            </span>
-            <Icon name="chevronRight" />
-          </button>
-          {accountOpen ? (
-            <div className="s1-account-menu">
-              <b>沈岚</b>
-              <small>个人工作空间</small>
-              <button
-                type="button"
-                onClick={() => notify("已打开账号设置", "info")}
+          <div className="s1-account-wrap" ref={accountRef}>
+            <button
+              type="button"
+              className={`s1-profile-entry ${accountOpen ? "is-open" : ""}`}
+              aria-label="打开用户菜单"
+              aria-expanded={accountOpen}
+              aria-haspopup="menu"
+              onClick={() => setAccountOpen((current) => !current)}
+            >
+              <i>SL</i>
+              <span>
+                <b>沈岚</b>
+                <small>个人工作空间</small>
+              </span>
+              <Icon name={accountOpen ? "chevronUp" : "chevronRight"} />
+            </button>
+            {accountOpen ? (
+              <div
+                className="s1-account-menu"
+                role="menu"
+                aria-label="用户菜单"
               >
-                账号设置
-              </button>
-              <button
-                type="button"
-                onClick={() => notify("当前没有需要切换的工作空间", "info")}
-              >
-                切换工作空间
-              </button>
-              <button
-                type="button"
-                onClick={() => notify("原型未连接真实账号", "info")}
-              >
-                退出登录
-              </button>
-            </div>
-          ) : null}
+                <header>
+                  <i>SL</i>
+                  <span>
+                    <b>沈岚</b>
+                    <small>个人工作空间</small>
+                  </span>
+                </header>
+                <div className="s1-account-menu-items">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      notify("已打开设置", "info");
+                    }}
+                  >
+                    <Icon name="settings" />
+                    <span>
+                      <b>设置</b>
+                      <small>偏好、通知与自动化</small>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      notify("当前没有需要切换的工作空间", "info");
+                    }}
+                  >
+                    <Icon name="database" />
+                    <span>
+                      <b>切换工作空间</b>
+                      <small>当前仅有 1 个工作空间</small>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="is-danger"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      notify("原型未连接真实账号", "info");
+                    }}
+                  >
+                    <Icon name="logout" />
+                    <span>
+                      <b>退出登录</b>
+                      <small>安全退出当前账号</small>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </div>
           <button
             type="button"
             className="s1-sidebar-toggle"

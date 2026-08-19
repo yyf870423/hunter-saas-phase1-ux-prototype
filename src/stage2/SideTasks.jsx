@@ -254,6 +254,7 @@ export function SideTaskDetail() {
   const [authMode, setAuthMode] = useState("confirm");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
+  const [planDetailsOpen, setPlanDetailsOpen] = useState(false);
   const send = (text, files) => {
     setResolved(true);
     setComposer("");
@@ -373,33 +374,36 @@ export function SideTaskDetail() {
                 <li>一组资料显示 2025 年加入穹顶智能，另一组仍显示原公司。</li>
                 <li>两项来源都没有足够新鲜的直接联系方式。</li>
               </ul>
+              <h2>待确认的两条记录</h2>
+              <table className="s2-markdown-table">
+                <thead>
+                  <tr>
+                    <th>记录</th>
+                    <th>人物</th>
+                    <th>当前任职</th>
+                    <th>来源更新</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>A</td>
+                    <td>周明远</td>
+                    <td>穹顶智能 · 具身智能算法总监</td>
+                    <td>2026-08-17</td>
+                  </tr>
+                  <tr>
+                    <td>B</td>
+                    <td>周明远</td>
+                    <td>矩阵机器人 · 机器人学习负责人</td>
+                    <td>2025-11-08</td>
+                  </tr>
+                </tbody>
+              </table>
+              <blockquote className="s2-markdown-note">
+                建议暂时标记为“疑似同一人”，补充最新任职证据后再合并。系统不会在证据不足时自动合并人物。
+              </blockquote>
+              <p>可以直接在下方输入你掌握的任职信息，或上传相关文件。</p>
             </HunterReply>
-            <section className="s2-identity-compare">
-              <header>
-                <Icon name="users" />
-                <span>
-                  <b>身份核验需要决定</b>
-                  <small>系统不会在证据不足时自动合并</small>
-                </span>
-              </header>
-              <div>
-                <article>
-                  <small>记录 A</small>
-                  <b>周明远</b>
-                  <p>穹顶智能 · 具身智能算法总监</p>
-                  <span>来源更新：2026-08-17</span>
-                </article>
-                <article>
-                  <small>记录 B</small>
-                  <b>周明远</b>
-                  <p>矩阵机器人 · 机器人学习负责人</p>
-                  <span>来源更新：2025-11-08</span>
-                </article>
-              </div>
-              <p>
-                建议暂时标记为“疑似同一人”，补充最新任职证据后再合并。也可以直接输入你掌握的任职信息。
-              </p>
-            </section>
             {resolved ? (
               <>
                 <UserMessage time="刚刚">
@@ -435,8 +439,24 @@ export function SideTaskDetail() {
               </button>
               {planOpen ? (
                 <div className="s2-task-plan-body">
-                  <PlanUpdate update={planUpdate} />
-                  <PlanList steps={visiblePlan} />
+                  <div className="s2-task-plan-detail-toggle">
+                    <span>计划步骤</span>
+                    <button
+                      type="button"
+                      aria-expanded={planDetailsOpen}
+                      onClick={() => setPlanDetailsOpen((value) => !value)}
+                    >
+                      {planDetailsOpen ? "收起依据" : "查看计划依据"}
+                      <Icon
+                        name={planDetailsOpen ? "chevronUp" : "chevronDown"}
+                      />
+                    </button>
+                  </div>
+                  <PlanUpdate update={planUpdate} detailed={planDetailsOpen} />
+                  <PlanList
+                    steps={visiblePlan}
+                    showRequirements={planDetailsOpen}
+                  />
                 </div>
               ) : null}
             </div>

@@ -412,21 +412,24 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
         </aside>
       </div>
       <footer className="s2-review-footer">
-        <span>
-          已选择 <b>{selected.size}</b>{" "}
-          位；结构化操作与自然语言指令使用同一审核命令。
-        </span>
-        <div className="s2-review-actions">
+        <div className="s2-review-selection-summary">
+          <span>
+            批量处理已选 <b>{selected.size}</b> 位候选人
+          </span>
+          <small>右侧详情只用于查看；以下决定应用于左侧已勾选的人选。</small>
+        </div>
+        <div className="s2-review-actions" aria-label="批量处理方式">
+          <small>处理方式</small>
           <div
             className="s2-action-segment"
             role="radiogroup"
-            aria-label="候选人处理方式"
+            aria-label="批量处理已选候选人的方式"
           >
             {[
-              ["contact", "加入联系名单"],
-              ["reserve", "加入岗位储备"],
-              ["exclude", "本轮排除"],
-            ].map(([value, label]) => (
+              ["contact", "加入联系名单", "后续核验后再联系"],
+              ["reserve", "加入岗位储备", "暂不进入联系环节"],
+              ["exclude", "本轮排除", "不删除候选人"],
+            ].map(([value, label, description]) => (
               <button
                 type="button"
                 role="radio"
@@ -435,16 +438,28 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
                 key={value}
                 onClick={() => setAction(value)}
               >
-                {label}
+                <b>{label}</b>
+                <small>{description}</small>
               </button>
             ))}
           </div>
+        </div>
+        <div className="s2-review-confirm">
+          <small>
+            确认后返回业务主线；不会自动联系候选人。未勾选的人继续留在本轮审核中。
+          </small>
           <Button
             tone="primary"
             disabled={!selected.size}
             onClick={() => onApply({ selected: Array.from(selected), action })}
           >
-            应用决定并继续
+            {
+              {
+                contact: "确认加入联系名单并返回",
+                reserve: "确认加入岗位储备并返回",
+                exclude: "确认本轮排除并返回",
+              }[action]
+            }
           </Button>
         </div>
       </footer>

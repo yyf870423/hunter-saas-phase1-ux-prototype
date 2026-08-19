@@ -4,7 +4,6 @@ import { Icon } from "../components/Icon";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import {
   Composer,
-  EvidenceTable,
   HunterReply,
   RuntimeBar,
   UserMessage,
@@ -22,61 +21,16 @@ import { CandidateReviewWorkspace, InspectionPanel } from "./ReviewWorkspace";
 const defaultPrompt =
   "为星澜机器人“具身智能 VLA 算法负责人”岗位做多渠道找人。优先北京，候选人要有机器人学习或多模态策略经验，也要真正做过产品落地和团队管理。本轮先给我 20 位以内值得判断的人选，不要直接联系。";
 
-function CandidateArtifact({ onOpen }) {
+function CandidateReviewEntry({ onOpen }) {
   return (
-    <section className="s2-candidate-artifact">
-      <header>
-        <span>
-          <Icon name="users" />
-          <b>首批候选人审核结果</b>
-        </span>
-        <StatusBadge tone="warning">等待用户</StatusBadge>
-      </header>
-      <div className="s2-candidate-summary">
-        <div>
-          <b>18</b>
-          <span>进入本轮审核</span>
-        </div>
-        <div>
-          <b>5</b>
-          <span>建议优先联系</span>
-        </div>
-        <div>
-          <b>8</b>
-          <span>储备与观察</span>
-        </div>
-        <div>
-          <b>5</b>
-          <span>谨慎或不建议</span>
-        </div>
-      </div>
-      <p>
-        已完成身份检查、重复合并、角色门禁和匹配评分。3
-        位因明确不满足岗位角色要求被硬门槛跳过，不进入本轮审核。
-      </p>
-      <div className="s2-candidate-preview">
-        {candidates.slice(0, 3).map((candidate) => (
-          <button type="button" key={candidate.id} onClick={onOpen}>
-            <span>
-              <b>{candidate.name}</b>
-              <small>
-                {candidate.company} · {candidate.role}
-              </small>
-            </span>
-            <strong>{candidate.score}</strong>
-            <Icon name="chevronRight" />
-          </button>
-        ))}
-      </div>
-      <footer>
-        <Button tone="primary" onClick={onOpen}>
-          打开完整审核
-        </Button>
-        <span>
-          也可以直接输入筛选和处理规则，例如“联系 85 分以上的人，但排除赵星羽”。
-        </span>
-      </footer>
-    </section>
+    <div className="s2-markdown-action-row">
+      <Button tone="primary" icon="users" onClick={onOpen}>
+        打开候选人审核（18）
+      </Button>
+      <small>
+        也可以直接输入处理规则，例如“联系 85 分以上的人，但排除赵星羽”。
+      </small>
+    </div>
   );
 }
 
@@ -622,16 +576,37 @@ export function AutomationWorkspace() {
                 <p>
                   我找到了三类能够相互印证的输入。没有把“纯学术经历”直接判断为不合适，而是把产品落地和团队管理作为本轮必须单独检查的风险项。
                 </p>
-                <EvidenceTable
-                  rows={evidenceRows}
-                  onOpen={() =>
+                <table className="s2-markdown-table">
+                  <thead>
+                    <tr>
+                      <th>来源</th>
+                      <th>确认结果</th>
+                      <th>时效</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {evidenceRows.map((row) => (
+                      <tr key={row.finding}>
+                        <td>{row.source}</td>
+                        <td>{row.finding}</td>
+                        <td>{row.freshness}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <button
+                  type="button"
+                  className="s2-markdown-link"
+                  onClick={() =>
                     setInspection({
                       title: "岗位边界与来源证据",
                       rows: evidenceRows,
                       kind: "evidence",
                     })
                   }
-                />
+                >
+                  查看完整来源证据 <Icon name="chevronRight" />
+                </button>
                 {phase === 3 ? (
                   <p className="s2-progress-line">
                     <span />
@@ -647,7 +622,33 @@ export function AutomationWorkspace() {
                   共召回 34 位人物，合并重复身份后保留 21 位，其中 3
                   位因明确不满足角色硬门槛被跳过，18 位进入本轮审核。
                 </p>
-                <CandidateArtifact onOpen={() => setReviewOpen(true)} />
+                <table className="s2-markdown-table is-compact">
+                  <thead>
+                    <tr>
+                      <th>审核分组</th>
+                      <th>人数</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>建议优先联系</td>
+                      <td>5</td>
+                    </tr>
+                    <tr>
+                      <td>储备与观察</td>
+                      <td>8</td>
+                    </tr>
+                    <tr>
+                      <td>谨慎或不建议</td>
+                      <td>5</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <blockquote className="s2-markdown-note">
+                  已完成身份检查、重复合并、角色门禁和匹配评分。被硬门槛跳过的 3
+                  位候选人不进入本轮审核。
+                </blockquote>
+                <CandidateReviewEntry onOpen={() => setReviewOpen(true)} />
               </HunterReply>
             ) : null}
             {userDecisions.map((decision, index) => (
