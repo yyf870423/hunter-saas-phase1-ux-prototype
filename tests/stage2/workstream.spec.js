@@ -94,6 +94,27 @@ test("执行计划持续标记进度并显示新信息造成的调整", async ({
   ).toHaveCount(1);
 });
 
+test("对话输入框随内容自动增高并在上限后内部滚动", async ({ page }) => {
+  const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
+  await expect(input).toBeVisible({ timeout: 6_000 });
+  const initialHeight = await input.evaluate((element) => element.clientHeight);
+  await input.fill("第一行\n第二行\n第三行\n第四行\n第五行");
+  const expandedHeight = await input.evaluate(
+    (element) => element.clientHeight,
+  );
+  expect(expandedHeight).toBeGreaterThan(initialHeight);
+  await expect(input).toHaveCSS("resize", "none");
+  await input.fill(
+    Array.from({ length: 20 }, (_, index) => `第 ${index + 1} 行`).join("\n"),
+  );
+  const cappedHeight = await input.evaluate((element) => element.clientHeight);
+  expect(cappedHeight).toBeLessThanOrEqual(150);
+  await expect(input).toHaveCSS("overflow-y", "auto");
+  await input.fill("");
+  const resetHeight = await input.evaluate((element) => element.clientHeight);
+  expect(resetHeight).toBe(initialHeight);
+});
+
 test("大型候选人审核支持筛选、详情和结构化决定", async ({ page }) => {
   await waitForReview(page);
   await page.getByRole("button", { name: /打开候选人审核/ }).click();

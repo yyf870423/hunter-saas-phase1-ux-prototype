@@ -1117,9 +1117,11 @@
 .s2-composer textarea {
   display: block;
   width: 100%;
+  height: 54px;
   min-height: 54px;
   max-height: 150px;
-  resize: vertical;
+  resize: none;
+  overflow-y: hidden;
   padding: 7px 9px;
   color: var(--s1-ink);
   font: inherit;

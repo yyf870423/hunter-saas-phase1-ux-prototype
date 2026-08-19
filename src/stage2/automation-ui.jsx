@@ -100,7 +100,16 @@ export function Composer({
   disabled = false,
 }) {
   const fileRef = useRef(null);
+  const textareaRef = useRef(null);
   const [attachmentError, setAttachmentError] = useState("");
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    textarea.style.height = "0px";
+    const nextHeight = Math.min(Math.max(textarea.scrollHeight, 54), 150);
+    textarea.style.height = `${nextHeight}px`;
+    textarea.style.overflowY = textarea.scrollHeight > 150 ? "auto" : "hidden";
+  }, [value]);
   const addFiles = (incoming) => {
     const allowed = incoming.filter((file) => {
       const extension = file.name.split(".").pop()?.toLowerCase();
@@ -170,6 +179,7 @@ export function Composer({
         </div>
       ) : null}
       <textarea
+        ref={textareaRef}
         value={value}
         disabled={disabled}
         rows={2}
