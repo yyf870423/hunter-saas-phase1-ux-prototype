@@ -577,28 +577,63 @@
   color: var(--s1-muted);
   font-size: 12px;
 }
-.s2-runtime-plan-header > button,
-.s2-task-plan-detail-toggle > button {
+.s2-plan-view-switch {
   display: inline-flex;
-  height: 28px;
-  align-items: center;
-  gap: 4px;
-  padding: 0 7px;
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 2px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+.s2-plan-view-switch > button {
+  height: 26px;
+  padding: 0 9px;
   color: var(--s1-muted);
   font-size: 12px;
+  font-weight: 560;
   background: transparent;
   border: 0;
   border-radius: 5px;
   cursor: pointer;
 }
-.s2-runtime-plan-header > button:hover,
-.s2-task-plan-detail-toggle > button:hover {
-  color: var(--s1-accent);
-  background: var(--s1-accent-soft);
+.s2-plan-view-switch > button:hover {
+  color: var(--s1-ink);
 }
-.s2-runtime-plan-header > button svg,
-.s2-task-plan-detail-toggle > button svg {
-  width: 13px;
+.s2-plan-view-switch > button.is-active {
+  color: var(--s1-accent);
+  background: var(--s1-surface);
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.1);
+}
+.s2-plan-basis {
+  display: grid;
+  gap: 8px;
+}
+.s2-plan-basis dl {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+}
+.s2-plan-basis dl > div {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.36fr) minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 10px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+.s2-plan-basis dt {
+  color: var(--s1-ink);
+  font-size: 12px;
+  font-weight: 620;
+  line-height: 18px;
+}
+.s2-plan-basis dd {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
 }
 
 .s2-plan-list {
@@ -682,21 +717,6 @@
   color: var(--s1-muted);
   font-size: 12px;
   line-height: 17px;
-}
-.s2-plan-list li small.s2-plan-requirement {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  margin-top: 5px;
-  padding: 5px 7px;
-  color: var(--s1-ink);
-  background: var(--s1-canvas);
-  border-radius: 5px;
-}
-.s2-plan-requirement > span {
-  flex: 0 0 auto;
-  color: var(--s1-accent);
-  font-weight: 650;
 }
 .s2-plan-list li em {
   align-self: start;
@@ -1954,10 +1974,7 @@
 .s2-review-footer {
   display: grid;
   min-height: 86px;
-  grid-template-columns: minmax(190px, 0.62fr) minmax(430px, 1.42fr) minmax(
-      240px,
-      0.8fr
-    );
+  grid-template-columns: minmax(220px, 0.72fr) minmax(560px, 1.28fr);
   align-items: center;
   gap: 16px;
   padding: 10px 16px;
@@ -1980,63 +1997,22 @@
   font-size: 12px;
   line-height: 17px;
 }
-.s2-review-actions {
-  display: grid;
-  gap: 5px;
-}
-.s2-review-actions > small {
-  color: var(--s1-muted);
-  font-size: 12px;
-}
-.s2-action-segment {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-}
-.s2-action-segment > button {
-  min-height: 48px;
-  padding: 6px 8px;
-  color: var(--s1-muted);
-  text-align: left;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 7px;
-  cursor: pointer;
-}
-.s2-action-segment > button b,
-.s2-action-segment > button small {
-  display: block;
-}
-.s2-action-segment > button b {
-  color: var(--s1-ink);
-  font-size: 12px;
-}
-.s2-action-segment > button small {
-  margin-top: 2px;
-  font-size: 11px;
-  line-height: 15px;
-}
-.s2-action-segment > button.is-active {
-  color: var(--s1-accent);
-  background: var(--s1-accent-soft);
-  border-color: color-mix(in srgb, var(--s1-accent) 42%, var(--s1-line));
-  box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, var(--s1-accent) 12%, transparent);
-}
-.s2-action-segment > button.is-active b {
-  color: var(--s1-accent);
-}
-.s2-review-confirm {
+.s2-review-direct-actions {
   display: grid;
   gap: 7px;
+  justify-items: end;
 }
-.s2-review-confirm > small {
+.s2-review-direct-actions > small {
   color: var(--s1-muted);
   font-size: 12px;
   line-height: 17px;
+  text-align: right;
 }
-.s2-review-confirm .s1-button {
-  width: 100%;
+.s2-review-direct-actions > div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 /* New mainline and side task */
@@ -2560,14 +2536,14 @@
   overflow-y: auto;
   border-top: 1px solid var(--s1-line);
 }
-.s2-task-plan-detail-toggle {
+.s2-task-plan-view-header {
   display: flex;
-  min-height: 36px;
+  min-height: 42px;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
-.s2-task-plan-detail-toggle > span {
+.s2-task-plan-view-header > span {
   color: var(--s1-ink);
   font-size: 12px;
   font-weight: 650;
@@ -3208,11 +3184,16 @@
   .s2-candidate-table > button > span:last-child {
     display: none;
   }
-  .s2-review-actions {
-    display: grid;
-  }
-  .s2-action-segment {
+  .s2-review-direct-actions {
     width: 100%;
+    justify-items: stretch;
+  }
+  .s2-review-direct-actions > small {
+    text-align: left;
+  }
+  .s2-review-direct-actions > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
   }
   .s2-new-workstream {
     min-height: calc(100vh - 156px);

@@ -129,9 +129,6 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
   const [focused, setFocused] = useState(
     () => sessionStorage.getItem("hunter-review-focused") || candidates[0]?.id,
   );
-  const [action, setAction] = useState(
-    () => sessionStorage.getItem("hunter-review-action") || "contact",
-  );
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   useEffect(() => {
     sessionStorage.setItem("hunter-review-query", query);
@@ -145,8 +142,7 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
       JSON.stringify(Array.from(selected)),
     );
     sessionStorage.setItem("hunter-review-focused", focused || "");
-    sessionStorage.setItem("hunter-review-action", action);
-  }, [action, focused, query, selected, sortDescending, tab]);
+  }, [focused, query, selected, sortDescending, tab]);
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     return candidates
@@ -418,49 +414,39 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
           </span>
           <small>右侧详情只用于查看；以下决定应用于左侧已勾选的人选。</small>
         </div>
-        <div className="s2-review-actions" aria-label="批量处理方式">
-          <small>处理方式</small>
-          <div
-            className="s2-action-segment"
-            role="radiogroup"
-            aria-label="批量处理已选候选人的方式"
-          >
-            {[
-              ["contact", "加入联系名单", "后续核验后再联系"],
-              ["reserve", "加入岗位储备", "暂不进入联系环节"],
-              ["exclude", "本轮排除", "不删除候选人"],
-            ].map(([value, label, description]) => (
-              <button
-                type="button"
-                role="radio"
-                aria-checked={action === value}
-                className={action === value ? "is-active" : ""}
-                key={value}
-                onClick={() => setAction(value)}
-              >
-                <b>{label}</b>
-                <small>{description}</small>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="s2-review-confirm">
+        <div className="s2-review-direct-actions" aria-label="批量处理动作">
           <small>
-            确认后返回业务主线；不会自动联系候选人。未勾选的人继续留在本轮审核中。
+            点击后直接应用于已勾选候选人并返回业务主线；不会自动联系候选人，也不会删除未选候选人。
           </small>
-          <Button
-            tone="primary"
-            disabled={!selected.size}
-            onClick={() => onApply({ selected: Array.from(selected), action })}
-          >
-            {
-              {
-                contact: "确认加入联系名单并返回",
-                reserve: "确认加入岗位储备并返回",
-                exclude: "确认本轮排除并返回",
-              }[action]
-            }
-          </Button>
+          <div>
+            <Button
+              tone="primary"
+              disabled={!selected.size}
+              onClick={() =>
+                onApply({ selected: Array.from(selected), action: "contact" })
+              }
+            >
+              加入联系名单
+            </Button>
+            <Button
+              tone="secondary"
+              disabled={!selected.size}
+              onClick={() =>
+                onApply({ selected: Array.from(selected), action: "reserve" })
+              }
+            >
+              加入岗位储备
+            </Button>
+            <Button
+              tone="ghost"
+              disabled={!selected.size}
+              onClick={() =>
+                onApply({ selected: Array.from(selected), action: "exclude" })
+              }
+            >
+              本轮排除
+            </Button>
+          </div>
         </div>
       </footer>
     </section>

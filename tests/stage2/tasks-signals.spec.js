@@ -39,6 +39,18 @@ test("支线任务详情支持补充资料、恢复和结果回流", async ({ pa
   expect(planDock.y + planDock.height).toBeLessThanOrEqual(composer.y);
   await page.getByRole("button", { name: /执行计划/ }).click();
   await expect(page.getByText("计划已调整为等待用户")).toBeVisible();
+  await page
+    .locator(".s2-task-plan")
+    .getByRole("tab", { name: "计划依据" })
+    .click();
+  await expect(
+    page.getByText("证据不足时必须停下来等待用户决定。"),
+  ).toBeVisible();
+  await expect(page.locator(".s2-task-plan .s2-plan-list")).toHaveCount(0);
+  await page
+    .locator(".s2-task-plan")
+    .getByRole("tab", { name: "计划步骤" })
+    .click();
   await expect(
     page.locator(".s2-task-plan .s2-plan-list li.is-complete"),
   ).toHaveCount(2);

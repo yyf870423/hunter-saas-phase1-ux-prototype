@@ -266,7 +266,7 @@ const planStatus = {
   pending: { label: "待开始", className: "is-pending" },
 };
 
-export function PlanList({ steps, showRequirements = false }) {
+export function PlanList({ steps }) {
   return (
     <ol className="s2-plan-list">
       {steps.map((step, index) => {
@@ -285,12 +285,6 @@ export function PlanList({ steps, showRequirements = false }) {
             <span>
               <b>{step.title}</b>
               <small>{step.detail}</small>
-              {showRequirements && step.requirement ? (
-                <small className="s2-plan-requirement">
-                  <span>对应要求</span>
-                  {step.requirement}
-                </small>
-              ) : null}
               {step.statusDetail ? <small>{step.statusDetail}</small> : null}
             </span>
             <em>{step.statusLabel || status.label}</em>
@@ -298,6 +292,46 @@ export function PlanList({ steps, showRequirements = false }) {
         );
       })}
     </ol>
+  );
+}
+
+export function PlanViewSwitch({ value, onChange }) {
+  return (
+    <div className="s2-plan-view-switch" role="tablist" aria-label="计划视图">
+      {[
+        ["steps", "计划步骤"],
+        ["basis", "计划依据"],
+      ].map(([nextValue, label]) => (
+        <button
+          type="button"
+          role="tab"
+          aria-selected={value === nextValue}
+          className={value === nextValue ? "is-active" : ""}
+          key={nextValue}
+          onClick={() => onChange(nextValue)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function PlanBasis({ steps, update }) {
+  return (
+    <div className="s2-plan-basis">
+      <PlanUpdate update={update} detailed />
+      <dl>
+        {steps.map((step) => (
+          <div key={step.id}>
+            <dt>{step.title}</dt>
+            <dd>
+              {step.requirement || "依据当前任务目标和已确认的执行边界。"}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
@@ -347,7 +381,7 @@ export function RuntimeBar({
   paused = false,
   docked = false,
 }) {
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [planView, setPlanView] = useState("steps");
   const [tasksOpen, setTasksOpen] = useState(false);
   const done = plan.filter((step) => step.status === "done").length;
   const waiting = plan.some((step) => step.status === "waiting-user");
@@ -421,22 +455,21 @@ export function RuntimeBar({
           <div className="s2-runtime-plan">
             <header className="s2-runtime-plan-header">
               <span>
-                <b>计划步骤</b>
+                <b>{planView === "steps" ? "当前进度" : "制定与调整依据"}</b>
                 <small>
                   {done} / {plan.length} 项已完成
                 </small>
               </span>
-              <button
-                type="button"
-                aria-expanded={detailsOpen}
-                onClick={() => setDetailsOpen((value) => !value)}
-              >
-                {detailsOpen ? "收起依据" : "查看计划依据"}
-                <Icon name={detailsOpen ? "chevronUp" : "chevronDown"} />
-              </button>
+              <PlanViewSwitch value={planView} onChange={setPlanView} />
             </header>
-            <PlanUpdate update={planUpdate} detailed={detailsOpen} />
-            <PlanList steps={plan} showRequirements={detailsOpen} />
+            {planView === "steps" ? (
+              <>
+                <PlanUpdate update={planUpdate} />
+                <PlanList steps={plan} />
+              </>
+            ) : (
+              <PlanBasis steps={plan} update={planUpdate} />
+            )}
           </div>
           <section className="s2-runtime-tasks">
             <button

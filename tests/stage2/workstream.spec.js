@@ -36,9 +36,14 @@ test("业务主线从第一条输入渐进推进到审核节点", async ({ page 
   expect(composer).not.toBeNull();
   expect(planDock.y + planDock.height).toBeLessThanOrEqual(composer.y);
   await page.getByRole("button", { name: /执行计划/ }).click();
-  await expect(page.getByText("对应要求")).toHaveCount(0);
-  await page.getByRole("button", { name: "查看计划依据" }).click();
-  await expect(page.getByText("对应要求").first()).toBeVisible();
+  await expect(page.getByRole("tab", { name: "计划步骤" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.getByRole("tab", { name: "计划依据" }).click();
+  await expect(page.getByText(/多渠道找人；北京优先/)).toBeVisible();
+  await expect(page.locator(".s2-runtime .s2-plan-list")).toHaveCount(0);
+  await page.getByRole("tab", { name: "计划步骤" }).click();
   const relatedTasks = page.getByRole("button", { name: /相关任务/ });
   await expect(relatedTasks).toContainText("3 项完成 · 1 项等待用户");
   await relatedTasks.click();
@@ -97,10 +102,9 @@ test("大型候选人审核支持筛选、详情和结构化决定", async ({ pa
   ).toBeVisible();
   await page.getByPlaceholder("搜索姓名、公司、职位或技能").fill("林昊");
   await expect(page.getByRole("button", { name: /林昊/ })).toBeVisible();
-  await page.getByRole("radio", { name: "加入岗位储备" }).click();
   await expect(page.getByText(/批量处理已选/)).toBeVisible();
   await expect(page.getByText(/不会自动联系候选人/)).toBeVisible();
-  await page.getByRole("button", { name: "确认加入岗位储备并返回" }).click();
+  await page.getByRole("button", { name: "加入岗位储备" }).click();
   await expect(page.getByText(/已应用审核决定/)).toBeVisible();
   await expect(page.getByText("已从当前检查点继续")).toBeVisible();
 });
@@ -115,14 +119,12 @@ test("候选人审核支持排序并在刷新后恢复未提交状态", async ({
   await page.getByRole("button", { name: "匹配分从高到低" }).click();
   await expect(rows.first()).toContainText("孟予安");
   await page.getByPlaceholder("搜索姓名、公司、职位或技能").fill("林昊");
-  await page.getByRole("radio", { name: "加入岗位储备" }).click();
+  await page.getByLabel("选择 林昊").uncheck();
   await page.reload();
   await expect(page.getByPlaceholder("搜索姓名、公司、职位或技能")).toHaveValue(
     "林昊",
   );
-  await expect(
-    page.getByRole("radio", { name: "加入岗位储备" }),
-  ).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByLabel("选择 林昊")).not.toBeChecked();
   await page.getByRole("button", { name: "返回对话" }).click();
   await expect(composer).toHaveValue("稍后还要核实异地意愿");
 });
