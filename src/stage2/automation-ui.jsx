@@ -295,46 +295,6 @@ export function PlanList({ steps }) {
   );
 }
 
-export function PlanViewSwitch({ value, onChange }) {
-  return (
-    <div className="s2-plan-view-switch" role="tablist" aria-label="计划视图">
-      {[
-        ["steps", "计划步骤"],
-        ["basis", "计划依据"],
-      ].map(([nextValue, label]) => (
-        <button
-          type="button"
-          role="tab"
-          aria-selected={value === nextValue}
-          className={value === nextValue ? "is-active" : ""}
-          key={nextValue}
-          onClick={() => onChange(nextValue)}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-export function PlanBasis({ steps, update }) {
-  return (
-    <div className="s2-plan-basis">
-      <PlanUpdate update={update} detailed />
-      <dl>
-        {steps.map((step) => (
-          <div key={step.id}>
-            <dt>{step.title}</dt>
-            <dd>
-              {step.requirement || "依据当前任务目标和已确认的执行边界。"}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </div>
-  );
-}
-
 export function PlanUpdate({ update, detailed = false }) {
   if (!update) return null;
   return (
@@ -381,7 +341,6 @@ export function RuntimeBar({
   paused = false,
   docked = false,
 }) {
-  const [planView, setPlanView] = useState("steps");
   const [tasksOpen, setTasksOpen] = useState(false);
   const done = plan.filter((step) => step.status === "done").length;
   const waiting = plan.some((step) => step.status === "waiting-user");
@@ -448,28 +407,21 @@ export function RuntimeBar({
         >
           {badge}
         </StatusBadge>
-        <Icon name={open ? "chevronUp" : "chevronDown"} />
+        <Icon name={open ? "chevronDown" : "chevronUp"} />
       </button>
       {open ? (
         <div className="s2-runtime-body">
           <div className="s2-runtime-plan">
             <header className="s2-runtime-plan-header">
               <span>
-                <b>{planView === "steps" ? "当前进度" : "制定与调整依据"}</b>
+                <b>当前进度</b>
                 <small>
                   {done} / {plan.length} 项已完成
                 </small>
               </span>
-              <PlanViewSwitch value={planView} onChange={setPlanView} />
             </header>
-            {planView === "steps" ? (
-              <>
-                <PlanUpdate update={planUpdate} />
-                <PlanList steps={plan} />
-              </>
-            ) : (
-              <PlanBasis steps={plan} update={planUpdate} />
-            )}
+            <PlanUpdate update={planUpdate} />
+            <PlanList steps={plan} />
           </div>
           <section className="s2-runtime-tasks">
             <button

@@ -60,14 +60,6 @@ test("截取候选人审核、支线任务和信号中心", async ({ page }) => 
     path: `${output}/desktop-side-task-plan.png`,
     fullPage: true,
   });
-  await page
-    .locator(".s2-task-plan")
-    .getByRole("tab", { name: "计划依据" })
-    .click();
-  await page.screenshot({
-    path: `${output}/desktop-side-task-plan-basis.png`,
-    fullPage: true,
-  });
   await page.goto("#/signals");
   await page.screenshot({
     path: `${output}/desktop-signals.png`,

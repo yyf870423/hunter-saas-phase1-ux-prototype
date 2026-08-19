@@ -416,7 +416,7 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
         </div>
         <div className="s2-review-direct-actions" aria-label="批量处理动作">
           <small>
-            点击后直接应用于已勾选候选人并返回业务主线；不会自动联系候选人，也不会删除未选候选人。
+            点击后直接应用于已勾选候选人并返回业务主线；未勾选候选人继续保留在本轮结果中，不会自动联系候选人。
           </small>
           <div>
             <Button
@@ -436,15 +436,6 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
               }
             >
               加入岗位储备
-            </Button>
-            <Button
-              tone="ghost"
-              disabled={!selected.size}
-              onClick={() =>
-                onApply({ selected: Array.from(selected), action: "exclude" })
-              }
-            >
-              本轮排除
             </Button>
           </div>
         </div>

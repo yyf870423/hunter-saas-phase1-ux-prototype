@@ -35,24 +35,24 @@ test("业务主线从第一条输入渐进推进到审核节点", async ({ page 
   expect(planDock).not.toBeNull();
   expect(composer).not.toBeNull();
   expect(planDock.y + planDock.height).toBeLessThanOrEqual(composer.y);
+  await expect(
+    page.locator(".s2-runtime-summary > svg path").first(),
+  ).toHaveAttribute("d", "m18 15-6-6-6 6");
   await page.getByRole("button", { name: /执行计划/ }).click();
-  await expect(page.getByRole("tab", { name: "计划步骤" })).toHaveAttribute(
-    "aria-selected",
-    "true",
-  );
-  await page.getByRole("tab", { name: "计划依据" }).click();
-  await expect(page.getByText(/多渠道找人；北京优先/)).toBeVisible();
-  await expect(page.locator(".s2-runtime .s2-plan-list")).toHaveCount(0);
-  await page.getByRole("tab", { name: "计划步骤" }).click();
-  const relatedTasks = page.getByRole("button", { name: /相关任务/ });
-  await expect(relatedTasks).toContainText("3 项完成 · 1 项等待用户");
-  await relatedTasks.click();
+  await expect(
+    page.locator(".s2-runtime-summary > svg path").first(),
+  ).toHaveAttribute("d", "m6 9 6 6 6-6");
+  await expect(page.getByText("当前进度", { exact: true })).toBeVisible();
+  await expect(page.getByText("计划依据", { exact: true })).toHaveCount(0);
   await expect(
     page.locator(".s2-runtime .s2-plan-list li.is-complete"),
   ).toHaveCount(4);
   await expect(
     page.locator(".s2-runtime .s2-plan-list li.is-waiting"),
   ).toHaveCount(1);
+  const relatedTasks = page.getByRole("button", { name: /相关任务/ });
+  await expect(relatedTasks).toContainText("3 项完成 · 1 项等待用户");
+  await relatedTasks.click();
   await expect(
     page.locator(".s2-runtime .s2-plan-list li").filter({
       hasText: "按决定继续后续动作",
@@ -104,6 +104,7 @@ test("大型候选人审核支持筛选、详情和结构化决定", async ({ pa
   await expect(page.getByRole("button", { name: /林昊/ })).toBeVisible();
   await expect(page.getByText(/批量处理已选/)).toBeVisible();
   await expect(page.getByText(/不会自动联系候选人/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "本轮排除" })).toHaveCount(0);
   await page.getByRole("button", { name: "加入岗位储备" }).click();
   await expect(page.getByText(/已应用审核决定/)).toBeVisible();
   await expect(page.getByText("已从当前检查点继续")).toBeVisible();

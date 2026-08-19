@@ -12,10 +12,8 @@ import {
 import {
   Composer,
   HunterReply,
-  PlanBasis,
   PlanList,
   PlanUpdate,
-  PlanViewSwitch,
   UserMessage,
 } from "./automation-ui";
 import { sideTasks } from "./data";
@@ -256,7 +254,6 @@ export function SideTaskDetail() {
   const [authMode, setAuthMode] = useState("confirm");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
-  const [planView, setPlanView] = useState("steps");
   const send = (text, files) => {
     setResolved(true);
     setComposer("");
@@ -437,24 +434,12 @@ export function SideTaskDetail() {
                         : "2 / 3 项完成，等待身份决定"}
                   </small>
                 </span>
-                <Icon name={planOpen ? "chevronUp" : "chevronDown"} />
+                <Icon name={planOpen ? "chevronDown" : "chevronUp"} />
               </button>
               {planOpen ? (
                 <div className="s2-task-plan-body">
-                  <div className="s2-task-plan-view-header">
-                    <span>
-                      {planView === "steps" ? "当前进度" : "制定与调整依据"}
-                    </span>
-                    <PlanViewSwitch value={planView} onChange={setPlanView} />
-                  </div>
-                  {planView === "steps" ? (
-                    <>
-                      <PlanUpdate update={planUpdate} />
-                      <PlanList steps={visiblePlan} />
-                    </>
-                  ) : (
-                    <PlanBasis steps={visiblePlan} update={planUpdate} />
-                  )}
+                  <PlanUpdate update={planUpdate} />
+                  <PlanList steps={visiblePlan} />
                 </div>
               ) : null}
             </div>

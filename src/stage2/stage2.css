@@ -577,65 +577,6 @@
   color: var(--s1-muted);
   font-size: 12px;
 }
-.s2-plan-view-switch {
-  display: inline-flex;
-  flex: 0 0 auto;
-  gap: 2px;
-  padding: 2px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 7px;
-}
-.s2-plan-view-switch > button {
-  height: 26px;
-  padding: 0 9px;
-  color: var(--s1-muted);
-  font-size: 12px;
-  font-weight: 560;
-  background: transparent;
-  border: 0;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.s2-plan-view-switch > button:hover {
-  color: var(--s1-ink);
-}
-.s2-plan-view-switch > button.is-active {
-  color: var(--s1-accent);
-  background: var(--s1-surface);
-  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.1);
-}
-.s2-plan-basis {
-  display: grid;
-  gap: 8px;
-}
-.s2-plan-basis dl {
-  display: grid;
-  gap: 5px;
-  margin: 0;
-}
-.s2-plan-basis dl > div {
-  display: grid;
-  grid-template-columns: minmax(130px, 0.36fr) minmax(0, 1fr);
-  gap: 12px;
-  padding: 8px 10px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 6px;
-}
-.s2-plan-basis dt {
-  color: var(--s1-ink);
-  font-size: 12px;
-  font-weight: 620;
-  line-height: 18px;
-}
-.s2-plan-basis dd {
-  margin: 0;
-  color: var(--s1-muted);
-  font-size: 12px;
-  line-height: 18px;
-}
-
 .s2-plan-list {
   display: grid;
   gap: 1px;
@@ -2536,19 +2477,6 @@
   overflow-y: auto;
   border-top: 1px solid var(--s1-line);
 }
-.s2-task-plan-view-header {
-  display: flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.s2-task-plan-view-header > span {
-  color: var(--s1-ink);
-  font-size: 12px;
-  font-weight: 650;
-}
-
 /* Signals */
 .s2-signal-shell {
   position: relative;

@@ -424,7 +424,6 @@ export function AutomationWorkspace() {
             const labels = {
               contact: "加入联系名单",
               reserve: "加入岗位储备",
-              exclude: "本轮排除",
             };
             completeDecision(
               `将已选择的 ${selected.length} 位候选人${labels[action]}。`,
