@@ -27,6 +27,19 @@ test("导航展开状态被记忆", async ({ page }) => {
   await expect(page.locator(".s1-app")).toHaveClass(/nav-collapsed/);
 });
 
+test("常见桌面高度下导航无需滚动", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 768 });
+  await page.getByRole("button", { name: "展开导航" }).click();
+  const navigation = page.locator(".s1-sidebar-scroll");
+  const dimensions = await navigation.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+  }));
+  expect(dimensions.scrollHeight).toBeLessThanOrEqual(dimensions.clientHeight);
+  await expect(page.getByRole("button", { name: "专利" })).toBeInViewport();
+  await expect(page.getByRole("button", { name: "收起导航" })).toBeInViewport();
+});
+
 test("通知计数使用正圆标记", async ({ page }) => {
   const badge = page.getByRole("button", { name: "打开通知" }).locator("em");
   const box = await badge.boundingBox();
