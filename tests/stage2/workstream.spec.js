@@ -25,6 +25,16 @@ test("业务主线从第一条输入渐进推进到审核节点", async ({ page 
     "aria-expanded",
     "false",
   );
+  await expect(page.locator(".s2-timeline .s2-runtime")).toHaveCount(0);
+  const planDock = await page
+    .locator(".s2-composer-wrap > .s2-runtime")
+    .boundingBox();
+  const composer = await page
+    .locator(".s2-composer-wrap > .s2-composer")
+    .boundingBox();
+  expect(planDock).not.toBeNull();
+  expect(composer).not.toBeNull();
+  expect(planDock.y + planDock.height).toBeLessThanOrEqual(composer.y);
   await page.getByRole("button", { name: /执行计划/ }).click();
   await expect(page.getByText("相关内部任务")).toBeVisible();
   await expect(

@@ -228,16 +228,19 @@ const taskPlan = [
     id: "collect",
     title: "汇总现有人物与来源",
     detail: "读取人才版图和公开来源中已经存在的两组人物记录。",
+    requirement: "核验两位“周明远”是否为同一个人。",
   },
   {
     id: "compare",
     title: "比较身份与任职证据",
     detail: "对比姓名、教育、任职时间和团队关系。",
+    requirement: "只形成身份建议，不自动合并人物。",
   },
   {
     id: "decide",
     title: "交付消歧建议",
     detail: "无法安全判断时等待用户补充或选择。",
+    requirement: "证据不足时必须停下来等待用户决定。",
   },
 ];
 
@@ -250,7 +253,7 @@ export function SideTaskDetail() {
   const [attachments, setAttachments] = useState([]);
   const [authMode, setAuthMode] = useState("confirm");
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [planOpen, setPlanOpen] = useState(true);
+  const [planOpen, setPlanOpen] = useState(false);
   const send = (text, files) => {
     setResolved(true);
     setComposer("");
@@ -397,6 +400,20 @@ export function SideTaskDetail() {
                 建议暂时标记为“疑似同一人”，补充最新任职证据后再合并。也可以直接输入你掌握的任职信息。
               </p>
             </section>
+            {resolved ? (
+              <>
+                <UserMessage time="刚刚">
+                  补充：这是同一个人，2025 年 12 月加入穹顶智能。
+                </UserMessage>
+                <HunterReply>
+                  <p>
+                    已记录你补充的任职事实，并将两组记录标记为同一人物的合并建议。该建议已回流“星澜机器人人才版图”的更新与审核区，仍需按当前写入规则完成审核。
+                  </p>
+                </HunterReply>
+              </>
+            ) : null}
+          </div>
+          <div className="s2-task-composer-dock">
             <div className="s2-task-plan">
               <button
                 type="button"
@@ -423,30 +440,18 @@ export function SideTaskDetail() {
                 </div>
               ) : null}
             </div>
-            {resolved ? (
-              <>
-                <UserMessage time="刚刚">
-                  补充：这是同一个人，2025 年 12 月加入穹顶智能。
-                </UserMessage>
-                <HunterReply>
-                  <p>
-                    已记录你补充的任职事实，并将两组记录标记为同一人物的合并建议。该建议已回流“星澜机器人人才版图”的更新与审核区，仍需按当前写入规则完成审核。
-                  </p>
-                </HunterReply>
-              </>
-            ) : null}
+            <Composer
+              value={composer}
+              onChange={setComposer}
+              onSend={send}
+              authMode={authMode}
+              onAuthChange={setAuthMode}
+              attachments={attachments}
+              onAttachmentsChange={setAttachments}
+              placeholder="输入你掌握的信息，或上传能够帮助核验的文件"
+              disabled={paused || resolved}
+            />
           </div>
-          <Composer
-            value={composer}
-            onChange={setComposer}
-            onSend={send}
-            authMode={authMode}
-            onAuthChange={setAuthMode}
-            attachments={attachments}
-            onAttachmentsChange={setAttachments}
-            placeholder="输入你掌握的信息，或上传能够帮助核验的文件"
-            disabled={paused || resolved}
-          />
         </section>
       </div>
       <Modal

@@ -55,9 +55,7 @@ test("截取候选人审核、支线任务和信号中心", async ({ page }) => 
     fullPage: true,
   });
   await page.goto("#/tasks/task-hand-team");
-  await page.locator(".s2-task-timeline").evaluate((element) => {
-    element.scrollTop = element.scrollHeight;
-  });
+  await page.getByRole("button", { name: /执行计划/ }).click();
   await page.screenshot({
     path: `${output}/desktop-side-task-plan.png`,
     fullPage: true,

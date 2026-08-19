@@ -53,26 +53,32 @@ export const planSteps = [
     id: "scope",
     title: "确认岗位边界与找人范围",
     detail: "复用已解析岗位，校验硬要求、可放宽条件和本轮数量上限。",
+    requirement:
+      "VLA 算法负责人；机器人学习或多模态策略；产品落地与团队管理需要单独检查。",
   },
   {
     id: "recall",
     title: "并行召回候选人与人物线索",
     detail: "系统候选人、人才平台、论文与专利来源并行处理。",
+    requirement: "多渠道找人；北京优先，异地人选保留地点意愿风险。",
   },
   {
     id: "enrich",
     title: "补全、查重并执行匹配门禁",
     detail: "保留来源证据，跳过明确不满足硬门槛的人选。",
+    requirement: "只保留角色、能力和经历满足岗位边界的人选。",
   },
   {
     id: "review",
     title: "交付候选人审核结果",
     detail: "等待用户决定联系、储备、观察或排除范围。",
+    requirement: "本轮交付不超过 20 位值得判断的人选。",
   },
   {
     id: "followup",
     title: "按决定继续后续动作",
     detail: "外部联系前再次检查授权、对象和渠道范围。",
+    requirement: "先交付审核结果，不直接联系候选人。",
   },
 ];
 

@@ -406,6 +406,20 @@
   border: 1px solid var(--s1-line);
   border-radius: 9px;
 }
+.s2-runtime.is-docked {
+  width: min(820px, 100%);
+  margin: 0 auto 8px;
+  background: var(--s1-surface-raised);
+  box-shadow: 0 5px 18px rgba(17, 24, 39, 0.06);
+}
+.s2-runtime.is-docked .s2-runtime-summary {
+  min-height: 46px;
+}
+.s2-runtime.is-docked .s2-runtime-body {
+  max-height: min(42vh, 370px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 
 .s2-runtime-summary {
   display: grid;
@@ -568,6 +582,21 @@
   font-size: 12px;
   line-height: 17px;
 }
+.s2-plan-list li small.s2-plan-requirement {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 5px;
+  padding: 5px 7px;
+  color: var(--s1-ink);
+  background: var(--s1-canvas);
+  border-radius: 5px;
+}
+.s2-plan-requirement > span {
+  flex: 0 0 auto;
+  color: var(--s1-accent);
+  font-weight: 650;
+}
 .s2-plan-list li em {
   align-self: start;
   color: var(--s1-subtle);
@@ -625,6 +654,54 @@
   color: var(--s1-subtle);
   font-size: 12px;
   white-space: nowrap;
+}
+.s2-plan-update-requirement {
+  display: block;
+  margin-top: 7px;
+  padding: 7px 8px;
+  color: var(--s1-ink);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 18px;
+  background: color-mix(in srgb, var(--s1-surface) 72%, transparent);
+  border-left: 2px solid var(--s1-warning);
+  border-radius: 0 5px 5px 0;
+}
+.s2-plan-update-requirement::before,
+.s2-plan-update-requirement::after {
+  content: none;
+}
+.s2-plan-update-requirement > span {
+  display: block;
+  color: var(--s1-warning);
+  font-weight: 650;
+}
+.s2-plan-update-changes {
+  display: grid;
+  gap: 4px;
+  margin: 7px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.s2-plan-update-changes li {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 7px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 17px;
+}
+.s2-plan-update-changes li b {
+  color: var(--s1-ink);
+}
+.s2-plan-update-unchanged {
+  display: flex !important;
+  gap: 7px;
+  margin-top: 7px !important;
+}
+.s2-plan-update-unchanged b {
+  flex: 0 0 auto;
+  color: var(--s1-success);
 }
 
 .s2-internal-tasks {
@@ -2190,9 +2267,12 @@
   overflow-y: auto;
   padding: 26px 0;
 }
-.s2-task-conversation > .s2-composer {
+.s2-task-composer-dock {
   width: min(780px, calc(100% - 40px));
   margin: 8px auto 12px;
+}
+.s2-task-composer-dock > .s2-composer {
+  width: 100%;
 }
 .s2-identity-compare > header {
   display: flex;
@@ -2256,9 +2336,12 @@
   line-height: 18px;
 }
 .s2-task-plan {
-  margin-top: 16px;
-  border-top: 1px solid var(--s1-line);
-  border-bottom: 1px solid var(--s1-line);
+  margin-bottom: 8px;
+  overflow: hidden;
+  background: var(--s1-surface-raised);
+  border: 1px solid var(--s1-line);
+  border-radius: 9px;
+  box-shadow: 0 5px 18px rgba(17, 24, 39, 0.06);
 }
 .s2-task-plan > button {
   display: grid;
@@ -2266,7 +2349,7 @@
   grid-template-columns: 28px minmax(0, 1fr) 16px;
   gap: 8px;
   align-items: center;
-  padding: 10px 0;
+  padding: 9px 11px;
   text-align: left;
   background: transparent;
   border: 0;
@@ -2292,7 +2375,10 @@
   font-size: 12px;
 }
 .s2-task-plan-body {
-  padding: 0 0 10px 36px;
+  max-height: min(42vh, 340px);
+  padding: 0 11px 10px 46px;
+  overflow-y: auto;
+  border-top: 1px solid var(--s1-line);
 }
 
 /* Signals */
@@ -2300,7 +2386,7 @@
   position: relative;
   display: grid;
   min-height: 650px;
-  grid-template-columns: minmax(380px, 0.72fr) minmax(560px, 1.28fr);
+  grid-template-columns: minmax(340px, 0.64fr) minmax(600px, 1.36fr);
   overflow: hidden;
   background: var(--s1-surface);
   border: 1px solid var(--s1-line);
@@ -2309,11 +2395,13 @@
 .s2-signal-list-pane {
   display: grid;
   min-width: 0;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  background: var(--s1-canvas);
   border-right: 1px solid var(--s1-line);
 }
 .s2-signal-toolbar {
   padding: 12px;
+  background: color-mix(in srgb, var(--s1-canvas) 88%, var(--s1-surface));
   border-bottom: 1px solid var(--s1-line);
 }
 .s2-signal-toolbar .s1-search-field {
@@ -2345,31 +2433,55 @@
   margin-left: 4px;
   font-style: normal;
 }
+.s2-signal-list-label {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  color: var(--s1-ink);
+  font-size: 12px;
+  background: color-mix(in srgb, var(--s1-canvas) 92%, var(--s1-surface));
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-signal-list-label b {
+  font-weight: 650;
+}
+.s2-signal-list-label span {
+  color: var(--s1-subtle);
+}
 .s2-signal-feed {
   min-height: 0;
   overflow-y: auto;
+  padding: 6px;
 }
 .s2-signal-feed > button {
+  position: relative;
   display: grid;
   width: 100%;
   min-width: 0;
   grid-template-columns: 34px minmax(0, 1fr) auto;
   align-items: start;
   gap: 10px;
-  padding: 13px 12px;
+  margin-bottom: 4px;
+  padding: 12px 9px;
   color: var(--s1-ink);
   text-align: left;
   background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--s1-line);
+  border: 1px solid transparent;
+  border-radius: 8px;
   cursor: pointer;
 }
 .s2-signal-feed > button:hover,
 .s2-signal-feed > button.is-active {
-  background: color-mix(in srgb, var(--s1-accent-soft) 48%, transparent);
+  background: var(--s1-surface);
 }
 .s2-signal-feed > button.is-active {
-  box-shadow: inset 3px 0 var(--s1-accent);
+  background: color-mix(in srgb, var(--s1-accent-soft) 58%, var(--s1-surface));
+  border-color: color-mix(in srgb, var(--s1-accent) 34%, var(--s1-line));
+  box-shadow:
+    inset 3px 0 var(--s1-accent),
+    0 5px 14px rgba(17, 24, 39, 0.07);
 }
 .s2-signal-feed > button > i {
   display: grid;
@@ -2427,10 +2539,45 @@
   font-size: 12px;
   font-style: normal;
 }
+.s2-signal-row-trailing {
+  display: flex !important;
+  align-items: center;
+  gap: 3px;
+}
+.s2-signal-row-trailing > svg {
+  width: 13px;
+  color: var(--s1-subtle);
+  opacity: 0;
+  transform: translateX(-3px);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+.s2-signal-feed > button:hover .s2-signal-row-trailing > svg,
+.s2-signal-feed > button.is-active .s2-signal-row-trailing > svg {
+  opacity: 1;
+  transform: translateX(0);
+}
+.s2-signal-feed > button.is-active .s2-signal-row-trailing > svg {
+  color: var(--s1-accent);
+}
 .s2-signal-detail {
   min-width: 0;
   overflow-y: auto;
   padding: 20px;
+  background: var(--s1-surface);
+  box-shadow: inset 8px 0 20px -20px rgba(17, 24, 39, 0.34);
+  animation: s2-signal-detail-enter 180ms ease-out;
+}
+@keyframes s2-signal-detail-enter {
+  from {
+    opacity: 0.58;
+    transform: translateX(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 .s2-signal-mobile-back {
   display: none;
@@ -2950,7 +3097,7 @@
     display: none;
   }
   .s2-task-timeline,
-  .s2-task-conversation > .s2-composer {
+  .s2-task-composer-dock {
     width: calc(100% - 24px);
   }
   .s2-identity-compare > div {

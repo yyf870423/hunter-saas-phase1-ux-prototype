@@ -215,6 +215,12 @@ export function AutomationWorkspace() {
       !forcedState &&
       sessionStorage.getItem("hunter-workstream-plan-adjusted") === "1",
   );
+  const [latestPlanRequirement, setLatestPlanRequirement] = useState(
+    () =>
+      (!forcedState &&
+        sessionStorage.getItem("hunter-workstream-plan-requirement")) ||
+      "",
+  );
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [terminateOpen, setTerminateOpen] = useState(false);
   const [streamStopped, setStreamStopped] = useState(false);
@@ -285,8 +291,12 @@ export function AutomationWorkspace() {
         "hunter-workstream-plan-adjusted",
         planAdjusted ? "1" : "0",
       );
+      sessionStorage.setItem(
+        "hunter-workstream-plan-requirement",
+        latestPlanRequirement,
+      );
     }
-  }, [forcedState, paused, planAdjusted]);
+  }, [forcedState, latestPlanRequirement, paused, planAdjusted]);
 
   useEffect(() => {
     if (phase > 0)
@@ -305,6 +315,7 @@ export function AutomationWorkspace() {
     setReviewOpen(false);
     setUserDecisions([]);
     setPlanAdjusted(false);
+    setLatestPlanRequirement("");
     setStreamStopped(false);
     setStreamError(false);
     sessionStorage.removeItem("hunter-workstream-phase");
@@ -313,6 +324,7 @@ export function AutomationWorkspace() {
     sessionStorage.removeItem("hunter-review-open");
     sessionStorage.removeItem("hunter-workstream-paused");
     sessionStorage.removeItem("hunter-workstream-plan-adjusted");
+    sessionStorage.removeItem("hunter-workstream-plan-requirement");
     notify("已从第一条输入重新演示", "info");
   };
 
@@ -322,6 +334,7 @@ export function AutomationWorkspace() {
     setReviewOpen(false);
     setInspection(null);
     setPlanAdjusted(false);
+    setLatestPlanRequirement("");
     setPaused(false);
   };
 
@@ -340,6 +353,7 @@ export function AutomationWorkspace() {
       ]);
       setPaused(true);
       setPlanAdjusted(true);
+      setLatestPlanRequirement(`${text}${attachmentText}`);
     } else if (/85|八十五/.test(text)) {
       const excluded = /赵星羽/.test(text);
       completeDecision(
@@ -393,6 +407,18 @@ export function AutomationWorkspace() {
         title: "计划已根据新信息调整",
         detail:
           "保留已经完成的工作，只暂停并重做受影响的当前步骤；继续后从此检查点推进。",
+        requirement: latestPlanRequirement,
+        changes: [
+          {
+            title: "候选人召回范围",
+            detail: "按补充要求增量查找受影响的人选，不重复已经完成的检索。",
+          },
+          {
+            title: "补全、查重与匹配门禁",
+            detail: "只对新增或受影响的人选重新处理，并重新合并审核结果。",
+          },
+        ],
+        unchanged: "本轮最多 20 位、北京优先、先审核且不直接联系。",
         time: "刚刚",
         tone: "warning",
       }
@@ -504,7 +530,10 @@ export function AutomationWorkspace() {
           paused={paused}
           terminated={terminated}
           onPause={() => {
-            if (paused) setPlanAdjusted(false);
+            if (paused) {
+              setPlanAdjusted(false);
+              setLatestPlanRequirement("");
+            }
             setPaused(!paused);
             setStreamStopped(false);
           }}
@@ -587,19 +616,6 @@ export function AutomationWorkspace() {
                 </Button>
               </div>
             ) : null}
-            {phase >= 2 ? (
-              <RuntimeBar
-                open={runtimeOpen}
-                onToggle={() => setRuntimeOpen((value) => !value)}
-                plan={plan}
-                planUpdate={planUpdate}
-                tasks={internalTasks}
-                paused={paused}
-                onInspectTask={(task) =>
-                  setInspection({ ...task, kind: "task" })
-                }
-              />
-            ) : null}
             {phase >= 3 ? (
               <HunterReply>
                 <h2>岗位边界已经确认</h2>
@@ -668,6 +684,18 @@ export function AutomationWorkspace() {
           </div>
         </div>
         <div className="s2-composer-wrap">
+          {phase >= 1 ? (
+            <RuntimeBar
+              open={runtimeOpen}
+              onToggle={() => setRuntimeOpen((value) => !value)}
+              plan={plan}
+              planUpdate={planUpdate}
+              tasks={internalTasks}
+              paused={paused}
+              docked
+              onInspectTask={(task) => setInspection({ ...task, kind: "task" })}
+            />
+          ) : null}
           <Composer
             value={composer}
             onChange={setComposer}

@@ -285,6 +285,12 @@ export function PlanList({ steps }) {
             <span>
               <b>{step.title}</b>
               <small>{step.detail}</small>
+              {step.requirement ? (
+                <small className="s2-plan-requirement">
+                  <span>对应要求</span>
+                  {step.requirement}
+                </small>
+              ) : null}
               {step.statusDetail ? <small>{step.statusDetail}</small> : null}
             </span>
             <em>{step.statusLabel || status.label}</em>
@@ -303,6 +309,28 @@ export function PlanUpdate({ update }) {
       <span>
         <b>{update.title}</b>
         <small>{update.detail}</small>
+        {update.requirement ? (
+          <q className="s2-plan-update-requirement">
+            <span>你的补充要求</span>
+            {update.requirement}
+          </q>
+        ) : null}
+        {update.changes?.length ? (
+          <ul className="s2-plan-update-changes">
+            {update.changes.map((change) => (
+              <li key={change.title}>
+                <b>{change.title}</b>
+                <span>{change.detail}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {update.unchanged ? (
+          <small className="s2-plan-update-unchanged">
+            <b>保持不变</b>
+            {update.unchanged}
+          </small>
+        ) : null}
       </span>
       <time>{update.time}</time>
     </div>
@@ -317,6 +345,7 @@ export function RuntimeBar({
   tasks,
   onInspectTask,
   paused = false,
+  docked = false,
 }) {
   const done = plan.filter((step) => step.status === "done").length;
   const waiting = plan.some((step) => step.status === "waiting-user");
@@ -341,7 +370,9 @@ export function RuntimeBar({
         ? "已完成"
         : "推进中";
   return (
-    <section className={`s2-runtime ${open ? "is-open" : ""}`}>
+    <section
+      className={`s2-runtime ${docked ? "is-docked" : ""} ${open ? "is-open" : ""}`}
+    >
       <button
         type="button"
         className="s2-runtime-summary"

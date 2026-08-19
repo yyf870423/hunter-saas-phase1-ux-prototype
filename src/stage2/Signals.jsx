@@ -92,12 +92,18 @@ export function SignalsPage() {
               ))}
             </div>
           </div>
+          <div className="s2-signal-list-label">
+            <b>信号列表</b>
+            <span>{visible.length} 条</span>
+          </div>
           <div className="s2-signal-feed">
             {visible.map((signal) => (
               <button
                 type="button"
                 className={selected.id === signal.id ? "is-active" : ""}
                 key={signal.id}
+                aria-pressed={selected.id === signal.id}
+                aria-controls="selected-signal-detail"
                 onClick={() => {
                   setSelectedId(signal.id);
                   setMobileDetailOpen(true);
@@ -124,7 +130,10 @@ export function SignalsPage() {
                     {signal.evidence} 个来源 · {signal.time}
                   </em>
                 </span>
-                <StatusBadge tone={signal.tone}>{signal.status}</StatusBadge>
+                <span className="s2-signal-row-trailing">
+                  <StatusBadge tone={signal.tone}>{signal.status}</StatusBadge>
+                  <Icon name="chevronRight" />
+                </span>
               </button>
             ))}
             {!visible.length ? (
@@ -147,6 +156,8 @@ export function SignalsPage() {
         </div>
         {selected ? (
           <aside
+            id="selected-signal-detail"
+            key={selected.id}
             className={`s2-signal-detail ${mobileDetailOpen ? "is-mobile-open" : ""}`}
           >
             <button
@@ -159,7 +170,7 @@ export function SignalsPage() {
             </button>
             <header>
               <span>
-                <small>{selected.type}</small>
+                <small>所选信号 · {selected.type}</small>
                 <h2>{selected.title}</h2>
                 <p>
                   {selected.object} · {selected.time}

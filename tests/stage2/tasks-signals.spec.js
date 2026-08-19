@@ -28,6 +28,15 @@ test("支线任务详情支持补充资料、恢复和结果回流", async ({ pa
   await page.goto("#/tasks/task-hand-team");
   await expect(page.getByText("身份核验需要决定")).toBeVisible();
   await expect(page.getByText("查看技术信息")).toHaveCount(0);
+  await expect(page.locator(".s2-task-timeline .s2-task-plan")).toHaveCount(0);
+  const planDock = await page.locator(".s2-task-plan").boundingBox();
+  const composer = await page
+    .locator(".s2-task-composer-dock > .s2-composer")
+    .boundingBox();
+  expect(planDock).not.toBeNull();
+  expect(composer).not.toBeNull();
+  expect(planDock.y + planDock.height).toBeLessThanOrEqual(composer.y);
+  await page.getByRole("button", { name: /执行计划/ }).click();
   await expect(page.getByText("计划已调整为等待用户")).toBeVisible();
   await expect(
     page.locator(".s2-task-plan .s2-plan-list li.is-complete"),
@@ -59,6 +68,20 @@ test("信号中心支持合并来源、观察和转化", async ({ page }) => {
   expect(listBox).not.toBeNull();
   expect(detailBox).not.toBeNull();
   expect(detailBox.width).toBeGreaterThan(listBox.width * 1.35);
+  const nextSignal = page
+    .locator(".s2-signal-feed > button")
+    .filter({ hasText: "拓界智驾新增感知与规划团队招聘页面" });
+  await nextSignal.click();
+  await expect(nextSignal).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("heading", {
+      name: "拓界智驾新增感知与规划团队招聘页面",
+    }),
+  ).toBeVisible();
+  await page
+    .locator(".s2-signal-feed > button")
+    .filter({ hasText: "云脉芯能正在组建机器人芯片团队" })
+    .click();
   await page.getByRole("button", { name: "加入观察" }).click();
   await expect(page.getByText(/信号已加入观察/)).toBeVisible();
   await page.getByRole("button", { name: "转化或启动工作" }).click();
