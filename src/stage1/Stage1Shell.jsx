@@ -433,8 +433,14 @@ export function Stage1Shell() {
   }, []);
 
   const selectNavigation = (item) => {
-    if (item.id === "home") {
-      navigate("/home");
+    const routes = {
+      home: "/home",
+      workstreams: "/workstreams/position-vla",
+      tasks: "/tasks",
+      signals: "/signals",
+    };
+    if (routes[item.id]) {
+      navigate(routes[item.id]);
       return;
     }
     if (item.id === "usage") {
@@ -466,11 +472,23 @@ export function Stage1Shell() {
                 <button
                   type="button"
                   key={item.id}
-                  className={
-                    item.id === "home" && location.pathname === "/home"
-                      ? "is-active"
-                      : ""
-                  }
+                  className={(() => {
+                    if (item.id === "home")
+                      return location.pathname === "/home" ? "is-active" : "";
+                    if (item.id === "workstreams")
+                      return location.pathname.startsWith("/workstreams")
+                        ? "is-active"
+                        : "";
+                    if (item.id === "tasks")
+                      return location.pathname.startsWith("/tasks")
+                        ? "is-active"
+                        : "";
+                    if (item.id === "signals")
+                      return location.pathname.startsWith("/signals")
+                        ? "is-active"
+                        : "";
+                    return "";
+                  })()}
                   aria-label={item.label}
                   title={expanded ? undefined : item.label}
                   onClick={() => selectNavigation(item)}
@@ -601,7 +619,8 @@ export function Stage1Shell() {
                 close={() => setNewOpen(false)}
                 onSelect={(label) => {
                   setNewOpen(false);
-                  notify(`已选择“${label}”入口`, "info");
+                  if (label === "新建业务主线") navigate("/workstreams/new");
+                  else notify(`已选择“${label}”入口`, "info");
                 }}
               />
             </div>
@@ -620,7 +639,9 @@ export function Stage1Shell() {
             />
           </div>
         </header>
-        <main className="s1-main">
+        <main
+          className={`s1-main ${location.pathname.startsWith("/workstreams") || location.pathname.startsWith("/tasks/") ? "s1-main-workspace" : ""}`}
+        >
           <Outlet />
         </main>
       </section>
@@ -636,7 +657,14 @@ export function Stage1Shell() {
           <button
             type="button"
             key={id}
-            className={id === "home" ? "is-active" : ""}
+            className={
+              (id === "home" && location.pathname === "/home") ||
+              (id === "workstreams" &&
+                location.pathname.startsWith("/workstreams")) ||
+              (id === "tasks" && location.pathname.startsWith("/tasks"))
+                ? "is-active"
+                : ""
+            }
             onClick={() => {
               if (id === "home") navigate("/home");
               else if (id === "assets" || id === "more") setMobileMode(id);

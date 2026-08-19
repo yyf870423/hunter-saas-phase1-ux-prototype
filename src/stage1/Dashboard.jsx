@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { actionItems, mainlines, sideTasks, signals } from "./data";
 import { Button, EmptyState, Skeleton, StatusBadge, useToast } from "./ui";
@@ -286,13 +286,19 @@ function LoadingDashboard() {
 }
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const [selectedId, setSelectedId] = useState(mainlines[0].id);
   const [actionExpanded, setActionExpanded] = useState(false);
   const notify = useToast();
   const state = params.get("state") || "normal";
-  const openPlaceholder = (title) =>
-    notify(`已选择“${title}”，完整页面将在对应原型阶段提交`, "info");
+  const openPlaceholder = (title) => {
+    if (title === "全部业务主线" || title === "具身智能 VLA 算法负责人") {
+      navigate("/workstreams/position-vla");
+      return;
+    }
+    notify(`已选择“${title}”，完整业务剧本将在原型阶段三提交`, "info");
+  };
   const recoverTasks = () => {
     const next = new URLSearchParams(params);
     next.delete("state");
