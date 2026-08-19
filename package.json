@@ -1,0 +1,26 @@
+{
+  "name": "hunter-saas-phase1-ux-prototype",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "format:check": "prettier --check .",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:e2e": "playwright test",
+    "test:routes": "playwright test tests/stage1/routes.spec.js",
+    "capture": "playwright test tests/stage1/visual.spec.js"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2",
+    "vite": "^7.1.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "prettier": "^3.9.6"
+  }
+}
