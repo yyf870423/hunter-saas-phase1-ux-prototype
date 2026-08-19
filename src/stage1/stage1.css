@@ -131,7 +131,7 @@ input:focus-visible {
 
 .s1-sidebar-brand {
   display: flex;
-  height: 56px;
+  height: 64px;
   align-items: center;
   padding: 0 14px;
   border: 0;
@@ -148,9 +148,9 @@ input:focus-visible {
 
 .s1-brand > i {
   display: grid;
-  width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
   place-items: center;
   color: #ffffff;
   background: linear-gradient(145deg, #2388ff, #0064da);
@@ -185,7 +185,7 @@ input:focus-visible {
 .s1-sidebar-toggle {
   display: flex;
   width: 100%;
-  height: 32px;
+  height: 36px;
   align-items: center;
   gap: 10px;
   overflow: hidden;
@@ -229,7 +229,7 @@ input:focus-visible {
   flex: 1;
   overflow-x: hidden;
   overflow-y: auto;
-  padding: 6px 8px;
+  padding: 14px 8px;
   overscroll-behavior: contain;
   scrollbar-width: none;
 }
@@ -239,17 +239,17 @@ input:focus-visible {
 }
 
 .s1-nav-section + .s1-nav-section {
-  margin-top: 6px;
+  margin-top: 18px;
 }
 
 .s1-nav-section h2 {
-  height: 15px;
-  margin: 0 10px 2px;
+  height: 18px;
+  margin: 0 10px 5px;
   overflow: hidden;
   color: #6f86a8;
   font-size: 12px;
   font-weight: 600;
-  line-height: 15px;
+  line-height: 18px;
   white-space: nowrap;
   opacity: 0;
   transition: opacity 100ms ease;
@@ -265,13 +265,13 @@ input:focus-visible {
 }
 
 .nav-collapsed .s1-nav-section + .s1-nav-section {
-  padding-top: 6px;
+  padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .s1-nav-section nav {
   display: grid;
-  gap: 2px;
+  gap: 3px;
 }
 
 .s1-nav-section nav > button,
@@ -279,7 +279,7 @@ input:focus-visible {
   position: relative;
   display: flex;
   width: 100%;
-  height: 32px;
+  height: 40px;
   align-items: center;
   gap: 10px;
   overflow: hidden;
@@ -342,6 +342,129 @@ input:focus-visible {
   opacity: 0;
 }
 
+.s1-assets-entry-chevron {
+  margin-left: auto;
+  opacity: 0;
+}
+
+.nav-expanded .s1-assets-entry-chevron {
+  opacity: 0.75;
+}
+
+.s1-asset-nav-panel {
+  position: absolute;
+  z-index: 60;
+  top: 294px;
+  left: calc(100% + 10px);
+  width: 380px;
+  padding: 16px;
+  color: var(--s1-ink);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 10px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.2);
+}
+
+.nav-collapsed .s1-asset-nav-panel {
+  top: 260px;
+}
+
+.s1-asset-nav-panel > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--s1-line);
+}
+
+.s1-asset-nav-panel > header span,
+.s1-asset-nav-panel > header b,
+.s1-asset-nav-panel > header small {
+  display: block;
+}
+
+.s1-asset-nav-panel > header b {
+  font-size: 14px;
+}
+
+.s1-asset-nav-panel > header small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.s1-asset-nav-panel > header .s1-icon-button {
+  width: 30px;
+  height: 30px;
+  box-shadow: none;
+}
+
+.s1-asset-nav-groups {
+  display: grid;
+  gap: 13px;
+  padding-top: 13px;
+}
+
+.s1-asset-nav-groups h2 {
+  margin: 0 0 6px;
+  color: var(--s1-subtle);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.s1-asset-nav-groups section > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.s1-asset-nav-groups section > div > button {
+  display: grid;
+  min-width: 0;
+  height: 44px;
+  grid-template-columns: 28px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--s1-surface-raised);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.s1-asset-nav-groups section > div > button:hover {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 28%, var(--s1-line));
+}
+
+.s1-asset-nav-groups section > div > button > i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 6px;
+}
+
+.s1-asset-nav-groups section > div > button span {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.s1-asset-nav-groups section > div > button > svg {
+  width: 14px;
+  height: 14px;
+  color: var(--s1-subtle);
+}
+
 .nav-expanded .s1-nav-section nav > button em {
   opacity: 1;
 }
@@ -349,8 +472,8 @@ input:focus-visible {
 .s1-sidebar-foot {
   position: relative;
   display: grid;
-  gap: 3px;
-  padding: 6px 8px;
+  gap: 4px;
+  padding: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -358,7 +481,7 @@ input:focus-visible {
   display: flex;
   width: 100%;
   min-width: 0;
-  height: 36px;
+  height: 42px;
   align-items: center;
   gap: 9px;
   padding: 0 7px;
@@ -376,16 +499,16 @@ input:focus-visible {
 .s1-usage-ring {
   position: relative;
   display: grid;
-  width: 26px;
-  height: 26px;
-  flex: 0 0 26px;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
   place-items: center;
 }
 
 .s1-usage-ring svg {
   position: absolute;
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   transform: rotate(-90deg);
 }
 
@@ -435,7 +558,7 @@ input:focus-visible {
 .s1-profile-entry {
   display: flex;
   width: 100%;
-  height: 38px;
+  height: 44px;
   align-items: center;
   gap: 9px;
   overflow: hidden;
@@ -453,9 +576,9 @@ input:focus-visible {
 
 .s1-profile-entry > i {
   display: grid;
-  width: 26px;
-  height: 26px;
-  flex: 0 0 26px;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
   place-items: center;
   color: #dcecff;
   font-size: 12px;

@@ -44,3 +44,14 @@ test("截取桌面展开导航", async ({ page }) => {
     fullPage: true,
   });
 });
+
+test("截取桌面业务资产导航", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("#/home");
+  await page.getByRole("button", { name: "展开导航" }).click();
+  await page.getByRole("button", { name: "打开业务资产" }).click();
+  await page.screenshot({
+    path: `${output}/desktop-home-asset-navigation.png`,
+    fullPage: true,
+  });
+});

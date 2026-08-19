@@ -256,6 +256,75 @@ function NotificationPanel({ open, close, items, setItems }) {
   );
 }
 
+function DesktopAssetNavigation({ open, close, onSelect, triggerRef }) {
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onPointerDown = (event) => {
+      if (
+        !panelRef.current?.contains(event.target) &&
+        !triggerRef.current?.contains(event.target)
+      ) {
+        close();
+      }
+    };
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") close();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [close, open, triggerRef]);
+
+  if (!open) return null;
+
+  return (
+    <aside
+      className="s1-asset-nav-panel"
+      role="dialog"
+      aria-label="业务资产导航"
+      ref={panelRef}
+    >
+      <header>
+        <span>
+          <b>业务资产</b>
+          <small>直接打开正式业务数据</small>
+        </span>
+        <IconButton icon="close" label="关闭业务资产导航" onClick={close} />
+      </header>
+      <div className="s1-asset-nav-groups">
+        {navSections.slice(1).map((section) => (
+          <section key={section.label}>
+            <h2>{section.label}</h2>
+            <div>
+              {section.items.map((item) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  onClick={() => {
+                    onSelect(item);
+                    close();
+                  }}
+                >
+                  <i>
+                    <Icon name={item.icon} />
+                  </i>
+                  <span>{item.label}</span>
+                  <Icon name="chevronRight" />
+                </button>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
 function MobileNavigation({ open, close, mode, onSelect }) {
   const assets = navSections.slice(1).flatMap((section) => section.items);
   const more = [
@@ -339,7 +408,9 @@ export function Stage1Shell() {
   const [newOpen, setNewOpen] = useState(false);
   const [usageOpen, setUsageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [assetNavigationOpen, setAssetNavigationOpen] = useState(false);
   const [mobileMode, setMobileMode] = useState(null);
+  const assetTriggerRef = useRef(null);
   const [notificationItems, setNotificationItems] =
     useState(initialNotifications);
   const unread = notificationItems.filter((item) => item.unread).length;
@@ -388,32 +459,54 @@ export function Stage1Shell() {
           <Brand expanded={expanded} />
         </button>
         <div className="s1-sidebar-scroll">
-          {navSections.map((section) => (
-            <section className="s1-nav-section" key={section.label}>
-              <h2>{section.label}</h2>
-              <nav>
-                {section.items.map((item) => (
-                  <button
-                    type="button"
-                    key={item.id}
-                    className={
-                      item.id === "home" && location.pathname === "/home"
-                        ? "is-active"
-                        : ""
-                    }
-                    aria-label={item.label}
-                    title={expanded ? undefined : item.label}
-                    onClick={() => selectNavigation(item)}
-                  >
-                    <Icon name={item.icon} />
-                    <span>{item.label}</span>
-                    {item.count ? <em>{item.count}</em> : null}
-                  </button>
-                ))}
-              </nav>
-            </section>
-          ))}
+          <section className="s1-nav-section">
+            <h2>{navSections[0].label}</h2>
+            <nav>
+              {navSections[0].items.map((item) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  className={
+                    item.id === "home" && location.pathname === "/home"
+                      ? "is-active"
+                      : ""
+                  }
+                  aria-label={item.label}
+                  title={expanded ? undefined : item.label}
+                  onClick={() => selectNavigation(item)}
+                >
+                  <Icon name={item.icon} />
+                  <span>{item.label}</span>
+                  {item.count ? <em>{item.count}</em> : null}
+                </button>
+              ))}
+            </nav>
+          </section>
+          <section className="s1-nav-section s1-nav-section-assets">
+            <h2>业务数据</h2>
+            <nav>
+              <button
+                type="button"
+                className={assetNavigationOpen ? "is-active" : ""}
+                aria-label="打开业务资产"
+                aria-expanded={assetNavigationOpen}
+                title={expanded ? undefined : "打开业务资产"}
+                ref={assetTriggerRef}
+                onClick={() => setAssetNavigationOpen((current) => !current)}
+              >
+                <Icon name="database" />
+                <span>业务资产</span>
+                <Icon className="s1-assets-entry-chevron" name="chevronRight" />
+              </button>
+            </nav>
+          </section>
         </div>
+        <DesktopAssetNavigation
+          open={assetNavigationOpen}
+          close={() => setAssetNavigationOpen(false)}
+          onSelect={selectNavigation}
+          triggerRef={assetTriggerRef}
+        />
         <div className="s1-sidebar-foot">
           <button
             type="button"

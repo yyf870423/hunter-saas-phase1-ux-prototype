@@ -36,8 +36,21 @@ test("常见桌面高度下导航无需滚动", async ({ page }) => {
     scrollHeight: element.scrollHeight,
   }));
   expect(dimensions.scrollHeight).toBeLessThanOrEqual(dimensions.clientHeight);
+  await page.getByRole("button", { name: "打开业务资产" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "业务资产导航" }),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: "专利" })).toBeInViewport();
   await expect(page.getByRole("button", { name: "收起导航" })).toBeInViewport();
+});
+
+test("业务资产使用侧向面板并可直接选择", async ({ page }) => {
+  await page.getByRole("button", { name: "打开业务资产" }).click();
+  const panel = page.getByRole("dialog", { name: "业务资产导航" });
+  await expect(panel).toBeVisible();
+  await panel.getByRole("button", { name: "候选人" }).click();
+  await expect(panel).toBeHidden();
+  await expect(page.getByText("已选择“候选人”入口")).toBeVisible();
 });
 
 test("通知计数使用正圆标记", async ({ page }) => {

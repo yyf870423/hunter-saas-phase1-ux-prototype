@@ -27,20 +27,21 @@
 ## 三、产品级组件
 
 1. `AppShell`：桌面导航、顶栏、移动顶栏和底部导航。
-2. `SidebarNav`：分组导航、收起/展开、Tooltip 和底部固定区。
-3. `Topbar`：搜索、创建、主题、通知和账号。
-4. `Button` / `IconButton`：主、次、幽灵、危险和加载状态。
-5. `StatusBadge`：运行、等待、异常、完成、观察和普通状态。
-6. `SearchDialog`：搜索输入、最近访问、分组结果、无结果和键盘关闭。
-7. `NotificationDrawer`：全部/未读、已读操作和空状态。
-8. `Modal` / `Drawer`：统一尺寸、遮罩、焦点和关闭逻辑。
-9. `Toast`：成功、信息、警告和错误。
-10. `UsageRing`：紧凑用量入口和详情。
-11. `MainlineFocus`：工作台唯一主焦点和紧凑主线切换。
-12. `TaskSummaryList`：少量需要关注的独立支线摘要。
-13. `SignalFeed`：少量高优先级信号摘要。
-14. `ActionQueue`：默认收起的人工行动摘要。
-15. `Skeleton` / `EmptyState` / `ErrorState` / `PermissionState`：全局状态组件。
+2. `SidebarNav`：核心工作导航、收起/展开、Tooltip 和底部固定区。
+3. `AssetNavigationPanel`：桌面侧向资产导航，按招聘、人才和研究分组直接进入八类正式资产。
+4. `Topbar`：搜索、创建、主题、通知和账号。
+5. `Button` / `IconButton`：主、次、幽灵、危险和加载状态。
+6. `StatusBadge`：运行、等待、异常、完成、观察和普通状态。
+7. `SearchDialog`：搜索输入、最近访问、分组结果、无结果和键盘关闭。
+8. `NotificationDrawer`：全部/未读、已读操作和空状态。
+9. `Modal` / `Drawer`：统一尺寸、遮罩、焦点和关闭逻辑。
+10. `Toast`：成功、信息、警告和错误。
+11. `UsageRing`：紧凑用量入口和详情。
+12. `MainlineFocus`：工作台唯一主焦点和紧凑主线切换。
+13. `TaskSummaryList`：少量需要关注的独立支线摘要。
+14. `SignalFeed`：少量高优先级信号摘要。
+15. `ActionQueue`：默认收起的人工行动摘要。
+16. `Skeleton` / `EmptyState` / `ErrorState` / `PermissionState`：全局状态组件。
 
 ## 四、复用约束
 
