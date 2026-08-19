@@ -529,6 +529,23 @@
   border-radius: 50%;
   animation: s2-pulse 1.2s ease infinite;
 }
+.s2-plan-list li.is-waiting > i {
+  color: var(--s1-warning);
+  background: var(--s1-warning-soft);
+  border-color: color-mix(in srgb, var(--s1-warning) 38%, var(--s1-line));
+}
+.s2-plan-list li.is-paused > i {
+  color: var(--s1-muted);
+  background: var(--s1-canvas);
+}
+.s2-plan-list li.is-adjusted > i {
+  color: var(--s1-warning);
+  background: var(--s1-warning-soft);
+  border-color: color-mix(in srgb, var(--s1-warning) 38%, var(--s1-line));
+}
+.s2-plan-list li > i svg {
+  width: 12px;
+}
 @keyframes s2-pulse {
   50% {
     box-shadow: 0 0 0 5px color-mix(in srgb, var(--s1-accent) 15%, transparent);
@@ -563,6 +580,51 @@
 }
 .s2-plan-list li.is-active em {
   color: var(--s1-accent);
+}
+.s2-plan-list li.is-waiting em,
+.s2-plan-list li.is-adjusted em {
+  color: var(--s1-warning);
+}
+.s2-plan-list li.is-paused em {
+  color: var(--s1-muted);
+}
+.s2-plan-update {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  margin: 8px 0 6px;
+  padding: 9px;
+  background: var(--s1-accent-soft);
+  border-radius: 7px;
+}
+.s2-plan-update.tone-warning {
+  background: var(--s1-warning-soft);
+}
+.s2-plan-update > svg {
+  width: 15px;
+  color: var(--s1-accent);
+}
+.s2-plan-update.tone-warning > svg {
+  color: var(--s1-warning);
+}
+.s2-plan-update b,
+.s2-plan-update small {
+  display: block;
+}
+.s2-plan-update b {
+  font-size: 12px;
+}
+.s2-plan-update small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 17px;
+}
+.s2-plan-update time {
+  color: var(--s1-subtle);
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .s2-internal-tasks {
@@ -2201,7 +2263,7 @@
 .s2-task-plan > button {
   display: grid;
   width: 100%;
-  grid-template-columns: 28px minmax(0, 1fr);
+  grid-template-columns: 28px minmax(0, 1fr) 16px;
   gap: 8px;
   align-items: center;
   padding: 10px 0;
@@ -2212,6 +2274,10 @@
 .s2-task-plan > button > svg {
   width: 17px;
   color: var(--s1-accent);
+}
+.s2-task-plan > button > svg:last-child {
+  width: 14px;
+  color: var(--s1-muted);
 }
 .s2-task-plan b,
 .s2-task-plan small {
@@ -2225,19 +2291,8 @@
   color: var(--s1-muted);
   font-size: 12px;
 }
-.s2-task-plan .s2-plan-list {
+.s2-task-plan-body {
   padding: 0 0 10px 36px;
-}
-.s2-technical {
-  margin: 0;
-  padding: 13px;
-  overflow-x: auto;
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 12px;
-  line-height: 20px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 7px;
 }
 
 /* Signals */
@@ -2245,7 +2300,7 @@
   position: relative;
   display: grid;
   min-height: 650px;
-  grid-template-columns: minmax(480px, 0.95fr) minmax(420px, 1.05fr);
+  grid-template-columns: minmax(380px, 0.72fr) minmax(560px, 1.28fr);
   overflow: hidden;
   background: var(--s1-surface);
   border: 1px solid var(--s1-line);

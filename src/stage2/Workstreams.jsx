@@ -180,7 +180,12 @@ export function AutomationWorkspace() {
     const restored = Number(sessionStorage.getItem("hunter-workstream-phase"));
     return Number.isFinite(restored) ? restored : 0;
   });
-  const [paused, setPaused] = useState(forcedState === "limited");
+  const [paused, setPaused] = useState(
+    () =>
+      forcedState === "limited" ||
+      (!forcedState &&
+        sessionStorage.getItem("hunter-workstream-paused") === "1"),
+  );
   const [terminated, setTerminated] = useState(false);
   const [runtimeOpen, setRuntimeOpen] = useState(
     () => sessionStorage.getItem("hunter-runtime-open") === "1",
@@ -205,6 +210,11 @@ export function AutomationWorkspace() {
   );
   const [attachments, setAttachments] = useState([]);
   const [userDecisions, setUserDecisions] = useState([]);
+  const [planAdjusted, setPlanAdjusted] = useState(
+    () =>
+      !forcedState &&
+      sessionStorage.getItem("hunter-workstream-plan-adjusted") === "1",
+  );
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [terminateOpen, setTerminateOpen] = useState(false);
   const [streamStopped, setStreamStopped] = useState(false);
@@ -269,6 +279,16 @@ export function AutomationWorkspace() {
   }, [authMode]);
 
   useEffect(() => {
+    if (!forcedState) {
+      sessionStorage.setItem("hunter-workstream-paused", paused ? "1" : "0");
+      sessionStorage.setItem(
+        "hunter-workstream-plan-adjusted",
+        planAdjusted ? "1" : "0",
+      );
+    }
+  }, [forcedState, paused, planAdjusted]);
+
+  useEffect(() => {
     if (phase > 0)
       scrollRef.current?.scrollTo({
         top: scrollRef.current.scrollHeight,
@@ -284,12 +304,15 @@ export function AutomationWorkspace() {
     setInspection(null);
     setReviewOpen(false);
     setUserDecisions([]);
+    setPlanAdjusted(false);
     setStreamStopped(false);
     setStreamError(false);
     sessionStorage.removeItem("hunter-workstream-phase");
     sessionStorage.removeItem("hunter-workstream-draft");
     sessionStorage.removeItem("hunter-workstream-inspection");
     sessionStorage.removeItem("hunter-review-open");
+    sessionStorage.removeItem("hunter-workstream-paused");
+    sessionStorage.removeItem("hunter-workstream-plan-adjusted");
     notify("已从第一条输入重新演示", "info");
   };
 
@@ -298,6 +321,8 @@ export function AutomationWorkspace() {
     setPhase(5);
     setReviewOpen(false);
     setInspection(null);
+    setPlanAdjusted(false);
+    setPaused(false);
   };
 
   const send = (text, files) => {
@@ -314,6 +339,7 @@ export function AutomationWorkspace() {
         },
       ]);
       setPaused(true);
+      setPlanAdjusted(true);
     } else if (/85|八十五/.test(text)) {
       const excluded = /赵星羽/.test(text);
       completeDecision(
@@ -333,6 +359,80 @@ export function AutomationWorkspace() {
     setComposer("");
     setAttachments([]);
   };
+
+  const plan = planSteps.map((step, index) => {
+    let status = "pending";
+    if (phase >= 5) status = "done";
+    else if (phase >= 4) status = index < 4 ? "done" : "waiting-user";
+    else if (phase === 3)
+      status = index < 2 ? "done" : index === 2 ? "running" : "pending";
+    else if (phase === 2)
+      status = index < 1 ? "done" : index === 1 ? "running" : "pending";
+    else if (phase === 1) status = index === 0 ? "running" : "pending";
+
+    if (paused && status === "running") {
+      status = planAdjusted ? "adjusted" : "paused";
+    }
+
+    return {
+      ...step,
+      status,
+      statusDetail:
+        status === "adjusted"
+          ? "新增信息只影响当前步骤；已完成步骤和已有结果继续保留。"
+          : status === "paused"
+            ? "当前检查点和已有结果已保留，继续后从该步骤恢复。"
+            : status === "waiting-user"
+              ? "等待审核决定后再检查后续动作和授权。"
+              : undefined,
+    };
+  });
+
+  const planUpdate = planAdjusted
+    ? {
+        title: "计划已根据新信息调整",
+        detail:
+          "保留已经完成的工作，只暂停并重做受影响的当前步骤；继续后从此检查点推进。",
+        time: "刚刚",
+        tone: "warning",
+      }
+    : paused
+      ? {
+          title: "计划已暂停",
+          detail:
+            "当前步骤、检查点和已有结果均已保留，继续后不会重复已完成工作。",
+          time: "刚刚",
+          tone: "warning",
+        }
+      : phase >= 5
+        ? {
+            title: "用户决定已应用",
+            detail: "候选人处理结果已保留，外部联系继续停在授权检查点。",
+            time: "刚刚",
+            tone: "info",
+          }
+        : phase >= 4
+          ? {
+              title: "计划进入候选人审核节点",
+              detail: "召回、补全、查重和门禁已完成，等待用户决定处理范围。",
+              time: "09:08",
+              tone: "info",
+            }
+          : phase >= 3
+            ? {
+                title: "并行召回已完成",
+                detail: "计划继续执行候选人补全、身份查重和匹配门禁。",
+                time: "09:05",
+                tone: "info",
+              }
+            : phase >= 2
+              ? {
+                  title: "岗位边界已确认",
+                  detail: "已按确认后的条件启动系统、人才平台和研究来源召回。",
+                  time: "09:02",
+                  tone: "info",
+                }
+              : null;
 
   if (reviewOpen) {
     return (
@@ -404,7 +504,8 @@ export function AutomationWorkspace() {
           paused={paused}
           terminated={terminated}
           onPause={() => {
-            setPaused((value) => !value);
+            if (paused) setPlanAdjusted(false);
+            setPaused(!paused);
             setStreamStopped(false);
           }}
           onReset={resetDemo}
@@ -490,8 +591,8 @@ export function AutomationWorkspace() {
               <RuntimeBar
                 open={runtimeOpen}
                 onToggle={() => setRuntimeOpen((value) => !value)}
-                phase={phase}
-                plan={planSteps}
+                plan={plan}
+                planUpdate={planUpdate}
                 tasks={internalTasks}
                 paused={paused}
                 onInspectTask={(task) =>

@@ -27,6 +27,17 @@ test("业务主线从第一条输入渐进推进到审核节点", async ({ page 
   );
   await page.getByRole("button", { name: /执行计划/ }).click();
   await expect(page.getByText("相关内部任务")).toBeVisible();
+  await expect(
+    page.locator(".s2-runtime .s2-plan-list li.is-complete"),
+  ).toHaveCount(4);
+  await expect(
+    page.locator(".s2-runtime .s2-plan-list li.is-waiting"),
+  ).toHaveCount(1);
+  await expect(
+    page.locator(".s2-runtime .s2-plan-list li").filter({
+      hasText: "按决定继续后续动作",
+    }),
+  ).toContainText("等待用户");
   await page.getByRole("button", { name: /人才平台并行寻访/ }).click();
   await expect(
     page.getByRole("heading", { name: "人才平台并行寻访" }),
@@ -34,6 +45,33 @@ test("业务主线从第一条输入渐进推进到审核节点", async ({ page 
   await page.getByRole("button", { name: "关闭检查区" }).click();
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
+});
+
+test("执行计划持续标记进度并显示新信息造成的调整", async ({ page }) => {
+  const runtimeButton = page.getByRole("button", { name: /执行计划/ });
+  await expect(runtimeButton).toBeVisible({ timeout: 6_000 });
+  await runtimeButton.click();
+  await expect(
+    page.locator(".s2-runtime .s2-plan-list li.is-active"),
+  ).toHaveCount(1);
+
+  const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
+  await input.fill("补充：最近加入北京团队的候选人也要纳入本轮判断。");
+  await input.press("Enter");
+
+  await expect(page.getByText("计划已根据新信息调整")).toBeVisible();
+  await expect(
+    page.locator(".s2-runtime .s2-plan-list li.is-adjusted"),
+  ).toHaveCount(1);
+  await expect(page.locator(".s2-runtime .s2-plan-list")).toContainText(
+    "已完成步骤和已有结果继续保留",
+  );
+
+  await page.reload();
+  await expect(page.getByText("计划已根据新信息调整")).toBeVisible();
+  await expect(
+    page.locator(".s2-runtime .s2-plan-list li.is-adjusted"),
+  ).toHaveCount(1);
 });
 
 test("大型候选人审核支持筛选、详情和结构化决定", async ({ page }) => {

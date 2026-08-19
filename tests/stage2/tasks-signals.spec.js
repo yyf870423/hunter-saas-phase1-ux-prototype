@@ -27,6 +27,14 @@ test("支线任务列表支持分类、搜索、详情和删除", async ({ page 
 test("支线任务详情支持补充资料、恢复和结果回流", async ({ page }) => {
   await page.goto("#/tasks/task-hand-team");
   await expect(page.getByText("身份核验需要决定")).toBeVisible();
+  await expect(page.getByText("查看技术信息")).toHaveCount(0);
+  await expect(page.getByText("计划已调整为等待用户")).toBeVisible();
+  await expect(
+    page.locator(".s2-task-plan .s2-plan-list li.is-complete"),
+  ).toHaveCount(2);
+  await expect(
+    page.locator(".s2-task-plan .s2-plan-list li.is-waiting"),
+  ).toHaveCount(1);
   const input = page.getByPlaceholder(/输入你掌握的信息/);
   await input.fill("这是同一个人，2025 年 12 月加入穹顶智能。");
   await input.press("Enter");
@@ -34,6 +42,10 @@ test("支线任务详情支持补充资料、恢复和结果回流", async ({ pa
     page.getByText(/已回流“星澜机器人人才版图”的更新与审核区/),
   ).toBeVisible();
   await expect(page.getByText("完成", { exact: true }).first()).toBeVisible();
+  await expect(
+    page.locator(".s2-task-plan .s2-plan-list li.is-complete"),
+  ).toHaveCount(3);
+  await expect(page.getByText("计划已完成", { exact: true })).toBeVisible();
 });
 
 test("信号中心支持合并来源、观察和转化", async ({ page }) => {
@@ -42,6 +54,11 @@ test("信号中心支持合并来源、观察和转化", async ({ page }) => {
     page.getByRole("heading", { name: /云脉芯能正在组建机器人芯片团队/ }),
   ).toBeVisible();
   await expect(page.getByText("4 个来源 · 今天 09:12")).toBeVisible();
+  const listBox = await page.locator(".s2-signal-list-pane").boundingBox();
+  const detailBox = await page.locator(".s2-signal-detail").boundingBox();
+  expect(listBox).not.toBeNull();
+  expect(detailBox).not.toBeNull();
+  expect(detailBox.width).toBeGreaterThan(listBox.width * 1.35);
   await page.getByRole("button", { name: "加入观察" }).click();
   await expect(page.getByText(/信号已加入观察/)).toBeVisible();
   await page.getByRole("button", { name: "转化或启动工作" }).click();

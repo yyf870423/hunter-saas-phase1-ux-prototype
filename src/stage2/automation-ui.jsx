@@ -249,33 +249,45 @@ export function HunterReply({ children, streaming = false }) {
   );
 }
 
-export function PlanList({ steps, activeIndex, stopped = false }) {
+const planStatus = {
+  done: { label: "完成", icon: "check", className: "is-complete" },
+  running: { label: "进行中", className: "is-active" },
+  "waiting-user": {
+    label: "等待用户",
+    icon: "clock",
+    className: "is-waiting",
+  },
+  paused: { label: "已暂停", icon: "pause", className: "is-paused" },
+  adjusted: {
+    label: "需调整",
+    icon: "refresh",
+    className: "is-adjusted",
+  },
+  pending: { label: "待开始", className: "is-pending" },
+};
+
+export function PlanList({ steps }) {
   return (
     <ol className="s2-plan-list">
       {steps.map((step, index) => {
-        const complete = index < activeIndex;
-        const active = index === activeIndex && !stopped;
+        const status = planStatus[step.status] || planStatus.pending;
         return (
-          <li
-            className={complete ? "is-complete" : active ? "is-active" : ""}
-            key={step.id}
-          >
+          <li className={status.className} key={step.id}>
             <i>
-              {complete ? <Icon name="check" /> : active ? <span /> : index + 1}
+              {step.status === "running" ? (
+                <span />
+              ) : status.icon ? (
+                <Icon name={status.icon} />
+              ) : (
+                index + 1
+              )}
             </i>
             <span>
               <b>{step.title}</b>
               <small>{step.detail}</small>
+              {step.statusDetail ? <small>{step.statusDetail}</small> : null}
             </span>
-            <em>
-              {complete
-                ? "完成"
-                : active
-                  ? "进行中"
-                  : stopped && index === activeIndex
-                    ? "已暂停"
-                    : "未开始"}
-            </em>
+            <em>{step.statusLabel || status.label}</em>
           </li>
         );
       })}
@@ -283,16 +295,51 @@ export function PlanList({ steps, activeIndex, stopped = false }) {
   );
 }
 
+export function PlanUpdate({ update }) {
+  if (!update) return null;
+  return (
+    <div className={`s2-plan-update tone-${update.tone || "info"}`}>
+      <Icon name={update.tone === "warning" ? "refresh" : "info"} />
+      <span>
+        <b>{update.title}</b>
+        <small>{update.detail}</small>
+      </span>
+      <time>{update.time}</time>
+    </div>
+  );
+}
+
 export function RuntimeBar({
   open,
   onToggle,
-  phase,
   plan,
+  planUpdate,
   tasks,
   onInspectTask,
   paused = false,
 }) {
-  const done = Math.min(phase, plan.length);
+  const done = plan.filter((step) => step.status === "done").length;
+  const waiting = plan.some((step) => step.status === "waiting-user");
+  const adjusted = plan.some((step) => step.status === "adjusted");
+  const running = plan.some((step) => step.status === "running");
+  const summary = adjusted
+    ? `${done} 项已完成，1 项根据新信息调整`
+    : paused
+      ? `${done} 项已完成，当前步骤已暂停`
+      : waiting
+        ? `${done} 项已完成，正在等待候选人审核`
+        : running
+          ? `已完成 ${done} / ${plan.length} 项`
+          : `${done} / ${plan.length} 项已完成`;
+  const badge = paused
+    ? adjusted
+      ? "计划调整"
+      : "已暂停"
+    : waiting
+      ? "等待用户"
+      : done === plan.length
+        ? "已完成"
+        : "推进中";
   return (
     <section className={`s2-runtime ${open ? "is-open" : ""}`}>
       <button
@@ -306,18 +353,20 @@ export function RuntimeBar({
         </span>
         <span>
           <b>执行计划</b>
-          <small>
-            {paused
-              ? "已暂停，检查点和已有结果已保留"
-              : phase >= 4
-                ? "4 项已完成，正在等待候选人审核"
-                : `已完成 ${done} / ${plan.length} 项`}
-          </small>
+          <small>{summary}</small>
         </span>
         <StatusBadge
-          tone={paused ? "neutral" : phase >= 4 ? "warning" : "info"}
+          tone={
+            done === plan.length
+              ? "success"
+              : adjusted || waiting
+                ? "warning"
+                : paused
+                  ? "neutral"
+                  : "info"
+          }
         >
-          {paused ? "已暂停" : phase >= 4 ? "等待用户" : "推进中"}
+          {badge}
         </StatusBadge>
         <Icon name={open ? "chevronUp" : "chevronDown"} />
       </button>
@@ -328,11 +377,8 @@ export function RuntimeBar({
               <b>动态计划</b>
               <small>计划会随新信息更新，不代表固定流水线</small>
             </header>
-            <PlanList
-              steps={plan}
-              activeIndex={Math.min(phase, 4)}
-              stopped={paused}
-            />
+            <PlanUpdate update={planUpdate} />
+            <PlanList steps={plan} />
           </div>
           <div>
             <header>

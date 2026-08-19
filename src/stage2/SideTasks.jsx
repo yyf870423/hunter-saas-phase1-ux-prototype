@@ -9,7 +9,13 @@ import {
   StatusBadge,
   useToast,
 } from "../stage1/ui";
-import { Composer, HunterReply, PlanList, UserMessage } from "./automation-ui";
+import {
+  Composer,
+  HunterReply,
+  PlanList,
+  PlanUpdate,
+  UserMessage,
+} from "./automation-ui";
 import { sideTasks } from "./data";
 
 const tabs = [
@@ -244,7 +250,7 @@ export function SideTaskDetail() {
   const [attachments, setAttachments] = useState([]);
   const [authMode, setAuthMode] = useState("confirm");
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [technicalOpen, setTechnicalOpen] = useState(false);
+  const [planOpen, setPlanOpen] = useState(true);
   const send = (text, files) => {
     setResolved(true);
     setComposer("");
@@ -256,6 +262,42 @@ export function SideTaskDetail() {
       "success",
     );
   };
+  const visiblePlan = taskPlan.map((step, index) => ({
+    ...step,
+    status: resolved
+      ? "done"
+      : index < 2
+        ? "done"
+        : paused
+          ? "paused"
+          : "waiting-user",
+    statusDetail:
+      !resolved && index === 2
+        ? paused
+          ? "身份建议和已有证据已保留，继续后仍从当前决定节点恢复。"
+          : "公开证据不足，等待用户补充最新任职信息或给出决定。"
+        : undefined,
+  }));
+  const planUpdate = resolved
+    ? {
+        title: "计划已完成",
+        detail: "用户补充最新任职信息后，身份建议已回流人才版图审核区。",
+        time: "刚刚",
+        tone: "info",
+      }
+    : paused
+      ? {
+          title: "计划已暂停",
+          detail: "身份建议、证据和等待节点均已保留，继续后从当前检查点恢复。",
+          time: "刚刚",
+          tone: "warning",
+        }
+      : {
+          title: "计划已调整为等待用户",
+          detail: "公开证据不足以安全合并人物，自动判断已停止并保留现有结果。",
+          time: "08:58",
+          tone: "warning",
+        };
   return (
     <div className="s2-page s2-task-detail-page">
       <header className="s2-detail-header">
@@ -312,9 +354,6 @@ export function SideTaskDetail() {
               </dd>
             </div>
           </dl>
-          <button type="button" onClick={() => setTechnicalOpen(true)}>
-            查看技术信息 <Icon name="chevronRight" />
-          </button>
         </aside>
         <section className="s2-task-conversation">
           <div className="s2-task-timeline">
@@ -359,20 +398,30 @@ export function SideTaskDetail() {
               </p>
             </section>
             <div className="s2-task-plan">
-              <button type="button">
+              <button
+                type="button"
+                aria-expanded={planOpen}
+                onClick={() => setPlanOpen((value) => !value)}
+              >
                 <Icon name="task" />
                 <span>
                   <b>执行计划</b>
                   <small>
-                    {resolved ? "3 / 3 项完成" : "2 / 3 项完成，等待身份决定"}
+                    {resolved
+                      ? "3 / 3 项完成"
+                      : paused
+                        ? "2 / 3 项完成，当前已暂停"
+                        : "2 / 3 项完成，等待身份决定"}
                   </small>
                 </span>
+                <Icon name={planOpen ? "chevronUp" : "chevronDown"} />
               </button>
-              <PlanList
-                steps={taskPlan}
-                activeIndex={resolved ? 3 : 2}
-                stopped={paused}
-              />
+              {planOpen ? (
+                <div className="s2-task-plan-body">
+                  <PlanUpdate update={planUpdate} />
+                  <PlanList steps={visiblePlan} />
+                </div>
+              ) : null}
             </div>
             {resolved ? (
               <>
@@ -427,30 +476,6 @@ export function SideTaskDetail() {
           <p>任务对话、计划和尚未写入正式资产的专属文件会一起进入回收站。</p>
           <p>人才版图中已经确认的正式人物记录不会删除。</p>
         </div>
-      </Modal>
-      <Modal
-        open={technicalOpen}
-        close={() => setTechnicalOpen(false)}
-        title="任务技术信息"
-        description="用于排查问题，不影响业务判断。"
-        footer={
-          <Button
-            tone="primary"
-            onClick={() => {
-              navigator.clipboard?.writeText(
-                "任务检查点：identity_compare_complete\n输出校验：通过\n待处理：business_identity_decision",
-              );
-              notify("技术信息已复制", "success");
-            }}
-          >
-            复制技术信息
-          </Button>
-        }
-      >
-        <pre className="s2-technical">
-          任务检查点：identity_compare_complete{"\n"}输出校验：通过{"\n"}
-          待处理：business_identity_decision{"\n"}重试次数：0 / 2
-        </pre>
       </Modal>
     </div>
   );
