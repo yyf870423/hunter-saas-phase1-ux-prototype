@@ -669,7 +669,7 @@ export function AutomationWorkspace() {
               </div>
             ) : null}
             {forcedState === "limited" ? (
-              <div className="s2-permission-state">
+              <div className="s2-permission-state s2-permission-state--handoff">
                 <Icon name="warning" />
                 <span>
                   <b>本机协作暂不可用</b>

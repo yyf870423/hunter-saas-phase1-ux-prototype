@@ -1218,6 +1218,9 @@
   background: var(--s1-warning-soft);
   border-color: color-mix(in srgb, var(--s1-warning) 25%, transparent);
 }
+.s2-permission-state--handoff {
+  margin: -14px 0 20px;
+}
 .s2-local-error > svg {
   color: var(--s1-danger);
 }
@@ -1471,68 +1474,6 @@
 }
 .s2-attachment-error > button svg {
   width: 13px;
-}
-
-.s2-upload-confirm {
-  display: grid;
-  gap: 14px;
-}
-.s2-upload-confirm-target {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 10px 12px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 8px;
-}
-.s2-upload-confirm-target span,
-.s2-upload-confirm-list small,
-.s2-upload-confirm > p {
-  color: var(--s1-muted);
-  font-size: 12px;
-}
-.s2-upload-confirm-list {
-  display: grid;
-  gap: 8px;
-}
-.s2-upload-confirm-list > div {
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 32px;
-  align-items: center;
-  gap: 10px;
-  min-height: 54px;
-  padding: 8px 10px;
-  background: var(--s1-surface-raised);
-  border: 1px solid var(--s1-line);
-  border-radius: 8px;
-}
-.s2-upload-confirm-list > div > i {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  color: var(--s1-accent);
-  background: var(--s1-accent-soft);
-  border-radius: 7px;
-}
-.s2-upload-confirm-list b,
-.s2-upload-confirm-list small {
-  display: block;
-}
-.s2-upload-confirm-list b {
-  overflow: hidden;
-  font-size: 13px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.s2-upload-confirm-list small {
-  margin-top: 3px;
-}
-.s2-upload-confirm > p {
-  margin: 0;
-  line-height: 18px;
 }
 
 .s2-email-review {

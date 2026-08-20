@@ -222,6 +222,22 @@ test("加载、流式中断和本机协作受限状态都可恢复", async ({ pa
 
   await page.goto("#/workstreams/position-vla?state=limited");
   await expect(page.getByText("本机协作暂不可用").first()).toBeVisible();
+  const handoffSpacing = await page
+    .locator(".s2-permission-state--handoff")
+    .evaluate((element) => {
+      const current = element.getBoundingClientRect();
+      const previous = element.previousElementSibling.getBoundingClientRect();
+      const next = element.nextElementSibling.getBoundingClientRect();
+      return {
+        above: Math.round(current.top - previous.bottom),
+        below: Math.round(next.top - current.bottom),
+      };
+    });
+  expect(handoffSpacing.above).toBeGreaterThanOrEqual(12);
+  expect(handoffSpacing.below).toBeGreaterThanOrEqual(12);
+  expect(
+    Math.abs(handoffSpacing.above - handoffSpacing.below),
+  ).toBeLessThanOrEqual(6);
   await page.getByRole("button", { name: "查看处理方式" }).click();
   await expect(page.getByRole("heading", { name: "在本机继续" })).toBeVisible();
   await expect(
@@ -242,7 +258,7 @@ test("附件格式失败使用局部反馈且可以关闭", async ({ page }) => 
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
 
-test("文件只有在用户确认后才上传到当前工作", async ({ page }) => {
+test("文件随消息直接上传且不再二次确认", async ({ page }) => {
   const chooser = page.locator('input[type="file"]');
   await chooser.setInputFiles({
     name: "林昊补充简历.pdf",
@@ -252,18 +268,10 @@ test("文件只有在用户确认后才上传到当前工作", async ({ page }) 
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
   await input.fill("补充这份候选人资料");
   await input.press("Enter");
+  await expect(page.getByText(/已记录新信息/)).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "确认上传到 Hunter" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("dialog").getByText("林昊补充简历.pdf"),
-  ).toBeVisible();
-  await expect(page.getByText("当前工作", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "取消" }).click();
-  await expect(input).toHaveValue("补充这份候选人资料");
-  await input.press("Enter");
-  await page.getByRole("button", { name: "确认上传并发送" }).click();
-  await expect(page.getByText(/已记录新信息/)).toBeVisible();
+  ).toHaveCount(0);
 });
 
 test("本机结果等待、岗位版本变化和身份冲突都有独立状态", async ({ page }) => {

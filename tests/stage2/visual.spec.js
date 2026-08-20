@@ -125,7 +125,7 @@ test("截取阶段二异常状态和移动端详情", async ({ page }) => {
   });
 });
 
-test("截取云端交接、文件上传确认和本机结果回流状态", async ({ page }) => {
+test("截取云端交接和本机结果回流状态", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/workstreams/position-vla");
   await expect(page.getByText("云端检索已开始")).toBeVisible({
@@ -140,25 +140,6 @@ test("截取云端交接、文件上传确认和本机结果回流状态", async
     animations: "disabled",
   });
   await page.getByRole("button", { name: "关闭" }).click();
-
-  await page.locator('input[type="file"]').setInputFiles({
-    name: "林昊补充简历.pdf",
-    mimeType: "application/pdf",
-    buffer: Buffer.from("prototype-resume"),
-  });
-  const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
-  await input.fill("补充这份候选人资料");
-  await input.press("Enter");
-  await expect(
-    page.getByRole("heading", { name: "确认上传到 Hunter" }),
-  ).toBeVisible();
-  await expectNoHorizontalOverflow(page);
-  await page.screenshot({
-    path: `${output}/desktop-upload-confirm.png`,
-    fullPage: true,
-    animations: "disabled",
-  });
-  await page.getByRole("button", { name: "取消" }).click();
   await page.reload();
   await page.evaluate(() => sessionStorage.clear());
 
