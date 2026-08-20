@@ -4,6 +4,7 @@ import { Icon } from "../components/Icon";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import {
   Composer,
+  DecisionRequest,
   HunterReply,
   RuntimeBar,
   UserMessage,
@@ -35,7 +36,12 @@ function CandidateReviewEntry({ onOpen }) {
   );
 }
 
-function WorkstreamHeader({
+export function WorkstreamHeader({
+  type = "岗位招聘",
+  title = "具身智能 VLA 算法负责人",
+  object = "星澜机器人 · 北京",
+  status,
+  statusTone,
   paused,
   terminated,
   onPause,
@@ -56,15 +62,17 @@ function WorkstreamHeader({
   return (
     <header className="s2-workstream-header">
       <div>
-        <span>岗位招聘</span>
-        <h1>具身智能 VLA 算法负责人</h1>
-        <small>星澜机器人 · 北京</small>
+        <span>{type}</span>
+        <h1>{title}</h1>
+        <small>{object}</small>
       </div>
       <div>
         <StatusBadge
-          tone={terminated ? "danger" : paused ? "neutral" : "warning"}
+          tone={
+            terminated ? "danger" : paused ? "neutral" : statusTone || "warning"
+          }
         >
-          {terminated ? "已终止" : paused ? "已暂停" : "等待用户"}
+          {terminated ? "已终止" : paused ? "已暂停" : status || "等待用户"}
         </StatusBadge>
         {!terminated ? (
           <Button
@@ -132,6 +140,10 @@ export function AutomationWorkspace() {
   const [phase, setPhase] = useState(() => {
     if (forcedState === "stream-error") return 1;
     if (forcedState === "limited") return 2;
+    if (forcedState === "review") return 4;
+    if (forcedState === "no-candidate") return 4;
+    if (forcedState === "waiting" || forcedState === "candidate-reply")
+      return 5;
     const restored = Number(sessionStorage.getItem("hunter-workstream-phase"));
     return Number.isFinite(restored) ? restored : 0;
   });
@@ -182,6 +194,12 @@ export function AutomationWorkspace() {
   const [streamError, setStreamError] = useState(
     forcedState === "stream-error",
   );
+  const [contactStage, setContactStage] = useState(() => {
+    if (forcedState === "waiting") return "waiting";
+    if (forcedState === "candidate-reply") return "reply";
+    return sessionStorage.getItem("hunter-workstream-contact-stage") || "idle";
+  });
+  const [localError, setLocalError] = useState(forcedState === "error");
   const scrollRef = useRef(null);
   const prompt =
     sessionStorage.getItem("hunter-new-workstream-prompt") || defaultPrompt;
@@ -197,6 +215,17 @@ export function AutomationWorkspace() {
       setPaused(true);
       setStreamError(false);
       setStreamStopped(false);
+    } else if (forcedState === "review") {
+      setPhase(4);
+    } else if (forcedState === "waiting") {
+      setPhase(5);
+      setContactStage("waiting");
+    } else if (forcedState === "candidate-reply") {
+      setPhase(5);
+      setContactStage("reply");
+    } else if (forcedState === "error") {
+      setPhase(3);
+      setLocalError(true);
     }
   }, [forcedState]);
 
@@ -240,6 +269,10 @@ export function AutomationWorkspace() {
   }, [authMode]);
 
   useEffect(() => {
+    sessionStorage.setItem("hunter-workstream-contact-stage", contactStage);
+  }, [contactStage]);
+
+  useEffect(() => {
     if (!forcedState) {
       sessionStorage.setItem("hunter-workstream-paused", paused ? "1" : "0");
       sessionStorage.setItem(
@@ -257,9 +290,9 @@ export function AutomationWorkspace() {
     if (phase > 0)
       scrollRef.current?.scrollTo({
         top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
+        behavior: forcedState ? "auto" : "smooth",
       });
-  }, [phase, userDecisions]);
+  }, [contactStage, forcedState, phase, userDecisions]);
 
   const resetDemo = () => {
     setPhase(0);
@@ -273,6 +306,8 @@ export function AutomationWorkspace() {
     setLatestPlanRequirement("");
     setStreamStopped(false);
     setStreamError(false);
+    setContactStage("idle");
+    setLocalError(false);
     sessionStorage.removeItem("hunter-workstream-phase");
     sessionStorage.removeItem("hunter-workstream-draft");
     sessionStorage.removeItem("hunter-workstream-inspection");
@@ -280,6 +315,7 @@ export function AutomationWorkspace() {
     sessionStorage.removeItem("hunter-workstream-paused");
     sessionStorage.removeItem("hunter-workstream-plan-adjusted");
     sessionStorage.removeItem("hunter-workstream-plan-requirement");
+    sessionStorage.removeItem("hunter-workstream-contact-stage");
     notify("已从第一条输入重新演示", "info");
   };
 
@@ -291,6 +327,7 @@ export function AutomationWorkspace() {
     setPlanAdjusted(false);
     setLatestPlanRequirement("");
     setPaused(false);
+    setContactStage("scope");
   };
 
   const send = (text, files) => {
@@ -315,6 +352,26 @@ export function AutomationWorkspace() {
         `${text}${attachmentText}`,
         `已按同一审核规则处理：${omitted ? "未选择赵星羽，" : ""}4 位候选人已加入岗位储备；其余候选人继续保留在本轮审核结果中。下一步可以继续指定需要联系的人选。`,
       );
+    } else if (contactStage === "waiting") {
+      setUserDecisions((items) => [
+        ...items,
+        {
+          text: `${text}${attachmentText}`,
+          result:
+            "已收到候选人回复或新资料。我会先展示档案变化与合并结果，再只重做受影响的身份检查和岗位匹配。",
+        },
+      ]);
+      setContactStage("reply");
+    } else if (/联系|沟通|微信|电话/.test(text)) {
+      setUserDecisions((items) => [
+        ...items,
+        {
+          text: `${text}${attachmentText}`,
+          result:
+            "已整理联系范围。产生外部影响前，需要确认本次联系对象、渠道和消息边界。",
+        },
+      ]);
+      setContactStage("authorization");
     } else {
       setUserDecisions((items) => [
         ...items,
@@ -469,14 +526,24 @@ export function AutomationWorkspace() {
         currentId="position-vla"
         onToggle={() => setHistoryCollapsed((value) => !value)}
         onCreate={() => navigate("/new")}
-        onSelect={(item) =>
-          item.id === "position-vla"
-            ? null
-            : notify(`已选择“${item.title}”，完整业务剧本在阶段三提交`, "info")
-        }
+        onSelect={(item) => navigate(`/workstreams/${item.id}`)}
       />
       <section className="s2-workstream-main">
         <WorkstreamHeader
+          status={
+            contactStage === "waiting"
+              ? "等待外部"
+              : phase < 4
+                ? "推进中"
+                : "等待用户"
+          }
+          statusTone={
+            contactStage === "waiting"
+              ? "neutral"
+              : phase < 4
+                ? "info"
+                : "warning"
+          }
           paused={paused}
           terminated={terminated}
           onPause={() => {
@@ -566,6 +633,25 @@ export function AutomationWorkspace() {
                 </Button>
               </div>
             ) : null}
+            {localError ? (
+              <div className="s2-local-error" role="alert">
+                <Icon name="warning" />
+                <span>
+                  <b>论文与专利人物线索处理失败</b>
+                  <small>
+                    系统候选人和人才平台结果已经保留。可以只重试失败来源，不重新执行整轮寻访。
+                  </small>
+                </span>
+                <Button
+                  tone="secondary"
+                  size="sm"
+                  icon="refresh"
+                  onClick={() => setLocalError(false)}
+                >
+                  重试失败来源
+                </Button>
+              </div>
+            ) : null}
             {phase >= 3 ? (
               <HunterReply>
                 <h2>岗位边界已经确认</h2>
@@ -611,7 +697,7 @@ export function AutomationWorkspace() {
                 ) : null}
               </HunterReply>
             ) : null}
-            {phase >= 4 ? (
+            {phase >= 4 && forcedState !== "no-candidate" ? (
               <HunterReply>
                 <h2>首批候选人已经可以审核</h2>
                 <p>
@@ -647,6 +733,38 @@ export function AutomationWorkspace() {
                 <CandidateReviewEntry onOpen={() => setReviewOpen(true)} />
               </HunterReply>
             ) : null}
+            {phase >= 4 && forcedState === "no-candidate" ? (
+              <HunterReply>
+                <h2>本轮没有候选人通过岗位门禁</h2>
+                <p>
+                  四个渠道共召回 16 位人物，合并重复身份后保留 11 位；其中 7
+                  位角色层级不匹配，4
+                  位缺少真机产品落地经历，因此没有进入候选人审核。
+                </p>
+                <table className="s2-markdown-table is-compact">
+                  <thead>
+                    <tr>
+                      <th>未进入审核原因</th>
+                      <th>人数</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>角色层级明显不匹配</td>
+                      <td>7</td>
+                    </tr>
+                    <tr>
+                      <td>缺少真机产品落地经历</td>
+                      <td>4</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <blockquote className="s2-markdown-note">
+                  可以补充新的渠道或调整岗位边界后重做受影响步骤；Hunter
+                  不会为了凑数量放宽已经确认的硬门槛。
+                </blockquote>
+              </HunterReply>
+            ) : null}
             {userDecisions.map((decision, index) => (
               <div
                 className="s2-decision-thread"
@@ -664,6 +782,103 @@ export function AutomationWorkspace() {
                 <p>
                   审核结果和岗位储备关系已经保存，执行计划已更新。下一步可以直接告诉我需要联系哪些候选人；联系前仍会检查对象、渠道和授权范围。
                 </p>
+              </HunterReply>
+            ) : null}
+            {contactStage === "authorization" ? (
+              <HunterReply>
+                <DecisionRequest
+                  title="是否允许联系这 3 位候选人？"
+                  description="拟通过猎聘向林昊、周明远和陈楚宁发送已审核的岗位沟通消息；不会正式推荐，不会改变候选人推进阶段。"
+                  options={[
+                    {
+                      value: "allow",
+                      label: "仅允许本次联系",
+                      description: "发送 3 条消息，随后分别进入等待外部。",
+                    },
+                    {
+                      value: "edit",
+                      label: "先修改对象或消息",
+                      description: "保留当前范围，在下方输入修改意见。",
+                    },
+                    {
+                      value: "deny",
+                      label: "暂不联系",
+                      description: "岗位储备关系继续保留，不产生外部动作。",
+                    },
+                  ]}
+                  onSelect={(option) => {
+                    if (option.value === "allow") setContactStage("waiting");
+                    else
+                      notify(
+                        option.value === "edit"
+                          ? "请在下方输入需要修改的联系人选或消息"
+                          : "已保留岗位储备，本次不联系候选人",
+                        "info",
+                      );
+                  }}
+                />
+              </HunterReply>
+            ) : null}
+            {contactStage === "waiting" ? (
+              <section className="s3-external-wait">
+                <div className="s3-wait-icon">
+                  <Icon name="clock" />
+                </div>
+                <span>
+                  <small>等待外部</small>
+                  <b>等待 3 位候选人回复岗位沟通</b>
+                  <p>
+                    消息已发送，岗位储备关系没有变化。收到回复或简历后会回到本主线；也可以手动补充电话、微信和线下结果。
+                  </p>
+                  <em>
+                    最近检查：刚刚 · 下次检查：2 小时后 · 等待期间不消耗 Agent
+                    用量
+                  </em>
+                </span>
+                <Button
+                  tone="secondary"
+                  size="sm"
+                  onClick={() =>
+                    notify("可以在下方输入回复内容或上传新简历", "info")
+                  }
+                >
+                  补充线下结果
+                </Button>
+              </section>
+            ) : null}
+            {contactStage === "reply" ? (
+              <HunterReply>
+                <h2>林昊的新简历已合并并完成局部重匹配</h2>
+                <p>
+                  新简历补充了最近 8
+                  个月的团队扩张和真机数据闭环项目，没有创建重复候选人档案。原始简历版本继续保留。
+                </p>
+                <table className="s2-markdown-table">
+                  <thead>
+                    <tr>
+                      <th>变化</th>
+                      <th>影响</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>团队规模从 8 人更新为 15 人</td>
+                      <td>团队管理分项提高</td>
+                    </tr>
+                    <tr>
+                      <td>新增量产双臂机器人项目</td>
+                      <td>产品落地风险降低</td>
+                    </tr>
+                    <tr>
+                      <td>明确只考虑北京或远程</td>
+                      <td>地点风险已更新</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <blockquote className="s2-markdown-note">
+                  正式推荐、面试安排、薪资承诺、Offer
+                  和推进阶段仍由猎头手动处理。
+                </blockquote>
               </HunterReply>
             ) : null}
             {terminated ? (

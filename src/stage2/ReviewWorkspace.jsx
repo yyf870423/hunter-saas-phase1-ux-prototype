@@ -13,11 +13,28 @@ function recommendationTone(recommendation) {
 export function InspectionPanel({ item, onClose }) {
   if (!item) return null;
   const isTask = item.kind === "task";
+  const checkpoints = item.checkpoints || [
+    {
+      title: "数据读取完成",
+      detail: "输入范围与来源权限已检查",
+      done: true,
+    },
+    {
+      title: "身份与重复检查完成",
+      detail: "未生成重复候选人记录",
+      done: true,
+    },
+    {
+      title: "等待业务审核",
+      detail: "用户决定后从当前检查点继续",
+      done: false,
+    },
+  ];
   return (
     <aside className="s2-inspector" aria-label="当前检查内容">
       <header>
         <span>
-          <small>{isTask ? "内部任务" : "证据集合"}</small>
+          <small>{isTask ? item.kindLabel || "相关任务" : "证据集合"}</small>
           <h2>{item.title}</h2>
         </span>
         <IconButton icon="close" label="关闭检查区" onClick={onClose} />
@@ -41,40 +58,35 @@ export function InspectionPanel({ item, onClose }) {
             </div>
             <div>
               <dt>结果去向</dt>
-              <dd>具身智能 VLA 算法负责人 · 候选人审核</dd>
+              <dd>
+                {item.resultDestination ||
+                  "具身智能 VLA 算法负责人 · 候选人审核"}
+              </dd>
             </div>
           </dl>
           <section>
             <h3>处理检查点</h3>
             <ol className="s2-checkpoints">
-              <li className="is-done">
-                <Icon name="check" />
-                <span>
-                  <b>数据读取完成</b>
-                  <small>输入范围与来源权限已检查</small>
-                </span>
-              </li>
-              <li className="is-done">
-                <Icon name="check" />
-                <span>
-                  <b>身份与重复检查完成</b>
-                  <small>未生成重复候选人记录</small>
-                </span>
-              </li>
-              <li>
-                <Icon name="clock" />
-                <span>
-                  <b>等待业务审核</b>
-                  <small>用户决定后从当前检查点继续</small>
-                </span>
-              </li>
+              {checkpoints.map((checkpoint) => (
+                <li
+                  className={checkpoint.done ? "is-done" : undefined}
+                  key={checkpoint.title}
+                >
+                  <Icon name={checkpoint.done ? "check" : "clock"} />
+                  <span>
+                    <b>{checkpoint.title}</b>
+                    <small>{checkpoint.detail}</small>
+                  </span>
+                </li>
+              ))}
             </ol>
           </section>
         </div>
       ) : (
         <div className="s2-inspector-content">
           <p className="s2-inspector-lead">
-            本次岗位边界由三类来源共同确认。存在冲突的内容不会进入自动筛选门槛。
+            {item.lead ||
+              "本次岗位边界由三类来源共同确认。存在冲突的内容不会进入自动筛选门槛。"}
           </p>
           <div className="s2-source-list">
             {item.rows.map((row, index) => (

@@ -5,6 +5,7 @@ import App from "./App";
 import { ToastProvider } from "./stage1/ui";
 import "./stage1/stage1.css";
 import "./stage2/stage2.css";
+import "./stage3/stage3.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

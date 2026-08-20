@@ -37,15 +37,6 @@ export const workstreamHistory = [
     tone: "neutral",
     time: "昨天 18:26",
   },
-  {
-    id: "client-cloudchip",
-    type: "客户开发",
-    title: "云脉芯能机器人团队",
-    object: "云脉芯能",
-    status: "草稿",
-    tone: "neutral",
-    time: "8 月 17 日",
-  },
 ];
 
 export const planSteps = [

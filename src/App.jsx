@@ -7,7 +7,7 @@ import { NewWork } from "./stage2/NewWork";
 import { SideTaskDetail, SideTasksPage } from "./stage2/SideTasks";
 import { SignalsPage } from "./stage2/Signals";
 import { Stage2ReviewPage } from "./stage2/Stage2ReviewPage";
-import { AutomationWorkspace } from "./stage2/Workstreams";
+import { WorkstreamRoute } from "./stage3/WorkstreamRoute";
 
 export default function App() {
   return (
@@ -25,7 +25,7 @@ export default function App() {
         />
         <Route
           path="/workstreams/:workstreamId"
-          element={<AutomationWorkspace />}
+          element={<WorkstreamRoute />}
         />
         <Route path="/tasks" element={<SideTasksPage />} />
         <Route path="/tasks/new" element={<Navigate to="/new" replace />} />
