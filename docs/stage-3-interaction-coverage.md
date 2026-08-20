@@ -42,7 +42,7 @@
 
 无法通过 URL 独立进入的交互必须在最终验收清单中提供入口和操作步骤，包括审核、授权、补充文件、计划调整、等待恢复、终止和删除。
 
-专用业务空结果分别使用客户开发 `state=no-contact`、岗位招聘 `state=no-candidate`、人才摸排 `state=gaps` 和候选人求职 `state=no-position` 表达，不使用与业务无关的统一空白占位。岗位招聘额外提供 `state=local-waiting`、`state=stale-task` 和 `state=merge-conflict`，分别验收等待本机结果、岗位版本变化和身份合并冲突。
+专用业务空结果分别使用客户开发 `state=no-contact`、岗位招聘 `state=no-candidate`、人才摸排 `state=gaps` 和候选人求职 `state=no-position` 表达，不使用与业务无关的统一空白占位。岗位招聘额外提供 `state=local-waiting`、`state=stale-task` 和 `state=merge-conflict`，分别验收等待本机结果、岗位版本变化和身份合并冲突。身份合并冲突必须在决定选项前显示两份资料的来源、更新时间和逐字段差异，不能只给冲突摘要后要求用户直接决定。
 
 人才摸排审核新增以下交互覆盖：
 

@@ -739,3 +739,63 @@ export function DecisionRequest({ title, description, options, onSelect }) {
     </section>
   );
 }
+
+export function IdentityConflictReview({
+  title,
+  description,
+  records,
+  differences,
+  note,
+}) {
+  return (
+    <section className="s2-identity-compare">
+      <header>
+        <Icon name="warning" />
+        <span>
+          <b>{title}</b>
+          <small>{description}</small>
+        </span>
+      </header>
+      <div className="s2-identity-records">
+        {records.map((record) => (
+          <article key={record.label}>
+            <small>{record.label}</small>
+            <b>{record.name}</b>
+            <p>{record.organization}</p>
+            <span>{record.role}</span>
+            <span>
+              {record.source} · {record.updatedAt}
+            </span>
+          </article>
+        ))}
+      </div>
+      <div className="s2-identity-differences">
+        <table>
+          <thead>
+            <tr>
+              <th>对比字段</th>
+              <th>{records[0].label}</th>
+              <th>{records[1].label}</th>
+              <th>系统判断</th>
+            </tr>
+          </thead>
+          <tbody>
+            {differences.map((difference) => (
+              <tr key={difference.field}>
+                <th>{difference.field}</th>
+                <td data-label={records[0].label}>{difference.current}</td>
+                <td data-label={records[1].label}>{difference.incoming}</td>
+                <td data-label="系统判断">
+                  <span className={`tone-${difference.tone}`}>
+                    {difference.assessment}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>{note}</p>
+    </section>
+  );
+}

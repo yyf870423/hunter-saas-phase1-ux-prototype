@@ -8,6 +8,7 @@ import {
   DecisionRequest,
   EmailDraftReview,
   HunterReply,
+  IdentityConflictReview,
   RuntimeBar,
   UserMessage,
   WorkstreamHistory,
@@ -804,9 +805,69 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
             ) : null}
             {forcedState === "merge-conflict" ? (
               <HunterReply>
+                <IdentityConflictReview
+                  title="合并前资料对比"
+                  description="以下两份资料可能属于同一位候选人，但有两项内容不能自动确认。"
+                  records={[
+                    {
+                      label: "系统候选人记录",
+                      name: "林昊",
+                      organization: "拓界机器人",
+                      role: "机器人学习负责人",
+                      source: "候选人库",
+                      updatedAt: "2026-08-14 更新",
+                    },
+                    {
+                      label: "本机返回资料",
+                      name: "林昊",
+                      organization: "拓界机器人 · 具身智能中心",
+                      role: "VLA 算法负责人",
+                      source: "猎聘简历",
+                      updatedAt: "2026-08-21 获取",
+                    },
+                  ]}
+                  differences={[
+                    {
+                      field: "手机号后四位",
+                      current: "2816",
+                      incoming: "2816",
+                      assessment: "一致",
+                      tone: "same",
+                    },
+                    {
+                      field: "当前公司与部门",
+                      current: "拓界机器人",
+                      incoming: "拓界机器人 · 具身智能中心",
+                      assessment: "可能是部门补充",
+                      tone: "supplement",
+                    },
+                    {
+                      field: "当前职位",
+                      current: "机器人学习负责人",
+                      incoming: "VLA 算法负责人",
+                      assessment: "可能是职务更新",
+                      tone: "supplement",
+                    },
+                    {
+                      field: "最近项目时间",
+                      current: "2024.03–2025.12",
+                      incoming: "2024.05–2025.12",
+                      assessment: "开始时间相差 2 个月",
+                      tone: "conflict",
+                    },
+                    {
+                      field: "教育经历",
+                      current: "清华大学 · 自动化 · 硕士",
+                      incoming: "清华大学 · 自动化 · 硕士",
+                      assessment: "一致",
+                      tone: "same",
+                    },
+                  ]}
+                  note="如果确认合并，Hunter 会保留两个原始来源；一致字段直接复用，补充字段按较新资料更新，项目时间冲突保留在变化记录中。"
+                />
                 <DecisionRequest
                   title="林昊的资料存在冲突，确认后才能合并"
-                  description="系统候选人记录为“拓界机器人”，本机返回资料为“拓界机器人具身智能中心”；手机号后四位一致，最近项目时间存在两个月差异。"
+                  description="请根据上方资料来源和字段差异，确认这两份记录是否属于同一人。"
                   options={[
                     {
                       value: "merge",

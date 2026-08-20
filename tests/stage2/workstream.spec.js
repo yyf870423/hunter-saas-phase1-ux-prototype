@@ -285,6 +285,17 @@ test("本机结果等待、岗位版本变化和身份冲突都有独立状态",
 
   await page.goto("#/workstreams/position-vla?state=merge-conflict");
   await expect(page.getByText(/林昊的资料存在冲突/)).toBeVisible();
+  await expect(page.getByText("合并前资料对比")).toBeVisible();
+  const identityTable = page.locator(".s2-identity-differences table");
+  await expect(identityTable).toContainText("系统候选人记录");
+  await expect(identityTable).toContainText("本机返回资料");
+  await expect(identityTable).toContainText("手机号后四位");
+  await expect(identityTable).toContainText("开始时间相差 2 个月");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator(".s2-identity-differences tbody tr")).toHaveCount(
+    5,
+  );
+  await expectNoHorizontalOverflow(page);
   await page.getByRole("button", { name: /确认为同一人并合并/ }).click();
   await expect(page.getByText(/已合并林昊的资料/)).toBeVisible();
 });
