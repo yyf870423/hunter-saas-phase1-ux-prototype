@@ -49,14 +49,14 @@ export const planSteps = [
   },
   {
     id: "recall",
-    title: "并行召回候选人与人物线索",
-    detail: "系统候选人、人才平台、论文与专利来源并行处理。",
+    title: "云端检索并准备本地任务",
+    detail: "系统候选人、公开网络、论文专利与本机渠道并行处理。",
     requirement: "多渠道找人；北京优先，异地人选保留地点意愿风险。",
   },
   {
     id: "enrich",
-    title: "补全、查重并执行匹配门禁",
-    detail: "保留来源证据，跳过明确不满足硬门槛的人选。",
+    title: "持续合并并执行匹配门禁",
+    detail: "每批结果到达后立即补全、查重、合并和匹配。",
     requirement: "只保留角色、能力和经历满足岗位边界的人选。",
   },
   {
@@ -68,8 +68,8 @@ export const planSteps = [
   {
     id: "followup",
     title: "按决定继续后续动作",
-    detail: "外部联系前再次检查授权、对象和渠道范围。",
-    requirement: "先交付审核结果，不直接联系候选人。",
+    detail: "邮件发送前逐次确认收件人、主题、正文和附件。",
+    requirement: "先交付审核结果；没有用户确认时不发送邮件。",
   },
 ];
 
@@ -83,11 +83,11 @@ export const internalTasks = [
     duration: "18 秒",
   },
   {
-    id: "internal-platforms",
-    title: "人才平台并行寻访",
+    id: "internal-local-handoff",
+    title: "准备本地任务并接收结果",
     status: "完成",
     tone: "success",
-    action: "猎聘与脉脉共形成 12 位不重复候选人",
+    action: "本机返回 12 位候选人，已进入云端合并门禁",
     duration: "8 分 42 秒",
   },
   {
@@ -328,7 +328,9 @@ export const candidates = candidateBase.map(
     risk,
     years: 8 + (index % 6),
     education: index % 4 === 0 ? "博士" : "硕士",
-    source: ["系统候选人", "猎聘", "脉脉", "论文线索"][index % 4],
+    source: ["系统候选人", "本机批次 · 猎聘", "本机批次 · 脉脉", "论文线索"][
+      index % 4
+    ],
     skills: ["VLA", "机器人学习", "多模态模型"].slice(0, 2 + (index % 2)),
   }),
 );

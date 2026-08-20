@@ -741,7 +741,7 @@ export function Stage1Shell() {
         open={usageOpen}
         close={() => setUsageOpen(false)}
         title="本月 Agent 用量"
-        description="仅实际运行的 Agent、搜索、浏览器和数据处理任务消耗用量"
+        description="仅实际运行的 Agent、公开网络搜索和数据处理任务消耗用量"
         footer={
           <Button tone="primary" onClick={() => setUsageOpen(false)}>
             知道了

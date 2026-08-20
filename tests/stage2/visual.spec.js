@@ -11,6 +11,14 @@ test.beforeAll(async () => {
   await mkdir(output, { recursive: true });
 });
 
+async function continueOnLocalDevice(page) {
+  await expect(page.getByText("云端检索已开始")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "在本机继续" }).click();
+  await page.getByRole("button", { name: "在此设备继续" }).click();
+}
+
 for (const viewport of [
   { name: "desktop", width: 1440, height: 900 },
   { name: "ipad", width: 820, height: 1180 },
@@ -20,6 +28,7 @@ for (const viewport of [
     const assertNoConsoleErrors = trackConsoleErrors(page);
     await page.setViewportSize(viewport);
     await page.goto("#/workstreams/position-vla");
+    await continueOnLocalDevice(page);
     await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
       timeout: 10_000,
     });
@@ -35,6 +44,7 @@ for (const viewport of [
 test("截取候选人审核、支线任务和信号中心", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/workstreams/position-vla");
+  await continueOnLocalDevice(page);
   await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -113,4 +123,67 @@ test("截取阶段二异常状态和移动端详情", async ({ page }) => {
     path: `${output}/iphone-signal-detail.png`,
     fullPage: true,
   });
+});
+
+test("截取云端交接、文件上传确认和本机结果回流状态", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("#/workstreams/position-vla");
+  await expect(page.getByText("云端检索已开始")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "在本机继续" }).click();
+  await expect(page.getByRole("heading", { name: "在本机继续" })).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/desktop-local-handoff.png`,
+    fullPage: true,
+    animations: "disabled",
+  });
+  await page.getByRole("button", { name: "关闭" }).click();
+
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "林昊补充简历.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("prototype-resume"),
+  });
+  const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
+  await input.fill("补充这份候选人资料");
+  await input.press("Enter");
+  await expect(
+    page.getByRole("heading", { name: "确认上传到 Hunter" }),
+  ).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/desktop-upload-confirm.png`,
+    fullPage: true,
+    animations: "disabled",
+  });
+  await page.getByRole("button", { name: "取消" }).click();
+  await page.reload();
+  await page.evaluate(() => sessionStorage.clear());
+
+  for (const [state, marker, filename] of [
+    ["local-waiting", "等待本机结果", "desktop-local-waiting.png"],
+    [
+      "stale-task",
+      "岗位信息已更新，本地任务使用的是上一版本",
+      "desktop-stale-task.png",
+    ],
+    [
+      "merge-conflict",
+      "林昊的资料存在冲突，确认后才能合并",
+      "desktop-merge-conflict.png",
+    ],
+  ]) {
+    await page.goto(`#/workstreams/position-vla?state=${state}`);
+    const stateMarker = page.getByText(marker);
+    await expect(stateMarker).toBeVisible({ timeout: 10_000 });
+    await stateMarker.scrollIntoViewIfNeeded();
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `${output}/${filename}`,
+      fullPage: true,
+      animations: "disabled",
+    });
+  }
 });

@@ -1473,6 +1473,215 @@
   width: 13px;
 }
 
+.s2-upload-confirm {
+  display: grid;
+  gap: 14px;
+}
+.s2-upload-confirm-target {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s2-upload-confirm-target span,
+.s2-upload-confirm-list small,
+.s2-upload-confirm > p {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-upload-confirm-list {
+  display: grid;
+  gap: 8px;
+}
+.s2-upload-confirm-list > div {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 8px 10px;
+  background: var(--s1-surface-raised);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s2-upload-confirm-list > div > i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 7px;
+}
+.s2-upload-confirm-list b,
+.s2-upload-confirm-list small {
+  display: block;
+}
+.s2-upload-confirm-list b {
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s2-upload-confirm-list small {
+  margin-top: 3px;
+}
+.s2-upload-confirm > p {
+  margin: 0;
+  line-height: 18px;
+}
+
+.s2-email-review {
+  overflow: hidden;
+  background: var(--s1-surface-raised);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
+}
+.s2-email-review > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 14px;
+  background: var(--s1-canvas);
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-email-review > header > i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 8px;
+}
+.s2-email-review > header b,
+.s2-email-review > header small {
+  display: block;
+}
+.s2-email-review > header b {
+  font-size: 13px;
+}
+.s2-email-review > header small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-email-fields {
+  display: grid;
+  gap: 11px;
+  padding: 14px;
+}
+.s2-email-fields label {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+}
+.s2-email-fields label > span {
+  padding-top: 9px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-email-fields input,
+.s2-email-fields textarea {
+  width: 100%;
+  color: var(--s1-ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 7px;
+  outline: 0;
+}
+.s2-email-fields input {
+  height: 38px;
+  padding: 0 10px;
+}
+.s2-email-fields input[readonly] {
+  color: var(--s1-muted);
+  background: var(--s1-canvas);
+}
+.s2-email-fields textarea {
+  min-height: 138px;
+  padding: 9px 10px;
+  resize: vertical;
+}
+.s2-email-fields input:focus,
+.s2-email-fields textarea:focus {
+  border-color: var(--s1-accent);
+  box-shadow: 0 0 0 3px var(--s1-accent-soft);
+}
+.s2-email-review > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 14px;
+  background: var(--s1-canvas);
+  border-top: 1px solid var(--s1-line);
+}
+.s2-email-review > footer > small {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-email-review > footer > div {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+.s2-handoff-options {
+  display: grid;
+  gap: 10px;
+}
+.s2-handoff-options > section {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 66px;
+  padding: 10px 12px;
+  background: var(--s1-surface-raised);
+  border: 1px solid var(--s1-line);
+  border-radius: 9px;
+}
+.s2-handoff-options > section.is-unavailable {
+  background: var(--s1-canvas);
+}
+.s2-handoff-options > section > i {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 8px;
+}
+.s2-handoff-options b,
+.s2-handoff-options small {
+  display: block;
+}
+.s2-handoff-options b {
+  font-size: 13px;
+}
+.s2-handoff-options small {
+  margin-top: 3px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-handoff-options > p {
+  margin: 2px 0 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
 .s2-workspace-loading {
   display: grid;
   height: 100%;

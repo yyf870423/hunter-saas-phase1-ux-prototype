@@ -133,10 +133,10 @@ export function ComponentsPage() {
             <Icon name="warning" />
           </i>
           <div>
-            <b>平台登录已失效</b>
-            <p>相关任务已暂停，已获取结果和检查点已保留。</p>
+            <b>本机协作暂不可用</b>
+            <p>云端任务继续运行，已有结果和检查点均保留。</p>
           </div>
-          <Button size="sm">处理登录</Button>
+          <Button size="sm">查看处理方式</Button>
         </article>
       </section>
       <Modal

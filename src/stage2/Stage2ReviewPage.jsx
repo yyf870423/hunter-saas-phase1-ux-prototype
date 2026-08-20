@@ -62,9 +62,24 @@ const reviewLinks = [
     "保留已生成内容并从当前检查点继续",
   ],
   [
-    "权限受限",
+    "本机协作异常",
     "/workstreams/position-vla?state=limited",
-    "单个平台失效只暂停受影响任务",
+    "本机暂不可用时保留云端进展，并允许下载任务后继续",
+  ],
+  [
+    "等待本机结果",
+    "/workstreams/position-vla?state=local-waiting",
+    "云端结果先行可见，本机批次尚未返回时不阻塞主线",
+  ],
+  [
+    "旧版本结果回流",
+    "/workstreams/position-vla?state=stale-task",
+    "岗位发生更新后，旧任务结果按最新版本重新匹配",
+  ],
+  [
+    "候选人合并冲突",
+    "/workstreams/position-vla?state=merge-conflict",
+    "本机批次与云端候选人疑似同人时等待用户决定",
   ],
   ["阶段一工作台", "/home", "已审批并冻结的全局框架与工作台"],
 ];

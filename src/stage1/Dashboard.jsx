@@ -368,11 +368,14 @@ export function Dashboard() {
             <Icon name="warning" />
           </i>
           <div>
-            <b>脉脉登录已失效，相关任务已暂停</b>
-            <p>检查点和已获取结果已保留，其他业务主线与资产不受影响。</p>
+            <b>本机协作暂不可用</b>
+            <p>云端检索和已有结果继续保留，可稍后在本机继续或下载本地任务。</p>
           </div>
-          <Button size="sm" onClick={() => openPlaceholder("处理人才平台登录")}>
-            处理平台登录
+          <Button
+            size="sm"
+            onClick={() => openPlaceholder("查看本机协作处理方式")}
+          >
+            查看处理方式
           </Button>
         </section>
       ) : null}

@@ -242,7 +242,7 @@ test("截取岗位招聘的审核、外部等待和简历回流状态", async ({
     ["position-vla?state=review", "首批候选人已经可以审核", "position-review"],
     [
       "position-vla?state=waiting",
-      "等待 3 位候选人回复岗位沟通",
+      "等待 3 位候选人回复邮件",
       "position-waiting",
     ],
     [
@@ -270,5 +270,23 @@ test("截取岗位招聘无候选人结果", async ({ page }) => {
   await page.screenshot({
     path: `${output}/desktop-position-no-candidate.png`,
     fullPage: true,
+  });
+});
+
+test("截取客户开发邮件逐次确认", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("#/workstreams/client-xinglan");
+  await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "打开公司与联系人审核" }).click();
+  await page.getByRole("button", { name: "保存审核结果" }).click();
+  await expect(page.getByText("确认邮件内容")).toBeVisible();
+  await page.locator(".s2-email-review").scrollIntoViewIfNeeded();
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/desktop-email-confirm.png`,
+    fullPage: true,
+    animations: "disabled",
   });
 });

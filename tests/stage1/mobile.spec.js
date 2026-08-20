@@ -40,5 +40,5 @@ test("iPhone 空状态和权限状态可读", async ({ page }) => {
     page.getByRole("heading", { name: "还没有业务主线" }),
   ).toBeVisible();
   await page.goto("#/home?state=limited");
-  await expect(page.getByText("脉脉登录已失效，相关任务已暂停")).toBeVisible();
+  await expect(page.getByText("本机协作暂不可用")).toBeVisible();
 });

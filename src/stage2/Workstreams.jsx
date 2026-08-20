@@ -6,6 +6,7 @@ import {
   Composer,
   createMarkdownTable,
   DecisionRequest,
+  EmailDraftReview,
   HunterReply,
   RuntimeBar,
   UserMessage,
@@ -141,6 +142,9 @@ export function AutomationWorkspace() {
   const [phase, setPhase] = useState(() => {
     if (forcedState === "stream-error") return 1;
     if (forcedState === "limited") return 2;
+    if (forcedState === "local-waiting" || forcedState === "stale-task")
+      return 3;
+    if (forcedState === "merge-conflict") return 4;
     if (forcedState === "review") return 4;
     if (forcedState === "no-candidate") return 4;
     if (forcedState === "waiting" || forcedState === "candidate-reply")
@@ -150,9 +154,8 @@ export function AutomationWorkspace() {
   });
   const [paused, setPaused] = useState(
     () =>
-      forcedState === "limited" ||
-      (!forcedState &&
-        sessionStorage.getItem("hunter-workstream-paused") === "1"),
+      !forcedState &&
+      sessionStorage.getItem("hunter-workstream-paused") === "1",
   );
   const [terminated, setTerminated] = useState(false);
   const [runtimeOpen, setRuntimeOpen] = useState(
@@ -201,6 +204,19 @@ export function AutomationWorkspace() {
     return sessionStorage.getItem("hunter-workstream-contact-stage") || "idle";
   });
   const [localError, setLocalError] = useState(forcedState === "error");
+  const [handoffOpen, setHandoffOpen] = useState(false);
+  const [handoffComplete, setHandoffComplete] = useState(
+    () =>
+      [
+        "local-waiting",
+        "stale-task",
+        "merge-conflict",
+        "review",
+        "waiting",
+        "candidate-reply",
+      ].includes(forcedState) ||
+      sessionStorage.getItem("hunter-workstream-handoff") === "1",
+  );
   const scrollRef = useRef(null);
   const prompt =
     sessionStorage.getItem("hunter-new-workstream-prompt") || defaultPrompt;
@@ -213,9 +229,19 @@ export function AutomationWorkspace() {
       setStreamStopped(false);
     } else if (forcedState === "limited") {
       setPhase(2);
-      setPaused(true);
+      setPaused(false);
       setStreamError(false);
       setStreamStopped(false);
+      setHandoffComplete(false);
+    } else if (
+      forcedState === "local-waiting" ||
+      forcedState === "stale-task"
+    ) {
+      setPhase(3);
+      setHandoffComplete(true);
+    } else if (forcedState === "merge-conflict") {
+      setPhase(4);
+      setHandoffComplete(true);
     } else if (forcedState === "review") {
       setPhase(4);
     } else if (forcedState === "waiting") {
@@ -231,7 +257,15 @@ export function AutomationWorkspace() {
   }, [forcedState]);
 
   useEffect(() => {
-    if (paused || terminated || streamStopped || streamError || phase >= 4)
+    if (forcedState && forcedState !== "stream-error") return undefined;
+    if (
+      paused ||
+      terminated ||
+      streamStopped ||
+      streamError ||
+      phase >= 4 ||
+      (phase === 2 && !handoffComplete)
+    )
       return undefined;
     const delays = [700, 1200, 1450, 1750];
     const timer = window.setTimeout(
@@ -239,7 +273,22 @@ export function AutomationWorkspace() {
       delays[phase] || 1200,
     );
     return () => window.clearTimeout(timer);
-  }, [paused, phase, streamError, streamStopped, terminated]);
+  }, [
+    forcedState,
+    handoffComplete,
+    paused,
+    phase,
+    streamError,
+    streamStopped,
+    terminated,
+  ]);
+
+  useEffect(() => {
+    sessionStorage.setItem(
+      "hunter-workstream-handoff",
+      handoffComplete ? "1" : "0",
+    );
+  }, [handoffComplete]);
 
   useEffect(() => {
     if (!forcedState)
@@ -309,6 +358,8 @@ export function AutomationWorkspace() {
     setStreamError(false);
     setContactStage("idle");
     setLocalError(false);
+    setHandoffOpen(false);
+    setHandoffComplete(false);
     sessionStorage.removeItem("hunter-workstream-phase");
     sessionStorage.removeItem("hunter-workstream-draft");
     sessionStorage.removeItem("hunter-workstream-inspection");
@@ -317,6 +368,7 @@ export function AutomationWorkspace() {
     sessionStorage.removeItem("hunter-workstream-plan-adjusted");
     sessionStorage.removeItem("hunter-workstream-plan-requirement");
     sessionStorage.removeItem("hunter-workstream-contact-stage");
+    sessionStorage.removeItem("hunter-workstream-handoff");
     notify("已从第一条输入重新演示", "info");
   };
 
@@ -363,13 +415,13 @@ export function AutomationWorkspace() {
         },
       ]);
       setContactStage("reply");
-    } else if (/联系|沟通|微信|电话/.test(text)) {
+    } else if (/联系|沟通|邮件/.test(text)) {
       setUserDecisions((items) => [
         ...items,
         {
           text: `${text}${attachmentText}`,
           result:
-            "已整理联系范围。产生外部影响前，需要确认本次联系对象、渠道和消息边界。",
+            "已整理联系范围并生成邮件草稿。邮件不会自动发送，请先确认收件人、主题和正文。",
         },
       ]);
       setContactStage("authorization");
@@ -467,7 +519,8 @@ export function AutomationWorkspace() {
             : phase >= 2
               ? {
                   title: "岗位边界已确认",
-                  detail: "已按确认后的条件启动系统、人才平台和研究来源召回。",
+                  detail:
+                    "云端候选人和公开资料检索已经开始；本机任务由用户选择设备后继续。",
                   time: "09:02",
                   tone: "info",
                 }
@@ -565,7 +618,7 @@ export function AutomationWorkspace() {
             {phase >= 1 ? (
               <HunterReply
                 streaming={phase === 1 && !streamStopped}
-                markdown={`我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行检索系统候选人、人才平台和研究来源。${
+                markdown={`我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行处理系统候选人、公开资料和需要在本机继续的渠道。${
                   phase >= 2
                     ? `
 
@@ -619,17 +672,17 @@ export function AutomationWorkspace() {
               <div className="s2-permission-state">
                 <Icon name="warning" />
                 <span>
-                  <b>猎聘登录已失效，相关内部任务已暂停</b>
+                  <b>本机协作暂不可用</b>
                   <small>
-                    其他来源和已有结果不受影响。处理平台账号后可以从检查点继续。
+                    云端检索和已有结果继续保留。可以稍后在本机继续，或下载本地任务。
                   </small>
                 </span>
                 <Button
                   tone="secondary"
                   size="sm"
-                  onClick={() => notify("已打开人才平台处理入口", "info")}
+                  onClick={() => setHandoffOpen(true)}
                 >
-                  打开平台处理
+                  查看处理方式
                 </Button>
               </div>
             ) : null}
@@ -639,7 +692,7 @@ export function AutomationWorkspace() {
                 <span>
                   <b>论文与专利人物线索处理失败</b>
                   <small>
-                    系统候选人和人才平台结果已经保留。可以只重试失败来源，不重新执行整轮寻访。
+                    系统候选人、公开资料和本机返回结果已经保留。可以只重试失败来源，不重新执行整轮工作。
                   </small>
                 </span>
                 <Button
@@ -652,23 +705,71 @@ export function AutomationWorkspace() {
                 </Button>
               </div>
             ) : null}
+            {phase >= 2 ? (
+              <HunterReply
+                markdown={`## 云端检索已开始
+
+Hunter 正在检查系统候选人、论文、专利和公开网络资料。需要在本机处理的渠道不会在云端运行，也不会阻塞云端结果。`}
+              >
+                <div className="s2-markdown-action-row">
+                  <Button
+                    tone={handoffComplete ? "secondary" : "primary"}
+                    icon={handoffComplete ? "check" : "download"}
+                    onClick={() => setHandoffOpen(true)}
+                  >
+                    {handoffComplete ? "本地任务已准备" : "在本机继续"}
+                  </Button>
+                  <small>
+                    {handoffComplete
+                      ? "本机结果返回后会自动进入身份检查、去重、合并和匹配。"
+                      : "可以选择已连接设备，也可以下载任务后在本机处理。"}
+                  </small>
+                </div>
+              </HunterReply>
+            ) : null}
+            {forcedState === "local-waiting" ? (
+              <div className="s2-system-state">
+                <Icon name="clock" />
+                <span>
+                  <b>等待本机结果</b>
+                  <small>
+                    云端已经形成 9
+                    位候选人，本地任务仍在处理。新结果会随时合并，不需要等待全部来源结束。
+                  </small>
+                </span>
+              </div>
+            ) : null}
+            {forcedState === "stale-task" ? (
+              <div className="s2-permission-state">
+                <Icon name="warning" />
+                <span>
+                  <b>岗位信息已更新，本地任务使用的是上一版本</b>
+                  <small>
+                    已返回候选人仍会接收，但会按照最新岗位重新匹配；后续本地任务将使用新版本。
+                  </small>
+                </span>
+              </div>
+            ) : null}
             {phase >= 3 ? (
               <HunterReply
-                markdown={`## 岗位边界已经确认
+                markdown={`## 候选人结果正在持续合并
 
-我找到了三类能够相互印证的输入。没有把“纯学术经历”直接判断为不合适，而是把产品落地和团队管理作为本轮必须单独检查的风险项。
+云端和本机结果不需要同时完成。每批结果到达后，Hunter 都会立即执行身份检查、去重、资料合并和最新岗位匹配，再把新增或变化的人选交给你审核。
 
-${createMarkdownTable(
-  ["来源", "确认结果", "时效"],
-  evidenceRows.map((row) => [row.source, row.finding, row.freshness]),
-)}`}
+| 来源 | 本批结果 | 合并后变化 |
+| --- | --- | --- |
+| 系统候选人 | 8 位 | 新增 5 位，更新 2 位，合并重复 1 位 |
+| 论文、专利与公开网络 | 14 位人物线索 | 转为候选人 4 位，保留线索 10 位 |
+| 本机结果 | 12 位 | 新增 9 位，更新 2 位，合并重复 1 位 |
+
+> 原始简历附件不会随候选人批次自动上传。来源资料仅保留来源平台和本地批次，不在云端保存认证页面链接。`}
               >
                 <button
                   type="button"
                   className="s2-markdown-link"
                   onClick={() =>
                     setInspection({
-                      title: "岗位边界与来源证据",
+                      title: "候选人来源与合并记录",
                       rows: evidenceRows,
                       kind: "evidence",
                     })
@@ -679,7 +780,7 @@ ${createMarkdownTable(
                 {phase === 3 ? (
                   <p className="s2-progress-line">
                     <span />
-                    正在补全候选人资料并执行身份、重复和匹配门禁…
+                    正在处理新到达批次，并更新候选人审核结果…
                   </p>
                 ) : null}
               </HunterReply>
@@ -699,6 +800,34 @@ ${createMarkdownTable(
 > 已完成身份检查、重复合并、角色门禁和匹配评分。被硬门槛跳过的 3 位候选人不进入本轮审核。`}
               >
                 <CandidateReviewEntry onOpen={() => setReviewOpen(true)} />
+              </HunterReply>
+            ) : null}
+            {forcedState === "merge-conflict" ? (
+              <HunterReply>
+                <DecisionRequest
+                  title="林昊的资料存在冲突，确认后才能合并"
+                  description="系统候选人记录为“拓界机器人”，本机返回资料为“拓界机器人具身智能中心”；手机号后四位一致，最近项目时间存在两个月差异。"
+                  options={[
+                    {
+                      value: "merge",
+                      label: "确认为同一人并合并",
+                      description: "保留两个来源和冲突字段，按较新资料更新。",
+                    },
+                    {
+                      value: "separate",
+                      label: "保留为两个人",
+                      description: "不合并档案，并记录本次判断避免重复询问。",
+                    },
+                  ]}
+                  onSelect={(option) =>
+                    notify(
+                      option.value === "merge"
+                        ? "已合并林昊的资料，并保留来源与变化记录"
+                        : "已保留为两个人，并记录本次身份判断",
+                      "success",
+                    )
+                  }
+                />
               </HunterReply>
             ) : null}
             {phase >= 4 && forcedState === "no-candidate" ? (
@@ -728,40 +857,23 @@ ${createMarkdownTable(
               <HunterReply
                 markdown={`## 已从当前检查点继续
 
-审核结果和岗位储备关系已经保存，执行计划已更新。下一步可以直接告诉我需要联系哪些候选人；联系前仍会检查对象、渠道和授权范围。`}
+审核结果和岗位储备关系已经保存，执行计划已更新。下一步可以直接告诉我需要给哪些候选人发邮件；发送前仍会逐项确认收件人、主题、正文和附件。`}
               />
             ) : null}
             {contactStage === "authorization" ? (
               <HunterReply>
-                <DecisionRequest
-                  title="是否允许联系这 3 位候选人？"
-                  description="拟通过猎聘向林昊、周明远和陈楚宁发送已审核的岗位沟通消息；不会正式推荐，不会改变候选人推进阶段。"
-                  options={[
-                    {
-                      value: "allow",
-                      label: "仅允许本次联系",
-                      description: "发送 3 条消息，随后分别进入等待外部。",
-                    },
-                    {
-                      value: "edit",
-                      label: "先修改对象或消息",
-                      description: "保留当前范围，在下方输入修改意见。",
-                    },
-                    {
-                      value: "deny",
-                      label: "暂不联系",
-                      description: "岗位储备关系继续保留，不产生外部动作。",
-                    },
-                  ]}
-                  onSelect={(option) => {
-                    if (option.value === "allow") setContactStage("waiting");
-                    else
-                      notify(
-                        option.value === "edit"
-                          ? "请在下方输入需要修改的联系人选或消息"
-                          : "已保留岗位储备，本次不联系候选人",
-                        "info",
-                      );
+                <EmailDraftReview
+                  sender="沈岚 <shenlan@hunter-mail.cn>"
+                  initialRecipients="linhao@tuojie-robotics.com, mingyuan.zhou@qiongding.ai, chuning.chen@lingyue-robotics.com"
+                  initialSubject="北京具身智能 VLA 算法负责人机会"
+                  initialBody={`你好，\n\n我正在协助星澜机器人寻找具身智能 VLA 算法负责人。岗位重点关注机器人学习、多模态策略、真机产品落地和团队管理经验。\n\n你的经历与岗位方向有较高匹配度。如果你愿意了解，我可以先介绍团队范围、汇报关系和岗位目标，再由你判断是否继续。\n\n沈岚`}
+                  onCancel={() => {
+                    setContactStage("idle");
+                    notify("邮件草稿已保留，本次没有发送", "info");
+                  }}
+                  onSend={() => {
+                    setContactStage("waiting");
+                    notify("邮件已发送，后续回复会回到当前主线", "success");
                   }}
                 />
               </HunterReply>
@@ -773,13 +885,13 @@ ${createMarkdownTable(
                 </div>
                 <span>
                   <small>等待外部</small>
-                  <b>等待 3 位候选人回复岗位沟通</b>
+                  <b>等待 3 位候选人回复邮件</b>
                   <p>
-                    消息已发送，岗位储备关系没有变化。收到回复或简历后会回到本主线；也可以手动补充电话、微信和线下结果。
+                    邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到本主线；猎头在系统外获得的新信息也可以作为普通跟进记录补充。
                   </p>
                   <em>
-                    最近检查：刚刚 · 下次检查：2 小时后 · 等待期间不消耗 Agent
-                    用量
+                    最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 ·
+                    7 天后标记长期未回复
                   </em>
                 </span>
                 <Button
@@ -789,7 +901,7 @@ ${createMarkdownTable(
                     notify("可以在下方输入回复内容或上传新简历", "info")
                   }
                 >
-                  补充线下结果
+                  补充跟进结果
                 </Button>
               </section>
             ) : null}
@@ -855,6 +967,70 @@ ${createMarkdownTable(
         </div>
       </section>
       <InspectionPanel item={inspection} onClose={() => setInspection(null)} />
+      <Modal
+        open={handoffOpen}
+        close={() => setHandoffOpen(false)}
+        title="在本机继续"
+        description="选择已连接设备处理本地任务；云端工作会继续运行。"
+        size="lg"
+      >
+        <div className="s2-handoff-options">
+          <section
+            className={forcedState === "limited" ? "is-unavailable" : ""}
+          >
+            <i>
+              <Icon name="database" />
+            </i>
+            <span>
+              <b>Eric 的 MacBook Pro</b>
+              <small>
+                {forcedState === "limited"
+                  ? "设备当前不可用 · 上次连接于 18 分钟前"
+                  : "设备在线 · 任务仅在这台电脑中处理"}
+              </small>
+            </span>
+            <Button
+              tone="primary"
+              size="sm"
+              disabled={forcedState === "limited"}
+              onClick={() => {
+                setHandoffComplete(true);
+                setPhase((current) => Math.max(current, 3));
+                setHandoffOpen(false);
+                notify("本地任务已准备，云端将继续接收返回结果", "success");
+              }}
+            >
+              在此设备继续
+            </Button>
+          </section>
+          <section>
+            <i>
+              <Icon name="download" />
+            </i>
+            <span>
+              <b>下载本地任务</b>
+              <small>
+                适用于当前设备不可用时；处理完成后可将结果导回 Hunter。
+              </small>
+            </span>
+            <Button
+              tone="secondary"
+              size="sm"
+              onClick={() => {
+                setHandoffComplete(true);
+                setPhase((current) => Math.max(current, 3));
+                setHandoffOpen(false);
+                notify("本地任务已下载，云端工作继续运行", "success");
+              }}
+            >
+              下载任务
+            </Button>
+          </section>
+          <p>
+            本地任务包含岗位信息和已确认的筛选范围，不包含云端账号凭据。云端不会登录或控制需要认证的人才网站。
+          </p>
+        </div>
+      </Modal>
       <Modal
         open={terminateOpen}
         close={() => setTerminateOpen(false)}

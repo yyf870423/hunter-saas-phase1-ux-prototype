@@ -7,7 +7,7 @@ const stateLinks = [
   ["加载状态", "/home?state=loading", "局部骨架与稳定布局"],
   ["空状态", "/home?state=empty", "首次使用与新建引导"],
   ["局部错误", "/home?state=error", "支线失败但其他区域可用"],
-  ["权限受限", "/home?state=limited", "人才平台失效的局部影响"],
+  ["本机协作异常", "/home?state=limited", "本机不可用时云端继续工作"],
   ["组件状态", "/components", "本阶段公共组件与状态"],
 ];
 

@@ -56,8 +56,11 @@ test("客户开发完成联系人审核、联系授权、外部等待和招聘�
   await page.getByRole("button", { name: /陈雨/ }).click();
   await expect(page.getByText("138 **** 6217").first()).toBeVisible();
   await page.getByRole("button", { name: "保存审核结果" }).click();
-  await expect(page.getByText("是否允许本次对外联系？")).toBeVisible();
-  await page.getByRole("button", { name: /仅允许本次发送/ }).click();
+  await expect(page.getByText("确认邮件内容")).toBeVisible();
+  await expect(page.getByLabel("主题")).toHaveValue(
+    "星澜机器人具身智能团队招聘合作",
+  );
+  await page.getByRole("button", { name: "确认并发送" }).click();
   await expect(page.getByText("等待陈雨回复招聘合作邮件")).toBeVisible();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
   await input.fill("陈雨回复：两个岗位正在招聘，稍后补完整 JD。");
@@ -241,9 +244,9 @@ test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ pa
   await page.getByRole("button", { name: "返回主线并继续" }).click();
   await expect(page.getByText("请由你本人联系林昊")).toBeVisible();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
-  await input.fill("微信已联系，暂时还没有回复。");
+  await input.fill("已经联系，暂时还没有回复。");
   await input.press("Enter");
-  await expect(page.getByText("等待林昊回复猎头的微信")).toBeVisible();
+  await expect(page.getByText("等待林昊补充反馈")).toBeVisible();
   await expect(page.getByText(/不消耗 Agent 用量/)).toBeVisible();
 });
 
@@ -261,11 +264,14 @@ test("岗位招聘在入岗位储备后单独确认联系并接收新简历", as
   await page.getByRole("button", { name: /打开候选人审核/ }).click();
   await page.getByRole("button", { name: "加入岗位储备" }).click();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
-  await input.fill("联系林昊、周明远和陈楚宁，先了解意愿。");
+  await input.fill("给林昊、周明远和陈楚宁发邮件，先了解意愿。");
   await input.press("Enter");
-  await expect(page.getByText("是否允许联系这 3 位候选人？")).toBeVisible();
-  await page.getByRole("button", { name: /仅允许本次联系/ }).click();
-  await expect(page.getByText("等待 3 位候选人回复岗位沟通")).toBeVisible();
+  await expect(page.getByText("确认邮件内容")).toBeVisible();
+  await expect(page.getByLabel("主题")).toHaveValue(
+    "北京具身智能 VLA 算法负责人机会",
+  );
+  await page.getByRole("button", { name: "确认并发送" }).click();
+  await expect(page.getByText("等待 3 位候选人回复邮件")).toBeVisible();
   await input.fill("林昊回复并发来一份新简历，只考虑北京或远程。");
   await input.press("Enter");
   await expect(
@@ -323,34 +329,32 @@ test("移动端客户联系人和候选人岗位详情可查看并返回", async
   await expectNoHorizontalOverflow(page);
 });
 
-test("客户开发授权选项使用独立纵向组件且不受 Markdown 样式污染", async ({
-  page,
-}) => {
+test("客户开发邮件草稿使用独立编辑组件且需要逐次确认", async ({ page }) => {
   for (const viewport of [
     { width: 1440, height: 900 },
     { width: 390, height: 844 },
   ]) {
     await page.setViewportSize(viewport);
-    await page.goto("#/workstreams/client-xinglan?state=waiting");
-    const request = page.locator(".s2-decision-request");
-    const options = request.locator(":scope > div > button");
+    await page.goto("#/workstreams/client-xinglan");
+    await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
+      timeout: 10_000,
+    });
+    await page.getByRole("button", { name: "打开公司与联系人审核" }).click();
+    await page.getByRole("button", { name: "保存审核结果" }).click();
+    const request = page.locator(".s2-email-review");
     await expect(request).toBeVisible();
-    await expect(options).toHaveCount(3);
+    await expect(request.locator("input")).toHaveCount(3);
+    await expect(request.locator("textarea")).toHaveCount(1);
     const layout = await request.evaluate((element) => {
       const container = element.getBoundingClientRect();
-      const buttons = [...element.querySelectorAll(":scope > div > button")];
+      const controls = [...element.querySelectorAll("input, textarea")];
       return {
         overflow: element.scrollWidth - element.clientWidth,
-        buttons: buttons.map((button) => {
-          const rect = button.getBoundingClientRect();
-          const style = getComputedStyle(button);
+        controls: controls.map((control) => {
+          const rect = control.getBoundingClientRect();
+          const style = getComputedStyle(control);
           return {
-            x: rect.x,
-            y: rect.y,
-            right: rect.right,
-            bottom: rect.bottom,
             width: rect.width,
-            display: style.display,
             appearance: style.appearance,
             fontFamily: style.fontFamily,
           };
@@ -359,17 +363,14 @@ test("客户开发授权选项使用独立纵向组件且不受 Markdown 样式�
       };
     });
     expect(layout.overflow).toBeLessThanOrEqual(1);
-    for (const [index, option] of layout.buttons.entries()) {
-      expect(option.display).toBe("grid");
-      expect(option.appearance).toBe("none");
-      expect(option.width).toBeGreaterThanOrEqual(layout.containerWidth - 2);
-      expect(option.fontFamily.toLowerCase()).toContain("sans-serif");
-      if (index > 0) {
-        expect(option.y).toBeGreaterThanOrEqual(
-          layout.buttons[index - 1].bottom - 1,
-        );
-      }
+    for (const control of layout.controls) {
+      expect(control.appearance).toBe("auto");
+      expect(control.width).toBeGreaterThan(160);
+      expect(control.fontFamily.toLowerCase()).toContain("sans-serif");
     }
+    await expect(
+      page.getByRole("button", { name: "确认并发送" }),
+    ).toBeEnabled();
     await expectNoHorizontalOverflow(page);
   }
 });

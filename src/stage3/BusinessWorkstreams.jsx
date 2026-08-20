@@ -6,6 +6,7 @@ import {
   Composer,
   createMarkdownTable,
   DecisionRequest,
+  EmailDraftReview,
   HunterReply,
   RuntimeBar,
   UserMessage,
@@ -304,41 +305,21 @@ ${createMarkdownTable(
           />
         </HunterReply>
       ) : null}
-      {phase >= 4 ? (
+      {phase === 4 ? (
         <HunterReply
           markdown={`## 公司与联系人已保存
 
 已保存星澜机器人公司资料、陈雨和周琪两位正式联系人，以及刘健的引荐关系。人力资源副总裁仍只保留为联系人线索。`}
         >
-          <DecisionRequest
-            title="是否允许本次对外联系？"
-            description="拟以猎头于一凡身份，向陈雨发送 1 封业务合作邮件；刘健只作为备用引荐路径，不会同时联系。"
-            options={[
-              {
-                value: "allow",
-                label: "仅允许本次发送",
-                description: "发送审核后的邮件，随后进入等待外部。",
-              },
-              {
-                value: "edit",
-                label: "先修改对象或正文",
-                description: "保留当前结果，在对话中补充修改要求。",
-              },
-              {
-                value: "deny",
-                label: "暂不对外联系",
-                description: "公司与联系人继续保留，本主线停在当前节点。",
-              },
-            ]}
-            onSelect={(option) => {
-              if (option.value === "allow") setPhase(5);
-              else
-                notify(
-                  option.value === "edit"
-                    ? "请在下方输入需要修改的对象或正文"
-                    : "已保留公司与联系人，本次不执行对外联系",
-                  "info",
-                );
+          <EmailDraftReview
+            sender="于一凡 <yifan.yu@hunter-mail.cn>"
+            initialRecipients="yu.chen@xinglan-robotics.com"
+            initialSubject="星澜机器人具身智能团队招聘合作"
+            initialBody={`陈雨，你好：\n\n我长期关注具身智能算法和机器人学习方向的人才。近期看到星澜机器人北京研发团队持续扩张，希望了解贵司 VLA 算法和机器人学习岗位是否考虑外部猎头合作。\n\n我可以先根据团队方向提供一份候选人市场分布和代表性人才概览，供你判断是否值得进一步沟通。\n\n于一凡`}
+            onCancel={() => notify("邮件草稿已保留，本次没有发送", "info")}
+            onSend={() => {
+              setPhase(5);
+              notify("邮件已发送，回复会回到当前业务主线", "success");
             }}
           />
         </HunterReply>
@@ -346,8 +327,8 @@ ${createMarkdownTable(
       {phase === 5 ? (
         <ExternalWaitState
           title="等待陈雨回复招聘合作邮件"
-          description="邮件已于今天 09:26 发送。收到回复后会回到本主线；电话、微信或线下结果也可以由你补充。"
-          meta="最近检查：刚刚 · 下次检查：今天 13:30 · 等待期间不消耗 Agent 用量"
+          description="邮件已于今天 09:26 发送。邮件回复会自动回到本主线；猎头在系统外获得的新信息也可以作为普通跟进记录补充。"
+          meta="最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 · 7 天后标记长期未回复"
           onAddResult={() =>
             notify("可以在下方输入回复内容，或上传邮件截图和附件", "info")
           }
@@ -532,12 +513,12 @@ function CareerTimeline({
       {phase >= 1 ? (
         <HunterReply
           streaming={phase === 1}
-          markdown={`我会先核验动向信号和林昊档案的新鲜度，再与 Hunter 中正在招聘的岗位做增量匹配。不会搜索公开市场岗位，也不会替你发送微信、邮件或其他消息。${
+          markdown={`我会先核验动向信号和林昊档案的新鲜度，再与 Hunter 中正在招聘的岗位做增量匹配。不会搜索公开市场岗位，也不会替你联系候选人。${
             phase >= 2
               ? `
 
 - 两条公开动态属于中等强度信号，不能直接判断其正在求职。
-- 手机、微信和最近一次沟通记录均可用，但最近一份简历是 9 个月前。
+- 已有联系方式和最近一次跟进记录均可用，但最近一份简历是 9 个月前。
 - 首次联系和后续联系都由猎头本人完成。`
               : ""
           }`}
@@ -617,16 +598,16 @@ function CareerTimeline({
 
 建议先了解他是否愿意看北京的团队负责人岗位，再按兴趣介绍星澜和拓界。不要一开始承诺薪酬、岗位范围或推荐结果。
 
-> 联系后可以直接输入结果，例如“微信已联系，暂时没回复”“愿意了解星澜，但不考虑上海”，也可以上传新简历或聊天截图。Hunter 会先说明档案变化和受影响岗位，再局部重新匹配。`}
+> 联系后可以直接输入结果，例如“已经联系，暂时没回复”“愿意了解星澜，但不考虑上海”，也可以上传新简历或其他补充文件。Hunter 会先说明档案变化和受影响岗位，再局部重新匹配。`}
         />
       ) : null}
       {phase === 5 ? (
         <ExternalWaitState
-          title="等待林昊回复猎头的微信"
-          description="Hunter 没有代替你发送消息。你已记录今天 10:14 通过微信联系，询问是否愿意了解北京的团队负责人岗位。"
+          title="等待林昊补充反馈"
+          description="Hunter 没有代替你联系候选人。你已记录今天 10:14 完成首次联系，并询问是否愿意了解北京的团队负责人岗位。"
           meta="最近记录：今天 10:14 · 建议提醒：2 个工作日后 · 等待期间不消耗 Agent 用量"
           onAddResult={() =>
-            notify("请在下方输入回复内容，或上传新简历和聊天截图", "info")
+            notify("请在下方输入回复内容，或上传新简历和补充文件", "info")
           }
         />
       ) : null}
@@ -816,7 +797,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
           result:
             nextPhase === 6
               ? "已收到新的候选人信息。我会先展示档案变化与合并结果，再只重做受影响岗位的匹配。"
-              : "已记录本次人工联系，主线进入等待外部；等待期间不持续消耗 Agent 用量。",
+              : "已记录本次人工跟进，主线进入等待外部；等待期间不持续消耗 Agent 用量。",
         },
       ]);
       setPhase(nextPhase);

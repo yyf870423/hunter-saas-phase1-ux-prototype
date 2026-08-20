@@ -31,7 +31,7 @@ export const contactReviewRows = [
     category: "招聘负责人",
     phone: "138 **** 6217",
     email: "yu.chen@xinglan-robotics.com",
-    source: "官网招聘邮箱、脉脉身份与用户关系备注交叉确认",
+    source: "官网招聘邮箱、公开职业资料与用户关系备注交叉确认",
     confidence: "身份已确认",
     tone: "success",
     preferred: true,
@@ -785,7 +785,7 @@ export const mappingRelationshipViews = [
         summary: "目标人才，在 Hunter 中已有完整候选人档案。",
         facts: [
           ["版图分类", "目标人才"],
-          ["可联系", "已有手机和微信沟通记录"],
+          ["可联系", "已有联系方式和跟进记录"],
         ],
         evidence: ["Hunter 候选人档案", "公开履历"],
       },
@@ -1138,7 +1138,7 @@ export const mappingRelationshipViews = [
         tone: "info",
         summary: "当前联系路径的起点。",
         facts: [
-          ["可用渠道", "电话、微信、邮件"],
+          ["现有资料", "已保存邮箱和手机信息"],
           ["范围", "仅当前工作空间"],
         ],
         evidence: ["当前用户"],
@@ -1575,7 +1575,8 @@ export const businessScenarios = {
       {
         id: "outreach",
         title: "联系并等待外部回复",
-        detail: "发送前检查对象、身份、渠道和正文；等待期间不持续运行。",
+        detail:
+          "发送前检查收件人、发件身份、主题、正文和附件；等待期间不持续运行。",
         requirement: "产生外部影响前必须得到本次授权。",
         doneAt: 6,
         waitAt: 4,
@@ -1697,7 +1698,7 @@ export const businessScenarios = {
     title: "林昊职业机会",
     object: "林昊 · 机器人学习负责人",
     prompt:
-      "我确认要跟进林昊最近可能看机会这条信号。先看看他和系统里哪些岗位匹配，告诉我联系时应该重点确认什么；不要替我发消息，我会自己通过微信联系。",
+      "我确认要跟进林昊最近可能看机会这条信号。先看看他和系统里哪些岗位匹配，告诉我联系时应该重点确认什么；不要替我联系，我会自己处理。",
     autoStopPhase: 3,
     maxPhase: 6,
     defaultAuth: "analysis",
@@ -1727,7 +1728,7 @@ export const businessScenarios = {
       {
         id: "contact",
         title: "记录猎头联系结果",
-        detail: "用户通过微信、电话或已有关系联系后补充结果。",
+        detail: "猎头联系候选人后，通过普通跟进记录补充结果。",
         requirement: "文字、文件和新简历均可作为补充信息。",
         doneAt: 6,
         waitAt: 4,
@@ -1763,7 +1764,7 @@ export const businessScenarios = {
         title: "等待猎头补充联系结果",
         status: "等待用户",
         tone: "warning",
-        action: "Hunter 不自动发送消息，等待用户记录微信或电话结果",
+        action: "Hunter 不自动联系候选人，等待用户补充普通跟进结果",
         duration: "—",
       },
     ],

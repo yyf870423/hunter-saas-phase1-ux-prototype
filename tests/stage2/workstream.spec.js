@@ -5,6 +5,12 @@ import {
 } from "../stage1/helpers";
 
 async function waitForReview(page) {
+  await expect(page.getByText("云端检索已开始")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "在本机继续" }).click();
+  await expect(page.getByRole("heading", { name: "在本机继续" })).toBeVisible();
+  await page.getByRole("button", { name: "在此设备继续" }).click();
   await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -58,9 +64,9 @@ test("业务主线从第一条输入渐进推进到审核节点", async ({ page 
       hasText: "按决定继续后续动作",
     }),
   ).toContainText("等待用户");
-  await page.getByRole("button", { name: /人才平台并行寻访/ }).click();
+  await page.getByRole("button", { name: /准备本地任务并接收结果/ }).click();
   await expect(
-    page.getByRole("heading", { name: "人才平台并行寻访" }),
+    page.getByRole("heading", { name: "准备本地任务并接收结果" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "关闭检查区" }).click();
   await expectNoHorizontalOverflow(page);
@@ -203,21 +209,25 @@ test("新建工作判断为业务主线后进入主线工作区", async ({ page 
   ).toBeVisible();
 });
 
-test("加载、流式中断和平台权限受限状态都可恢复", async ({ page }) => {
+test("加载、流式中断和本机协作受限状态都可恢复", async ({ page }) => {
   await page.goto("#/workstreams/position-vla?state=loading");
   await expect(page.locator(".s2-workspace-loading")).toBeVisible();
 
   await page.goto("#/workstreams/position-vla?state=stream-error");
   await expect(page.getByText("回复生成中断")).toBeVisible();
   await page.getByRole("button", { name: "继续生成" }).click();
-  await expect(page.getByText("岗位边界已经确认")).toBeVisible({
+  await expect(page.getByText("云端检索已开始")).toBeVisible({
     timeout: 8_000,
   });
 
   await page.goto("#/workstreams/position-vla?state=limited");
-  await expect(page.getByText(/猎聘登录已失效/)).toBeVisible();
-  await page.getByRole("button", { name: "打开平台处理" }).click();
-  await expect(page.getByText("已打开人才平台处理入口")).toBeVisible();
+  await expect(page.getByText("本机协作暂不可用").first()).toBeVisible();
+  await page.getByRole("button", { name: "查看处理方式" }).click();
+  await expect(page.getByRole("heading", { name: "在本机继续" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "在此设备继续" }),
+  ).toBeDisabled();
+  await expect(page.getByRole("button", { name: "下载任务" })).toBeEnabled();
 });
 
 test("附件格式失败使用局部反馈且可以关闭", async ({ page }) => {
@@ -230,6 +240,45 @@ test("附件格式失败使用局部反馈且可以关闭", async ({ page }) => 
   await expect(page.getByRole("alert")).toContainText("仅支持文档、表格和图片");
   await page.getByRole("button", { name: "关闭文件错误" }).click();
   await expect(page.getByRole("alert")).toHaveCount(0);
+});
+
+test("文件只有在用户确认后才上传到当前工作", async ({ page }) => {
+  const chooser = page.locator('input[type="file"]');
+  await chooser.setInputFiles({
+    name: "林昊补充简历.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("prototype-resume"),
+  });
+  const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
+  await input.fill("补充这份候选人资料");
+  await input.press("Enter");
+  await expect(
+    page.getByRole("heading", { name: "确认上传到 Hunter" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("dialog").getByText("林昊补充简历.pdf"),
+  ).toBeVisible();
+  await expect(page.getByText("当前工作", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
+  await expect(input).toHaveValue("补充这份候选人资料");
+  await input.press("Enter");
+  await page.getByRole("button", { name: "确认上传并发送" }).click();
+  await expect(page.getByText(/已记录新信息/)).toBeVisible();
+});
+
+test("本机结果等待、岗位版本变化和身份冲突都有独立状态", async ({ page }) => {
+  await page.goto("#/workstreams/position-vla?state=local-waiting");
+  await expect(page.getByText("等待本机结果")).toBeVisible();
+  await expect(page.getByText(/云端已经形成 9 位候选人/)).toBeVisible();
+
+  await page.goto("#/workstreams/position-vla?state=stale-task");
+  await expect(page.getByText(/本地任务使用的是上一版本/)).toBeVisible();
+  await expect(page.getByText(/按照最新岗位重新匹配/)).toBeVisible();
+
+  await page.goto("#/workstreams/position-vla?state=merge-conflict");
+  await expect(page.getByText(/林昊的资料存在冲突/)).toBeVisible();
+  await page.getByRole("button", { name: /确认为同一人并合并/ }).click();
+  await expect(page.getByText(/已合并林昊的资料/)).toBeVisible();
 });
 
 test("移动端候选人审核可以查看详情并返回列表", async ({ page }) => {

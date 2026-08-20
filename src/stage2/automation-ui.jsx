@@ -2,7 +2,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Icon } from "../components/Icon";
-import { Button, IconButton, SearchField, StatusBadge } from "../stage1/ui";
+import {
+  Button,
+  IconButton,
+  Modal,
+  SearchField,
+  StatusBadge,
+} from "../stage1/ui";
 
 export const authorizationModes = [
   {
@@ -22,7 +28,7 @@ export const authorizationModes = [
     id: "auto",
     label: "自动执行",
     description:
-      "在本次任务的对象、渠道、数量和用量边界内自动推进，强制门禁始终生效。",
+      "在本次任务边界内自动分析和写入；文件上传与邮件发送仍需逐次确认。",
     icon: "play",
   },
 ];
@@ -104,6 +110,7 @@ export function Composer({
   const fileRef = useRef(null);
   const textareaRef = useRef(null);
   const [attachmentError, setAttachmentError] = useState("");
+  const [uploadConfirmOpen, setUploadConfirmOpen] = useState(false);
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -140,104 +147,264 @@ export function Composer({
     }
     if (allowed.length) onAttachmentsChange([...attachments, ...allowed]);
   };
-  const submit = () => {
+  const commitSubmit = () => {
     if (!value.trim() && !attachments.length) return;
     onSend(value.trim(), attachments);
+    setUploadConfirmOpen(false);
+  };
+  const submit = () => {
+    if (!value.trim() && !attachments.length) return;
+    if (attachments.length) {
+      setUploadConfirmOpen(true);
+      return;
+    }
+    commitSubmit();
   };
   return (
-    <div className={`s2-composer ${disabled ? "is-disabled" : ""}`}>
-      {attachments.length ? (
-        <div className="s2-attachments">
-          {attachments.map((file, index) => (
-            <span key={`${file.name}-${index}`}>
-              <Icon name={file.type?.startsWith("image/") ? "image" : "file"} />
-              <b>{file.name}</b>
-              <button
-                type="button"
-                aria-label={`移除 ${file.name}`}
-                onClick={() =>
-                  onAttachmentsChange(
-                    attachments.filter((_, itemIndex) => itemIndex !== index),
-                  )
-                }
-              >
-                <Icon name="close" />
-              </button>
-            </span>
-          ))}
+    <>
+      <div className={`s2-composer ${disabled ? "is-disabled" : ""}`}>
+        {attachments.length ? (
+          <div className="s2-attachments">
+            {attachments.map((file, index) => (
+              <span key={`${file.name}-${index}`}>
+                <Icon
+                  name={file.type?.startsWith("image/") ? "image" : "file"}
+                />
+                <b>{file.name}</b>
+                <button
+                  type="button"
+                  aria-label={`移除 ${file.name}`}
+                  onClick={() =>
+                    onAttachmentsChange(
+                      attachments.filter((_, itemIndex) => itemIndex !== index),
+                    )
+                  }
+                >
+                  <Icon name="close" />
+                </button>
+              </span>
+            ))}
+          </div>
+        ) : null}
+        {attachmentError ? (
+          <div className="s2-attachment-error" role="alert">
+            <Icon name="warning" />
+            <span>{attachmentError}</span>
+            <button
+              type="button"
+              aria-label="关闭文件错误"
+              onClick={() => setAttachmentError("")}
+            >
+              <Icon name="close" />
+            </button>
+          </div>
+        ) : null}
+        <textarea
+          ref={textareaRef}
+          value={value}
+          disabled={disabled}
+          rows={2}
+          placeholder={placeholder}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              submit();
+            }
+          }}
+          onPaste={(event) => {
+            const files = Array.from(event.clipboardData?.files || []);
+            if (files.length) addFiles(files);
+          }}
+        />
+        <div className="s2-composer-toolbar">
+          <div>
+            <IconButton
+              icon="file"
+              label="添加文件或截图"
+              disabled={disabled}
+              onClick={() => fileRef.current?.click()}
+            />
+            <input
+              ref={fileRef}
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.png,.jpg,.jpeg,.webp"
+              hidden
+              onChange={(event) => {
+                const files = Array.from(event.target.files || []);
+                addFiles(files);
+                event.target.value = "";
+              }}
+            />
+            <AuthorizationSelector
+              value={authMode}
+              onChange={onAuthChange}
+              disabled={disabled}
+            />
+          </div>
+          {streaming ? (
+            <Button tone="secondary" icon="pause" onClick={onStop}>
+              停止生成
+            </Button>
+          ) : (
+            <IconButton
+              icon="send"
+              label="发送"
+              disabled={disabled || (!value.trim() && !attachments.length)}
+              onClick={submit}
+            />
+          )}
         </div>
-      ) : null}
-      {attachmentError ? (
-        <div className="s2-attachment-error" role="alert">
-          <Icon name="warning" />
-          <span>{attachmentError}</span>
-          <button
-            type="button"
-            aria-label="关闭文件错误"
-            onClick={() => setAttachmentError("")}
-          >
-            <Icon name="close" />
-          </button>
-        </div>
-      ) : null}
-      <textarea
-        ref={textareaRef}
-        value={value}
-        disabled={disabled}
-        rows={2}
-        placeholder={placeholder}
-        onChange={(event) => onChange(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            submit();
-          }
-        }}
-        onPaste={(event) => {
-          const files = Array.from(event.clipboardData?.files || []);
-          if (files.length) addFiles(files);
-        }}
-      />
-      <div className="s2-composer-toolbar">
-        <div>
-          <IconButton
-            icon="file"
-            label="添加文件或截图"
-            disabled={disabled}
-            onClick={() => fileRef.current?.click()}
-          />
-          <input
-            ref={fileRef}
-            type="file"
-            multiple
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.png,.jpg,.jpeg,.webp"
-            hidden
-            onChange={(event) => {
-              const files = Array.from(event.target.files || []);
-              addFiles(files);
-              event.target.value = "";
-            }}
-          />
-          <AuthorizationSelector
-            value={authMode}
-            onChange={onAuthChange}
-            disabled={disabled}
-          />
-        </div>
-        {streaming ? (
-          <Button tone="secondary" icon="pause" onClick={onStop}>
-            停止生成
-          </Button>
-        ) : (
-          <IconButton
-            icon="send"
-            label="发送"
-            disabled={disabled || (!value.trim() && !attachments.length)}
-            onClick={submit}
-          />
-        )}
       </div>
-    </div>
+      <Modal
+        open={uploadConfirmOpen}
+        close={() => setUploadConfirmOpen(false)}
+        title="确认上传到 Hunter"
+        description="文件将在确认后上传到当前工作，用于本次分析。"
+        size="lg"
+        footer={
+          <>
+            <Button
+              tone="secondary"
+              onClick={() => setUploadConfirmOpen(false)}
+            >
+              取消
+            </Button>
+            <Button tone="primary" onClick={commitSubmit}>
+              确认上传并发送
+            </Button>
+          </>
+        }
+      >
+        <div className="s2-upload-confirm">
+          <div className="s2-upload-confirm-target">
+            <span>上传位置</span>
+            <b>当前工作</b>
+          </div>
+          <div className="s2-upload-confirm-list">
+            {attachments.map((file, index) => (
+              <div key={`${file.name}-${index}`}>
+                <i>
+                  <Icon
+                    name={file.type?.startsWith("image/") ? "image" : "file"}
+                  />
+                </i>
+                <span>
+                  <b>{file.name}</b>
+                  <small>
+                    {file.type || "未知类型"} · {formatFileSize(file.size)}
+                  </small>
+                </span>
+                <IconButton
+                  icon="close"
+                  label={`移除 ${file.name}`}
+                  onClick={() => {
+                    const next = attachments.filter(
+                      (_, itemIndex) => itemIndex !== index,
+                    );
+                    onAttachmentsChange(next);
+                    if (!next.length) setUploadConfirmOpen(false);
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+          <p>
+            上传前请确认文件不包含无关的敏感资料。原始简历附件不会因候选人自动提交而自动上传。
+          </p>
+        </div>
+      </Modal>
+    </>
+  );
+}
+
+function formatFileSize(size = 0) {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${Math.ceil(size / 1024)} KB`;
+  return `${(size / 1024 / 1024).toFixed(1)} MB`;
+}
+
+export function EmailDraftReview({
+  sender,
+  initialRecipients,
+  initialSubject,
+  initialBody,
+  onSend,
+  onCancel,
+}) {
+  const [recipients, setRecipients] = useState(initialRecipients);
+  const [subject, setSubject] = useState(initialSubject);
+  const [body, setBody] = useState(initialBody);
+  const [sending, setSending] = useState(false);
+  const valid = recipients.trim() && subject.trim() && body.trim();
+
+  const send = () => {
+    if (!valid || sending) return;
+    setSending(true);
+    window.setTimeout(() => {
+      onSend({ recipients, subject, body });
+      setSending(false);
+    }, 650);
+  };
+
+  return (
+    <section className="s2-email-review" aria-label="邮件发送确认">
+      <header>
+        <i>
+          <Icon name="mail" />
+        </i>
+        <span>
+          <b>确认邮件内容</b>
+          <small>Hunter 已起草邮件，但不会自动发送。</small>
+        </span>
+      </header>
+      <div className="s2-email-fields">
+        <label>
+          <span>发件人</span>
+          <input value={sender} readOnly />
+        </label>
+        <label>
+          <span>收件人</span>
+          <input
+            value={recipients}
+            onChange={(event) => setRecipients(event.target.value)}
+          />
+        </label>
+        <label>
+          <span>主题</span>
+          <input
+            value={subject}
+            onChange={(event) => setSubject(event.target.value)}
+          />
+        </label>
+        <label>
+          <span>正文</span>
+          <textarea
+            rows={7}
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+          />
+        </label>
+      </div>
+      <footer>
+        <small>如需附件，请先添加文件并逐项确认。本次邮件没有附件。</small>
+        <div>
+          <Button tone="secondary" onClick={onCancel}>
+            暂不发送
+          </Button>
+          <Button
+            tone="primary"
+            icon="send"
+            loading={sending}
+            disabled={!valid}
+            onClick={send}
+          >
+            确认并发送
+          </Button>
+        </div>
+      </footer>
+    </section>
   );
 }
 
