@@ -504,6 +504,9 @@
   background: var(--s1-canvas);
   border-left: 3px solid var(--s1-line-strong);
 }
+.s2-markdown-note > :last-child {
+  margin-bottom: 0;
+}
 .s2-markdown-link {
   display: inline-flex;
   align-items: center;
@@ -930,7 +933,6 @@
   transform: translateY(-50%);
 }
 
-.s2-inline-artifact,
 .s2-candidate-artifact,
 .s2-decision-request,
 .s2-identity-compare {
@@ -941,7 +943,6 @@
   border-radius: 9px;
 }
 
-.s2-inline-artifact > header,
 .s2-candidate-artifact > header {
   display: flex;
   min-height: 44px;
@@ -953,35 +954,18 @@
   border-bottom: 1px solid var(--s1-line);
 }
 
-.s2-inline-artifact > header > span,
 .s2-candidate-artifact > header > span {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.s2-inline-artifact > header b,
 .s2-candidate-artifact > header b {
   font-size: 12px;
 }
-.s2-inline-artifact > header svg,
 .s2-candidate-artifact > header svg {
   width: 15px;
   color: var(--s1-accent);
 }
-.s2-inline-artifact > header > button {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  color: var(--s1-accent);
-  font-size: 12px;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-}
-.s2-inline-artifact > header > button svg {
-  width: 13px;
-}
-
 .s2-decision-request > header {
   display: grid;
   grid-template-columns: 20px minmax(0, 1fr);
@@ -1092,29 +1076,6 @@
   line-height: 18px;
   background: var(--s1-canvas);
   border-top: 1px solid var(--s1-line);
-}
-
-.s2-evidence-table > div {
-  display: grid;
-  grid-template-columns: 104px minmax(0, 1fr) 86px auto;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-top: 1px solid var(--s1-line);
-}
-.s2-evidence-table > div:first-child {
-  border-top: 0;
-}
-.s2-evidence-table b {
-  font-size: 12px;
-}
-.s2-evidence-table span {
-  font-size: 12px;
-  line-height: 18px;
-}
-.s2-evidence-table small {
-  color: var(--s1-muted);
-  font-size: 12px;
 }
 
 .s2-progress-line {
@@ -3318,15 +3279,6 @@
   }
   .s2-user-message {
     width: 92%;
-  }
-  .s2-evidence-table > div {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  .s2-evidence-table > div > span {
-    grid-column: 1 / -1;
-  }
-  .s2-evidence-table > div > small {
-    display: none;
   }
   .s2-candidate-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));

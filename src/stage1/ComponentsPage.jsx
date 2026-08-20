@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Icon } from "../components/Icon";
+import { HunterReply } from "../stage2/automation-ui";
 import {
   Button,
   EmptyState,
@@ -82,6 +83,41 @@ export function ComponentsPage() {
             打开 Modal
           </Button>
         </div>
+      </section>
+      <section className="s1-component-section">
+        <h2>Agent 动态内容</h2>
+        <HunterReply
+          markdown={`## 招聘机会核验结果
+
+已核验 **3 条来源**，当前结论仍需猎头确认。
+
+- 公司官网出现具身智能岗位。
+- 联系人邮箱已经核验。
+
+1. 先确认招聘方向。
+2. 再决定是否建立岗位。
+
+| 字段 | 内容 |
+| --- | --- |
+| 公司 | 星澜机器人 |
+| 状态 | 跟进中 |
+
+> 本结果只说明证据和建议，不会自行写入正式岗位。
+
+可以[查看公开来源](https://example.com)，内部字段使用 \`opportunity_status\`。
+
+---
+
+\`\`\`json
+{"status":"verified"}
+\`\`\`
+
+[不安全链接](javascript:alert(1))
+
+[协议相对链接](//unsafe.example)
+
+<button>不能渲染的 HTML</button>`}
+        />
       </section>
       <section className="s1-component-section s1-component-state-grid">
         <article>

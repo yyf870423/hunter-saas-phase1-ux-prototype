@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Icon } from "../components/Icon";
 import { Button, IconButton, SearchField, StatusBadge } from "../stage1/ui";
 
@@ -248,9 +250,69 @@ export function UserMessage({ children, time = "今天 09:06" }) {
   );
 }
 
-export function HunterReply({ children, streaming = false }) {
+function safeMarkdownHref(href) {
+  if (!href) return undefined;
+  if ((href.startsWith("/") && !href.startsWith("//")) || href.startsWith("#"))
+    return href;
+  try {
+    const url = new URL(href);
+    return ["http:", "https:"].includes(url.protocol) ? href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function createMarkdownTable(headers, rows) {
+  const escapeCell = (value) =>
+    String(value ?? "—")
+      .replaceAll("|", "\\|")
+      .replace(/\s*\n\s*/g, " ");
+  return [
+    `| ${headers.map(escapeCell).join(" | ")} |`,
+    `| ${headers.map(() => "---").join(" | ")} |`,
+    ...rows.map((row) => `| ${row.map(escapeCell).join(" | ")} |`),
+  ].join("\n");
+}
+
+export function HunterMarkdown({ content }) {
   return (
-    <article className={`s2-hunter-reply ${streaming ? "is-streaming" : ""}`}>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      skipHtml
+      components={{
+        table: ({ node: _node, ...props }) => (
+          <table className="s2-markdown-table" {...props} />
+        ),
+        blockquote: ({ node: _node, ...props }) => (
+          <blockquote className="s2-markdown-note" {...props} />
+        ),
+        a: ({ node: _node, href, ...props }) => {
+          const safeHref = safeMarkdownHref(href);
+          if (!safeHref) return <span {...props} />;
+          const external = /^https?:/i.test(safeHref);
+          return (
+            <a
+              {...props}
+              href={safeHref}
+              rel={external ? "noreferrer" : undefined}
+              target={external ? "_blank" : undefined}
+            />
+          );
+        },
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+}
+
+export function HunterReply({ children, markdown, streaming = false }) {
+  return (
+    <article
+      className={`s2-hunter-reply ${streaming ? "is-streaming" : ""}`}
+      data-renderer={markdown ? "markdown" : "controlled"}
+    >
+      {markdown ? <HunterMarkdown content={markdown} /> : null}
       {children}
       {streaming ? (
         <i className="s2-stream-caret" aria-label="正在生成" />
@@ -560,32 +622,6 @@ export function WorkstreamHistory({
         </>
       )}
     </aside>
-  );
-}
-
-export function EvidenceTable({ rows, onOpen }) {
-  return (
-    <div className="s2-inline-artifact">
-      <header>
-        <span>
-          <Icon name="paper" />
-          <b>已确认的岗位边界</b>
-        </span>
-        <button type="button" onClick={onOpen}>
-          查看完整证据 <Icon name="chevronRight" />
-        </button>
-      </header>
-      <div className="s2-evidence-table">
-        {rows.map((row) => (
-          <div key={row.finding}>
-            <b>{row.source}</b>
-            <span>{row.finding}</span>
-            <small>{row.freshness}</small>
-            <StatusBadge tone="success">{row.confidence}</StatusBadge>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 

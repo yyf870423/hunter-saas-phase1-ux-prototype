@@ -328,3 +328,40 @@ test("四类业务主线的 Markdown 标题列表引用和表格保持统一渲�
     expect(coveredTags.has(tag), `Markdown ${tag} 应有真实样本覆盖`).toBe(true);
   }
 });
+
+test("业务主线普通回复不再依赖场景专用对话卡片", async ({ page }) => {
+  const scenarios = [
+    ["client-xinglan?state=reply", "回复已形成一条招聘机会"],
+    ["position-vla?state=review", "首批候选人已经可以审核"],
+    ["mapping-embodied?state=conflict", "人物与关系批次可以审核"],
+    ["career-linhao?state=new-resume", "新简历已合并"],
+  ];
+
+  for (const [route, marker] of scenarios) {
+    await page.goto(`#/workstreams/${route}`);
+    await expect(page.getByText(marker, { exact: false }).first()).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(
+      page.locator('.s2-hunter-reply[data-renderer="markdown"]').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator(
+        ".s2-inline-artifact, .s2-evidence-table, .s3-opportunity-summary",
+      ),
+    ).toHaveCount(0);
+
+    const controlledViolations = await page
+      .locator('.s2-hunter-reply[data-renderer="controlled"]')
+      .evaluateAll(
+        (replies) =>
+          replies.filter(
+            (reply) =>
+              !reply.querySelector(".s2-decision-request") &&
+              !reply.querySelector(".s2-review-entry"),
+          ).length,
+      );
+    expect(controlledViolations).toBe(0);
+    await expectNoHorizontalOverflow(page);
+  }
+});

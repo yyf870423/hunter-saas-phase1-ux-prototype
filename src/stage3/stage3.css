@@ -51,66 +51,6 @@
   font-style: normal;
 }
 
-.s3-opportunity-summary {
-  margin-top: 12px;
-  overflow: hidden;
-  background: var(--s1-surface);
-  border: 1px solid var(--s1-line);
-  border-radius: 8px;
-}
-.s3-opportunity-summary > header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 11px 13px;
-  background: var(--s1-canvas);
-  border-bottom: 1px solid var(--s1-line);
-}
-.s3-opportunity-summary > header small,
-.s3-opportunity-summary > header b {
-  display: block;
-}
-.s3-opportunity-summary > header small {
-  color: var(--s1-muted);
-  font-size: 12px;
-}
-.s3-opportunity-summary > header b {
-  margin-top: 2px;
-  font-size: 14px;
-}
-.s3-opportunity-summary dl {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 0;
-}
-.s3-opportunity-summary dl > div {
-  padding: 10px 13px;
-  border-right: 1px solid var(--s1-line);
-  border-bottom: 1px solid var(--s1-line);
-}
-.s3-opportunity-summary dl > div:nth-child(2n) {
-  border-right: 0;
-}
-.s3-opportunity-summary dl > div:nth-last-child(-n + 2) {
-  border-bottom: 0;
-}
-.s3-opportunity-summary dt {
-  color: var(--s1-muted);
-  font-size: 12px;
-}
-.s3-opportunity-summary dd {
-  margin: 4px 0 0;
-  font-size: 13px;
-  line-height: 19px;
-}
-
-.s2-markdown-note.is-warning {
-  color: color-mix(in srgb, var(--s1-warning) 76%, var(--s1-text));
-  background: color-mix(in srgb, var(--s1-warning) 10%, var(--s1-surface));
-  border-color: color-mix(in srgb, var(--s1-warning) 28%, var(--s1-line));
-}
-
 .s3-review-workspace {
   position: relative;
   display: grid;
@@ -716,18 +656,8 @@
     grid-column: 2;
     justify-self: start;
   }
-  .s3-opportunity-summary dl,
   .s3-landscape-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .s3-opportunity-summary dl > div,
-  .s3-opportunity-summary dl > div:nth-child(2n),
-  .s3-opportunity-summary dl > div:nth-last-child(-n + 2) {
-    border-right: 0;
-    border-bottom: 1px solid var(--s1-line);
-  }
-  .s3-opportunity-summary dl > div:last-child {
-    border-bottom: 0;
   }
   .s3-review-header {
     align-items: flex-start;

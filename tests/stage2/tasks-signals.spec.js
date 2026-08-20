@@ -108,6 +108,34 @@ test("统一新建入口覆盖歧义、失败、权限受限和旧路由", async
   await expect(page).toHaveURL(/#\/new$/);
 });
 
+test("新建工作和支线任务的普通回复统一由动态 Markdown 渲染", async ({
+  page,
+}) => {
+  const routes = [
+    ["#/new?state=direct", "候选人跟进摘要"],
+    ["#/new?state=mainline", "建立一条岗位招聘业务主线"],
+    ["#/new?state=task", "创建独立支线任务"],
+    ["#/new?state=clarify", "还缺少一个会改变推进方式的信息"],
+    ["#/tasks/task-hand-team", "当前判断"],
+  ];
+
+  for (const [route, marker] of routes) {
+    await page.goto(route);
+    await expect(
+      page.getByText(marker, { exact: false }).first(),
+    ).toBeVisible();
+    await expect(
+      page.locator('.s2-hunter-reply[data-renderer="markdown"]').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator(
+        ".s2-inline-artifact, .s2-evidence-table, .s3-opportunity-summary",
+      ),
+    ).toHaveCount(0);
+    await expectNoHorizontalOverflow(page);
+  }
+});
+
 test("信号中心支持合并来源、观察和转化", async ({ page }) => {
   await page.goto("#/signals");
   await expect(

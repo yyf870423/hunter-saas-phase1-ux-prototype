@@ -68,7 +68,7 @@
 1. `ConversationTimeline`、`UserMessage`、`HunterMarkdown`、`StreamingReply`。
 2. `Composer`、`AttachmentChip`、`AuthorizationSelector`。
 3. `RuntimeBar`、`PlanList`、`InternalTaskList`。
-4. `ArtifactRenderer`、`EvidenceTable`、`ObjectInspector`。
+4. `HunterMarkdown` 承载普通分析、证据摘要和少量结果；`ObjectInspector` 仅承载需要独立查看的大型结果。旧的 `ArtifactRenderer`、`EvidenceTable` 不再作为对话协议组件。
 5. `DecisionRequest`、`ReviewWorkspace`、`CandidateReviewTable`。
 6. `WorkstreamHistory`、`TaskList`、`SignalFeed`、`SignalInspector`。
 

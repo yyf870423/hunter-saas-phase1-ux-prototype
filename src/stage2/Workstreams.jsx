@@ -4,6 +4,7 @@ import { Icon } from "../components/Icon";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import {
   Composer,
+  createMarkdownTable,
   DecisionRequest,
   HunterReply,
   RuntimeBar,
@@ -562,21 +563,20 @@ export function AutomationWorkspace() {
           <div className="s2-timeline">
             <UserMessage>{prompt}</UserMessage>
             {phase >= 1 ? (
-              <HunterReply streaming={phase === 1 && !streamStopped}>
-                <p>
-                  我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行检索系统候选人、人才平台和研究来源。
-                </p>
-                {phase >= 2 ? (
-                  <>
-                    <p>本轮按以下边界处理：</p>
-                    <ul>
-                      <li>最多交付 20 位经过补全、查重和角色门禁的候选人。</li>
-                      <li>北京优先；异地候选人保留地点意愿风险。</li>
-                      <li>只形成审核结果，不执行对外联系。</li>
-                    </ul>
-                  </>
-                ) : null}
-              </HunterReply>
+              <HunterReply
+                streaming={phase === 1 && !streamStopped}
+                markdown={`我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行检索系统候选人、人才平台和研究来源。${
+                  phase >= 2
+                    ? `
+
+本轮按以下边界处理：
+
+- 最多交付 20 位经过补全、查重和角色门禁的候选人。
+- 北京优先；异地候选人保留地点意愿风险。
+- 只形成审核结果，不执行对外联系。`
+                    : ""
+                }`}
+              />
             ) : null}
             {streamError ? (
               <div className="s2-local-error" role="alert">
@@ -653,29 +653,16 @@ export function AutomationWorkspace() {
               </div>
             ) : null}
             {phase >= 3 ? (
-              <HunterReply>
-                <h2>岗位边界已经确认</h2>
-                <p>
-                  我找到了三类能够相互印证的输入。没有把“纯学术经历”直接判断为不合适，而是把产品落地和团队管理作为本轮必须单独检查的风险项。
-                </p>
-                <table className="s2-markdown-table">
-                  <thead>
-                    <tr>
-                      <th>来源</th>
-                      <th>确认结果</th>
-                      <th>时效</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {evidenceRows.map((row) => (
-                      <tr key={row.finding}>
-                        <td>{row.source}</td>
-                        <td>{row.finding}</td>
-                        <td>{row.freshness}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <HunterReply
+                markdown={`## 岗位边界已经确认
+
+我找到了三类能够相互印证的输入。没有把“纯学术经历”直接判断为不合适，而是把产品落地和团队管理作为本轮必须单独检查的风险项。
+
+${createMarkdownTable(
+  ["来源", "确认结果", "时效"],
+  evidenceRows.map((row) => [row.source, row.finding, row.freshness]),
+)}`}
+              >
                 <button
                   type="button"
                   className="s2-markdown-link"
@@ -698,72 +685,35 @@ export function AutomationWorkspace() {
               </HunterReply>
             ) : null}
             {phase >= 4 && forcedState !== "no-candidate" ? (
-              <HunterReply>
-                <h2>首批候选人已经可以审核</h2>
-                <p>
-                  共召回 34 位人物，合并重复身份后保留 21 位，其中 3
-                  位因明确不满足角色硬门槛被跳过，18 位进入本轮审核。
-                </p>
-                <table className="s2-markdown-table is-compact">
-                  <thead>
-                    <tr>
-                      <th>审核分组</th>
-                      <th>人数</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>建议优先联系</td>
-                      <td>5</td>
-                    </tr>
-                    <tr>
-                      <td>储备与观察</td>
-                      <td>8</td>
-                    </tr>
-                    <tr>
-                      <td>谨慎或不建议</td>
-                      <td>5</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <blockquote className="s2-markdown-note">
-                  已完成身份检查、重复合并、角色门禁和匹配评分。被硬门槛跳过的 3
-                  位候选人不进入本轮审核。
-                </blockquote>
+              <HunterReply
+                markdown={`## 首批候选人已经可以审核
+
+共召回 34 位人物，合并重复身份后保留 21 位，其中 3 位因明确不满足角色硬门槛被跳过，18 位进入本轮审核。
+
+| 审核分组 | 人数 |
+| --- | --- |
+| 建议优先联系 | 5 |
+| 储备与观察 | 8 |
+| 谨慎或不建议 | 5 |
+
+> 已完成身份检查、重复合并、角色门禁和匹配评分。被硬门槛跳过的 3 位候选人不进入本轮审核。`}
+              >
                 <CandidateReviewEntry onOpen={() => setReviewOpen(true)} />
               </HunterReply>
             ) : null}
             {phase >= 4 && forcedState === "no-candidate" ? (
-              <HunterReply>
-                <h2>本轮没有候选人通过岗位门禁</h2>
-                <p>
-                  四个渠道共召回 16 位人物，合并重复身份后保留 11 位；其中 7
-                  位角色层级不匹配，4
-                  位缺少真机产品落地经历，因此没有进入候选人审核。
-                </p>
-                <table className="s2-markdown-table is-compact">
-                  <thead>
-                    <tr>
-                      <th>未进入审核原因</th>
-                      <th>人数</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>角色层级明显不匹配</td>
-                      <td>7</td>
-                    </tr>
-                    <tr>
-                      <td>缺少真机产品落地经历</td>
-                      <td>4</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <blockquote className="s2-markdown-note">
-                  可以补充新的渠道或调整岗位边界后重做受影响步骤；Hunter
-                  不会为了凑数量放宽已经确认的硬门槛。
-                </blockquote>
-              </HunterReply>
+              <HunterReply
+                markdown={`## 本轮没有候选人通过岗位门禁
+
+四个渠道共召回 16 位人物，合并重复身份后保留 11 位；其中 7 位角色层级不匹配，4 位缺少真机产品落地经历，因此没有进入候选人审核。
+
+| 未进入审核原因 | 人数 |
+| --- | --- |
+| 角色层级明显不匹配 | 7 |
+| 缺少真机产品落地经历 | 4 |
+
+> 可以补充新的渠道或调整岗位边界后重做受影响步骤；Hunter 不会为了凑数量放宽已经确认的硬门槛。`}
+              />
             ) : null}
             {userDecisions.map((decision, index) => (
               <div
@@ -771,18 +721,15 @@ export function AutomationWorkspace() {
                 key={`${decision.text}-${index}`}
               >
                 <UserMessage time="刚刚">{decision.text}</UserMessage>
-                <HunterReply>
-                  <p>{decision.result}</p>
-                </HunterReply>
+                <HunterReply markdown={decision.result} />
               </div>
             ))}
             {phase >= 5 ? (
-              <HunterReply>
-                <h2>已从当前检查点继续</h2>
-                <p>
-                  审核结果和岗位储备关系已经保存，执行计划已更新。下一步可以直接告诉我需要联系哪些候选人；联系前仍会检查对象、渠道和授权范围。
-                </p>
-              </HunterReply>
+              <HunterReply
+                markdown={`## 已从当前检查点继续
+
+审核结果和岗位储备关系已经保存，执行计划已更新。下一步可以直接告诉我需要联系哪些候选人；联系前仍会检查对象、渠道和授权范围。`}
+              />
             ) : null}
             {contactStage === "authorization" ? (
               <HunterReply>
@@ -847,39 +794,19 @@ export function AutomationWorkspace() {
               </section>
             ) : null}
             {contactStage === "reply" ? (
-              <HunterReply>
-                <h2>林昊的新简历已合并并完成局部重匹配</h2>
-                <p>
-                  新简历补充了最近 8
-                  个月的团队扩张和真机数据闭环项目，没有创建重复候选人档案。原始简历版本继续保留。
-                </p>
-                <table className="s2-markdown-table">
-                  <thead>
-                    <tr>
-                      <th>变化</th>
-                      <th>影响</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>团队规模从 8 人更新为 15 人</td>
-                      <td>团队管理分项提高</td>
-                    </tr>
-                    <tr>
-                      <td>新增量产双臂机器人项目</td>
-                      <td>产品落地风险降低</td>
-                    </tr>
-                    <tr>
-                      <td>明确只考虑北京或远程</td>
-                      <td>地点风险已更新</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <blockquote className="s2-markdown-note">
-                  正式推荐、面试安排、薪资承诺、Offer
-                  和推进阶段仍由猎头手动处理。
-                </blockquote>
-              </HunterReply>
+              <HunterReply
+                markdown={`## 林昊的新简历已合并并完成局部重匹配
+
+新简历补充了最近 8 个月的团队扩张和真机数据闭环项目，没有创建重复候选人档案。原始简历版本继续保留。
+
+| 变化 | 影响 |
+| --- | --- |
+| 团队规模从 8 人更新为 15 人 | 团队管理分项提高 |
+| 新增量产双臂机器人项目 | 产品落地风险降低 |
+| 明确只考虑北京或远程 | 地点风险已更新 |
+
+> 正式推荐、面试安排、薪资承诺、Offer 和推进阶段仍由猎头手动处理。`}
+              />
             ) : null}
             {terminated ? (
               <div className="s2-system-state is-danger">

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
-import { Button, Modal, StatusBadge, useToast } from "../stage1/ui";
+import { Button, Modal, useToast } from "../stage1/ui";
 import {
   Composer,
+  createMarkdownTable,
   DecisionRequest,
   HunterReply,
   RuntimeBar,
@@ -132,36 +133,6 @@ const inspectionContexts = {
   },
 };
 
-function EvidenceTable({ rows, onOpen }) {
-  return (
-    <>
-      <table className="s2-markdown-table">
-        <thead>
-          <tr>
-            <th>来源</th>
-            <th>核验结果</th>
-            <th>判断</th>
-            <th>时间</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={`${row.source}-${row.finding}`}>
-              <td>{row.source}</td>
-              <td>{row.finding}</td>
-              <td>{row.stance || row.confidence}</td>
-              <td>{row.freshness}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <button type="button" className="s2-markdown-link" onClick={onOpen}>
-        查看来源与核验详情 <Icon name="chevronRight" />
-      </button>
-    </>
-  );
-}
-
 function ReviewEntry({ icon, label, note, onOpen }) {
   return (
     <div className="s2-markdown-action-row">
@@ -232,28 +203,39 @@ function ClientTimeline({
   return (
     <>
       {phase >= 1 ? (
-        <HunterReply streaming={phase === 1}>
-          <p>
-            我会先核验公司身份和招聘信号，再查找招聘负责人、可用联系方式和已有关系。融资或扩张新闻只作为线索，不会直接当成真实招聘需求。
-          </p>
-          {phase >= 2 ? (
-            <ul>
-              <li>正式资产写入和对外联系分开确认。</li>
-              <li>找不到联系人时保留已尝试路径和缺口，不生成虚假联系人。</li>
-              <li>需求信息不完整时只形成招聘机会，不直接创建岗位。</li>
-            </ul>
-          ) : null}
-        </HunterReply>
+        <HunterReply
+          streaming={phase === 1}
+          markdown={`我会先核验公司身份和招聘信号，再查找招聘负责人、可用联系方式和已有关系。融资或扩张新闻只作为线索，不会直接当成真实招聘需求。${
+            phase >= 2
+              ? `
+
+- 正式资产写入和对外联系分开确认。
+- 找不到联系人时保留已尝试路径和缺口，不生成虚假联系人。
+- 需求信息不完整时只形成招聘机会，不直接创建岗位。`
+              : ""
+          }`}
+        />
       ) : null}
       {phase >= 2 ? (
-        <HunterReply>
-          <h2>公司值得继续核实招聘需求</h2>
-          <p>
-            融资、官网岗位变化和行业关系能够相互印证团队扩张，但“是否接受猎头合作”和具体招聘预算仍未确认。
-          </p>
-          <EvidenceTable
-            rows={clientEvidence}
-            onOpen={() =>
+        <HunterReply
+          markdown={`## 公司值得继续核实招聘需求
+
+融资、官网岗位变化和行业关系能够相互印证团队扩张，但“是否接受猎头合作”和具体招聘预算仍未确认。
+
+${createMarkdownTable(
+  ["来源", "核验结果", "判断", "时间"],
+  clientEvidence.map((row) => [
+    row.source,
+    row.finding,
+    row.stance || row.confidence,
+    row.freshness,
+  ]),
+)}`}
+        >
+          <button
+            type="button"
+            className="s2-markdown-link"
+            onClick={() =>
               setInspection({
                 title: "星澜机器人招聘信号证据",
                 rows: clientEvidence,
@@ -261,7 +243,9 @@ function ClientTimeline({
                 lead: "招聘信号由公司身份、近期招聘变化和关系信息共同核验。融资只作为线索，不会直接当作已确认需求。",
               })
             }
-          />
+          >
+            查看来源与核验详情 <Icon name="chevronRight" />
+          </button>
           {phase === 2 ? (
             <p className="s2-progress-line">
               <span />
@@ -271,15 +255,13 @@ function ClientTimeline({
         </HunterReply>
       ) : null}
       {phase >= 3 && forcedState === "no-contact" ? (
-        <HunterReply>
-          <h2>暂未找到可以直接联系的招聘负责人</h2>
-          <p>
-            已经检查官网、公开职业资料和现有联系人，定位到两条角色线索，但都缺少可以验证的自然人身份或联系方式。
-          </p>
-          <blockquote className="s2-markdown-note">
-            可以建立“寻找星澜机器人招聘联系路径”的有限支线，或等待你补充自己的
-            HR、投资人和行业关系。本主线不会猜测姓名或反复发送无效请求。
-          </blockquote>
+        <HunterReply
+          markdown={`## 暂未找到可以直接联系的招聘负责人
+
+已经检查官网、公开职业资料和现有联系人，定位到两条角色线索，但都缺少可以验证的自然人身份或联系方式。
+
+> 可以建立“寻找星澜机器人招聘联系路径”的有限支线，或等待你补充自己的 HR、投资人和行业关系。本主线不会猜测姓名或反复发送无效请求。`}
+        >
           <ReviewEntry
             icon="route"
             label="查看已尝试路径（6）"
@@ -301,38 +283,18 @@ function ClientTimeline({
         </HunterReply>
       ) : null}
       {phase >= 3 && forcedState !== "no-contact" ? (
-        <HunterReply>
-          <h2>公司与联系人结果可以审核</h2>
-          <p>
-            找到 2 位身份已确认的招聘联系人、1 条身份待确认线索和 1
-            位可以引荐的已有关系。2 位联系人具有可用邮箱，陈雨同时有已核验手机。
-          </p>
-          <table className="s2-markdown-table is-compact">
-            <thead>
-              <tr>
-                <th>结果</th>
-                <th>数量</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>正式联系人建议</td>
-                <td>2</td>
-              </tr>
-              <tr>
-                <td>联系人线索</td>
-                <td>1</td>
-              </tr>
-              <tr>
-                <td>已有引荐关系</td>
-                <td>1</td>
-              </tr>
-              <tr>
-                <td>具备手机或邮箱</td>
-                <td>2</td>
-              </tr>
-            </tbody>
-          </table>
+        <HunterReply
+          markdown={`## 公司与联系人结果可以审核
+
+找到 2 位身份已确认的招聘联系人、1 条身份待确认线索和 1 位可以引荐的已有关系。2 位联系人具有可用邮箱，陈雨同时有已核验手机。
+
+| 结果 | 数量 |
+| --- | --- |
+| 正式联系人建议 | 2 |
+| 联系人线索 | 1 |
+| 已有引荐关系 | 1 |
+| 具备手机或邮箱 | 2 |`}
+        >
           <ReviewEntry
             icon="users"
             label="打开公司与联系人审核"
@@ -342,11 +304,11 @@ function ClientTimeline({
         </HunterReply>
       ) : null}
       {phase >= 4 ? (
-        <HunterReply>
-          <h2>公司与联系人已保存</h2>
-          <p>
-            已保存星澜机器人公司资料、陈雨和周琪两位正式联系人，以及刘健的引荐关系。人力资源副总裁仍只保留为联系人线索。
-          </p>
+        <HunterReply
+          markdown={`## 公司与联系人已保存
+
+已保存星澜机器人公司资料、陈雨和周琪两位正式联系人，以及刘健的引荐关系。人力资源副总裁仍只保留为联系人线索。`}
+        >
           <DecisionRequest
             title="是否允许本次对外联系？"
             description="拟以猎头于一凡身份，向陈雨发送 1 封业务合作邮件；刘健只作为备用引荐路径，不会同时联系。"
@@ -391,44 +353,23 @@ function ClientTimeline({
         />
       ) : null}
       {phase >= 6 ? (
-        <HunterReply>
-          <h2>回复已形成一条招聘机会</h2>
-          <p>
-            陈雨确认北京团队正在招聘 VLA
-            算法负责人和机器人学习工程师，猎头合作预算需与业务负责人进一步确认。现有信息足以建立招聘机会，但不足以直接创建正式岗位。
-          </p>
-          <div className="s3-opportunity-summary">
-            <header>
-              <span>
-                <small>招聘机会</small>
-                <b>星澜机器人 · 具身智能团队招聘</b>
-              </span>
-              <StatusBadge tone="info">跟进中</StatusBadge>
-            </header>
-            <dl>
-              <div>
-                <dt>确认依据</dt>
-                <dd>招聘负责人邮件回复 · 今天 11:08</dd>
-              </div>
-              <div>
-                <dt>招聘方向</dt>
-                <dd>VLA 算法负责人、机器人学习工程师</dd>
-              </div>
-              <div>
-                <dt>联系人</dt>
-                <dd>陈雨 · 招聘负责人</dd>
-              </div>
-              <div>
-                <dt>仍缺信息</dt>
-                <dd>完整 JD、汇报关系、薪酬范围、合作预算</dd>
-              </div>
-            </dl>
-          </div>
-          <blockquote className="s2-markdown-note">
-            如果后续收到完整 JD，Hunter
-            会先生成岗位草稿；用户确认后再创建正式岗位和岗位招聘主线。
-          </blockquote>
-        </HunterReply>
+        <HunterReply
+          markdown={`## 回复已形成一条招聘机会
+
+陈雨确认北京团队正在招聘 VLA 算法负责人和机器人学习工程师，猎头合作预算需与业务负责人进一步确认。现有信息足以建立招聘机会，但不足以直接创建正式岗位。
+
+### 星澜机器人 · 具身智能团队招聘
+
+| 项目 | 当前信息 |
+| --- | --- |
+| 状态 | 跟进中 |
+| 确认依据 | 招聘负责人邮件回复 · 今天 11:08 |
+| 招聘方向 | VLA 算法负责人、机器人学习工程师 |
+| 联系人 | 陈雨 · 招聘负责人 |
+| 仍缺信息 | 完整 JD、汇报关系、薪酬范围、合作预算 |
+
+> 如果后续收到完整 JD，Hunter 会先生成岗位草稿；用户确认后再创建正式岗位和岗位招聘主线。`}
+        />
       ) : null}
     </>
   );
@@ -444,79 +385,48 @@ function MappingTimeline({
   return (
     <>
       {phase >= 1 ? (
-        <HunterReply streaming={phase === 1}>
-          <p>
-            我会先把目标拆成可以检查的摸排清单，再分批处理公司与组织、关键角色与人物、人物关系和联系路径。范围外的新发现先形成信号，不会无限启动新任务。
-          </p>
-          {phase >= 2 ? (
-            <ul>
-              <li>目标公司：星澜、拓界、穹顶、灵跃。</li>
-              <li>目标方向：VLA、机器人学习、灵巧操作。</li>
-              <li>结果要能回答关键人物是谁、关系如何、通过什么路径能联系。</li>
-            </ul>
-          ) : null}
-        </HunterReply>
+        <HunterReply
+          streaming={phase === 1}
+          markdown={`我会先把目标拆成可以检查的摸排清单，再分批处理公司与组织、关键角色与人物、人物关系和联系路径。范围外的新发现先形成信号，不会无限启动新任务。${
+            phase >= 2
+              ? `
+
+- 目标公司：星澜、拓界、穹顶、灵跃。
+- 目标方向：VLA、机器人学习、灵巧操作。
+- 结果要能回答关键人物是谁、关系如何、通过什么路径能联系。`
+              : ""
+          }`}
+        />
       ) : null}
       {phase >= 2 ? (
-        <HunterReply>
-          <h2>摸排目标清单已经建立</h2>
-          <table className="s2-markdown-table">
-            <thead>
-              <tr>
-                <th>目标</th>
-                <th>完成标准</th>
-                <th>当前状态</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>公司与组织</td>
-                <td>四家公司主要团队、方向和已知组织关系</td>
-                <td>正在处理</td>
-              </tr>
-              <tr>
-                <td>关键角色与人物</td>
-                <td>三个方向的负责人、核心骨干和可识别人物</td>
-                <td>正在处理</td>
-              </tr>
-              <tr>
-                <td>人物关系与联系路径</td>
-                <td>可核验关系、已有候选人和可联系入口</td>
-                <td>尚未开始</td>
-              </tr>
-            </tbody>
-          </table>
-          <blockquote className="s2-markdown-note">
-            完成情况按这份目标清单表达，不用未知市场总人数计算覆盖百分比。
-          </blockquote>
-        </HunterReply>
+        <HunterReply
+          markdown={`## 摸排目标清单已经建立
+
+| 目标 | 完成标准 | 当前状态 |
+| --- | --- | --- |
+| 公司与组织 | 四家公司主要团队、方向和已知组织关系 | 正在处理 |
+| 关键角色与人物 | 三个方向的负责人、核心骨干和可识别人物 | 正在处理 |
+| 人物关系与联系路径 | 可核验关系、已有候选人和可联系入口 | 尚未开始 |
+
+> 完成情况按这份目标清单表达，不用未知市场总人数计算覆盖百分比。`}
+        />
       ) : null}
       {phase >= 3 ? (
-        <HunterReply>
-          <h2>第一批公司、组织和方向已形成</h2>
-          <p>
-            四家公司都定位到与目标方向直接相关的团队。星澜和灵跃的公开证据较完整；拓界缺技术负责人，穹顶只能确认平台与方向，暂不能确认汇报关系。
-          </p>
-          <table className="s2-markdown-table">
-            <thead>
-              <tr>
-                <th>公司</th>
-                <th>方向</th>
-                <th>组织</th>
-                <th>当前缺口</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mappingCompanies.map((item) => (
-                <tr key={item.company}>
-                  <td>{item.company}</td>
-                  <td>{item.direction}</td>
-                  <td>{item.organization}</td>
-                  <td>{item.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <HunterReply
+          markdown={`## 第一批公司、组织和方向已形成
+
+四家公司都定位到与目标方向直接相关的团队。星澜和灵跃的公开证据较完整；拓界缺技术负责人，穹顶只能确认平台与方向，暂不能确认汇报关系。
+
+${createMarkdownTable(
+  ["公司", "方向", "组织", "当前缺口"],
+  mappingCompanies.map((item) => [
+    item.company,
+    item.direction,
+    item.organization,
+    item.status,
+  ]),
+)}`}
+        >
           {phase === 3 ? (
             <p className="s2-progress-line">
               <span />
@@ -526,23 +436,23 @@ function MappingTimeline({
         </HunterReply>
       ) : null}
       {phase >= 4 ? (
-        <HunterReply>
-          <h2>人物与关系批次可以审核</h2>
-          <p>
-            共定位 30 位人物：18 位身份已确认，11 位保留为人物线索，1
-            位存在同名与单位时间冲突。9 条人物关系可以写入，1
-            条关系需要等待确认。
-          </p>
-          {forcedState === "conflict" ? (
-            <blockquote className="s2-markdown-note is-warning">
-              王奕的论文作者身份与星澜公开活动名单可能属于同一人，但单位时间线存在冲突。即使处于自动执行模式，也不会自动合并。
-            </blockquote>
-          ) : null}
-          {forcedState === "gaps" ? (
-            <blockquote className="s2-markdown-note is-warning">
-              本轮仍缺拓界机器人技术负责人、穹顶智能汇报关系和王奕身份确认。每个缺口都保留了可执行动作和预期结果，不使用抽象完成百分比。
-            </blockquote>
-          ) : null}
+        <HunterReply
+          markdown={`## 人物与关系批次可以审核
+
+共定位 30 位人物：18 位身份已确认，11 位保留为人物线索，1 位存在同名与单位时间冲突。9 条人物关系可以写入，1 条关系需要等待确认。${
+            forcedState === "conflict"
+              ? `
+
+> **存在冲突：** 王奕的论文作者身份与星澜公开活动名单可能属于同一人，但单位时间线存在冲突。即使处于自动执行模式，也不会自动合并。`
+              : ""
+          }${
+            forcedState === "gaps"
+              ? `
+
+> **仍需补充：** 本轮仍缺拓界机器人技术负责人、穹顶智能汇报关系和王奕身份确认。每个缺口都保留了可执行动作和预期结果，不使用抽象完成百分比。`
+              : ""
+          }`}
+        >
           <ReviewEntry
             icon="database"
             label="打开本批次更新审核"
@@ -570,21 +480,15 @@ function MappingTimeline({
         </HunterReply>
       ) : null}
       {phase >= 5 ? (
-        <HunterReply>
-          <h2>人才版图已完成本批次更新</h2>
-          <ul>
-            <li>
-              新增 4 家公司范围、7 个组织方向、18 位已确认人物和 9 条人物关系。
-            </li>
-            <li>11 位人物线索继续保留，王奕身份冲突没有合并。</li>
-            <li>
-              下一步可以探索拓界技术负责人，预计补充 1 至 3
-              条线索；也可以接受当前缺口并结束本轮。
-            </li>
-          </ul>
-          <blockquote className="s2-markdown-note">
-            本轮结束不会把人才版图标记为“初版完成”或“维护中”。未来出现新变化时，通过新的任务或信号增量更新。
-          </blockquote>
+        <HunterReply
+          markdown={`## 人才版图已完成本批次更新
+
+- 新增 4 家公司范围、7 个组织方向、18 位已确认人物和 9 条人物关系。
+- 11 位人物线索继续保留，王奕身份冲突没有合并。
+- 下一步可以探索拓界技术负责人，预计补充 1 至 3 条线索；也可以接受当前缺口并结束本轮。
+
+> 本轮结束不会把人才版图标记为“初版完成”或“维护中”。未来出现新变化时，通过新的任务或信号增量更新。`}
+        >
           <DecisionRequest
             title="本轮接下来怎么处理？"
             description="两个选项都不会删除已经写入的人才版图结果。"
@@ -625,51 +529,29 @@ function CareerTimeline({
   return (
     <>
       {phase >= 1 ? (
-        <HunterReply streaming={phase === 1}>
-          <p>
-            我会先核验动向信号和林昊档案的新鲜度，再与 Hunter
-            中正在招聘的岗位做增量匹配。不会搜索公开市场岗位，也不会替你发送微信、邮件或其他消息。
-          </p>
-          {phase >= 2 ? (
-            <ul>
-              <li>两条公开动态属于中等强度信号，不能直接判断其正在求职。</li>
-              <li>
-                手机、微信和最近一次沟通记录均可用，但最近一份简历是 9 个月前。
-              </li>
-              <li>首次联系和后续联系都由猎头本人完成。</li>
-            </ul>
-          ) : null}
-        </HunterReply>
+        <HunterReply
+          streaming={phase === 1}
+          markdown={`我会先核验动向信号和林昊档案的新鲜度，再与 Hunter 中正在招聘的岗位做增量匹配。不会搜索公开市场岗位，也不会替你发送微信、邮件或其他消息。${
+            phase >= 2
+              ? `
+
+- 两条公开动态属于中等强度信号，不能直接判断其正在求职。
+- 手机、微信和最近一次沟通记录均可用，但最近一份简历是 9 个月前。
+- 首次联系和后续联系都由猎头本人完成。`
+              : ""
+          }`}
+        />
       ) : null}
       {phase >= 2 ? (
-        <HunterReply>
-          <h2>动向值得核实，但求职意愿仍未知</h2>
-          <table className="s2-markdown-table">
-            <thead>
-              <tr>
-                <th>信号</th>
-                <th>说明</th>
-                <th>强度</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>公开资料更新</td>
-                <td>新增“关注具身智能创业机会”，未写明正在求职</td>
-                <td>中</td>
-              </tr>
-              <tr>
-                <td>用户关系备注</td>
-                <td>共同联系人提到林昊近期在了解北京团队</td>
-                <td>中</td>
-              </tr>
-              <tr>
-                <td>最近沟通</td>
-                <td>6 个月前表示短期内不会离开现团队</td>
-                <td>反向证据</td>
-              </tr>
-            </tbody>
-          </table>
+        <HunterReply
+          markdown={`## 动向值得核实，但求职意愿仍未知
+
+| 信号 | 说明 | 强度 |
+| --- | --- | --- |
+| 公开资料更新 | 新增“关注具身智能创业机会”，未写明正在求职 | 中 |
+| 用户关系备注 | 共同联系人提到林昊近期在了解北京团队 | 中 |
+| 最近沟通 | 6 个月前表示短期内不会离开现团队 | 反向证据 |`}
+        >
           <button
             type="button"
             className="s2-markdown-link"
@@ -706,12 +588,11 @@ function CareerTimeline({
         </HunterReply>
       ) : null}
       {phase >= 3 && forcedState !== "no-position" ? (
-        <HunterReply>
-          <h2>系统内有 3 个岗位值得查看</h2>
-          <p>
-            7 个有效岗位完成匹配：1 个优先沟通、1 个可以了解、1 个暂不优先，其余
-            4 个因角色层级或硬技能门槛没有进入结果。
-          </p>
+        <HunterReply
+          markdown={`## 系统内有 3 个岗位值得查看
+
+7 个有效岗位完成匹配：1 个优先沟通、1 个可以了解、1 个暂不优先，其余 4 个因角色层级或硬技能门槛没有进入结果。`}
+        >
           <ReviewEntry
             icon="briefcase"
             label="查看完整岗位匹配"
@@ -721,28 +602,22 @@ function CareerTimeline({
         </HunterReply>
       ) : null}
       {phase >= 3 && forcedState === "no-position" ? (
-        <HunterReply>
-          <h2>当前没有合适的系统内岗位</h2>
-          <p>
-            7 个有效岗位均未通过角色层级或硬技能门槛。Hunter
-            不会为了维持主线而放宽硬门槛，也不会转去搜索公开市场职位。
-          </p>
-          <blockquote className="s2-markdown-note">
-            可以先由你联系林昊核实真实意愿并补充资料。本轮结束后，未来系统出现新的合适岗位时会形成新的候选人动向或岗位匹配提醒。
-          </blockquote>
-        </HunterReply>
+        <HunterReply
+          markdown={`## 当前没有合适的系统内岗位
+
+7 个有效岗位均未通过角色层级或硬技能门槛。Hunter 不会为了维持主线而放宽硬门槛，也不会转去搜索公开市场职位。
+
+> 可以先由你联系林昊核实真实意愿并补充资料。本轮结束后，未来系统出现新的合适岗位时会形成新的候选人动向或岗位匹配提醒。`}
+        />
       ) : null}
       {phase >= 4 ? (
-        <HunterReply>
-          <h2>请由你本人联系林昊</h2>
-          <p>
-            建议先了解他是否愿意看北京的团队负责人岗位，再按兴趣介绍星澜和拓界。不要一开始承诺薪酬、岗位范围或推荐结果。
-          </p>
-          <blockquote className="s2-markdown-note">
-            联系后可以直接输入结果，例如“微信已联系，暂时没回复”“愿意了解星澜，但不考虑上海”，也可以上传新简历或聊天截图。Hunter
-            会先说明档案变化和受影响岗位，再局部重新匹配。
-          </blockquote>
-        </HunterReply>
+        <HunterReply
+          markdown={`## 请由你本人联系林昊
+
+建议先了解他是否愿意看北京的团队负责人岗位，再按兴趣介绍星澜和拓界。不要一开始承诺薪酬、岗位范围或推荐结果。
+
+> 联系后可以直接输入结果，例如“微信已联系，暂时没回复”“愿意了解星澜，但不考虑上海”，也可以上传新简历或聊天截图。Hunter 会先说明档案变化和受影响岗位，再局部重新匹配。`}
+        />
       ) : null}
       {phase === 5 ? (
         <ExternalWaitState
@@ -755,38 +630,19 @@ function CareerTimeline({
         />
       ) : null}
       {phase >= 6 ? (
-        <HunterReply>
-          <h2>新简历已合并，2 个岗位需要重新判断</h2>
-          <p>
-            新简历补充了最近 8
-            个月的团队扩张和真机数据闭环项目，没有创建重复候选人档案。原始简历版本继续保留。
-          </p>
-          <table className="s2-markdown-table">
-            <thead>
-              <tr>
-                <th>变化</th>
-                <th>影响</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>团队规模从 8 人更新为 15 人</td>
-                <td>星澜岗位的团队管理分项提高</td>
-              </tr>
-              <tr>
-                <td>新增量产双臂机器人项目</td>
-                <td>拓界岗位的产品落地风险降低</td>
-              </tr>
-              <tr>
-                <td>明确只考虑北京或远程</td>
-                <td>上海、深圳岗位降级，不再优先建议</td>
-              </tr>
-            </tbody>
-          </table>
-          <blockquote className="s2-markdown-note">
-            如果林昊确认有意愿，可以由你选择把他交给星澜或其他岗位招聘主线；正式推荐和后续推进仍由猎头处理。
-          </blockquote>
-        </HunterReply>
+        <HunterReply
+          markdown={`## 新简历已合并，2 个岗位需要重新判断
+
+新简历补充了最近 8 个月的团队扩张和真机数据闭环项目，没有创建重复候选人档案。原始简历版本继续保留。
+
+| 变化 | 影响 |
+| --- | --- |
+| 团队规模从 8 人更新为 15 人 | 星澜岗位的团队管理分项提高 |
+| 新增量产双臂机器人项目 | 拓界岗位的产品落地风险降低 |
+| 明确只考虑北京或远程 | 上海、深圳岗位降级，不再优先建议 |
+
+> 如果林昊确认有意愿，可以由你选择把他交给星澜或其他岗位招聘主线；正式推荐和后续推进仍由猎头处理。`}
+        />
       ) : null}
     </>
   );
@@ -1215,9 +1071,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 key={`${message.text}-${index}`}
               >
                 <UserMessage time="刚刚">{message.text}</UserMessage>
-                <HunterReply>
-                  <p>{message.result}</p>
-                </HunterReply>
+                <HunterReply markdown={message.result} />
               </div>
             ))}
             {terminated ? (

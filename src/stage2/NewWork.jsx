@@ -31,49 +31,45 @@ function classifyWork(prompt) {
 function OutcomeReply({ outcome, prompt }) {
   if (outcome === "mainline") {
     return (
-      <HunterReply>
-        <p>
-          这项工作需要跨渠道找人、持续更新候选人信息，并在审核、联系和等待回复后继续推进。我会建立一条岗位招聘业务主线，有限范围的检索和核验会作为内部任务编排。
-        </p>
-        <blockquote className="s2-markdown-note">
-          正在建立业务主线，并保留当前输入、附件和授权方式。
-        </blockquote>
-      </HunterReply>
+      <HunterReply
+        markdown={`这项工作需要跨渠道找人、持续更新候选人信息，并在审核、联系和等待回复后继续推进。我会建立一条岗位招聘业务主线，有限范围的检索和核验会作为内部任务编排。
+
+> 正在建立业务主线，并保留当前输入、附件和授权方式。`}
+      />
     );
   }
   if (outcome === "task") {
     return (
-      <HunterReply>
-        <p>
-          这是一项范围有限、交付明确的一次性核验。我会创建独立支线任务；核验完成后，结果会回到对应的人才版图，不会自动合并人物。
-        </p>
-        <blockquote className="s2-markdown-note">
-          正在创建支线任务，并保留当前输入、附件和授权方式。
-        </blockquote>
-      </HunterReply>
+      <HunterReply
+        markdown={`这是一项范围有限、交付明确的一次性核验。我会创建独立支线任务；核验完成后，结果会回到对应的人才版图，不会自动合并人物。
+
+> 正在创建支线任务，并保留当前输入、附件和授权方式。`}
+      />
     );
   }
   if (outcome === "direct") {
     const isCompanySummary = /云脉芯能|公司/.test(prompt);
+    const details = isCompanySummary
+      ? [
+          "公司聚焦边缘侧机器人芯片，近期公开信息出现团队扩张信号。",
+          "目前证据只能支持一次性判断，尚不足以确认正式招聘需求。",
+          "如需持续寻找负责人和招聘机会，可以继续建立客户开发主线。",
+        ]
+      : [
+          "技术能力满足岗位要求，系统设计和跨团队协作评价较好。",
+          "候选人希望进一步确认汇报对象、团队规模和年度奖金结构。",
+          "建议两天内补充岗位信息，再确认下一轮面试时间。",
+        ];
     return (
-      <HunterReply>
-        <p>这项工作可以在当前对话中直接完成，不需要建立业务主线或支线任务。</p>
-        <h2>{isCompanySummary ? "云脉芯能公开信息摘要" : "候选人跟进摘要"}</h2>
-        {isCompanySummary ? (
-          <ul>
-            <li>公司聚焦边缘侧机器人芯片，近期公开信息出现团队扩张信号。</li>
-            <li>目前证据只能支持一次性判断，尚不足以确认正式招聘需求。</li>
-            <li>如需持续寻找负责人和招聘机会，可以继续建立客户开发主线。</li>
-          </ul>
-        ) : (
-          <ul>
-            <li>技术能力满足岗位要求，系统设计和跨团队协作评价较好。</li>
-            <li>候选人希望进一步确认汇报对象、团队规模和年度奖金结构。</li>
-            <li>建议两天内补充岗位信息，再确认下一轮面试时间。</li>
-          </ul>
-        )}
-        <p>可以继续补充信息，或直接提出下一项工作。</p>
-      </HunterReply>
+      <HunterReply
+        markdown={`这项工作可以在当前对话中直接完成，不需要建立业务主线或支线任务。
+
+## ${isCompanySummary ? "云脉芯能公开信息摘要" : "候选人跟进摘要"}
+
+${details.map((item) => `- ${item}`).join("\n")}
+
+可以继续补充信息，或直接提出下一项工作。`}
+      />
     );
   }
   return null;
@@ -184,18 +180,18 @@ export function NewWork() {
           <div className="s2-new-work-conversation" aria-live="polite">
             <UserMessage time="刚刚">{submittedPrompt}</UserMessage>
             {status === "classifying" ? (
-              <HunterReply streaming>
-                <p>
-                  我正在判断这项工作的范围、持续时间，以及是否需要等待外部反馈或拆分任务。
-                </p>
-              </HunterReply>
+              <HunterReply
+                streaming
+                markdown="我正在判断这项工作的范围、持续时间，以及是否需要等待外部反馈或拆分任务。"
+              />
             ) : null}
             <OutcomeReply outcome={status} prompt={submittedPrompt} />
             {status === "clarify" ? (
-              <HunterReply>
-                <p>
-                  这个目标还缺少一个会改变推进方式的信息：你希望只整理当前公开信息，还是持续跟踪这家公司的招聘需求并寻找联系人？
-                </p>
+              <HunterReply
+                markdown={`这个目标还缺少一个会改变推进方式的信息：你希望只整理当前公开信息，还是持续跟踪这家公司的招聘需求并寻找联系人？
+
+也可以直接在输入框中说明其他目标。`}
+              >
                 <div className="s2-new-work-choices">
                   <button type="button" onClick={() => chooseOutcome("direct")}>
                     <b>只整理当前信息</b>
@@ -211,7 +207,6 @@ export function NewWork() {
                     </small>
                   </button>
                 </div>
-                <p>也可以直接在输入框中说明其他目标。</p>
               </HunterReply>
             ) : null}
             {status === "error" ? (

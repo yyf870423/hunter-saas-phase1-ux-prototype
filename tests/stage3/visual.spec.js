@@ -149,6 +149,7 @@ test("截取阶段三等待、冲突和资料回流状态", async ({ page }) => 
       "暂未找到可以直接联系的招聘负责人",
       "client-no-contact",
     ],
+    ["client-xinglan?state=reply", "回复已形成一条招聘机会", "client-reply"],
     [
       "mapping-embodied?state=conflict",
       "人物与关系批次可以审核",
