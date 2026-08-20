@@ -600,14 +600,19 @@ export function DecisionRequest({ title, description, options, onSelect }) {
         </span>
       </header>
       <div>
-        {options.map((option) => (
+        {options.map((option, index) => (
           <button
             type="button"
             key={option.value}
             onClick={() => onSelect(option)}
           >
-            <b>{option.label}</b>
-            <small>{option.description}</small>
+            <span className="s2-decision-index" aria-hidden="true">
+              {index + 1}
+            </span>
+            <span className="s2-decision-copy">
+              <b>{option.label}</b>
+              <small>{option.description}</small>
+            </span>
             <Icon name="chevronRight" />
           </button>
         ))}

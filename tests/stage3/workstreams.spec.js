@@ -228,3 +228,103 @@ test("移动端客户联系人和候选人岗位详情可查看并返回", async
   );
   await expectNoHorizontalOverflow(page);
 });
+
+test("客户开发授权选项使用独立纵向组件且不受 Markdown 样式污染", async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("#/workstreams/client-xinglan?state=waiting");
+    const request = page.locator(".s2-decision-request");
+    const options = request.locator(":scope > div > button");
+    await expect(request).toBeVisible();
+    await expect(options).toHaveCount(3);
+    const layout = await request.evaluate((element) => {
+      const container = element.getBoundingClientRect();
+      const buttons = [...element.querySelectorAll(":scope > div > button")];
+      return {
+        overflow: element.scrollWidth - element.clientWidth,
+        buttons: buttons.map((button) => {
+          const rect = button.getBoundingClientRect();
+          const style = getComputedStyle(button);
+          return {
+            x: rect.x,
+            y: rect.y,
+            right: rect.right,
+            bottom: rect.bottom,
+            width: rect.width,
+            display: style.display,
+            appearance: style.appearance,
+            fontFamily: style.fontFamily,
+          };
+        }),
+        containerWidth: container.width,
+      };
+    });
+    expect(layout.overflow).toBeLessThanOrEqual(1);
+    for (const [index, option] of layout.buttons.entries()) {
+      expect(option.display).toBe("grid");
+      expect(option.appearance).toBe("none");
+      expect(option.width).toBeGreaterThanOrEqual(layout.containerWidth - 2);
+      expect(option.fontFamily.toLowerCase()).toContain("sans-serif");
+      if (index > 0) {
+        expect(option.y).toBeGreaterThanOrEqual(
+          layout.buttons[index - 1].bottom - 1,
+        );
+      }
+    }
+    await expectNoHorizontalOverflow(page);
+  }
+});
+
+test("四类业务主线的 Markdown 标题列表引用和表格保持统一渲染", async ({
+  page,
+}) => {
+  const scenarios = [
+    ["client-xinglan?state=no-contact", "暂未找到可以直接联系的招聘负责人"],
+    ["position-vla?state=no-candidate", "本轮没有候选人通过岗位门禁"],
+    ["mapping-embodied?state=conflict", "人物与关系批次可以审核"],
+    ["career-linhao?state=new-resume", "新简历已合并，2 个岗位需要重新判断"],
+  ];
+  const coveredTags = new Set();
+
+  for (const [route, marker] of scenarios) {
+    await page.goto(`#/workstreams/${route}`);
+    await expect(page.getByText(marker)).toBeVisible({ timeout: 10_000 });
+    const audit = await page
+      .locator(".s2-hunter-reply")
+      .evaluateAll((replies) =>
+        replies.flatMap((reply) =>
+          [...reply.querySelectorAll("h1,h2,h3,h4,p,ul,ol,li,blockquote,table")]
+            .filter((element) => {
+              const style = getComputedStyle(element);
+              return style.display !== "none" && style.visibility !== "hidden";
+            })
+            .map((element) => {
+              const style = getComputedStyle(element);
+              return {
+                tag: element.tagName.toLowerCase(),
+                overflow: element.scrollWidth - element.clientWidth,
+                fontFamily: style.fontFamily,
+                fontSize: Number.parseFloat(style.fontSize),
+              };
+            }),
+        ),
+      );
+    expect(audit.length).toBeGreaterThan(0);
+    for (const element of audit) {
+      coveredTags.add(element.tag);
+      expect(element.overflow).toBeLessThanOrEqual(1);
+      expect(element.fontFamily.toLowerCase()).toContain("sans-serif");
+      expect(element.fontSize).toBeGreaterThanOrEqual(12);
+    }
+    await expectNoHorizontalOverflow(page);
+  }
+
+  for (const tag of ["h2", "p", "ul", "li", "blockquote", "table"]) {
+    expect(coveredTags.has(tag), `Markdown ${tag} 应有真实样本覆盖`).toBe(true);
+  }
+});

@@ -371,6 +371,28 @@
   line-height: 24px;
 }
 
+.s2-hunter-reply h1,
+.s2-hunter-reply h3,
+.s2-hunter-reply h4 {
+  color: var(--s1-ink);
+  font-weight: 650;
+}
+.s2-hunter-reply h1 {
+  margin: 24px 0 10px;
+  font-size: 18px;
+  line-height: 27px;
+}
+.s2-hunter-reply h3 {
+  margin: 18px 0 7px;
+  font-size: 14px;
+  line-height: 22px;
+}
+.s2-hunter-reply h4 {
+  margin: 16px 0 6px;
+  font-size: 13px;
+  line-height: 20px;
+}
+
 .s2-hunter-reply p {
   margin: 0 0 12px;
 }
@@ -381,6 +403,61 @@
 }
 .s2-hunter-reply li {
   margin: 4px 0;
+}
+.s2-hunter-reply li::marker {
+  color: var(--s1-muted);
+}
+.s2-hunter-reply strong {
+  font-weight: 650;
+}
+.s2-hunter-reply em {
+  color: var(--s1-muted);
+}
+.s2-hunter-reply a {
+  color: var(--s1-accent);
+  font-weight: 600;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.s2-hunter-reply a:hover {
+  text-decoration: underline;
+}
+.s2-hunter-reply code {
+  padding: 1px 5px;
+  color: color-mix(in srgb, var(--s1-accent) 82%, var(--s1-ink));
+  font-family:
+    ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.88em;
+  background: color-mix(in srgb, var(--s1-accent-soft) 60%, var(--s1-canvas));
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 12%, var(--s1-line));
+  border-radius: 4px;
+}
+.s2-hunter-reply pre {
+  max-width: 100%;
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  color: var(--s1-ink);
+  font-family:
+    ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  line-height: 19px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+.s2-hunter-reply pre code {
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  background: transparent;
+  border: 0;
+}
+.s2-hunter-reply hr {
+  height: 1px;
+  margin: 18px 0;
+  background: var(--s1-line);
+  border: 0;
 }
 .s2-markdown-table {
   width: 100%;
@@ -903,6 +980,118 @@
 }
 .s2-inline-artifact > header > button svg {
   width: 13px;
+}
+
+.s2-decision-request > header {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+  padding: 12px 13px 11px;
+  background: color-mix(in srgb, var(--s1-warning-soft) 58%, var(--s1-surface));
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-decision-request > header > svg {
+  width: 18px;
+  margin-top: 1px;
+  color: var(--s1-warning);
+}
+.s2-decision-request > header b,
+.s2-decision-request > header small,
+.s2-decision-copy b,
+.s2-decision-copy small {
+  display: block;
+}
+.s2-decision-request > header b {
+  font-size: 13px;
+  line-height: 20px;
+}
+.s2-decision-request > header small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+.s2-decision-request > div {
+  display: grid;
+  gap: 0;
+}
+.s2-decision-request > div > button {
+  display: grid;
+  width: 100%;
+  min-height: 52px;
+  grid-template-columns: 24px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  color: var(--s1-ink);
+  font: inherit;
+  text-align: left;
+  background: var(--s1-surface);
+  border: 0;
+  border-top: 1px solid var(--s1-line);
+  border-radius: 0;
+  appearance: none;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+.s2-decision-request > div > button:first-child {
+  border-top: 0;
+}
+.s2-decision-request > div > button:hover {
+  color: var(--s1-accent);
+  background: color-mix(in srgb, var(--s1-accent-soft) 48%, var(--s1-surface));
+}
+.s2-decision-request > div > button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid color-mix(in srgb, var(--s1-accent) 48%, transparent);
+  outline-offset: -2px;
+}
+.s2-decision-index {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  color: var(--s1-muted);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 50%;
+}
+.s2-decision-request > div > button:hover .s2-decision-index {
+  color: var(--s1-accent);
+  border-color: color-mix(in srgb, var(--s1-accent) 44%, var(--s1-line));
+}
+.s2-decision-copy {
+  min-width: 0;
+}
+.s2-decision-copy b {
+  font-size: 12px;
+  line-height: 19px;
+}
+.s2-decision-copy small {
+  margin-top: 1px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+.s2-decision-request > div > button > svg {
+  width: 14px;
+  color: var(--s1-subtle);
+}
+.s2-decision-request > p {
+  margin: 0;
+  padding: 8px 13px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+  background: var(--s1-canvas);
+  border-top: 1px solid var(--s1-line);
 }
 
 .s2-evidence-table > div {
