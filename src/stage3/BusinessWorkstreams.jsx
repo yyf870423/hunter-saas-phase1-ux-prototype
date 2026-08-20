@@ -328,7 +328,7 @@ function ClientTimeline({
                 <td>1</td>
               </tr>
               <tr>
-                <td>具备可用联系方式</td>
+                <td>具备手机或邮箱</td>
                 <td>2</td>
               </tr>
             </tbody>
@@ -546,7 +546,7 @@ function MappingTimeline({
           <ReviewEntry
             icon="database"
             label="打开本批次更新审核"
-            note="查看公司、组织、人物、关系、冲突和行动缺口；不会覆盖已有冲突内容。"
+            note="查看公司、组织、人物、关系、冲突和待补充内容；待确认内容可由用户明确确认后写入。"
             onOpen={openReview}
           />
           <button
@@ -554,18 +554,18 @@ function MappingTimeline({
             className="s2-markdown-link"
             onClick={() =>
               setInspection({
-                title: "本轮行动缺口",
+                title: "待补充信息与下一步",
                 kind: "task",
                 status: "等待用户",
                 tone: "warning",
                 action: "拓界技术负责人、穹顶汇报关系和王奕身份仍需处理",
                 duration: "本轮已运行 13 分 25 秒",
-                resultDestination: "具身智能核心人才版图 · 行动缺口",
+                resultDestination: "具身智能核心人才版图 · 待补充信息",
                 checkpoints: inspectionContexts["mapping-embodied"].checkpoints,
               })
             }
           >
-            查看本轮行动缺口 <Icon name="chevronRight" />
+            查看待补充信息与下一步 <Icon name="chevronRight" />
           </button>
         </HunterReply>
       ) : null}
@@ -597,14 +597,14 @@ function MappingTimeline({
               {
                 value: "finish",
                 label: "接受当前缺口并结束本轮",
-                description: "保留行动缺口，后续出现新证据时再提醒。",
+                description: "保留待补充信息，后续出现新证据时再提醒。",
               },
             ]}
             onSelect={(option) =>
               notify(
                 option.value === "explore"
                   ? "已准备人物探索支线，确认范围后开始"
-                  : "本轮摸排已结束，行动缺口继续保留在人才版图",
+                  : "本轮摸排已结束，待补充信息继续保留在人才版图",
                 "success",
               )
             }
@@ -1033,14 +1033,21 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
           companies={mappingCompanies}
           people={mappingPeople}
           onClose={() => setReviewOpen(false)}
-          onApply={() => {
+          onApply={(pendingDecisions) => {
+            const confirmedCount = Object.values(pendingDecisions).filter(
+              (value) => value === "write",
+            ).length;
             setReviewOpen(false);
             setPhase(5);
             setMessages((items) => [
               ...items,
               {
-                text: "将本批次已确认结果更新到人才版图，冲突项暂不合并。",
-                result: "本批次已经写入；冲突、未知项和行动缺口继续保留。",
+                text: confirmedCount
+                  ? `将已确认结果更新到人才版图，并按我的决定写入 ${confirmedCount} 项待确认内容。`
+                  : "将本批次已确认结果更新到人才版图，其他内容继续待确认。",
+                result: confirmedCount
+                  ? `本批次已经写入；${confirmedCount} 项待确认内容按用户明确决定写入，并保留确认记录和原始冲突。`
+                  : "本批次已经写入；其他待确认内容和待补充信息继续保留。",
               },
             ]);
           }}

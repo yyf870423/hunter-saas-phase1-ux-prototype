@@ -236,7 +236,7 @@
   display: grid;
   min-width: 0;
   min-height: 0;
-  grid-template-columns: minmax(620px, 1fr) 360px;
+  grid-template-columns: minmax(520px, 0.82fr) minmax(520px, 1.18fr);
 }
 .s3-contact-list,
 .s3-match-list {
@@ -249,8 +249,8 @@
   display: grid;
   min-width: 0;
   grid-template-columns:
-    34px minmax(150px, 1fr) minmax(170px, 1fr) minmax(190px, 1.15fr)
-    118px;
+    32px minmax(110px, 1fr) minmax(130px, 1fr) minmax(145px, 1.15fr)
+    108px;
   align-items: center;
   gap: 8px;
 }
@@ -474,7 +474,7 @@
 .s3-landscape-people {
   display: grid;
   min-height: 100%;
-  grid-template-columns: minmax(360px, 0.9fr) minmax(340px, 1.1fr);
+  grid-template-columns: minmax(320px, 0.72fr) minmax(500px, 1.28fr);
   border: 1px solid var(--s1-line);
   border-radius: 8px;
   overflow: hidden;
@@ -545,6 +545,32 @@
   color: var(--s1-muted);
   font-size: 12px;
   line-height: 18px;
+}
+.s3-pending-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.s3-pending-decision {
+  margin-top: 18px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--s1-warning) 7%, var(--s1-surface));
+  border: 1px solid color-mix(in srgb, var(--s1-warning) 22%, var(--s1-line));
+  border-radius: 8px;
+}
+.s3-pending-decision h3 {
+  margin: 0;
+  font-size: 13px;
+}
+.s3-pending-decision p {
+  margin: 5px 0 10px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+.s3-pending-decision .s3-pending-actions {
+  justify-content: flex-start;
 }
 
 .s3-match-list > button {

@@ -20,6 +20,29 @@ function ReviewHeader({ eyebrow, title, summary, onClose }) {
   );
 }
 
+function PendingDecisionActions({ label, value, onChange }) {
+  return (
+    <div className="s3-pending-actions">
+      <Button
+        tone={value === "write" ? "primary" : "secondary"}
+        size="sm"
+        aria-label={`确认写入${label}`}
+        onClick={() => onChange("write")}
+      >
+        {value === "write" ? "已确认写入" : "确认并写入"}
+      </Button>
+      <Button
+        tone="secondary"
+        size="sm"
+        aria-label={`继续待确认${label}`}
+        onClick={() => onChange("pending")}
+      >
+        {value === "pending" ? "继续待确认" : "改为待确认"}
+      </Button>
+    </div>
+  );
+}
+
 export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(
@@ -36,7 +59,7 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
     const keyword = query.trim().toLowerCase();
     if (!keyword) return contacts;
     return contacts.filter((item) =>
-      `${item.name} ${item.role} ${item.company} ${item.category} ${item.email}`
+      `${item.name} ${item.role} ${item.company} ${item.category} ${item.phone} ${item.email}`
         .toLowerCase()
         .includes(keyword),
     );
@@ -60,13 +83,13 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
       />
       <div className="s3-review-toolbar">
         <div>
-          <b>2 位联系人具备可用联系方式</b>
+          <b>2 位联系人具备手机或邮箱</b>
           <small>陈雨是首选联系对象；刘健可作为已有关系引荐。</small>
         </div>
         <SearchField
           value={query}
           onChange={setQuery}
-          placeholder="搜索姓名、角色、公司或联系方式"
+          placeholder="搜索姓名、角色、公司、手机或邮箱"
         />
       </div>
       <div className="s3-review-body">
@@ -75,7 +98,7 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
             <span />
             <span>联系人或线索</span>
             <span>公司与角色</span>
-            <span>可用联系方式</span>
+            <span>手机 / 邮箱</span>
             <span>身份判断</span>
           </div>
           {visible.map((contact) => (
@@ -152,7 +175,7 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
             <h3>联系方式</h3>
             <dl className="s3-detail-list">
               <div>
-                <dt>手机或关系</dt>
+                <dt>手机</dt>
                 <dd>{focused.phone || "尚未找到"}</dd>
               </div>
               <div>
@@ -200,7 +223,15 @@ export function LandscapeReviewWorkspace({
   const [tab, setTab] = useState("organizations");
   const [focusedPerson, setFocusedPerson] = useState(people[0]);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
-  const [conflictResolved, setConflictResolved] = useState(false);
+  const [pendingDecisions, setPendingDecisions] = useState({
+    wangyi: "pending",
+    qiongding: "pending",
+  });
+  const confirmedPendingCount = Object.values(pendingDecisions).filter(
+    (value) => value === "write",
+  ).length;
+  const decidePending = (key, value) =>
+    setPendingDecisions((current) => ({ ...current, [key]: value }));
   return (
     <section className="s3-review-workspace" aria-label="人才版图更新审核">
       <ReviewHeader
@@ -240,10 +271,10 @@ export function LandscapeReviewWorkspace({
             className={tab === "gaps" ? "is-active" : ""}
             onClick={() => setTab("gaps")}
           >
-            冲突与缺口 <em>3</em>
+            冲突与待补充 <em>3</em>
           </button>
         </div>
-        <p>本批次只写入已经确认的增量；冲突项不会静默覆盖已有内容。</p>
+        <p>待确认内容不会自动写入；用户明确确认后可以写入，并保留确认记录。</p>
       </div>
       <div className="s3-landscape-review-body">
         {tab === "organizations" ? (
@@ -335,6 +366,19 @@ export function LandscapeReviewWorkspace({
                   <dd>{focusedPerson.confidence}</dd>
                 </div>
               </dl>
+              {focusedPerson.id === "map-wangyi" ? (
+                <section className="s3-pending-decision">
+                  <h3>本批次写入决定</h3>
+                  <p>
+                    单位时间线仍有冲突。可以明确确认后按当前人物关系写入，也可以继续保留为待确认内容。
+                  </p>
+                  <PendingDecisionActions
+                    label="王奕身份关系"
+                    value={pendingDecisions.wangyi}
+                    onChange={(value) => decidePending("wangyi", value)}
+                  />
+                </section>
+              ) : null}
             </aside>
           </div>
         ) : null}
@@ -348,13 +392,11 @@ export function LandscapeReviewWorkspace({
                   论文作者与星澜公开活动名单可能属于同一人，但单位时间线不能完全对应。
                 </p>
               </span>
-              <Button
-                tone="secondary"
-                size="sm"
-                onClick={() => setConflictResolved(true)}
-              >
-                {conflictResolved ? "已暂不合并" : "暂不合并"}
-              </Button>
+              <PendingDecisionActions
+                label="王奕身份关系"
+                value={pendingDecisions.wangyi}
+                onChange={(value) => decidePending("wangyi", value)}
+              />
             </article>
             <article>
               <Icon name="user" />
@@ -371,19 +413,31 @@ export function LandscapeReviewWorkspace({
               <span>
                 <b>穹顶智能组织上下级待确认</b>
                 <p>
-                  现有证据只能确认平台和方向，不能确认具体汇报关系。本批次保留组织单元，不写入上下级。
+                  现有证据只能确认平台和方向，具体汇报关系仍待确认。用户可以按当前证据确认写入，也可以继续保留待确认。
                 </p>
               </span>
+              <PendingDecisionActions
+                label="穹顶智能汇报关系"
+                value={pendingDecisions.qiongding}
+                onChange={(value) => decidePending("qiongding", value)}
+              />
             </article>
           </div>
         ) : null}
       </div>
       <footer className="s3-review-footer">
         <span>
-          <b>写入本批次已确认结果</b>
-          <small>冲突和未知项继续保留在待确认成果，不会被猜测补齐。</small>
+          <b>
+            写入本批次结果
+            {confirmedPendingCount
+              ? `，含 ${confirmedPendingCount} 项用户确认内容`
+              : ""}
+          </b>
+          <small>
+            自动流程不会写入待确认内容；用户明确确认写入的项目会记录确认人、时间和原始冲突。
+          </small>
         </span>
-        <Button tone="primary" onClick={onApply}>
+        <Button tone="primary" onClick={() => onApply(pendingDecisions)}>
           更新人才版图
         </Button>
       </footer>

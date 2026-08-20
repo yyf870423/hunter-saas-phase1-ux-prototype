@@ -66,7 +66,7 @@ export const contactReviewRows = [
     role: "投资经理",
     company: "启程资本",
     category: "中间介绍人",
-    phone: "微信已添加",
+    phone: "",
     email: "",
     source: "用户已有联系人",
     confidence: "关系已确认",
@@ -220,8 +220,9 @@ export const businessScenarios = {
       {
         id: "contacts",
         title: "查找联系人与可用联系路径",
-        detail: "识别招聘负责人、HRBP 和已有关系，并核验联系方式。",
-        requirement: "必须说明联系人数量、可用联系方式、首选对象和缺口。",
+        detail: "识别招聘负责人、HRBP 和已有关系，并核验手机或邮箱。",
+        requirement:
+          "必须说明联系人数量、具备手机或邮箱的人数、首选对象和待补充信息。",
         doneAt: 3,
       },
       {
@@ -318,7 +319,7 @@ export const businessScenarios = {
       },
       {
         id: "gaps",
-        title: "确认本轮行动缺口",
+        title: "确认待补充信息与下一步",
         detail: "明确还缺什么、能做什么和执行后的预期结果。",
         requirement: "不使用无法指导行动的抽象完成百分比。",
         doneAt: 6,

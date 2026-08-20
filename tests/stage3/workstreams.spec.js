@@ -37,6 +37,12 @@ test("客户开发完成联系人审核、联系授权、外部等待和招聘�
     page.getByRole("heading", { name: "星澜机器人招聘合作" }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "陈雨" })).toBeVisible();
+  await expect(page.getByText("手机 / 邮箱", { exact: true })).toBeVisible();
+  await expect(page.getByText("微信已添加", { exact: true })).toHaveCount(0);
+  await expect(page.locator(".s3-review-detail dt")).toHaveText([
+    "手机",
+    "邮箱",
+  ]);
   await expect(page.getByText("138 **** 6217").first()).toBeVisible();
   await page.getByRole("button", { name: "保存审核结果" }).click();
   await expect(page.getByText("是否允许本次对外联系？")).toBeVisible();
@@ -64,7 +70,7 @@ test("客户开发没有联系人时展示可执行缺口而不生成虚假联�
   ).toBeVisible();
 });
 
-test("人才摸排分批审核公司、人物、冲突和行动缺口", async ({ page }) => {
+test("人才摸排分批审核公司、人物、冲突和待补充信息", async ({ page }) => {
   await page.goto("#/workstreams/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
@@ -74,11 +80,17 @@ test("人才摸排分批审核公司、人物、冲突和行动缺口", async ({
   await page.getByRole("tab", { name: /人物与关系/ }).click();
   await page.getByRole("button", { name: /王奕/ }).click();
   await expect(page.getByText("存在冲突", { exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: /冲突与缺口/ }).click();
+  await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
+  await expect(
+    page.getByRole("button", { name: "确认写入王奕身份关系" }),
+  ).toContainText("已确认写入");
+  await page.getByRole("tab", { name: /冲突与待补充/ }).click();
   await expect(page.getByText("拓界机器人技术负责人仍缺失")).toBeVisible();
-  await page.getByRole("button", { name: "暂不合并" }).click();
-  await expect(page.getByRole("button", { name: "已暂不合并" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "确认写入王奕身份关系" }),
+  ).toContainText("已确认写入");
   await page.getByRole("button", { name: "更新人才版图" }).click();
+  await expect(page.getByText(/按我的决定写入 1 项待确认内容/)).toBeVisible();
   await expect(page.getByText("人才版图已完成本批次更新")).toBeVisible();
   await expect(page.getByText(/不会把人才版图标记为“初版完成”/)).toBeVisible();
 });

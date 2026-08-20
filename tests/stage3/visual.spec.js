@@ -77,12 +77,60 @@ test("截取三类业务审核工作区", async ({ page }) => {
     await page.goto(`#/workstreams/${scenario[0]}`);
     await expect(page.getByText(scenario[1])).toBeVisible({ timeout: 10_000 });
     await page.getByRole("button", { name: scenario[2] }).click();
+    if (scenario[3] === "contact-review" || scenario[3] === "match-review") {
+      const list = await page
+        .locator(
+          scenario[3] === "contact-review"
+            ? ".s3-contact-list"
+            : ".s3-match-list",
+        )
+        .boundingBox();
+      const detail = await page
+        .locator(
+          scenario[3] === "contact-review"
+            ? ".s3-review-detail"
+            : ".s3-match-detail",
+        )
+        .boundingBox();
+      expect(list).not.toBeNull();
+      expect(detail).not.toBeNull();
+      expect(detail.width).toBeGreaterThan(list.width);
+    }
     await expectNoHorizontalOverflow(page);
     await page.screenshot({
       path: `${output}/desktop-${scenario[3]}.png`,
       fullPage: true,
     });
   }
+});
+
+test("人才摸排人物详情区域宽于左侧列表", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("#/workstreams/mapping-embodied");
+  await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "打开本批次更新审核" }).click();
+  await page.getByRole("tab", { name: /人物与关系/ }).click();
+  await page.getByRole("button", { name: /王奕/ }).click();
+  const list = await page.locator(".s3-landscape-person-list").boundingBox();
+  const detail = await page
+    .locator(".s3-landscape-person-detail")
+    .boundingBox();
+  expect(list).not.toBeNull();
+  expect(detail).not.toBeNull();
+  expect(detail.width).toBeGreaterThan(list.width);
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/desktop-mapping-person-review.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
+  await page.getByRole("tab", { name: /冲突与待补充/ }).click();
+  await page.screenshot({
+    path: `${output}/desktop-mapping-pending-review.png`,
+    fullPage: true,
+  });
 });
 
 test("截取阶段三等待、冲突和资料回流状态", async ({ page }) => {
