@@ -20,24 +20,20 @@ function ReviewHeader({ eyebrow, title, summary, onClose }) {
   );
 }
 
-function PendingDecisionActions({ label, value, onChange }) {
+function PendingDecisionControl({ label, value, onChange }) {
+  const confirmed = value === "write";
   return (
-    <div className="s3-pending-actions">
-      <Button
-        tone={value === "write" ? "primary" : "secondary"}
-        size="sm"
-        aria-label={`确认写入${label}`}
-        onClick={() => onChange("write")}
-      >
-        {value === "write" ? "已确认写入" : "确认并写入"}
-      </Button>
+    <div className="s3-pending-control">
+      <StatusBadge tone={confirmed ? "success" : "warning"}>
+        {confirmed ? "已确认写入" : "待确认"}
+      </StatusBadge>
       <Button
         tone="secondary"
         size="sm"
-        aria-label={`继续待确认${label}`}
-        onClick={() => onChange("pending")}
+        aria-label={confirmed ? `撤销确认${label}` : `确认写入${label}`}
+        onClick={() => onChange(confirmed ? "pending" : "write")}
       >
-        {value === "pending" ? "继续待确认" : "改为待确认"}
+        {confirmed ? "撤销确认" : "确认并写入"}
       </Button>
     </div>
   );
@@ -100,11 +96,13 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
             <span>公司与角色</span>
             <span>手机 / 邮箱</span>
             <span>身份判断</span>
+            <span />
           </div>
           {visible.map((contact) => (
             <button
               type="button"
               className={focused.id === contact.id ? "is-active" : ""}
+              aria-selected={focused.id === contact.id}
               key={contact.id}
               onClick={() => {
                 setFocusedId(contact.id);
@@ -138,6 +136,7 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
                   {contact.confidence}
                 </StatusBadge>
               </span>
+              <Icon name="chevronRight" />
             </button>
           ))}
           {!visible.length ? (
@@ -161,7 +160,9 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
           </button>
           <header>
             <span>
-              <small>{focused.category}</small>
+              <small className="s3-detail-kicker">
+                联系人详情 · {focused.category}
+              </small>
               <h2>{focused.name}</h2>
               <p>
                 {focused.company} · {focused.role}
@@ -306,10 +307,15 @@ export function LandscapeReviewWorkspace({
         {tab === "people" ? (
           <div className="s3-landscape-people">
             <div className="s3-landscape-person-list">
+              <div className="s3-master-list-title">
+                <b>人物列表</b>
+                <small>{people.length} 位</small>
+              </div>
               {people.map((person) => (
                 <button
                   type="button"
                   className={focusedPerson.id === person.id ? "is-active" : ""}
+                  aria-selected={focusedPerson.id === person.id}
                   key={person.id}
                   onClick={() => {
                     setFocusedPerson(person);
@@ -344,10 +350,13 @@ export function LandscapeReviewWorkspace({
                 <Icon name="chevronLeft" />
                 返回人物列表
               </button>
-              <h2>{focusedPerson.name}</h2>
-              <p>
-                {focusedPerson.company} · {focusedPerson.role}
-              </p>
+              <header className="s3-landscape-detail-header">
+                <small className="s3-detail-kicker">人物详情</small>
+                <h2>{focusedPerson.name}</h2>
+                <p>
+                  {focusedPerson.company} · {focusedPerson.role}
+                </p>
+              </header>
               <dl className="s3-detail-list">
                 <div>
                   <dt>身份状态</dt>
@@ -372,7 +381,7 @@ export function LandscapeReviewWorkspace({
                   <p>
                     单位时间线仍有冲突。可以明确确认后按当前人物关系写入，也可以继续保留为待确认内容。
                   </p>
-                  <PendingDecisionActions
+                  <PendingDecisionControl
                     label="王奕身份关系"
                     value={pendingDecisions.wangyi}
                     onChange={(value) => decidePending("wangyi", value)}
@@ -392,7 +401,7 @@ export function LandscapeReviewWorkspace({
                   论文作者与星澜公开活动名单可能属于同一人，但单位时间线不能完全对应。
                 </p>
               </span>
-              <PendingDecisionActions
+              <PendingDecisionControl
                 label="王奕身份关系"
                 value={pendingDecisions.wangyi}
                 onChange={(value) => decidePending("wangyi", value)}
@@ -416,7 +425,7 @@ export function LandscapeReviewWorkspace({
                   现有证据只能确认平台和方向，具体汇报关系仍待确认。用户可以按当前证据确认写入，也可以继续保留待确认。
                 </p>
               </span>
-              <PendingDecisionActions
+              <PendingDecisionControl
                 label="穹顶智能汇报关系"
                 value={pendingDecisions.qiongding}
                 onChange={(value) => decidePending("qiongding", value)}
@@ -465,10 +474,15 @@ export function PositionMatchReviewWorkspace({ matches, onClose, onContinue }) {
       </div>
       <div className="s3-match-review-body">
         <div className="s3-match-list">
+          <div className="s3-master-list-title">
+            <b>岗位列表</b>
+            <small>{matches.length} 个结果</small>
+          </div>
           {matches.map((match) => (
             <button
               type="button"
               className={focused.id === match.id ? "is-active" : ""}
+              aria-selected={focused.id === match.id}
               key={match.id}
               onClick={() => {
                 setFocusedId(match.id);
@@ -505,10 +519,11 @@ export function PositionMatchReviewWorkspace({ matches, onClose, onContinue }) {
           </button>
           <header>
             <span>
-              <small>
-                {focused.company} · {focused.location}
-              </small>
+              <small className="s3-detail-kicker">岗位详情</small>
               <h2>{focused.title}</h2>
+              <p>
+                {focused.company} · {focused.location}
+              </p>
             </span>
             <strong>
               {focused.score}

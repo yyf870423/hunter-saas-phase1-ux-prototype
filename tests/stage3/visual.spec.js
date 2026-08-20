@@ -126,6 +126,9 @@ test("人才摸排人物详情区域宽于左侧列表", async ({ page }) => {
     fullPage: true,
   });
   await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
+  await expect(
+    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
+  ).toBeVisible();
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
   await page.screenshot({
     path: `${output}/desktop-mapping-pending-review.png`,

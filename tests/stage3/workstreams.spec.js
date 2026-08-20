@@ -43,6 +43,17 @@ test("客户开发完成联系人审核、联系授权、外部等待和招聘�
     "手机",
     "邮箱",
   ]);
+  await expect(page.getByRole("button", { name: /陈雨/ })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.getByRole("button", { name: /周琪/ }).click();
+  await expect(page.getByRole("heading", { name: "周琪" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /周琪/ })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.getByRole("button", { name: /陈雨/ }).click();
   await expect(page.getByText("138 **** 6217").first()).toBeVisible();
   await page.getByRole("button", { name: "保存审核结果" }).click();
   await expect(page.getByText("是否允许本次对外联系？")).toBeVisible();
@@ -82,13 +93,14 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
   await expect(page.getByText("存在冲突", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
   await expect(
-    page.getByRole("button", { name: "确认写入王奕身份关系" }),
-  ).toContainText("已确认写入");
+    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
+  ).toContainText("撤销确认");
+  await expect(page.getByText("已确认写入", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
   await expect(page.getByText("拓界机器人技术负责人仍缺失")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "确认写入王奕身份关系" }),
-  ).toContainText("已确认写入");
+    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
+  ).toContainText("撤销确认");
   await page.getByRole("button", { name: "更新人才版图" }).click();
   await expect(page.getByText(/按我的决定写入 1 项待确认内容/)).toBeVisible();
   await expect(page.getByText("人才版图已完成本批次更新")).toBeVisible();
@@ -116,9 +128,19 @@ test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ pa
     timeout: 10_000,
   });
   await page.getByRole("button", { name: "查看完整岗位匹配" }).click();
+  await expect(
+    page.getByRole("button", { name: /具身智能 VLA 算法负责人/ }),
+  ).toHaveAttribute("aria-selected", "true");
   await expect(page.locator(".s3-match-list strong").first()).toContainText(
     "92",
   );
+  await page.getByRole("button", { name: /机器人策略学习技术总监/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "机器人策略学习技术总监" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /机器人策略学习技术总监/ }),
+  ).toHaveAttribute("aria-selected", "true");
   await expect(page.getByText("推荐理由", { exact: true })).toBeVisible();
   await expect(page.getByText("风险提示", { exact: true })).toBeVisible();
   await expect(page.getByText("建议沟通要点", { exact: true })).toBeVisible();
