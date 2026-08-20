@@ -1,17 +1,19 @@
 import { expect, test } from "@playwright/test";
 import { expectNoHorizontalOverflow, trackConsoleErrors } from "./helpers";
 
-test("审核入口暴露阶段二范围并保留阶段一入口", async ({ page }) => {
+test("审核入口暴露阶段四全部业务资产范围", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/review");
   await expect(
-    page.getByRole("heading", { name: "自动化通用交互框架" }),
+    page.getByRole("heading", { name: "业务资产与统一数据管理" }),
   ).toBeVisible();
-  await expect(page.getByText("阶段二待审批")).toBeVisible();
+  await expect(page.getByText("阶段四待审批")).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /进入渐进式业务主线演示/ }),
+    page.getByRole("link", { name: /从候选人列表开始验收/ }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /阶段一工作台/ })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /人才版图重名导入/ }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });

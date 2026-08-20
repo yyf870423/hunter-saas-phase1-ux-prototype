@@ -50,7 +50,8 @@ test("业务资产使用侧向面板并可直接选择", async ({ page }) => {
   await expect(panel).toBeVisible();
   await panel.getByRole("button", { name: "候选人" }).click();
   await expect(panel).toBeHidden();
-  await expect(page.getByText("已选择“候选人”入口")).toBeVisible();
+  await expect(page).toHaveURL(/#\/candidates$/);
+  await expect(page.getByRole("heading", { name: "候选人" })).toBeVisible();
 });
 
 test("通知计数使用正圆标记", async ({ page }) => {
@@ -100,7 +101,8 @@ test("主题切换即时生效并记忆", async ({ page }) => {
 test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   await page.getByRole("button", { name: "新建", exact: true }).click();
   await page.getByRole("button", { name: /导入数据/ }).click();
-  await expect(page.getByText("已选择“导入数据”入口")).toBeVisible();
+  await expect(page).toHaveURL(/#\/data\/imports$/);
+  await expect(page.getByRole("heading", { name: "数据导入" })).toBeVisible();
   await page.getByLabel(/查看 Agent 用量/).click();
   await expect(
     page.getByRole("heading", { name: "本月 Agent 用量" }),

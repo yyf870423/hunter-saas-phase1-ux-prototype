@@ -454,6 +454,14 @@ export function Stage1Shell() {
       workstreams: "/workstreams/position-vla",
       tasks: "/tasks",
       signals: "/signals",
+      candidates: "/candidates",
+      positions: "/positions",
+      companies: "/companies",
+      contacts: "/contacts",
+      opportunities: "/opportunities",
+      mappings: "/mappings",
+      papers: "/papers",
+      patents: "/patents",
     };
     if (routes[item.id]) {
       navigate(routes[item.id]);
@@ -463,7 +471,11 @@ export function Stage1Shell() {
       setUsageOpen(true);
       return;
     }
-    notify(`已选择“${item.label}”入口，完整页面将在对应原型阶段提交`, "info");
+    if (item.id === "settings") {
+      notify("设置原型将在后续阶段提交", "info");
+      return;
+    }
+    notify(`已选择“${item.label}”入口`, "info");
   };
 
   return (
@@ -667,7 +679,9 @@ export function Stage1Shell() {
                 onSelect={(label) => {
                   setNewOpen(false);
                   if (label === "新建工作") navigate("/new");
-                  else notify(`已选择“${label}”入口`, "info");
+                  else if (label === "导入数据") navigate("/data/imports");
+                  else if (label === "手动新建资产")
+                    setAssetNavigationOpen(true);
                 }}
               />
             </div>
@@ -687,7 +701,7 @@ export function Stage1Shell() {
           </div>
         </header>
         <main
-          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/workstreams") || location.pathname.startsWith("/tasks/") ? "s1-main-workspace" : ""}`}
+          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/workstreams") || location.pathname.startsWith("/tasks/") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""}`}
         >
           <Outlet />
         </main>
