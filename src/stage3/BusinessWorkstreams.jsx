@@ -26,6 +26,7 @@ import {
   contactReviewRows,
   mappingCompanies,
   mappingPeople,
+  mappingRelationshipViews,
 } from "./data";
 
 function forcedPhase(scenarioId, state) {
@@ -888,6 +889,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         <LandscapeReviewWorkspace
           companies={mappingCompanies}
           people={mappingPeople}
+          relationshipViews={mappingRelationshipViews}
           onClose={() => setReviewOpen(false)}
           onApply={(pendingDecisions) => {
             const confirmedCount = Object.values(pendingDecisions).filter(

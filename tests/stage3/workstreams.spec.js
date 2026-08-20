@@ -107,6 +107,91 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
   await expect(page.getByText(/不会把人才版图标记为“初版完成”/)).toBeVisible();
 });
 
+test("人才摸排关系画布支持多视图探索和同一审核决定", async ({ page }) => {
+  await page.goto("#/workstreams/mapping-embodied");
+  await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "打开本批次更新审核" }).click();
+  await expect(page.getByRole("tab", { name: /关系画布/ })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(page.getByRole("tab", { name: "组织与方向" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page
+    .locator(".s3-relationship-node")
+    .filter({ hasText: "王奕" })
+    .click();
+  await expect(
+    page.getByText(/论文作者与公开活动名单可能属于同一人/),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
+  await expect(
+    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
+  ).toBeVisible();
+
+  await page.getByRole("tab", { name: "公司生态" }).click();
+  await expect(
+    page.getByText("5 家公司或机构 · 7 条生态关系 · 2 条待核验"),
+  ).toBeVisible();
+  await page.locator('[data-edge-id="eco-e2"]').press("Enter");
+  await expect(page.getByText("关系方向", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("星澜机器人 → 灵跃科技").first(),
+  ).toBeVisible();
+
+  await page.getByRole("tab", { name: "方向与角色" }).click();
+  await expect(
+    page.getByText("4 个方向 · 3 类关键角色 · 2 个明确缺口"),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "人物关系" }).click();
+  await expect(page.getByText("林昊", { exact: true }).first()).toBeVisible();
+  await page.getByRole("tab", { name: "人才流动" }).click();
+  await expect(
+    page.getByText("近 24 个月 · 18 条可核验流动记录 · 4 条主要流向"),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "联系路径" }).click();
+  await expect(
+    page.getByText("赵星羽 · 2 条可用路径 · 最短 2 段"),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "学术脉络" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Embodied VLA for…" }),
+  ).toBeVisible();
+
+  await page.getByRole("tab", { name: /冲突与待补充/ }).click();
+  await expect(
+    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
+  ).toBeVisible();
+});
+
+test("人才摸排关系画布缩放可重置且移动端不产生页面横向溢出", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/workstreams/mapping-embodied");
+  await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "打开本批次更新审核" }).click();
+  await page.getByRole("button", { name: "缩小关系画布" }).click();
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
+    "90%",
+  );
+  await page.getByRole("button", { name: "重置关系画布" }).click();
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
+    "100%",
+  );
+  await page.getByRole("tab", { name: "联系路径" }).click();
+  await expect(
+    page.getByText("投资关系", { exact: true }).last(),
+  ).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+});
+
 test("相关任务详情使用人才摸排自己的结果去向和检查点", async ({ page }) => {
   await page.goto("#/workstreams/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({

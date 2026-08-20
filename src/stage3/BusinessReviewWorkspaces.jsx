@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Icon } from "../components/Icon";
 import { Button, SearchField, StatusBadge } from "../stage1/ui";
+import { RelationshipCanvas } from "./RelationshipCanvas";
 
 function ReviewHeader({ eyebrow, title, summary, onClose }) {
   return (
@@ -218,10 +219,11 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
 export function LandscapeReviewWorkspace({
   companies,
   people,
+  relationshipViews,
   onClose,
   onApply,
 }) {
-  const [tab, setTab] = useState("organizations");
+  const [tab, setTab] = useState("relationships");
   const [focusedPerson, setFocusedPerson] = useState(people[0]);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [pendingDecisions, setPendingDecisions] = useState({
@@ -247,6 +249,15 @@ export function LandscapeReviewWorkspace({
           role="tablist"
           aria-label="人才版图审核内容"
         >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "relationships"}
+            className={tab === "relationships" ? "is-active" : ""}
+            onClick={() => setTab("relationships")}
+          >
+            关系画布 <em>7</em>
+          </button>
           <button
             type="button"
             role="tab"
@@ -278,6 +289,13 @@ export function LandscapeReviewWorkspace({
         <p>待确认内容不会自动写入；用户明确确认后可以写入，并保留确认记录。</p>
       </div>
       <div className="s3-landscape-review-body">
+        {tab === "relationships" ? (
+          <RelationshipCanvas
+            views={relationshipViews}
+            decisions={pendingDecisions}
+            onDecision={decidePending}
+          />
+        ) : null}
         {tab === "organizations" ? (
           <div className="s3-landscape-grid">
             {companies.map((item) => (

@@ -571,6 +571,385 @@
   justify-content: flex-start;
 }
 
+.s3-relationship-workspace {
+  display: grid;
+  min-width: 0;
+  min-height: 100%;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s3-relationship-header {
+  display: grid;
+  min-width: 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s3-relationship-view-tabs {
+  display: flex;
+  min-width: 0;
+  gap: 3px;
+  padding: 8px 10px 0;
+  overflow-x: auto;
+  background: var(--s1-canvas);
+}
+.s3-relationship-view-tabs button {
+  min-height: 34px;
+  padding: 0 11px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.s3-relationship-view-tabs button:hover {
+  color: var(--s1-ink);
+  background: color-mix(in srgb, var(--s1-accent) 4%, transparent);
+}
+.s3-relationship-view-tabs button.is-active {
+  color: var(--s1-accent);
+  border-bottom-color: var(--s1-accent);
+}
+.s3-relationship-intro {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 12px;
+}
+.s3-relationship-intro > span b,
+.s3-relationship-intro > span small {
+  display: block;
+}
+.s3-relationship-intro > span b {
+  font-size: 13px;
+}
+.s3-relationship-intro > span small {
+  margin-top: 3px;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s3-relationship-legend {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+}
+.s3-relationship-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.s3-relationship-legend span::before {
+  width: 7px;
+  height: 7px;
+  background: var(--s1-accent);
+  border-radius: 50%;
+  content: "";
+}
+.s3-relationship-legend .is-confirmed::before {
+  background: var(--s1-success);
+}
+.s3-relationship-legend .is-pending::before {
+  background: var(--s1-warning);
+}
+.s3-relationship-body {
+  display: grid;
+  min-width: 0;
+  min-height: 520px;
+  grid-template-columns: minmax(0, 1fr) 330px;
+}
+.s3-relationship-canvas-shell {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle, var(--s1-line-strong) 1px, transparent 1px),
+    var(--s1-canvas);
+  background-size: 18px 18px;
+  border-right: 1px solid var(--s1-line);
+}
+.s3-relationship-controls {
+  position: absolute;
+  z-index: 6;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--s1-surface) 94%, transparent);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+  box-shadow: var(--s1-control-shadow);
+}
+.s3-relationship-controls .s1-icon-button {
+  width: 28px;
+  height: 28px;
+}
+.s3-relationship-controls > span {
+  min-width: 38px;
+  color: var(--s1-muted);
+  font-size: 10px;
+  text-align: center;
+}
+.s3-relationship-viewport {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  overflow: auto;
+}
+.s3-relationship-stage {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 160ms ease;
+}
+.s3-relationship-edges {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.s3-relationship-edge {
+  color: var(--s1-accent);
+  cursor: pointer;
+  outline: none;
+}
+.s3-relationship-edge.is-success {
+  color: var(--s1-success);
+}
+.s3-relationship-edge.is-warning {
+  color: var(--s1-warning);
+}
+.s3-edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+}
+.s3-edge-line {
+  fill: none;
+  stroke: color-mix(in srgb, currentColor 52%, var(--s1-line));
+  stroke-width: var(--s3-edge-width, 1.5px);
+}
+.s3-relationship-edge.is-active .s3-edge-line,
+.s3-relationship-edge:focus-visible .s3-edge-line {
+  stroke: currentColor;
+  opacity: 1;
+}
+.s3-relationship-edge rect {
+  fill: color-mix(in srgb, var(--s1-surface) 95%, transparent);
+  stroke: var(--s1-line);
+}
+.s3-relationship-edge text {
+  fill: var(--s1-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.s3-relationship-edge.is-active text {
+  fill: currentColor;
+}
+.s3-relationship-stage.is-direction-role
+  .s3-relationship-edge:not(.is-active)
+  > g {
+  opacity: 0;
+  pointer-events: none;
+}
+#s3-arrow-success path {
+  fill: var(--s1-success);
+}
+#s3-arrow-info path {
+  fill: var(--s1-accent);
+}
+#s3-arrow-warning path {
+  fill: var(--s1-warning);
+}
+.s3-relationship-node {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  width: 148px;
+  height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 10px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 7px;
+  box-shadow: 0 2px 7px color-mix(in srgb, var(--s1-ink) 6%, transparent);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
+}
+.s3-relationship-node:hover {
+  border-color: color-mix(in srgb, var(--s1-accent) 38%, var(--s1-line));
+  transform: translateY(-1px);
+}
+.s3-relationship-node.is-active {
+  border-color: var(--s1-accent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--s1-accent) 14%, transparent),
+    0 4px 12px color-mix(in srgb, var(--s1-ink) 8%, transparent);
+}
+.s3-relationship-node.is-warning {
+  border-color: color-mix(in srgb, var(--s1-warning) 46%, var(--s1-line));
+}
+.s3-relationship-node.is-warning.is-active {
+  border-color: var(--s1-warning);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--s1-warning) 16%, transparent);
+}
+.s3-relationship-node span {
+  min-width: 0;
+}
+.s3-relationship-node b,
+.s3-relationship-node small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s3-relationship-node b {
+  font-size: 12px;
+}
+.s3-relationship-node small {
+  margin-top: 4px;
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.s3-relationship-node > svg {
+  flex: 0 0 auto;
+  width: 15px;
+  color: var(--s1-warning);
+}
+.s3-relationship-node.is-company {
+  border-left: 3px solid var(--s1-accent);
+}
+.s3-relationship-node.is-organization {
+  border-left: 3px solid #5965d8;
+}
+.s3-relationship-node.is-person {
+  border-left: 3px solid var(--s1-success);
+}
+.s3-relationship-node.is-paper,
+.s3-relationship-node.is-patent {
+  border-left: 3px solid #7b5cc7;
+}
+.s3-relationship-detail {
+  min-width: 0;
+  padding: 15px;
+  overflow-y: auto;
+  background: var(--s1-surface-raised);
+}
+.s3-relationship-detail > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s3-relationship-detail h2 {
+  margin: 3px 0 0;
+  font-size: 16px;
+  line-height: 22px;
+}
+.s3-relationship-detail header p {
+  margin: 4px 0 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 17px;
+}
+.s3-relationship-detail > section {
+  margin-top: 15px;
+}
+.s3-relationship-detail > section > h3 {
+  margin: 0 0 7px;
+  font-size: 12px;
+}
+.s3-relationship-summary {
+  margin: 12px 0 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.s3-evidence-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.s3-evidence-list li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 5px 8px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 5px;
+}
+.s3-evidence-list svg {
+  flex: 0 0 auto;
+  width: 14px;
+  color: var(--s1-muted);
+}
+.s3-direct-relations {
+  display: grid;
+  gap: 5px;
+}
+.s3-direct-relations button {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 5px;
+  cursor: pointer;
+}
+.s3-direct-relations button:hover {
+  border-color: color-mix(in srgb, var(--s1-accent) 30%, var(--s1-line));
+}
+.s3-direct-relations b,
+.s3-direct-relations small {
+  display: block;
+}
+.s3-direct-relations b {
+  font-size: 11px;
+}
+.s3-direct-relations small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.s3-direct-relations svg {
+  flex: 0 0 auto;
+  width: 14px;
+}
+
 .s3-match-list > button {
   display: grid;
   width: 100%;
@@ -646,6 +1025,9 @@
   .s3-landscape-person-list {
     border-right: 0;
   }
+  .s3-relationship-body {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
 }
 
 @media (max-width: 700px) {
@@ -715,6 +1097,29 @@
   }
   .s3-landscape-review-body {
     padding: 10px 12px;
+  }
+  .s3-relationship-intro {
+    display: grid;
+    gap: 8px;
+  }
+  .s3-relationship-legend {
+    overflow-x: auto;
+  }
+  .s3-relationship-body {
+    display: block;
+    min-height: 0;
+  }
+  .s3-relationship-canvas-shell {
+    height: 420px;
+    border-right: 0;
+    border-bottom: 1px solid var(--s1-line);
+  }
+  .s3-relationship-viewport {
+    min-height: 420px;
+  }
+  .s3-relationship-detail {
+    max-height: none;
+    overflow: visible;
   }
   .s3-gap-list article {
     grid-template-columns: 28px minmax(0, 1fr);

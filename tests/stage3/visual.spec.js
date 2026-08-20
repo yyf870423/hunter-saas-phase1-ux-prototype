@@ -136,6 +136,53 @@ test("人才摸排人物详情区域宽于左侧列表", async ({ page }) => {
   });
 });
 
+test("截取人才摸排关系画布的主要视图", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("#/workstreams/mapping-embodied");
+  await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "打开本批次更新审核" }).click();
+  for (const [tab, file] of [
+    ["组织与方向", "organization"],
+    ["公司生态", "ecosystem"],
+    ["方向与角色", "direction-role"],
+    ["人物关系", "people"],
+    ["人才流动", "talent-flow"],
+    ["联系路径", "contact-path"],
+    ["学术脉络", "academic"],
+  ]) {
+    await page.getByRole("tab", { name: tab }).click();
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `${output}/desktop-mapping-${file}-graph.png`,
+      fullPage: true,
+    });
+  }
+});
+
+test("截取移动端人才摸排关系画布", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/workstreams/mapping-embodied");
+  await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
+    timeout: 10_000,
+  });
+  await page.getByRole("button", { name: "打开本批次更新审核" }).click();
+  await page.getByRole("tab", { name: "联系路径" }).click();
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/iphone-mapping-contact-path-graph.png`,
+    fullPage: true,
+  });
+  await page
+    .getByRole("heading", { name: "投资关系" })
+    .scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: `${output}/iphone-mapping-contact-path-detail.png`,
+    fullPage: true,
+  });
+});
+
 test("截取阶段三等待、冲突和资料回流状态", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   for (const [route, marker, file] of [
