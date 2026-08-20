@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Icon } from "../components/Icon";
 import { Button, SearchField, StatusBadge } from "../stage1/ui";
 import { RelationshipCanvas } from "./RelationshipCanvas";
@@ -21,21 +21,73 @@ function ReviewHeader({ eyebrow, title, summary, onClose }) {
   );
 }
 
-function PendingDecisionControl({ label, value, onChange }) {
-  const confirmed = value === "write";
+function ContextReviewPanel({
+  eyebrow,
+  title,
+  items,
+  selectedId,
+  onSelect,
+  relationshipViews,
+  decisions,
+  onDecision,
+}) {
+  const selected = items.find((item) => item.id === selectedId) || items[0];
+  const sourceView = relationshipViews.find(
+    (view) => view.id === selected.viewId,
+  );
+  const contextualView = {
+    ...sourceView,
+    defaultSelection: selected.selection || sourceView.defaultSelection,
+  };
   return (
-    <div className="s3-pending-control">
-      <StatusBadge tone={confirmed ? "success" : "warning"}>
-        {confirmed ? "已确认写入" : "待确认"}
-      </StatusBadge>
-      <Button
-        tone="secondary"
-        size="sm"
-        aria-label={confirmed ? `撤销确认${label}` : `确认写入${label}`}
-        onClick={() => onChange(confirmed ? "pending" : "write")}
+    <div className="s3-context-review">
+      <aside className="s3-context-change-list" aria-label={title}>
+        <div className="s3-master-list-title">
+          <span>
+            <b>{title}</b>
+            <small>{eyebrow}</small>
+          </span>
+          <small>{items.length} 条重点变化</small>
+        </div>
+        <div className="s3-context-change-items">
+          {items.map((item) => (
+            <button
+              type="button"
+              className={item.id === selected.id ? "is-active" : ""}
+              aria-selected={item.id === selected.id}
+              key={item.id}
+              onClick={() => onSelect(item.id)}
+            >
+              <span>
+                <b>{item.title}</b>
+                <small>{item.summary}</small>
+                <em>{item.meta}</em>
+              </span>
+              <StatusBadge tone={item.tone}>{item.status}</StatusBadge>
+              <Icon name="chevronRight" />
+            </button>
+          ))}
+        </div>
+      </aside>
+      <section
+        className="s3-context-graph"
+        aria-label={`${selected.title}关系影响`}
       >
-        {confirmed ? "撤销确认" : "确认并写入"}
-      </Button>
+        <header className="s3-context-impact-header">
+          <span>
+            <small className="s3-detail-kicker">本批次变化影响</small>
+            <h2>{selected.title}</h2>
+            <p>{selected.impact}</p>
+          </span>
+          <StatusBadge tone={selected.tone}>{selected.status}</StatusBadge>
+        </header>
+        <RelationshipCanvas
+          key={`${selected.id}-${selected.viewId}`}
+          views={[contextualView]}
+          decisions={decisions}
+          onDecision={onDecision}
+        />
+      </section>
     </div>
   );
 }
@@ -223,9 +275,13 @@ export function LandscapeReviewWorkspace({
   onClose,
   onApply,
 }) {
-  const [tab, setTab] = useState("relationships");
-  const [focusedPerson, setFocusedPerson] = useState(people[0]);
-  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  const [tab, setTab] = useState("organizations");
+  const [focusedOrganizationChange, setFocusedOrganizationChange] = useState(
+    "organization-structure",
+  );
+  const [focusedPersonChange, setFocusedPersonChange] = useState("map-linhao");
+  const [focusedGap, setFocusedGap] = useState("gap-wangyi");
+  const reviewBodyRef = useRef(null);
   const [pendingDecisions, setPendingDecisions] = useState({
     wangyi: "pending",
     qiongding: "pending",
@@ -235,6 +291,171 @@ export function LandscapeReviewWorkspace({
   ).length;
   const decidePending = (key, value) =>
     setPendingDecisions((current) => ({ ...current, [key]: value }));
+  const switchTab = (nextTab) => {
+    setTab(nextTab);
+    requestAnimationFrame(() => reviewBodyRef.current?.scrollTo({ top: 0 }));
+  };
+  const organizationChanges = useMemo(
+    () => [
+      {
+        id: "organization-structure",
+        title: "星澜机器人组织层级补充",
+        summary: "新增具身智能中心下 2 个方向团队，并关联 3 位人物。",
+        meta: "新增 5 个对象 · 6 条关系",
+        impact:
+          "变化涉及星澜机器人、具身智能中心、VLA 算法组、机器人学习组和三位人物。点击图中节点或连线可查看本批次证据与关系方向。",
+        status: "已核验",
+        tone: "success",
+        viewId: "organization",
+        selection: { kind: "node", id: "org-vla-team" },
+      },
+      {
+        id: "organization-ecosystem",
+        title: "目标公司生态关系更新",
+        summary: "新增星澜与灵跃的竞争关系；穹顶相关关系仍待确认。",
+        meta: "新增 2 条 · 待确认 1 条",
+        impact:
+          "变化影响星澜、灵跃、穹顶与上海人工智能实验室之间的竞争、合作和人才来源关系。",
+        status: "有待确认项",
+        tone: "warning",
+        viewId: "ecosystem",
+        selection: { kind: "edge", id: "eco-e2" },
+      },
+      {
+        id: "organization-role",
+        title: "方向与关键角色覆盖更新",
+        summary: "补充 VLA、操作策略与灵巧操作覆盖，发现 2 个角色缺口。",
+        meta: "4 个方向 · 3 类角色",
+        impact:
+          "变化用于比较不同公司的方向覆盖和关键角色缺口，拓界技术负责人和数据闭环负责人仍需补充。",
+        status: "存在缺口",
+        tone: "warning",
+        viewId: "direction-role",
+        selection: { kind: "node", id: "matrix-head" },
+      },
+      {
+        id: "organization-flow",
+        title: "近 24 个月人才流动更新",
+        summary: "核验 18 条履历，形成 4 条主要人才流向。",
+        meta: "18 条记录 · 4 条主要流向",
+        impact:
+          "变化显示上海人工智能实验室、拓界和高校实验室向星澜、灵跃与穹顶的人才流动。",
+        status: "已核验",
+        tone: "success",
+        viewId: "talent-flow",
+        selection: { kind: "edge", id: "flow-e1" },
+      },
+    ],
+    [],
+  );
+  const personChanges = useMemo(() => {
+    const personById = Object.fromEntries(
+      people.map((person) => [person.id, person]),
+    );
+    return [
+      {
+        id: "map-linhao",
+        title: "林昊的人物关系补充",
+        summary: "新增与周明远的共同论文和前同事关系。",
+        meta: `${personById["map-linhao"]?.company || "拓界机器人"} · 已关联候选人`,
+        impact:
+          "变化补充林昊与周明远、陈楚宁等人的合作和任职关系，可继续沿直接关系查看证据。",
+        status: "已核验",
+        tone: "success",
+        viewId: "people",
+        selection: { kind: "node", id: "people-linhao" },
+      },
+      {
+        id: "map-zhaoxingyu",
+        title: "赵星羽的可联系路径补充",
+        summary: "找到 2 条可解释联系路径，最短路径为 2 段。",
+        meta: "星澜机器人 · VLA 算法负责人",
+        impact:
+          "变化补充刘健、陈雨与赵星羽之间的可解释联系路径，不会自动发起联系。",
+        status: "路径可用",
+        tone: "success",
+        viewId: "contact-path",
+        selection: { kind: "node", id: "path-zhao" },
+      },
+      {
+        id: "map-zhoumingyuan",
+        title: "周明远的成果关系补充",
+        summary: "新增专利发明人与学术合作关系，当前仍为人物线索。",
+        meta: `${personById["map-zhoumingyuan"]?.company || "穹顶智能"} · 人物线索`,
+        impact:
+          "变化把周明远与机器人策略迁移专利及共同发明人关联，尚未自动转为正式候选人。",
+        status: "较高可信",
+        tone: "info",
+        viewId: "academic",
+        selection: { kind: "node", id: "academic-zhou" },
+      },
+      {
+        id: "map-chenchuning",
+        title: "陈楚宁的合作关系补充",
+        summary: "确认灵巧操作方向合作关系和已有邮箱线索。",
+        meta: `${personById["map-chenchuning"]?.company || "灵跃科技"} · 已关联候选人`,
+        impact: "变化补充陈楚宁在灵巧操作方向的人物合作网络，并保留来源证据。",
+        status: "已核验",
+        tone: "success",
+        viewId: "people",
+        selection: { kind: "node", id: "people-chen" },
+      },
+      {
+        id: "map-wangyi",
+        title: "王奕的身份与成果关系待确认",
+        summary: "同名作者、专利发明人与公开职位的单位时间线存在冲突。",
+        meta: "星澜机器人 · 身份待确认",
+        impact:
+          "变化可能把王奕与专利、论文和星澜机器人关联；确认前不会自动写入该身份关系。",
+        status: "待确认",
+        tone: "warning",
+        viewId: "academic",
+        selection: { kind: "node", id: "academic-wang" },
+      },
+    ];
+  }, [people]);
+  const gapChanges = useMemo(
+    () => [
+      {
+        id: "gap-wangyi",
+        title: "王奕身份关系冲突",
+        summary:
+          "论文作者与公开活动名单可能属于同一人，但单位时间线不能完全对应。",
+        meta: "2 组证据冲突 · 等待用户确认",
+        impact:
+          "冲突影响王奕与专利、论文及星澜机器人的身份关系。可以查看完整关系上下文后决定是否写入。",
+        status: "待确认",
+        tone: "warning",
+        viewId: "academic",
+        selection: { kind: "node", id: "academic-wang" },
+      },
+      {
+        id: "gap-tuojie-head",
+        title: "拓界机器人技术负责人仍缺失",
+        summary: "已确认方向和团队，但未找到可稳定核验的技术负责人。",
+        meta: "1 个关键角色缺口",
+        impact:
+          "缺口位于操作策略方向的负责人角色，后续可围绕论文通讯作者、专利发明人和公开会议讲者继续探索。",
+        status: "待补充",
+        tone: "info",
+        viewId: "direction-role",
+        selection: { kind: "node", id: "matrix-head" },
+      },
+      {
+        id: "gap-qiongding",
+        title: "穹顶智能组织关系待确认",
+        summary: "已确认具身算法平台和技术方向，具体汇报及生态关系仍不明确。",
+        meta: "1 条关系待确认",
+        impact:
+          "不确定项影响穹顶与星澜的技术路线关系，以及后续组织上下级判断。确认前保留原始证据和冲突说明。",
+        status: "待确认",
+        tone: "warning",
+        viewId: "ecosystem",
+        selection: { kind: "edge", id: "eco-e3" },
+      },
+    ],
+    [],
+  );
   return (
     <section className="s3-review-workspace" aria-label="人才版图更新审核">
       <ReviewHeader
@@ -252,18 +473,9 @@ export function LandscapeReviewWorkspace({
           <button
             type="button"
             role="tab"
-            aria-selected={tab === "relationships"}
-            className={tab === "relationships" ? "is-active" : ""}
-            onClick={() => setTab("relationships")}
-          >
-            关系画布 <em>7</em>
-          </button>
-          <button
-            type="button"
-            role="tab"
             aria-selected={tab === "organizations"}
             className={tab === "organizations" ? "is-active" : ""}
-            onClick={() => setTab("organizations")}
+            onClick={() => switchTab("organizations")}
           >
             公司与组织 <em>4</em>
           </button>
@@ -272,7 +484,7 @@ export function LandscapeReviewWorkspace({
             role="tab"
             aria-selected={tab === "people"}
             className={tab === "people" ? "is-active" : ""}
-            onClick={() => setTab("people")}
+            onClick={() => switchTab("people")}
           >
             人物与关系 <em>30</em>
           </button>
@@ -281,175 +493,49 @@ export function LandscapeReviewWorkspace({
             role="tab"
             aria-selected={tab === "gaps"}
             className={tab === "gaps" ? "is-active" : ""}
-            onClick={() => setTab("gaps")}
+            onClick={() => switchTab("gaps")}
           >
             冲突与待补充 <em>3</em>
           </button>
         </div>
         <p>待确认内容不会自动写入；用户明确确认后可以写入，并保留确认记录。</p>
       </div>
-      <div className="s3-landscape-review-body">
-        {tab === "relationships" ? (
-          <RelationshipCanvas
-            views={relationshipViews}
+      <div className="s3-landscape-review-body" ref={reviewBodyRef}>
+        {tab === "organizations" ? (
+          <ContextReviewPanel
+            eyebrow={`${companies.length} 家公司`}
+            title="公司与组织变化"
+            items={organizationChanges}
+            selectedId={focusedOrganizationChange}
+            onSelect={setFocusedOrganizationChange}
+            relationshipViews={relationshipViews}
             decisions={pendingDecisions}
             onDecision={decidePending}
           />
         ) : null}
-        {tab === "organizations" ? (
-          <div className="s3-landscape-grid">
-            {companies.map((item) => (
-              <article key={item.company}>
-                <header>
-                  <b>{item.company}</b>
-                  <StatusBadge tone={item.tone}>{item.status}</StatusBadge>
-                </header>
-                <dl>
-                  <div>
-                    <dt>重点方向</dt>
-                    <dd>{item.direction}</dd>
-                  </div>
-                  <div>
-                    <dt>已知组织</dt>
-                    <dd>{item.organization}</dd>
-                  </div>
-                  <div>
-                    <dt>关键人物</dt>
-                    <dd>{item.people} 位</dd>
-                  </div>
-                </dl>
-              </article>
-            ))}
-          </div>
-        ) : null}
         {tab === "people" ? (
-          <div className="s3-landscape-people">
-            <div className="s3-landscape-person-list">
-              <div className="s3-master-list-title">
-                <b>人物列表</b>
-                <small>{people.length} 位</small>
-              </div>
-              {people.map((person) => (
-                <button
-                  type="button"
-                  className={focusedPerson.id === person.id ? "is-active" : ""}
-                  aria-selected={focusedPerson.id === person.id}
-                  key={person.id}
-                  onClick={() => {
-                    setFocusedPerson(person);
-                    setMobileDetailOpen(true);
-                  }}
-                >
-                  <span>
-                    <b>{person.name}</b>
-                    <small>
-                      {person.company} · {person.role}
-                    </small>
-                  </span>
-                  <StatusBadge
-                    tone={
-                      person.confidence === "存在冲突" ? "warning" : "neutral"
-                    }
-                  >
-                    {person.identity}
-                  </StatusBadge>
-                  <Icon name="chevronRight" />
-                </button>
-              ))}
-            </div>
-            <aside
-              className={`s3-landscape-person-detail ${mobileDetailOpen ? "is-mobile-open" : ""}`}
-            >
-              <button
-                type="button"
-                className="s3-mobile-back"
-                onClick={() => setMobileDetailOpen(false)}
-              >
-                <Icon name="chevronLeft" />
-                返回人物列表
-              </button>
-              <header className="s3-landscape-detail-header">
-                <small className="s3-detail-kicker">人物详情</small>
-                <h2>{focusedPerson.name}</h2>
-                <p>
-                  {focusedPerson.company} · {focusedPerson.role}
-                </p>
-              </header>
-              <dl className="s3-detail-list">
-                <div>
-                  <dt>身份状态</dt>
-                  <dd>{focusedPerson.identity}</dd>
-                </div>
-                <div>
-                  <dt>版图关系</dt>
-                  <dd>{focusedPerson.relation}</dd>
-                </div>
-                <div>
-                  <dt>来源</dt>
-                  <dd>{focusedPerson.source}</dd>
-                </div>
-                <div>
-                  <dt>可信度</dt>
-                  <dd>{focusedPerson.confidence}</dd>
-                </div>
-              </dl>
-              {focusedPerson.id === "map-wangyi" ? (
-                <section className="s3-pending-decision">
-                  <h3>本批次写入决定</h3>
-                  <p>
-                    单位时间线仍有冲突。可以明确确认后按当前人物关系写入，也可以继续保留为待确认内容。
-                  </p>
-                  <PendingDecisionControl
-                    label="王奕身份关系"
-                    value={pendingDecisions.wangyi}
-                    onChange={(value) => decidePending("wangyi", value)}
-                  />
-                </section>
-              ) : null}
-            </aside>
-          </div>
+          <ContextReviewPanel
+            eyebrow="本批次重点人物"
+            title="人物与关系变化"
+            items={personChanges}
+            selectedId={focusedPersonChange}
+            onSelect={setFocusedPersonChange}
+            relationshipViews={relationshipViews}
+            decisions={pendingDecisions}
+            onDecision={decidePending}
+          />
         ) : null}
         {tab === "gaps" ? (
-          <div className="s3-gap-list">
-            <article className="is-warning">
-              <Icon name="warning" />
-              <span>
-                <b>王奕身份冲突</b>
-                <p>
-                  论文作者与星澜公开活动名单可能属于同一人，但单位时间线不能完全对应。
-                </p>
-              </span>
-              <PendingDecisionControl
-                label="王奕身份关系"
-                value={pendingDecisions.wangyi}
-                onChange={(value) => decidePending("wangyi", value)}
-              />
-            </article>
-            <article>
-              <Icon name="user" />
-              <span>
-                <b>拓界机器人技术负责人仍缺失</b>
-                <p>
-                  下一步可围绕团队论文通讯作者、专利发明人和公开会议讲者做有限探索，预计补充
-                  1 至 3 条候选线索。
-                </p>
-              </span>
-            </article>
-            <article>
-              <Icon name="route" />
-              <span>
-                <b>穹顶智能组织上下级待确认</b>
-                <p>
-                  现有证据只能确认平台和方向，具体汇报关系仍待确认。用户可以按当前证据确认写入，也可以继续保留待确认。
-                </p>
-              </span>
-              <PendingDecisionControl
-                label="穹顶智能汇报关系"
-                value={pendingDecisions.qiongding}
-                onChange={(value) => decidePending("qiongding", value)}
-              />
-            </article>
-          </div>
+          <ContextReviewPanel
+            eyebrow="影响本批次写入"
+            title="冲突与待补充"
+            items={gapChanges}
+            selectedId={focusedGap}
+            onSelect={setFocusedGap}
+            relationshipViews={relationshipViews}
+            decisions={pendingDecisions}
+            onDecision={decidePending}
+          />
         ) : null}
       </div>
       <footer className="s3-review-footer">

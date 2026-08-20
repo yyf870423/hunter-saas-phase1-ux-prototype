@@ -217,24 +217,26 @@ export function RelationshipCanvas({ views, decisions, onDecision }) {
   return (
     <section className="s3-relationship-workspace">
       <header className="s3-relationship-header">
-        <div
-          className="s3-relationship-view-tabs"
-          role="tablist"
-          aria-label="人才版图关系视图"
-        >
-          {views.map((view) => (
-            <button
-              type="button"
-              role="tab"
-              aria-selected={view.id === activeView.id}
-              className={view.id === activeView.id ? "is-active" : ""}
-              key={view.id}
-              onClick={() => switchView(view.id)}
-            >
-              {view.label}
-            </button>
-          ))}
-        </div>
+        {views.length > 1 ? (
+          <div
+            className="s3-relationship-view-tabs"
+            role="tablist"
+            aria-label="人才版图关系视图"
+          >
+            {views.map((view) => (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view.id === activeView.id}
+                className={view.id === activeView.id ? "is-active" : ""}
+                key={view.id}
+                onClick={() => switchView(view.id)}
+              >
+                {view.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <div className="s3-relationship-intro">
           <span>
             <b>{activeView.description}</b>

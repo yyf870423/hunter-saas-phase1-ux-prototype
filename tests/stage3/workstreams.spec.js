@@ -87,17 +87,23 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
     timeout: 10_000,
   });
   await page.getByRole("button", { name: "打开本批次更新审核" }).click();
-  await expect(page.getByText("星澜机器人", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /星澜机器人组织层级补充/ }),
+  ).toHaveAttribute("aria-selected", "true");
   await page.getByRole("tab", { name: /人物与关系/ }).click();
-  await page.getByRole("button", { name: /王奕/ }).click();
-  await expect(page.getByText("存在冲突", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: /王奕的身份与成果关系待确认/ })
+    .click();
+  await expect(page.getByText("身份待确认", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
   await expect(
     page.getByRole("button", { name: "撤销确认王奕身份关系" }),
   ).toContainText("撤销确认");
   await expect(page.getByText("已确认写入", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
-  await expect(page.getByText("拓界机器人技术负责人仍缺失")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /王奕身份关系冲突/ }),
+  ).toHaveAttribute("aria-selected", "true");
   await expect(
     page.getByRole("button", { name: "撤销确认王奕身份关系" }),
   ).toContainText("撤销确认");
@@ -107,62 +113,64 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
   await expect(page.getByText(/不会把人才版图标记为“初版完成”/)).toBeVisible();
 });
 
-test("人才摸排关系画布支持多视图探索和同一审核决定", async ({ page }) => {
+test("人才摸排每条变化显示对应关系影响并保持同一审核决定", async ({ page }) => {
   await page.goto("#/workstreams/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
   await page.getByRole("button", { name: "打开本批次更新审核" }).click();
-  await expect(page.getByRole("tab", { name: /关系画布/ })).toHaveAttribute(
+  await expect(page.getByRole("tab", { name: /公司与组织/ })).toHaveAttribute(
     "aria-selected",
     "true",
   );
-  await expect(page.getByRole("tab", { name: "组织与方向" })).toHaveAttribute(
-    "aria-selected",
-    "true",
-  );
+  await expect(
+    page.getByRole("button", { name: /星澜机器人组织层级补充/ }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByText("当前聚焦星澜机器人 · 7 个对象 · 6 条关系"),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: /目标公司生态关系更新/ }).click();
+  await expect(
+    page.getByRole("button", { name: /目标公司生态关系更新/ }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByText("5 家公司或机构 · 7 条生态关系 · 2 条待核验"),
+  ).toBeVisible();
+  await page.locator('[data-edge-id="eco-e2"]').press("Enter");
+  await expect(page.getByText("关系方向", { exact: true })).toBeVisible();
+  await expect(page.getByText("星澜机器人 → 灵跃科技").first()).toBeVisible();
+
+  await page.getByRole("button", { name: /方向与关键角色覆盖更新/ }).click();
+  await expect(
+    page.getByText("4 个方向 · 3 类关键角色 · 2 个明确缺口"),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /近 24 个月人才流动更新/ }).click();
+  await expect(
+    page.getByText("近 24 个月 · 18 条可核验流动记录 · 4 条主要流向"),
+  ).toBeVisible();
+
+  await page.getByRole("tab", { name: /人物与关系/ }).click();
+  await page.getByRole("button", { name: /赵星羽的可联系路径补充/ }).click();
+  await expect(
+    page.getByText("赵星羽 · 2 条可用路径 · 最短 2 段"),
+  ).toBeVisible();
   await page
-    .locator(".s3-relationship-node")
-    .filter({ hasText: "王奕" })
+    .getByRole("button", { name: /王奕的身份与成果关系待确认/ })
     .click();
   await expect(
-    page.getByText(/论文作者与公开活动名单可能属于同一人/),
+    page.getByRole("button", { name: /王奕的身份与成果关系待确认/ }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByText(/同名身份与论文单位时间线存在冲突/),
   ).toBeVisible();
   await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
   await expect(
     page.getByRole("button", { name: "撤销确认王奕身份关系" }),
   ).toBeVisible();
 
-  await page.getByRole("tab", { name: "公司生态" }).click();
-  await expect(
-    page.getByText("5 家公司或机构 · 7 条生态关系 · 2 条待核验"),
-  ).toBeVisible();
-  await page.locator('[data-edge-id="eco-e2"]').press("Enter");
-  await expect(page.getByText("关系方向", { exact: true })).toBeVisible();
-  await expect(
-    page.getByText("星澜机器人 → 灵跃科技").first(),
-  ).toBeVisible();
-
-  await page.getByRole("tab", { name: "方向与角色" }).click();
-  await expect(
-    page.getByText("4 个方向 · 3 类关键角色 · 2 个明确缺口"),
-  ).toBeVisible();
-  await page.getByRole("tab", { name: "人物关系" }).click();
-  await expect(page.getByText("林昊", { exact: true }).first()).toBeVisible();
-  await page.getByRole("tab", { name: "人才流动" }).click();
-  await expect(
-    page.getByText("近 24 个月 · 18 条可核验流动记录 · 4 条主要流向"),
-  ).toBeVisible();
-  await page.getByRole("tab", { name: "联系路径" }).click();
-  await expect(
-    page.getByText("赵星羽 · 2 条可用路径 · 最短 2 段"),
-  ).toBeVisible();
-  await page.getByRole("tab", { name: "学术脉络" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Embodied VLA for…" }),
-  ).toBeVisible();
-
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
+  await page.getByRole("button", { name: /王奕身份关系冲突/ }).click();
   await expect(
     page.getByRole("button", { name: "撤销确认王奕身份关系" }),
   ).toBeVisible();
@@ -185,7 +193,8 @@ test("人才摸排关系画布缩放可重置且移动端不产生页面横向�
   await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
     "100%",
   );
-  await page.getByRole("tab", { name: "联系路径" }).click();
+  await page.getByRole("tab", { name: /人物与关系/ }).click();
+  await page.getByRole("button", { name: /赵星羽的可联系路径补充/ }).click();
   await expect(
     page.getByText("投资关系", { exact: true }).last(),
   ).toBeVisible();

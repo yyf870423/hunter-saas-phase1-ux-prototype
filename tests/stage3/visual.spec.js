@@ -104,7 +104,7 @@ test("截取三类业务审核工作区", async ({ page }) => {
   }
 });
 
-test("人才摸排人物详情区域宽于左侧列表", async ({ page }) => {
+test("人才摸排关系影响区域宽于左侧变化列表", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/workstreams/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
@@ -112,11 +112,11 @@ test("人才摸排人物详情区域宽于左侧列表", async ({ page }) => {
   });
   await page.getByRole("button", { name: "打开本批次更新审核" }).click();
   await page.getByRole("tab", { name: /人物与关系/ }).click();
-  await page.getByRole("button", { name: /王奕/ }).click();
-  const list = await page.locator(".s3-landscape-person-list").boundingBox();
-  const detail = await page
-    .locator(".s3-landscape-person-detail")
-    .boundingBox();
+  await page
+    .getByRole("button", { name: /王奕的身份与成果关系待确认/ })
+    .click();
+  const list = await page.locator(".s3-context-change-list").boundingBox();
+  const detail = await page.locator(".s3-context-graph").boundingBox();
   expect(list).not.toBeNull();
   expect(detail).not.toBeNull();
   expect(detail.width).toBeGreaterThan(list.width);
@@ -130,29 +130,40 @@ test("人才摸排人物详情区域宽于左侧列表", async ({ page }) => {
     page.getByRole("button", { name: "撤销确认王奕身份关系" }),
   ).toBeVisible();
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
+  await page.getByRole("button", { name: /王奕身份关系冲突/ }).click();
   await page.screenshot({
     path: `${output}/desktop-mapping-pending-review.png`,
     fullPage: true,
   });
 });
 
-test("截取人才摸排关系画布的主要视图", async ({ page }) => {
+test("截取人才摸排变化项对应的关系影响", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/workstreams/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
   await page.getByRole("button", { name: "打开本批次更新审核" }).click();
-  for (const [tab, file] of [
-    ["组织与方向", "organization"],
-    ["公司生态", "ecosystem"],
-    ["方向与角色", "direction-role"],
-    ["人物关系", "people"],
-    ["人才流动", "talent-flow"],
-    ["联系路径", "contact-path"],
-    ["学术脉络", "academic"],
+  for (const [item, file] of [
+    ["星澜机器人组织层级补充", "organization"],
+    ["目标公司生态关系更新", "ecosystem"],
+    ["方向与关键角色覆盖更新", "direction-role"],
+    ["近 24 个月人才流动更新", "talent-flow"],
   ]) {
-    await page.getByRole("tab", { name: tab }).click();
+    await page.getByRole("button", { name: new RegExp(item) }).click();
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `${output}/desktop-mapping-${file}-graph.png`,
+      fullPage: true,
+    });
+  }
+  await page.getByRole("tab", { name: /人物与关系/ }).click();
+  for (const [item, file] of [
+    ["林昊的人物关系补充", "people"],
+    ["赵星羽的可联系路径补充", "contact-path"],
+    ["周明远的成果关系补充", "academic"],
+  ]) {
+    await page.getByRole("button", { name: new RegExp(item) }).click();
     await expectNoHorizontalOverflow(page);
     await page.screenshot({
       path: `${output}/desktop-mapping-${file}-graph.png`,
@@ -168,14 +179,15 @@ test("截取移动端人才摸排关系画布", async ({ page }) => {
     timeout: 10_000,
   });
   await page.getByRole("button", { name: "打开本批次更新审核" }).click();
-  await page.getByRole("tab", { name: "联系路径" }).click();
+  await page.getByRole("tab", { name: /人物与关系/ }).click();
+  await page.getByRole("button", { name: /赵星羽的可联系路径补充/ }).click();
   await expectNoHorizontalOverflow(page);
   await page.screenshot({
     path: `${output}/iphone-mapping-contact-path-graph.png`,
     fullPage: true,
   });
   await page
-    .getByRole("heading", { name: "投资关系" })
+    .getByRole("heading", { name: "赵星羽", exact: true })
     .scrollIntoViewIfNeeded();
   await page.screenshot({
     path: `${output}/iphone-mapping-contact-path-detail.png`,
