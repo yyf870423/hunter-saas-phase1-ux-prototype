@@ -1416,6 +1416,9 @@
   display: grid;
   gap: 14px;
 }
+.s4-candidate-global-alert {
+  margin-bottom: 14px;
+}
 
 .s4-field-group {
   min-width: 0;

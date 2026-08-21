@@ -1057,12 +1057,9 @@ function TimelineTab({ candidate }) {
 
 function MatchingTab() {
   const navigate = useNavigate();
-  const notify = useToast();
-  const [rematchOpen, setRematchOpen] = useState(false);
   const [matchOpen, setMatchOpen] = useState(false);
   const [matchMode, setMatchMode] = useState("all");
   const [matchStep, setMatchStep] = useState("scope");
-  const [refreshing, setRefreshing] = useState(false);
   const startMatching = () => {
     setMatchStep("running");
     window.setTimeout(() => setMatchStep("done"), 900);
@@ -1073,22 +1070,6 @@ function MatchingTab() {
   };
   return (
     <div className="s4-detail-stack">
-      <StateBanner
-        tone="warning"
-        icon="warning"
-        title="1 条匹配结果需要更新"
-        description="候选人资料版本已变化，历史结果继续保留，但不再作为当前判断。"
-        action={
-          <Button
-            size="sm"
-            icon="refresh"
-            loading={refreshing}
-            onClick={() => setRematchOpen(true)}
-          >
-            重新匹配
-          </Button>
-        }
-      />
       <FieldGroup
         title="岗位匹配"
         action={
@@ -1144,42 +1125,6 @@ function MatchingTab() {
           </article>
         </div>
       </FieldGroup>
-      <Modal
-        open={rematchOpen}
-        close={() => setRematchOpen(false)}
-        title="重新匹配过期结果"
-        description="使用候选人资料版本 6 重新计算 1 个已过期岗位结果"
-        footer={
-          <>
-            <Button onClick={() => setRematchOpen(false)}>取消</Button>
-            <Button
-              tone="primary"
-              onClick={() => {
-                setRematchOpen(false);
-                setRefreshing(true);
-                notify("重新匹配任务已开始", "info");
-                window.setTimeout(() => {
-                  setRefreshing(false);
-                  notify("1 个岗位匹配结果已更新");
-                }, 900);
-              }}
-            >
-              确认重新匹配
-            </Button>
-          </>
-        }
-      >
-        <div className="s4-rematch-impact">
-          <article>
-            <span>
-              <b>机器人数据平台负责人</b>
-              <small>拓界机器人</small>
-            </span>
-            <StatusBadge tone="warning">资料版本过期</StatusBadge>
-          </article>
-          <p>历史分数和推荐理由继续保留；新结果生成后成为当前判断。</p>
-        </div>
-      </Modal>
       <Modal
         open={matchOpen}
         close={closeMatching}
@@ -1358,6 +1303,8 @@ export function CandidateDetailPage() {
       ? candidateDetail
       : candidates.find((item) => item.id === candidateId);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [rematchOpen, setRematchOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   if (!candidate)
     return (
       <NotFoundState label="候选人" onBack={() => navigate("/candidates")} />
@@ -1438,6 +1385,24 @@ export function CandidateDetailPage() {
         onBack={() => navigate("/candidates")}
         onDelete={() => setDeleteOpen(true)}
       />
+      <div className="s4-candidate-global-alert">
+        <StateBanner
+          tone="warning"
+          icon="warning"
+          title="1 条匹配结果需要更新"
+          description="候选人资料版本已变化，历史结果继续保留，但不再作为当前判断。"
+          action={
+            <Button
+              size="sm"
+              icon="refresh"
+              loading={refreshing}
+              onClick={() => setRematchOpen(true)}
+            >
+              重新匹配
+            </Button>
+          }
+        />
+      </div>
       <DetailTabs
         tabs={candidateTabs}
         value={tab}
@@ -1456,6 +1421,42 @@ export function CandidateDetailPage() {
       {tab === "timeline" ? <TimelineTab candidate={candidateDetail} /> : null}
       {tab === "matching" ? <MatchingTab /> : null}
       {tab === "relations" ? <RelationsTab /> : null}
+      <Modal
+        open={rematchOpen}
+        close={() => setRematchOpen(false)}
+        title="重新匹配过期结果"
+        description="使用候选人资料版本 6 重新计算 1 个已过期岗位结果"
+        footer={
+          <>
+            <Button onClick={() => setRematchOpen(false)}>取消</Button>
+            <Button
+              tone="primary"
+              onClick={() => {
+                setRematchOpen(false);
+                setRefreshing(true);
+                notify("重新匹配任务已开始", "info");
+                window.setTimeout(() => {
+                  setRefreshing(false);
+                  notify("1 个岗位匹配结果已更新");
+                }, 900);
+              }}
+            >
+              确认重新匹配
+            </Button>
+          </>
+        }
+      >
+        <div className="s4-rematch-impact">
+          <article>
+            <span>
+              <b>机器人数据平台负责人</b>
+              <small>拓界机器人</small>
+            </span>
+            <StatusBadge tone="warning">资料版本过期</StatusBadge>
+          </article>
+          <p>历史分数和推荐理由继续保留；新结果生成后成为当前判断。</p>
+        </div>
+      </Modal>
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
