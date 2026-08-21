@@ -465,7 +465,7 @@ test("阶段四次级控件不是装饰按钮", async ({ page }) => {
     .getByRole("button", { name: "赵星羽", exact: true })
     .first()
     .click();
-  await expect(page).toHaveURL(/candidates\/candidate-linhao/);
+  await expect(page).toHaveURL(/candidates\/candidate-zhaoxingyu/);
 });
 
 test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
@@ -706,28 +706,56 @@ test("论文作者与机构紧凑展示并支持查看全部作者", async ({ pa
 
 test("论文作者身份和专利发明人身份使用同一审核边界", async ({ page }) => {
   await page.goto("#/papers/paper-vla-survey");
-  await page.getByRole("button", { name: "审核人物身份" }).click();
-  const paperModal = page.getByRole("dialog", { name: "作者人物身份审核" });
+  await expect(
+    page.getByRole("button", { name: /审核作者身份|审核人物身份/ }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Yifan Jiang", exact: true }).click();
+  const paperModal = page.getByRole("dialog", {
+    name: "Yifan Jiang · 作者身份审核",
+  });
   await expect(paperModal).toBeVisible();
-  await paperModal
-    .getByRole("radio", { name: /保留为人物线索/ })
-    .first()
-    .click();
+  await expect(
+    paperModal.getByText("Shanghai AI Laboratory", { exact: true }),
+  ).toBeVisible();
+  await expect(paperModal.getByText(/蒋一帆 · 智源研究院/)).toBeVisible();
+  await expect(paperModal.getByText("机构与任职经历")).toBeVisible();
+  await expect(paperModal.getByText("Wenting He")).toHaveCount(0);
   await paperModal.getByRole("button", { name: "保存身份关系" }).click();
+  const yifan = page
+    .locator(".s4-authorship-list article")
+    .filter({ hasText: "Yifan Jiang" });
+  await expect(yifan.getByText("已关联", { exact: true })).toBeVisible();
+  await yifan.getByRole("button", { name: "Yifan Jiang" }).click();
+  await expect(page).toHaveURL(/candidates\/candidate-jiangyifan/);
 
   await page.goto("#/patents/patent-manipulation");
+  await expect(
+    page.getByRole("button", { name: /审核发明人身份|审核人物身份/ }),
+  ).toHaveCount(0);
   await expect(
     page.locator(".s4-academic-people .s4-authorship-list article"),
   ).toHaveCount(3);
   await expect(
     page.getByRole("button", { name: /还有 .* 位发明人/ }),
   ).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "审核发明人身份", exact: true })
-    .click();
+  await page.getByRole("button", { name: "王奕", exact: true }).click();
+  const patentModal = page.getByRole("dialog", {
+    name: "王奕 · 发明人身份审核",
+  });
+  await expect(patentModal).toBeVisible();
   await expect(
-    page.getByRole("dialog", { name: "发明人人物身份审核" }),
+    patentModal.getByText("星澜机器人（北京）有限公司", { exact: true }),
   ).toBeVisible();
+  await expect(patentModal.getByText(/王奕 · 星澜机器人/)).toBeVisible();
+  await expect(patentModal.getByText("陈雨")).toHaveCount(0);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/papers/paper-vla-survey");
+  await page.getByRole("button", { name: "Yifan Jiang", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Yifan Jiang · 作者身份审核" }),
+  ).toBeVisible();
+  await expectNoHorizontalOverflow(page);
 });
 
 test("导入、导出和回收站覆盖异步、重名和恢复冲突", async ({ page }) => {

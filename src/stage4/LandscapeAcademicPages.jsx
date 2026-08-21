@@ -33,7 +33,7 @@ import {
   useListController,
   useToast,
 } from "./asset-ui";
-import { landscapes, papers, patents } from "./data";
+import { candidates, landscapes, papers, patents } from "./data";
 
 export function MappingsListPage() {
   const navigate = useNavigate();
@@ -951,31 +951,79 @@ export function PatentsListPage() {
   return <AcademicCardList kind="patents" />;
 }
 
-function PersonIdentityReview({ kind, people, close }) {
+const candidateIdentityMatches = {
+  "Hao Lin": "candidate-linhao",
+  "Mingyuan Zhou": "candidate-zhoumingyuan",
+  "Yifan Jiang": "candidate-jiangyifan",
+  "Wenting He": "candidate-hewenting",
+  "Xingyu Zhao": "candidate-zhaoxingyu",
+  "Chuning Chen": "candidate-chenchuning",
+  赵星羽: "candidate-zhaoxingyu",
+  王奕: "candidate-wangyi",
+};
+
+function PersonIdentityReview({
+  kind,
+  person,
+  institution,
+  sourceTitle,
+  sourceMeta,
+  close,
+  onOpenCandidate,
+  onSave,
+}) {
   const notify = useToast();
-  const [decisions, setDecisions] = useState(() =>
-    Object.fromEntries(
-      people.map((person, index) => [
-        person,
-        index === 0 ? "candidate" : "none",
-      ]),
-    ),
+  const suggestedId = candidateIdentityMatches[person] || "";
+  const candidateOptions = candidates.map(
+    (candidate) =>
+      `${candidate.name} · ${candidate.company} · ${candidate.title}`,
   );
+  const candidateByLabel = Object.fromEntries(
+    candidates.map((candidate) => [
+      `${candidate.name} · ${candidate.company} · ${candidate.title}`,
+      candidate,
+    ]),
+  );
+  const suggestedCandidate = candidates.find(
+    (candidate) => candidate.id === suggestedId,
+  );
+  const [selectedLabel, setSelectedLabel] = useState(
+    suggestedCandidate
+      ? `${suggestedCandidate.name} · ${suggestedCandidate.company} · ${suggestedCandidate.title}`
+      : "",
+  );
+  const [decision, setDecision] = useState(
+    suggestedCandidate ? "candidate" : "lead",
+  );
+  const selectedCandidate = candidateByLabel[selectedLabel] || null;
+  const institutionMatches = selectedCandidate
+    ? institution.includes(selectedCandidate.company) ||
+      selectedCandidate.company.includes(institution)
+    : false;
+  const noun = kind === "paper" ? "作者" : "发明人";
   return (
     <Modal
       open
       close={close}
-      size="xl"
-      title={`${kind === "paper" ? "作者" : "发明人"}人物身份审核`}
-      description="同名只用于召回候选范围，不直接建立正式人物关系"
+      size="lg"
+      title={`${person} · ${noun}身份审核`}
+      description="判断该署名人物是否与系统中的候选人属于同一个人；同名只用于召回，不会直接建立关系。"
       footer={
         <>
           <Button onClick={close}>取消</Button>
           <Button
             tone="primary"
             onClick={() => {
+              if (decision === "candidate" && !selectedCandidate) {
+                notify("请先选择要关联的候选人");
+                return;
+              }
+              onSave({
+                decision,
+                candidateId: selectedCandidate?.id || null,
+              });
               close();
-              notify("人物身份决定已保存");
+              notify(`${person} 的身份决定已保存`);
             }}
           >
             保存身份关系
@@ -983,55 +1031,153 @@ function PersonIdentityReview({ kind, people, close }) {
         </>
       }
     >
-      <div className="s4-identity-review-list">
-        {people.map((person, index) => (
-          <article key={person}>
-            <header>
+      <div className="s4-person-identity-review">
+        <section className="s4-person-source-card">
+          <header>
+            <span>
+              <small>待判断署名人物</small>
+              <h3>{person}</h3>
+            </span>
+            <StatusBadge tone={suggestedCandidate ? "warning" : "neutral"}>
+              {suggestedCandidate ? "存在相似候选人" : "暂无可靠匹配"}
+            </StatusBadge>
+          </header>
+          <dl>
+            <div>
+              <dt>{kind === "paper" ? "论文署名机构" : "申请人 / 权利人"}</dt>
+              <dd>{institution}</dd>
+            </div>
+            <div>
+              <dt>来源成果</dt>
+              <dd>{sourceTitle}</dd>
+            </div>
+            <div>
+              <dt>成果信息</dt>
+              <dd>{sourceMeta}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section className="s4-person-candidate-match">
+          <header>
+            <span>
+              <h3>可能匹配的候选人</h3>
+              <p>系统只提供候选范围，仍需结合机构、经历和研究方向判断。</p>
+            </span>
+            <SelectMenu
+              label="选择候选人"
+              value={selectedLabel}
+              options={candidateOptions}
+              searchable
+              onChange={(value) => {
+                setSelectedLabel(value);
+                setDecision("candidate");
+              }}
+            />
+          </header>
+          {selectedCandidate ? (
+            <article>
+              <div className="s4-person-candidate-summary">
+                <span>
+                  <b>{selectedCandidate.name}</b>
+                  <small>
+                    {selectedCandidate.company} · {selectedCandidate.title}
+                  </small>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onOpenCandidate(selectedCandidate.id)}
+                >
+                  查看候选人详情
+                  <Icon name="chevronRight" />
+                </button>
+              </div>
+              <DefinitionGrid
+                items={[
+                  ["地点", selectedCandidate.location],
+                  ["学历", selectedCandidate.education],
+                  ["工作年限", selectedCandidate.experience],
+                ]}
+              />
+            </article>
+          ) : (
+            <div className="s4-person-candidate-empty">
+              <Icon name="search" />
               <span>
-                <b>{person}</b>
+                <b>没有找到可靠的系统候选人</b>
+                <small>可以保留为人物线索，后续获得更多信息后再判断。</small>
+              </span>
+            </div>
+          )}
+        </section>
+
+        <section className="s4-person-identity-evidence">
+          <h3>判断依据</h3>
+          <ul>
+            <li>
+              <Icon name={suggestedCandidate ? "check" : "alert"} />
+              <span>
+                <b>姓名对应</b>
                 <small>
-                  {index === 0
-                    ? "稳定作者身份和工作轨迹一致"
-                    : "仅姓名相似，仍需更多证据"}
+                  {suggestedCandidate
+                    ? `${person} 与候选人 ${suggestedCandidate.name} 的中英文姓名对应`
+                    : "当前没有足够信息建立姓名对应关系"}
                 </small>
               </span>
-              <StatusBadge tone={index === 0 ? "success" : "warning"}>
-                {index === 0 ? "高可信" : "证据不足"}
-              </StatusBadge>
-            </header>
-            <div>
-              <CustomRadio
-                label="关联已有候选人"
-                description={
-                  index === 0 ? "林昊 · 拓界机器人" : "当前没有可靠候选人"
-                }
-                checked={decisions[person] === "candidate"}
-                onChange={() =>
-                  setDecisions((current) => ({
-                    ...current,
-                    [person]: "candidate",
-                  }))
-                }
-              />
-              <CustomRadio
-                label="保留为人物线索"
-                description="继续探索，不进入候选人列表"
-                checked={decisions[person] === "lead"}
-                onChange={() =>
-                  setDecisions((current) => ({ ...current, [person]: "lead" }))
-                }
-              />
-              <CustomRadio
-                label="暂不关联"
-                description="只保留原始署名"
-                checked={decisions[person] === "none"}
-                onChange={() =>
-                  setDecisions((current) => ({ ...current, [person]: "none" }))
-                }
-              />
-            </div>
-          </article>
-        ))}
+            </li>
+            <li className={institutionMatches ? "is-positive" : "is-warning"}>
+              <Icon name={institutionMatches ? "check" : "alert"} />
+              <span>
+                <b>机构与任职经历</b>
+                <small>
+                  {institutionMatches
+                    ? `${institution} 与候选人当前公司一致`
+                    : `${institution} 与候选人当前公司不一致，需要结合时间线核实`}
+                </small>
+              </span>
+            </li>
+            <li>
+              <Icon name="sparkles" />
+              <span>
+                <b>研究方向</b>
+                <small>
+                  {selectedCandidate
+                    ? `候选人技能包含 ${selectedCandidate.skills.join("、")}`
+                    : "缺少可供比较的候选人技能与经历"}
+                </small>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section className="s4-person-identity-decisions">
+          <h3>身份处理</h3>
+          <div>
+            <CustomRadio
+              label="关联已有候选人"
+              description={
+                selectedCandidate
+                  ? `建立与 ${selectedCandidate.name} 的正式人物关系`
+                  : "请先选择候选人"
+              }
+              checked={decision === "candidate"}
+              disabled={!selectedCandidate}
+              onChange={() => setDecision("candidate")}
+            />
+            <CustomRadio
+              label="保留为人物线索"
+              description="继续探索，不进入正式候选人列表"
+              checked={decision === "lead"}
+              onChange={() => setDecision("lead")}
+            />
+            <CustomRadio
+              label="暂不关联"
+              description="只保留该成果中的原始署名"
+              checked={decision === "none"}
+              onChange={() => setDecision("none")}
+            />
+          </div>
+        </section>
       </div>
     </Modal>
   );
@@ -1041,7 +1187,8 @@ function AcademicPeopleList({
   people,
   institutions = [],
   kind,
-  linkedCount,
+  linkedPeople,
+  reviewStates = {},
   onLinked,
   onReview,
 }) {
@@ -1071,7 +1218,8 @@ function AcademicPeopleList({
     };
   }, [moreOpen]);
   const personItem = (person, index) => {
-    const linked = index < linkedCount;
+    const linkedCandidateId = linkedPeople[person] || null;
+    const linked = Boolean(linkedCandidateId);
     const institution =
       kind === "paper"
         ? institutions[index] || institutions[0] || "机构待补充"
@@ -1082,7 +1230,13 @@ function AcademicPeopleList({
           <button
             type="button"
             className={linked ? "is-linked" : ""}
-            onClick={() => (linked ? onLinked(person) : onReview(person))}
+            onClick={() => {
+              if (linked) onLinked(person, linkedCandidateId);
+              else {
+                setMoreOpen(false);
+                onReview(person, index);
+              }
+            }}
           >
             {person}
           </button>
@@ -1092,7 +1246,10 @@ function AcademicPeopleList({
           </small>
         </span>
         <StatusBadge tone={linked ? "success" : "warning"}>
-          {linked ? "已关联" : kind === "paper" ? "人物线索" : "待确认"}
+          {linked
+            ? "已关联"
+            : reviewStates[person] ||
+              (kind === "paper" ? "人物线索" : "待确认")}
         </StatusBadge>
       </article>
     );
@@ -1156,7 +1313,12 @@ export function PaperDetailPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const item = papers.find((paper) => paper.id === paperId);
-  const [identityOpen, setIdentityOpen] = useState(false);
+  const [identityPerson, setIdentityPerson] = useState(null);
+  const [identityLinks, setIdentityLinks] = useState({
+    "Hao Lin": "candidate-linhao",
+    "Mingyuan Zhou": "candidate-zhoumingyuan",
+  });
+  const [reviewStates, setReviewStates] = useState({});
   const [deleteOpen, setDeleteOpen] = useState(false);
   if (!item)
     return <NotFoundState label="论文" onBack={() => navigate("/papers")} />;
@@ -1173,11 +1335,7 @@ export function PaperDetailPage() {
         onBack={() => navigate("/papers")}
         onEdit={() => notify("已打开论文资料编辑")}
         onDelete={() => setDeleteOpen(true)}
-      >
-        <Button icon="users" onClick={() => setIdentityOpen(true)}>
-          审核作者身份
-        </Button>
-      </DetailHeader>
+      />
       <section className="s4-paper-hero">
         <small>中文标题</small>
         <h2>{item.titleZh}</h2>
@@ -1197,21 +1355,22 @@ export function PaperDetailPage() {
             视觉语言动作模型将多模态感知、语言理解和机器人控制统一起来。本文系统总结模型架构、数据流程、评测方法和真实机器人部署中的关键问题。
           </p>
         </FieldGroup>
-        <FieldGroup
-          title="作者与机构"
-          action={
-            <Button size="sm" onClick={() => setIdentityOpen(true)}>
-              审核人物身份
-            </Button>
-          }
-        >
+        <FieldGroup title="作者与机构">
           <AcademicPeopleList
             people={item.authors}
             institutions={item.institutions}
             kind="paper"
-            linkedCount={2}
-            onLinked={() => navigate("/candidates/candidate-linhao")}
-            onReview={() => setIdentityOpen(true)}
+            linkedPeople={identityLinks}
+            reviewStates={reviewStates}
+            onLinked={(_person, candidateId) =>
+              navigate(`/candidates/${candidateId}`)
+            }
+            onReview={(person, index) =>
+              setIdentityPerson({
+                person,
+                institution: item.institutions[index] || item.institutions[0],
+              })
+            }
           />
         </FieldGroup>
         <FieldGroup title="成果身份与来源">
@@ -1260,11 +1419,32 @@ export function PaperDetailPage() {
           />
         </FieldGroup>
       </div>
-      {identityOpen ? (
+      {identityPerson ? (
         <PersonIdentityReview
           kind="paper"
-          people={item.authors}
-          close={() => setIdentityOpen(false)}
+          person={identityPerson.person}
+          institution={identityPerson.institution}
+          sourceTitle={item.title}
+          sourceMeta={`${item.year} · ${item.venue}`}
+          close={() => setIdentityPerson(null)}
+          onOpenCandidate={(candidateId) => {
+            setIdentityPerson(null);
+            navigate(`/candidates/${candidateId}`);
+          }}
+          onSave={({ decision, candidateId }) => {
+            setIdentityLinks((current) => {
+              const next = { ...current };
+              if (decision === "candidate")
+                next[identityPerson.person] = candidateId;
+              else delete next[identityPerson.person];
+              return next;
+            });
+            setReviewStates((current) => ({
+              ...current,
+              [identityPerson.person]:
+                decision === "lead" ? "人物线索" : "未关联",
+            }));
+          }}
         />
       ) : null}
       <DeleteAssetModal
@@ -1288,7 +1468,11 @@ export function PatentDetailPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const item = patents.find((patent) => patent.id === patentId);
-  const [identityOpen, setIdentityOpen] = useState(false);
+  const [identityPerson, setIdentityPerson] = useState(null);
+  const [identityLinks, setIdentityLinks] = useState({
+    赵星羽: "candidate-zhaoxingyu",
+  });
+  const [reviewStates, setReviewStates] = useState({});
   const [deleteOpen, setDeleteOpen] = useState(false);
   if (!item)
     return <NotFoundState label="专利" onBack={() => navigate("/patents")} />;
@@ -1308,11 +1492,7 @@ export function PatentDetailPage() {
         onBack={() => navigate("/patents")}
         onEdit={() => notify("已打开专利资料编辑")}
         onDelete={() => setDeleteOpen(true)}
-      >
-        <Button icon="users" onClick={() => setIdentityOpen(true)}>
-          审核发明人身份
-        </Button>
-      </DetailHeader>
+      />
       <div className="s4-detail-stack">
         <FieldGroup title="专利摘要">
           <p className="s4-long-copy">
@@ -1335,20 +1515,18 @@ export function PatentDetailPage() {
             ]}
           />
         </FieldGroup>
-        <FieldGroup
-          title="发明人"
-          action={
-            <Button size="sm" onClick={() => setIdentityOpen(true)}>
-              审核人物身份
-            </Button>
-          }
-        >
+        <FieldGroup title="发明人">
           <AcademicPeopleList
             people={item.inventors}
             kind="patent"
-            linkedCount={1}
-            onLinked={() => navigate("/candidates/candidate-linhao")}
-            onReview={() => setIdentityOpen(true)}
+            linkedPeople={identityLinks}
+            reviewStates={reviewStates}
+            onLinked={(_person, candidateId) =>
+              navigate(`/candidates/${candidateId}`)
+            }
+            onReview={(person) =>
+              setIdentityPerson({ person, institution: item.applicant })
+            }
           />
         </FieldGroup>
         <FieldGroup title="来源与文件">
@@ -1378,11 +1556,32 @@ export function PatentDetailPage() {
           />
         </FieldGroup>
       </div>
-      {identityOpen ? (
+      {identityPerson ? (
         <PersonIdentityReview
           kind="patent"
-          people={item.inventors}
-          close={() => setIdentityOpen(false)}
+          person={identityPerson.person}
+          institution={identityPerson.institution}
+          sourceTitle={item.title}
+          sourceMeta={`${item.type} · ${item.applicationNo}`}
+          close={() => setIdentityPerson(null)}
+          onOpenCandidate={(candidateId) => {
+            setIdentityPerson(null);
+            navigate(`/candidates/${candidateId}`);
+          }}
+          onSave={({ decision, candidateId }) => {
+            setIdentityLinks((current) => {
+              const next = { ...current };
+              if (decision === "candidate")
+                next[identityPerson.person] = candidateId;
+              else delete next[identityPerson.person];
+              return next;
+            });
+            setReviewStates((current) => ({
+              ...current,
+              [identityPerson.person]:
+                decision === "lead" ? "人物线索" : "未关联",
+            }));
+          }}
         />
       ) : null}
       <DeleteAssetModal

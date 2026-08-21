@@ -126,6 +126,16 @@ test("论文和专利人物信息在大量作者下保持紧凑可读", async ({
     path: `${output}/paper-detail-authors.png`,
     fullPage: true,
   });
+  await page.getByRole("button", { name: "Yifan Jiang", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Yifan Jiang · 作者身份审核" }),
+  ).toBeVisible();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/paper-author-identity-modal.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "关闭", exact: true }).click();
   await page.getByRole("button", { name: /还有 15 位作者/ }).click();
   await expect(page.getByRole("dialog", { name: "其余作者" })).toBeVisible();
   await page.screenshot({
