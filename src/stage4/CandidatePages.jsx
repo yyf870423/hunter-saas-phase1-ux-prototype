@@ -296,7 +296,7 @@ function ProfileTab({ candidate, hasIdentityIssue = false }) {
               icon="edit"
               onClick={() => setEditSection("summary")}
             >
-              编辑概览
+              编辑职业概览
             </Button>
             <Button
               size="sm"
@@ -344,7 +344,7 @@ function ProfileTab({ candidate, hasIdentityIssue = false }) {
             icon="edit"
             onClick={() => setEditSection("overview")}
           >
-            编辑概览
+            编辑当前概览
           </Button>
         }
       >

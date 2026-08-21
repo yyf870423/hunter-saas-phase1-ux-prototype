@@ -219,7 +219,7 @@ test("候选人新建、身份合并和字段审核覆盖关键门禁", async ({
 test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作", async ({ page }) => {
   await page.goto("#/candidates/candidate-linhao");
   await expect(page.getByRole("button", { name: "身份与合并" })).toHaveCount(0);
-  await page.getByRole("button", { name: "编辑概览" }).last().click();
+  await page.getByRole("button", { name: "编辑当前概览" }).click();
   await expect(
     page.getByRole("dialog", { name: "编辑当前概览" }),
   ).toBeVisible();
