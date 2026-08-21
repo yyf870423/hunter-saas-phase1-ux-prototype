@@ -27,7 +27,7 @@
 ## 三、产品级组件
 
 1. `AppShell`：桌面导航、顶栏、移动顶栏和底部导航。
-2. `SidebarNav`：核心工作导航、收起/展开、Tooltip 和底部固定区。
+2. `SidebarNav`：核心工作导航、收起/展开和底部固定区；收起后使用固定图标与无障碍名称，不显示系统原生 Tooltip。
 3. `AssetNavigationPanel`：桌面侧向资产导航，按招聘、人才和研究分组直接进入八类正式资产。
 4. `Topbar`：搜索、创建、主题和通知。
 5. `Button` / `IconButton`：主、次、幽灵、危险和加载状态。
@@ -43,6 +43,8 @@
 15. `ActionQueue`：默认收起的人工行动摘要。
 16. `Skeleton` / `EmptyState` / `ErrorState` / `PermissionState`：全局状态组件。
 17. `UserMenu`：显示当前用户和工作空间，并承载设置、切换工作空间和退出登录；支持外部点击与 `Escape` 关闭。
+18. `AppTabs`：列表分类、详情分区和审核视图共用同一套清晰选中态、计数徽标、悬停态和键盘焦点态；业务页面不得另起一套 Tab 视觉。
+19. `OverflowTooltip`：只服务于确实被截断的文本和 `+N` 隐藏标签；使用产品自定义浮层，不使用 `title` 或 SVG `title` 触发系统原生提示。
 
 ## 四、复用约束
 

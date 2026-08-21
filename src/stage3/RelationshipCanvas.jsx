@@ -219,7 +219,7 @@ export function RelationshipCanvas({ views, decisions, onDecision }) {
       <header className="s3-relationship-header">
         {views.length > 1 ? (
           <div
-            className="s3-relationship-view-tabs"
+            className="s3-relationship-view-tabs app-tabs"
             role="tablist"
             aria-label="人才版图关系视图"
           >

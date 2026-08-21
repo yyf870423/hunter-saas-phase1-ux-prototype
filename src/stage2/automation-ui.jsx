@@ -653,7 +653,6 @@ export function WorkstreamHistory({
             <button
               type="button"
               aria-label={item.title}
-              title={item.title}
               className={item.id === currentId ? "is-active" : ""}
               key={item.id}
               onClick={() => onSelect(item)}

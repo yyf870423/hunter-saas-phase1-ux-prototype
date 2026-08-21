@@ -1235,9 +1235,15 @@ export function IdentityMergeReviewPage() {
           </div>
         </dl>
       </div>
-      <div className="s4-review-tabs">
+      <div
+        className="s4-review-tabs app-tabs"
+        role="tablist"
+        aria-label="资料合并审核内容"
+      >
         <button
           type="button"
+          role="tab"
+          aria-selected={section === "changes"}
           className={section === "changes" ? "is-active" : ""}
           onClick={() => setSection("changes")}
         >
@@ -1245,6 +1251,8 @@ export function IdentityMergeReviewPage() {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={section === "relations"}
           className={section === "relations" ? "is-active" : ""}
           onClick={() => setSection("relations")}
         >
@@ -1252,6 +1260,8 @@ export function IdentityMergeReviewPage() {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={section === "sources"}
           className={section === "sources" ? "is-active" : ""}
           onClick={() => setSection("sources")}
         >

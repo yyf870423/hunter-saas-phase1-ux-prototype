@@ -87,7 +87,7 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
               </i>
               <span>
                 <small>{item.type}</small>
-                <b title={item.title}>{item.title}</b>
+                <b>{item.title}</b>
                 <em>{item.object}</em>
               </span>
               <StatusBadge tone={item.tone}>{item.status}</StatusBadge>

@@ -73,10 +73,16 @@ export function SignalsPage() {
               onChange={setQuery}
               placeholder="搜索公司、人物或信号内容"
             />
-            <div className="s2-signal-tabs">
+            <div
+              className="s2-signal-tabs app-tabs"
+              role="tablist"
+              aria-label="信号状态"
+            >
               {signalTabs.map((item) => (
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={tab === item}
                   className={tab === item ? "is-active" : ""}
                   key={item}
                   onClick={() => setTab(item)}

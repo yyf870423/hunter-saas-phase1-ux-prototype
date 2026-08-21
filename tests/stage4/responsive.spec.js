@@ -84,6 +84,18 @@ test("阶段四公共筛选与数据管理生成桌面验收截图", async ({ pa
   });
   await page.setViewportSize({ width: 1440, height: 900 });
   for (const [route, file] of [
+    ["tasks", "stage4-tabs-tasks.png"],
+    ["signals", "stage4-tabs-signals.png"],
+    ["candidates/candidate-linhao", "stage4-tabs-candidate-detail.png"],
+  ]) {
+    await page.goto(`#/${route}`);
+    await page.waitForTimeout(240);
+    if (route === "signals") {
+      await expect(page.locator(".s2-signal-detail")).toHaveCSS("opacity", "1");
+    }
+    await page.screenshot({ path: `artifacts/${file}`, fullPage: true });
+  }
+  for (const [route, file] of [
     ["patents", "stage4-patents.png"],
     ["data/imports", "stage4-data-imports.png"],
     ["recycle-bin", "stage4-recycle-bin.png"],

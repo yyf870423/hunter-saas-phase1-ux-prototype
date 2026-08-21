@@ -25,7 +25,6 @@ function UsageRing({ value = 64, expanded, onClick }) {
       type="button"
       className={`s1-usage-entry ${expanded ? "is-expanded" : ""}`}
       aria-label={`查看 Agent 用量，本月已使用 ${value}%`}
-      title={expanded ? undefined : `本月 Agent 用量 ${value}%`}
       onClick={onClick}
     >
       <span className="s1-usage-ring">
@@ -519,7 +518,6 @@ export function Stage1Shell() {
                     return "";
                   })()}
                   aria-label={item.label}
-                  title={expanded ? undefined : item.label}
                   onClick={() => selectNavigation(item)}
                 >
                   <Icon name={item.icon} />
@@ -537,7 +535,6 @@ export function Stage1Shell() {
                 className={assetNavigationOpen ? "is-active" : ""}
                 aria-label="打开业务资产"
                 aria-expanded={assetNavigationOpen}
-                title={expanded ? undefined : "打开业务资产"}
                 ref={assetTriggerRef}
                 onClick={() => setAssetNavigationOpen((current) => !current)}
               >
@@ -637,7 +634,6 @@ export function Stage1Shell() {
             type="button"
             className="s1-sidebar-toggle"
             aria-label={expanded ? "收起导航" : "展开导航"}
-            title={expanded ? undefined : "展开导航"}
             onClick={() => setExpanded((current) => !current)}
           >
             <Icon name={expanded ? "panelLeft" : "panelRight"} />

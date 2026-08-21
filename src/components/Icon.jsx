@@ -149,10 +149,10 @@ export function Icon({ name, size = 18, className = "", label }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden={label ? undefined : true}
+      aria-label={label || undefined}
       role={label ? "img" : undefined}
       data-icon={name}
     >
-      {label && <title>{label}</title>}
       {lines.map((d, index) => (
         <path d={d} key={`${name}-${index}`} />
       ))}

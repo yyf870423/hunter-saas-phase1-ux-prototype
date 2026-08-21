@@ -209,7 +209,11 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
         </div>
       </header>
       <div className="s2-review-toolbar">
-        <div className="s2-review-tabs" role="tablist" aria-label="候选人分层">
+        <div
+          className="s2-review-tabs app-tabs"
+          role="tablist"
+          aria-label="候选人分层"
+        >
           {[
             ["all", "全部", candidates.length],
             [

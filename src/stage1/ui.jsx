@@ -89,7 +89,6 @@ export function IconButton({ icon, label, badge, className = "", ...props }) {
       type="button"
       className={`s1-icon-button ${className}`}
       aria-label={label}
-      title={label}
       {...props}
     >
       <Icon name={icon} />
@@ -197,7 +196,7 @@ export function Drawer({ open, close, title, children, side = "right" }) {
 
 export function Tabs({ value, onChange, items, label }) {
   return (
-    <div className="s1-tabs" role="tablist" aria-label={label}>
+    <div className="s1-tabs app-tabs" role="tablist" aria-label={label}>
       {items.map((item) => (
         <button
           type="button"

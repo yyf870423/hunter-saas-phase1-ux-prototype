@@ -466,7 +466,7 @@ export function LandscapeReviewWorkspace({
       />
       <div className="s3-review-toolbar is-tabbed">
         <div
-          className="s3-review-tabs"
+          className="s3-review-tabs app-tabs"
           role="tablist"
           aria-label="人才版图审核内容"
         >

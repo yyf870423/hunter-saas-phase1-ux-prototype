@@ -1,0 +1,113 @@
+/* Product-level interactive components shared by every prototype stage. */
+
+.app-tabs {
+  display: flex;
+  min-width: 0;
+  gap: 4px;
+  padding: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: color-mix(in srgb, var(--s1-canvas) 76%, var(--s1-surface));
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 9px;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 48%, transparent);
+  scrollbar-width: none;
+}
+
+.app-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.app-tabs > button {
+  position: relative;
+  display: inline-flex;
+  min-height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 18px;
+  white-space: nowrap;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.app-tabs > button:hover {
+  color: var(--s1-ink);
+  background: color-mix(in srgb, var(--s1-surface) 88%, transparent);
+  border-color: var(--s1-line);
+}
+
+.app-tabs > button:focus-visible {
+  z-index: 1;
+  outline: 2px solid color-mix(in srgb, var(--s1-accent) 72%, transparent);
+  outline-offset: 1px;
+}
+
+.app-tabs > button.is-active,
+.app-tabs > button[aria-selected="true"] {
+  color: var(--s1-accent);
+  background: var(--s1-surface);
+  border-color: color-mix(in srgb, var(--s1-accent) 36%, var(--s1-line));
+  box-shadow:
+    inset 0 -2px 0 var(--s1-accent),
+    0 1px 3px color-mix(in srgb, var(--s1-ink) 10%, transparent);
+}
+
+.app-tabs > button em {
+  display: inline-flex;
+  min-width: 19px;
+  height: 19px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 5px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 19px;
+  background: var(--s1-line);
+  border-radius: 999px;
+}
+
+.app-tabs > button.is-active em,
+.app-tabs > button[aria-selected="true"] em {
+  color: #ffffff;
+  background: var(--s1-accent);
+}
+
+.s4-detail-tabs .app-tabs {
+  width: max-content;
+  max-width: 100%;
+  margin: 7px 0;
+  padding: 4px;
+  border: 1px solid var(--s1-line-strong);
+}
+
+.s4-detail-tabs .app-tabs > button {
+  min-height: 36px;
+}
+
+@media (max-width: 720px) {
+  .app-tabs > button {
+    min-height: 34px;
+    padding-inline: 10px;
+  }
+
+  .s4-detail-tabs .app-tabs {
+    width: 100%;
+  }
+}

@@ -1241,17 +1241,22 @@
   -webkit-line-clamp: var(--s4-tooltip-lines);
 }
 .s4-floating-tooltip {
+  --s4-tooltip-surface: color-mix(
+    in srgb,
+    var(--s1-surface-raised) 94%,
+    var(--s1-accent-soft)
+  );
   position: fixed;
   z-index: 260;
   padding: 10px 12px 10px 14px;
-  color: #fafafa;
+  color: var(--s1-ink);
   font-size: 12px;
   font-weight: 500;
   line-height: 18px;
   white-space: normal;
-  background: color-mix(in srgb, #18181b 96%, transparent);
-  border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
-  border-left: 3px solid color-mix(in srgb, var(--s1-accent) 88%, #ffffff);
+  background: var(--s4-tooltip-surface);
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 24%, var(--s1-line));
+  border-left: 3px solid var(--s1-accent);
   border-radius: 8px;
   box-shadow:
     0 12px 32px rgba(0, 0, 0, 0.2),
@@ -1267,8 +1272,8 @@
   width: 9px;
   height: 9px;
   content: "";
-  background: #18181b;
-  border: 1px solid color-mix(in srgb, #ffffff 14%, transparent);
+  background: var(--s4-tooltip-surface);
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 24%, var(--s1-line));
   transform: translateX(-50%) rotate(45deg);
 }
 .s4-floating-tooltip.is-below::before {

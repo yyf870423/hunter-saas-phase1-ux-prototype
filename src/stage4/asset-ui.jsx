@@ -1,4 +1,11 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../components/Icon";
@@ -716,7 +723,7 @@ export function TagList({
         </span>
       ))}
       {hiddenItems.length ? (
-        <TooltipText tip={hiddenItems.join("、")} force>
+        <TooltipText tip={hiddenItems.join("、")} trigger="hidden-tags">
           <span className="s4-tag s4-tag-overflow">+{hiddenItems.length}</span>
         </TooltipText>
       ) : null}
@@ -1039,10 +1046,12 @@ export function TooltipText({
   children,
   tip,
   className = "",
-  force = false,
+  trigger = "truncated",
   clampLines,
 }) {
   const anchorRef = useRef(null);
+  const tooltipId = useId();
+  const [eligible, setEligible] = useState(trigger === "hidden-tags");
   const [tooltip, setTooltip] = useState(null);
   const isTruncated = (element) => {
     if (
@@ -1073,10 +1082,25 @@ export function TooltipText({
     clone.remove();
     return fullHeight > element.clientHeight + 1;
   };
+  useLayoutEffect(() => {
+    const element = anchorRef.current;
+    if (!element) return undefined;
+    const update = () =>
+      setEligible(
+        trigger === "hidden-tags" || Boolean(tip && isTruncated(element)),
+      );
+    update();
+    if (trigger === "hidden-tags" || !window.ResizeObserver) return undefined;
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [clampLines, tip, trigger]);
+  useEffect(() => {
+    if (!eligible) setTooltip(null);
+  }, [eligible]);
   const show = () => {
     const element = anchorRef.current;
-    if (!element || !tip) return;
-    if (!force && !isTruncated(element)) return;
+    if (!element || !tip || !eligible) return;
     const rect = element.getBoundingClientRect();
     const width = Math.min(
       Math.max(120, Array.from(String(tip)).length * 12 + 30),
@@ -1106,7 +1130,8 @@ export function TooltipText({
       ref={anchorRef}
       className={`s4-tooltip ${clampLines ? "is-line-clamped" : ""} ${className}`}
       style={clampLines ? { "--s4-tooltip-lines": clampLines } : undefined}
-      tabIndex="0"
+      tabIndex={eligible ? 0 : undefined}
+      aria-describedby={tooltip ? tooltipId : undefined}
       onMouseEnter={show}
       onMouseLeave={() => setTooltip(null)}
       onFocus={show}
@@ -1116,6 +1141,7 @@ export function TooltipText({
       {tooltip
         ? createPortal(
             <span
+              id={tooltipId}
               className={`s4-floating-tooltip is-${tooltip.placement}`}
               role="tooltip"
               style={{

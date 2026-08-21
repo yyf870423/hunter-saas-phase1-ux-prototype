@@ -345,6 +345,63 @@ test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
   ).toHaveCount(0);
 });
 
+test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", async ({
+  page,
+}) => {
+  for (const route of [
+    "#/home",
+    "#/tasks",
+    "#/signals",
+    "#/candidates",
+    "#/candidates/candidate-linhao",
+    "#/data/imports",
+  ]) {
+    await page.goto(route);
+    await expect(page.locator("[title]")).toHaveCount(0);
+    await expect(page.locator("svg > title")).toHaveCount(0);
+    await expect(page.locator('[role="tablist"]:not(.app-tabs)')).toHaveCount(
+      0,
+    );
+    await expect(
+      page.locator('.app-tabs button:not([role="tab"])'),
+    ).toHaveCount(0);
+  }
+
+  await page.goto("#/candidates");
+  const shortText = page.locator('td[data-label="地点"] .s4-tooltip').first();
+  await expect(shortText).not.toHaveAttribute("tabindex", "0");
+  await shortText.hover();
+  await expect(page.getByRole("tooltip")).toHaveCount(0);
+
+  await page.goto("#/patents");
+  await page
+    .locator(".s4-academic-list article")
+    .first()
+    .locator(".s4-tag-list > .s4-tag")
+    .first()
+    .hover();
+  await expect(page.getByRole("tooltip")).toHaveCount(0);
+  await page.locator(".s4-tag-overflow").first().hover();
+  await expect(page.getByRole("tooltip")).toBeVisible();
+  await expect(page.getByRole("tooltip")).toHaveCSS("border-radius", "8px");
+
+  await page.goto("#/tasks");
+  const activeTab = page.locator(
+    '.app-tabs [role="tab"][aria-selected="true"]',
+  );
+  await expect(activeTab).toBeVisible();
+  expect(
+    await activeTab.evaluate((element) => getComputedStyle(element).boxShadow),
+  ).toContain("inset");
+
+  await page.goto("#/signals");
+  const signalFeedBox = await page.locator(".s2-signal-feed").boundingBox();
+  const signalPaneBox = await page
+    .locator(".s2-signal-list-pane")
+    .boundingBox();
+  expect(signalFeedBox.width).toBeLessThanOrEqual(signalPaneBox.width + 1);
+});
+
 test("论文作者身份和专利发明人身份使用同一审核边界", async ({ page }) => {
   await page.goto("#/papers/paper-vla-survey");
   await page.getByRole("button", { name: "审核作者身份" }).click();

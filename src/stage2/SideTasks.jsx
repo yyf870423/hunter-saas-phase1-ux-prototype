@@ -69,7 +69,11 @@ export function SideTasksPage() {
       </header>
       <section className="s2-list-panel">
         <div className="s2-list-toolbar">
-          <div className="s2-module-tabs" role="tablist" aria-label="任务状态">
+          <div
+            className="s2-module-tabs app-tabs"
+            role="tablist"
+            aria-label="任务状态"
+          >
             {tabs.map(([value, label]) => (
               <button
                 type="button"
