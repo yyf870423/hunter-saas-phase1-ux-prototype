@@ -295,7 +295,7 @@ function ProfileTab({ candidate, hasIdentityIssue = false }) {
       >
         <p className="s4-long-copy">{candidate.summary}</p>
         <small className="s4-generated-meta">
-          基于资料版本 6 生成 · 昨天 18:20
+          基于资料版本 v6 生成 · 昨天 18:20
         </small>
       </FieldGroup>
       <FieldGroup
@@ -861,7 +861,7 @@ function FilesTab({ candidate }) {
         close={() => setChangesOpen(false)}
         size="xl"
         title="查看简历变化"
-        description="林昊_机器人学习负责人_2026.pdf 相比资料版本 6"
+        description="林昊_机器人学习负责人_2026.pdf 相比资料版本 v6"
         footer={
           <>
             <Button onClick={() => setChangesOpen(false)}>关闭</Button>
@@ -1396,7 +1396,7 @@ export function CandidateDetailPage() {
         subtitle={`${candidate.company} · ${candidate.title}`}
         badges={[
           { label: candidate.preference || "资料已确认", tone: "success" },
-          { label: "资料版本 6", tone: "info" },
+          { label: "资料版本 v6", tone: "info" },
         ]}
         onBack={() => navigate("/candidates")}
         onDelete={() => setDeleteOpen(true)}
@@ -1455,7 +1455,7 @@ export function CandidateDetailPage() {
         open={rematchOpen}
         close={() => setRematchOpen(false)}
         title="重新匹配过期结果"
-        description="使用候选人资料版本 6 重新计算 1 个已过期岗位结果"
+        description="使用候选人资料版本 v6 重新计算 1 个已过期岗位结果"
         footer={
           <>
             <Button onClick={() => setRematchOpen(false)}>取消</Button>
@@ -1809,7 +1809,7 @@ export function IdentityMergeReviewPage() {
         <article>
           <small>保留档案</small>
           <b>林昊</b>
-          <p>拓界机器人 · 资料版本 6</p>
+          <p>拓界机器人 · 资料版本 v6</p>
         </article>
         <Icon name="refresh" />
         <article>
