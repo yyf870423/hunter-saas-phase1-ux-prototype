@@ -1050,6 +1050,7 @@ export function TooltipText({
   clampLines,
 }) {
   const anchorRef = useRef(null);
+  const showTimerRef = useRef(null);
   const tooltipId = useId();
   const [eligible, setEligible] = useState(trigger === "hidden-tags");
   const [tooltip, setTooltip] = useState(null);
@@ -1075,6 +1076,12 @@ export function TooltipText({
   useEffect(() => {
     if (!eligible) setTooltip(null);
   }, [eligible]);
+  useEffect(
+    () => () => {
+      if (showTimerRef.current) window.clearTimeout(showTimerRef.current);
+    },
+    [],
+  );
   const show = () => {
     const element = anchorRef.current;
     if (!element || !tip) return;
@@ -1086,27 +1093,31 @@ export function TooltipText({
     if (!eligible) setEligible(true);
     const rect = element.getBoundingClientRect();
     const width = Math.min(
-      Math.max(120, Array.from(String(tip)).length * 12 + 30),
-      360,
+      Math.max(96, Array.from(String(tip)).length * 12 + 20),
+      320,
       window.innerWidth - 24,
     );
     const left = Math.min(
       Math.max(12, rect.left),
       window.innerWidth - width - 12,
     );
-    const openAbove = window.innerHeight - rect.bottom < 120 && rect.top > 120;
-    const arrowLeft = Math.min(
-      Math.max(16, rect.left + rect.width / 2 - left),
-      width - 16,
-    );
+    const openAbove = window.innerHeight - rect.bottom < 96 && rect.top > 96;
     setTooltip({
       left,
-      top: openAbove ? "auto" : rect.bottom + 7,
-      bottom: openAbove ? window.innerHeight - rect.top + 7 : "auto",
+      top: openAbove ? "auto" : rect.bottom + 6,
+      bottom: openAbove ? window.innerHeight - rect.top + 6 : "auto",
       width,
       placement: openAbove ? "above" : "below",
-      arrowLeft,
     });
+  };
+  const showWithDelay = () => {
+    if (showTimerRef.current) window.clearTimeout(showTimerRef.current);
+    showTimerRef.current = window.setTimeout(show, 150);
+  };
+  const hide = () => {
+    if (showTimerRef.current) window.clearTimeout(showTimerRef.current);
+    showTimerRef.current = null;
+    setTooltip(null);
   };
   return (
     <span
@@ -1115,10 +1126,13 @@ export function TooltipText({
       style={clampLines ? { "--s4-tooltip-lines": clampLines } : undefined}
       tabIndex={eligible ? 0 : undefined}
       aria-describedby={tooltip ? tooltipId : undefined}
-      onMouseEnter={show}
-      onMouseLeave={() => setTooltip(null)}
+      onMouseEnter={showWithDelay}
+      onMouseLeave={hide}
       onFocus={show}
-      onBlur={() => setTooltip(null)}
+      onBlur={hide}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") hide();
+      }}
     >
       {children}
       {tooltip
@@ -1132,7 +1146,6 @@ export function TooltipText({
                 top: tooltip.top,
                 bottom: tooltip.bottom,
                 width: tooltip.width,
-                "--s4-tooltip-arrow-left": `${tooltip.arrowLeft}px`,
               }}
             >
               {tip}

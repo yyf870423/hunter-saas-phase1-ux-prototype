@@ -335,7 +335,10 @@ test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
   await expect(page.getByRole("tooltip")).toContainText(
     "面向多任务机器人的操作策略训练方法",
   );
-  await expect(page.getByRole("tooltip")).toHaveCSS("border-left-width", "3px");
+  await expect(page.getByRole("tooltip")).toHaveCSS(
+    "background-color",
+    "rgb(31, 31, 31)",
+  );
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "专利类型", exact: true }).click();
   await page.getByRole("button", { name: "实用新型", exact: true }).click();
@@ -407,7 +410,7 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
   await expect(page.getByRole("tooltip")).toHaveCount(0);
   await page.locator(".s4-tag-overflow").first().hover();
   await expect(page.getByRole("tooltip")).toBeVisible();
-  await expect(page.getByRole("tooltip")).toHaveCSS("border-radius", "8px");
+  await expect(page.getByRole("tooltip")).toHaveCSS("border-radius", "6px");
 
   await page.goto("#/tasks");
   const activeTab = page.locator(

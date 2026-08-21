@@ -76,7 +76,7 @@
 .s2-history > .s1-search-field {
   height: 34px;
   margin: 0 10px 10px;
-  border-radius: 7px;
+  border-radius: 6px;
 }
 
 .s2-history-list {
@@ -107,9 +107,9 @@
 }
 
 .s2-history-list > button.is-active {
-  background: var(--s1-surface);
-  border-color: color-mix(in srgb, var(--s1-accent) 28%, var(--s1-line));
-  box-shadow: inset 3px 0 var(--s1-accent);
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 20%, var(--s1-line));
 }
 
 .s2-history-list > button > span {
@@ -275,8 +275,8 @@
   padding: 5px;
   background: var(--s1-surface-raised);
   border: 1px solid var(--s1-line);
-  border-radius: 9px;
-  box-shadow: var(--s1-shadow);
+  border-radius: 8px;
+  box-shadow: var(--s1-popover-shadow);
 }
 
 .s2-more-menu > button {
@@ -332,7 +332,7 @@
   line-height: 22px;
   background: color-mix(in srgb, var(--s1-accent-soft) 62%, var(--s1-surface));
   border: 1px solid color-mix(in srgb, var(--s1-accent) 18%, var(--s1-line));
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .s2-user-message time {
@@ -1256,15 +1256,15 @@
   padding: 7px;
   background: var(--s1-surface-raised);
   border: 1px solid var(--s1-line-strong);
-  border-radius: 10px;
-  box-shadow: 0 8px 28px rgba(17, 24, 39, 0.08);
+  border-radius: 8px;
+  box-shadow: var(--s1-control-shadow);
 }
 
 .s2-composer:focus-within {
   border-color: color-mix(in srgb, var(--s1-accent) 52%, var(--s1-line));
   box-shadow:
     0 0 0 3px color-mix(in srgb, var(--s1-accent) 12%, transparent),
-    0 8px 28px rgba(17, 24, 39, 0.08);
+    var(--s1-control-shadow);
 }
 
 .s2-composer textarea {
@@ -1353,8 +1353,8 @@
   padding: 6px;
   background: var(--s1-surface-raised);
   border: 1px solid var(--s1-line);
-  border-radius: 10px;
-  box-shadow: var(--s1-shadow);
+  border-radius: 8px;
+  box-shadow: var(--s1-popover-shadow);
 }
 .s2-auth-menu > button {
   display: grid;
@@ -1480,8 +1480,8 @@
   overflow: hidden;
   background: var(--s1-surface-raised);
   border: 1px solid var(--s1-line-strong);
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
+  border-radius: 8px;
+  box-shadow: var(--s1-shadow);
 }
 .s2-email-review > header {
   display: flex;
@@ -2872,8 +2872,8 @@
   overflow: hidden;
   background: var(--s1-surface-raised);
   border: 1px solid var(--s1-line);
-  border-radius: 9px;
-  box-shadow: 0 5px 18px rgba(17, 24, 39, 0.06);
+  border-radius: 8px;
+  box-shadow: var(--s1-control-shadow);
 }
 .s2-task-plan > button {
   display: grid;
@@ -2921,7 +2921,7 @@
   overflow: hidden;
   background: var(--s1-surface);
   border: 1px solid var(--s1-line);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 .s2-signal-list-pane {
   display: grid;

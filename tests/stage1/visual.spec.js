@@ -29,6 +29,7 @@ test("截取桌面深色工作台", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/home");
   await page.getByRole("button", { name: "切换深色模式" }).click();
+  await page.waitForTimeout(220);
   await page.screenshot({
     path: `${output}/desktop-home-dark.png`,
     fullPage: true,
