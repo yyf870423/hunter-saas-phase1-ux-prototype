@@ -57,6 +57,11 @@ const candidatePages = [
   ["reviews/fields/candidate-linhao", "candidate-field-review"],
   ["sources/candidate-linhao", "candidate-source-evidence"],
   ["candidates/candidate-linhao?state=limited", "candidate-limited"],
+  ["candidates/candidate-linhao?state=loading", "candidate-loading"],
+  [
+    "candidates/candidate-linhao?state=identity-conflict",
+    "candidate-identity-conflict",
+  ],
   ["candidates/candidate-linhao?state=error", "candidate-error"],
 ];
 

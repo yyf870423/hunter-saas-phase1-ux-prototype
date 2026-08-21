@@ -17,6 +17,7 @@ import {
   FormField,
   Modal,
   NotFoundState,
+  ProgressBar,
   SelectMenu,
   SourceList,
   StateBanner,
@@ -43,20 +44,268 @@ const candidateTabs = [
   { value: "relations", label: "关联信息" },
 ];
 
-function ProfileTab({ candidate, onEdit }) {
+function CandidateSectionEditModal({ section, close, candidate }) {
+  const notify = useToast();
+  const config = {
+    summary: {
+      title: "编辑职业概览",
+      description: "人工维护的概览不会被后续 Agent 结果静默覆盖",
+      body: (
+        <FormField label="职业概览" required span={2}>
+          <TextArea value={candidate.summary} onChange={() => {}} rows={7} />
+        </FormField>
+      ),
+    },
+    basic: {
+      title: "编辑基本资料",
+      description: "出生年份用于动态计算年龄",
+      body: (
+        <>
+          <FormField label="中文名" required>
+            <TextInput value={candidate.name} onChange={() => {}} />
+          </FormField>
+          <FormField label="英文名">
+            <TextInput value={candidate.englishName} onChange={() => {}} />
+          </FormField>
+          <FormField label="出生年份">
+            <TextInput value={candidate.birthYear} onChange={() => {}} />
+          </FormField>
+          <FormField label="性别">
+            <SelectMenu
+              label="选择性别"
+              value={candidate.gender}
+              options={["男", "女", "未知"]}
+              onChange={() => {}}
+            />
+          </FormField>
+          <FormField label="地点">
+            <TextInput value={candidate.location} onChange={() => {}} />
+          </FormField>
+          <FormField label="求职状态">
+            <SelectMenu
+              label="选择状态"
+              value={candidate.preference}
+              options={["正在求职", "愿意了解机会", "暂不考虑", "未知"]}
+              onChange={() => {}}
+            />
+          </FormField>
+        </>
+      ),
+    },
+    overview: {
+      title: "编辑当前概览",
+      description: "概览允许与详细经历暂时不一致，并保留核实状态",
+      body: (
+        <>
+          <FormField label="当前公司原文">
+            <TextInput value={candidate.company} onChange={() => {}} />
+          </FormField>
+          <FormField label="当前职位">
+            <TextInput value={candidate.title} onChange={() => {}} />
+          </FormField>
+          <FormField label="工作年限">
+            <TextInput value={candidate.experience} onChange={() => {}} />
+          </FormField>
+          <FormField label="最高教育">
+            <TextInput value={candidate.education} onChange={() => {}} />
+          </FormField>
+          <FormField label="职级">
+            <TextInput value="技术总监 / 负责人" onChange={() => {}} />
+          </FormField>
+          <FormField label="信息状态">
+            <SelectMenu
+              label="选择状态"
+              value="待本人核实"
+              options={["已核实", "待本人核实", "公开资料推断"]}
+              onChange={() => {}}
+            />
+          </FormField>
+        </>
+      ),
+    },
+    contacts: {
+      title: "编辑联系方式",
+      description: "阶段一结构化联系方式只保存手机和邮箱",
+      body: (
+        <>
+          <FormField label="手机号码">
+            <TextInput value={candidate.phone} onChange={() => {}} />
+          </FormField>
+          <FormField label="手机状态">
+            <SelectMenu
+              label="选择状态"
+              value="可用"
+              options={["可用", "待核实", "已失效"]}
+              onChange={() => {}}
+            />
+          </FormField>
+          <FormField label="邮箱">
+            <TextInput value={candidate.email} onChange={() => {}} />
+          </FormField>
+          <FormField label="邮箱状态">
+            <SelectMenu
+              label="选择状态"
+              value="已回复"
+              options={["已回复", "可用", "待核实", "已失效"]}
+              onChange={() => {}}
+            />
+          </FormField>
+        </>
+      ),
+    },
+    skills: {
+      title: "编辑技能与行业",
+      description: "技能标签使用标准词，同时保留无法归一的原始表达",
+      body: (
+        <>
+          <FormField label="关键技能" span={2}>
+            <TextArea
+              value="VLA、强化学习、机器人学习、模仿学习、真机部署、数据闭环、团队管理"
+              onChange={() => {}}
+              rows={4}
+            />
+          </FormField>
+          <FormField label="行业标签">
+            <SelectMenu
+              label="选择行业"
+              value={["机器人", "人工智能"]}
+              options={["机器人", "人工智能", "自动驾驶", "智能硬件"]}
+              multiple
+              onChange={() => {}}
+            />
+          </FormField>
+          <FormField label="软性能力">
+            <TextArea
+              value="能够在研究、工程和产品团队之间建立清晰的交付边界，愿意亲自解决关键技术问题。"
+              onChange={() => {}}
+              rows={4}
+            />
+          </FormField>
+        </>
+      ),
+    },
+    links: {
+      title: "编辑公开资料链接",
+      description: "系统根据域名自动识别链接类型",
+      body: (
+        <>
+          {candidate.links.map(([type, url]) => (
+            <FormField label={type} key={url}>
+              <TextInput value={`https://${url}`} onChange={() => {}} />
+            </FormField>
+          ))}
+          <FormField label="新增链接" span={2}>
+            <TextInput
+              value=""
+              onChange={() => {}}
+              placeholder="粘贴公开资料 URL"
+            />
+          </FormField>
+        </>
+      ),
+    },
+  };
+  const active = config[section];
+  return (
+    <Modal
+      open={Boolean(active)}
+      close={close}
+      size="xl"
+      title={active?.title || "编辑候选人资料"}
+      description={active?.description}
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            onClick={() => {
+              close();
+              notify(`${active?.title || "候选人资料"}已保存`);
+            }}
+          >
+            保存修改
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-form-grid">{active?.body}</div>
+    </Modal>
+  );
+}
+
+function ProfileTab({ candidate, hasIdentityIssue = false }) {
   const navigate = useNavigate();
+  const [editSection, setEditSection] = useState(null);
   return (
     <div className="s4-detail-stack">
+      <section className="s4-candidate-review-strip">
+        <article className="is-warning">
+          <i>
+            <Icon name="warning" />
+          </i>
+          <span>
+            <b>7 项资料变化等待审核</b>
+            <p>新简历带来工作经历、教育经历、论文、专利和技能变化。</p>
+          </span>
+          <Button
+            size="sm"
+            onClick={() => navigate("/reviews/fields/candidate-linhao")}
+          >
+            审核资料变化
+          </Button>
+        </article>
+        <article>
+          <i>
+            <Icon name="link" />
+          </i>
+          <span>
+            <b>资料来源可追溯</b>
+            <p>关键字段关联 12 项文件、网页和人工确认依据。</p>
+          </span>
+          <Button
+            size="sm"
+            onClick={() => navigate("/sources/candidate-linhao")}
+          >
+            查看来源与证据
+          </Button>
+        </article>
+        {hasIdentityIssue ? (
+          <article className="is-danger">
+            <i>
+              <Icon name="copy" />
+            </i>
+            <span>
+              <b>发现疑似重复候选人</b>
+              <p>手机后四位和工作轨迹高度一致，需要确认是否合并。</p>
+            </span>
+            <Button
+              size="sm"
+              onClick={() => navigate("/reviews/identity/candidate-linhao")}
+            >
+              处理身份冲突
+            </Button>
+          </article>
+        ) : null}
+      </section>
       <FieldGroup
         title="职业概览"
         action={
-          <Button
-            size="sm"
-            icon="sparkles"
-            onClick={() => navigate("/new?prompt=补全林昊的候选人资料")}
-          >
-            启动信息补全
-          </Button>
+          <div className="s4-field-actions">
+            <Button
+              size="sm"
+              icon="edit"
+              onClick={() => setEditSection("summary")}
+            >
+              编辑概览
+            </Button>
+            <Button
+              size="sm"
+              icon="sparkles"
+              onClick={() => navigate("/new?prompt=补全林昊的候选人资料")}
+            >
+              启动信息补全
+            </Button>
+          </div>
         }
       >
         <p className="s4-long-copy">{candidate.summary}</p>
@@ -67,7 +316,7 @@ function ProfileTab({ candidate, onEdit }) {
       <FieldGroup
         title="基本资料"
         action={
-          <Button size="sm" icon="edit" onClick={onEdit}>
+          <Button size="sm" icon="edit" onClick={() => setEditSection("basic")}>
             编辑资料
           </Button>
         }
@@ -89,6 +338,15 @@ function ProfileTab({ candidate, onEdit }) {
       <FieldGroup
         title="当前概览"
         description="概览不强制覆盖详细经历；存在差异时保留待核实提示。"
+        action={
+          <Button
+            size="sm"
+            icon="edit"
+            onClick={() => setEditSection("overview")}
+          >
+            编辑概览
+          </Button>
+        }
       >
         <DefinitionGrid
           items={[
@@ -104,7 +362,18 @@ function ProfileTab({ candidate, onEdit }) {
           ]}
         />
       </FieldGroup>
-      <FieldGroup title="联系方式">
+      <FieldGroup
+        title="联系方式"
+        action={
+          <Button
+            size="sm"
+            icon="edit"
+            onClick={() => setEditSection("contacts")}
+          >
+            编辑方式
+          </Button>
+        }
+      >
         <div className="s4-contact-methods">
           <article>
             <i>
@@ -128,7 +397,18 @@ function ProfileTab({ candidate, onEdit }) {
           </article>
         </div>
       </FieldGroup>
-      <FieldGroup title="技能与行业">
+      <FieldGroup
+        title="技能与行业"
+        action={
+          <Button
+            size="sm"
+            icon="edit"
+            onClick={() => setEditSection("skills")}
+          >
+            编辑标签
+          </Button>
+        }
+      >
         <div className="s4-labeled-row">
           <b>关键技能</b>
           <TagList
@@ -155,7 +435,14 @@ function ProfileTab({ candidate, onEdit }) {
           </p>
         </div>
       </FieldGroup>
-      <FieldGroup title="公开资料链接">
+      <FieldGroup
+        title="公开资料链接"
+        action={
+          <Button size="sm" icon="edit" onClick={() => setEditSection("links")}>
+            编辑链接
+          </Button>
+        }
+      >
         <div className="s4-link-list">
           {candidate.links.map(([type, url, status]) => (
             <button
@@ -176,6 +463,11 @@ function ProfileTab({ candidate, onEdit }) {
           ))}
         </div>
       </FieldGroup>
+      <CandidateSectionEditModal
+        section={editSection}
+        close={() => setEditSection(null)}
+        candidate={candidate}
+      />
     </div>
   );
 }
@@ -183,6 +475,7 @@ function ProfileTab({ candidate, onEdit }) {
 function ExperienceTab({ candidate }) {
   const notify = useToast();
   const [experienceModal, setExperienceModal] = useState(false);
+  const [recordModal, setRecordModal] = useState(null);
   return (
     <div className="s4-detail-stack">
       <FieldGroup
@@ -233,7 +526,9 @@ function ExperienceTab({ candidate }) {
           <Button
             size="sm"
             icon="plus"
-            onClick={() => notify("已打开教育经历编辑")}
+            onClick={() =>
+              setRecordModal({ kind: "education", mode: "create" })
+            }
           >
             添加教育
           </Button>
@@ -252,7 +547,13 @@ function ExperienceTab({ candidate }) {
               <time>{period}</time>
               <button
                 type="button"
-                onClick={() => notify(`已打开“${school}”教育经历`)}
+                onClick={() =>
+                  setRecordModal({
+                    kind: "education",
+                    mode: "edit",
+                    name: school,
+                  })
+                }
               >
                 <Icon name="edit" />
               </button>
@@ -266,7 +567,7 @@ function ExperienceTab({ candidate }) {
           <Button
             size="sm"
             icon="plus"
-            onClick={() => notify("已打开项目经历编辑")}
+            onClick={() => setRecordModal({ kind: "project", mode: "create" })}
           >
             添加项目
           </Button>
@@ -284,7 +585,9 @@ function ExperienceTab({ candidate }) {
                 </span>
                 <button
                   type="button"
-                  onClick={() => notify(`已打开“${name}”项目经历`)}
+                  onClick={() =>
+                    setRecordModal({ kind: "project", mode: "edit", name })
+                  }
                 >
                   <Icon name="edit" />
                 </button>
@@ -302,7 +605,90 @@ function ExperienceTab({ candidate }) {
           notify("工作经历已保存");
         }}
       />
+      <CandidateRecordModal
+        config={recordModal}
+        close={() => setRecordModal(null)}
+        onSave={() => {
+          notify(
+            recordModal?.kind === "education"
+              ? "教育经历已保存"
+              : "项目经历已保存",
+          );
+          setRecordModal(null);
+        }}
+      />
     </div>
+  );
+}
+
+function CandidateRecordModal({ config, close, onSave }) {
+  const isEducation = config?.kind === "education";
+  const isEdit = config?.mode === "edit";
+  return (
+    <Modal
+      open={Boolean(config)}
+      close={close}
+      size="lg"
+      title={`${isEdit ? "编辑" : "添加"}${isEducation ? "教育经历" : "项目经历"}`}
+      description="该记录会独立保存，并保留后续变化历史"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button tone="primary" onClick={onSave}>
+            保存记录
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-form-grid">
+        {isEducation ? (
+          <>
+            <FormField label="学校" required>
+              <TextInput
+                value={config?.name || "上海交通大学"}
+                onChange={() => {}}
+              />
+            </FormField>
+            <FormField label="学历" required>
+              <SelectMenu
+                label="选择学历"
+                value="硕士"
+                options={["博士", "硕士", "本科", "大专"]}
+                onChange={() => {}}
+              />
+            </FormField>
+            <FormField label="专业">
+              <TextInput value="控制科学与工程" onChange={() => {}} />
+            </FormField>
+            <FormField label="起止时间">
+              <TextInput value="2010.09 - 2013.06" onChange={() => {}} />
+            </FormField>
+          </>
+        ) : (
+          <>
+            <FormField label="项目名称" required>
+              <TextInput
+                value={config?.name || "多任务机器人操作策略平台"}
+                onChange={() => {}}
+              />
+            </FormField>
+            <FormField label="项目角色">
+              <TextInput value="项目负责人" onChange={() => {}} />
+            </FormField>
+            <FormField label="起止时间">
+              <TextInput value="2023.01 - 2025.12" onChange={() => {}} />
+            </FormField>
+            <FormField label="项目描述" required span={2}>
+              <TextArea
+                value="负责从数据采集、策略训练到真机评测的完整闭环，推动多任务策略在客户现场稳定运行。"
+                onChange={() => {}}
+                rows={6}
+              />
+            </FormField>
+          </>
+        )}
+      </div>
+    </Modal>
   );
 }
 
@@ -362,9 +748,11 @@ function ExperienceModal({ open, close, onSave }) {
 }
 
 function FilesTab({ candidate }) {
+  const navigate = useNavigate();
   const notify = useToast();
   const [preview, setPreview] = useState(null);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [changesOpen, setChangesOpen] = useState(false);
   return (
     <div className="s4-detail-stack">
       <StateBanner
@@ -373,8 +761,8 @@ function FilesTab({ candidate }) {
         title="新简历不会直接覆盖候选人档案"
         description="系统会先比较新增、更新和冲突字段，再由用户确认或按当前授权处理。"
         action={
-          <Button size="sm" onClick={() => notify("已打开资料版本变化")}>
-            查看变化
+          <Button size="sm" onClick={() => setChangesOpen(true)}>
+            查看简历变化
           </Button>
         }
       />
@@ -483,6 +871,64 @@ function FilesTab({ candidate }) {
       >
         <FileDrop files={[]} onFiles={() => {}} accept="PDF、DOCX、PNG、JPG" />
       </Modal>
+      <Modal
+        open={changesOpen}
+        close={() => setChangesOpen(false)}
+        size="xl"
+        title="查看简历变化"
+        description="林昊_机器人学习负责人_2026.pdf 相比资料版本 6"
+        footer={
+          <>
+            <Button onClick={() => setChangesOpen(false)}>关闭</Button>
+            <Button
+              tone="primary"
+              onClick={() => {
+                setChangesOpen(false);
+                navigate("/reviews/fields/candidate-linhao");
+              }}
+            >
+              审核 7 项变化
+            </Button>
+          </>
+        }
+      >
+        <div className="s4-resume-change-summary">
+          <article>
+            <b>4</b>
+            <span>新增内容</span>
+          </article>
+          <article>
+            <b>2</b>
+            <span>更新内容</span>
+          </article>
+          <article>
+            <b>1</b>
+            <span>需要核实</span>
+          </article>
+        </div>
+        <div className="s4-resume-change-list">
+          {[
+            [
+              "工作经历",
+              "更新",
+              "补充拓界机器人团队规模、汇报对象和真机数据闭环成果",
+            ],
+            ["教育经历", "新增", "新增上海交通大学控制科学与工程硕士经历"],
+            ["论文成果", "新增", "新增 2 篇具身智能论文，作者身份需要交叉核实"],
+            ["专利成果", "新增", "新增 1 项机器人训练数据相关发明专利"],
+            ["关键技能", "更新", "新增数据闭环、Diffusion Policy 与 Sim2Real"],
+            ["意向地点", "待核实", "简历写北京、上海，当前档案仅记录上海"],
+          ].map(([field, status, detail]) => (
+            <article key={field}>
+              <StatusFromText value={status} />
+              <span>
+                <b>{field}</b>
+                <p>{detail}</p>
+              </span>
+            </article>
+          ))}
+        </div>
+      </Modal>
       {preview ? (
         <FilePreview name={preview} close={() => setPreview(null)} />
       ) : null}
@@ -492,26 +938,43 @@ function FilesTab({ candidate }) {
 
 function TimelineTab({ candidate }) {
   const notify = useToast();
+  const [items, setItems] = useState(candidate.timeline);
   const [noteOpen, setNoteOpen] = useState(false);
   const [note, setNote] = useState("");
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [deleteIndex, setDeleteIndex] = useState(null);
+  const openCreate = () => {
+    setEditingIndex(null);
+    setNote("");
+    setNoteOpen(true);
+  };
+  const openEdit = (index) => {
+    setEditingIndex(index);
+    setNote(items[index][2]);
+    setNoteOpen(true);
+  };
   return (
     <div className="s4-detail-stack">
       <FieldGroup
         title="跟进与沟通"
         description="真实消息只保存一次；岗位业务事件通过引用显示。"
         action={
-          <Button size="sm" icon="plus" onClick={() => setNoteOpen(true)}>
+          <Button size="sm" icon="plus" onClick={openCreate}>
             添加记录
           </Button>
         }
       >
-        <ActivityTimeline items={candidate.timeline} />
+        <ActivityTimeline
+          items={items}
+          onEdit={openEdit}
+          onDelete={setDeleteIndex}
+        />
       </FieldGroup>
       <Modal
         open={noteOpen}
         close={() => setNoteOpen(false)}
-        title="添加跟进记录"
-        description="可以记录电话、微信、线下沟通或其他人工信息"
+        title={editingIndex === null ? "添加跟进记录" : "编辑跟进记录"}
+        description="可以记录电话、线下沟通或其他人工信息"
         footer={
           <>
             <Button onClick={() => setNoteOpen(false)}>取消</Button>
@@ -519,12 +982,28 @@ function TimelineTab({ candidate }) {
               tone="primary"
               disabled={!note.trim()}
               onClick={() => {
+                if (editingIndex === null) {
+                  setItems((current) => [
+                    ["刚刚", "人工备注", note.trim(), "沈岚"],
+                    ...current,
+                  ]);
+                } else {
+                  setItems((current) =>
+                    current.map((item, index) =>
+                      index === editingIndex
+                        ? [item[0], item[1], note.trim(), item[3]]
+                        : item,
+                    ),
+                  );
+                }
                 setNoteOpen(false);
                 setNote("");
-                notify("跟进记录已添加");
+                notify(
+                  editingIndex === null ? "跟进记录已添加" : "跟进记录已更新",
+                );
               }}
             >
-              保存记录
+              {editingIndex === null ? "保存记录" : "保存修改"}
             </Button>
           </>
         }
@@ -556,6 +1035,37 @@ function TimelineTab({ candidate }) {
           </FormField>
         </div>
       </Modal>
+      <Modal
+        open={deleteIndex !== null}
+        close={() => setDeleteIndex(null)}
+        title="删除跟进记录"
+        description="记录删除后进入变更历史，当前时间线不再显示"
+        footer={
+          <>
+            <Button onClick={() => setDeleteIndex(null)}>取消</Button>
+            <Button
+              tone="danger"
+              onClick={() => {
+                setItems((current) =>
+                  current.filter((_, index) => index !== deleteIndex),
+                );
+                setDeleteIndex(null);
+                notify("跟进记录已删除");
+              }}
+            >
+              确认删除
+            </Button>
+          </>
+        }
+      >
+        <div className="s4-delete-impact">
+          <Icon name="warning" />
+          <span>
+            <b>{deleteIndex !== null ? items[deleteIndex]?.[1] : "跟进记录"}</b>
+            <p>{deleteIndex !== null ? items[deleteIndex]?.[2] : ""}</p>
+          </span>
+        </div>
+      </Modal>
     </div>
   );
 }
@@ -563,6 +1073,19 @@ function TimelineTab({ candidate }) {
 function MatchingTab() {
   const navigate = useNavigate();
   const notify = useToast();
+  const [rematchOpen, setRematchOpen] = useState(false);
+  const [matchOpen, setMatchOpen] = useState(false);
+  const [matchMode, setMatchMode] = useState("all");
+  const [matchStep, setMatchStep] = useState("scope");
+  const [refreshing, setRefreshing] = useState(false);
+  const startMatching = () => {
+    setMatchStep("running");
+    window.setTimeout(() => setMatchStep("done"), 900);
+  };
+  const closeMatching = () => {
+    setMatchOpen(false);
+    setMatchStep("scope");
+  };
   return (
     <div className="s4-detail-stack">
       <StateBanner
@@ -574,7 +1097,8 @@ function MatchingTab() {
           <Button
             size="sm"
             icon="refresh"
-            onClick={() => notify("已创建重新匹配任务", "info")}
+            loading={refreshing}
+            onClick={() => setRematchOpen(true)}
           >
             重新匹配
           </Button>
@@ -583,11 +1107,7 @@ function MatchingTab() {
       <FieldGroup
         title="岗位匹配"
         action={
-          <Button
-            size="sm"
-            icon="sparkles"
-            onClick={() => notify("已创建候选人全量匹配任务", "info")}
-          >
+          <Button size="sm" icon="sparkles" onClick={() => setMatchOpen(true)}>
             匹配岗位
           </Button>
         }
@@ -639,6 +1159,119 @@ function MatchingTab() {
           </article>
         </div>
       </FieldGroup>
+      <Modal
+        open={rematchOpen}
+        close={() => setRematchOpen(false)}
+        title="重新匹配过期结果"
+        description="使用候选人资料版本 6 重新计算 1 个已过期岗位结果"
+        footer={
+          <>
+            <Button onClick={() => setRematchOpen(false)}>取消</Button>
+            <Button
+              tone="primary"
+              onClick={() => {
+                setRematchOpen(false);
+                setRefreshing(true);
+                notify("重新匹配任务已开始", "info");
+                window.setTimeout(() => {
+                  setRefreshing(false);
+                  notify("1 个岗位匹配结果已更新");
+                }, 900);
+              }}
+            >
+              确认重新匹配
+            </Button>
+          </>
+        }
+      >
+        <div className="s4-rematch-impact">
+          <article>
+            <span>
+              <b>机器人数据平台负责人</b>
+              <small>拓界机器人</small>
+            </span>
+            <StatusBadge tone="warning">资料版本过期</StatusBadge>
+          </article>
+          <p>历史分数和推荐理由继续保留；新结果生成后成为当前判断。</p>
+        </div>
+      </Modal>
+      <Modal
+        open={matchOpen}
+        close={closeMatching}
+        size="lg"
+        title="匹配岗位"
+        description="选择本次匹配范围，结果会写入候选人的匹配历史"
+        footer={
+          matchStep === "scope" ? (
+            <>
+              <Button onClick={closeMatching}>取消</Button>
+              <Button tone="primary" onClick={startMatching}>
+                开始匹配
+              </Button>
+            </>
+          ) : matchStep === "done" ? (
+            <Button tone="primary" onClick={closeMatching}>
+              查看匹配结果
+            </Button>
+          ) : (
+            <Button disabled>正在匹配</Button>
+          )
+        }
+      >
+        {matchStep === "scope" ? (
+          <div className="s4-match-scope">
+            <CustomRadio
+              checked={matchMode === "all"}
+              onChange={() => setMatchMode("all")}
+              label="全部招聘中岗位"
+              description="当前工作空间 8 个岗位，自动排除已关闭和已暂停岗位"
+            />
+            <CustomRadio
+              checked={matchMode === "selected"}
+              onChange={() => setMatchMode("selected")}
+              label="指定岗位"
+              description="只匹配本次选择的岗位"
+            />
+            {matchMode === "selected" ? (
+              <FormField label="选择岗位">
+                <SelectMenu
+                  label="选择一个或多个岗位"
+                  value={["具身智能 VLA 算法负责人"]}
+                  options={[
+                    "具身智能 VLA 算法负责人",
+                    "机器人数据平台负责人",
+                    "强化学习算法专家",
+                  ]}
+                  multiple
+                  searchable
+                  onChange={() => {}}
+                />
+              </FormField>
+            ) : null}
+          </div>
+        ) : matchStep === "running" ? (
+          <div className="s4-match-running">
+            <ProgressBar
+              value={68}
+              label="正在计算角色适配、硬性门槛和综合匹配"
+            />
+            <small>已完成 5 / 8 个岗位，关闭窗口不会中断任务。</small>
+          </div>
+        ) : (
+          <div className="s4-match-complete">
+            <i>
+              <Icon name="check" />
+            </i>
+            <h3>岗位匹配完成</h3>
+            <p>8 个岗位中，2 个推荐、3 个有条件匹配、3 个未通过硬性门槛。</p>
+            <div>
+              <StatusBadge tone="success">推荐 2</StatusBadge>
+              <StatusBadge tone="warning">有条件 3</StatusBadge>
+              <StatusBadge tone="neutral">未通过 3</StatusBadge>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
@@ -689,7 +1322,17 @@ function RelationsTab() {
           />
         </div>
       </FieldGroup>
-      <FieldGroup title="来源与证据">
+      <FieldGroup
+        title="来源与证据"
+        action={
+          <Button
+            size="sm"
+            onClick={() => navigate("/sources/candidate-linhao")}
+          >
+            查看全部证据
+          </Button>
+        }
+      >
         <SourceList
           items={[
             {
@@ -711,86 +1354,10 @@ function RelationsTab() {
               status: "已确认",
             },
           ]}
+          onOpen={() => navigate("/sources/candidate-linhao")}
         />
       </FieldGroup>
     </div>
-  );
-}
-
-function EditCandidateModal({ open, close, candidate }) {
-  const notify = useToast();
-  const [name, setName] = useState(candidate.name);
-  const [company, setCompany] = useState(candidate.company);
-  const [title, setTitle] = useState(candidate.title);
-  const [year, setYear] = useState(candidate.birthYear);
-  return (
-    <Modal
-      open={open}
-      close={close}
-      size="xl"
-      title="编辑候选人资料"
-      description="修改基础资料不会覆盖简历原文和历史版本"
-      footer={
-        <>
-          <Button onClick={close}>取消</Button>
-          <Button
-            tone="primary"
-            disabled={!name.trim()}
-            onClick={() => {
-              close();
-              notify("候选人资料已保存");
-            }}
-          >
-            保存修改
-          </Button>
-        </>
-      }
-    >
-      <div className="s4-form-grid">
-        <FormField label="姓名" required>
-          <TextInput value={name} onChange={setName} />
-        </FormField>
-        <FormField label="英文名">
-          <TextInput value={candidate.englishName} onChange={() => {}} />
-        </FormField>
-        <FormField label="当前公司原文">
-          <TextInput value={company} onChange={setCompany} />
-        </FormField>
-        <FormField label="正式公司关联">
-          <SelectMenu
-            label="选择公司"
-            value={company}
-            options={["拓界机器人", "星澜机器人", "上海人工智能实验室"]}
-            onChange={setCompany}
-            searchable
-          />
-        </FormField>
-        <FormField label="当前职位">
-          <TextInput value={title} onChange={setTitle} />
-        </FormField>
-        <FormField label="地点">
-          <TextInput value={candidate.location} onChange={() => {}} />
-        </FormField>
-        <FormField label="出生年份" help="年龄将根据出生年份动态计算">
-          <TextInput value={year} onChange={setYear} />
-        </FormField>
-        <FormField label="求职状态">
-          <SelectMenu
-            label="选择状态"
-            value={candidate.preference}
-            options={["正在求职", "愿意了解机会", "暂不考虑", "未知"]}
-            onChange={() => {}}
-          />
-        </FormField>
-        <FormField label="用户备注" span={2}>
-          <TextArea
-            value=""
-            onChange={() => {}}
-            placeholder="用户维护的备注不会被 Agent 覆盖"
-          />
-        </FormField>
-      </div>
-    </Modal>
   );
 }
 
@@ -805,7 +1372,6 @@ export function CandidateDetailPage() {
     candidateId === candidateDetail.id || candidateId === "candidate-linhao"
       ? candidateDetail
       : candidates.find((item) => item.id === candidateId);
-  const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   if (!candidate)
     return (
@@ -813,10 +1379,42 @@ export function CandidateDetailPage() {
     );
   if (state === "loading")
     return (
-      <div className="s4-detail-loading">
-        <span />
-        <span />
-        <span />
+      <div className="s4-detail-loading" aria-label="候选人详情正在加载">
+        <header>
+          <i />
+          <span>
+            <b />
+            <small />
+            <em />
+          </span>
+        </header>
+        <nav>
+          {[0, 1, 2, 3, 4, 5].map((item) => (
+            <span key={item} />
+          ))}
+        </nav>
+        <section>
+          <header>
+            <b />
+            <i />
+          </header>
+          <div className="s4-detail-loading-grid">
+            {[0, 1, 2, 3, 4, 5].map((item) => (
+              <span key={item} />
+            ))}
+          </div>
+        </section>
+        <section>
+          <header>
+            <b />
+            <i />
+          </header>
+          <div className="s4-detail-loading-lines">
+            <span />
+            <span />
+            <span />
+          </div>
+        </section>
       </div>
     );
   if (state === "error")
@@ -853,16 +1451,8 @@ export function CandidateDetailPage() {
           { label: "资料版本 6", tone: "info" },
         ]}
         onBack={() => navigate("/candidates")}
-        onEdit={() => setEditOpen(true)}
         onDelete={() => setDeleteOpen(true)}
-      >
-        <Button
-          icon="copy"
-          onClick={() => navigate("/reviews/identity/candidate-linhao")}
-        >
-          身份与合并
-        </Button>
-      </DetailHeader>
+      />
       <DetailTabs
         tabs={candidateTabs}
         value={tab}
@@ -871,7 +1461,7 @@ export function CandidateDetailPage() {
       {tab === "profile" ? (
         <ProfileTab
           candidate={{ ...candidateDetail, ...candidate }}
-          onEdit={() => setEditOpen(true)}
+          hasIdentityIssue={state === "identity-conflict"}
         />
       ) : null}
       {tab === "experience" ? (
@@ -881,11 +1471,6 @@ export function CandidateDetailPage() {
       {tab === "timeline" ? <TimelineTab candidate={candidateDetail} /> : null}
       {tab === "matching" ? <MatchingTab /> : null}
       {tab === "relations" ? <RelationsTab /> : null}
-      <EditCandidateModal
-        open={editOpen}
-        close={() => setEditOpen(false)}
-        candidate={candidateDetail}
-      />
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
@@ -1395,14 +1980,54 @@ export function IdentityMergeReviewPage() {
 export function FieldChangeReviewPage() {
   const navigate = useNavigate();
   const notify = useToast();
-  const [accepted, setAccepted] = useState(new Set(["skill", "team"]));
+  const [accepted, setAccepted] = useState(
+    new Set(["work", "education", "paper", "patent", "skill", "team"]),
+  );
+  const [evidence, setEvidence] = useState(null);
   const changes = [
+    {
+      id: "work",
+      field: "工作经历",
+      before: "拓界机器人 · 机器人学习负责人；负责操作策略平台和真机部署。",
+      after:
+        "拓界机器人 · 机器人学习负责人；管理 14 人团队，负责 VLA、多任务操作策略、真机数据闭环和跨团队交付。",
+      source: "新简历第 1-2 页",
+      evidence:
+        "工作经历段落明确补充团队规模、汇报对象、职责范围和 2025 年交付成果。",
+    },
+    {
+      id: "education",
+      field: "教育经历",
+      before: "浙江大学 · 自动化 · 本科",
+      after: "上海交通大学 · 控制科学与工程 · 硕士（2010-2013）",
+      source: "新简历第 3 页",
+      evidence: "教育经历区块提供学校、专业、学历和起止时间。",
+    },
+    {
+      id: "paper",
+      field: "论文成果",
+      before: "已关联 1 篇论文",
+      after: "新增 2 篇 VLA 与机器人操作论文，其中 1 篇为第一作者",
+      source: "新简历第 5 页、OpenAlex",
+      evidence:
+        "标题、作者顺序和机构一致；作者身份已通过工作经历和公开主页交叉核实。",
+    },
+    {
+      id: "patent",
+      field: "专利成果",
+      before: "未记录",
+      after: "机器人训练数据的自动筛选与回流系统 · 第一发明人",
+      source: "新简历第 6 页、国家知识产权公开信息",
+      evidence: "专利标题、申请人、发明人顺序和申请号均可核验。",
+    },
     {
       id: "skill",
       field: "关键技能",
       before: "VLA、强化学习、真机部署",
       after: "VLA、强化学习、真机部署、数据闭环",
       source: "项目作品集第 6 页",
+      evidence:
+        "项目说明写明持续使用离线数据回流、困难样本筛选和真机评测闭环。",
     },
     {
       id: "team",
@@ -1410,6 +2035,7 @@ export function FieldChangeReviewPage() {
       before: "未记录",
       after: "14 人",
       source: "新简历工作经历",
+      evidence: "拓界机器人经历中写明直接管理 14 人算法团队。",
     },
     {
       id: "location",
@@ -1417,6 +2043,7 @@ export function FieldChangeReviewPage() {
       before: "上海",
       after: "上海、北京",
       source: "邮件回复",
+      evidence: "候选人回复：上海优先，核心团队在北京时可以进一步沟通。",
     },
   ];
   return (
@@ -1428,7 +2055,7 @@ export function FieldChangeReviewPage() {
         </button>
         <span>
           <small>字段变化审核</small>
-          <h1>林昊 · 3 项资料建议</h1>
+          <h1>林昊 · 7 项资料建议</h1>
           <p>每项变化保留来源；未选择的建议不会写入正式档案。</p>
         </span>
       </header>
@@ -1443,7 +2070,9 @@ export function FieldChangeReviewPage() {
           <article key={item.id}>
             <b>
               {item.field}
-              <small>{item.source}</small>
+              <button type="button" onClick={() => setEvidence(item)}>
+                {item.source}
+              </button>
             </b>
             <p>{item.before}</p>
             <p>{item.after}</p>
@@ -1488,6 +2117,24 @@ export function FieldChangeReviewPage() {
           </Button>
         </div>
       </footer>
+      <Modal
+        open={Boolean(evidence)}
+        close={() => setEvidence(null)}
+        title={`${evidence?.field || "字段"}的判断依据`}
+        description={evidence?.source}
+        footer={<Button onClick={() => setEvidence(null)}>关闭</Button>}
+      >
+        <div className="s4-evidence-preview">
+          <i>
+            <Icon name="file" />
+          </i>
+          <span>
+            <b>支持本次变化的原始片段</b>
+            <p>{evidence?.evidence}</p>
+            <small>来源原文只用于本次审核，不会代替正式字段内容。</small>
+          </span>
+        </div>
+      </Modal>
     </div>
   );
 }
@@ -1495,6 +2142,7 @@ export function FieldChangeReviewPage() {
 export function SourceEvidencePage() {
   const navigate = useNavigate();
   const [activeField, setActiveField] = useState("当前职位");
+  const [preview, setPreview] = useState(null);
   const evidenceByField = {
     当前职位: {
       value: "机器人学习负责人",
@@ -1550,6 +2198,70 @@ export function SourceEvidencePage() {
         },
       ],
     },
+    工作经历: {
+      value: "拓界机器人 · 机器人学习负责人",
+      count: 2,
+      sources: [
+        {
+          title: "林昊_机器人学习负责人_2026.pdf",
+          description: "工作经历区块包含职责、团队规模和主要成果",
+          meta: "第 1-2 页 · 2026-08-18 上传",
+          status: "直接证据",
+          icon: "file",
+        },
+        {
+          title: "拓界机器人团队公开介绍",
+          description: "公开页面中的负责人信息与履历时间一致",
+          meta: "https://tuojie.example.com/team · 2026-08-19 获取",
+          status: "交叉验证",
+        },
+      ],
+    },
+    教育经历: {
+      value: "上海交通大学 · 控制科学与工程 · 硕士",
+      count: 1,
+      sources: [
+        {
+          title: "林昊_机器人学习负责人_2026.pdf",
+          description: "教育经历区块提供学校、专业、学历和时间",
+          meta: "第 3 页 · 2026-08-18 上传",
+          status: "直接证据",
+          icon: "file",
+        },
+      ],
+    },
+    论文成果: {
+      value: "3 篇已确认论文",
+      count: 2,
+      sources: [
+        {
+          title: "OpenAlex 作者与论文记录",
+          description: "作者、机构、标题和 DOI 与候选人公开主页一致",
+          meta: "OpenAlex · 2026-08-20 获取",
+          status: "已验证",
+          icon: "paper",
+        },
+        {
+          title: "Google Scholar 公开主页",
+          description: "显示相同论文标题和作者顺序",
+          meta: "公开网页 · 2026-08-20 获取",
+          status: "交叉验证",
+        },
+      ],
+    },
+    专利成果: {
+      value: "1 项已确认发明专利",
+      count: 1,
+      sources: [
+        {
+          title: "国家知识产权公开信息",
+          description: "申请号、申请人和发明人顺序均可核验",
+          meta: "公开专利页面 · 2026-08-20 获取",
+          status: "已验证",
+          icon: "patent",
+        },
+      ],
+    },
   };
   const activeEvidence = evidenceByField[activeField];
   return (
@@ -1581,7 +2293,10 @@ export function SourceEvidencePage() {
         </aside>
         <section>
           <FieldGroup title={`${activeField}：${activeEvidence.value}`}>
-            <SourceList items={activeEvidence.sources} />
+            <SourceList
+              items={activeEvidence.sources}
+              onOpen={(item) => setPreview({ ...item, field: activeField })}
+            />
           </FieldGroup>
           <FieldGroup title="证据状态">
             <DefinitionGrid
@@ -1596,6 +2311,41 @@ export function SourceEvidencePage() {
           </FieldGroup>
         </section>
       </div>
+      <Modal
+        open={Boolean(preview)}
+        close={() => setPreview(null)}
+        size="lg"
+        title={preview?.title || "查看证据"}
+        description={`${preview?.field || "候选人字段"} · ${preview?.meta || ""}`}
+        footer={<Button onClick={() => setPreview(null)}>关闭</Button>}
+      >
+        <div className="s4-evidence-document">
+          <header>
+            <i>
+              <Icon name={preview?.icon || "link"} />
+            </i>
+            <span>
+              <b>证据原文</b>
+              <small>{preview?.status}</small>
+            </span>
+          </header>
+          <blockquote>{preview?.description}</blockquote>
+          <dl>
+            <div>
+              <dt>支持字段</dt>
+              <dd>{preview?.field}</dd>
+            </div>
+            <div>
+              <dt>获取信息</dt>
+              <dd>{preview?.meta}</dd>
+            </div>
+            <div>
+              <dt>访问状态</dt>
+              <dd>当前可访问</dd>
+            </div>
+          </dl>
+        </div>
+      </Modal>
     </div>
   );
 }

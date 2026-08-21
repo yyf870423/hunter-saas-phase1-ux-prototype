@@ -46,7 +46,7 @@
 16. `Skeleton` / `EmptyState` / `ErrorState` / `PermissionState`：全局状态组件。
 17. `UserMenu`：显示当前用户和工作空间，并承载设置、切换工作空间和退出登录；支持外部点击与 `Escape` 关闭。
 18. `AppTabs`：列表分类、详情分区和审核视图共用 WorkBuddy × Vercel 内容导航式 Tab；整行使用轻底边区分内容层级，选中项通过强调文字、字重和底部色条表达，计数使用弱底色徽标；业务页面不得另起一套按钮块或分段框 Tab。
-19. `OverflowTooltip`：只服务于确实被截断的文本和 `+N` 隐藏标签；使用产品自定义深色轻浮层，不使用箭头、彩色边框、毛玻璃、`title` 或 SVG `title`。鼠标悬停延迟约 `150ms`，键盘聚焦立即显示，移开、失焦或按 `Escape` 关闭；富信息改用 Context Card、Drawer 或详情页。
+19. `OverflowTooltip`：只服务于确实被截断的文本和 `+N` 隐藏标签；采用 WorkBuddy × Vercel 的中性高层浮层，亮色模式使用白色表面、细灰边界和短距离阴影，深色模式使用深灰表面，不使用箭头、左侧色带、彩色边框、毛玻璃、`title` 或 SVG `title`。鼠标悬停延迟约 `150ms`，键盘聚焦立即显示，移开、失焦或按 `Escape` 关闭；富信息改用 Context Card、Drawer 或详情页。
 20. `TagList`：技能、行业、人物类别、论文主题和专利主题等同组标签统一使用 `8px` 横向间距和 `6px` 换行间距；隐藏项使用同行 `+N`，业务页面不得自行压缩标签间距。
 
 ## 四、复用约束

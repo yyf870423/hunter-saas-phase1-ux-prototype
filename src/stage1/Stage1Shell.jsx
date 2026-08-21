@@ -328,7 +328,7 @@ function MobileNavigation({ open, close, mode, onSelect }) {
   const assets = navSections.slice(1).flatMap((section) => section.items);
   const more = [
     navSections[0].items[3],
-    { id: "imports", label: "导入数据", icon: "download" },
+    { id: "data", label: "数据管理", icon: "download" },
     { id: "usage", label: "订阅与用量", icon: "database" },
     { id: "settings", label: "设置", icon: "settings" },
   ];
@@ -461,7 +461,7 @@ export function Stage1Shell() {
       mappings: "/mappings",
       papers: "/papers",
       patents: "/patents",
-      imports: "/data/imports",
+      data: "/data/imports",
     };
     if (routes[item.id]) {
       navigate(routes[item.id]);
@@ -541,6 +541,22 @@ export function Stage1Shell() {
                 <Icon name="database" />
                 <span>业务资产</span>
                 <Icon className="s1-assets-entry-chevron" name="chevronRight" />
+              </button>
+              <button
+                type="button"
+                className={
+                  location.pathname.startsWith("/data/") ||
+                  location.pathname === "/recycle-bin"
+                    ? "is-active"
+                    : ""
+                }
+                aria-label="打开数据管理"
+                onClick={() =>
+                  selectNavigation({ id: "data", label: "数据管理" })
+                }
+              >
+                <Icon name="download" />
+                <span>数据管理</span>
               </button>
             </nav>
           </section>
@@ -662,13 +678,6 @@ export function Stage1Shell() {
             <kbd>Ctrl K</kbd>
           </button>
           <div className="s1-topbar-actions">
-            <Button
-              className="s1-global-import"
-              icon="download"
-              onClick={() => navigate("/data/imports")}
-            >
-              导入数据
-            </Button>
             <div className="s1-new-menu-wrap">
               <Button
                 tone="primary"

@@ -210,10 +210,102 @@ test("候选人新建、身份合并和字段审核覆盖关键门禁", async ({
 
   await page.goto("#/reviews/fields/candidate-linhao");
   await expect(
-    page.getByRole("heading", { name: "林昊 · 3 项资料建议" }),
+    page.getByRole("heading", { name: "林昊 · 7 项资料建议" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "应用变化" }).click();
   await expect(page.getByText("字段变化已写入候选人档案")).toBeVisible();
+});
+
+test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作", async ({ page }) => {
+  await page.goto("#/candidates/candidate-linhao");
+  await expect(page.getByRole("button", { name: "身份与合并" })).toHaveCount(0);
+  await page.getByRole("button", { name: "编辑概览" }).last().click();
+  await expect(
+    page.getByRole("dialog", { name: "编辑当前概览" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("button", { name: "审核资料变化" }).click();
+  await expect(page).toHaveURL(/reviews\/fields\/candidate-linhao/);
+
+  await page.goto("#/candidates/candidate-linhao?state=identity-conflict");
+  await expect(
+    page.getByRole("button", { name: "处理身份冲突" }),
+  ).toBeVisible();
+
+  await page.goto("#/candidates/candidate-linhao?tab=files");
+  await page.getByRole("button", { name: "查看简历变化" }).click();
+  const resumeChanges = page.getByRole("dialog", { name: "查看简历变化" });
+  await expect(resumeChanges.getByText("论文成果")).toBeVisible();
+  await expect(resumeChanges.getByText("专利成果")).toBeVisible();
+  await resumeChanges
+    .locator("footer")
+    .getByRole("button", { name: "关闭" })
+    .click();
+
+  await page.goto("#/candidates/candidate-linhao?tab=timeline");
+  await page.getByRole("button", { name: "编辑" }).first().click();
+  const editRecord = page.getByRole("dialog", { name: "编辑跟进记录" });
+  await editRecord
+    .getByLabel("内容")
+    .fill("候选人确认下周可以安排一次电话沟通。");
+  await editRecord.getByRole("button", { name: "保存修改" }).click();
+  await expect(page.getByText("跟进记录已更新")).toBeVisible();
+  await page
+    .locator(".s4-timeline")
+    .getByRole("button", { name: "删除" })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: "删除跟进记录" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
+
+  await page.goto("#/candidates/candidate-linhao?tab=matching");
+  await page.getByRole("button", { name: "重新匹配" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "重新匹配过期结果" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("button", { name: "匹配岗位" }).click();
+  const matching = page.getByRole("dialog", { name: "匹配岗位" });
+  await matching.getByRole("button", { name: "开始匹配" }).click();
+  await expect(matching.getByText("岗位匹配完成")).toBeVisible();
+});
+
+test("候选人来源证据逐项可打开且详情加载状态完整", async ({ page }) => {
+  await page.goto("#/sources/candidate-linhao");
+  await page.getByRole("button", { name: /工作经历/ }).click();
+  await page
+    .getByRole("button", { name: /林昊_机器人学习负责人_2026.pdf/ })
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: /林昊_机器人学习负责人_2026.pdf/ }),
+  ).toBeVisible();
+  await page
+    .getByRole("dialog")
+    .locator("footer")
+    .getByRole("button", { name: "关闭" })
+    .click();
+  await page.goto("#/candidates/candidate-linhao?state=loading");
+  await expect(page.getByLabel("候选人详情正在加载")).toBeVisible();
+  await expect(page.locator(".s4-detail-loading > section")).toHaveCount(2);
+});
+
+test("数据管理使用独立导航而不是全局导入按钮", async ({ page }) => {
+  await page.goto("#/candidates");
+  await expect(
+    page.locator(".s1-topbar").getByRole("button", { name: "导入数据" }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "打开数据管理" }).click();
+  await expect(page).toHaveURL(/data\/imports/);
+  await expect(page.getByRole("tab", { name: "数据导入" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.getByRole("tab", { name: "数据导出" }).click();
+  await expect(page).toHaveURL(/data\/exports/);
+  await page.getByRole("tab", { name: "回收站" }).click();
+  await expect(page).toHaveURL(/recycle-bin/);
 });
 
 test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) => {
@@ -337,7 +429,7 @@ test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
   );
   await expect(page.getByRole("tooltip")).toHaveCSS(
     "background-color",
-    "rgb(31, 31, 31)",
+    "rgba(255, 255, 255, 0.98)",
   );
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "专利类型", exact: true }).click();
@@ -411,6 +503,10 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
   await page.locator(".s4-tag-overflow").first().hover();
   await expect(page.getByRole("tooltip")).toBeVisible();
   await expect(page.getByRole("tooltip")).toHaveCSS("border-radius", "6px");
+  await expect(page.getByRole("tooltip")).toHaveCSS(
+    "border-left-color",
+    "rgb(229, 231, 235)",
+  );
 
   await page.goto("#/tasks");
   const activeTab = page.locator(
@@ -541,6 +637,10 @@ test("导入、导出和回收站覆盖异步、重名和恢复冲突", async ({
   await expect(page.getByText("导出任务已创建")).toBeVisible();
 
   await page.goto("#/recycle-bin");
+  await expect(page.getByRole("tab", { name: "回收站" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   const guidance = page.locator(".s4-recycle-guidance");
   const filterBar = page.locator(".s4-filter-bar");
   const guidanceBox = await guidance.boundingBox();

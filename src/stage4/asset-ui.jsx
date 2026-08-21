@@ -15,7 +15,6 @@ import {
   IconButton,
   Modal,
   SearchField,
-  Skeleton,
   StatusBadge,
   Tabs,
   useToast,
@@ -570,11 +569,22 @@ export function Pagination({ page, pages, onChange }) {
 export function AssetListState({ state, label, onRetry, children }) {
   if (state === "loading") {
     return (
-      <div className="s4-list-loading">
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
+      <div className="s4-list-loading" aria-label={`${label}正在加载`}>
+        <header>
+          <span />
+          <span />
+          <span />
+          <span />
+        </header>
+        {[0, 1, 2, 3, 4].map((row) => (
+          <article key={row}>
+            <i />
+            <span />
+            <span />
+            <span />
+            <b />
+          </article>
+        ))}
       </div>
     );
   }
@@ -896,17 +906,37 @@ export function DeleteAssetModal({
   );
 }
 
-export function ActivityTimeline({ items }) {
+export function ActivityTimeline({ items, onEdit, onDelete }) {
   return (
     <ol className="s4-timeline">
-      {items.map(([time, type, content, source]) => (
+      {items.map(([time, type, content, source], index) => (
         <li key={`${time}-${content}`}>
-          <i />
           <time>{time}</time>
+          <i />
           <div>
             <span>
               <b>{type}</b>
               <em>{source}</em>
+              {onEdit || onDelete ? (
+                <span className="s4-timeline-actions">
+                  {onEdit ? (
+                    <button type="button" onClick={() => onEdit(index)}>
+                      <Icon name="edit" />
+                      编辑
+                    </button>
+                  ) : null}
+                  {onDelete ? (
+                    <button
+                      type="button"
+                      className="is-danger"
+                      onClick={() => onDelete(index)}
+                    >
+                      <Icon name="trash" />
+                      删除
+                    </button>
+                  ) : null}
+                </span>
+              ) : null}
             </span>
             <p>{content}</p>
           </div>
@@ -916,22 +946,37 @@ export function ActivityTimeline({ items }) {
   );
 }
 
-export function SourceList({ items }) {
+export function SourceList({ items, onOpen }) {
   return (
     <div className="s4-source-list">
-      {items.map((item) => (
-        <article key={item.title}>
-          <i>
-            <Icon name={item.icon || "link"} />
-          </i>
-          <span>
-            <b>{item.title}</b>
-            <p>{item.description}</p>
-            <small>{item.meta}</small>
-          </span>
-          <StatusBadge tone={item.tone || "success"}>{item.status}</StatusBadge>
-        </article>
-      ))}
+      {items.map((item) => {
+        const open = item.onClick || (onOpen ? () => onOpen(item) : null);
+        const content = (
+          <>
+            <i>
+              <Icon name={item.icon || "link"} />
+            </i>
+            <span>
+              <b>{item.title}</b>
+              <p>{item.description}</p>
+              <small>{item.meta}</small>
+            </span>
+            <StatusBadge tone={item.tone || "success"}>
+              {item.status}
+            </StatusBadge>
+            {open ? (
+              <Icon className="s4-source-open-icon" name="chevronRight" />
+            ) : null}
+          </>
+        );
+        return open ? (
+          <button type="button" key={item.title} onClick={open}>
+            {content}
+          </button>
+        ) : (
+          <article key={item.title}>{content}</article>
+        );
+      })}
     </div>
   );
 }
@@ -1108,6 +1153,9 @@ export function TooltipText({
       bottom: openAbove ? window.innerHeight - rect.top + 6 : "auto",
       width,
       placement: openAbove ? "above" : "below",
+      theme:
+        document.querySelector(".s1-app")?.getAttribute("data-theme") ||
+        "light",
     });
   };
   const showWithDelay = () => {
@@ -1139,7 +1187,7 @@ export function TooltipText({
         ? createPortal(
             <span
               id={tooltipId}
-              className={`s4-floating-tooltip is-${tooltip.placement}`}
+              className={`s4-floating-tooltip is-${tooltip.placement} is-${tooltip.theme}`}
               role="tooltip"
               style={{
                 left: tooltip.left,

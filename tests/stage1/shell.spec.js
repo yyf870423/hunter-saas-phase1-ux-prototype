@@ -100,12 +100,16 @@ test("主题切换即时生效并记忆", async ({ page }) => {
 
 test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   const topbar = page.locator(".s1-topbar");
-  const importButton = topbar.getByRole("button", {
-    name: "导入数据",
-    exact: true,
+  await expect(
+    topbar.getByRole("button", { name: "导入数据", exact: true }),
+  ).toHaveCount(0);
+  const dataManagementButton = page.getByRole("button", {
+    name: "打开数据管理",
   });
-  await expect(importButton.locator('[data-icon="download"]')).toBeVisible();
-  await importButton.click();
+  await expect(
+    dataManagementButton.locator('[data-icon="download"]'),
+  ).toBeVisible();
+  await dataManagementButton.click();
   await expect(page).toHaveURL(/#\/data\/imports$/);
   await expect(page.getByRole("heading", { name: "数据导入" })).toBeVisible();
   await page.goto("#/home");

@@ -31,9 +31,12 @@ function DataManagementNav({ value }) {
         tabs={[
           { value: "imports", label: "数据导入" },
           { value: "exports", label: "数据导出" },
+          { value: "recycle", label: "回收站" },
         ]}
         value={value}
-        onChange={(next) => navigate(`/data/${next}`)}
+        onChange={(next) =>
+          navigate(next === "recycle" ? "/recycle-bin" : `/data/${next}`)
+        }
       />
     </div>
   );
@@ -579,6 +582,7 @@ export function RecycleBinPage() {
         description="正式资产删除后保留 30 天；到期自动永久清理。"
         count={rows.length}
       />
+      <DataManagementNav value="recycle" />
       <div className="s4-recycle-guidance">
         <StateBanner
           tone="warning"
