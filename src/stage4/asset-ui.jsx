@@ -1054,33 +1054,10 @@ export function TooltipText({
   const [eligible, setEligible] = useState(trigger === "hidden-tags");
   const [tooltip, setTooltip] = useState(null);
   const isTruncated = (element) => {
-    if (
+    return (
       element.scrollWidth > element.clientWidth + 1 ||
       element.scrollHeight > element.clientHeight + 1
-    )
-      return true;
-    if (!clampLines) return false;
-    const clone = element.cloneNode(true);
-    Object.assign(clone.style, {
-      position: "fixed",
-      left: "-10000px",
-      top: "0",
-      width: `${element.clientWidth}px`,
-      height: "auto",
-      minHeight: "0",
-      maxHeight: "none",
-      overflow: "visible",
-      display: "block",
-      WebkitLineClamp: "unset",
-      WebkitBoxOrient: "initial",
-      whiteSpace: "normal",
-      visibility: "hidden",
-      pointerEvents: "none",
-    });
-    document.body.appendChild(clone);
-    const fullHeight = clone.getBoundingClientRect().height;
-    clone.remove();
-    return fullHeight > element.clientHeight + 1;
+    );
   };
   useLayoutEffect(() => {
     const element = anchorRef.current;

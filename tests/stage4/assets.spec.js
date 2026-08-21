@@ -374,6 +374,30 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
   await expect(page.getByRole("tooltip")).toHaveCount(0);
 
   await page.goto("#/patents");
+  const summaries = page.locator(".s4-academic-summary");
+  const longSummaryMetrics = await summaries.first().evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+  }));
+  expect(longSummaryMetrics.scrollHeight).toBeGreaterThan(
+    longSummaryMetrics.clientHeight,
+  );
+  await summaries.first().hover();
+  await expect(page.getByRole("tooltip")).toBeVisible();
+  await page.mouse.move(10, 10);
+  await page.goto("#/mappings");
+  const untruncatedSummary = page.locator(".s4-landscape-goal").nth(1);
+  const shortSummaryMetrics = await untruncatedSummary.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+  }));
+  expect(shortSummaryMetrics.scrollHeight).toBeLessThanOrEqual(
+    shortSummaryMetrics.clientHeight + 1,
+  );
+  await expect(untruncatedSummary).not.toHaveAttribute("tabindex", "0");
+  await untruncatedSummary.hover();
+  await expect(page.getByRole("tooltip")).toHaveCount(0);
+  await page.goto("#/patents");
   await page
     .locator(".s4-academic-list article")
     .first()
@@ -390,9 +414,19 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
     '.app-tabs [role="tab"][aria-selected="true"]',
   );
   await expect(activeTab).toBeVisible();
-  expect(
-    await activeTab.evaluate((element) => getComputedStyle(element).boxShadow),
-  ).toContain("inset");
+  const activeTabStyle = await activeTab.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      borderBottomWidth: style.borderBottomWidth,
+      borderBottomColor: style.borderBottomColor,
+      backgroundColor: style.backgroundColor,
+      fontWeight: Number(style.fontWeight),
+    };
+  });
+  expect(activeTabStyle.borderBottomWidth).toBe("3px");
+  expect(activeTabStyle.borderBottomColor).not.toBe("rgba(0, 0, 0, 0)");
+  expect(activeTabStyle.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+  expect(activeTabStyle.fontWeight).toBeGreaterThanOrEqual(700);
 
   await page.goto("#/signals");
   const signalFeedBox = await page.locator(".s2-signal-feed").boundingBox();
