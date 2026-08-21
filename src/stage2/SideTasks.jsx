@@ -1,6 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import {
+  buildRecommendationReportVersions,
+  RecommendationReportFile,
+} from "../components/RecommendationReportFile";
 import {
   Button,
   IconButton,
@@ -483,14 +487,49 @@ function RecommendationReportTask() {
   const [authMode, setAuthMode] = useState("confirm");
   const [revised, setRevised] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
+  const candidateName =
+    sessionStorage.getItem("hunter-recommendation-candidate") || "林昊";
+  const candidateRecord = useMemo(() => {
+    try {
+      return JSON.parse(
+        sessionStorage.getItem("hunter-recommendation-candidate-record"),
+      );
+    } catch {
+      return null;
+    }
+  }, []);
   const reportRequirement =
     sessionStorage.getItem("hunter-recommendation-task-prompt") ||
     "面向客户技术负责人，重点说明真机部署、团队管理和风险核实情况。";
+  const baseReportVersions = buildRecommendationReportVersions(candidateName);
+  const reportVersions = revised
+    ? [
+        {
+          ...baseReportVersions[0],
+          version: "v3",
+          createdAt: "刚刚",
+          fileName: `${candidateName}-具身智能VLA算法负责人-推荐报告-v3.md`,
+          summary: `${candidateName}具备机器人学习、VLA、真机部署及 12 人团队管理经验，与岗位目标高度一致。建议由客户技术负责人优先安排岗位沟通。`,
+        },
+        ...baseReportVersions,
+      ]
+    : baseReportVersions;
+  useEffect(() => {
+    const candidateId = sessionStorage.getItem(
+      "hunter-recommendation-candidate-id",
+    );
+    if (candidateId) {
+      sessionStorage.setItem(
+        `hunter-recommendation-report-${candidateId}`,
+        "1",
+      );
+    }
+  }, []);
   const plan = [
     {
       id: "read",
       title: "读取候选人与岗位资料",
-      detail: "使用当前岗位 v3 和林昊候选人资料 v6。",
+      detail: `使用当前岗位 v3 和${candidateName}候选人资料 v6。`,
       status: "done",
     },
     {
@@ -517,10 +556,16 @@ function RecommendationReportTask() {
         </button>
         <div>
           <small>候选人推荐报告</small>
-          <h1>为林昊生成客户推荐报告</h1>
-          <p>关联：具身智能 VLA 算法负责人 · 林昊</p>
+          <h1>为{candidateName}生成客户推荐报告</h1>
+          <p>关联：具身智能 VLA 算法负责人 · {candidateName}</p>
         </div>
         <div>
+          <Button
+            size="sm"
+            onClick={() => navigate("/positions/position-vla?tab=matching")}
+          >
+            查看岗位匹配
+          </Button>
           <StatusBadge tone={revised ? "success" : "warning"}>
             {revised ? "完成" : "等待用户"}
           </StatusBadge>
@@ -554,11 +599,11 @@ function RecommendationReportTask() {
             <HunterReply
               markdown={`推荐报告初稿已经生成。我只引用已核实的候选人资料和本岗位匹配结论，并把尚未确认的信息放入风险提示。
 
-## 林昊｜具身智能 VLA 算法负责人推荐报告
+## ${candidateName}｜具身智能 VLA 算法负责人推荐报告
 
 ### 推荐结论
 
-林昊当前担任拓界机器人机器人学习负责人，综合匹配分 **91 分**。其 VLA、机器人学习、真机部署和团队管理经历与岗位目标高度一致，建议进入客户沟通。
+${candidateName}当前担任${candidateRecord?.company || "拓界机器人"}${candidateRecord?.title || "机器人学习负责人"}，综合匹配分 **${candidateRecord?.score || 91} 分**。其 VLA、机器人学习、真机部署和团队管理经历与岗位目标高度一致，建议进入客户沟通。
 
 ### 核心匹配证据
 
@@ -574,6 +619,17 @@ function RecommendationReportTask() {
 ### 推荐沟通重点
 
 重点讨论其真机数据闭环中的个人决策范围、团队规模，以及是否接受北京为主的工作安排。`}
+            />
+            <RecommendationReportFile
+              candidateName={candidateName}
+              versions={reportVersions}
+              showHistory
+              onRegenerate={() => {
+                setComposer(
+                  "请基于当前最新的候选人和岗位资料重新生成整份推荐报告，并保留所有风险提示。",
+                );
+                notify("已将重新生成要求放入输入框");
+              }}
             />
             {revised ? (
               <>

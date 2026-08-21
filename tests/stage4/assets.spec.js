@@ -392,6 +392,9 @@ test("数据管理使用独立导航而不是全局导入按钮", async ({ page 
 
 test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) => {
   await page.goto("#/positions/position-vla?tab=pipeline");
+  await expect(
+    page.getByRole("slider", { name: "候选人流程横向位置" }),
+  ).toBeVisible();
   const firstCandidate = page.locator(".s4-kanban article").first();
   const targetStage = page.locator(".s4-kanban > section").nth(2);
   await firstCandidate.dragTo(targetStage);
@@ -415,6 +418,33 @@ test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) 
   await expect(
     stageModal.locator(".s4-stage-config article.is-fixed"),
   ).toHaveCount(5);
+  await expect(
+    stageModal.locator(".s4-stage-config article.is-fixed .s4-select > button"),
+  ).toHaveCount(5);
+  const movableStages = stageModal.locator(
+    ".s4-stage-config article:not(.is-fixed)",
+  );
+  await movableStages.first().evaluate((element) => {
+    element.dispatchEvent(
+      new DragEvent("dragstart", {
+        bubbles: true,
+        dataTransfer: new DataTransfer(),
+      }),
+    );
+  });
+  await movableStages.nth(1).evaluate((element) => {
+    element.dispatchEvent(
+      new DragEvent("dragover", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: new DataTransfer(),
+      }),
+    );
+  });
+  await expect(movableStages.nth(1)).toHaveClass(/is-drop-target/);
+  await movableStages.first().evaluate((element) => {
+    element.dispatchEvent(new DragEvent("dragend", { bubbles: true }));
+  });
   await stageModal.getByRole("button", { name: "保存配置" }).click();
   await expect(page.getByText("岗位推进阶段已保存")).toBeVisible();
 
@@ -433,10 +463,20 @@ test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) 
 
   await page.getByRole("tab", { name: /角色适配通过/ }).click();
   await page.locator(".s4-match-result-list button").first().click();
-  const reportButton = page.getByRole("button", { name: "生成推荐报告" });
-  if (!(await reportButton.count())) {
-    await page.getByRole("button", { name: "加入岗位储备" }).click();
-  }
+  await expect(page.getByText(/推荐报告-v2\.md/)).toBeVisible();
+  await page.getByRole("button", { name: "在线查看" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "在线查看推荐报告" }),
+  ).toBeVisible();
+  await page
+    .getByRole("dialog", { name: "在线查看推荐报告" })
+    .getByRole("button", { name: "关闭", exact: true })
+    .first()
+    .click();
+
+  await page.locator(".s4-match-result-list button").nth(1).click();
+  const joinButton = page.getByRole("button", { name: "加入岗位储备" });
+  if (await joinButton.count()) await joinButton.click();
   await page.getByRole("button", { name: "生成推荐报告" }).click();
   await expect(
     page.getByRole("dialog", { name: /生成推荐报告/ }),
@@ -454,7 +494,20 @@ test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) 
     .click();
 
   await page.getByRole("tab", { name: "岗位资料" }).click();
-  await expect(page.getByRole("button", { name: "编辑" })).toHaveCount(0);
+  await page.getByRole("button", { name: "版本历史" }).click();
+  const historyModal = page.getByRole("dialog", { name: "岗位 JD 版本" });
+  await historyModal.getByRole("button", { name: /v2/ }).click();
+  await expect(historyModal.getByText(/建设机器人数据采集/)).toBeVisible();
+  await expect(
+    historyModal.getByRole("button", { name: "恢复 v2" }),
+  ).toBeVisible();
+  await historyModal
+    .getByRole("button", { name: "关闭", exact: true })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("button", { name: "编辑", exact: true }),
+  ).toHaveCount(1);
   await page.getByRole("button", { name: "编辑资料" }).click();
   const modal = page.getByRole("dialog", { name: "编辑岗位基本资料" });
   await modal.getByRole("button", { name: "招聘状态" }).click();
@@ -474,6 +527,22 @@ test("大批量匹配结果中的模拟候选人可以进入完整档案", async
   await expect(
     page.getByRole("heading", { level: 1, name: selectedName }),
   ).toBeVisible();
+});
+
+test("推荐报告任务完成后回流岗位匹配详情", async ({ page }) => {
+  await page.goto("#/positions/position-vla?tab=matching");
+  await page.getByRole("tab", { name: /角色适配通过/ }).click();
+  await page.locator(".s4-match-result-list button").nth(1).click();
+  await page.getByRole("button", { name: "加入岗位储备" }).click();
+  await page.getByRole("button", { name: "生成推荐报告" }).click();
+  await page
+    .getByLabel("报告要求")
+    .fill("突出候选人的真机部署和团队管理范围。");
+  await page.getByRole("button", { name: "创建并开始" }).click();
+  await expect(page).toHaveURL(/tasks\/task-recommend-linhao/);
+  await page.getByRole("button", { name: "查看岗位匹配" }).click();
+  await expect(page).toHaveURL(/positions\/position-vla\?tab=matching/);
+  await expect(page.getByText(/推荐报告-v2\.md/)).toBeVisible();
 });
 
 test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", async ({ page }) => {

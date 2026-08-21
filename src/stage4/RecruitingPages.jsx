@@ -1,6 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import {
+  buildRecommendationReportVersions,
+  RecommendationReportFile,
+} from "../components/RecommendationReportFile";
 import {
   ActivityTimeline,
   AssetPageHeader,
@@ -10,6 +14,7 @@ import {
   DeleteAssetModal,
   DetailHeader,
   DetailTabs,
+  Drawer,
   FieldGroup,
   FormField,
   Modal,
@@ -38,7 +43,34 @@ function PositionProfile({ detail }) {
   const navigate = useNavigate();
   const notify = useToast();
   const [versionOpen, setVersionOpen] = useState(false);
+  const [selectedVersion, setSelectedVersion] = useState("v3");
   const [editSection, setEditSection] = useState(null);
+  const jdVersions = useMemo(
+    () => [
+      {
+        id: "v3",
+        label: "v3 · 当前版本",
+        meta: "2026-08-19 · 岗位解析后用户确认",
+        content: detail.jd,
+        current: true,
+      },
+      {
+        id: "v2",
+        label: "v2",
+        meta: "2026-08-12 · 客户补充团队规模与地点",
+        content: `岗位职责\n1. 负责具身智能 VLA 算法方向的技术规划与工程落地，带领团队完成多模态感知、策略学习和真机部署。\n2. 建设机器人数据采集、训练、评测和迭代闭环，推动算法在仓储与柔性制造场景稳定交付。\n3. 与硬件、数据和产品团队协作，拆解季度目标并识别关键技术风险。\n\n任职要求\n1. 计算机、自动化或机器人相关专业硕士及以上学历。\n2. 8 年以上算法研发经验，具备机器人学习、强化学习或多模态模型经验。\n3. 有 8 人以上团队管理经验，能够负责跨团队项目交付。\n4. 工作地点以北京为主。`,
+      },
+      {
+        id: "v1",
+        label: "v1 · 原始 JD",
+        meta: "2026-08-08 · 用户输入",
+        content: `岗位职责\n负责公司具身智能 VLA 算法方向，推进模型训练和机器人真机落地，带领算法团队完成客户项目。\n\n任职要求\n熟悉机器人学习、强化学习和多模态大模型，有团队管理经验，能够在北京工作。`,
+      },
+    ],
+    [detail.jd],
+  );
+  const activeVersion =
+    jdVersions.find((item) => item.id === selectedVersion) || jdVersions[0];
   return (
     <div className="s4-detail-stack">
       <FieldGroup
@@ -66,31 +98,25 @@ function PositionProfile({ detail }) {
             ["薪资范围", detail.salary],
             ["最低工作年限", detail.experience],
             ["学历要求", detail.education],
+            [
+              "来源机会",
+              <button
+                type="button"
+                className="s4-position-source-inline"
+                onClick={() => navigate("/opportunities/opportunity-xinglan")}
+              >
+                <span>
+                  <b>{detail.sourceOpportunity}</b>
+                  <small>已确认 · 已形成 2 个岗位</small>
+                </span>
+                <Icon name="chevronRight" />
+              </button>,
+            ],
           ]}
         />
         <div className="s4-labeled-row">
           <b>关键技能</b>
           <TagList items={detail.skills} tone="info" />
-        </div>
-        <div className="s4-position-source-row">
-          <span>
-            <b>来源机会</b>
-            <small>该岗位由已确认的招聘机会形成</small>
-          </span>
-          <button
-            type="button"
-            className="s4-position-source-link"
-            onClick={() => navigate("/opportunities/opportunity-xinglan")}
-          >
-            <i>
-              <Icon name="signal" />
-            </i>
-            <span>
-              <b>{detail.sourceOpportunity}</b>
-              <small>星澜机器人 · 已形成 2 个岗位</small>
-            </span>
-            <Icon name="chevronRight" />
-          </button>
         </div>
       </FieldGroup>
       <FieldGroup
@@ -200,48 +226,70 @@ function PositionProfile({ detail }) {
       <Modal
         open={versionOpen}
         close={() => setVersionOpen(false)}
-        size="lg"
+        size="xl"
         title="岗位 JD 版本"
-        description="恢复历史版本会形成新的变化记录，不覆盖审计历史"
+        description="先查看当时的完整内容，再决定是否恢复；恢复后会形成新版本"
+        footer={
+          <>
+            <Button onClick={() => setVersionOpen(false)}>关闭</Button>
+            <Button
+              tone="primary"
+              disabled={activeVersion.current}
+              onClick={() => {
+                setVersionOpen(false);
+                notify(`${activeVersion.id} 已恢复为新版本 v4`);
+              }}
+            >
+              {activeVersion.current ? "当前版本" : `恢复 ${activeVersion.id}`}
+            </Button>
+          </>
+        }
       >
-        <div className="s4-version-list">
-          <article className="is-current">
-            <span>
-              <b>v3 · 当前版本</b>
-              <small>2026-08-19 · 岗位解析后用户确认</small>
-            </span>
-            <StatusBadge tone="success">当前</StatusBadge>
-          </article>
-          <article>
-            <span>
-              <b>v2</b>
-              <small>2026-08-12 · 客户补充团队规模与地点</small>
-            </span>
-            <Button
-              size="sm"
-              onClick={() => {
-                setVersionOpen(false);
-                notify("v2 已恢复为新版本 v4");
-              }}
-            >
-              恢复
-            </Button>
-          </article>
-          <article>
-            <span>
-              <b>v1 · 原始 JD</b>
-              <small>2026-08-08 · 用户输入</small>
-            </span>
-            <Button
-              size="sm"
-              onClick={() => {
-                setVersionOpen(false);
-                notify("v1 已恢复为新版本 v4");
-              }}
-            >
-              恢复
-            </Button>
-          </article>
+        <div className="s4-version-review">
+          <nav aria-label="岗位 JD 历史版本">
+            {jdVersions.map((item) => (
+              <button
+                type="button"
+                className={item.id === activeVersion.id ? "is-active" : ""}
+                key={item.id}
+                onClick={() => setSelectedVersion(item.id)}
+              >
+                <span>
+                  <b>{item.label}</b>
+                  <small>{item.meta}</small>
+                </span>
+                {item.current ? (
+                  <StatusBadge tone="success">当前</StatusBadge>
+                ) : (
+                  <Icon name="chevronRight" />
+                )}
+              </button>
+            ))}
+          </nav>
+          <section>
+            <header>
+              <span>
+                <small>正在查看</small>
+                <h3>{activeVersion.label}</h3>
+              </span>
+              <small>{activeVersion.meta}</small>
+            </header>
+            <div className="s4-jd-content is-version-preview">
+              {activeVersion.content
+                .split("\n")
+                .map((line, index) =>
+                  line ? (
+                    /^(岗位职责|任职要求)$/.test(line) ? (
+                      <h3 key={index}>{line}</h3>
+                    ) : (
+                      <p key={index}>{line}</p>
+                    )
+                  ) : (
+                    <br key={index} />
+                  ),
+                )}
+            </div>
+          </section>
         </div>
       </Modal>
       <PositionSectionEditor
@@ -599,8 +647,25 @@ function MatchScore({ score, compact = false }) {
   );
 }
 
+function pipelineStageTone(stage = "") {
+  if (stage === "储备") return "reserve";
+  if (stage === "已入职") return "success";
+  if (["已落选", "候选人放弃", "候选人不合适"].includes(stage)) return "danger";
+  return "active";
+}
+
+function PipelineStageTag({ stage, prefix = false }) {
+  return (
+    <span className={`s4-pipeline-stage-tag is-${pipelineStageTone(stage)}`}>
+      {prefix ? "流程中 · " : ""}
+      {stage}
+    </span>
+  );
+}
+
 function CandidatePipeline() {
   const notify = useToast();
+  const boardRef = useRef(null);
   const [view, setView] = useState("board");
   const [stageModal, setStageModal] = useState(false);
   const [stages, setStages] = useState(initialPipelineStages);
@@ -609,6 +674,7 @@ function CandidatePipeline() {
   const [pendingMove, setPendingMove] = useState(null);
   const [candidateOpen, setCandidateOpen] = useState(null);
   const [filter, setFilter] = useState("全部");
+  const [boardScroll, setBoardScroll] = useState(0);
   const visibleGroups =
     filter === "全部"
       ? stages
@@ -707,96 +773,126 @@ function CandidatePipeline() {
         ))}
       </div>
       {view === "board" ? (
-        <div className="s4-kanban">
-          {visibleGroups.map((stage) => (
-            <section
-              className={`s4-kanban-${stage.tone} ${dragOver === stage.id ? "is-drag-over" : ""}`}
-              key={stage.id}
-              onDragOver={(event) => {
-                event.preventDefault();
-                if (dragging?.from !== stage.id) setDragOver(stage.id);
-              }}
-              onDragLeave={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget)) {
-                  setDragOver(null);
-                }
-              }}
-              onDrop={(event) => {
-                event.preventDefault();
-                let dragData = dragging;
-                if (!dragData) {
-                  try {
-                    dragData = JSON.parse(
-                      event.dataTransfer.getData("text/plain"),
-                    );
-                  } catch {
-                    dragData = null;
+        <div className="s4-kanban-shell">
+          <div
+            className="s4-kanban"
+            ref={boardRef}
+            onScroll={(event) => {
+              const { scrollLeft, scrollWidth, clientWidth } =
+                event.currentTarget;
+              const max = Math.max(1, scrollWidth - clientWidth);
+              setBoardScroll(Math.round((scrollLeft / max) * 100));
+            }}
+          >
+            {visibleGroups.map((stage) => (
+              <section
+                className={`s4-kanban-${stage.tone} ${dragOver === stage.id ? "is-drag-over" : ""}`}
+                key={stage.id}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  if (dragging?.from !== stage.id) setDragOver(stage.id);
+                }}
+                onDragLeave={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setDragOver(null);
                   }
-                }
-                if (dragData && dragData.from !== stage.id) {
-                  setPendingMove({
-                    ...dragData,
-                    to: stage.id,
-                    toName: stage.name,
-                  });
-                }
-                setDragOver(null);
-              }}
-            >
-              <header>
-                <b>{stage.name}</b>
-                <em>{stage.people.length}</em>
-              </header>
-              <div>
-                {stage.people.map((personId) => {
-                  const person = pipelineCandidateSeed[personId];
-                  return (
-                    <article
-                      draggable
-                      className={
-                        dragging?.personId === personId ? "is-dragging" : ""
-                      }
-                      key={personId}
-                      onDragStart={(event) => {
-                        event.dataTransfer.effectAllowed = "move";
-                        const dragData = {
-                          personId,
-                          from: stage.id,
-                          fromName: stage.name,
-                        };
-                        event.dataTransfer.setData(
-                          "text/plain",
-                          JSON.stringify(dragData),
-                        );
-                        setDragging(dragData);
-                      }}
-                      onDragEnd={() => {
-                        setDragging(null);
-                        setDragOver(null);
-                      }}
-                      onClick={() => {
-                        if (!dragging)
-                          setCandidateOpen({ ...person, stage: stage.name });
-                      }}
-                    >
-                      <time>{person.days}</time>
-                      <span>
-                        <b>{person.name}</b>
-                        <small>
-                          {person.company} · {person.title}
-                        </small>
-                      </span>
-                      <MatchScore score={person.score} compact />
-                      <p>{person.note}</p>
-                    </article>
-                  );
-                })}
-                {!stage.people.length ? (
-                  <span className="s4-kanban-empty">拖动候选人到此阶段</span>
-                ) : null}
-              </div>
-            </section>
-          ))}
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  let dragData = dragging;
+                  if (!dragData) {
+                    try {
+                      dragData = JSON.parse(
+                        event.dataTransfer.getData("text/plain"),
+                      );
+                    } catch {
+                      dragData = null;
+                    }
+                  }
+                  if (dragData && dragData.from !== stage.id) {
+                    setPendingMove({
+                      ...dragData,
+                      to: stage.id,
+                      toName: stage.name,
+                    });
+                  }
+                  setDragOver(null);
+                }}
+              >
+                <header>
+                  <b>{stage.name}</b>
+                  <em>{stage.people.length}</em>
+                </header>
+                <div>
+                  {stage.people.map((personId) => {
+                    const person = pipelineCandidateSeed[personId];
+                    return (
+                      <article
+                        draggable
+                        className={
+                          dragging?.personId === personId ? "is-dragging" : ""
+                        }
+                        key={personId}
+                        onDragStart={(event) => {
+                          event.dataTransfer.effectAllowed = "move";
+                          const dragData = {
+                            personId,
+                            from: stage.id,
+                            fromName: stage.name,
+                          };
+                          event.dataTransfer.setData(
+                            "text/plain",
+                            JSON.stringify(dragData),
+                          );
+                          setDragging(dragData);
+                        }}
+                        onDragEnd={() => {
+                          setDragging(null);
+                          setDragOver(null);
+                        }}
+                        onClick={() => {
+                          if (!dragging)
+                            setCandidateOpen({ ...person, stage: stage.name });
+                        }}
+                      >
+                        <header>
+                          <b>{person.name}</b>
+                          <time>{person.days}</time>
+                        </header>
+                        <strong>{person.title}</strong>
+                        <small>{person.company}</small>
+                        <footer>
+                          <MatchScore score={person.score} compact />
+                          <span>查看推进记录</span>
+                        </footer>
+                        <p>{person.note}</p>
+                      </article>
+                    );
+                  })}
+                  {!stage.people.length ? (
+                    <span className="s4-kanban-empty">拖动候选人到此阶段</span>
+                  ) : null}
+                </div>
+              </section>
+            ))}
+          </div>
+          <input
+            className="s4-kanban-scroll-control"
+            type="range"
+            min="0"
+            max="100"
+            value={boardScroll}
+            aria-label="候选人流程横向位置"
+            onChange={(event) => {
+              const value = Number(event.target.value);
+              setBoardScroll(value);
+              if (boardRef.current) {
+                const max =
+                  boardRef.current.scrollWidth - boardRef.current.clientWidth;
+                boardRef.current.scrollLeft = (max * value) / 100;
+              }
+            }}
+          />
         </div>
       ) : (
         <PipelineList stages={stages} onOpen={setCandidateOpen} />
@@ -845,17 +941,7 @@ function PipelineList({ stages, onOpen }) {
                   {person.company} · {person.title}
                 </small>
               </b>
-              <StatusBadge
-                tone={
-                  stage.tone === "success"
-                    ? "success"
-                    : stage.tone === "danger"
-                      ? "danger"
-                      : "info"
-                }
-              >
-                {stage.name}
-              </StatusBadge>
+              <PipelineStageTag stage={stage.name} />
               <MatchScore score={person.score} compact />
               <p>{person.note}</p>
               <button
@@ -875,6 +961,7 @@ function PipelineList({ stages, onOpen }) {
 function StageConfigModal({ open, close, initialStages, onSave }) {
   const [stages, setStages] = useState(initialStages);
   const [dragging, setDragging] = useState(null);
+  const [dropTarget, setDropTarget] = useState(null);
   const reorder = (targetId) => {
     if (!dragging || dragging === targetId) return;
     const from = stages.findIndex((stage) => stage.id === dragging);
@@ -884,6 +971,7 @@ function StageConfigModal({ open, close, initialStages, onSave }) {
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
     setStages(next);
+    setDropTarget(null);
   };
   return (
     <Modal
@@ -904,13 +992,24 @@ function StageConfigModal({ open, close, initialStages, onSave }) {
       <div className="s4-stage-config">
         {stages.map((stage) => (
           <article
-            className={stage.fixed ? "is-fixed" : ""}
+            className={`${stage.fixed ? "is-fixed" : ""} ${dragging === stage.id ? "is-dragging" : ""} ${dropTarget === stage.id ? "is-drop-target" : ""}`.trim()}
             draggable={!stage.fixed}
             key={stage.id}
-            onDragStart={() => setDragging(stage.id)}
-            onDragOver={(event) => event.preventDefault()}
+            onDragStart={() => {
+              setDragging(stage.id);
+              setDropTarget(null);
+            }}
+            onDragOver={(event) => {
+              if (!stage.fixed && dragging !== stage.id) {
+                event.preventDefault();
+                setDropTarget(stage.id);
+              }
+            }}
             onDrop={() => reorder(stage.id)}
-            onDragEnd={() => setDragging(null)}
+            onDragEnd={() => {
+              setDragging(null);
+              setDropTarget(null);
+            }}
           >
             <Icon name={stage.fixed ? "lock" : "menu"} />
             <TextInput
@@ -1033,17 +1132,19 @@ function PipelineCandidateModal({ candidate, close }) {
   const [note, setNote] = useState("");
   const [editing, setEditing] = useState(false);
   return (
-    <Modal
+    <Drawer
       open={Boolean(candidate)}
       close={close}
-      size="xl"
+      className="s4-pipeline-record-drawer"
       title={`${candidate?.name || "候选人"} · 完整推进记录`}
-      description={`${candidate?.company || "—"} · ${candidate?.title || "—"}`}
     >
       <div className="s4-pipeline-candidate-detail">
+        <p className="s4-pipeline-record-role">
+          {candidate?.company || "—"} · {candidate?.title || "—"}
+        </p>
         <header>
           <span>
-            <StatusBadge tone="info">{candidate?.stage || "储备"}</StatusBadge>
+            <PipelineStageTag stage={candidate?.stage || "储备"} />
             <MatchScore score={candidate?.score} />
           </span>
           <Button size="sm" onClick={() => notify("已打开候选人完整档案")}>
@@ -1116,7 +1217,7 @@ function PipelineCandidateModal({ candidate, close }) {
           />
         </section>
       </div>
-    </Modal>
+    </Drawer>
   );
 }
 
@@ -1218,7 +1319,11 @@ const matchTabs = [
 function MatchingResults() {
   const navigate = useNavigate();
   const notify = useToast();
-  const [selected, setSelected] = useState(matchingCatalog[0]?.id);
+  const [selected, setSelected] = useState(
+    () =>
+      sessionStorage.getItem("hunter-matching-selected-candidate") ||
+      matchingCatalog[0]?.id,
+  );
   const [scope, setScope] = useState("all");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -1235,6 +1340,22 @@ function MatchingResults() {
         .map((item) => [item.id, item.pipelineStage]),
     ),
   );
+  const [reportFiles] = useState(() => {
+    const generatedId = sessionStorage.getItem(
+      "hunter-recommendation-candidate-id",
+    );
+    const generatedName = sessionStorage.getItem(
+      "hunter-recommendation-candidate",
+    );
+    return {
+      [matchingCatalog[0].id]: buildRecommendationReportVersions(
+        matchingCatalog[0].name,
+      ),
+      ...(generatedId && generatedName
+        ? { [generatedId]: buildRecommendationReportVersions(generatedName) }
+        : {}),
+    };
+  });
   const [runOpen, setRunOpen] = useState(false);
   const [runMode, setRunMode] = useState("complete");
   const [reportCandidate, setReportCandidate] = useState(null);
@@ -1318,6 +1439,21 @@ function MatchingResults() {
     });
     notify(`${current.name} 已恢复到匹配结果`);
     changeScope("all");
+  };
+  const startReportTask = (candidate, requirement) => {
+    sessionStorage.setItem(
+      "hunter-recommendation-task-prompt",
+      requirement ||
+        "重点说明候选人的 VLA 落地能力、团队管理范围和岗位适配证据。",
+    );
+    sessionStorage.setItem("hunter-recommendation-candidate", candidate.name);
+    sessionStorage.setItem("hunter-recommendation-candidate-id", candidate.id);
+    sessionStorage.setItem(
+      "hunter-recommendation-candidate-record",
+      JSON.stringify(candidate),
+    );
+    sessionStorage.setItem("hunter-matching-selected-candidate", candidate.id);
+    navigate("/tasks/task-recommend-linhao");
   };
   return (
     <div className="s4-match-shell">
@@ -1411,7 +1547,7 @@ function MatchingResults() {
                           : "角色适配通过"}
                   </em>
                   {pipelineStages[item.id] ? (
-                    <i>流程：{pipelineStages[item.id]}</i>
+                    <PipelineStageTag stage={pipelineStages[item.id]} prefix />
                   ) : null}
                 </span>
                 <Icon name="chevronRight" />
@@ -1434,9 +1570,7 @@ function MatchingResults() {
                 {current.company} · {current.title}
               </p>
               {pipelineStages[current.id] ? (
-                <StatusBadge tone="info">
-                  流程中 · {pipelineStages[current.id]}
-                </StatusBadge>
+                <PipelineStageTag stage={pipelineStages[current.id]} prefix />
               ) : null}
             </span>
             <MatchScore score={current.score} />
@@ -1504,6 +1638,37 @@ function MatchingResults() {
               </FieldGroup>
             </>
           )}
+          <FieldGroup title="推荐报告">
+            {reportFiles[current.id] ? (
+              <RecommendationReportFile
+                candidateName={current.name}
+                versions={reportFiles[current.id]}
+                showHistory={false}
+                onRegenerate={() => startReportTask(current)}
+              />
+            ) : (
+              <div className="s4-report-empty">
+                <span>
+                  <Icon name="file" />
+                  <b>未生成过推荐报告</b>
+                  <small>
+                    {pipelineStages[current.id]
+                      ? "可创建支线任务生成报告，完成后最新文件会显示在这里。"
+                      : "候选人加入岗位流程后，才可以生成面向客户的推荐报告。"}
+                  </small>
+                </span>
+                {pipelineStages[current.id] ? (
+                  <Button
+                    size="sm"
+                    icon="sparkles"
+                    onClick={() => setReportCandidate(current)}
+                  >
+                    生成推荐报告
+                  </Button>
+                ) : null}
+              </div>
+            )}
+          </FieldGroup>
           <footer className="s4-match-actions">
             <Button
               onClick={() =>
@@ -1534,14 +1699,7 @@ function MatchingResults() {
                 >
                   标记不合适
                 </Button>
-                {pipelineStages[current.id] ? (
-                  <Button
-                    icon="sparkles"
-                    onClick={() => setReportCandidate(current)}
-                  >
-                    生成推荐报告
-                  </Button>
-                ) : (
+                {!pipelineStages[current.id] ? (
                   <Button
                     tone="primary"
                     disabled={
@@ -1557,7 +1715,7 @@ function MatchingResults() {
                   >
                     加入岗位储备
                   </Button>
-                )}
+                ) : null}
               </>
             )}
           </footer>
@@ -1580,13 +1738,9 @@ function MatchingResults() {
             <Button
               tone="primary"
               onClick={() => {
-                sessionStorage.setItem(
-                  "hunter-recommendation-task-prompt",
-                  reportPrompt ||
-                    "重点说明候选人的 VLA 落地能力、团队管理范围和岗位适配证据。",
-                );
+                const candidate = reportCandidate;
                 setReportCandidate(null);
-                navigate("/tasks/task-recommend-linhao");
+                startReportTask(candidate, reportPrompt);
               }}
             >
               创建并开始

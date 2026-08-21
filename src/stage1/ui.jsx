@@ -167,7 +167,14 @@ export function Modal({
   );
 }
 
-export function Drawer({ open, close, title, children, side = "right" }) {
+export function Drawer({
+  open,
+  close,
+  title,
+  children,
+  side = "right",
+  className = "",
+}) {
   const titleId = useId();
   useOverlay(open, close);
   if (!open) return null;
@@ -179,7 +186,7 @@ export function Drawer({ open, close, title, children, side = "right" }) {
       }}
     >
       <aside
-        className={`s1-drawer s1-drawer-${side}`}
+        className={`s1-drawer s1-drawer-${side} ${className}`.trim()}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

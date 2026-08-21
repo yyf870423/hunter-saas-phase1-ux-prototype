@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
   Button,
+  Drawer,
   EmptyState,
   IconButton,
   Modal,
@@ -1735,4 +1736,4 @@ export function NotFoundState({ label, onBack }) {
   );
 }
 
-export { Button, Modal, StatusBadge, Tabs, useToast };
+export { Button, Drawer, Modal, StatusBadge, Tabs, useToast };

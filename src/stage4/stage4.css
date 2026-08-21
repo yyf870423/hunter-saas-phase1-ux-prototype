@@ -6006,84 +6006,6 @@
 }
 
 /* Position detail: section ownership, recruitment pipeline and matching review */
-.s4-position-source-row {
-  display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
-  align-items: center;
-  gap: 18px;
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--s1-line);
-}
-.s4-position-source-row > span b,
-.s4-position-source-row > span small {
-  display: block;
-}
-.s4-position-source-row > span b {
-  font-size: 12px;
-  line-height: 18px;
-}
-.s4-position-source-row > span small {
-  margin-top: 3px;
-  color: var(--s1-muted);
-  font-size: 11px;
-  line-height: 16px;
-}
-.s4-position-source-link {
-  display: grid;
-  min-width: 0;
-  grid-template-columns: 34px minmax(0, 1fr) 14px;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 11px;
-  color: var(--s1-ink);
-  text-align: left;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 8px;
-  cursor: pointer;
-}
-.s4-position-source-link:hover {
-  background: var(--s1-accent-soft);
-  border-color: color-mix(in srgb, var(--s1-accent) 30%, var(--s1-line));
-}
-.s4-position-source-link > i {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  color: var(--s1-accent);
-  background: var(--s1-surface);
-  border: 1px solid var(--s1-line);
-  border-radius: 7px;
-}
-.s4-position-source-link > i svg {
-  width: 15px;
-}
-.s4-position-source-link > span {
-  min-width: 0;
-}
-.s4-position-source-link b,
-.s4-position-source-link small {
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.s4-position-source-link b {
-  font-size: 12px;
-  line-height: 18px;
-}
-.s4-position-source-link small {
-  margin-top: 2px;
-  color: var(--s1-muted);
-  font-size: 11px;
-  line-height: 16px;
-}
-.s4-position-source-link > svg {
-  width: 13px;
-  color: var(--s1-subtle);
-}
 .s4-position-analysis-editor {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -7335,10 +7257,6 @@
     grid-template-columns: 1fr;
     gap: 5px;
   }
-  .s4-position-source-row {
-    grid-template-columns: 1fr;
-    gap: 9px;
-  }
   .s4-position-analysis-editor {
     grid-template-columns: 1fr;
   }
@@ -7676,5 +7594,518 @@
   }
   .s4-import-summary > dl {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Position review refinements: compact source, evidence-led versions and report files */
+.s4-position-source-inline {
+  display: inline-grid;
+  max-width: 100%;
+  grid-template-columns: minmax(0, 1fr) 13px;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.s4-position-source-inline:hover b {
+  color: var(--s1-accent);
+}
+.s4-position-source-inline span,
+.s4-position-source-inline b,
+.s4-position-source-inline small {
+  display: block;
+  min-width: 0;
+}
+.s4-position-source-inline b {
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s4-position-source-inline small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+.s4-position-source-inline > svg {
+  width: 13px;
+  color: var(--s1-subtle);
+}
+.s4-version-review {
+  display: grid;
+  min-height: 520px;
+  grid-template-columns: 270px minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s4-version-review > nav {
+  padding: 8px;
+  background: var(--s1-canvas);
+  border-right: 1px solid var(--s1-line);
+}
+.s4-version-review > nav > button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 11px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.s4-version-review > nav > button + button {
+  margin-top: 4px;
+}
+.s4-version-review > nav > button:hover,
+.s4-version-review > nav > button.is-active {
+  background: var(--s1-surface);
+  border-color: var(--s1-line);
+  box-shadow: var(--s1-control-shadow);
+}
+.s4-version-review > nav span,
+.s4-version-review > nav b,
+.s4-version-review > nav small {
+  display: block;
+  min-width: 0;
+}
+.s4-version-review > nav b {
+  font-size: 12px;
+}
+.s4-version-review > nav small {
+  margin-top: 4px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+.s4-version-review > nav svg {
+  width: 13px;
+  color: var(--s1-subtle);
+}
+.s4-version-review > section {
+  min-width: 0;
+  padding: 20px 22px;
+}
+.s4-version-review > section > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s4-version-review > section > header small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s4-version-review > section > header h3 {
+  margin: 3px 0 0;
+  font-size: 14px;
+}
+.s4-jd-content.is-version-preview {
+  max-height: 410px;
+  overflow: auto;
+  padding: 17px 4px 0 0;
+}
+
+/* Pipeline board: visible horizontal navigation and separated card hierarchy */
+.s4-kanban-shell {
+  min-width: 0;
+}
+.s4-kanban {
+  overflow-x: scroll;
+  padding-bottom: 13px;
+  scrollbar-width: auto;
+  scrollbar-color: color-mix(
+      in srgb,
+      var(--s1-accent) 45%,
+      var(--s1-line-strong)
+    )
+    var(--s1-canvas);
+}
+.s4-kanban-scroll-control {
+  width: 100%;
+  height: 14px;
+  margin: 3px 0 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+}
+.s4-kanban-scroll-control::-webkit-slider-runnable-track {
+  height: 7px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 99px;
+}
+.s4-kanban-scroll-control::-webkit-slider-thumb {
+  width: clamp(90px, 26vw, 320px);
+  height: 7px;
+  margin-top: -1px;
+  appearance: none;
+  background: color-mix(in srgb, var(--s1-accent) 50%, var(--s1-line-strong));
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 38%, var(--s1-line));
+  border-radius: 99px;
+  box-shadow: var(--s1-control-shadow);
+}
+.s4-kanban-scroll-control::-moz-range-track {
+  height: 7px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 99px;
+}
+.s4-kanban-scroll-control::-moz-range-thumb {
+  width: min(26vw, 320px);
+  height: 7px;
+  background: color-mix(in srgb, var(--s1-accent) 50%, var(--s1-line-strong));
+  border: 0;
+  border-radius: 99px;
+}
+.s4-kanban::-webkit-scrollbar {
+  height: 9px;
+}
+.s4-kanban::-webkit-scrollbar-track {
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 99px;
+}
+.s4-kanban::-webkit-scrollbar-thumb {
+  min-width: 90px;
+  background: color-mix(in srgb, var(--s1-accent) 46%, var(--s1-line-strong));
+  border: 2px solid var(--s1-canvas);
+  border-radius: 99px;
+}
+.s4-kanban article > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.s4-kanban article > header b {
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s4-kanban article > header time {
+  flex: 0 0 auto;
+  color: var(--s1-subtle);
+  font-size: 10px;
+}
+.s4-kanban article > strong {
+  display: block;
+  margin-top: 8px;
+  overflow: hidden;
+  color: var(--s1-ink);
+  font-size: 12px;
+  font-weight: 620;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s4-kanban article > small {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--s1-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s4-kanban article > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  margin-top: 9px;
+}
+.s4-kanban article > footer > span {
+  color: var(--s1-accent);
+  font-size: 10px;
+}
+.s4-kanban article > p {
+  display: -webkit-box;
+  margin: 9px 0 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* Stage configuration uses a visible insertion gap and explicit locked controls. */
+.s4-stage-config > article {
+  position: relative;
+  transition:
+    margin 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 150ms ease,
+    opacity 150ms ease,
+    background 150ms ease;
+}
+.s4-stage-config > article.is-dragging {
+  opacity: 0.42;
+  transform: scale(0.985);
+}
+.s4-stage-config > article.is-drop-target {
+  margin-top: 48px;
+}
+.s4-stage-config > article.is-drop-target::before {
+  position: absolute;
+  top: -42px;
+  right: 4px;
+  left: 4px;
+  display: grid;
+  height: 34px;
+  place-items: center;
+  color: var(--s1-accent);
+  font-size: 11px;
+  content: "放到这里";
+  background: var(--s1-accent-soft);
+  border: 1px dashed color-mix(in srgb, var(--s1-accent) 54%, var(--s1-line));
+  border-radius: 7px;
+}
+.s4-stage-config > article.is-fixed .s4-input,
+.s4-stage-config > article.is-fixed .s4-select > button {
+  color: var(--s1-subtle);
+  background: color-mix(in srgb, var(--s1-subtle) 5%, var(--s1-canvas));
+  border-color: var(--s1-line);
+  border-style: dashed;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.s4-stage-config > article.is-fixed .s4-select > button svg {
+  opacity: 0.35;
+}
+
+/* Long progress histories use the common right drawer instead of a modal. */
+.s1-drawer.s4-pipeline-record-drawer {
+  width: min(590px, 100%);
+}
+.s4-pipeline-record-drawer .s1-drawer-body {
+  padding: 18px 20px 28px;
+}
+.s4-pipeline-record-role {
+  margin: -4px 0 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s4-pipeline-stage-tag {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  min-height: 24px;
+  align-items: center;
+  padding: 3px 7px;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+.s4-pipeline-stage-tag.is-reserve {
+  color: #486389;
+  background: color-mix(in srgb, #5575a7 10%, var(--s1-surface));
+  border-color: color-mix(in srgb, #5575a7 28%, var(--s1-line));
+}
+.s4-pipeline-stage-tag.is-active {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 28%, var(--s1-line));
+}
+.s4-pipeline-stage-tag.is-success {
+  color: #08795d;
+  background: var(--s1-success-soft);
+  border-color: color-mix(in srgb, var(--s1-success) 28%, var(--s1-line));
+}
+.s4-pipeline-stage-tag.is-danger {
+  color: var(--s1-danger);
+  background: var(--s1-danger-soft);
+  border-color: color-mix(in srgb, var(--s1-danger) 25%, var(--s1-line));
+}
+.s4-match-result-list .s4-pipeline-stage-tag {
+  margin-top: 5px;
+}
+.s4-match-detail-head .s4-pipeline-stage-tag {
+  margin-top: 8px;
+}
+
+/* Recommendation reports are latest-file artifacts in matching and versioned in tasks. */
+.s4-report-empty,
+.recommendation-report-file {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s4-report-empty > span {
+  display: contents;
+}
+.s4-report-empty svg,
+.recommendation-report-file > i {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--s1-accent);
+  font-style: normal;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s4-report-empty > span > svg {
+  padding: 10px;
+}
+.recommendation-report-file > i svg {
+  width: 16px;
+}
+.s4-report-empty b,
+.s4-report-empty small,
+.recommendation-report-file > span,
+.recommendation-report-file b,
+.recommendation-report-file small {
+  display: block;
+  min-width: 0;
+}
+.s4-report-empty b,
+.recommendation-report-file b {
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s4-report-empty small,
+.recommendation-report-file small {
+  margin-top: 3px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+.s4-report-empty > .s1-button,
+.recommendation-report-file > div {
+  grid-column: 3;
+}
+.recommendation-report-file > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.recommendation-report-document {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  padding: 34px 38px;
+  color: var(--s1-ink);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+  box-shadow: 0 16px 44px color-mix(in srgb, var(--s1-ink) 8%, transparent);
+}
+.recommendation-report-document > header {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.recommendation-report-document > header small,
+.recommendation-report-document > header span {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.recommendation-report-document h2 {
+  margin: 7px 0;
+  font-size: 20px;
+}
+.recommendation-report-document section {
+  margin-top: 22px;
+}
+.recommendation-report-document h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.recommendation-report-document p,
+.recommendation-report-document li {
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 21px;
+}
+.recommendation-report-document p,
+.recommendation-report-document ul {
+  margin: 0;
+}
+.recommendation-report-document ul {
+  padding-left: 20px;
+}
+.recommendation-report-history {
+  display: grid;
+  gap: 8px;
+}
+.recommendation-report-history article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 9px;
+  padding: 11px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.recommendation-report-history b,
+.recommendation-report-history small {
+  display: block;
+}
+.recommendation-report-history b {
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.recommendation-report-history small {
+  margin-top: 3px;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s2-task-timeline > .recommendation-report-file {
+  margin: 4px 0 14px;
+}
+
+@media (max-width: 760px) {
+  .s4-version-review {
+    grid-template-columns: 1fr;
+  }
+  .s4-version-review > nav {
+    display: flex;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--s1-line);
+  }
+  .s4-version-review > nav > button {
+    min-width: 220px;
+  }
+  .s4-version-review > nav > button + button {
+    margin-top: 0;
+  }
+  .s4-report-empty,
+  .recommendation-report-file {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+  .s4-report-empty > .s1-button,
+  .recommendation-report-file > div {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+  .recommendation-report-document {
+    padding: 24px 18px;
   }
 }
