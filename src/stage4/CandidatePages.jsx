@@ -1055,7 +1055,7 @@ function TimelineTab({ candidate }) {
   );
 }
 
-function MatchingTab() {
+function MatchingTab({ onRematch, refreshing }) {
   const navigate = useNavigate();
   const [matchOpen, setMatchOpen] = useState(false);
   const [matchMode, setMatchMode] = useState("all");
@@ -1070,6 +1070,22 @@ function MatchingTab() {
   };
   return (
     <div className="s4-detail-stack">
+      <StateBanner
+        tone="warning"
+        icon="warning"
+        title="1 条匹配结果需要更新"
+        description="候选人资料版本已变化，历史结果继续保留，但不再作为当前判断。"
+        action={
+          <Button
+            size="sm"
+            icon="refresh"
+            loading={refreshing}
+            onClick={onRematch}
+          >
+            重新匹配
+          </Button>
+        }
+      />
       <FieldGroup
         title="岗位匹配"
         action={
@@ -1385,24 +1401,33 @@ export function CandidateDetailPage() {
         onBack={() => navigate("/candidates")}
         onDelete={() => setDeleteOpen(true)}
       />
-      <div className="s4-candidate-global-alert">
-        <StateBanner
-          tone="warning"
-          icon="warning"
-          title="1 条匹配结果需要更新"
-          description="候选人资料版本已变化，历史结果继续保留，但不再作为当前判断。"
-          action={
-            <Button
-              size="sm"
-              icon="refresh"
-              loading={refreshing}
-              onClick={() => setRematchOpen(true)}
-            >
-              重新匹配
-            </Button>
-          }
-        />
-      </div>
+      <nav
+        className="s4-candidate-attention-index"
+        aria-label="候选人待处理区域"
+      >
+        <span>
+          <Icon name="warning" />
+          <b>2 个区域有待处理事项</b>
+        </span>
+        <div>
+          <button
+            type="button"
+            aria-label={`候选人资料，${state === "identity-conflict" ? 8 : 7} 项待处理`}
+            onClick={() => setParams({ tab: "profile" })}
+          >
+            候选人资料
+            <em>{state === "identity-conflict" ? 8 : 7}</em>
+          </button>
+          <button
+            type="button"
+            aria-label="匹配与推进，1 项待处理"
+            onClick={() => setParams({ tab: "matching" })}
+          >
+            匹配与推进
+            <em>1</em>
+          </button>
+        </div>
+      </nav>
       <DetailTabs
         tabs={candidateTabs}
         value={tab}
@@ -1419,7 +1444,12 @@ export function CandidateDetailPage() {
       ) : null}
       {tab === "files" ? <FilesTab candidate={candidateDetail} /> : null}
       {tab === "timeline" ? <TimelineTab candidate={candidateDetail} /> : null}
-      {tab === "matching" ? <MatchingTab /> : null}
+      {tab === "matching" ? (
+        <MatchingTab
+          refreshing={refreshing}
+          onRematch={() => setRematchOpen(true)}
+        />
+      ) : null}
       {tab === "relations" ? <RelationsTab /> : null}
       <Modal
         open={rematchOpen}

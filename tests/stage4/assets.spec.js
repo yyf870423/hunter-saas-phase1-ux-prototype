@@ -219,7 +219,7 @@ test("候选人新建、身份合并和字段审核覆盖关键门禁", async ({
 test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作", async ({ page }) => {
   await page.goto("#/candidates/candidate-linhao");
   const alertBox = await page
-    .locator(".s4-candidate-global-alert")
+    .locator(".s4-candidate-attention-index")
     .boundingBox();
   const tabsBox = await page.locator(".s4-detail-tabs").boundingBox();
   expect(alertBox.y + alertBox.height).toBeLessThan(tabsBox.y);
@@ -268,12 +268,13 @@ test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作",
   ).toBeVisible();
   await page.getByRole("button", { name: "取消" }).click();
 
-  await page.goto("#/candidates/candidate-linhao?tab=matching");
+  await page.getByRole("button", { name: "匹配与推进，1 项待处理" }).click();
+  await expect(page).toHaveURL(/tab=matching/);
   await expect(
     page.locator(".s4-detail-stack .s4-state-banner").filter({
       hasText: "1 条匹配结果需要更新",
     }),
-  ).toHaveCount(0);
+  ).toBeVisible();
   await page.getByRole("button", { name: "重新匹配" }).click();
   await expect(
     page.getByRole("dialog", { name: "重新匹配过期结果" }),
