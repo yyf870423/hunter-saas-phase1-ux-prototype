@@ -25,6 +25,13 @@ import {
   positions,
 } from "./data";
 
+const educationTones = {
+  博士: "violet",
+  硕士: "info",
+  本科: "success",
+  专科: "warning",
+};
+
 const configs = {
   candidates: {
     title: "候选人",
@@ -48,7 +55,7 @@ const configs = {
     ],
     defaultHidden: [],
     stickyEdges: true,
-    tableMinWidth: 1420,
+    tableMinWidth: 1600,
     columns: [
       {
         key: "name",
@@ -67,18 +74,23 @@ const configs = {
         key: "education",
         label: "学历",
         width: 90,
-        render: (row) => <TagList items={[row.education]} tone="info" />,
+        render: (row) => (
+          <TagList
+            items={[row.education]}
+            tone={educationTones[row.education] || "neutral"}
+          />
+        ),
       },
       {
         key: "skills",
         label: "技能",
-        width: 196,
+        width: 270,
         render: (row) => <TagList items={row.skills.slice(0, 3)} />,
       },
       {
         key: "industries",
         label: "行业",
-        width: 166,
+        width: 220,
         render: (row) => <TagList items={row.industries.slice(0, 2)} />,
       },
       { key: "experience", label: "年限", width: 80 },

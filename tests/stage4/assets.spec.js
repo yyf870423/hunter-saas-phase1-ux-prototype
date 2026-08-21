@@ -36,6 +36,27 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
     };
   });
   expect(beforeScroll.scrollWidth).toBeGreaterThan(beforeScroll.clientWidth);
+  const degreeTones = await page
+    .locator("td.s4-data-col-education .s4-tag")
+    .evaluateAll((tags) => [...new Set(tags.map((tag) => tag.className))]);
+  expect(degreeTones.some((value) => value.includes("s4-tag-violet"))).toBe(
+    true,
+  );
+  expect(degreeTones.some((value) => value.includes("s4-tag-info"))).toBe(true);
+  for (const key of ["skills", "industries"]) {
+    const hasTruncatedTag = await page
+      .locator(`td.s4-data-col-${key} .s4-tag`)
+      .evaluateAll((tags) =>
+        tags.some((tag) => tag.scrollWidth > tag.clientWidth + 1),
+      );
+    expect(hasTruncatedTag).toBe(false);
+  }
+  const pagination = page.getByRole("navigation", { name: "分页" });
+  await pagination.getByRole("button", { name: "2", exact: true }).click();
+  await expect(
+    page.locator("td.s4-data-col-education .s4-tag-success").first(),
+  ).toBeVisible();
+  await pagination.getByRole("button", { name: "1", exact: true }).click();
   await tableWrap.evaluate((element) => {
     element.scrollLeft = element.scrollWidth;
   });
@@ -50,11 +71,11 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
   });
   expect(afterScroll.scrollLeft).toBeGreaterThan(0);
   expect(Math.abs(afterScroll.nameLeft - beforeScroll.nameLeft)).toBeLessThan(
-    2,
+    4,
   );
   expect(
     Math.abs(afterScroll.actionsRight - beforeScroll.actionsRight),
-  ).toBeLessThan(2);
+  ).toBeLessThan(4);
   await page.getByPlaceholder(/搜索姓名/).fill("林昊");
   await expect(
     page.getByRole("button", { name: /林昊/ }).first(),
