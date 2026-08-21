@@ -5118,146 +5118,127 @@
   display: grid;
   gap: 14px;
 }
-.s4-person-source-card,
-.s4-person-candidate-match,
-.s4-person-identity-evidence,
-.s4-person-identity-decisions {
+.s4-person-identity-comparison,
+.s4-person-identity-evidence {
   min-width: 0;
 }
-.s4-person-source-card {
-  padding: 14px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 8px;
-}
-.s4-person-source-card > header,
-.s4-person-candidate-match > header,
-.s4-person-candidate-summary {
+.s4-person-identity-comparison > header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+  margin-bottom: 10px;
 }
-.s4-person-source-card > header span,
-.s4-person-source-card > header small,
-.s4-person-candidate-match > header span,
-.s4-person-candidate-match > header p,
-.s4-person-candidate-summary span,
-.s4-person-candidate-summary small {
+.s4-person-identity-comparison > header span,
+.s4-person-identity-comparison > header p {
   display: block;
 }
-.s4-person-source-card h3,
-.s4-person-candidate-match h3,
-.s4-person-identity-evidence h3,
-.s4-person-identity-decisions h3 {
+.s4-person-identity-comparison h3,
+.s4-person-identity-evidence h3 {
   margin: 0;
   font-size: 13px;
 }
-.s4-person-source-card > header small,
-.s4-person-candidate-match > header p,
-.s4-person-candidate-summary small {
+.s4-person-identity-comparison > header p {
   margin-top: 3px;
   color: var(--s1-muted);
   font-size: 12px;
 }
-.s4-person-source-card > header h3 {
-  margin-top: 3px;
-  font-size: 17px;
-}
-.s4-person-source-card dl {
+.s4-person-compare-profiles {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 13px 0 0;
-  padding-top: 12px;
-  border-top: 1px solid var(--s1-line);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
 }
-.s4-person-source-card dl div {
-  min-width: 0;
-}
-.s4-person-source-card dt {
-  color: var(--s1-muted);
-  font-size: 12px;
-}
-.s4-person-source-card dd {
-  margin: 4px 0 0;
-  overflow: hidden;
-  font-size: 12px;
-  line-height: 18px;
-  text-overflow: ellipsis;
-}
-.s4-person-candidate-match {
-  padding: 2px 0 0;
-}
-.s4-person-candidate-match > header {
-  align-items: flex-end;
-  margin-bottom: 9px;
-}
-.s4-person-candidate-match > header > .s4-select {
-  width: min(300px, 42%);
-  flex: 0 0 auto;
-}
-.s4-person-candidate-match > article {
-  display: grid;
-  gap: 12px;
+.s4-person-compare-profiles article {
+  position: relative;
+  min-height: 105px;
   padding: 13px;
-  background: var(--s1-surface);
+  background: var(--s1-canvas);
   border: 1px solid var(--s1-line);
   border-radius: 8px;
 }
-.s4-person-candidate-summary b,
-.s4-person-candidate-summary small {
-  display: block;
+.s4-person-compare-profiles article.is-candidate {
+  background: color-mix(in srgb, var(--s1-accent) 5%, var(--s1-surface));
+  border-color: color-mix(in srgb, var(--s1-accent) 20%, var(--s1-line));
 }
-.s4-person-candidate-summary b {
-  font-size: 14px;
+.s4-person-compare-profiles small {
+  color: var(--s1-muted);
+  font-size: 11px;
+  font-weight: 650;
 }
-.s4-person-candidate-summary > button {
+.s4-person-compare-profiles h4 {
+  margin: 5px 0 2px;
+  font-size: 16px;
+}
+.s4-person-compare-profiles p {
+  margin: 0 0 9px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+.s4-person-compare-profiles button {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 0;
   color: var(--s1-accent);
-  font: inherit;
+  font-family: inherit;
   font-size: 12px;
   font-weight: 650;
   background: transparent;
   border: 0;
+  cursor: pointer;
 }
-.s4-person-candidate-summary > button svg {
+.s4-person-compare-profiles button:hover {
+  text-decoration: underline;
+}
+.s4-person-compare-profiles button svg {
   width: 12px;
 }
-.s4-person-candidate-match .s4-definition-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.s4-person-candidate-empty {
-  display: flex;
-  min-height: 82px;
-  align-items: center;
-  gap: 10px;
-  padding: 14px;
-  background: var(--s1-canvas);
-  border: 1px dashed var(--s1-line-strong);
-  border-radius: 8px;
-}
-.s4-person-candidate-empty > svg {
+.s4-person-compare-profiles article.is-empty > svg {
   width: 18px;
   color: var(--s1-muted);
 }
-.s4-person-candidate-empty b,
-.s4-person-candidate-empty small {
-  display: block;
+.s4-person-compare-table {
+  overflow: hidden;
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
 }
-.s4-person-candidate-empty b {
-  font-size: 13px;
+.s4-person-compare-table > div {
+  display: grid;
+  grid-template-columns: 105px minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 42px;
+  align-items: stretch;
+  border-bottom: 1px solid var(--s1-line);
 }
-.s4-person-candidate-empty small {
-  margin-top: 3px;
-  color: var(--s1-muted);
+.s4-person-compare-table > div:last-child {
+  border-bottom: 0;
+}
+.s4-person-compare-table > div > * {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  padding: 8px 10px;
   font-size: 12px;
+  line-height: 17px;
+  border-right: 1px solid var(--s1-line);
 }
-.s4-person-identity-evidence > h3,
-.s4-person-identity-decisions > h3 {
+.s4-person-compare-table > div > *:last-child {
+  border-right: 0;
+}
+.s4-person-compare-table > div > b {
+  color: var(--s1-muted);
+  background: var(--s1-canvas);
+}
+.s4-person-compare-table > div.is-head {
+  min-height: 36px;
+}
+.s4-person-compare-table > div.is-head > b {
+  color: var(--s1-ink);
+  font-size: 11px;
+  background: color-mix(in srgb, var(--s1-canvas) 72%, var(--s1-surface));
+}
+.s4-person-identity-evidence > h3 {
   margin-bottom: 8px;
 }
 .s4-person-identity-evidence ul {
@@ -5302,11 +5283,6 @@
   color: var(--s1-muted);
   font-size: 12px;
   line-height: 17px;
-}
-.s4-person-identity-decisions > div {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
 }
 
 .s4-task-table,
@@ -6721,22 +6697,19 @@
   .s4-authorship-more-panel > .s4-authorship-list {
     grid-template-columns: 1fr;
   }
-  .s4-person-source-card dl,
-  .s4-person-identity-evidence ul,
-  .s4-person-identity-decisions > div {
+  .s4-person-compare-profiles,
+  .s4-person-identity-evidence ul {
     grid-template-columns: 1fr;
   }
-  .s4-person-source-card > header,
-  .s4-person-candidate-match > header,
-  .s4-person-candidate-summary {
+  .s4-person-identity-comparison > header {
     align-items: flex-start;
     flex-direction: column;
   }
-  .s4-person-candidate-match > header > .s4-select {
-    width: 100%;
+  .s4-person-compare-table {
+    overflow-x: auto;
   }
-  .s4-person-candidate-match .s4-definition-grid {
-    grid-template-columns: 1fr;
+  .s4-person-compare-table > div {
+    min-width: 650px;
   }
   .s4-task-table > header,
   .s4-recycle-table > header {

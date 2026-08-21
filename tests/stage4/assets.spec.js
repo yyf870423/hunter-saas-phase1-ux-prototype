@@ -715,12 +715,35 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
   });
   await expect(paperModal).toBeVisible();
   await expect(
-    paperModal.getByText("Shanghai AI Laboratory", { exact: true }),
+    paperModal
+      .locator(".s4-person-compare-profiles article")
+      .first()
+      .locator("p"),
   ).toBeVisible();
-  await expect(paperModal.getByText(/蒋一帆 · 智源研究院/)).toBeVisible();
+  await expect(
+    paperModal
+      .locator(".s4-person-compare-profiles article")
+      .first()
+      .locator("p"),
+  ).toHaveText("Shanghai AI Laboratory");
+  await expect(paperModal.getByText("系统疑似候选人")).toBeVisible();
+  await expect(
+    paperModal
+      .locator(".s4-person-compare-profiles h4")
+      .filter({ hasText: "蒋一帆" }),
+  ).toBeVisible();
+  await expect(
+    paperModal.locator(".s4-person-compare-profiles article.is-candidate p"),
+  ).toHaveText("智源研究院 · 多模态算法研究员");
+  await expect(paperModal.getByText("时间与背景")).toBeVisible();
+  await expect(paperModal.getByText("研究与技能")).toBeVisible();
   await expect(paperModal.getByText("机构与任职经历")).toBeVisible();
   await expect(paperModal.getByText("Wenting He")).toHaveCount(0);
-  await paperModal.getByRole("button", { name: "保存身份关系" }).click();
+  await expect(
+    paperModal.getByRole("button", { name: "选择候选人" }),
+  ).toHaveCount(0);
+  await expect(paperModal.getByRole("radio")).toHaveCount(0);
+  await paperModal.getByRole("button", { name: "确认是同一人并关联" }).click();
   const yifan = page
     .locator(".s4-authorship-list article")
     .filter({ hasText: "Yifan Jiang" });
@@ -744,10 +767,30 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
   });
   await expect(patentModal).toBeVisible();
   await expect(
-    patentModal.getByText("星澜机器人（北京）有限公司", { exact: true }),
+    patentModal
+      .locator(".s4-person-compare-profiles article")
+      .first()
+      .locator("p"),
+  ).toHaveText("星澜机器人（北京）有限公司");
+  await expect(
+    patentModal.locator(".s4-person-compare-profiles h4"),
+  ).toHaveCount(2);
+  await expect(
+    patentModal.locator(".s4-person-compare-profiles article.is-candidate p"),
+  ).toHaveText("星澜机器人 · 机器人学习研究员");
+  await expect(
+    patentModal.getByRole("button", { name: "保留人物线索" }),
   ).toBeVisible();
-  await expect(patentModal.getByText(/王奕 · 星澜机器人/)).toBeVisible();
+  await expect(
+    patentModal.getByRole("button", { name: "暂不关联" }),
+  ).toBeVisible();
   await expect(patentModal.getByText("陈雨")).toHaveCount(0);
+  await patentModal.getByRole("button", { name: "保留人物线索" }).click();
+  await expect(patentModal).toBeHidden();
+  const wangyi = page
+    .locator(".s4-authorship-list article")
+    .filter({ hasText: "王奕" });
+  await expect(wangyi.getByText("人物线索", { exact: true })).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("#/papers/paper-vla-survey");

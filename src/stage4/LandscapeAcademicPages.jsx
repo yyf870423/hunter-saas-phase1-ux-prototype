@@ -7,7 +7,6 @@ import {
   AssetPageHeader,
   Button,
   CustomCheckbox,
-  CustomRadio,
   DatePicker,
   DefinitionGrid,
   DeleteAssetModal,
@@ -22,7 +21,6 @@ import {
   Modal,
   NotFoundState,
   Pagination,
-  SelectMenu,
   SourceList,
   StateBanner,
   StatusBadge,
@@ -974,145 +972,147 @@ function PersonIdentityReview({
 }) {
   const notify = useToast();
   const suggestedId = candidateIdentityMatches[person] || "";
-  const candidateOptions = candidates.map(
-    (candidate) =>
-      `${candidate.name} · ${candidate.company} · ${candidate.title}`,
-  );
-  const candidateByLabel = Object.fromEntries(
-    candidates.map((candidate) => [
-      `${candidate.name} · ${candidate.company} · ${candidate.title}`,
-      candidate,
-    ]),
-  );
   const suggestedCandidate = candidates.find(
     (candidate) => candidate.id === suggestedId,
   );
-  const [selectedLabel, setSelectedLabel] = useState(
-    suggestedCandidate
-      ? `${suggestedCandidate.name} · ${suggestedCandidate.company} · ${suggestedCandidate.title}`
-      : "",
-  );
-  const [decision, setDecision] = useState(
-    suggestedCandidate ? "candidate" : "lead",
-  );
-  const selectedCandidate = candidateByLabel[selectedLabel] || null;
-  const institutionMatches = selectedCandidate
-    ? institution.includes(selectedCandidate.company) ||
-      selectedCandidate.company.includes(institution)
+  const institutionMatches = suggestedCandidate
+    ? institution.includes(suggestedCandidate.company) ||
+      suggestedCandidate.company.includes(institution)
     : false;
   const noun = kind === "paper" ? "作者" : "发明人";
+  const sourceDirection =
+    kind === "paper"
+      ? "视觉语言动作模型、机器人学习与真机部署"
+      : "机器人操作、运动控制与系统实现";
+  const saveDecision = (decision) => {
+    onSave({
+      decision,
+      candidateId:
+        decision === "candidate" ? suggestedCandidate?.id || null : null,
+    });
+    close();
+    notify(
+      decision === "candidate"
+        ? `已关联至候选人 ${suggestedCandidate.name}`
+        : decision === "lead"
+          ? `${person} 已保留为人物线索`
+          : `${person} 已暂不关联`,
+    );
+  };
   return (
     <Modal
       open
       close={close}
       size="lg"
       title={`${person} · ${noun}身份审核`}
-      description="判断该署名人物是否与系统中的候选人属于同一个人；同名只用于召回，不会直接建立关系。"
+      description="逐项对比来源署名与系统中置信度最高的疑似候选人；同名只用于召回，不会直接建立关系。"
       footer={
         <>
-          <Button onClick={close}>取消</Button>
-          <Button
-            tone="primary"
-            onClick={() => {
-              if (decision === "candidate" && !selectedCandidate) {
-                notify("请先选择要关联的候选人");
-                return;
-              }
-              onSave({
-                decision,
-                candidateId: selectedCandidate?.id || null,
-              });
-              close();
-              notify(`${person} 的身份决定已保存`);
-            }}
-          >
-            保存身份关系
+          <Button tone="ghost" onClick={() => saveDecision("none")}>
+            暂不关联
           </Button>
+          <Button onClick={() => saveDecision("lead")}>保留人物线索</Button>
+          {suggestedCandidate ? (
+            <Button tone="primary" onClick={() => saveDecision("candidate")}>
+              确认是同一人并关联
+            </Button>
+          ) : null}
         </>
       }
     >
       <div className="s4-person-identity-review">
-        <section className="s4-person-source-card">
+        <section className="s4-person-identity-comparison">
           <header>
             <span>
-              <small>待判断署名人物</small>
-              <h3>{person}</h3>
+              <h3>身份信息对比</h3>
+              <p>系统只给出一位疑似候选人，以下信息用于人工判断。</p>
             </span>
             <StatusBadge tone={suggestedCandidate ? "warning" : "neutral"}>
-              {suggestedCandidate ? "存在相似候选人" : "暂无可靠匹配"}
+              {suggestedCandidate ? "需要人工确认" : "暂无可靠匹配"}
             </StatusBadge>
           </header>
-          <dl>
-            <div>
-              <dt>{kind === "paper" ? "论文署名机构" : "申请人 / 权利人"}</dt>
-              <dd>{institution}</dd>
-            </div>
-            <div>
-              <dt>来源成果</dt>
-              <dd>{sourceTitle}</dd>
-            </div>
-            <div>
-              <dt>成果信息</dt>
-              <dd>{sourceMeta}</dd>
-            </div>
-          </dl>
-        </section>
 
-        <section className="s4-person-candidate-match">
-          <header>
-            <span>
-              <h3>可能匹配的候选人</h3>
-              <p>系统只提供候选范围，仍需结合机构、经历和研究方向判断。</p>
-            </span>
-            <SelectMenu
-              label="选择候选人"
-              value={selectedLabel}
-              options={candidateOptions}
-              searchable
-              onChange={(value) => {
-                setSelectedLabel(value);
-                setDecision("candidate");
-              }}
-            />
-          </header>
-          {selectedCandidate ? (
+          <div className="s4-person-compare-profiles">
             <article>
-              <div className="s4-person-candidate-summary">
-                <span>
-                  <b>{selectedCandidate.name}</b>
-                  <small>
-                    {selectedCandidate.company} · {selectedCandidate.title}
-                  </small>
-                </span>
+              <small>
+                {kind === "paper" ? "论文署名信息" : "专利署名信息"}
+              </small>
+              <h4>{person}</h4>
+              <p>{institution}</p>
+              <StatusBadge tone="neutral">原始来源</StatusBadge>
+            </article>
+            {suggestedCandidate ? (
+              <article className="is-candidate">
+                <small>系统疑似候选人</small>
+                <h4>{suggestedCandidate.name}</h4>
+                <p>
+                  {suggestedCandidate.company} · {suggestedCandidate.title}
+                </p>
                 <button
                   type="button"
-                  onClick={() => onOpenCandidate(selectedCandidate.id)}
+                  onClick={() => onOpenCandidate(suggestedCandidate.id)}
                 >
-                  查看候选人详情
+                  查看完整候选人详情
                   <Icon name="chevronRight" />
                 </button>
-              </div>
-              <DefinitionGrid
-                items={[
-                  ["地点", selectedCandidate.location],
-                  ["学历", selectedCandidate.education],
-                  ["工作年限", selectedCandidate.experience],
-                ]}
-              />
-            </article>
-          ) : (
-            <div className="s4-person-candidate-empty">
-              <Icon name="search" />
+              </article>
+            ) : (
+              <article className="is-empty">
+                <Icon name="search" />
+                <h4>没有可靠的疑似候选人</h4>
+                <p>可以保留为人物线索，获得更多信息后再判断。</p>
+              </article>
+            )}
+          </div>
+
+          <div className="s4-person-compare-table">
+            <div className="is-head">
+              <b>对比项</b>
+              <b>来源署名信息</b>
+              <b>系统候选人信息</b>
+            </div>
+            <div>
+              <b>姓名</b>
+              <span>{person}</span>
+              <span>{suggestedCandidate?.name || "暂无"}</span>
+            </div>
+            <div>
+              <b>机构与任职</b>
+              <span>{institution}</span>
               <span>
-                <b>没有找到可靠的系统候选人</b>
-                <small>可以保留为人物线索，后续获得更多信息后再判断。</small>
+                {suggestedCandidate
+                  ? `${suggestedCandidate.company} · ${suggestedCandidate.title}`
+                  : "暂无"}
               </span>
             </div>
-          )}
+            <div>
+              <b>研究与技能</b>
+              <span>{sourceDirection}</span>
+              <span>{suggestedCandidate?.skills.join("、") || "暂无"}</span>
+            </div>
+            <div>
+              <b>时间与背景</b>
+              <span>{sourceMeta}</span>
+              <span>
+                {suggestedCandidate
+                  ? `${suggestedCandidate.education} · ${suggestedCandidate.experience} · ${suggestedCandidate.location}`
+                  : "暂无"}
+              </span>
+            </div>
+            <div>
+              <b>关联成果</b>
+              <span>{sourceTitle}</span>
+              <span>
+                {suggestedCandidate
+                  ? `${suggestedCandidate.name} 的候选人资料与历史经历`
+                  : "暂无"}
+              </span>
+            </div>
+          </div>
         </section>
 
         <section className="s4-person-identity-evidence">
-          <h3>判断依据</h3>
+          <h3>系统判断提示</h3>
           <ul>
             <li>
               <Icon name={suggestedCandidate ? "check" : "alert"} />
@@ -1120,7 +1120,7 @@ function PersonIdentityReview({
                 <b>姓名对应</b>
                 <small>
                   {suggestedCandidate
-                    ? `${person} 与候选人 ${suggestedCandidate.name} 的中英文姓名对应`
+                    ? `${person} 与候选人 ${suggestedCandidate.name} 的中英文姓名疑似对应`
                     : "当前没有足够信息建立姓名对应关系"}
                 </small>
               </span>
@@ -1132,7 +1132,9 @@ function PersonIdentityReview({
                 <small>
                   {institutionMatches
                     ? `${institution} 与候选人当前公司一致`
-                    : `${institution} 与候选人当前公司不一致，需要结合时间线核实`}
+                    : suggestedCandidate
+                      ? `${institution} 与候选人当前公司不一致，需要结合经历时间线核实`
+                      : "缺少可供比较的候选人任职经历"}
                 </small>
               </span>
             </li>
@@ -1141,42 +1143,13 @@ function PersonIdentityReview({
               <span>
                 <b>研究方向</b>
                 <small>
-                  {selectedCandidate
-                    ? `候选人技能包含 ${selectedCandidate.skills.join("、")}`
+                  {suggestedCandidate
+                    ? `来源成果方向与候选人的 ${suggestedCandidate.skills.join("、")} 存在交集`
                     : "缺少可供比较的候选人技能与经历"}
                 </small>
               </span>
             </li>
           </ul>
-        </section>
-
-        <section className="s4-person-identity-decisions">
-          <h3>身份处理</h3>
-          <div>
-            <CustomRadio
-              label="关联已有候选人"
-              description={
-                selectedCandidate
-                  ? `建立与 ${selectedCandidate.name} 的正式人物关系`
-                  : "请先选择候选人"
-              }
-              checked={decision === "candidate"}
-              disabled={!selectedCandidate}
-              onChange={() => setDecision("candidate")}
-            />
-            <CustomRadio
-              label="保留为人物线索"
-              description="继续探索，不进入正式候选人列表"
-              checked={decision === "lead"}
-              onChange={() => setDecision("lead")}
-            />
-            <CustomRadio
-              label="暂不关联"
-              description="只保留该成果中的原始署名"
-              checked={decision === "none"}
-              onChange={() => setDecision("none")}
-            />
-          </div>
         </section>
       </div>
     </Modal>
