@@ -701,7 +701,7 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
       }
     >
       {section === "basic" ? (
-        <div className="s4-form-grid">
+        <div className="s4-form-grid s4-contact-profile-editor-grid">
           <FormField label="姓名或明确称呼" required>
             <TextInput value={name} onChange={setName} />
           </FormField>
@@ -732,7 +732,7 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
           </FormField>
         </div>
       ) : (
-        <div className="s4-form-grid">
+        <div className="s4-form-grid s4-contact-relation-editor-grid">
           <FormField label="正式公司">
             <SelectMenu
               label="选择公司"

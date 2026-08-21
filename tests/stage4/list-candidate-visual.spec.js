@@ -112,6 +112,20 @@ test("公司、联系人和招聘机会详情遵循分区编辑与完整岗位�
     path: `${output}/contact-detail-section-editing.png`,
     fullPage: true,
   });
+  await page.getByRole("button", { name: "编辑联系方式" }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/contact-profile-editor-compact.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("button", { name: "编辑公司关系" }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/contact-relation-editor-compact.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "取消" }).click();
   await page.goto("#/contacts/contact-chenyu?tab=timeline");
   await page.screenshot({
     path: `${output}/contact-timeline-crud.png`,
@@ -150,6 +164,14 @@ test("公共时间选择器展开态符合统一设计语言", async ({ page }) 
     .getByRole("button", { name: /选择起止时间：2022\.03 - 至今/ })
     .click();
   await page.waitForTimeout(180);
+  const rangeFields = page.locator(".s4-date-range-steps > button");
+  await expect(rangeFields).toHaveCount(2);
+  const startBox = await rangeFields.nth(0).boundingBox();
+  const endBox = await rangeFields.nth(1).boundingBox();
+  expect(startBox).not.toBeNull();
+  expect(endBox).not.toBeNull();
+  expect(Math.abs(startBox.y - endBox.y)).toBeLessThanOrEqual(1);
+  expect(endBox.x).toBeGreaterThan(startBox.x + startBox.width);
   await page.screenshot({
     path: `${output}/date-picker-month-range.png`,
     fullPage: true,
