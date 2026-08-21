@@ -26,6 +26,7 @@ import {
   TextInput,
   useToast,
 } from "./asset-ui";
+import { IndustryCascade } from "./CandidateFilters";
 import {
   candidates,
   companies,
@@ -57,7 +58,7 @@ function CompactRelationTable({ type, rows, onOpen }) {
                 {row.name}
                 <small>{row.company}</small>
               </b>
-              <TagList items={row.categories.slice(0, 2)} />
+              <TagList items={row.categories} maxVisible={1} />
               <span>{row.role}</span>
               <span>{row.phone || row.email}</span>
             </>
@@ -318,6 +319,7 @@ function CompanyEditor({ open, close }) {
   const notify = useToast();
   const [name, setName] = useState(companyDetail.name);
   const [intro, setIntro] = useState(companyDetail.intro);
+  const [industries, setIndustries] = useState(companyDetail.industries);
   return (
     <Modal
       open={open}
@@ -345,13 +347,7 @@ function CompanyEditor({ open, close }) {
           <TextInput value={name} onChange={setName} />
         </FormField>
         <FormField label="行业标签">
-          <SelectMenu
-            label="选择行业"
-            value={["机器人", "人工智能"]}
-            options={["机器人", "人工智能", "智能制造", "企业服务"]}
-            onChange={() => {}}
-            multiple
-          />
+          <IndustryCascade value={industries} onChange={setIndustries} />
         </FormField>
         <FormField label="公司简介" span={2}>
           <TextArea value={intro} onChange={setIntro} rows={5} />
@@ -1258,6 +1254,7 @@ export function CompanyCreatePage() {
   const [files, setFiles] = useState([]);
   const [name, setName] = useState("");
   const [intro, setIntro] = useState("");
+  const [industries, setIndustries] = useState([]);
   const create = () => {
     if (!name.trim()) {
       notify("请输入公司名称", "error");
@@ -1311,12 +1308,9 @@ export function CompanyCreatePage() {
                   />
                 </FormField>
                 <FormField label="行业标签">
-                  <SelectMenu
-                    label="选择行业"
-                    value={[]}
-                    options={["机器人", "人工智能", "智能制造", "企业服务"]}
-                    onChange={() => {}}
-                    multiple
+                  <IndustryCascade
+                    value={industries}
+                    onChange={setIndustries}
                   />
                 </FormField>
                 <FormField label="公司简介" span={2}>

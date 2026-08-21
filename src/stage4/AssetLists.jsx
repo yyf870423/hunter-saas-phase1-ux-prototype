@@ -20,6 +20,7 @@ import {
 import {
   CandidateFilterBar,
   FavoritePickerModal,
+  IndustryCascade,
   candidateFilterDefaults,
 } from "./CandidateFilters";
 import {
@@ -85,13 +86,13 @@ const configs = {
         key: "skills",
         label: "技能",
         width: 270,
-        render: (row) => <TagList items={row.skills.slice(0, 3)} />,
+        render: (row) => <TagList items={row.skills} maxVisible={2} />,
       },
       {
         key: "industries",
         label: "行业",
         width: 220,
-        render: (row) => <TagList items={row.industries.slice(0, 2)} />,
+        render: (row) => <TagList items={row.industries} maxVisible={1} />,
       },
       { key: "experience", label: "年限", width: 80 },
       {
@@ -142,7 +143,7 @@ const configs = {
       {
         key: "skills",
         label: "关键技能",
-        render: (row) => <TagList items={row.skills.slice(0, 2)} />,
+        render: (row) => <TagList items={row.skills} maxVisible={2} />,
       },
       { key: "matches", label: "匹配结果" },
       { key: "progress", label: "推进中" },
@@ -155,7 +156,8 @@ const configs = {
     data: companies,
     searchKeys: ["name", "industries", "location"],
     placeholder: "搜索公司名称、名称变体、行业或地点",
-    filters: [["行业", ["机器人", "人工智能", "智能制造", "科研"]]],
+    industryFilter: true,
+    filters: [],
     columns: [
       {
         key: "name",
@@ -172,7 +174,7 @@ const configs = {
         key: "industries",
         label: "行业",
         required: true,
-        render: (row) => <TagList items={row.industries} />,
+        render: (row) => <TagList items={row.industries} maxVisible={1} />,
       },
       { key: "contacts", label: "联系人" },
       { key: "opportunities", label: "招聘机会" },
@@ -208,7 +210,7 @@ const configs = {
       {
         key: "categories",
         label: "类别",
-        render: (row) => <TagList items={row.categories.slice(0, 2)} />,
+        render: (row) => <TagList items={row.categories} maxVisible={1} />,
       },
       { key: "phone", label: "手机" },
       {
@@ -303,6 +305,7 @@ export function AssetListPage({ type }) {
   const [candidateFilters, setCandidateFilters] = useState(
     candidateFilterDefaults,
   );
+  const [companyIndustries, setCompanyIndustries] = useState([]);
   const [candidateFolders, setCandidateFolders] = useState(() =>
     Object.fromEntries(
       candidates.map((candidate) => [candidate.id, candidate.folders]),
@@ -371,15 +374,12 @@ export function AssetListPage({ type }) {
             .includes(candidateFilters.title.trim().toLowerCase())
         )
           return false;
-        if (candidateFilters.favorite === "favorited" && !row.folders.length)
-          return false;
-        if (candidateFilters.favorite === "unfiled" && row.folders.length)
-          return false;
-        if (candidateFilters.favorite.startsWith("folder:")) {
-          const path = candidateFilters.favorite.slice("folder:".length);
+        if (candidateFilters.favorite.length) {
           if (
-            !row.folders.some(
-              (folder) => folder === path || folder.startsWith(`${path}/`),
+            !candidateFilters.favorite.some((path) =>
+              row.folders.some(
+                (folder) => folder === path || folder.startsWith(`${path}/`),
+              ),
             )
           )
             return false;
@@ -403,8 +403,14 @@ export function AssetListPage({ type }) {
         return true;
       });
     }
-    return controller.filtered.filter((row) =>
-      config.filters.every(([label]) => {
+    return controller.filtered.filter((row) => {
+      if (
+        type === "companies" &&
+        companyIndustries.length &&
+        !companyIndustries.some((industry) => row.industries.includes(industry))
+      )
+        return false;
+      return config.filters.every(([label]) => {
         const values = filterValues[label];
         if (!values?.length) return true;
         const key = {
@@ -423,11 +429,12 @@ export function AssetListPage({ type }) {
             ? cell.includes(value)
             : String(cell || "").includes(value),
         );
-      }),
-    );
+      });
+    });
   }, [
     candidateFilters,
     candidateRows,
+    companyIndustries,
     config.filters,
     controller.filtered,
     filterValues,
@@ -438,7 +445,10 @@ export function AssetListPage({ type }) {
     (controller.page - 1) * 6,
     controller.page * 6,
   );
-  useEffect(() => controller.setPage(1), [candidateFilters, filterValues]);
+  useEffect(
+    () => controller.setPage(1),
+    [candidateFilters, companyIndustries, filterValues],
+  );
   const filterConfigs = config.filters.map(([label, options]) => ({
     label,
     value: filterValues[label],
@@ -477,7 +487,21 @@ export function AssetListPage({ type }) {
           query={controller.query}
           setQuery={controller.setQuery}
           placeholder={config.placeholder}
-          filters={filterConfigs}
+          filters={
+            config.industryFilter
+              ? [
+                  {
+                    key: "industry",
+                    render: (
+                      <IndustryCascade
+                        value={companyIndustries}
+                        onChange={setCompanyIndustries}
+                      />
+                    ),
+                  },
+                ]
+              : filterConfigs
+          }
           trailing={
             <ColumnMenu
               columns={config.columns}

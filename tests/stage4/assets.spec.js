@@ -52,18 +52,21 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
   await page.getByRole("button", { name: "行业 · 1" }).click();
 
   await page.getByRole("button", { name: "收藏夹", exact: true }).click();
-  await expect(page.getByRole("radio", { name: /重点岗位人才/ })).toBeVisible();
   await expect(
-    page.getByRole("radio", { name: /VLA 算法负责人/ }),
+    page.getByRole("checkbox", { name: /重点岗位人才/ }),
   ).toBeVisible();
-  await page.getByRole("radio", { name: /VLA 算法负责人/ }).click();
   await expect(
-    page
-      .locator(".s4-favorite-filter > button")
-      .getByText("VLA 算法负责人", { exact: true }),
+    page.getByRole("checkbox", { name: /VLA 算法负责人/ }),
   ).toBeVisible();
+  await page.getByRole("checkbox", { name: /VLA 算法负责人/ }).click();
+  await page.getByRole("checkbox", { name: /客户项目/ }).click();
+  await expect(
+    page.getByText("已选 2 个收藏夹", { exact: false }),
+  ).toBeVisible();
+  await page.locator(".s4-favorite-filter > button").click();
   await page
-    .getByRole("button", { name: "收藏夹：VLA 算法负责人", exact: true })
+    .locator(".s4-candidate-filter-chips")
+    .getByRole("button", { name: "收藏夹 · 2", exact: false })
     .click();
   const tableWrap = page.locator(".s4-table-wrap");
   const beforeScroll = await tableWrap.evaluate((element) => {
@@ -158,6 +161,38 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
   await assertNoConsoleErrors();
 });
 
+test("公共筛选浮层不被容器裁切且行业统一使用两级多选", async ({ page }) => {
+  await page.goto("#/candidates");
+  await page.getByRole("button", { name: "行业", exact: true }).click();
+  const cascade = page.locator("body > .s4-cascade-panel");
+  await expect(cascade).toBeVisible();
+  const search = cascade.getByPlaceholder("搜索行业（跨一级）");
+  await search.focus();
+  expect(
+    await search.evaluate((element) => getComputedStyle(element).boxShadow),
+  ).toBe("none");
+  const cascadeBox = await cascade.boundingBox();
+  expect(cascadeBox.x).toBeGreaterThanOrEqual(0);
+  expect(cascadeBox.x + cascadeBox.width).toBeLessThanOrEqual(
+    await page.evaluate(() => window.innerWidth),
+  );
+
+  await page.goto("#/companies");
+  await page.getByRole("button", { name: "行业", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "AI/互联网/IT" }),
+  ).toBeVisible();
+  await page.getByRole("checkbox", { name: "具身智能与机器人" }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByText("星澜机器人", { exact: true })).toBeVisible();
+
+  await page.goto("#/companies/company-xinglan");
+  await page.getByRole("button", { name: "编辑资料" }).click();
+  const editor = page.getByRole("dialog", { name: "编辑公司资料" });
+  await editor.locator(".s4-cascade > button").click();
+  await expect(page.locator("body > .s4-cascade-panel")).toBeVisible();
+});
+
 test("候选人新建、身份合并和字段审核覆盖关键门禁", async ({ page }) => {
   await page.goto("#/candidates/new");
   await page.getByRole("button", { name: "创建候选人" }).click();
@@ -187,7 +222,7 @@ test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) 
   await expect(page.getByRole("dialog", { name: /移动/ })).toBeVisible();
   const moveModal = page.getByRole("dialog", { name: /移动/ });
   await moveModal.locator(".s4-select > button").click();
-  await moveModal.getByRole("button", { name: "二面", exact: true }).click();
+  await page.getByRole("button", { name: "二面", exact: true }).click();
   await page.getByRole("button", { name: "确认移动" }).click();
   await expect(page.getByText(/已移动到“二面”/)).toBeVisible();
 
@@ -201,7 +236,7 @@ test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) 
   await page.getByRole("button", { name: "编辑" }).click();
   const modal = page.getByRole("dialog", { name: "编辑岗位资料" });
   await modal.getByRole("button", { name: "招聘状态" }).click();
-  await modal.getByRole("button", { name: "已暂停", exact: true }).click();
+  await page.getByRole("button", { name: "已暂停", exact: true }).click();
   await expect(modal.getByText(/暂时不能保存/)).toBeVisible();
   await expect(modal.getByRole("button", { name: "保存修改" })).toBeDisabled();
 });
@@ -263,6 +298,9 @@ test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
   expect((await paperSummaries.first().textContent()).length).toBeGreaterThan(
     70,
   );
+  await expect(page.locator(".s4-tag-overflow").first()).toHaveText("+1");
+  await page.locator(".s4-tag-overflow").first().hover();
+  await expect(page.getByRole("tooltip")).toBeVisible();
   await expect(
     page.locator(".s4-page-header").getByRole("button", { name: /导入/ }),
   ).toHaveCount(0);
@@ -273,6 +311,12 @@ test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
   expect((await patentSummaries.first().textContent()).length).toBeGreaterThan(
     60,
   );
+  await page.getByRole("button", { name: "专利类型", exact: true }).click();
+  await page.getByRole("button", { name: "实用新型", exact: true }).click();
+  await expect(page.getByText("灵巧手关节传动机构及机器人")).toBeVisible();
+  await expect(
+    page.getByText("一种面向多任务机器人的操作策略训练方法"),
+  ).toHaveCount(0);
 });
 
 test("论文作者身份和专利发明人身份使用同一审核边界", async ({ page }) => {
@@ -297,6 +341,10 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
 
 test("导入、导出和回收站覆盖异步、重名和恢复冲突", async ({ page }) => {
   await page.goto("#/data/imports?type=mapping");
+  await expect(page.getByRole("tab", { name: "数据导入" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   await expect(
     page
       .getByRole("button", { name: "新建导入" })
@@ -320,6 +368,10 @@ test("导入、导出和回收站覆盖异步、重名和恢复冲突", async ({
   ).toBeVisible();
 
   await page.goto("#/data/exports");
+  await expect(page.getByRole("tab", { name: "数据导出" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   await expect(
     page
       .getByRole("button", { name: "新建导出" })
@@ -331,6 +383,12 @@ test("导入、导出和回收站覆盖异步、重名和恢复冲突", async ({
   await expect(page.getByText("导出任务已创建")).toBeVisible();
 
   await page.goto("#/recycle-bin");
+  const guidance = page.locator(".s4-recycle-guidance");
+  const filterBar = page.locator(".s4-filter-bar");
+  const guidanceBox = await guidance.boundingBox();
+  const filterBox = await filterBar.boundingBox();
+  const spacing = filterBox.y - (guidanceBox.y + guidanceBox.height);
+  expect(spacing).toBeGreaterThanOrEqual(14);
   await page.getByRole("button", { name: "恢复" }).nth(2).click();
   await expect(
     page.getByRole("dialog", { name: "恢复前需要处理名称冲突" }),

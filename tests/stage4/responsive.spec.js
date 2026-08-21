@@ -52,3 +52,27 @@ test("阶段四关键页面生成桌面、平板和手机截图", async ({ page 
     });
   }
 });
+
+test("阶段四公共筛选与数据管理生成桌面验收截图", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("#/candidates");
+  await page.getByRole("button", { name: "收藏夹", exact: true }).click();
+  await page.screenshot({
+    path: "artifacts/stage4-candidate-favorites.png",
+    fullPage: true,
+  });
+  await page.goto("#/companies");
+  await page.getByRole("button", { name: "行业", exact: true }).click();
+  await page.screenshot({
+    path: "artifacts/stage4-company-industry.png",
+    fullPage: true,
+  });
+  for (const [route, file] of [
+    ["patents", "stage4-patents.png"],
+    ["data/imports", "stage4-data-imports.png"],
+    ["recycle-bin", "stage4-recycle-bin.png"],
+  ]) {
+    await page.goto(`#/${route}`);
+    await page.screenshot({ path: `artifacts/${file}`, fullPage: true });
+  }
+});

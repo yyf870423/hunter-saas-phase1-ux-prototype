@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
@@ -100,6 +101,72 @@ export function CustomRadio({
   );
 }
 
+export function FloatingPanel({
+  open,
+  anchorRef,
+  panelRef,
+  className,
+  width = 240,
+  align = "start",
+  children,
+}) {
+  const [style, setStyle] = useState(null);
+  useLayoutEffect(() => {
+    if (!open || !anchorRef.current) {
+      setStyle(null);
+      return undefined;
+    }
+    const update = () => {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const viewportPadding = 8;
+      const gap = 6;
+      const resolvedWidth = Math.min(
+        Math.max(width, rect.width),
+        window.innerWidth - viewportPadding * 2,
+      );
+      const preferredLeft =
+        align === "end" ? rect.right - resolvedWidth : rect.left;
+      const left = Math.min(
+        Math.max(viewportPadding, preferredLeft),
+        window.innerWidth - resolvedWidth - viewportPadding,
+      );
+      const below = window.innerHeight - rect.bottom - viewportPadding;
+      const above = rect.top - viewportPadding;
+      const openUpward = below < 260 && above > below;
+      const maxHeight = Math.max(180, (openUpward ? above : below) - gap);
+      setStyle({
+        position: "fixed",
+        left,
+        right: "auto",
+        top: openUpward ? "auto" : rect.bottom + gap,
+        bottom: openUpward ? window.innerHeight - rect.top + gap : "auto",
+        width: resolvedWidth,
+        maxHeight,
+        zIndex: 220,
+      });
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [align, anchorRef, open, width]);
+  if (!open || !style) return null;
+  return createPortal(
+    <div
+      ref={panelRef}
+      className={`${className} s4-floating-panel`}
+      style={style}
+    >
+      {children}
+    </div>,
+    document.body,
+  );
+}
+
 export function SelectMenu({
   label,
   value,
@@ -114,6 +181,7 @@ export function SelectMenu({
   const [query, setQuery] = useState("");
   const [draftValue, setDraftValue] = useState(value ?? (multiple ? [] : ""));
   const ref = useRef(null);
+  const panelRef = useRef(null);
   const valueKey = JSON.stringify(value ?? (multiple ? [] : ""));
   useEffect(
     () => setDraftValue(value ?? (multiple ? [] : "")),
@@ -123,7 +191,11 @@ export function SelectMenu({
   useEffect(() => {
     if (!open) return undefined;
     const close = (event) => {
-      if (!ref.current?.contains(event.target)) setOpen(false);
+      if (
+        !ref.current?.contains(event.target) &&
+        !panelRef.current?.contains(event.target)
+      )
+        setOpen(false);
     };
     const escape = (event) => {
       if (event.key === "Escape") setOpen(false);
@@ -169,75 +241,79 @@ export function SelectMenu({
         <span>{display}</span>
         <Icon name={open ? "chevronUp" : "chevronDown"} />
       </button>
-      {open ? (
-        <div className="s4-select-panel">
-          {searchable ? (
-            <label className="s4-select-search">
-              <Icon name="search" />
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (
-                    event.key === "Enter" &&
-                    creatable &&
-                    query.trim() &&
-                    !values.includes(query.trim())
-                  ) {
-                    event.preventDefault();
-                    choose(query.trim());
-                    setQuery("");
-                  }
-                }}
-                placeholder={
-                  creatable ? `输入${label}后按 Enter 添加` : `搜索${label}`
+      <FloatingPanel
+        open={open}
+        anchorRef={ref}
+        panelRef={panelRef}
+        className="s4-select-panel"
+        width={260}
+      >
+        {searchable ? (
+          <label className="s4-select-search">
+            <Icon name="search" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (
+                  event.key === "Enter" &&
+                  creatable &&
+                  query.trim() &&
+                  !values.includes(query.trim())
+                ) {
+                  event.preventDefault();
+                  choose(query.trim());
+                  setQuery("");
                 }
-                autoFocus
-              />
-            </label>
-          ) : null}
-          {creatable && query.trim() && !visible.includes(query.trim()) ? (
-            <div className="s4-select-create-hint">
-              按 Enter 添加“{query.trim()}”
-            </div>
-          ) : null}
-          <div className="s4-select-options">
-            {visible.map((option) => (
-              <button
-                type="button"
-                className={values.includes(option) ? "is-selected" : ""}
-                key={option}
-                onClick={() => choose(option)}
-              >
-                {multiple ? (
-                  <span className="s4-option-check">
-                    {values.includes(option) ? <Icon name="check" /> : null}
-                  </span>
-                ) : null}
-                <span>{option}</span>
-                {!multiple && values.includes(option) ? (
-                  <Icon name="check" />
-                ) : null}
-              </button>
-            ))}
+              }}
+              placeholder={
+                creatable ? `输入${label}后按 Enter 添加` : `搜索${label}`
+              }
+              autoFocus
+            />
+          </label>
+        ) : null}
+        {creatable && query.trim() && !visible.includes(query.trim()) ? (
+          <div className="s4-select-create-hint">
+            按 Enter 添加“{query.trim()}”
           </div>
-          {multiple ? (
-            <footer>
-              <span>已选 {values.length} 项</span>
-              <button
-                type="button"
-                disabled={!values.length}
-                onClick={() => {
-                  setDraftValue([]);
-                  onChange?.([]);
-                }}
-              >
-                清空
-              </button>
-            </footer>
-          ) : null}
+        ) : null}
+        <div className="s4-select-options">
+          {visible.map((option) => (
+            <button
+              type="button"
+              className={values.includes(option) ? "is-selected" : ""}
+              key={option}
+              onClick={() => choose(option)}
+            >
+              {multiple ? (
+                <span className="s4-option-check">
+                  {values.includes(option) ? <Icon name="check" /> : null}
+                </span>
+              ) : null}
+              <span>{option}</span>
+              {!multiple && values.includes(option) ? (
+                <Icon name="check" />
+              ) : null}
+            </button>
+          ))}
         </div>
-      ) : null}
+        {multiple ? (
+          <footer>
+            <span>已选 {values.length} 项</span>
+            <button
+              type="button"
+              disabled={!values.length}
+              onClick={() => {
+                setDraftValue([]);
+                onChange?.([]);
+              }}
+            >
+              清空
+            </button>
+          </footer>
+        ) : null}
+      </FloatingPanel>
     </div>
   );
 }
@@ -257,9 +333,15 @@ export function FilterBar({
         placeholder={placeholder}
       />
       <div className="s4-filter-controls">
-        {filters.map((filter) => (
-          <SelectMenu key={filter.label} {...filter} />
-        ))}
+        {filters.map((filter) =>
+          filter.render ? (
+            <span className="s4-filter-custom" key={filter.key || filter.label}>
+              {filter.render}
+            </span>
+          ) : (
+            <SelectMenu key={filter.label} {...filter} />
+          ),
+        )}
       </div>
       {trailing ? <div className="s4-filter-trailing">{trailing}</div> : null}
     </section>
@@ -269,10 +351,13 @@ export function FilterBar({
 export function ColumnMenu({ columns, visible, onChange }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const panelRef = useRef(null);
   useEffect(() => {
     if (!open) return undefined;
     const close = (event) =>
-      !ref.current?.contains(event.target) && setOpen(false);
+      !ref.current?.contains(event.target) &&
+      !panelRef.current?.contains(event.target) &&
+      setOpen(false);
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
   }, [open]);
@@ -283,31 +368,36 @@ export function ColumnMenu({ columns, visible, onChange }) {
         label="设置显示列"
         onClick={() => setOpen((current) => !current)}
       />
-      {open ? (
-        <div className="s4-column-panel">
-          <header>
-            <b>显示列</b>
-            <small>拖拽顺序将在正式产品中保留</small>
-          </header>
-          {columns.map((column) => (
-            <div key={column.key}>
-              <CustomCheckbox
-                checked={column.required || visible.includes(column.key)}
-                disabled={column.required}
-                onChange={(checked) =>
-                  onChange(
-                    checked
-                      ? [...visible, column.key]
-                      : visible.filter((item) => item !== column.key),
-                  )
-                }
-                label={column.label}
-              />
-              {column.required ? <em>固定</em> : <Icon name="menu" />}
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <FloatingPanel
+        open={open}
+        anchorRef={ref}
+        panelRef={panelRef}
+        className="s4-column-panel"
+        width={280}
+        align="end"
+      >
+        <header>
+          <b>显示列</b>
+          <small>拖拽顺序将在正式产品中保留</small>
+        </header>
+        {columns.map((column) => (
+          <div key={column.key}>
+            <CustomCheckbox
+              checked={column.required || visible.includes(column.key)}
+              disabled={column.required}
+              onChange={(checked) =>
+                onChange(
+                  checked
+                    ? [...visible, column.key]
+                    : visible.filter((item) => item !== column.key),
+                )
+              }
+              label={column.label}
+            />
+            {column.required ? <em>固定</em> : <Icon name="menu" />}
+          </div>
+        ))}
+      </FloatingPanel>
     </div>
   );
 }
@@ -411,9 +501,13 @@ export function DataTable({
                     className={`s4-table-value ${columnIndex === 0 ? "is-primary" : ""}`}
                     onClick={() => onRow?.(row)}
                   >
-                    {column.render
-                      ? column.render(row)
-                      : row[column.key] || "—"}
+                    {column.render ? (
+                      column.render(row)
+                    ) : (
+                      <TooltipText tip={String(row[column.key] || "—")}>
+                        {row[column.key] || "—"}
+                      </TooltipText>
+                    )}
                   </button>
                 </td>
               ))}
@@ -600,10 +694,14 @@ export function TagList({
   tone = "neutral",
   removable = false,
   onRemove,
+  maxVisible,
 }) {
+  const visibleItems =
+    typeof maxVisible === "number" ? items.slice(0, maxVisible) : items;
+  const hiddenItems = items.slice(visibleItems.length);
   return (
     <span className="s4-tag-list">
-      {items.map((item) => (
+      {visibleItems.map((item) => (
         <span className={`s4-tag s4-tag-${tone}`} key={item}>
           {item}
           {removable ? (
@@ -617,6 +715,11 @@ export function TagList({
           ) : null}
         </span>
       ))}
+      {hiddenItems.length ? (
+        <TooltipText tip={hiddenItems.join("、")} force>
+          <span className="s4-tag s4-tag-overflow">+{hiddenItems.length}</span>
+        </TooltipText>
+      ) : null}
     </span>
   );
 }
@@ -932,11 +1035,53 @@ export function ProgressBar({ value, label }) {
   );
 }
 
-export function TooltipText({ children, tip }) {
+export function TooltipText({ children, tip, className = "", force = false }) {
+  const anchorRef = useRef(null);
+  const [tooltip, setTooltip] = useState(null);
+  const show = () => {
+    const element = anchorRef.current;
+    if (!element || !tip) return;
+    const truncated =
+      element.scrollWidth > element.clientWidth + 1 ||
+      element.scrollHeight > element.clientHeight + 1;
+    if (!force && !truncated) return;
+    const rect = element.getBoundingClientRect();
+    const width = Math.min(360, window.innerWidth - 24);
+    const left = Math.min(
+      Math.max(12, rect.left),
+      window.innerWidth - width - 12,
+    );
+    const openAbove = window.innerHeight - rect.bottom < 120 && rect.top > 120;
+    setTooltip({
+      left,
+      top: openAbove ? "auto" : rect.bottom + 7,
+      bottom: openAbove ? window.innerHeight - rect.top + 7 : "auto",
+      width,
+    });
+  };
   return (
-    <span className="s4-tooltip" tabIndex="0">
+    <span
+      ref={anchorRef}
+      className={`s4-tooltip ${className}`}
+      tabIndex="0"
+      onMouseEnter={show}
+      onMouseLeave={() => setTooltip(null)}
+      onFocus={show}
+      onBlur={() => setTooltip(null)}
+    >
       {children}
-      <span role="tooltip">{tip}</span>
+      {tooltip
+        ? createPortal(
+            <span
+              className="s4-floating-tooltip"
+              role="tooltip"
+              style={tooltip}
+            >
+              {tip}
+            </span>,
+            document.body,
+          )
+        : null}
     </span>
   );
 }

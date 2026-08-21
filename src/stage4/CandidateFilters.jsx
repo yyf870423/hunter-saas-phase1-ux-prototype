@@ -2,14 +2,24 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "../components/Icon";
 import { SearchField } from "../stage1/ui";
-import { Button, CustomCheckbox, Modal, SelectMenu } from "./asset-ui";
+import {
+  Button,
+  CustomCheckbox,
+  FloatingPanel,
+  Modal,
+  SelectMenu,
+} from "./asset-ui";
 import { candidateFavoriteTree, candidateIndustryTree } from "./data";
 
-function useDismiss(open, close, ref) {
+function useDismiss(open, close, anchorRef, panelRef) {
   useEffect(() => {
     if (!open) return undefined;
     const pointer = (event) => {
-      if (!ref.current?.contains(event.target)) close();
+      if (
+        !anchorRef.current?.contains(event.target) &&
+        !panelRef.current?.contains(event.target)
+      )
+        close();
     };
     const keyboard = (event) => {
       if (event.key === "Escape") close();
@@ -20,7 +30,7 @@ function useDismiss(open, close, ref) {
       document.removeEventListener("pointerdown", pointer);
       document.removeEventListener("keydown", keyboard);
     };
-  }, [close, open, ref]);
+  }, [anchorRef, close, open, panelRef]);
 }
 
 function toggleArray(values, value) {
@@ -34,7 +44,8 @@ export function IndustryCascade({ value = [], onChange }) {
   const [query, setQuery] = useState("");
   const [primary, setPrimary] = useState(Object.keys(candidateIndustryTree)[0]);
   const ref = useRef(null);
-  useDismiss(open, () => setOpen(false), ref);
+  const panelRef = useRef(null);
+  useDismiss(open, () => setOpen(false), ref, panelRef);
   const searchResults = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return [];
@@ -52,75 +63,79 @@ export function IndustryCascade({ value = [], onChange }) {
         <span>{value.length ? `已选 ${value.length} 个行业` : "行业"}</span>
         <Icon name={open ? "chevronUp" : "chevronDown"} />
       </button>
-      {open ? (
-        <div className="s4-cascade-panel">
-          <label className="s4-cascade-search">
-            <Icon name="search" />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="搜索行业（跨一级）"
-              autoFocus
-            />
-          </label>
-          {query.trim() ? (
-            <div className="s4-cascade-results">
-              {searchResults.length ? (
-                searchResults.map(({ group, item }) => (
-                  <CustomCheckbox
-                    key={`${group}-${item}`}
-                    checked={value.includes(item)}
-                    label={item}
-                    onChange={() => onChange(toggleArray(value, item))}
-                  />
-                ))
-              ) : (
-                <p>没有匹配的行业</p>
-              )}
+      <FloatingPanel
+        open={open}
+        anchorRef={ref}
+        panelRef={panelRef}
+        className="s4-cascade-panel"
+        width={620}
+      >
+        <label className="s4-cascade-search">
+          <Icon name="search" />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="搜索行业（跨一级）"
+            autoFocus
+          />
+        </label>
+        {query.trim() ? (
+          <div className="s4-cascade-results">
+            {searchResults.length ? (
+              searchResults.map(({ group, item }) => (
+                <CustomCheckbox
+                  key={`${group}-${item}`}
+                  checked={value.includes(item)}
+                  label={item}
+                  onChange={() => onChange(toggleArray(value, item))}
+                />
+              ))
+            ) : (
+              <p>没有匹配的行业</p>
+            )}
+          </div>
+        ) : (
+          <div className="s4-cascade-body">
+            <div className="s4-cascade-primary">
+              {Object.keys(candidateIndustryTree).map((group) => (
+                <button
+                  type="button"
+                  className={primary === group ? "is-active" : ""}
+                  key={group}
+                  onClick={() => setPrimary(group)}
+                >
+                  <span>{group}</span>
+                  {selectedByPrimary(group) ? (
+                    <em>{selectedByPrimary(group)}</em>
+                  ) : null}
+                </button>
+              ))}
             </div>
-          ) : (
-            <div className="s4-cascade-body">
-              <div className="s4-cascade-primary">
-                {Object.keys(candidateIndustryTree).map((group) => (
-                  <button
-                    type="button"
-                    className={primary === group ? "is-active" : ""}
-                    key={group}
-                    onClick={() => setPrimary(group)}
-                  >
-                    <span>{group}</span>
-                    {selectedByPrimary(group) ? (
-                      <em>{selectedByPrimary(group)}</em>
-                    ) : null}
-                  </button>
-                ))}
-              </div>
-              <div className="s4-cascade-secondary">
-                {candidateIndustryTree[primary].map((item) => (
-                  <CustomCheckbox
-                    key={item}
-                    checked={value.includes(item)}
-                    label={item}
-                    onChange={() => onChange(toggleArray(value, item))}
-                  />
-                ))}
-              </div>
+            <div className="s4-cascade-secondary">
+              {candidateIndustryTree[primary].map((item) => (
+                <CustomCheckbox
+                  key={item}
+                  checked={value.includes(item)}
+                  label={item}
+                  onChange={() => onChange(toggleArray(value, item))}
+                />
+              ))}
             </div>
-          )}
-          <footer>
-            <span>
-              已选 <b>{value.length}</b> 个行业
-            </span>
-            <button
-              type="button"
-              disabled={!value.length}
-              onClick={() => onChange([])}
-            >
-              清空
-            </button>
-          </footer>
-        </div>
-      ) : null}
+          </div>
+        )}
+        <footer>
+          <span>
+            已选 <b>{value.length}</b> 个行业
+          </span>
+          <button
+            type="button"
+            disabled={!value.length}
+            onClick={() => onChange([])}
+          >
+            清空
+          </button>
+        </footer>
+      </FloatingPanel>
     </div>
   );
 }
@@ -215,24 +230,13 @@ function FolderTree({ value, onChange, multiple = false, query = "" }) {
   );
 }
 
-export function FavoriteFilter({ value = "all", onChange }) {
+export function FavoriteFilter({ value = [], onChange }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef(null);
-  useDismiss(open, () => setOpen(false), ref);
-  const selectedFolder = value.startsWith("folder:")
-    ? value.slice("folder:".length).split("/").at(-1)
-    : "";
-  const label =
-    value === "favorited"
-      ? "全部收藏夹"
-      : value === "unfiled"
-        ? "未收藏"
-        : selectedFolder || "收藏夹";
-  const choose = (nextValue) => {
-    onChange(nextValue);
-    setOpen(false);
-  };
+  const panelRef = useRef(null);
+  useDismiss(open, () => setOpen(false), ref, panelRef);
+  const label = value.length ? `收藏夹 · ${value.length}` : "收藏夹";
   return (
     <div
       className={`s4-select s4-favorite-filter ${open ? "is-open" : ""}`}
@@ -242,43 +246,35 @@ export function FavoriteFilter({ value = "all", onChange }) {
         <span>{label}</span>
         <Icon name={open ? "chevronUp" : "chevronDown"} />
       </button>
-      {open ? (
-        <div className="s4-favorite-panel">
-          <div
-            className="s4-favorite-scope"
-            role="radiogroup"
-            aria-label="收藏夹范围"
+      <FloatingPanel
+        open={open}
+        anchorRef={ref}
+        panelRef={panelRef}
+        className="s4-favorite-panel"
+        width={440}
+      >
+        <label className="s4-cascade-search">
+          <Icon name="search" />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="搜索收藏夹"
+          />
+        </label>
+        <FolderTree value={value} onChange={onChange} multiple query={query} />
+        <footer>
+          <span>
+            已选 <b>{value.length}</b> 个收藏夹
+          </span>
+          <button
+            type="button"
+            disabled={!value.length}
+            onClick={() => onChange([])}
           >
-            {[
-              ["all", "全部候选人"],
-              ["favorited", "全部收藏夹"],
-              ["unfiled", "未收藏"],
-            ].map(([key, text]) => (
-              <button
-                type="button"
-                role="radio"
-                aria-checked={value === key}
-                className={value === key ? "is-selected" : ""}
-                key={key}
-                onClick={() => choose(key)}
-              >
-                <span>{value === key ? <Icon name="check" /> : null}</span>
-                {text}
-              </button>
-            ))}
-          </div>
-          <label className="s4-cascade-search">
-            <Icon name="search" />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="搜索收藏夹"
-            />
-          </label>
-          <FolderTree value={value} onChange={choose} query={query} />
-          <footer>选择上级目录时包含其全部子目录</footer>
-        </div>
-      ) : null}
+            清空
+          </button>
+        </footer>
+      </FloatingPanel>
     </div>
   );
 }
@@ -393,7 +389,7 @@ export const candidateFilterDefaults = {
   opportunity: [],
   pipeline: "",
   title: "",
-  favorite: "all",
+  favorite: [],
   yearsMin: "",
   ageMin: "",
   ageMax: "",
@@ -417,7 +413,7 @@ export function CandidateFilterBar({
     values.opportunity.length,
     values.pipeline && values.pipeline !== "全部" ? 1 : 0,
     values.title ? 1 : 0,
-    values.favorite !== "all" ? 1 : 0,
+    values.favorite.length,
     values.yearsMin ? 1 : 0,
     values.ageMin || values.ageMax ? 1 : 0,
   ].reduce((sum, item) => sum + Number(item || 0), 0);
@@ -441,19 +437,8 @@ export function CandidateFilterBar({
       ? [values.pipeline, "", "pipeline"]
       : null,
     values.title ? [`职位：${values.title}`, "", "title"] : null,
-    values.favorite !== "all"
-      ? [
-          values.favorite === "favorited"
-            ? "收藏夹：全部"
-            : values.favorite === "unfiled"
-              ? "收藏夹：未收藏"
-              : `收藏夹：${values.favorite
-                  .replace(/^folder:/, "")
-                  .split("/")
-                  .at(-1)}`,
-          "",
-          "favorite",
-        ]
+    values.favorite.length
+      ? ["收藏夹", values.favorite.length, "favorite"]
       : null,
     values.yearsMin ? [`年限 ≥ ${values.yearsMin} 年`, "", "yearsMin"] : null,
     values.ageMin || values.ageMax
@@ -471,7 +456,7 @@ export function CandidateFilterBar({
       ].includes(key)
     )
       update(key, []);
-    else if (key === "favorite") update(key, "all");
+    else if (key === "favorite") update(key, []);
     else if (key === "age")
       setValues((current) => ({ ...current, ageMin: "", ageMax: "" }));
     else update(key, "");

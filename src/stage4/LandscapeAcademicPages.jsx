@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
@@ -27,6 +27,7 @@ import {
   TagList,
   TextArea,
   TextInput,
+  TooltipText,
   useListController,
   useToast,
 } from "./asset-ui";
@@ -98,7 +99,9 @@ export function MappingsListPage() {
                   </div>
                 ) : null}
               </header>
-              <p>{item.goal}</p>
+              <TooltipText className="s4-landscape-goal" tip={item.goal}>
+                {item.goal}
+              </TooltipText>
               <dl>
                 <div>
                   <dt>公司</dt>
@@ -725,7 +728,36 @@ function AcademicCardList({ kind }) {
     4,
   );
   const [selected, setSelected] = useState(new Set());
+  const [typeFilters, setTypeFilters] = useState([]);
+  const [relationFilters, setRelationFilters] = useState([]);
   const label = kind === "papers" ? "论文" : "专利";
+  const relationLabel = (relation) =>
+    relation.includes("待确认")
+      ? "存在待确认"
+      : relation.includes("未")
+        ? "没有人物关联"
+        : "已关联候选人";
+  const filteredItems = controller.filtered.filter((item) => {
+    if (
+      typeFilters.length &&
+      !(kind === "papers"
+        ? typeFilters.includes(String(item.year))
+        : typeFilters.includes(item.type))
+    )
+      return false;
+    if (
+      relationFilters.length &&
+      !relationFilters.includes(relationLabel(item.relation))
+    )
+      return false;
+    return true;
+  });
+  const pages = Math.max(1, Math.ceil(filteredItems.length / 4));
+  const rows = filteredItems.slice(
+    (controller.page - 1) * 4,
+    controller.page * 4,
+  );
+  useEffect(() => controller.setPage(1), [relationFilters, typeFilters]);
   return (
     <div className="s4-page">
       <AssetPageHeader
@@ -735,7 +767,7 @@ function AcademicCardList({ kind }) {
             ? "管理论文原文、翻译、作者机构和人物身份关系。"
             : "管理专利信息、发明人、权利人和人物身份关系。"
         }
-        count={controller.filtered.length}
+        count={filteredItems.length}
         primaryLabel="AI 搜索"
         primaryIcon="sparkles"
         onPrimary={() => navigate(`/new?prompt=搜索具身智能方向${label}`)}
@@ -753,39 +785,39 @@ function AcademicCardList({ kind }) {
             ? [
                 {
                   label: "年份",
-                  value: [],
+                  value: typeFilters,
                   options: ["2026", "2025", "2024", "2023"],
                   multiple: true,
-                  onChange: () => {},
+                  onChange: setTypeFilters,
                 },
                 {
                   label: "人物关联",
-                  value: [],
+                  value: relationFilters,
                   options: ["已关联候选人", "存在待确认", "没有人物关联"],
                   multiple: true,
-                  onChange: () => {},
+                  onChange: setRelationFilters,
                 },
               ]
             : [
                 {
                   label: "专利类型",
-                  value: [],
+                  value: typeFilters,
                   options: ["发明专利", "实用新型"],
                   multiple: true,
-                  onChange: () => {},
+                  onChange: setTypeFilters,
                 },
                 {
                   label: "人物关联",
-                  value: [],
+                  value: relationFilters,
                   options: ["已关联候选人", "存在待确认", "没有人物关联"],
                   multiple: true,
-                  onChange: () => {},
+                  onChange: setRelationFilters,
                 },
               ]
         }
       />
       <div className="s4-academic-list">
-        {controller.rows.map((item) => (
+        {rows.map((item) => (
           <article
             key={item.id}
             className={selected.has(item.id) ? "is-selected" : ""}
@@ -819,13 +851,15 @@ function AcademicCardList({ kind }) {
                   ? item.authors.join("、")
                   : item.inventors.join("、")}
               </p>
-              <p className="s4-academic-summary">{item.summary}</p>
+              <TooltipText className="s4-academic-summary" tip={item.summary}>
+                {item.summary}
+              </TooltipText>
               <span>
                 {kind === "papers"
                   ? item.institutions.join(" · ")
                   : item.applicant}
               </span>
-              <TagList items={item.tags} tone="info" />
+              <TagList items={item.tags} tone="info" maxVisible={2} />
             </div>
             <aside>
               <StatusBadge
@@ -883,7 +917,7 @@ function AcademicCardList({ kind }) {
       ) : null}
       <Pagination
         page={controller.page}
-        pages={controller.pages}
+        pages={pages}
         onChange={controller.setPage}
       />
     </div>

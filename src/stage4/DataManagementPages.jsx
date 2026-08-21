@@ -6,6 +6,7 @@ import {
   Button,
   CustomCheckbox,
   CustomRadio,
+  DetailTabs,
   FileDrop,
   FilterBar,
   FormField,
@@ -22,8 +23,23 @@ import {
 } from "./asset-ui";
 import { exportTasks, importTasks, recycleItems } from "./data";
 
-export function ImportsPage() {
+function DataManagementNav({ value }) {
   const navigate = useNavigate();
+  return (
+    <div className="s4-data-management-nav">
+      <DetailTabs
+        tabs={[
+          { value: "imports", label: "数据导入" },
+          { value: "exports", label: "数据导出" },
+        ]}
+        value={value}
+        onChange={(next) => navigate(`/data/${next}`)}
+      />
+    </div>
+  );
+}
+
+export function ImportsPage() {
   const notify = useToast();
   const [params] = useSearchParams();
   const [wizardOpen, setWizardOpen] = useState(Boolean(params.get("type")));
@@ -91,10 +107,8 @@ export function ImportsPage() {
         primaryLabel="新建导入"
         primaryIcon="download"
         onPrimary={() => setWizardOpen(true)}
-        actions={
-          <Button onClick={() => navigate("/data/exports")}>数据导出</Button>
-        }
       />
+      <DataManagementNav value="imports" />
       <FilterBar
         query={query}
         setQuery={setQuery}
@@ -407,7 +421,6 @@ export function ImportsPage() {
 }
 
 export function ExportsPage() {
-  const navigate = useNavigate();
   const notify = useToast();
   const [createOpen, setCreateOpen] = useState(false);
   const [scope, setScope] = useState("候选人");
@@ -429,10 +442,8 @@ export function ExportsPage() {
         primaryLabel="新建导出"
         primaryIcon="upload"
         onPrimary={() => setCreateOpen(true)}
-        actions={
-          <Button onClick={() => navigate("/data/imports")}>数据导入</Button>
-        }
       />
+      <DataManagementNav value="exports" />
       <FilterBar
         query={query}
         setQuery={setQuery}
@@ -568,12 +579,14 @@ export function RecycleBinPage() {
         description="正式资产删除后保留 30 天；到期自动永久清理。"
         count={rows.length}
       />
-      <StateBanner
-        tone="warning"
-        icon="warning"
-        title="回收站中的关系只用于恢复和影响说明"
-        description="删除不会级联其他独立资产；永久清理后，其他对象只保留必要历史名称或已删除引用。"
-      />
+      <div className="s4-recycle-guidance">
+        <StateBanner
+          tone="warning"
+          icon="warning"
+          title="回收站中的关系只用于恢复和影响说明"
+          description="删除不会级联其他独立资产；永久清理后，其他对象只保留必要历史名称或已删除引用。"
+        />
+      </div>
       <FilterBar
         query={query}
         setQuery={setQuery}

@@ -599,7 +599,7 @@ export const companies = [
   {
     id: "company-xinglan",
     name: "星澜机器人",
-    industries: ["机器人", "人工智能"],
+    industries: ["具身智能与机器人", "人工智能", "工业自动化"],
     location: "北京、上海",
     contacts: 4,
     opportunities: 2,
@@ -611,7 +611,7 @@ export const companies = [
   {
     id: "company-tuojie",
     name: "拓界机器人",
-    industries: ["机器人", "智能制造"],
+    industries: ["具身智能与机器人", "工业自动化"],
     location: "上海",
     contacts: 3,
     opportunities: 1,
@@ -623,7 +623,7 @@ export const companies = [
   {
     id: "company-lingyue",
     name: "灵跃科技",
-    industries: ["机器人", "硬件"],
+    industries: ["具身智能与机器人", "智能硬件/消费电子"],
     location: "深圳、东莞",
     contacts: 2,
     opportunities: 1,
@@ -635,7 +635,7 @@ export const companies = [
   {
     id: "company-qiongding",
     name: "穹顶智能",
-    industries: ["机器人", "企业服务"],
+    industries: ["具身智能与机器人", "计算机软件"],
     location: "北京",
     contacts: 1,
     opportunities: 1,
@@ -647,7 +647,7 @@ export const companies = [
   {
     id: "company-ailab",
     name: "上海人工智能实验室",
-    industries: ["科研", "人工智能"],
+    industries: ["学术/科研", "人工智能"],
     location: "上海",
     contacts: 2,
     opportunities: 0,
@@ -830,7 +830,7 @@ export const papers = [
     authors: ["Hao Lin", "Mingyuan Zhou", "Yifan Jiang"],
     institutions: ["Tuojie Robotics", "Qiongding AI"],
     citations: 42,
-    tags: ["VLA", "机器人学习"],
+    tags: ["VLA", "机器人学习", "多模态决策"],
     summary:
       "系统梳理视觉语言动作模型在机器人感知、动作生成和真实环境部署中的主要技术路线，并比较不同训练数据、模型结构与评测方法的适用边界。论文进一步总结当前 VLA 系统在长程任务、数据规模和安全泛化方面的关键问题。",
     relation: "2 位已关联",
@@ -845,7 +845,7 @@ export const papers = [
     authors: ["Xingyu Zhao", "Chuning Chen"],
     institutions: ["Xinglan Robotics", "Lingyue AI"],
     citations: 68,
-    tags: ["扩散策略", "机器人操作"],
+    tags: ["扩散策略", "机器人操作", "泛化学习"],
     summary:
       "提出面向多任务机器人操作的条件扩散策略，通过统一动作表示和跨场景数据增强提升新物体、新摆放和新任务下的泛化能力。实验覆盖桌面抓取、双臂协同与连续操作，并报告了真实机器人上的稳定性和失败模式。",
     relation: "1 位待确认",
@@ -860,7 +860,7 @@ export const papers = [
     authors: ["Wenting He", "Hao Lin"],
     institutions: ["Shanghai AI Laboratory", "Tuojie Robotics"],
     citations: 31,
-    tags: ["数据闭环", "真机部署"],
+    tags: ["数据闭环", "真机部署", "持续学习"],
     summary:
       "围绕大规模真机学习的数据采集、失败样本回流、质量筛选和持续训练建立完整闭环，重点讨论如何降低人工标注和重复采集成本。结果显示，按失败类型组织回流数据能显著提高新任务上线速度和策略迭代效率。",
     relation: "2 位已关联",
@@ -875,7 +875,7 @@ export const papers = [
     authors: ["Chen Liang", "Yuan Gao"],
     institutions: ["Galbot", "Tencent Robotics X"],
     citations: 97,
-    tags: ["Sim2Real", "强化学习"],
+    tags: ["Sim2Real", "强化学习", "动作先验"],
     summary:
       "使用可迁移的动作先验和分层强化学习方法缩小仿真环境与真实机器人之间的差异，使策略能够在少量真机数据下完成快速适配。论文同时分析了传感器噪声、动力学偏差和动作延迟对迁移效果的影响。",
     relation: "未关联",
@@ -894,7 +894,7 @@ export const patents = [
     publicationNo: "CN118765432A",
     applicationDate: "2026-03-18",
     grantDate: "—",
-    tags: ["操作策略", "VLA"],
+    tags: ["操作策略", "VLA", "多任务机器人"],
     summary:
       "该专利公开一种面向多任务机器人的操作策略训练方法，将视觉、语言指令和动作轨迹编码为统一训练样本，并通过任务难度分层与失败样本回放提高策略稳定性。方案适用于抓取、放置、装配等连续操作任务。",
     relation: "1 位已关联",
@@ -902,14 +902,14 @@ export const patents = [
   {
     id: "patent-hand",
     title: "灵巧手关节传动机构及机器人",
-    type: "发明专利",
+    type: "实用新型",
     applicant: "深圳灵跃科技有限公司",
     inventors: ["陈楚宁", "李博", "许佳"],
     applicationNo: "CN202510987654.2",
     publicationNo: "CN117654321A",
     applicationDate: "2025-08-09",
     grantDate: "2026-06-20",
-    tags: ["灵巧手", "精密传动"],
+    tags: ["灵巧手", "精密传动", "关节机构"],
     summary:
       "该专利涉及灵巧手关节的紧凑传动机构，通过差动组件、柔性连接和预紧结构降低回差并提高狭小空间内的输出能力。设计兼顾模块化装配、维护便利性以及多指协同控制所需的重复定位精度。",
     relation: "1 位已关联",
@@ -924,7 +924,7 @@ export const patents = [
     publicationNo: "CN117998877A",
     applicationDate: "2025-10-11",
     grantDate: "—",
-    tags: ["数据闭环", "机器人学习"],
+    tags: ["数据闭环", "机器人学习", "样本筛选"],
     summary:
       "该专利提出机器人训练数据的自动筛选、质量评分和回流系统，可按照任务阶段、失败类型与数据新颖度识别高价值样本。系统支持将线上执行记录自动转化为可复用训练集，并保留样本来源与版本追溯信息。",
     relation: "1 位已关联",
