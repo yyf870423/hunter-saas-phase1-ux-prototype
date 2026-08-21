@@ -254,21 +254,6 @@ function ProfileTab({ candidate, hasIdentityIssue = false }) {
             审核资料变化
           </Button>
         </article>
-        <article>
-          <i>
-            <Icon name="link" />
-          </i>
-          <span>
-            <b>资料来源可追溯</b>
-            <p>关键字段关联 12 项文件、网页和人工确认依据。</p>
-          </span>
-          <Button
-            size="sm"
-            onClick={() => navigate("/sources/candidate-linhao")}
-          >
-            查看来源与证据
-          </Button>
-        </article>
         {hasIdentityIssue ? (
           <article className="is-danger">
             <i>

@@ -219,6 +219,9 @@ test("候选人新建、身份合并和字段审核覆盖关键门禁", async ({
 test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作", async ({ page }) => {
   await page.goto("#/candidates/candidate-linhao");
   await expect(page.getByRole("button", { name: "身份与合并" })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "查看来源与证据" }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: "编辑当前概览" }).click();
   await expect(
     page.getByRole("dialog", { name: "编辑当前概览" }),
@@ -270,6 +273,11 @@ test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作",
   const matching = page.getByRole("dialog", { name: "匹配岗位" });
   await matching.getByRole("button", { name: "开始匹配" }).click();
   await expect(matching.getByText("岗位匹配完成")).toBeVisible();
+
+  await page.goto("#/candidates/candidate-linhao?tab=relations");
+  await expect(
+    page.getByRole("button", { name: "查看全部证据" }),
+  ).toBeVisible();
 });
 
 test("候选人来源证据逐项可打开且详情加载状态完整", async ({ page }) => {
