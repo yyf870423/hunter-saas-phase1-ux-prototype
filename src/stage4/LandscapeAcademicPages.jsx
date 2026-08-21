@@ -960,6 +960,208 @@ const candidateIdentityMatches = {
   王奕: "candidate-wangyi",
 };
 
+const identityComparisonProfiles = {
+  "Yifan Jiang": {
+    contactStatus: ["信息不足", "warning"],
+    workStatus: ["时间存在冲突", "warning"],
+    educationStatus: ["高度一致", "success"],
+    projectStatus: ["方向一致", "success"],
+    source: {
+      contacts: [
+        { title: "手机", value: "未从公开成果中获取" },
+        { title: "邮箱", value: "yi***@pjlab.org.cn", meta: "论文通讯信息" },
+      ],
+      work: [
+        {
+          title: "上海人工智能实验室",
+          meta: "2023.07 至今",
+          detail: "论文署名单位；具身智能与机器人学习方向。",
+        },
+        {
+          title: "上海交通大学机器人研究所",
+          meta: "2020.09 - 2023.06",
+          detail: "从共同作者与公开项目页面获得，具体职位待核实。",
+        },
+      ],
+      education: [
+        {
+          title: "上海交通大学 · 计算机科学与技术",
+          meta: "2016.09 - 2021.06 · 博士",
+          detail: "研究方向为机器人学习与多模态控制。",
+        },
+      ],
+      projects: [
+        {
+          title: "VLA 机器人综述与评测",
+          meta: "2025.03 - 2026.03",
+          detail: "负责真实机器人部署、数据闭环和评测协议相关研究。",
+        },
+        {
+          title: "多任务机器人操作数据集",
+          meta: "2024.01 - 2025.02",
+          detail: "参与数据采集规范和跨任务泛化实验。",
+        },
+      ],
+    },
+    candidate: {
+      contacts: [
+        { title: "手机", value: "186 **** 3271", meta: "候选人资料" },
+        {
+          title: "邮箱",
+          value: "yif***@baai.ac.cn",
+          meta: "最近核实于 2026.07",
+        },
+      ],
+      work: [
+        {
+          title: "智源研究院 · 多模态算法研究员",
+          meta: "2024.08 至今",
+          detail: "负责多模态基础模型和具身智能预训练。",
+        },
+        {
+          title: "上海人工智能实验室 · 研究科学家",
+          meta: "2021.07 - 2024.07",
+          detail: "从事机器人学习、VLA 模型和真机部署。",
+        },
+      ],
+      education: [
+        {
+          title: "上海交通大学 · 计算机科学与技术",
+          meta: "2016.09 - 2021.06 · 博士",
+          detail: "导师与公开论文作者网络能够对应。",
+        },
+      ],
+      projects: [
+        {
+          title: "具身 VLA 预训练项目",
+          meta: "2024.08 至今",
+          detail: "负责多模态对齐、数据闭环与机器人策略评测。",
+        },
+        {
+          title: "真实机器人多任务泛化",
+          meta: "2022.02 - 2024.06",
+          detail: "完成真机部署和失败样本回流方案。",
+        },
+      ],
+    },
+  },
+  王奕: {
+    contactStatus: ["仅候选人有记录", "warning"],
+    workStatus: ["当前机构一致", "success"],
+    educationStatus: ["来源未披露", "neutral"],
+    projectStatus: ["成果方向一致", "success"],
+    source: {
+      contacts: [
+        { title: "手机", value: "专利公开信息未披露" },
+        { title: "邮箱", value: "专利公开信息未披露" },
+      ],
+      work: [
+        {
+          title: "星澜机器人（北京）有限公司",
+          meta: "专利申请时在职",
+          detail: "公开专利未披露具体部门与职位。",
+        },
+      ],
+      education: [],
+      projects: [
+        {
+          title: "多任务机器人操作策略训练方法",
+          meta: "发明人 · 申请于 2025.11",
+          detail: "涉及多模态策略学习、失败样本回流和真实机器人操作。",
+        },
+      ],
+    },
+    candidate: {
+      contacts: [
+        { title: "手机", value: "139 **** 5816", meta: "候选人资料" },
+        {
+          title: "邮箱",
+          value: "wang***@xinglan.ai",
+          meta: "最近核实于 2026.06",
+        },
+      ],
+      work: [
+        {
+          title: "星澜机器人 · 机器人学习研究员",
+          meta: "2023.04 至今",
+          detail: "负责机器人操作策略、模仿学习和真机评测。",
+        },
+        {
+          title: "腾讯 Robotics X · 算法工程师",
+          meta: "2021.07 - 2023.03",
+          detail: "参与运动控制和强化学习项目。",
+        },
+      ],
+      education: [
+        {
+          title: "浙江大学 · 控制科学与工程",
+          meta: "2018.09 - 2021.06 · 硕士",
+          detail: "研究方向为机器人控制与强化学习。",
+        },
+      ],
+      projects: [
+        {
+          title: "机器人多任务操作平台",
+          meta: "2023.08 至今",
+          detail: "负责策略训练、失败样本回流和真实场景成功率优化。",
+        },
+      ],
+    },
+  },
+};
+
+function IdentityRecordList({ items, emptyLabel }) {
+  if (!items.length)
+    return (
+      <div className="s4-person-record-empty">
+        <Icon name="alert" />
+        <span>{emptyLabel}</span>
+      </div>
+    );
+  return (
+    <div className="s4-person-record-list">
+      {items.map((item) => (
+        <article key={`${item.title}-${item.meta || item.value}`}>
+          <b>{item.title}</b>
+          {item.value ? <p>{item.value}</p> : null}
+          {item.meta ? <small>{item.meta}</small> : null}
+          {item.detail ? <p>{item.detail}</p> : null}
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function IdentityCompareGroup({
+  title,
+  status,
+  source,
+  candidate,
+  emptyLabel,
+}) {
+  return (
+    <section className="s4-person-compare-group">
+      <header>
+        <h3>{title}</h3>
+        <StatusBadge tone={status[1]}>{status[0]}</StatusBadge>
+      </header>
+      <div>
+        <section>
+          <small>来源人物资料</small>
+          <IdentityRecordList items={source} emptyLabel={emptyLabel} />
+        </section>
+        <section>
+          <small>疑似候选人资料</small>
+          <IdentityRecordList
+            items={candidate}
+            emptyLabel="候选人资料中没有对应记录"
+          />
+        </section>
+      </div>
+    </section>
+  );
+}
+
 function PersonIdentityReview({
   kind,
   person,
@@ -975,15 +1177,67 @@ function PersonIdentityReview({
   const suggestedCandidate = candidates.find(
     (candidate) => candidate.id === suggestedId,
   );
-  const institutionMatches = suggestedCandidate
-    ? institution.includes(suggestedCandidate.company) ||
-      suggestedCandidate.company.includes(institution)
-    : false;
   const noun = kind === "paper" ? "作者" : "发明人";
-  const sourceDirection =
-    kind === "paper"
-      ? "视觉语言动作模型、机器人学习与真机部署"
-      : "机器人操作、运动控制与系统实现";
+  const comparison = identityComparisonProfiles[person] || {
+    contactStatus: ["信息不足", "warning"],
+    workStatus: ["需要核实", "warning"],
+    educationStatus: ["来源未披露", "neutral"],
+    projectStatus: ["方向疑似相关", "warning"],
+    source: {
+      contacts: [
+        { title: "手机", value: "未从公开成果中获取" },
+        { title: "邮箱", value: "未从公开成果中获取" },
+      ],
+      work: [
+        {
+          title: institution,
+          meta: sourceMeta,
+          detail: "来自当前成果的署名机构，具体职位和任职时间待核实。",
+        },
+      ],
+      education: [],
+      projects: [
+        {
+          title: sourceTitle,
+          meta: sourceMeta,
+          detail: `以${noun}身份出现在当前成果中。`,
+        },
+      ],
+    },
+    candidate: {
+      contacts: suggestedCandidate
+        ? [
+            { title: "手机", value: "已录入，进入候选人详情查看" },
+            { title: "邮箱", value: "已录入，进入候选人详情查看" },
+          ]
+        : [],
+      work: suggestedCandidate
+        ? [
+            {
+              title: `${suggestedCandidate.company} · ${suggestedCandidate.title}`,
+              meta: `${suggestedCandidate.experience}工作经验`,
+              detail: `当前地点为${suggestedCandidate.location}。`,
+            },
+          ]
+        : [],
+      education: suggestedCandidate
+        ? [
+            {
+              title: suggestedCandidate.education,
+              meta: "院校与专业信息待进入候选人详情查看",
+            },
+          ]
+        : [],
+      projects: suggestedCandidate
+        ? [
+            {
+              title: suggestedCandidate.skills.join("、"),
+              meta: "候选人技能和项目方向摘要",
+            },
+          ]
+        : [],
+    },
+  };
   const saveDecision = (decision) => {
     onSave({
       decision,
@@ -1064,93 +1318,38 @@ function PersonIdentityReview({
               </article>
             )}
           </div>
-
-          <div className="s4-person-compare-table">
-            <div className="is-head">
-              <b>对比项</b>
-              <b>来源署名信息</b>
-              <b>系统候选人信息</b>
-            </div>
-            <div>
-              <b>姓名</b>
-              <span>{person}</span>
-              <span>{suggestedCandidate?.name || "暂无"}</span>
-            </div>
-            <div>
-              <b>机构与任职</b>
-              <span>{institution}</span>
-              <span>
-                {suggestedCandidate
-                  ? `${suggestedCandidate.company} · ${suggestedCandidate.title}`
-                  : "暂无"}
-              </span>
-            </div>
-            <div>
-              <b>研究与技能</b>
-              <span>{sourceDirection}</span>
-              <span>{suggestedCandidate?.skills.join("、") || "暂无"}</span>
-            </div>
-            <div>
-              <b>时间与背景</b>
-              <span>{sourceMeta}</span>
-              <span>
-                {suggestedCandidate
-                  ? `${suggestedCandidate.education} · ${suggestedCandidate.experience} · ${suggestedCandidate.location}`
-                  : "暂无"}
-              </span>
-            </div>
-            <div>
-              <b>关联成果</b>
-              <span>{sourceTitle}</span>
-              <span>
-                {suggestedCandidate
-                  ? `${suggestedCandidate.name} 的候选人资料与历史经历`
-                  : "暂无"}
-              </span>
-            </div>
-          </div>
         </section>
 
-        <section className="s4-person-identity-evidence">
-          <h3>系统判断提示</h3>
-          <ul>
-            <li>
-              <Icon name={suggestedCandidate ? "check" : "alert"} />
-              <span>
-                <b>姓名对应</b>
-                <small>
-                  {suggestedCandidate
-                    ? `${person} 与候选人 ${suggestedCandidate.name} 的中英文姓名疑似对应`
-                    : "当前没有足够信息建立姓名对应关系"}
-                </small>
-              </span>
-            </li>
-            <li className={institutionMatches ? "is-positive" : "is-warning"}>
-              <Icon name={institutionMatches ? "check" : "alert"} />
-              <span>
-                <b>机构与任职经历</b>
-                <small>
-                  {institutionMatches
-                    ? `${institution} 与候选人当前公司一致`
-                    : suggestedCandidate
-                      ? `${institution} 与候选人当前公司不一致，需要结合经历时间线核实`
-                      : "缺少可供比较的候选人任职经历"}
-                </small>
-              </span>
-            </li>
-            <li>
-              <Icon name="sparkles" />
-              <span>
-                <b>研究方向</b>
-                <small>
-                  {suggestedCandidate
-                    ? `来源成果方向与候选人的 ${suggestedCandidate.skills.join("、")} 存在交集`
-                    : "缺少可供比较的候选人技能与经历"}
-                </small>
-              </span>
-            </li>
-          </ul>
-        </section>
+        <div className="s4-person-compare-groups">
+          <IdentityCompareGroup
+            title="联系方式"
+            status={comparison.contactStatus}
+            source={comparison.source.contacts}
+            candidate={comparison.candidate.contacts}
+            emptyLabel="公开成果中没有联系方式"
+          />
+          <IdentityCompareGroup
+            title="工作经历"
+            status={comparison.workStatus}
+            source={comparison.source.work}
+            candidate={comparison.candidate.work}
+            emptyLabel="公开成果中没有工作经历"
+          />
+          <IdentityCompareGroup
+            title="教育经历"
+            status={comparison.educationStatus}
+            source={comparison.source.education}
+            candidate={comparison.candidate.education}
+            emptyLabel="公开成果中没有教育经历"
+          />
+          <IdentityCompareGroup
+            title="项目与研究经历"
+            status={comparison.projectStatus}
+            source={comparison.source.projects}
+            candidate={comparison.candidate.projects}
+            emptyLabel="公开成果中没有项目或研究经历"
+          />
+        </div>
       </div>
     </Modal>
   );

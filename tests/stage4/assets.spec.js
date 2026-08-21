@@ -735,9 +735,18 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
   await expect(
     paperModal.locator(".s4-person-compare-profiles article.is-candidate p"),
   ).toHaveText("智源研究院 · 多模态算法研究员");
-  await expect(paperModal.getByText("时间与背景")).toBeVisible();
-  await expect(paperModal.getByText("研究与技能")).toBeVisible();
-  await expect(paperModal.getByText("机构与任职经历")).toBeVisible();
+  for (const group of ["联系方式", "工作经历", "教育经历", "项目与研究经历"])
+    await expect(paperModal.getByText(group, { exact: true })).toBeVisible();
+  await expect(paperModal.getByText("手机", { exact: true })).toHaveCount(2);
+  await expect(paperModal.getByText("邮箱", { exact: true })).toHaveCount(2);
+  await expect(paperModal.getByText(/186 \*\*\*\* 3271/)).toBeVisible();
+  await expect(
+    paperModal.getByText("上海交通大学 · 计算机科学与技术", {
+      exact: true,
+    }),
+  ).toHaveCount(2);
+  await expect(paperModal.getByText("具身 VLA 预训练项目")).toBeVisible();
+  await expect(paperModal.locator(".s4-person-compare-table")).toHaveCount(0);
   await expect(paperModal.getByText("Wenting He")).toHaveCount(0);
   await expect(
     paperModal.getByRole("button", { name: "选择候选人" }),
@@ -778,6 +787,12 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
   await expect(
     patentModal.locator(".s4-person-compare-profiles article.is-candidate p"),
   ).toHaveText("星澜机器人 · 机器人学习研究员");
+  await expect(
+    patentModal.getByText("腾讯 Robotics X · 算法工程师"),
+  ).toBeVisible();
+  await expect(
+    patentModal.getByText("浙江大学 · 控制科学与工程"),
+  ).toBeVisible();
   await expect(
     patentModal.getByRole("button", { name: "保留人物线索" }),
   ).toBeVisible();
