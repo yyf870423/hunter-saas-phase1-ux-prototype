@@ -5233,12 +5233,26 @@
 .s4-person-compare-group > div > section:last-child {
   border-right: 0;
 }
-.s4-person-compare-group > div > section > small {
-  display: block;
+.s4-person-compare-side-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 8px;
+}
+.s4-person-compare-side-title small {
   color: var(--s1-muted);
   font-size: 11px;
   font-weight: 650;
+}
+.s4-person-compare-side-title span {
+  padding: 1px 6px;
+  color: var(--s1-muted);
+  font-size: 10px;
+  font-weight: 650;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 999px;
 }
 .s4-person-record-list {
   display: grid;
@@ -5257,6 +5271,20 @@
   content: "";
   background: var(--s1-accent);
   border-radius: 50%;
+}
+.s4-person-record-list article > header {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.s4-person-record-list article > header > b {
+  min-width: 0;
+  flex: 1;
+}
+.s4-person-record-list article > header .s1-status {
+  flex: 0 0 auto;
 }
 .s4-person-record-list b,
 .s4-person-record-list small,

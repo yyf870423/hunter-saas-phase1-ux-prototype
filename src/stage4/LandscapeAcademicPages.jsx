@@ -976,11 +976,15 @@ const identityComparisonProfiles = {
           title: "上海人工智能实验室",
           meta: "2023.07 至今",
           detail: "论文署名单位；具身智能与机器人学习方向。",
+          relation: "可对应",
+          relationTone: "success",
         },
         {
           title: "上海交通大学机器人研究所",
           meta: "2020.09 - 2023.06",
           detail: "从共同作者与公开项目页面获得，具体职位待核实。",
+          relation: "待核实",
+          relationTone: "warning",
         },
       ],
       education: [
@@ -1017,11 +1021,22 @@ const identityComparisonProfiles = {
           title: "智源研究院 · 多模态算法研究员",
           meta: "2024.08 至今",
           detail: "负责多模态基础模型和具身智能预训练。",
+          relation: "来源未发现",
+          relationTone: "warning",
         },
         {
           title: "上海人工智能实验室 · 研究科学家",
           meta: "2021.07 - 2024.07",
           detail: "从事机器人学习、VLA 模型和真机部署。",
+          relation: "时间冲突",
+          relationTone: "warning",
+        },
+        {
+          title: "上海交通大学机器人研究所 · 研究助理",
+          meta: "2019.09 - 2021.06",
+          detail: "参与机器人学习和视觉控制研究。",
+          relation: "候选人补充",
+          relationTone: "info",
         },
       ],
       education: [
@@ -1029,6 +1044,15 @@ const identityComparisonProfiles = {
           title: "上海交通大学 · 计算机科学与技术",
           meta: "2016.09 - 2021.06 · 博士",
           detail: "导师与公开论文作者网络能够对应。",
+          relation: "一致",
+          relationTone: "success",
+        },
+        {
+          title: "华中科技大学 · 自动化",
+          meta: "2012.09 - 2016.06 · 本科",
+          detail: "候选人简历中记录的本科教育经历。",
+          relation: "来源未披露",
+          relationTone: "neutral",
         },
       ],
       projects: [
@@ -1041,6 +1065,13 @@ const identityComparisonProfiles = {
           title: "真实机器人多任务泛化",
           meta: "2022.02 - 2024.06",
           detail: "完成真机部署和失败样本回流方案。",
+        },
+        {
+          title: "多模态具身数据清洗工具链",
+          meta: "2021.08 - 2022.01",
+          detail: "负责数据质量评估、轨迹筛选和训练样本版本管理。",
+          relation: "候选人补充",
+          relationTone: "info",
         },
       ],
     },
@@ -1122,7 +1153,14 @@ function IdentityRecordList({ items, emptyLabel }) {
     <div className="s4-person-record-list">
       {items.map((item) => (
         <article key={`${item.title}-${item.meta || item.value}`}>
-          <b>{item.title}</b>
+          <header>
+            <b>{item.title}</b>
+            {item.relation ? (
+              <StatusBadge tone={item.relationTone || "neutral"}>
+                {item.relation}
+              </StatusBadge>
+            ) : null}
+          </header>
           {item.value ? <p>{item.value}</p> : null}
           {item.meta ? <small>{item.meta}</small> : null}
           {item.detail ? <p>{item.detail}</p> : null}
@@ -1147,11 +1185,17 @@ function IdentityCompareGroup({
       </header>
       <div>
         <section>
-          <small>来源人物资料</small>
+          <header className="s4-person-compare-side-title">
+            <small>来源人物资料</small>
+            <span>{source.length} 条</span>
+          </header>
           <IdentityRecordList items={source} emptyLabel={emptyLabel} />
         </section>
         <section>
-          <small>疑似候选人资料</small>
+          <header className="s4-person-compare-side-title">
+            <small>疑似候选人资料</small>
+            <span>{candidate.length} 条</span>
+          </header>
           <IdentityRecordList
             items={candidate}
             emptyLabel="候选人资料中没有对应记录"

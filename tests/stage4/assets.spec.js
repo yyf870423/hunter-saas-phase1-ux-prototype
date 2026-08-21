@@ -747,6 +747,26 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
   ).toHaveCount(2);
   await expect(paperModal.getByText("具身 VLA 预训练项目")).toBeVisible();
   await expect(paperModal.locator(".s4-person-compare-table")).toHaveCount(0);
+  const workGroup = paperModal
+    .locator(".s4-person-compare-group")
+    .filter({ has: page.getByRole("heading", { name: "工作经历" }) });
+  await expect(
+    workGroup.locator(".s4-person-compare-side-title span"),
+  ).toHaveText(["2 条", "3 条"]);
+  await expect(workGroup.getByText("来源未发现")).toBeVisible();
+  await expect(workGroup.getByText("候选人补充")).toBeVisible();
+  const educationGroup = paperModal
+    .locator(".s4-person-compare-group")
+    .filter({ has: page.getByRole("heading", { name: "教育经历" }) });
+  await expect(
+    educationGroup.locator(".s4-person-compare-side-title span"),
+  ).toHaveText(["1 条", "2 条"]);
+  const projectGroup = paperModal
+    .locator(".s4-person-compare-group")
+    .filter({ has: page.getByRole("heading", { name: "项目与研究经历" }) });
+  await expect(
+    projectGroup.locator(".s4-person-compare-side-title span"),
+  ).toHaveText(["2 条", "3 条"]);
   await expect(paperModal.getByText("Wenting He")).toHaveCount(0);
   await expect(
     paperModal.getByRole("button", { name: "选择候选人" }),
