@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Icon } from "./Icon";
-import { Button, Modal, StatusBadge, useToast } from "../stage1/ui";
+import { Button, Modal, useToast } from "../stage1/ui";
 
 export function buildRecommendationReportVersions(candidateName = "林昊") {
   return [
@@ -34,6 +34,17 @@ export function buildRecommendationReportVersions(candidateName = "林昊") {
       suggestion: "首次沟通重点核实团队管理范围、薪资预期和到岗时间。",
     },
   ];
+}
+
+export function buildRevisedRecommendationReport(candidateName = "林昊") {
+  const [latest] = buildRecommendationReportVersions(candidateName);
+  return {
+    ...latest,
+    version: "v3",
+    createdAt: "刚刚",
+    fileName: `${candidateName}-具身智能VLA算法负责人-推荐报告-v3.md`,
+    summary: `${candidateName}具备机器人学习、VLA、真机部署及 12 人团队管理经验，并有真实场景量产交付记录，与岗位目标高度一致。建议由客户技术负责人优先安排岗位沟通。`,
+  };
 }
 
 function reportMarkdown(report) {
@@ -100,7 +111,6 @@ export function RecommendationReportFile({
   candidateName = "林昊",
   report,
   versions,
-  showHistory = false,
   onRegenerate,
 }) {
   const notify = useToast();
@@ -110,7 +120,6 @@ export function RecommendationReportFile({
   );
   const latest = report || availableVersions[0];
   const [preview, setPreview] = useState(null);
-  const [historyOpen, setHistoryOpen] = useState(false);
 
   return (
     <>
@@ -138,11 +147,6 @@ export function RecommendationReportFile({
           >
             下载
           </Button>
-          {showHistory ? (
-            <Button size="sm" onClick={() => setHistoryOpen(true)}>
-              历史版本
-            </Button>
-          ) : null}
           {onRegenerate ? (
             <Button size="sm" icon="refresh" onClick={onRegenerate}>
               重新生成
@@ -173,38 +177,6 @@ export function RecommendationReportFile({
         }
       >
         {preview ? <ReportDocument report={preview} /> : null}
-      </Modal>
-      <Modal
-        open={historyOpen}
-        close={() => setHistoryOpen(false)}
-        size="lg"
-        title="推荐报告历史版本"
-        description="匹配详情只保留最新文件；历史版本保留在本支线任务中"
-      >
-        <div className="recommendation-report-history">
-          {availableVersions.map((item, index) => (
-            <article key={item.version}>
-              <span>
-                <b>{item.fileName}</b>
-                <small>
-                  {item.createdAt} · {index === 0 ? "当前最新" : "历史版本"}
-                </small>
-              </span>
-              {index === 0 ? (
-                <StatusBadge tone="success">最新</StatusBadge>
-              ) : null}
-              <Button
-                size="sm"
-                onClick={() => {
-                  setHistoryOpen(false);
-                  setPreview(item);
-                }}
-              >
-                查看
-              </Button>
-            </article>
-          ))}
-        </div>
       </Modal>
     </>
   );

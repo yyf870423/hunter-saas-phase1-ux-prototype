@@ -392,9 +392,18 @@ test("数据管理使用独立导航而不是全局导入按钮", async ({ page 
 
 test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) => {
   await page.goto("#/positions/position-vla?tab=pipeline");
-  await expect(
-    page.getByRole("slider", { name: "候选人流程横向位置" }),
-  ).toBeVisible();
+  await expect(page.locator(".s4-kanban-scroll-control")).toHaveCount(0);
+  await expect
+    .poll(() =>
+      page.locator(".s4-kanban").evaluate((element) => ({
+        overflow: getComputedStyle(element).overflowX,
+        scrollable: element.scrollWidth > element.clientWidth,
+      })),
+    )
+    .toEqual({ overflow: "scroll", scrollable: true });
+  await expect(page.locator(".s4-stage-age.is-warning").first()).toBeVisible();
+  await expect(page.locator(".s4-stage-age.is-high").first()).toBeVisible();
+  await expect(page.locator(".s4-stage-age.is-danger").first()).toBeVisible();
   const firstCandidate = page.locator(".s4-kanban article").first();
   const targetStage = page.locator(".s4-kanban > section").nth(2);
   await firstCandidate.dragTo(targetStage);
@@ -450,6 +459,18 @@ test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) 
 
   await page.getByRole("tab", { name: /匹配结果/ }).click();
   await expect(page.getByText("128 位候选人完成本轮处理")).toBeVisible();
+  const workspace = page.locator(".s4-match-workspace");
+  const list = workspace.locator(".s4-match-result-list");
+  const pagination = workspace.locator("aside > .s4-pagination");
+  await expect
+    .poll(async () => {
+      const listBox = await list.boundingBox();
+      const paginationBox = await pagination.boundingBox();
+      return Math.round(
+        (paginationBox?.y || 0) - (listBox?.y || 0) - (listBox?.height || 0),
+      );
+    })
+    .toBeLessThanOrEqual(1);
   await page.getByRole("tab", { name: /有条件匹配/ }).click();
   await page.locator(".s4-match-result-list button").first().click();
   await expect(
@@ -540,9 +561,14 @@ test("推荐报告任务完成后回流岗位匹配详情", async ({ page }) => 
     .fill("突出候选人的真机部署和团队管理范围。");
   await page.getByRole("button", { name: "创建并开始" }).click();
   await expect(page).toHaveURL(/tasks\/task-recommend-linhao/);
+  await page
+    .locator(".s2-composer textarea")
+    .fill("请突出量产交付经验，并把薪资风险放到最后。");
+  await page.getByRole("button", { name: "发送" }).click();
+  await expect(page.getByText(/推荐报告-v3\.md/)).toBeVisible();
   await page.getByRole("button", { name: "查看岗位匹配" }).click();
   await expect(page).toHaveURL(/positions\/position-vla\?tab=matching/);
-  await expect(page.getByText(/推荐报告-v2\.md/)).toBeVisible();
+  await expect(page.getByText(/推荐报告-v3\.md/)).toBeVisible();
 });
 
 test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", async ({ page }) => {

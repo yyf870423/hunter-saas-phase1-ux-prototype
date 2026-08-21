@@ -6271,6 +6271,8 @@
   padding-inline: 10px;
 }
 .s4-match-workspace {
+  height: clamp(620px, calc(100vh - 250px), 780px);
+  min-height: 0;
   grid-template-columns: minmax(300px, 0.68fr) minmax(0, 1.52fr);
 }
 .s4-match-workspace > aside {
@@ -6314,7 +6316,7 @@
 .s4-match-result-list {
   min-height: 0;
   flex: 1;
-  max-height: 650px;
+  max-height: none;
 }
 .s4-match-result-list button {
   grid-template-columns: 54px minmax(0, 1fr) 13px;
@@ -6357,9 +6359,13 @@
   font-style: normal;
 }
 .s4-match-workspace > aside > .s4-pagination {
-  margin-top: auto;
+  margin-top: 0;
   padding: 9px;
   border-top: 1px solid var(--s1-line);
+}
+.s4-match-workspace > section {
+  min-height: 0;
+  overflow-y: auto;
 }
 .s4-match-workspace > aside > .s4-pagination > span:last-child {
   display: none;
@@ -7717,13 +7723,13 @@
   padding: 17px 4px 0 0;
 }
 
-/* Pipeline board: visible horizontal navigation and separated card hierarchy */
+/* Pipeline board: one native horizontal scrollbar and separated card hierarchy. */
 .s4-kanban-shell {
   min-width: 0;
 }
 .s4-kanban {
   overflow-x: scroll;
-  padding-bottom: 13px;
+  padding-bottom: 9px;
   scrollbar-width: auto;
   scrollbar-color: color-mix(
       in srgb,
@@ -7731,44 +7737,6 @@
       var(--s1-line-strong)
     )
     var(--s1-canvas);
-}
-.s4-kanban-scroll-control {
-  width: 100%;
-  height: 14px;
-  margin: 3px 0 0;
-  padding: 0;
-  appearance: none;
-  background: transparent;
-  cursor: ew-resize;
-}
-.s4-kanban-scroll-control::-webkit-slider-runnable-track {
-  height: 7px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 99px;
-}
-.s4-kanban-scroll-control::-webkit-slider-thumb {
-  width: clamp(90px, 26vw, 320px);
-  height: 7px;
-  margin-top: -1px;
-  appearance: none;
-  background: color-mix(in srgb, var(--s1-accent) 50%, var(--s1-line-strong));
-  border: 1px solid color-mix(in srgb, var(--s1-accent) 38%, var(--s1-line));
-  border-radius: 99px;
-  box-shadow: var(--s1-control-shadow);
-}
-.s4-kanban-scroll-control::-moz-range-track {
-  height: 7px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 99px;
-}
-.s4-kanban-scroll-control::-moz-range-thumb {
-  width: min(26vw, 320px);
-  height: 7px;
-  background: color-mix(in srgb, var(--s1-accent) 50%, var(--s1-line-strong));
-  border: 0;
-  border-radius: 99px;
 }
 .s4-kanban::-webkit-scrollbar {
   height: 9px;
@@ -7800,6 +7768,37 @@
   flex: 0 0 auto;
   color: var(--s1-subtle);
   font-size: 10px;
+}
+.s4-stage-age {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  min-height: 21px;
+  align-items: center;
+  padding: 2px 6px;
+  color: var(--s1-subtle);
+  font-size: 10px;
+  font-style: normal;
+  line-height: 15px;
+  white-space: nowrap;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+}
+.s4-stage-age.is-warning {
+  color: #8a5d00;
+  background: var(--s1-warning-soft);
+  border-color: color-mix(in srgb, #ca8a04 28%, var(--s1-line));
+}
+.s4-stage-age.is-high {
+  color: #b84d0e;
+  background: color-mix(in srgb, #f97316 10%, var(--s1-surface));
+  border-color: color-mix(in srgb, #f97316 30%, var(--s1-line));
+}
+.s4-stage-age.is-danger {
+  color: var(--s1-danger);
+  background: var(--s1-danger-soft);
+  border-color: color-mix(in srgb, var(--s1-danger) 28%, var(--s1-line));
 }
 .s4-kanban article > strong {
   display: block;
@@ -8047,35 +8046,6 @@
 .recommendation-report-document ul {
   padding-left: 20px;
 }
-.recommendation-report-history {
-  display: grid;
-  gap: 8px;
-}
-.recommendation-report-history article {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 9px;
-  padding: 11px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 8px;
-}
-.recommendation-report-history b,
-.recommendation-report-history small {
-  display: block;
-}
-.recommendation-report-history b {
-  overflow: hidden;
-  font-size: 12px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.recommendation-report-history small {
-  margin-top: 3px;
-  color: var(--s1-muted);
-  font-size: 11px;
-}
 .s2-task-timeline > .recommendation-report-file {
   margin: 4px 0 14px;
 }
@@ -8107,5 +8077,12 @@
   }
   .recommendation-report-document {
     padding: 24px 18px;
+  }
+  .s4-match-workspace {
+    height: auto;
+    min-height: 0;
+  }
+  .s4-match-workspace > section {
+    overflow: visible;
   }
 }

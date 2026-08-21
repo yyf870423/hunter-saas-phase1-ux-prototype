@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
   buildRecommendationReportVersions,
+  buildRevisedRecommendationReport,
   RecommendationReportFile,
 } from "../components/RecommendationReportFile";
 import {
@@ -485,46 +486,37 @@ function RecommendationReportTask() {
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [authMode, setAuthMode] = useState("confirm");
-  const [revised, setRevised] = useState(false);
+  const candidateId = sessionStorage.getItem(
+    "hunter-recommendation-candidate-id",
+  );
+  const [revised, setRevised] = useState(
+    () =>
+      Boolean(candidateId) &&
+      sessionStorage.getItem(
+        `hunter-recommendation-report-version-${candidateId}`,
+      ) === "v3",
+  );
   const [planOpen, setPlanOpen] = useState(false);
   const candidateName =
     sessionStorage.getItem("hunter-recommendation-candidate") || "林昊";
-  const candidateRecord = useMemo(() => {
-    try {
-      return JSON.parse(
-        sessionStorage.getItem("hunter-recommendation-candidate-record"),
-      );
-    } catch {
-      return null;
-    }
-  }, []);
   const reportRequirement =
     sessionStorage.getItem("hunter-recommendation-task-prompt") ||
     "面向客户技术负责人，重点说明真机部署、团队管理和风险核实情况。";
   const baseReportVersions = buildRecommendationReportVersions(candidateName);
   const reportVersions = revised
-    ? [
-        {
-          ...baseReportVersions[0],
-          version: "v3",
-          createdAt: "刚刚",
-          fileName: `${candidateName}-具身智能VLA算法负责人-推荐报告-v3.md`,
-          summary: `${candidateName}具备机器人学习、VLA、真机部署及 12 人团队管理经验，与岗位目标高度一致。建议由客户技术负责人优先安排岗位沟通。`,
-        },
-        ...baseReportVersions,
-      ]
+    ? [buildRevisedRecommendationReport(candidateName), ...baseReportVersions]
     : baseReportVersions;
+  const latestReport = reportVersions[0];
+  const initialReport = baseReportVersions[1];
+  const reviewedReport = baseReportVersions[0];
   useEffect(() => {
-    const candidateId = sessionStorage.getItem(
-      "hunter-recommendation-candidate-id",
-    );
     if (candidateId) {
       sessionStorage.setItem(
         `hunter-recommendation-report-${candidateId}`,
         "1",
       );
     }
-  }, []);
+  }, [candidateId]);
   const plan = [
     {
       id: "read",
@@ -595,48 +587,38 @@ function RecommendationReportTask() {
         </aside>
         <section className="s2-task-conversation">
           <div className="s2-task-timeline">
-            <UserMessage time="今天 10:16">{reportRequirement}</UserMessage>
+            <UserMessage time="今天 10:08">{reportRequirement}</UserMessage>
             <HunterReply
-              markdown={`推荐报告初稿已经生成。我只引用已核实的候选人资料和本岗位匹配结论，并把尚未确认的信息放入风险提示。
+              markdown={`推荐报告初稿已经生成。
 
-## ${candidateName}｜具身智能 VLA 算法负责人推荐报告
+- 使用岗位资料 **v3**、候选人资料 **v6** 和当前匹配结论；
+- 已将未确认的团队规模、薪资和到岗时间放入风险提示；
+- 报告以文件交付，可以在线查看或下载。
 
-### 推荐结论
-
-${candidateName}当前担任${candidateRecord?.company || "拓界机器人"}${candidateRecord?.title || "机器人学习负责人"}，综合匹配分 **${candidateRecord?.score || 91} 分**。其 VLA、机器人学习、真机部署和团队管理经历与岗位目标高度一致，建议进入客户沟通。
-
-### 核心匹配证据
-
-- 负责多任务机器人操作策略和真机数据闭环，经历覆盖训练、评测与部署。
-- 当前管理 12 人算法团队，具备跨硬件、数据和产品团队的交付经验。
-- 最近两项项目均有量产或真实场景部署记录，不属于纯研究型履历。
-
-### 风险与待核实项
-
-- 当前总包可能高于岗位区间，需要提前确认薪资弹性。
-- 公开资料没有明确说明到岗时间，建议首次沟通时核实。
-
-### 推荐沟通重点
-
-重点讨论其真机数据闭环中的个人决策范围、团队规模，以及是否接受北京为主的工作安排。`}
+你可以继续在对话中提出修改意见，每次修改都会生成一个新的报告文件。`}
             />
             <RecommendationReportFile
               candidateName={candidateName}
-              versions={reportVersions}
-              showHistory
-              onRegenerate={() => {
-                setComposer(
-                  "请基于当前最新的候选人和岗位资料重新生成整份推荐报告，并保留所有风险提示。",
-                );
-                notify("已将重新生成要求放入输入框");
-              }}
+              report={initialReport}
+            />
+            <UserMessage time="今天 10:20">
+              把开头改得更适合直接发给客户，并补充团队规模，但不要删除风险提示。
+            </UserMessage>
+            <HunterReply markdown="已按要求调整：开头改为客户可直接阅读的推荐摘要，并在核心证据中补充当前管理的团队规模；原有风险提示和待核实项均保留。" />
+            <RecommendationReportFile
+              candidateName={candidateName}
+              report={reviewedReport}
             />
             {revised ? (
               <>
                 <UserMessage time="刚刚">
-                  把开头改得更适合直接发给客户，并补充团队规模。
+                  请进一步突出量产交付经验，并把薪资风险放到最后。
                 </UserMessage>
-                <HunterReply markdown="已完成第二版：开头改为客户可直接阅读的推荐摘要，并在核心证据中明确补充其当前管理 **12 人算法团队**。原始事实、风险提示和待核实项均保留。" />
+                <HunterReply markdown="已完成新一轮修改：优先呈现量产和真实场景交付证据，薪资风险移动到报告末尾，未删除任何待核实信息。" />
+                <RecommendationReportFile
+                  candidateName={candidateName}
+                  report={latestReport}
+                />
               </>
             ) : null}
           </div>
@@ -667,6 +649,15 @@ ${candidateName}当前担任${candidateRecord?.company || "拓界机器人"}${ca
               onChange={setComposer}
               onSend={() => {
                 setRevised(true);
+                const candidateId = sessionStorage.getItem(
+                  "hunter-recommendation-candidate-id",
+                );
+                if (candidateId) {
+                  sessionStorage.setItem(
+                    `hunter-recommendation-report-version-${candidateId}`,
+                    "v3",
+                  );
+                }
                 setComposer("");
                 setAttachments([]);
                 notify("报告已按补充要求更新", "success");

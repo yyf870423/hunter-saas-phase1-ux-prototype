@@ -1,8 +1,9 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
   buildRecommendationReportVersions,
+  buildRevisedRecommendationReport,
   RecommendationReportFile,
 } from "../components/RecommendationReportFile";
 import {
@@ -488,7 +489,7 @@ const pipelineCandidateSeed = {
     title: "VLA 算法负责人",
     score: 94,
     note: "等待确认本周沟通时间",
-    days: "进入 2 天",
+    stageDays: 2,
   },
   hewenting: {
     id: "hewenting",
@@ -497,7 +498,7 @@ const pipelineCandidateSeed = {
     title: "机器人学习研究员",
     score: 84,
     note: "需要补充团队管理经历",
-    days: "进入 4 天",
+    stageDays: 9,
   },
   jiangyifan: {
     id: "jiangyifan",
@@ -506,7 +507,7 @@ const pipelineCandidateSeed = {
     title: "机器人算法专家",
     score: null,
     note: "手动加入，尚未进行岗位匹配",
-    days: "今天加入",
+    stageDays: 0,
   },
   linhao: {
     id: "linhao",
@@ -515,7 +516,7 @@ const pipelineCandidateSeed = {
     title: "机器人学习负责人",
     score: 91,
     note: "推荐报告已发送客户",
-    days: "进入 3 天",
+    stageDays: 16,
   },
   chenchuning: {
     id: "chenchuning",
@@ -524,7 +525,7 @@ const pipelineCandidateSeed = {
     title: "灵巧操作算法负责人",
     score: 89,
     note: "客户已确认进入技术面",
-    days: "进入 1 天",
+    stageDays: 1,
   },
   zhoumingyuan: {
     id: "zhoumingyuan",
@@ -533,7 +534,7 @@ const pipelineCandidateSeed = {
     title: "具身智能算法总监",
     score: 86,
     note: "等待客户反馈一面结论",
-    days: "停留 5 天",
+    stageDays: 33,
   },
   liangchen: {
     id: "liangchen",
@@ -542,7 +543,7 @@ const pipelineCandidateSeed = {
     title: "多模态算法 Lead",
     score: 82,
     note: "二面安排在周五 14:00",
-    days: "进入 1 天",
+    stageDays: 1,
   },
   gaoyuan: {
     id: "gaoyuan",
@@ -551,7 +552,7 @@ const pipelineCandidateSeed = {
     title: "强化学习负责人",
     score: 78,
     note: "候选人期望总包 115 万",
-    days: "停留 3 天",
+    stageDays: 8,
   },
   yangfan: {
     id: "yangfan",
@@ -560,7 +561,7 @@ const pipelineCandidateSeed = {
     title: "机器人算法经理",
     score: 88,
     note: "已确认 9 月 16 日入职",
-    days: "8 月 20 日",
+    enteredAt: "8 月 20 日",
   },
   sunran: {
     id: "sunran",
@@ -569,7 +570,7 @@ const pipelineCandidateSeed = {
     title: "高级算法工程师",
     score: 69,
     note: "客户认为管理跨度不足",
-    days: "8 月 18 日",
+    enteredAt: "8 月 18 日",
   },
   wangyi: {
     id: "wangyi",
@@ -578,7 +579,7 @@ const pipelineCandidateSeed = {
     title: "机器人学习研究员",
     score: null,
     note: "候选人暂不考虑外部机会",
-    days: "8 月 17 日",
+    enteredAt: "8 月 17 日",
   },
 };
 
@@ -663,9 +664,26 @@ function PipelineStageTag({ stage, prefix = false }) {
   );
 }
 
+function stageAgeTone(stageDays) {
+  if (stageDays > 30) return "danger";
+  if (stageDays > 14) return "high";
+  if (stageDays > 7) return "warning";
+  return "normal";
+}
+
+function StageAge({ candidate }) {
+  const tone = stageAgeTone(candidate.stageDays);
+  const text =
+    candidate.stageDays === 0
+      ? "今天进入"
+      : Number.isFinite(candidate.stageDays)
+        ? `进入 ${candidate.stageDays} 天`
+        : candidate.enteredAt;
+  return <time className={`s4-stage-age is-${tone}`}>{text}</time>;
+}
+
 function CandidatePipeline() {
   const notify = useToast();
-  const boardRef = useRef(null);
   const [view, setView] = useState("board");
   const [stageModal, setStageModal] = useState(false);
   const [stages, setStages] = useState(initialPipelineStages);
@@ -674,7 +692,6 @@ function CandidatePipeline() {
   const [pendingMove, setPendingMove] = useState(null);
   const [candidateOpen, setCandidateOpen] = useState(null);
   const [filter, setFilter] = useState("全部");
-  const [boardScroll, setBoardScroll] = useState(0);
   const visibleGroups =
     filter === "全部"
       ? stages
@@ -774,16 +791,7 @@ function CandidatePipeline() {
       </div>
       {view === "board" ? (
         <div className="s4-kanban-shell">
-          <div
-            className="s4-kanban"
-            ref={boardRef}
-            onScroll={(event) => {
-              const { scrollLeft, scrollWidth, clientWidth } =
-                event.currentTarget;
-              const max = Math.max(1, scrollWidth - clientWidth);
-              setBoardScroll(Math.round((scrollLeft / max) * 100));
-            }}
-          >
+          <div className="s4-kanban">
             {visibleGroups.map((stage) => (
               <section
                 className={`s4-kanban-${stage.tone} ${dragOver === stage.id ? "is-drag-over" : ""}`}
@@ -857,7 +865,7 @@ function CandidatePipeline() {
                       >
                         <header>
                           <b>{person.name}</b>
-                          <time>{person.days}</time>
+                          <StageAge candidate={person} />
                         </header>
                         <strong>{person.title}</strong>
                         <small>{person.company}</small>
@@ -876,23 +884,6 @@ function CandidatePipeline() {
               </section>
             ))}
           </div>
-          <input
-            className="s4-kanban-scroll-control"
-            type="range"
-            min="0"
-            max="100"
-            value={boardScroll}
-            aria-label="候选人流程横向位置"
-            onChange={(event) => {
-              const value = Number(event.target.value);
-              setBoardScroll(value);
-              if (boardRef.current) {
-                const max =
-                  boardRef.current.scrollWidth - boardRef.current.clientWidth;
-                boardRef.current.scrollLeft = (max * value) / 100;
-              }
-            }}
-          />
         </div>
       ) : (
         <PipelineList stages={stages} onOpen={setCandidateOpen} />
@@ -942,7 +933,7 @@ function PipelineList({ stages, onOpen }) {
                 </small>
               </b>
               <PipelineStageTag stage={stage.name} />
-              <MatchScore score={person.score} compact />
+              <StageAge candidate={person} />
               <p>{person.note}</p>
               <button
                 type="button"
@@ -1347,12 +1338,21 @@ function MatchingResults() {
     const generatedName = sessionStorage.getItem(
       "hunter-recommendation-candidate",
     );
+    const buildReports = (candidateId, candidateName) => {
+      const versions = buildRecommendationReportVersions(candidateName);
+      return sessionStorage.getItem(
+        `hunter-recommendation-report-version-${candidateId}`,
+      ) === "v3"
+        ? [buildRevisedRecommendationReport(candidateName), ...versions]
+        : versions;
+    };
     return {
-      [matchingCatalog[0].id]: buildRecommendationReportVersions(
+      [matchingCatalog[0].id]: buildReports(
+        matchingCatalog[0].id,
         matchingCatalog[0].name,
       ),
       ...(generatedId && generatedName
-        ? { [generatedId]: buildRecommendationReportVersions(generatedName) }
+        ? { [generatedId]: buildReports(generatedId, generatedName) }
         : {}),
     };
   });
@@ -1642,8 +1642,7 @@ function MatchingResults() {
             {reportFiles[current.id] ? (
               <RecommendationReportFile
                 candidateName={current.name}
-                versions={reportFiles[current.id]}
-                showHistory={false}
+                report={reportFiles[current.id][0]}
                 onRegenerate={() => startReportTask(current)}
               />
             ) : (

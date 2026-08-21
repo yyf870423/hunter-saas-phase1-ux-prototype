@@ -65,10 +65,15 @@ test("支线任务详情支持补充资料、恢复和结果回流", async ({ pa
   await expect(page.getByText("计划已完成", { exact: true })).toBeVisible();
 });
 
-test("推荐报告任务保留最新文件和历史版本", async ({ page }) => {
+test("推荐报告任务按对话过程保留每次生成的文件", async ({ page }) => {
   await page.goto("#/tasks/task-recommend-linhao");
+  await expect(page.getByText(/推荐报告-v1\.md/)).toBeVisible();
   await expect(page.getByText(/推荐报告-v2\.md/)).toBeVisible();
-  await page.getByRole("button", { name: "在线查看" }).click();
+  await expect(page.getByRole("button", { name: "历史版本" })).toHaveCount(0);
+  const v2File = page
+    .locator(".recommendation-report-file")
+    .filter({ hasText: /推荐报告-v2\.md/ });
+  await v2File.getByRole("button", { name: "在线查看" }).click();
   const preview = page.getByRole("dialog", { name: "在线查看推荐报告" });
   await expect(preview.getByText("核心匹配证据")).toBeVisible();
   await preview
@@ -77,31 +82,16 @@ test("推荐报告任务保留最新文件和历史版本", async ({ page }) => 
     .click();
 
   const downloadStarted = page.waitForEvent("download");
-  await page.getByRole("button", { name: "下载", exact: true }).click();
+  await v2File.getByRole("button", { name: "下载", exact: true }).click();
   const download = await downloadStarted;
   expect(download.suggestedFilename()).toMatch(/推荐报告-v2\.md$/);
 
-  await page.getByRole("button", { name: "历史版本" }).click();
-  const history = page.getByRole("dialog", { name: "推荐报告历史版本" });
-  await expect(
-    history.locator(".recommendation-report-history article"),
-  ).toHaveCount(2);
-  await history.getByRole("button", { name: "查看" }).last().click();
-  await expect(
-    page
-      .getByRole("dialog", { name: "在线查看推荐报告" })
-      .getByText("v1 · 今天 10:16"),
-  ).toBeVisible();
   await page
-    .getByRole("dialog", { name: "在线查看推荐报告" })
-    .getByRole("button", { name: "关闭", exact: true })
-    .first()
-    .click();
-
-  await page.getByRole("button", { name: "重新生成" }).click();
-  await expect(page.locator(".s2-composer textarea")).toHaveValue(
-    /重新生成整份推荐报告/,
-  );
+    .locator(".s2-composer textarea")
+    .fill("请突出量产交付经验，并把薪资风险放到最后。");
+  await page.getByRole("button", { name: "发送" }).click();
+  await expect(page.getByText(/推荐报告-v3\.md/)).toBeVisible();
+  await expect(page.locator(".recommendation-report-file")).toHaveCount(3);
 });
 
 test("统一新建入口可进入支线任务或直接完成", async ({ page }) => {

@@ -71,13 +71,24 @@ test("截取候选人审核、支线任务和信号中心", async ({ page }) => 
     fullPage: true,
   });
   await page.goto("#/tasks/task-recommend-linhao");
+  await page
+    .locator(".recommendation-report-file")
+    .last()
+    .scrollIntoViewIfNeeded();
   await page.screenshot({
     path: `${output}/desktop-recommendation-report-task.png`,
     fullPage: true,
   });
-  await page.getByRole("button", { name: "历史版本" }).click();
+  await page
+    .locator(".s2-composer textarea")
+    .fill("请突出量产交付经验，并把薪资风险放到最后。");
+  await page.getByRole("button", { name: "发送" }).click();
+  await page
+    .locator(".recommendation-report-file")
+    .last()
+    .scrollIntoViewIfNeeded();
   await page.screenshot({
-    path: `${output}/desktop-recommendation-report-history.png`,
+    path: `${output}/desktop-recommendation-report-revisions.png`,
     fullPage: true,
   });
   await page.goto("#/signals");
