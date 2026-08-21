@@ -115,3 +115,29 @@ test("公共时间选择器展开态符合统一设计语言", async ({ page }) 
   });
   await assertNoConsoleErrors();
 });
+
+test("论文和专利人物信息在大量作者下保持紧凑可读", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  await page.goto("#/papers/paper-vla-survey");
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/paper-detail-authors.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: /还有 15 位作者/ }).click();
+  await expect(page.getByRole("dialog", { name: "其余作者" })).toBeVisible();
+  await page.screenshot({
+    path: `${output}/paper-detail-authors-popover.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/patents/patent-manipulation");
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/patent-detail-inventors.png`,
+    fullPage: true,
+  });
+  await assertNoConsoleErrors();
+});

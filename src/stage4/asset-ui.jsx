@@ -1383,6 +1383,7 @@ export function SourceList({ items, onOpen }) {
   return (
     <div className="s4-source-list">
       {items.map((item) => {
+        const href = item.href || null;
         const open = item.onClick || (onOpen ? () => onOpen(item) : null);
         const content = (
           <>
@@ -1397,12 +1398,19 @@ export function SourceList({ items, onOpen }) {
             <StatusBadge tone={item.tone || "success"}>
               {item.status}
             </StatusBadge>
-            {open ? (
-              <Icon className="s4-source-open-icon" name="chevronRight" />
+            {href || open ? (
+              <Icon
+                className="s4-source-open-icon"
+                name={href ? "external" : "chevronRight"}
+              />
             ) : null}
           </>
         );
-        return open ? (
+        return href ? (
+          <a href={href} key={item.title} target="_blank" rel="noreferrer">
+            {content}
+          </a>
+        ) : open ? (
           <button type="button" key={item.title} onClick={open}>
             {content}
           </button>

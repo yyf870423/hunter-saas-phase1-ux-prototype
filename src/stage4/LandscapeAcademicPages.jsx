@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
@@ -17,6 +17,7 @@ import {
   FieldGroup,
   FileDrop,
   FilterBar,
+  FloatingPanel,
   FormField,
   Modal,
   NotFoundState,
@@ -859,7 +860,11 @@ function AcademicCardList({ kind }) {
               </button>
               <p>
                 {kind === "papers"
-                  ? item.authors.join("、")
+                  ? `${item.authors.slice(0, 4).join("、")}${
+                      item.authors.length > 4
+                        ? ` 等 ${item.authors.length} 位作者`
+                        : ""
+                    }`
                   : item.inventors.join("、")}
               </p>
               <TooltipText
@@ -1032,6 +1037,120 @@ function PersonIdentityReview({ kind, people, close }) {
   );
 }
 
+function AcademicPeopleList({
+  people,
+  institutions = [],
+  kind,
+  linkedCount,
+  onLinked,
+  onReview,
+}) {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef(null);
+  const panelRef = useRef(null);
+  const noun = kind === "paper" ? "作者" : "发明人";
+  const visiblePeople = people.slice(0, 5);
+  const hiddenPeople = people.slice(5);
+  useEffect(() => {
+    if (!moreOpen) return undefined;
+    const close = (event) => {
+      if (
+        !moreRef.current?.contains(event.target) &&
+        !panelRef.current?.contains(event.target)
+      )
+        setMoreOpen(false);
+    };
+    const escape = (event) => {
+      if (event.key === "Escape") setMoreOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [moreOpen]);
+  const personItem = (person, index) => {
+    const linked = index < linkedCount;
+    const institution =
+      kind === "paper"
+        ? institutions[index] || institutions[0] || "机构待补充"
+        : "原始发明人署名";
+    return (
+      <article key={person}>
+        <span>
+          <button
+            type="button"
+            className={linked ? "is-linked" : ""}
+            onClick={() => (linked ? onLinked(person) : onReview(person))}
+          >
+            {person}
+          </button>
+          <small>
+            <Icon name={kind === "paper" ? "building" : "patent"} />
+            {institution}
+          </small>
+        </span>
+        <StatusBadge tone={linked ? "success" : "warning"}>
+          {linked ? "已关联" : kind === "paper" ? "人物线索" : "待确认"}
+        </StatusBadge>
+      </article>
+    );
+  };
+  return (
+    <div className="s4-academic-people">
+      <div className="s4-authorship-list">{visiblePeople.map(personItem)}</div>
+      {hiddenPeople.length ? (
+        <div className="s4-authorship-more" ref={moreRef}>
+          <button
+            type="button"
+            aria-expanded={moreOpen}
+            onClick={() => setMoreOpen((value) => !value)}
+          >
+            <Icon name="plus" />
+            还有 {hiddenPeople.length} 位{noun}
+            <Icon name={moreOpen ? "chevronUp" : "chevronDown"} />
+          </button>
+          <FloatingPanel
+            open={moreOpen}
+            anchorRef={moreRef}
+            panelRef={panelRef}
+            className="s4-authorship-more-panel"
+            width={600}
+            role="dialog"
+            ariaLabel={`其余${noun}`}
+          >
+            <header>
+              <span>
+                <b>
+                  其余 {hiddenPeople.length} 位{noun}
+                </b>
+                <small>
+                  {kind === "paper"
+                    ? "机构名称来自论文署名信息"
+                    : "点击姓名可以处理人物身份"}
+                </small>
+              </span>
+              <button
+                type="button"
+                aria-label={`关闭其余${noun}`}
+                onClick={() => setMoreOpen(false)}
+              >
+                <Icon name="close" />
+              </button>
+            </header>
+            <div className="s4-authorship-list">
+              {hiddenPeople.map((person, hiddenIndex) =>
+                personItem(person, hiddenIndex + 5),
+              )}
+            </div>
+          </FloatingPanel>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function PaperDetailPage() {
   const { paperId } = useParams();
   const navigate = useNavigate();
@@ -1086,31 +1205,14 @@ export function PaperDetailPage() {
             </Button>
           }
         >
-          <div className="s4-authorship-list">
-            {item.authors.map((author, index) => (
-              <article key={author}>
-                <em>{index + 1}</em>
-                <span>
-                  <b>{author}</b>
-                  <small>
-                    {item.institutions[index] || item.institutions[0]}
-                  </small>
-                </span>
-                <StatusBadge tone={index < 2 ? "success" : "warning"}>
-                  {index < 2 ? "已关联候选人" : "人物线索"}
-                </StatusBadge>
-                <button
-                  type="button"
-                  onClick={() =>
-                    index < 2 && navigate("/candidates/candidate-linhao")
-                  }
-                >
-                  查看
-                  <Icon name="chevronRight" />
-                </button>
-              </article>
-            ))}
-          </div>
+          <AcademicPeopleList
+            people={item.authors}
+            institutions={item.institutions}
+            kind="paper"
+            linkedCount={2}
+            onLinked={() => navigate("/candidates/candidate-linhao")}
+            onReview={() => setIdentityOpen(true)}
+          />
         </FieldGroup>
         <FieldGroup title="成果身份与来源">
           <div className="s4-identifier-list">
@@ -1144,6 +1246,7 @@ export function PaperDetailPage() {
                 description: "PDF 与摘要原文",
                 meta: "2026-08-20 获取",
                 status: "可访问",
+                href: item.originalUrl,
               },
             ]}
           />
@@ -1240,31 +1343,13 @@ export function PatentDetailPage() {
             </Button>
           }
         >
-          <div className="s4-authorship-list">
-            {item.inventors.map((person, index) => (
-              <article key={person}>
-                <em>{index + 1}</em>
-                <span>
-                  <b>{person}</b>
-                  <small>原始发明人署名</small>
-                </span>
-                <StatusBadge tone={index === 0 ? "success" : "warning"}>
-                  {index === 0 ? "已关联候选人" : "待确认"}
-                </StatusBadge>
-                <button
-                  type="button"
-                  onClick={() =>
-                    index === 0
-                      ? navigate("/candidates/candidate-linhao")
-                      : setIdentityOpen(true)
-                  }
-                >
-                  查看
-                  <Icon name="chevronRight" />
-                </button>
-              </article>
-            ))}
-          </div>
+          <AcademicPeopleList
+            people={item.inventors}
+            kind="patent"
+            linkedCount={1}
+            onLinked={() => navigate("/candidates/candidate-linhao")}
+            onReview={() => setIdentityOpen(true)}
+          />
         </FieldGroup>
         <FieldGroup title="来源与文件">
           <SourceList

@@ -461,7 +461,10 @@ test("阶段四次级控件不是装饰按钮", async ({ page }) => {
   await expect(page.getByText("团队规模：18 人")).toBeVisible();
 
   await page.goto("/#/patents/patent-manipulation");
-  await page.getByRole("button", { name: "查看", exact: true }).first().click();
+  await page
+    .getByRole("button", { name: "赵星羽", exact: true })
+    .first()
+    .click();
   await expect(page).toHaveURL(/candidates\/candidate-linhao/);
 });
 
@@ -655,9 +658,55 @@ test("所有业务资产的同组标签保持统一间距", async ({ page }) => 
   }
 });
 
+test("论文作者与机构紧凑展示并支持查看全部作者", async ({ page }) => {
+  await page.goto("#/papers/paper-vla-survey");
+  const people = page.locator(".s4-academic-people").first();
+  await expect(
+    people.locator(":scope > .s4-authorship-list article"),
+  ).toHaveCount(5);
+  await expect(
+    people.getByText("Tuojie Robotics", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    people.getByText("Shanghai AI Laboratory", { exact: true }),
+  ).toBeVisible();
+  const more = people.getByRole("button", { name: /还有 15 位作者/ });
+  await expect(more).toBeVisible();
+  await more.click();
+  const remaining = page.getByRole("dialog", { name: "其余作者" });
+  await expect(remaining).toBeVisible();
+  await expect(remaining.locator(".s4-authorship-list article")).toHaveCount(
+    15,
+  );
+  await expect(
+    remaining.getByText("Shanghai Jiao Tong University", { exact: true }),
+  ).toBeVisible();
+  await remaining.getByRole("button", { name: "关闭其余作者" }).click();
+  await expect(remaining).toBeHidden();
+
+  const original = page.getByRole("link", { name: /arXiv 原文/ });
+  await expect(original).toHaveAttribute("target", "_blank");
+  await expect(original).toHaveAttribute(
+    "href",
+    "https://arxiv.org/abs/2603.01452",
+  );
+  expect(
+    await original.evaluate((element) => getComputedStyle(element).cursor),
+  ).toBe("pointer");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/papers/paper-vla-survey");
+  await expectNoHorizontalOverflow(page);
+  await page.getByRole("button", { name: /还有 15 位作者/ }).click();
+  const mobilePanel = page.getByRole("dialog", { name: "其余作者" });
+  const panelBox = await mobilePanel.boundingBox();
+  expect(panelBox.x).toBeGreaterThanOrEqual(8);
+  expect(panelBox.x + panelBox.width).toBeLessThanOrEqual(382);
+});
+
 test("论文作者身份和专利发明人身份使用同一审核边界", async ({ page }) => {
   await page.goto("#/papers/paper-vla-survey");
-  await page.getByRole("button", { name: "审核作者身份" }).click();
+  await page.getByRole("button", { name: "审核人物身份" }).click();
   const paperModal = page.getByRole("dialog", { name: "作者人物身份审核" });
   await expect(paperModal).toBeVisible();
   await paperModal
@@ -667,6 +716,12 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
   await paperModal.getByRole("button", { name: "保存身份关系" }).click();
 
   await page.goto("#/patents/patent-manipulation");
+  await expect(
+    page.locator(".s4-academic-people .s4-authorship-list article"),
+  ).toHaveCount(3);
+  await expect(
+    page.getByRole("button", { name: /还有 .* 位发明人/ }),
+  ).toHaveCount(0);
   await page
     .getByRole("button", { name: "审核发明人身份", exact: true })
     .click();
