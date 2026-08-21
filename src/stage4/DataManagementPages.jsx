@@ -518,7 +518,7 @@ export function ExportsPage() {
           </>
         }
       >
-        <div className="s4-form-grid">
+        <div className="s4-form-grid s4-export-create-form">
           <FormField label="资产类型" required>
             <SelectMenu
               label="资产类型"

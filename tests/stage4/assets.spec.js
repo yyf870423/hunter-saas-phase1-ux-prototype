@@ -665,17 +665,114 @@ test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", as
 });
 
 test("人才版图多视图、关系详情与写入决定可用", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/mappings/new");
+  const mappingComposer = page.locator(".s4-agent-create-entry .s2-composer");
+  await expect(mappingComposer).toBeVisible();
+  await expect(
+    mappingComposer.getByRole("button", { name: "发送" }),
+  ).toBeDisabled();
+
+  await page.goto("#/mappings/mapping-embodied?tab=overview");
+  await page.getByRole("button", { name: "添加目标" }).click();
+  const targetEditor = page.getByRole("dialog", { name: "增加摸排目标" });
+  await expect(targetEditor).toBeVisible();
+  await targetEditor
+    .getByLabel("目标事项")
+    .fill("确认穹顶智能操作策略方向技术负责人");
+  await targetEditor
+    .getByLabel("完成标准")
+    .fill("确认负责人身份并形成稳定人物线索。");
+  await targetEditor.getByRole("button", { name: "添加目标" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "摸排目标详情" }),
+  ).toBeVisible();
+  await page
+    .getByRole("dialog", { name: "摸排目标详情" })
+    .getByRole("button", { name: "关闭", exact: true })
+    .last()
+    .click();
+  await page
+    .getByRole("button", {
+      name: "查看目标：核实王奕的当前单位与身份",
+    })
+    .click();
+  await expect(
+    page
+      .getByRole("dialog", { name: "摸排目标详情" })
+      .getByText("两个公开来源冲突"),
+  ).toBeVisible();
+  await page
+    .getByRole("dialog", { name: "摸排目标详情" })
+    .getByRole("button", { name: "关闭", exact: true })
+    .last()
+    .click();
+
+  await page.goto("#/mappings/mapping-embodied?tab=organization");
+  await page.getByRole("button", { name: /查看证据：岗位页面/ }).click();
+  const evidence = page.getByRole("dialog", { name: "查看证据内容" });
+  await expect(evidence).toContainText("本轮读取到的关键内容");
+  await evidence
+    .getByRole("button", { name: "关闭", exact: true })
+    .last()
+    .click();
+
   await page.goto("#/mappings/mapping-embodied?tab=people");
   await expect(page.getByRole("heading", { name: "人物与关系" })).toBeVisible();
   await page.getByRole("tab", { name: "人物关系" }).click();
-  await page.locator(".s3-relationship-node").first().click();
+  await page
+    .locator(".s3-relationship-node")
+    .filter({ hasText: "林昊" })
+    .click();
   await expect(page.locator(".s3-relationship-detail")).toBeVisible();
+  await page.getByRole("button", { name: "打开候选人详情" }).click();
+  await expect(page).toHaveURL(/candidates\/candidate-linhao/);
+
+  await page.goto("#/mappings/mapping-embodied?tab=updates");
+  await page.getByRole("button", { name: /王奕身份冲突/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "王奕身份冲突" }),
+  ).toBeVisible();
+  await expect(page.locator(".s3-relationship-detail")).toBeVisible();
+
+  await page.goto("#/mappings/mapping-embodied?tab=people");
+  await page.getByRole("tab", { name: "人物关系" }).click();
+  await page
+    .locator(".s3-relationship-node")
+    .filter({ hasText: "王奕" })
+    .click();
   const decision = page.getByRole("button", { name: /确认写入/ });
   if (await decision.count()) {
     await decision.first().click();
     await expect(page.getByText("已确认写入")).toBeVisible();
   }
+
+  await page.goto("#/mappings/mapping-embodied?tab=business");
+  await page.getByRole("button", { name: "编辑关联" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "编辑相关业务" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("button", { name: "编辑", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "编辑人才版图" }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
+  await assertNoConsoleErrors();
+});
+
+test("导出范围控件保持紧凑且文件名保留完整编辑宽度", async ({ page }) => {
+  await page.goto("#/data/exports");
+  await page.getByRole("button", { name: "新建导出" }).click();
+  const modal = page.getByRole("dialog", { name: "新建数据导出" });
+  const rangeField = modal.getByText("导出范围", { exact: true }).locator("..");
+  const fileField = modal.getByText("文件名称", { exact: true }).locator("..");
+  const rangeBox = await rangeField.boundingBox();
+  const fileBox = await fileField.boundingBox();
+  expect(rangeBox).not.toBeNull();
+  expect(fileBox).not.toBeNull();
+  expect(rangeBox.width).toBeLessThan(380);
+  expect(fileBox.width).toBeGreaterThan(rangeBox.width);
 });
 
 test("阶段四次级控件不是装饰按钮", async ({ page }) => {

@@ -1961,6 +1961,9 @@
 .s4-contact-profile-editor-grid .s4-form-span-2 {
   width: min(336px, 100%);
 }
+.s4-export-create-form .s4-form-field:nth-child(3) {
+  width: min(336px, 100%);
+}
 .s4-contact-relation-editor-grid .s4-form-field:nth-child(1) {
   width: min(288px, 100%);
 }
@@ -2629,6 +2632,12 @@
 .s4-simple-records b,
 .s4-task-records b {
   font-size: 12px;
+}
+.s4-task-records p {
+  margin: 4px 0 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
 }
 .s4-contact-methods small,
 .s4-link-list small,
@@ -4710,6 +4719,20 @@
   border: 1px solid var(--s1-line);
   border-radius: 7px;
 }
+.s4-target-list article.is-clickable {
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+.s4-target-list article.is-clickable:hover,
+.s4-target-list article.is-clickable:focus-visible {
+  background: var(--s1-surface-raised);
+  border-color: color-mix(in srgb, var(--s1-accent) 34%, var(--s1-line));
+  box-shadow: var(--s1-control-shadow);
+  outline: none;
+}
 .s4-target-list article > button:first-child {
   display: grid;
   width: 28px;
@@ -4766,6 +4789,27 @@
   background: transparent;
   border: 0;
   cursor: pointer;
+}
+.s4-target-detail {
+  display: grid;
+  gap: 10px;
+}
+.s4-target-detail > section {
+  padding: 12px 13px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s4-target-detail > section small {
+  color: var(--s1-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.s4-target-detail > section p {
+  margin: 5px 0 0;
+  color: var(--s1-ink);
+  font-size: 12px;
+  line-height: 20px;
 }
 .s4-scope-summary {
   display: grid;
@@ -4935,6 +4979,18 @@
 .s4-update-impact footer > div {
   display: flex;
   gap: 7px;
+}
+.s4-mapping-reuse-records article {
+  align-items: start;
+}
+.s4-mapping-reuse-records b {
+  font-size: 13px;
+  line-height: 18px;
+}
+.s4-mapping-reuse-records small,
+.s4-mapping-reuse-records p {
+  font-size: 12px;
+  line-height: 18px;
 }
 
 .s4-academic-list {
@@ -7248,6 +7304,7 @@
     grid-template-columns: 1fr;
   }
   .s4-contact-profile-editor-grid .s4-form-span-2,
+  .s4-export-create-form .s4-form-field:nth-child(3),
   .s4-contact-relation-editor-grid .s4-form-field:nth-child(1),
   .s4-contact-relation-editor-grid .s4-form-field:nth-child(3),
   .s4-contact-relation-editor-grid .s4-form-field:nth-child(4) {

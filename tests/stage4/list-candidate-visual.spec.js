@@ -198,6 +198,81 @@ test("公共时间选择器展开态符合统一设计语言", async ({ page }) 
   await assertNoConsoleErrors();
 });
 
+test("人才版图创建、目标、关系证据、冲突和相关业务交互完整", async ({
+  page,
+}) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  await page.goto("#/mappings/new");
+  await page.screenshot({
+    path: `${output}/mapping-create-composer.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/mappings/mapping-embodied?tab=overview");
+  await page.getByRole("button", { name: "添加目标" }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/mapping-target-create.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "取消" }).click();
+  await page
+    .getByRole("button", {
+      name: "查看目标：核实王奕的当前单位与身份",
+    })
+    .click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/mapping-target-detail.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/mappings/mapping-embodied?tab=organization");
+  await page.getByRole("button", { name: /查看证据：岗位页面/ }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/mapping-evidence-preview.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/mappings/mapping-embodied?tab=people");
+  await page.getByRole("tab", { name: "人物关系" }).click();
+  await page
+    .locator(".s3-relationship-node")
+    .filter({ hasText: "王奕" })
+    .click();
+  await page.screenshot({
+    path: `${output}/mapping-candidate-node.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/mappings/mapping-embodied?tab=updates");
+  await page.getByRole("button", { name: /王奕身份冲突/ }).click();
+  await page.screenshot({
+    path: `${output}/mapping-conflict-review.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/mappings/mapping-embodied?tab=business");
+  await page.getByRole("button", { name: "编辑关联" }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/mapping-business-editor.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/data/exports");
+  await page.getByRole("button", { name: "新建导出" }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/data-export-compact-range.png`,
+    fullPage: true,
+  });
+  await assertNoConsoleErrors();
+});
+
 test("论文和专利人物信息在大量作者下保持紧凑可读", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 900 });

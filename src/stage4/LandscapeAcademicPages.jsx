@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { Composer } from "../stage2/automation-ui";
 import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
 import { mappingRelationshipViews } from "../stage3/data";
 import {
@@ -21,6 +22,7 @@ import {
   Modal,
   NotFoundState,
   Pagination,
+  SelectMenu,
   SourceList,
   StateBanner,
   StatusBadge,
@@ -173,53 +175,228 @@ const mappingTabs = [
   { value: "business", label: "相关业务" },
 ];
 
-function LandscapeOverview() {
+const initialMappingTargets = [
+  {
+    id: "target-vla-lead",
+    title: "确认星澜机器人 VLA 算法组负责人",
+    category: "关键人物",
+    priority: "高",
+    status: "已完成",
+    gap: "—",
+    action: "已关联赵星羽",
+    completion: "确认负责人身份，并关联到正式候选人或稳定人物线索。",
+    evidence: "候选人档案、公司团队页面和公开履历相互印证。",
+  },
+  {
+    id: "target-tuojie-org",
+    title: "补齐拓界机器人学习团队组织关系",
+    category: "组织结构",
+    priority: "高",
+    status: "进行中",
+    gap: "缺技术负责人",
+    action: "继续公开资料探索",
+    completion: "明确一级组织、方向团队、负责人和至少 3 位核心成员。",
+    evidence: "已确认智能操作部和策略学习团队，负责人身份仍缺稳定来源。",
+  },
+  {
+    id: "target-wangyi-identity",
+    title: "核实王奕的当前单位与身份",
+    category: "身份确认",
+    priority: "中",
+    status: "等待用户",
+    gap: "两个公开来源冲突",
+    action: "查看冲突证据",
+    completion: "确认论文作者和活动名单中的王奕是否为同一人。",
+    evidence: "论文单位时间线与公司公开活动名单存在冲突，需要人工判断。",
+  },
+  {
+    id: "target-contact-path",
+    title: "建立 VLA 核心人才联系路径",
+    category: "联系路径",
+    priority: "中",
+    status: "进行中",
+    gap: "5 人缺可靠路径",
+    action: "从共同作者和前同事继续探索",
+    completion: "为核心人才建立至少一条可解释、可执行的联系路径。",
+    evidence: "已关联共同作者、前同事和 2 位现有联系人。",
+  },
+];
+
+function MappingTargetEditor({ open, target, close, onSave }) {
+  const [title, setTitle] = useState(target?.title || "");
+  const [category, setCategory] = useState(target?.category || "关键人物");
+  const [priority, setPriority] = useState(target?.priority || "中");
+  const [completion, setCompletion] = useState(target?.completion || "");
+  const [gap, setGap] = useState(target?.gap === "—" ? "" : target?.gap || "");
+  useEffect(() => {
+    setTitle(target?.title || "");
+    setCategory(target?.category || "关键人物");
+    setPriority(target?.priority || "中");
+    setCompletion(target?.completion || "");
+    setGap(target?.gap === "—" ? "" : target?.gap || "");
+  }, [open, target]);
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="lg"
+      title={target ? "编辑摸排目标" : "增加摸排目标"}
+      description="目标必须说明要补齐什么，以及达到什么条件才算完成。"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            disabled={!title.trim() || !completion.trim()}
+            onClick={() =>
+              onSave({
+                ...(target || {}),
+                id: target?.id || `target-${Date.now()}`,
+                title: title.trim(),
+                category,
+                priority,
+                status: target?.status || "进行中",
+                gap: gap.trim() || "暂无明确缺口",
+                action: target?.action || "继续收集并核验证据",
+                completion: completion.trim(),
+                evidence: target?.evidence || "由本轮摸排任务持续补充。",
+              })
+            }
+          >
+            {target ? "保存修改" : "添加目标"}
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-form-grid">
+        <FormField label="目标事项" required span={2}>
+          <TextInput
+            value={title}
+            onChange={setTitle}
+            placeholder="例如：确认拓界机器人操作策略方向技术负责人"
+          />
+        </FormField>
+        <FormField label="目标类别" required>
+          <SelectMenu
+            label="选择目标类别"
+            value={category}
+            options={["关键人物", "组织结构", "身份确认", "联系路径"]}
+            onChange={setCategory}
+          />
+        </FormField>
+        <FormField label="优先级" required>
+          <SelectMenu
+            label="选择优先级"
+            value={priority}
+            options={["高", "中", "低"]}
+            onChange={setPriority}
+          />
+        </FormField>
+        <FormField label="完成标准" required span={2}>
+          <TextArea
+            value={completion}
+            onChange={setCompletion}
+            placeholder="说明获得哪些信息或关系后，这个目标可以结束"
+            rows={4}
+          />
+        </FormField>
+        <FormField label="当前已知缺口" span={2}>
+          <TextArea
+            value={gap}
+            onChange={setGap}
+            placeholder="例如：已知团队名称，但缺少负责人稳定身份"
+            rows={3}
+          />
+        </FormField>
+      </div>
+    </Modal>
+  );
+}
+
+function MappingTargetDetail({ target, close, onEdit, onToggleStatus }) {
+  if (!target) return null;
+  return (
+    <Modal
+      open
+      close={close}
+      size="lg"
+      title="摸排目标详情"
+      description={target.title}
+      footer={
+        <>
+          <Button onClick={close}>关闭</Button>
+          <Button icon="edit" onClick={() => onEdit(target)}>
+            编辑目标
+          </Button>
+          <Button tone="primary" onClick={() => onToggleStatus(target)}>
+            {target.status === "已完成" ? "重新打开" : "标记完成"}
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-target-detail">
+        <DefinitionGrid
+          columns={3}
+          items={[
+            ["目标类别", target.category],
+            ["优先级", target.priority],
+            ["当前状态", target.status],
+          ]}
+        />
+        <section>
+          <small>完成标准</small>
+          <p>{target.completion}</p>
+        </section>
+        <section>
+          <small>当前缺口</small>
+          <p>{target.gap}</p>
+        </section>
+        <section>
+          <small>当前证据与判断</small>
+          <p>{target.evidence}</p>
+        </section>
+        <section>
+          <small>下一步</small>
+          <p>{target.action}</p>
+        </section>
+      </div>
+    </Modal>
+  );
+}
+
+function LandscapeOverview({ profile }) {
   const notify = useToast();
-  const targets = [
-    {
-      title: "确认星澜机器人 VLA 算法组负责人",
-      category: "关键人物",
-      priority: "高",
-      status: "已完成",
-      gap: "—",
-      action: "已关联赵星羽",
-    },
-    {
-      title: "补齐拓界机器人学习团队组织关系",
-      category: "组织结构",
-      priority: "高",
-      status: "进行中",
-      gap: "缺技术负责人",
-      action: "继续公开资料探索",
-    },
-    {
-      title: "核实王奕的当前单位与身份",
-      category: "身份确认",
-      priority: "中",
-      status: "等待用户",
-      gap: "两个公开来源冲突",
-      action: "查看冲突证据",
-    },
-    {
-      title: "建立 VLA 核心人才联系路径",
-      category: "联系路径",
-      priority: "中",
-      status: "进行中",
-      gap: "5 人缺可靠路径",
-      action: "从共同作者和前同事继续探索",
-    },
-  ];
+  const [targets, setTargets] = useState(initialMappingTargets);
+  const [targetEditor, setTargetEditor] = useState(null);
+  const [targetDetail, setTargetDetail] = useState(null);
+  const saveTarget = (target) => {
+    setTargets((current) => {
+      const exists = current.some((item) => item.id === target.id);
+      return exists
+        ? current.map((item) => (item.id === target.id ? target : item))
+        : [...current, target];
+    });
+    setTargetEditor(null);
+    setTargetDetail(target);
+    notify(targetEditor?.id ? "摸排目标已更新" : "摸排目标已添加");
+  };
+  const toggleTargetStatus = (target) => {
+    const status = target.status === "已完成" ? "进行中" : "已完成";
+    const updated = { ...target, status };
+    setTargets((current) =>
+      current.map((item) => (item.id === target.id ? updated : item)),
+    );
+    setTargetDetail(updated);
+    notify(status === "已完成" ? "目标已标记完成" : "目标已重新打开");
+  };
   return (
     <div className="s4-detail-stack">
       <div className="s4-mapping-progress">
         <article>
           <span>
             <small>摸排目标</small>
-            <h2>具身智能 VLA 核心人才版图</h2>
-            <p>
-              摸清
-              VLA、机器人学习与真机数据闭环团队及关键人才，为星澜机器人岗位找人提供依据。
-            </p>
+            <h2>{profile.name}</h2>
+            <p>{profile.goal}</p>
           </span>
           <strong>
             8<small>目标公司</small>
@@ -227,10 +404,19 @@ function LandscapeOverview() {
         </article>
         <dl>
           {[
-            ["目标事项", "12 项"],
-            ["已完成", "7 项"],
-            ["进行中", "3 项"],
-            ["等待用户", "2 项"],
+            ["目标事项", `${targets.length + 8} 项`],
+            [
+              "已完成",
+              `${targets.filter((item) => item.status === "已完成").length + 6} 项`,
+            ],
+            [
+              "进行中",
+              `${targets.filter((item) => item.status === "进行中").length + 1} 项`,
+            ],
+            [
+              "等待用户",
+              `${targets.filter((item) => item.status === "等待用户").length + 1} 项`,
+            ],
           ].map(([label, value]) => (
             <div key={label}>
               <dt>{label}</dt>
@@ -246,7 +432,7 @@ function LandscapeOverview() {
           <Button
             size="sm"
             icon="plus"
-            onClick={() => notify("已添加一个空目标事项")}
+            onClick={() => setTargetEditor({ mode: "create" })}
           >
             添加目标
           </Button>
@@ -254,17 +440,30 @@ function LandscapeOverview() {
       >
         <div className="s4-target-list">
           {targets.map((item) => (
-            <article key={item.title}>
+            <article
+              className="is-clickable"
+              key={item.id}
+              role="button"
+              tabIndex="0"
+              aria-label={`查看目标：${item.title}`}
+              onClick={() => setTargetDetail(item)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setTargetDetail(item);
+                }
+              }}
+            >
               <button
                 type="button"
                 className={item.status === "已完成" ? "is-done" : ""}
-                onClick={() =>
-                  notify(
-                    item.status === "已完成"
-                      ? "目标已重新打开"
-                      : "目标已标记完成",
-                  )
+                aria-label={
+                  item.status === "已完成" ? "重新打开目标" : "标记目标完成"
                 }
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleTargetStatus(item);
+                }}
               >
                 <Icon name={item.status === "已完成" ? "check" : "clock"} />
               </button>
@@ -286,8 +485,14 @@ function LandscapeOverview() {
               >
                 {item.status}
               </StatusBadge>
-              <button type="button" onClick={() => notify(item.action)}>
-                {item.action}
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setTargetDetail(item);
+                }}
+              >
+                查看详情
                 <Icon name="chevronRight" />
               </button>
             </article>
@@ -298,25 +503,33 @@ function LandscapeOverview() {
         <div className="s4-scope-summary">
           <article>
             <b>纳入范围</b>
-            <p>
-              中国具身智能创业公司与重点研究机构；VLA、机器人学习、操作策略和数据闭环方向；技术负责人和核心骨干。
-            </p>
+            <p>{profile.includedScope}</p>
           </article>
           <article>
             <b>排除范围</b>
-            <p>
-              仅做人形硬件机械设计、纯视觉感知、没有机器人任务落地的多模态研究。
-            </p>
+            <p>{profile.excludedScope}</p>
           </article>
           <article>
             <b>完成标准</b>
-            <p>
-              完成 8
-              家目标公司、核心团队结构、关键角色与人才、主要人物关系和可行联系路径的核验。
-            </p>
+            <p>{profile.completion}</p>
           </article>
         </div>
       </FieldGroup>
+      <MappingTargetEditor
+        open={Boolean(targetEditor)}
+        target={targetEditor?.mode === "create" ? null : targetEditor}
+        close={() => setTargetEditor(null)}
+        onSave={saveTarget}
+      />
+      <MappingTargetDetail
+        target={targetDetail}
+        close={() => setTargetDetail(null)}
+        onEdit={(target) => {
+          setTargetDetail(null);
+          setTargetEditor(target);
+        }}
+        onToggleStatus={toggleTargetStatus}
+      />
     </div>
   );
 }
@@ -491,34 +704,60 @@ function LandscapeUpdates() {
 
 function LandscapeBusiness() {
   const navigate = useNavigate();
+  const notify = useToast();
+  const [editOpen, setEditOpen] = useState(false);
+  const [positionLinks, setPositionLinks] = useState([
+    "具身智能 VLA 算法负责人",
+    "机器人数据平台负责人",
+  ]);
+  const [workstreamLinks, setWorkstreamLinks] = useState([
+    "具身智能 VLA 人才摸排",
+  ]);
   return (
     <div className="s4-detail-stack">
-      <FieldGroup title="关联岗位">
+      <FieldGroup
+        title="关联岗位"
+        action={
+          <Button size="sm" icon="edit" onClick={() => setEditOpen(true)}>
+            编辑关联
+          </Button>
+        }
+      >
         <div className="s4-entity-grid">
-          <EntityLink
-            icon="briefcase"
-            title="具身智能 VLA 算法负责人"
-            meta="用于候选人范围扩展和关系路径"
-            onClick={() => navigate("/positions/position-vla")}
-          />
-          <EntityLink
-            icon="briefcase"
-            title="机器人数据平台负责人"
-            meta="用于数据闭环方向人才摸排"
-            onClick={() => navigate("/positions/position-platform")}
-          />
+          {positionLinks.map((position) => (
+            <EntityLink
+              icon="briefcase"
+              title={position}
+              meta={
+                position === "具身智能 VLA 算法负责人"
+                  ? "用于候选人范围扩展和关系路径"
+                  : "用于数据闭环方向人才摸排"
+              }
+              key={position}
+              onClick={() =>
+                navigate(
+                  position === "具身智能 VLA 算法负责人"
+                    ? "/positions/position-vla"
+                    : "/positions/position-platform",
+                )
+              }
+            />
+          ))}
         </div>
       </FieldGroup>
       <FieldGroup title="业务主线">
-        <EntityLink
-          icon="route"
-          title="具身智能 VLA 人才摸排"
-          meta="运行中 · 3 项目标正在推进"
-          onClick={() => navigate("/workstreams/mapping-embodied")}
-        />
+        {workstreamLinks.map((workstream) => (
+          <EntityLink
+            icon="route"
+            title={workstream}
+            meta="运行中 · 3 项目标正在推进"
+            key={workstream}
+            onClick={() => navigate("/workstreams/mapping-embodied")}
+          />
+        ))}
       </FieldGroup>
       <FieldGroup title="复用记录">
-        <div className="s4-task-records">
+        <div className="s4-task-records s4-mapping-reuse-records">
           <article>
             <i>
               <Icon name="users" />
@@ -532,7 +771,129 @@ function LandscapeBusiness() {
           </article>
         </div>
       </FieldGroup>
+      <Modal
+        open={editOpen}
+        close={() => setEditOpen(false)}
+        size="lg"
+        title="编辑相关业务"
+        description="这里只维护人才版图与现有业务资产的关联，不复制岗位或业务主线。"
+        footer={
+          <>
+            <Button onClick={() => setEditOpen(false)}>取消</Button>
+            <Button
+              tone="primary"
+              onClick={() => {
+                setEditOpen(false);
+                notify("相关业务关联已更新");
+              }}
+            >
+              保存关联
+            </Button>
+          </>
+        }
+      >
+        <div className="s4-form-grid">
+          <FormField label="关联岗位" span={2}>
+            <SelectMenu
+              label="选择关联岗位"
+              value={positionLinks}
+              options={[
+                "具身智能 VLA 算法负责人",
+                "机器人数据平台负责人",
+                "运动控制算法专家",
+              ]}
+              onChange={setPositionLinks}
+              multiple
+              searchable
+            />
+          </FormField>
+          <FormField label="关联业务主线" span={2}>
+            <SelectMenu
+              label="选择业务主线"
+              value={workstreamLinks}
+              options={[
+                "具身智能 VLA 人才摸排",
+                "星澜机器人客户开发",
+                "具身智能 VLA 算法负责人招聘",
+              ]}
+              onChange={setWorkstreamLinks}
+              multiple
+              searchable
+            />
+          </FormField>
+        </div>
+      </Modal>
     </div>
+  );
+}
+
+function MappingEditModal({ open, profile, close, onSave }) {
+  const [name, setName] = useState(profile.name);
+  const [goal, setGoal] = useState(profile.goal);
+  const [includedScope, setIncludedScope] = useState(profile.includedScope);
+  const [excludedScope, setExcludedScope] = useState(profile.excludedScope);
+  const [completion, setCompletion] = useState(profile.completion);
+  useEffect(() => {
+    setName(profile.name);
+    setGoal(profile.goal);
+    setIncludedScope(profile.includedScope);
+    setExcludedScope(profile.excludedScope);
+    setCompletion(profile.completion);
+  }, [open, profile]);
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="lg"
+      title="编辑人才版图"
+      description="调整版图名称、摸排范围和完成标准；已有关系和审核记录不会被删除。"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            disabled={!name.trim() || !goal.trim() || !completion.trim()}
+            onClick={() =>
+              onSave({
+                name: name.trim(),
+                goal: goal.trim(),
+                includedScope: includedScope.trim(),
+                excludedScope: excludedScope.trim(),
+                completion: completion.trim(),
+              })
+            }
+          >
+            保存修改
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-form-grid">
+        <FormField label="版图名称" required span={2}>
+          <TextInput value={name} onChange={setName} />
+        </FormField>
+        <FormField label="摸排目标" required span={2}>
+          <TextArea value={goal} onChange={setGoal} rows={4} />
+        </FormField>
+        <FormField label="纳入范围" required span={2}>
+          <TextArea
+            value={includedScope}
+            onChange={setIncludedScope}
+            rows={3}
+          />
+        </FormField>
+        <FormField label="排除范围" span={2}>
+          <TextArea
+            value={excludedScope}
+            onChange={setExcludedScope}
+            rows={3}
+          />
+        </FormField>
+        <FormField label="完成标准" required span={2}>
+          <TextArea value={completion} onChange={setCompletion} rows={4} />
+        </FormField>
+      </div>
+    </Modal>
   );
 }
 
@@ -544,6 +905,17 @@ export function MappingDetailPage() {
   const tab = params.get("tab") || "overview";
   const item = landscapes.find((mapping) => mapping.id === mappingId);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [profile, setProfile] = useState(() => ({
+    name: item?.name || "",
+    goal: item?.goal || "",
+    includedScope:
+      "中国具身智能创业公司与重点研究机构；VLA、机器人学习、操作策略和数据闭环方向；技术负责人和核心骨干。",
+    excludedScope:
+      "仅做人形硬件机械设计、纯视觉感知、没有机器人任务落地的多模态研究。",
+    completion:
+      "完成 8 家目标公司、核心团队结构、关键角色与人才、主要人物关系和可行联系路径的核验。",
+  }));
   if (!item)
     return (
       <NotFoundState label="人才版图" onBack={() => navigate("/mappings")} />
@@ -552,14 +924,14 @@ export function MappingDetailPage() {
     <div className="s4-detail-page s4-mapping-detail">
       <DetailHeader
         icon="route"
-        title={item.name}
-        subtitle={item.goal}
+        title={profile.name}
+        subtitle={profile.goal}
         badges={[
           { label: `${item.gaps} 项缺口`, tone: "warning" },
           { label: `${item.people} 位人物`, tone: "info" },
         ]}
         onBack={() => navigate("/mappings")}
-        onEdit={() => notify("已打开版图范围编辑")}
+        onEdit={() => setEditOpen(true)}
         onDelete={() => setDeleteOpen(true)}
       >
         <Button
@@ -574,7 +946,7 @@ export function MappingDetailPage() {
         value={tab}
         onChange={(value) => setParams({ tab: value })}
       />
-      {tab === "overview" ? <LandscapeOverview /> : null}
+      {tab === "overview" ? <LandscapeOverview profile={profile} /> : null}
       {tab === "ecosystem" ? <LandscapeGraphTab kind="ecosystem" /> : null}
       {tab === "organization" ? (
         <LandscapeGraphTab kind="organization" />
@@ -582,6 +954,16 @@ export function MappingDetailPage() {
       {tab === "people" ? <LandscapeGraphTab kind="people" /> : null}
       {tab === "updates" ? <LandscapeUpdates /> : null}
       {tab === "business" ? <LandscapeBusiness /> : null}
+      <MappingEditModal
+        open={editOpen}
+        profile={profile}
+        close={() => setEditOpen(false)}
+        onSave={(next) => {
+          setProfile(next);
+          setEditOpen(false);
+          notify("人才版图资料已更新");
+        }}
+      />
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
@@ -604,6 +986,8 @@ export function MappingCreatePage() {
   const [mode, setMode] = useState("natural");
   const [goal, setGoal] = useState("");
   const [files, setFiles] = useState([]);
+  const [authMode, setAuthMode] = useState("confirm");
+  const [attachments, setAttachments] = useState([]);
   return (
     <div className="s4-create-page">
       <AssetPageHeader
@@ -644,24 +1028,28 @@ export function MappingCreatePage() {
                 可以补充文字、链接和文件。Hunter
                 会先形成范围与目标清单，再开始探索。
               </p>
-              <div className="s4-inline-agent-input">
-                <TextArea
+              <div className="s4-agent-composer-shell">
+                <Composer
                   value={goal}
                   onChange={setGoal}
+                  onSend={(text, attachedFiles) => {
+                    const fileNames = attachedFiles
+                      .map((file) => file.name)
+                      .join("、");
+                    const prompt = text || `根据附件 ${fileNames} 新建人才版图`;
+                    navigate(`/new?prompt=${encodeURIComponent(prompt)}`);
+                  }}
+                  authMode={authMode}
+                  onAuthChange={setAuthMode}
+                  attachments={attachments}
+                  onAttachmentsChange={setAttachments}
                   placeholder="例如：摸排国内具身智能 VLA 方向，重点关注有真机部署经验的算法负责人和核心骨干，优先北京、上海和深圳。"
-                  rows={7}
                 />
-                <Button
-                  tone="primary"
-                  icon="send"
-                  disabled={!goal.trim()}
-                  onClick={() =>
-                    navigate(`/new?prompt=${encodeURIComponent(goal)}`)
-                  }
-                >
-                  开始
-                </Button>
               </div>
+              <small className="s4-agent-create-hint">
+                可直接粘贴链接，或添加文件与截图；Hunter
+                会先形成可调整的摸排计划和目标清单。
+              </small>
             </div>
           ) : mode === "file" ? (
             <>

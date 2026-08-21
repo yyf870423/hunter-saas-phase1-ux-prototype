@@ -1020,6 +1020,9 @@
   font-size: 12px;
   line-height: 19px;
 }
+.s3-related-asset-link {
+  margin-top: 10px;
+}
 .s3-evidence-list {
   display: grid;
   gap: 6px;
@@ -1028,20 +1031,100 @@
   list-style: none;
 }
 .s3-evidence-list li {
-  display: flex;
+  min-width: 0;
+}
+.s3-evidence-list button {
+  display: grid;
+  width: 100%;
+  min-height: 34px;
+  grid-template-columns: 14px minmax(0, 1fr) 12px;
   align-items: center;
   gap: 7px;
-  min-height: 30px;
-  padding: 5px 8px;
+  padding: 6px 8px;
   color: var(--s1-muted);
   font-size: 11px;
+  text-align: left;
   background: var(--s1-canvas);
   border: 1px solid var(--s1-line);
   border-radius: 5px;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease;
 }
-.s3-evidence-list svg {
+.s3-evidence-list button:hover {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 30%, var(--s1-line));
+}
+.s3-evidence-list button span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s3-evidence-list button svg {
   flex: 0 0 auto;
   width: 14px;
+  color: currentColor;
+}
+.s3-evidence-list button svg:last-child {
+  width: 12px;
+  color: var(--s1-subtle);
+}
+.s3-evidence-preview {
+  display: grid;
+  gap: 14px;
+}
+.s3-evidence-preview > dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  overflow: hidden;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s3-evidence-preview > dl > div {
+  padding: 10px 12px;
+  border-right: 1px solid var(--s1-line);
+  border-bottom: 1px solid var(--s1-line);
+}
+.s3-evidence-preview > dl > div:nth-child(2n) {
+  border-right: 0;
+}
+.s3-evidence-preview > dl > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+.s3-evidence-preview dt {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s3-evidence-preview dd {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 620;
+}
+.s3-evidence-preview > section {
+  padding: 14px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s3-evidence-preview > section small {
+  color: var(--s1-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.s3-evidence-preview > section p,
+.s3-evidence-preview > p {
+  margin: 7px 0 0;
+  color: var(--s1-ink);
+  font-size: 12px;
+  line-height: 20px;
+}
+.s3-evidence-preview > p {
+  margin: 0;
   color: var(--s1-muted);
 }
 .s3-direct-relations {
