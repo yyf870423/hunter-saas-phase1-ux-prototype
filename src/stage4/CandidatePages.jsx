@@ -370,7 +370,7 @@ function ProfileTab({ candidate, hasIdentityIssue = false }) {
             icon="edit"
             onClick={() => setEditSection("contacts")}
           >
-            编辑方式
+            编辑联系方式
           </Button>
         }
       >
