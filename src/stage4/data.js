@@ -133,6 +133,8 @@ const candidateSeed = [
   ],
 ];
 
+const candidateAges = [37, 35, 34, 40, 33, 31, 36, 39, 38, 35, 32, 30];
+
 export const candidates = candidateSeed.map((item, index) => ({
   id: item[0],
   name: item[1],
@@ -141,6 +143,7 @@ export const candidates = candidateSeed.map((item, index) => ({
   location: item[4],
   education: item[5],
   experience: item[6],
+  age: candidateAges[index],
   score: Number(item[7]),
   pipeline: item[8],
   industries: index % 2 ? ["人工智能", "机器人"] : ["机器人", "企业服务"],

@@ -414,6 +414,7 @@
 }
 
 .s4-table-wrap {
+  position: relative;
   width: 100%;
   overflow: visible;
   background: var(--s1-surface);
@@ -421,10 +422,69 @@
   border-left: 1px solid var(--s1-line);
 }
 
+.s4-table-wrap.s4-table-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: var(--s1-line-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.s4-table-wrap.s4-table-scroll::-webkit-scrollbar {
+  height: 9px;
+}
+
+.s4-table-wrap.s4-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--s1-line-strong);
+  border: 2px solid var(--s1-surface);
+  border-radius: 999px;
+}
+
 .s4-data-table {
   width: 100%;
+  min-width: var(--s4-table-min-width, 0);
   table-layout: fixed;
   border-collapse: collapse;
+}
+
+.s4-table-sticky-edges .s4-select-cell,
+.s4-table-sticky-edges .is-sticky-first,
+.s4-table-sticky-edges .s4-actions-cell {
+  position: sticky;
+  background: var(--s1-surface);
+}
+
+.s4-table-sticky-edges .s4-select-cell {
+  z-index: 4;
+  left: 0;
+}
+
+.s4-table-sticky-edges .is-sticky-first {
+  z-index: 3;
+  left: 42px;
+  box-shadow: 8px 0 12px -12px rgba(6, 25, 58, 0.5);
+}
+
+.s4-table-sticky-edges .s4-actions-cell {
+  z-index: 3;
+  right: 0;
+  box-shadow: -8px 0 12px -12px rgba(6, 25, 58, 0.5);
+}
+
+.s4-table-sticky-edges thead .s4-select-cell,
+.s4-table-sticky-edges thead .is-sticky-first,
+.s4-table-sticky-edges thead .s4-actions-cell {
+  z-index: 6;
+  background: color-mix(in srgb, var(--s1-canvas) 75%, var(--s1-surface));
+}
+
+.s4-table-sticky-edges tr:hover .s4-select-cell,
+.s4-table-sticky-edges tr:hover .is-sticky-first,
+.s4-table-sticky-edges tr:hover .s4-actions-cell,
+.s4-table-sticky-edges tr.is-selected .s4-select-cell,
+.s4-table-sticky-edges tr.is-selected .is-sticky-first,
+.s4-table-sticky-edges tr.is-selected .s4-actions-cell {
+  background: var(--s1-accent-soft);
 }
 .s4-data-table th {
   height: 42px;
@@ -4585,12 +4645,18 @@
     border-left: 0;
     background: transparent;
   }
+  .s4-table-wrap.s4-table-scroll {
+    overflow: visible;
+  }
   .s4-data-table,
   .s4-data-table tbody,
   .s4-data-table tr,
   .s4-data-table td {
     display: block;
     width: 100%;
+  }
+  .s4-data-table {
+    min-width: 0;
   }
   .s4-data-table thead {
     display: none;
@@ -4626,6 +4692,7 @@
     z-index: 1;
     top: 13px;
     right: 9px;
+    left: auto;
     display: block !important;
     width: 24px;
     padding: 0;
@@ -4641,6 +4708,10 @@
     display: block !important;
     width: auto;
     padding: 0;
+  }
+  .s4-table-sticky-edges .is-sticky-first {
+    position: static;
+    box-shadow: none;
   }
   .s4-table-value {
     white-space: normal;

@@ -46,33 +46,55 @@ const configs = {
       ["行业", ["人工智能", "机器人", "智能制造"]],
       ["收藏夹", ["VLA 重点人才", "本周联系", "长期观察"]],
     ],
+    defaultHidden: [],
+    stickyEdges: true,
+    tableMinWidth: 1420,
     columns: [
       {
         key: "name",
-        label: "候选人",
+        label: "姓名",
         required: true,
+        width: 142,
         render: (row) => (
           <span className="s4-primary-cell">
             <b>{row.name}</b>
-            <small>{row.title}</small>
           </span>
         ),
       },
-      { key: "company", label: "当前公司", required: true },
-      { key: "location", label: "地点" },
-      { key: "education", label: "学历" },
-      { key: "experience", label: "工作年限" },
+      { key: "company", label: "公司", width: 132 },
+      { key: "title", label: "职位", width: 178 },
+      {
+        key: "education",
+        label: "学历",
+        width: 90,
+        render: (row) => <TagList items={[row.education]} tone="info" />,
+      },
       {
         key: "skills",
-        label: "关键技能",
-        render: (row) => <TagList items={row.skills.slice(0, 2)} />,
+        label: "技能",
+        width: 196,
+        render: (row) => <TagList items={row.skills.slice(0, 3)} />,
       },
       {
+        key: "industries",
+        label: "行业",
+        width: 166,
+        render: (row) => <TagList items={row.industries.slice(0, 2)} />,
+      },
+      { key: "experience", label: "年限", width: 80 },
+      {
+        key: "age",
+        label: "年龄",
+        width: 74,
+        render: (row) => (row.age ? `${row.age} 岁` : "—"),
+      },
+      { key: "location", label: "地点", width: 90 },
+      {
         key: "pipeline",
-        label: "最近推进",
+        label: "流程",
+        width: 110,
         render: (row) => <StatusFromText value={row.pipeline} />,
       },
-      { key: "updatedAt", label: "更新时间" },
     ],
   },
   positions: {
@@ -270,7 +292,10 @@ export function AssetListPage({ type }) {
     config.columns
       .filter(
         (column) =>
-          column.required || !["updatedAt", "experience"].includes(column.key),
+          column.required ||
+          !(config.defaultHidden ?? ["updatedAt", "experience"]).includes(
+            column.key,
+          ),
       )
       .map((column) => column.key),
   );
@@ -389,6 +414,8 @@ export function AssetListPage({ type }) {
               onDelete={setDeleteTarget}
             />
           )}
+          stickyEdges={config.stickyEdges}
+          minWidth={config.tableMinWidth}
           empty={
             <div className="s4-custom-empty">
               <Icon name="search" />

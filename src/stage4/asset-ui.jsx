@@ -300,6 +300,8 @@ export function DataTable({
   onSelect,
   onRow,
   rowActions,
+  stickyEdges = false,
+  minWidth,
   empty,
 }) {
   const shown = columns.filter(
@@ -321,8 +323,26 @@ export function DataTable({
       )
     );
   return (
-    <div className="s4-table-wrap">
-      <table className="s4-data-table">
+    <div
+      className={`s4-table-wrap ${stickyEdges ? "s4-table-scroll s4-table-sticky-edges" : ""}`}
+      data-sticky-edges={stickyEdges ? "true" : undefined}
+    >
+      <table
+        className="s4-data-table"
+        style={
+          minWidth ? { "--s4-table-min-width": `${minWidth}px` } : undefined
+        }
+      >
+        <colgroup>
+          {onSelect ? <col style={{ width: 42 }} /> : null}
+          {shown.map((column) => (
+            <col
+              key={column.key}
+              style={column.width ? { width: column.width } : undefined}
+            />
+          ))}
+          {rowActions ? <col style={{ width: 72 }} /> : null}
+        </colgroup>
         <thead>
           <tr>
             {onSelect ? (
@@ -330,8 +350,13 @@ export function DataTable({
                 <CustomCheckbox checked={allChecked} onChange={toggleAll} />
               </th>
             ) : null}
-            {shown.map((column) => (
-              <th key={column.key}>{column.label}</th>
+            {shown.map((column, columnIndex) => (
+              <th
+                key={column.key}
+                className={`s4-data-col-${column.key} ${stickyEdges && columnIndex === 0 ? "is-sticky-first" : ""}`}
+              >
+                {column.label}
+              </th>
             ))}
             {rowActions ? <th className="s4-actions-cell">操作</th> : null}
           </tr>
@@ -356,7 +381,11 @@ export function DataTable({
                 </td>
               ) : null}
               {shown.map((column, columnIndex) => (
-                <td key={column.key} data-label={column.label}>
+                <td
+                  key={column.key}
+                  data-label={column.label}
+                  className={`s4-data-col-${column.key} ${stickyEdges && columnIndex === 0 ? "is-sticky-first" : ""}`}
+                >
                   <button
                     type="button"
                     className={`s4-table-value ${columnIndex === 0 ? "is-primary" : ""}`}

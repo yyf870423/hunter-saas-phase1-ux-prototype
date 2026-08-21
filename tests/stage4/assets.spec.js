@@ -7,6 +7,54 @@ import {
 test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/candidates");
+  for (const heading of [
+    "姓名",
+    "公司",
+    "职位",
+    "学历",
+    "技能",
+    "行业",
+    "年限",
+    "年龄",
+    "地点",
+    "流程",
+    "操作",
+  ]) {
+    await expect(
+      page.getByRole("columnheader", { name: heading, exact: true }),
+    ).toBeVisible();
+  }
+  const tableWrap = page.locator(".s4-table-wrap");
+  const beforeScroll = await tableWrap.evaluate((element) => {
+    const name = element.querySelector("th.s4-data-col-name");
+    const actions = element.querySelector("th.s4-actions-cell");
+    return {
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      nameLeft: name.getBoundingClientRect().left,
+      actionsRight: actions.getBoundingClientRect().right,
+    };
+  });
+  expect(beforeScroll.scrollWidth).toBeGreaterThan(beforeScroll.clientWidth);
+  await tableWrap.evaluate((element) => {
+    element.scrollLeft = element.scrollWidth;
+  });
+  const afterScroll = await tableWrap.evaluate((element) => {
+    const name = element.querySelector("th.s4-data-col-name");
+    const actions = element.querySelector("th.s4-actions-cell");
+    return {
+      scrollLeft: element.scrollLeft,
+      nameLeft: name.getBoundingClientRect().left,
+      actionsRight: actions.getBoundingClientRect().right,
+    };
+  });
+  expect(afterScroll.scrollLeft).toBeGreaterThan(0);
+  expect(Math.abs(afterScroll.nameLeft - beforeScroll.nameLeft)).toBeLessThan(
+    2,
+  );
+  expect(
+    Math.abs(afterScroll.actionsRight - beforeScroll.actionsRight),
+  ).toBeLessThan(2);
   await page.getByPlaceholder(/搜索姓名/).fill("林昊");
   await expect(
     page.getByRole("button", { name: /林昊/ }).first(),
