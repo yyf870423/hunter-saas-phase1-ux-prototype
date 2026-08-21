@@ -6,6 +6,7 @@ import {
   AssetPageHeader,
   Button,
   CustomCheckbox,
+  DatePicker,
   DefinitionGrid,
   DeleteAssetModal,
   DetailHeader,
@@ -804,7 +805,12 @@ export function ContactDetailPage() {
             />
           </FormField>
           <FormField label="发生时间">
-            <TextInput value="2026-08-21 14:30" onChange={() => {}} />
+            <DatePicker
+              label="选择发生时间"
+              mode="datetime"
+              value="2026-08-21 14:30"
+              onChange={() => {}}
+            />
           </FormField>
           <FormField label="沟通内容" span={2}>
             <TextArea value="" onChange={() => {}} rows={5} />
@@ -1204,7 +1210,12 @@ function OpportunityEditor({ open, close, item = null }) {
           <TextInput value="20 - 25" onChange={() => {}} />
         </FormField>
         <FormField label="预计时间">
-          <TextInput value="2026 年下半年" onChange={() => {}} />
+          <DatePicker
+            label="选择预计时间"
+            mode="month-range"
+            value="2026.07 - 2026.12"
+            onChange={() => {}}
+          />
         </FormField>
         <FormField label="相关联系人">
           <SelectMenu

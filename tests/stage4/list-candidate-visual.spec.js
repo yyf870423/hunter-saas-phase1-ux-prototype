@@ -79,3 +79,39 @@ test("候选人创建、详情、审核与异常状态视觉完整", async ({ pa
   }
   await assertNoConsoleErrors();
 });
+
+test("公共时间选择器展开态符合统一设计语言", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  await page.goto("#/candidates/candidate-linhao?tab=experience");
+  await page.getByRole("button", { name: "添加经历" }).click();
+  await page
+    .getByRole("button", { name: /选择起止时间：2022\.03 - 至今/ })
+    .click();
+  await page.waitForTimeout(180);
+  await page.screenshot({
+    path: `${output}/date-picker-month-range.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/contacts/contact-chenyu?tab=timeline");
+  await page.getByRole("button", { name: "添加沟通记录" }).click();
+  await page
+    .getByRole("button", { name: /选择发生时间：2026-08-21 14:30/ })
+    .click();
+  await page.waitForTimeout(180);
+  await page.screenshot({
+    path: `${output}/date-picker-datetime.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/papers");
+  await page.getByRole("button", { name: "年份", exact: true }).click();
+  await page.waitForTimeout(180);
+  await page.screenshot({
+    path: `${output}/date-picker-years.png`,
+    fullPage: true,
+  });
+  await assertNoConsoleErrors();
+});

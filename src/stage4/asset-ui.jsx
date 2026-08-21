@@ -114,6 +114,8 @@ export function FloatingPanel({
   className,
   width = 240,
   align = "start",
+  role,
+  ariaLabel,
   children,
 }) {
   const [style, setStyle] = useState(null);
@@ -166,6 +168,8 @@ export function FloatingPanel({
       ref={panelRef}
       className={`${className} s4-floating-panel`}
       style={style}
+      role={role}
+      aria-label={ariaLabel}
     >
       {children}
     </div>,
@@ -319,6 +323,435 @@ export function SelectMenu({
             </button>
           </footer>
         ) : null}
+      </FloatingPanel>
+    </div>
+  );
+}
+
+const monthLabels = [
+  "1 月",
+  "2 月",
+  "3 月",
+  "4 月",
+  "5 月",
+  "6 月",
+  "7 月",
+  "8 月",
+  "9 月",
+  "10 月",
+  "11 月",
+  "12 月",
+];
+const weekLabels = ["一", "二", "三", "四", "五", "六", "日"];
+const padDatePart = (value) => String(value).padStart(2, "0");
+const parseYear = (value, fallback = 2026) =>
+  Number(String(value || "").match(/\d{4}/)?.[0] || fallback);
+const parseMonthParts = (value) => {
+  const parts = [...String(value || "").matchAll(/(\d{4})[.-](\d{1,2})/g)].map(
+    (match) => ({ year: Number(match[1]), month: Number(match[2]) }),
+  );
+  return {
+    start: parts[0] || null,
+    end: parts[1] || null,
+    ongoing: String(value || "").includes("至今"),
+  };
+};
+
+export function DatePicker({
+  label = "选择时间",
+  value,
+  onChange,
+  mode = "date",
+  yearOptions = [],
+  allowOngoing = false,
+  initialYear = 2026,
+  className = "",
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const panelRef = useRef(null);
+  const initialRange = parseMonthParts(value);
+  const [draftValue, setDraftValue] = useState(
+    value || (mode === "years" ? [] : ""),
+  );
+  const [selectedYears, setSelectedYears] = useState(
+    Array.isArray(value) ? value : [],
+  );
+  const [viewYear, setViewYear] = useState(
+    initialRange.start?.year || parseYear(value, initialYear),
+  );
+  const [viewMonth, setViewMonth] = useState(
+    Math.max(
+      0,
+      Number(String(value || "").match(/\d{4}-(\d{2})/)?.[1] || 8) - 1,
+    ),
+  );
+  const [selectedDate, setSelectedDate] = useState(
+    String(value || "").match(/\d{4}-\d{2}-\d{2}/)?.[0] ||
+      `${initialYear}-08-21`,
+  );
+  const [rangeStep, setRangeStep] = useState("start");
+  const [rangeStart, setRangeStart] = useState(initialRange.start);
+  const [rangeEnd, setRangeEnd] = useState(initialRange.end);
+  const [rangeOngoing, setRangeOngoing] = useState(initialRange.ongoing);
+  const valueKey = JSON.stringify(value || "");
+  useEffect(() => {
+    setDraftValue(value || (mode === "years" ? [] : ""));
+    if (mode === "years") setSelectedYears(Array.isArray(value) ? value : []);
+    if (mode === "month-range") {
+      const next = parseMonthParts(value);
+      setRangeStart(next.start);
+      setRangeEnd(next.end);
+      setRangeOngoing(next.ongoing);
+      setViewYear(next.start?.year || initialYear);
+      setRangeStep("start");
+    }
+  }, [initialYear, mode, valueKey]);
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = (event) => {
+      if (
+        !ref.current?.contains(event.target) &&
+        !panelRef.current?.contains(event.target)
+      )
+        setOpen(false);
+    };
+    const escape = (event) => {
+      if (event.key === "Escape") {
+        event.stopImmediatePropagation();
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", escape, true);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", escape, true);
+    };
+  }, [open]);
+  const commit = (next) => {
+    setDraftValue(next);
+    onChange?.(next);
+  };
+  const shiftMonth = (step) => {
+    const date = new Date(viewYear, viewMonth + step, 1);
+    setViewYear(date.getFullYear());
+    setViewMonth(date.getMonth());
+  };
+  const chooseMonth = (month) => {
+    const next = { year: viewYear, month };
+    if (rangeStep === "start") {
+      setRangeStart(next);
+      setRangeEnd(null);
+      setRangeOngoing(false);
+      setRangeStep("end");
+      return;
+    }
+    const startNumber =
+      (rangeStart?.year || viewYear) * 12 + (rangeStart?.month || month);
+    const endNumber = viewYear * 12 + month;
+    if (endNumber < startNumber) {
+      setRangeStart(next);
+      setRangeEnd(null);
+      setRangeStep("end");
+      return;
+    }
+    setRangeEnd(next);
+    setRangeOngoing(false);
+  };
+  const confirmMonthRange = () => {
+    if (!rangeStart || (!rangeEnd && !rangeOngoing)) return;
+    const start = `${rangeStart.year}.${padDatePart(rangeStart.month)}`;
+    const end = rangeOngoing
+      ? "至今"
+      : `${rangeEnd.year}.${padDatePart(rangeEnd.month)}`;
+    commit(`${start} - ${end}`);
+    setOpen(false);
+  };
+  const resolvedYearOptions = yearOptions.length
+    ? yearOptions.map(String)
+    : Array.from({ length: 12 }, (_, index) => String(viewYear - 5 + index));
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const leadingDays = (firstDay + 6) % 7;
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const display = Array.isArray(draftValue)
+    ? draftValue.length
+      ? `${label} · ${draftValue.length}`
+      : label
+    : draftValue || label;
+  const accessibleLabel = display === label ? label : `${label}：${display}`;
+  return (
+    <div
+      className={`s4-date-picker ${open ? "is-open" : ""} ${className}`}
+      ref={ref}
+    >
+      <button
+        type="button"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label={accessibleLabel}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <Icon name="calendar" />
+        <span>{display}</span>
+        <Icon name={open ? "chevronUp" : "chevronDown"} />
+      </button>
+      <FloatingPanel
+        open={open}
+        anchorRef={ref}
+        panelRef={panelRef}
+        className="s4-date-picker-panel"
+        width={mode === "month-range" ? 344 : 320}
+        role="dialog"
+        ariaLabel={`${label}时间选择器`}
+      >
+        <header>
+          <span>
+            <b>{label}</b>
+            <small>
+              {mode === "month-range"
+                ? "在同一面板中依次选择开始和结束时间"
+                : mode === "years"
+                  ? "可以选择多个年份"
+                  : "选择后立即更新当前字段"}
+            </small>
+          </span>
+          <IconButton
+            icon="close"
+            label="关闭时间选择器"
+            onClick={() => setOpen(false)}
+          />
+        </header>
+        {mode === "month-range" ? (
+          <>
+            <div className="s4-date-range-steps">
+              <button
+                type="button"
+                className={rangeStep === "start" ? "is-active" : ""}
+                onClick={() => {
+                  setRangeStep("start");
+                  if (rangeStart) setViewYear(rangeStart.year);
+                }}
+              >
+                <small>开始</small>
+                <b>
+                  {rangeStart
+                    ? `${rangeStart.year}.${padDatePart(rangeStart.month)}`
+                    : "请选择"}
+                </b>
+              </button>
+              <Icon name="chevronRight" />
+              <button
+                type="button"
+                className={rangeStep === "end" ? "is-active" : ""}
+                onClick={() => {
+                  setRangeStep("end");
+                  if (rangeEnd) setViewYear(rangeEnd.year);
+                }}
+              >
+                <small>结束</small>
+                <b>
+                  {rangeOngoing
+                    ? "至今"
+                    : rangeEnd
+                      ? `${rangeEnd.year}.${padDatePart(rangeEnd.month)}`
+                      : "请选择"}
+                </b>
+              </button>
+            </div>
+            <div className="s4-date-picker-nav">
+              <IconButton
+                icon="chevronLeft"
+                label="上一年"
+                onClick={() => setViewYear((year) => year - 1)}
+              />
+              <b>{viewYear} 年</b>
+              <IconButton
+                icon="chevronRight"
+                label="下一年"
+                onClick={() => setViewYear((year) => year + 1)}
+              />
+            </div>
+            <div className="s4-month-grid">
+              {monthLabels.map((monthLabel, index) => {
+                const month = index + 1;
+                const selected =
+                  (rangeStart?.year === viewYear &&
+                    rangeStart.month === month) ||
+                  (rangeEnd?.year === viewYear && rangeEnd.month === month);
+                return (
+                  <button
+                    type="button"
+                    className={selected ? "is-selected" : ""}
+                    key={monthLabel}
+                    onClick={() => chooseMonth(month)}
+                  >
+                    {monthLabel}
+                  </button>
+                );
+              })}
+            </div>
+            <footer>
+              {allowOngoing && rangeStep === "end" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRangeOngoing(true);
+                    setRangeEnd(null);
+                  }}
+                >
+                  设为至今
+                </button>
+              ) : (
+                <span />
+              )}
+              <Button
+                size="sm"
+                tone="primary"
+                disabled={!rangeStart || (!rangeEnd && !rangeOngoing)}
+                onClick={confirmMonthRange}
+              >
+                确定
+              </Button>
+            </footer>
+          </>
+        ) : mode === "year" || mode === "years" ? (
+          <>
+            {mode === "year" ? (
+              <div className="s4-date-picker-nav">
+                <IconButton
+                  icon="chevronLeft"
+                  label="上一组年份"
+                  onClick={() => setViewYear((year) => year - 12)}
+                />
+                <b>
+                  {viewYear - 5} - {viewYear + 6}
+                </b>
+                <IconButton
+                  icon="chevronRight"
+                  label="下一组年份"
+                  onClick={() => setViewYear((year) => year + 12)}
+                />
+              </div>
+            ) : null}
+            <div className="s4-year-grid">
+              {resolvedYearOptions.map((year) => {
+                const selected =
+                  mode === "years"
+                    ? selectedYears.includes(year)
+                    : String(draftValue) === year;
+                return (
+                  <button
+                    type="button"
+                    className={selected ? "is-selected" : ""}
+                    key={year}
+                    onClick={() => {
+                      if (mode === "years") {
+                        setSelectedYears((current) =>
+                          current.includes(year)
+                            ? current.filter((item) => item !== year)
+                            : [...current, year],
+                        );
+                        return;
+                      }
+                      commit(year);
+                      setOpen(false);
+                    }}
+                  >
+                    {year}
+                  </button>
+                );
+              })}
+            </div>
+            {mode === "years" ? (
+              <footer>
+                <button type="button" onClick={() => setSelectedYears([])}>
+                  清空
+                </button>
+                <Button
+                  size="sm"
+                  tone="primary"
+                  onClick={() => {
+                    commit(selectedYears);
+                    setOpen(false);
+                  }}
+                >
+                  确定
+                </Button>
+              </footer>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <div className="s4-date-picker-nav">
+              <IconButton
+                icon="chevronLeft"
+                label="上个月"
+                onClick={() => shiftMonth(-1)}
+              />
+              <b>
+                {viewYear} 年 {monthLabels[viewMonth]}
+              </b>
+              <IconButton
+                icon="chevronRight"
+                label="下个月"
+                onClick={() => shiftMonth(1)}
+              />
+            </div>
+            <div className="s4-week-grid">
+              {weekLabels.map((day) => (
+                <span key={day}>{day}</span>
+              ))}
+            </div>
+            <div className="s4-day-grid">
+              {Array.from({ length: leadingDays }, (_, index) => (
+                <i key={`blank-${index}`} />
+              ))}
+              {Array.from({ length: daysInMonth }, (_, index) => {
+                const day = index + 1;
+                const date = `${viewYear}-${padDatePart(viewMonth + 1)}-${padDatePart(day)}`;
+                return (
+                  <button
+                    type="button"
+                    className={selectedDate === date ? "is-selected" : ""}
+                    key={date}
+                    onClick={() => {
+                      setSelectedDate(date);
+                      if (mode === "date") {
+                        commit(date);
+                        setOpen(false);
+                      }
+                    }}
+                  >
+                    {day}
+                  </button>
+                );
+              })}
+            </div>
+            {mode === "datetime" ? (
+              <div className="s4-time-grid">
+                <small>选择时间</small>
+                <div>
+                  {["09:00", "10:30", "14:30", "16:00", "18:30"].map((time) => (
+                    <button
+                      type="button"
+                      className={
+                        String(draftValue).endsWith(time) ? "is-selected" : ""
+                      }
+                      key={time}
+                      onClick={() => {
+                        commit(`${selectedDate} ${time}`);
+                        setOpen(false);
+                      }}
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </>
+        )}
       </FloatingPanel>
     </div>
   );

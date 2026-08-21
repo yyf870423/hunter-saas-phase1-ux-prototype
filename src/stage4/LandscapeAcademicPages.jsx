@@ -8,6 +8,7 @@ import {
   Button,
   CustomCheckbox,
   CustomRadio,
+  DatePicker,
   DefinitionGrid,
   DeleteAssetModal,
   DetailHeader,
@@ -788,11 +789,17 @@ function AcademicCardList({ kind }) {
           kind === "papers"
             ? [
                 {
+                  key: "paper-years",
                   label: "年份",
-                  value: typeFilters,
-                  options: ["2026", "2025", "2024", "2023"],
-                  multiple: true,
-                  onChange: setTypeFilters,
+                  render: (
+                    <DatePicker
+                      label="年份"
+                      mode="years"
+                      value={typeFilters}
+                      yearOptions={["2026", "2025", "2024", "2023"]}
+                      onChange={setTypeFilters}
+                    />
+                  ),
                 },
                 {
                   label: "人物关联",

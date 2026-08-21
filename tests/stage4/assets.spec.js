@@ -310,6 +310,69 @@ test("候选人来源证据逐项可打开且详情加载状态完整", async ({
   await expect(page.locator(".s4-detail-loading > section")).toHaveCount(2);
 });
 
+test("时间相关字段统一使用单触发框时间选择器", async ({ page }) => {
+  await page.goto("#/candidates/candidate-linhao");
+  await page.getByRole("button", { name: "编辑资料" }).click();
+  const basicEditor = page.getByRole("dialog", { name: "编辑基本资料" });
+  await basicEditor.getByRole("button", { name: /1989/ }).click();
+  const yearPicker = page.getByRole("dialog", {
+    name: "选择出生年份时间选择器",
+  });
+  await expect(yearPicker).toBeVisible();
+  await yearPicker.getByRole("button", { name: "1990", exact: true }).click();
+  await expect(basicEditor.getByRole("button", { name: /1990/ })).toBeVisible();
+  await basicEditor.getByRole("button", { name: "取消" }).click();
+
+  await page.goto("#/candidates/candidate-linhao?tab=experience");
+  await page.getByRole("button", { name: "添加经历" }).click();
+  const experienceEditor = page.getByRole("dialog", {
+    name: "编辑工作经历",
+  });
+  await experienceEditor
+    .getByRole("button", { name: /选择起止时间：2022\.03 - 至今/ })
+    .click();
+  const rangePicker = page.getByRole("dialog", {
+    name: "选择起止时间时间选择器",
+  });
+  await expect(rangePicker.getByText("开始", { exact: true })).toBeVisible();
+  await expect(rangePicker.getByText("结束", { exact: true })).toBeVisible();
+  await rangePicker.getByRole("button", { name: /结束/ }).click();
+  await expect(
+    rangePicker.getByRole("button", { name: "设为至今" }),
+  ).toBeVisible();
+  await expect(experienceEditor.locator('input[type="date"]')).toHaveCount(0);
+  await expect(experienceEditor.locator('input[type="month"]')).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await experienceEditor.getByRole("button", { name: "取消" }).click();
+
+  await page.goto("#/contacts/contact-chenyu?tab=timeline");
+  await page.getByRole("button", { name: "添加沟通记录" }).click();
+  const contactEditor = page.getByRole("dialog", { name: "添加沟通记录" });
+  await contactEditor
+    .getByRole("button", { name: /选择发生时间：2026-08-21 14:30/ })
+    .click();
+  const dateTimePicker = page.getByRole("dialog", {
+    name: "选择发生时间时间选择器",
+  });
+  await expect(dateTimePicker.getByText("选择时间")).toBeVisible();
+  await dateTimePicker.getByRole("button", { name: "16:00" }).click();
+  await expect(
+    contactEditor.getByRole("button", {
+      name: /选择发生时间：2026-08-21 16:00/,
+    }),
+  ).toBeVisible();
+
+  await page.goto("#/papers");
+  await page.getByRole("button", { name: "年份", exact: true }).click();
+  const yearsPicker = page.getByRole("dialog", { name: "年份时间选择器" });
+  await yearsPicker.getByRole("button", { name: "2025", exact: true }).click();
+  await yearsPicker.getByRole("button", { name: "2024", exact: true }).click();
+  await yearsPicker.getByRole("button", { name: "确定" }).click();
+  await expect(page.getByRole("button", { name: /年份 · 2/ })).toBeVisible();
+  await expect(page.locator('input[type="date"]')).toHaveCount(0);
+  await expect(page.locator('input[type="datetime-local"]')).toHaveCount(0);
+});
+
 test("数据管理使用独立导航而不是全局导入按钮", async ({ page }) => {
   await page.goto("#/candidates");
   await expect(

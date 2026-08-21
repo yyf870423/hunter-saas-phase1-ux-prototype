@@ -6,6 +6,7 @@ import {
   AssetPageHeader,
   Button,
   CustomRadio,
+  DatePicker,
   DefinitionGrid,
   DeleteAssetModal,
   DetailHeader,
@@ -68,7 +69,13 @@ function CandidateSectionEditModal({ section, close, candidate }) {
             <TextInput value={candidate.englishName} onChange={() => {}} />
           </FormField>
           <FormField label="出生年份">
-            <TextInput value={candidate.birthYear} onChange={() => {}} />
+            <DatePicker
+              label="选择出生年份"
+              mode="year"
+              value={candidate.birthYear}
+              initialYear={1990}
+              onChange={() => {}}
+            />
           </FormField>
           <FormField label="性别">
             <SelectMenu
@@ -646,7 +653,12 @@ function CandidateRecordModal({ config, close, onSave }) {
               <TextInput value="控制科学与工程" onChange={() => {}} />
             </FormField>
             <FormField label="起止时间">
-              <TextInput value="2010.09 - 2013.06" onChange={() => {}} />
+              <DatePicker
+                label="选择起止时间"
+                mode="month-range"
+                value="2010.09 - 2013.06"
+                onChange={() => {}}
+              />
             </FormField>
           </>
         ) : (
@@ -661,7 +673,12 @@ function CandidateRecordModal({ config, close, onSave }) {
               <TextInput value="项目负责人" onChange={() => {}} />
             </FormField>
             <FormField label="起止时间">
-              <TextInput value="2023.01 - 2025.12" onChange={() => {}} />
+              <DatePicker
+                label="选择起止时间"
+                mode="month-range"
+                value="2023.01 - 2025.12"
+                onChange={() => {}}
+              />
             </FormField>
             <FormField label="项目描述" required span={2}>
               <TextArea
@@ -719,7 +736,13 @@ function ExperienceModal({ open, close, onSave }) {
           <TextInput value="智能操作部 / 机器人学习团队" onChange={() => {}} />
         </FormField>
         <FormField label="起止时间">
-          <TextInput value="2022.03 - 至今" onChange={() => {}} />
+          <DatePicker
+            label="选择起止时间"
+            mode="month-range"
+            value="2022.03 - 至今"
+            allowOngoing
+            onChange={() => {}}
+          />
         </FormField>
         <FormField label="团队规模">
           <TextInput value="14 人" onChange={() => {}} />
@@ -994,6 +1017,14 @@ function TimelineTab({ candidate }) {
         }
       >
         <div className="s4-form-grid">
+          <FormField label="发生时间">
+            <DatePicker
+              label="选择发生时间"
+              mode="datetime"
+              value="2026-08-21 14:30"
+              onChange={() => {}}
+            />
+          </FormField>
           <FormField label="记录类型">
             <SelectMenu
               label="选择类型"
@@ -1605,10 +1636,12 @@ export function CandidateCreatePage() {
                   <TextInput value="" onChange={() => {}} />
                 </FormField>
                 <FormField label="出生年份">
-                  <TextInput
+                  <DatePicker
+                    label="选择出生年份"
+                    mode="year"
                     value=""
+                    initialYear={1990}
                     onChange={() => {}}
-                    placeholder="例如：1990"
                   />
                 </FormField>
                 <FormField label="用户备注" span={2}>
