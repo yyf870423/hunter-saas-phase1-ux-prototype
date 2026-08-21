@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
   Button,
@@ -245,6 +245,15 @@ const taskPlan = [
 ];
 
 export function SideTaskDetail() {
+  const { taskId } = useParams();
+  return taskId === "task-recommend-linhao" ? (
+    <RecommendationReportTask />
+  ) : (
+    <IdentityReviewTask />
+  );
+}
+
+function IdentityReviewTask() {
   const navigate = useNavigate();
   const notify = useToast();
   const [paused, setPaused] = useState(false);
@@ -462,6 +471,159 @@ export function SideTaskDetail() {
           <p>人才版图中已经确认的正式人物记录不会删除。</p>
         </div>
       </Modal>
+    </div>
+  );
+}
+
+function RecommendationReportTask() {
+  const navigate = useNavigate();
+  const notify = useToast();
+  const [composer, setComposer] = useState("");
+  const [attachments, setAttachments] = useState([]);
+  const [authMode, setAuthMode] = useState("confirm");
+  const [revised, setRevised] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
+  const reportRequirement =
+    sessionStorage.getItem("hunter-recommendation-task-prompt") ||
+    "面向客户技术负责人，重点说明真机部署、团队管理和风险核实情况。";
+  const plan = [
+    {
+      id: "read",
+      title: "读取候选人与岗位资料",
+      detail: "使用当前岗位 v3 和林昊候选人资料 v6。",
+      status: "done",
+    },
+    {
+      id: "evidence",
+      title: "组织匹配证据与风险",
+      detail: "区分已核实事实、匹配判断和待客户确认项。",
+      status: "done",
+    },
+    {
+      id: "draft",
+      title: "交付并修改推荐报告",
+      detail: revised
+        ? "已按用户要求完成第二版报告。"
+        : "初稿已生成，等待用户反馈。",
+      status: revised ? "done" : "waiting-user",
+    },
+  ];
+  return (
+    <div className="s2-page s2-task-detail-page">
+      <header className="s2-detail-header">
+        <button type="button" onClick={() => navigate("/tasks")}>
+          <Icon name="chevronLeft" />
+          返回支线任务
+        </button>
+        <div>
+          <small>候选人推荐报告</small>
+          <h1>为林昊生成客户推荐报告</h1>
+          <p>关联：具身智能 VLA 算法负责人 · 林昊</p>
+        </div>
+        <div>
+          <StatusBadge tone={revised ? "success" : "warning"}>
+            {revised ? "完成" : "等待用户"}
+          </StatusBadge>
+        </div>
+      </header>
+      <div className="s2-task-detail-layout">
+        <aside className="s2-task-context">
+          <h2>任务上下文</h2>
+          <dl>
+            <div>
+              <dt>任务目标</dt>
+              <dd>生成可以直接用于客户推荐的候选人报告。</dd>
+            </div>
+            <div>
+              <dt>报告要求</dt>
+              <dd>{reportRequirement}</dd>
+            </div>
+            <div>
+              <dt>资料版本</dt>
+              <dd>岗位 v3 · 候选人 v6 · 匹配策略 v12</dd>
+            </div>
+            <div>
+              <dt>执行边界</dt>
+              <dd>只生成和修改报告，不自动发送给客户。</dd>
+            </div>
+          </dl>
+        </aside>
+        <section className="s2-task-conversation">
+          <div className="s2-task-timeline">
+            <UserMessage time="今天 10:16">{reportRequirement}</UserMessage>
+            <HunterReply
+              markdown={`推荐报告初稿已经生成。我只引用已核实的候选人资料和本岗位匹配结论，并把尚未确认的信息放入风险提示。
+
+## 林昊｜具身智能 VLA 算法负责人推荐报告
+
+### 推荐结论
+
+林昊当前担任拓界机器人机器人学习负责人，综合匹配分 **91 分**。其 VLA、机器人学习、真机部署和团队管理经历与岗位目标高度一致，建议进入客户沟通。
+
+### 核心匹配证据
+
+- 负责多任务机器人操作策略和真机数据闭环，经历覆盖训练、评测与部署。
+- 当前管理 12 人算法团队，具备跨硬件、数据和产品团队的交付经验。
+- 最近两项项目均有量产或真实场景部署记录，不属于纯研究型履历。
+
+### 风险与待核实项
+
+- 当前总包可能高于岗位区间，需要提前确认薪资弹性。
+- 公开资料没有明确说明到岗时间，建议首次沟通时核实。
+
+### 推荐沟通重点
+
+重点讨论其真机数据闭环中的个人决策范围、团队规模，以及是否接受北京为主的工作安排。`}
+            />
+            {revised ? (
+              <>
+                <UserMessage time="刚刚">
+                  把开头改得更适合直接发给客户，并补充团队规模。
+                </UserMessage>
+                <HunterReply markdown="已完成第二版：开头改为客户可直接阅读的推荐摘要，并在核心证据中明确补充其当前管理 **12 人算法团队**。原始事实、风险提示和待核实项均保留。" />
+              </>
+            ) : null}
+          </div>
+          <div className="s2-task-composer-dock">
+            <div className="s2-task-plan">
+              <button
+                type="button"
+                aria-expanded={planOpen}
+                onClick={() => setPlanOpen((value) => !value)}
+              >
+                <Icon name="task" />
+                <span>
+                  <b>执行计划</b>
+                  <small>
+                    {revised ? "3 / 3 项完成" : "2 / 3 项完成，等待修改意见"}
+                  </small>
+                </span>
+                <Icon name={planOpen ? "chevronDown" : "chevronUp"} />
+              </button>
+              {planOpen ? (
+                <div className="s2-task-plan-body">
+                  <PlanList steps={plan} />
+                </div>
+              ) : null}
+            </div>
+            <Composer
+              value={composer}
+              onChange={setComposer}
+              onSend={() => {
+                setRevised(true);
+                setComposer("");
+                setAttachments([]);
+                notify("报告已按补充要求更新", "success");
+              }}
+              authMode={authMode}
+              onAuthChange={setAuthMode}
+              attachments={attachments}
+              onAttachmentsChange={setAttachments}
+              placeholder="输入报告修改要求，或上传需要引用的补充资料"
+            />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

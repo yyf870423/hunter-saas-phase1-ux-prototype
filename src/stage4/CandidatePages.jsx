@@ -1,5 +1,10 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
   ActivityTimeline,
@@ -1340,13 +1345,16 @@ function RelationsTab() {
 
 export function CandidateDetailPage() {
   const { candidateId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") || "profile";
   const state = params.get("state") || "normal";
-  const candidate =
-    candidateId === candidateDetail.id || candidateId === "candidate-linhao"
+  const linkedCandidate = location.state?.candidate;
+  const candidate = linkedCandidate
+    ? { ...candidateDetail, ...linkedCandidate }
+    : candidateId === candidateDetail.id || candidateId === "candidate-linhao"
       ? candidateDetail
       : candidates.find((item) => item.id === candidateId);
   const [deleteOpen, setDeleteOpen] = useState(false);

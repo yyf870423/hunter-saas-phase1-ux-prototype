@@ -185,6 +185,7 @@ export function SelectMenu({
   multiple = false,
   searchable = false,
   creatable = false,
+  disabled = false,
   className = "",
 }) {
   const [open, setOpen] = useState(false);
@@ -246,6 +247,7 @@ export function SelectMenu({
       <button
         type="button"
         aria-expanded={open}
+        disabled={disabled}
         onClick={() => setOpen((current) => !current)}
       >
         <span>{display}</span>
@@ -961,7 +963,7 @@ export function DataTable({
   );
 }
 
-export function Pagination({ page, pages, onChange }) {
+export function Pagination({ page, pages, onChange, pageSize = 20 }) {
   return (
     <nav className="s4-pagination" aria-label="分页">
       <span>
@@ -994,7 +996,7 @@ export function Pagination({ page, pages, onChange }) {
           onClick={() => onChange(page + 1)}
         />
       </div>
-      <span>每页 20 条</span>
+      <span>每页 {pageSize} 条</span>
     </nav>
   );
 }

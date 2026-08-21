@@ -337,6 +337,15 @@ export const candidates = candidateBase.map(
 
 export const sideTaskRows = [
   [
+    "task-recommend-linhao",
+    "为林昊生成客户推荐报告",
+    "候选人推荐报告",
+    "具身智能 VLA 算法负责人",
+    "等待用户",
+    "warning",
+    "刚刚",
+  ],
+  [
     "task-hand-team",
     "核验灵巧手团队负责人",
     "人物身份核验",
@@ -402,7 +411,7 @@ export const sideTaskRows = [
 ];
 
 export const sideTasks = sideTaskRows.map(
-  ([id, title, type, object, status, tone, time], index) => ({
+  ([id, title, type, object, status, tone, time]) => ({
     id,
     title,
     type,
@@ -412,9 +421,11 @@ export const sideTasks = sideTaskRows.map(
     time,
     owner: "沈岚",
     summary:
-      index === 0
-        ? "公开来源中出现两位同名负责人，需要核验身份、任职和团队关系。"
-        : "该任务具有独立目标和明确交付，结果将回流关联业务对象。",
+      id === "task-recommend-linhao"
+        ? "基于岗位、候选人和匹配证据生成客户推荐报告，并等待用户提出修改要求。"
+        : id === "task-hand-team"
+          ? "公开来源中出现两位同名负责人，需要核验身份、任职和团队关系。"
+          : "该任务具有独立目标和明确交付，结果将回流关联业务对象。",
   }),
 );
 

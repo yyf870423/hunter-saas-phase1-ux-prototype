@@ -10,11 +10,12 @@ import {
   DeleteAssetModal,
   DetailHeader,
   DetailTabs,
-  EntityLink,
   FieldGroup,
   FormField,
   Modal,
   NotFoundState,
+  Pagination,
+  ProgressBar,
   SelectMenu,
   StateBanner,
   StatusBadge,
@@ -24,25 +25,26 @@ import {
   TextInput,
   useToast,
 } from "./asset-ui";
-import { candidates, matchResults, positionDetail, positions } from "./data";
+import { matchResults, positionDetail, positions } from "./data";
 
 const tabs = [
   { value: "profile", label: "岗位资料" },
-  { value: "pipeline", label: "候选人流程", count: 18 },
-  { value: "matching", label: "匹配结果", count: 18 },
+  { value: "pipeline", label: "候选人流程", count: 11 },
+  { value: "matching", label: "匹配结果", count: 128 },
   { value: "work", label: "相关工作" },
 ];
 
-function PositionProfile({ detail, onEdit }) {
+function PositionProfile({ detail }) {
   const navigate = useNavigate();
   const notify = useToast();
   const [versionOpen, setVersionOpen] = useState(false);
+  const [editSection, setEditSection] = useState(null);
   return (
     <div className="s4-detail-stack">
       <FieldGroup
         title="岗位基本资料"
         action={
-          <Button size="sm" icon="edit" onClick={onEdit}>
+          <Button size="sm" icon="edit" onClick={() => setEditSection("base")}>
             编辑资料
           </Button>
         }
@@ -70,14 +72,24 @@ function PositionProfile({ detail, onEdit }) {
           <b>关键技能</b>
           <TagList items={detail.skills} tone="info" />
         </div>
-        <div className="s4-labeled-row">
-          <b>来源机会</b>
+        <div className="s4-position-source-row">
+          <span>
+            <b>来源机会</b>
+            <small>该岗位由已确认的招聘机会形成</small>
+          </span>
           <button
             type="button"
-            className="s4-inline-link"
+            className="s4-position-source-link"
             onClick={() => navigate("/opportunities/opportunity-xinglan")}
           >
-            {detail.sourceOpportunity}
+            <i>
+              <Icon name="signal" />
+            </i>
+            <span>
+              <b>{detail.sourceOpportunity}</b>
+              <small>星澜机器人 · 已形成 2 个岗位</small>
+            </span>
+            <Icon name="chevronRight" />
           </button>
         </div>
       </FieldGroup>
@@ -86,6 +98,9 @@ function PositionProfile({ detail, onEdit }) {
         description={`${detail.jdVersion} · 当前有效版本`}
         action={
           <div className="s4-group-actions">
+            <Button size="sm" icon="edit" onClick={() => setEditSection("jd")}>
+              编辑 JD
+            </Button>
             <Button size="sm" onClick={() => setVersionOpen(true)}>
               版本历史
             </Button>
@@ -124,7 +139,7 @@ function PositionProfile({ detail, onEdit }) {
           <Button
             size="sm"
             icon="edit"
-            onClick={() => notify("已打开已确认要求编辑")}
+            onClick={() => setEditSection("requirements")}
           >
             编辑要求
           </Button>
@@ -139,6 +154,15 @@ function PositionProfile({ detail, onEdit }) {
       <FieldGroup
         title="岗位解析"
         description="用于理解岗位和辅助寻访，不自动成为硬要求。"
+        action={
+          <Button
+            size="sm"
+            icon="edit"
+            onClick={() => setEditSection("analysis")}
+          >
+            编辑解析
+          </Button>
+        }
       >
         <div className="s4-analysis-list">
           {detail.analysis.map(([label, value]) => (
@@ -156,7 +180,7 @@ function PositionProfile({ detail, onEdit }) {
           <Button
             size="sm"
             icon="edit"
-            onClick={() => notify("已进入寻访关键词编辑")}
+            onClick={() => setEditSection("keywords")}
           >
             编辑
           </Button>
@@ -220,30 +244,421 @@ function PositionProfile({ detail, onEdit }) {
           </article>
         </div>
       </Modal>
+      <PositionSectionEditor
+        section={editSection}
+        close={() => setEditSection(null)}
+        onSave={(label) => {
+          setEditSection(null);
+          notify(`${label}已保存`);
+        }}
+      />
     </div>
   );
 }
 
-const pipelineGroups = [
-  ["储备", "reserve", ["赵星羽", "何文婷", "蒋一帆"]],
-  ["推荐", "active", ["林昊", "陈楚宁"]],
-  ["一面", "active", ["周明远"]],
-  ["二面", "active", ["梁辰"]],
-  ["谈薪", "active", ["高远"]],
-  ["已入职", "success", ["杨帆"]],
-  ["失败", "danger", ["孙然", "王奕"]],
+function PositionSectionEditor({ section, close, onSave }) {
+  const [status, setStatus] = useState("招聘中");
+  const [keywordGroups, setKeywordGroups] = useState(() =>
+    positionDetail.keywordGroups.map((group) => [...group]),
+  );
+  const statusBlocked = section === "base" && status !== "招聘中";
+  const config = {
+    base: {
+      title: "编辑岗位基本资料",
+      label: "岗位基本资料",
+      content: (
+        <div className="s4-form-grid">
+          <FormField label="岗位名称" required>
+            <TextInput value={positionDetail.name} onChange={() => {}} />
+          </FormField>
+          <FormField label="招聘状态">
+            <SelectMenu
+              label="招聘状态"
+              value={status}
+              options={["招聘中", "已暂停", "已关闭"]}
+              onChange={setStatus}
+            />
+          </FormField>
+          <FormField label="招聘公司原文" required>
+            <TextInput value="星澜机器人" onChange={() => {}} />
+          </FormField>
+          <FormField label="正式公司关联">
+            <SelectMenu
+              label="正式公司关联"
+              value="星澜机器人"
+              options={["星澜机器人", "拓界机器人", "灵跃科技"]}
+              onChange={() => {}}
+            />
+          </FormField>
+          <FormField label="工作地点">
+            <TextInput value="北京 / 上海" onChange={() => {}} />
+          </FormField>
+          <FormField label="薪资范围">
+            <TextInput value="80 - 120 万 / 年" onChange={() => {}} />
+          </FormField>
+          <FormField label="最低工作年限">
+            <TextInput value="8" onChange={() => {}} />
+          </FormField>
+          <FormField label="学历要求">
+            <SelectMenu
+              label="学历要求"
+              value="硕士"
+              options={["不限", "本科", "硕士", "博士"]}
+              onChange={() => {}}
+            />
+          </FormField>
+        </div>
+      ),
+    },
+    jd: {
+      title: "编辑岗位 JD",
+      label: "岗位 JD",
+      content: (
+        <FormField label="岗位 JD" required>
+          <TextArea value={positionDetail.jd} onChange={() => {}} />
+        </FormField>
+      ),
+    },
+    requirements: {
+      title: "编辑已确认招聘要求",
+      label: "已确认招聘要求",
+      content: (
+        <FormField label="每行一项明确要求" required>
+          <TextArea
+            value={positionDetail.confirmedRequirements.join("\n")}
+            onChange={() => {}}
+          />
+        </FormField>
+      ),
+    },
+    analysis: {
+      title: "编辑岗位解析",
+      label: "岗位解析",
+      content: (
+        <div className="s4-position-analysis-editor">
+          {positionDetail.analysis.map(([label, value]) => (
+            <FormField label={label} key={label}>
+              <TextArea value={value} onChange={() => {}} />
+            </FormField>
+          ))}
+        </div>
+      ),
+    },
+    keywords: {
+      title: "编辑寻访关键词",
+      label: "寻访关键词",
+      content: (
+        <div className="s4-position-keyword-editor">
+          {keywordGroups.map((group, index) => (
+            <article key={`keyword-group-${index}`}>
+              <span>组合 {index + 1}</span>
+              <TextInput
+                value={group[0]}
+                onChange={(value) =>
+                  setKeywordGroups((current) =>
+                    current.map((item, itemIndex) =>
+                      itemIndex === index ? [value, item[1]] : item,
+                    ),
+                  )
+                }
+              />
+              <TextInput
+                value={group[1]}
+                onChange={(value) =>
+                  setKeywordGroups((current) =>
+                    current.map((item, itemIndex) =>
+                      itemIndex === index ? [item[0], value] : item,
+                    ),
+                  )
+                }
+              />
+              <button
+                type="button"
+                aria-label={`删除组合 ${index + 1}`}
+                onClick={() =>
+                  setKeywordGroups((current) =>
+                    current.filter((_, itemIndex) => itemIndex !== index),
+                  )
+                }
+              >
+                <Icon name="trash" />
+              </button>
+            </article>
+          ))}
+          <Button
+            size="sm"
+            icon="plus"
+            disabled={keywordGroups.length >= 5}
+            onClick={() =>
+              setKeywordGroups((current) => [...current, ["", ""]])
+            }
+          >
+            添加关键词组合
+          </Button>
+        </div>
+      ),
+    },
+  }[section];
+  return (
+    <Modal
+      open={Boolean(config)}
+      close={close}
+      size={section === "analysis" ? "xl" : "lg"}
+      title={config?.title || "编辑岗位资料"}
+      description="修改后形成新的资料版本，并保留变化记录"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            disabled={statusBlocked}
+            onClick={() => onSave(config?.label || "资料")}
+          >
+            保存修改
+          </Button>
+        </>
+      }
+    >
+      {config?.content}
+      {statusBlocked ? (
+        <StateBanner
+          tone="warning"
+          icon="warning"
+          title="当前有 2 个运行中任务，暂时不能保存"
+          description="暂停或关闭岗位前，需要先停止岗位招聘主线和候选人匹配任务。"
+        />
+      ) : null}
+    </Modal>
+  );
+}
+
+const pipelineCandidateSeed = {
+  zhaoxingyu: {
+    id: "zhaoxingyu",
+    name: "赵星羽",
+    company: "星澜机器人",
+    title: "VLA 算法负责人",
+    score: 94,
+    note: "等待确认本周沟通时间",
+    days: "进入 2 天",
+  },
+  hewenting: {
+    id: "hewenting",
+    name: "何文婷",
+    company: "上海人工智能实验室",
+    title: "机器人学习研究员",
+    score: 84,
+    note: "需要补充团队管理经历",
+    days: "进入 4 天",
+  },
+  jiangyifan: {
+    id: "jiangyifan",
+    name: "蒋一帆",
+    company: "银河通用",
+    title: "机器人算法专家",
+    score: null,
+    note: "手动加入，尚未进行岗位匹配",
+    days: "今天加入",
+  },
+  linhao: {
+    id: "linhao",
+    name: "林昊",
+    company: "拓界机器人",
+    title: "机器人学习负责人",
+    score: 91,
+    note: "推荐报告已发送客户",
+    days: "进入 3 天",
+  },
+  chenchuning: {
+    id: "chenchuning",
+    name: "陈楚宁",
+    company: "灵跃科技",
+    title: "灵巧操作算法负责人",
+    score: 89,
+    note: "客户已确认进入技术面",
+    days: "进入 1 天",
+  },
+  zhoumingyuan: {
+    id: "zhoumingyuan",
+    name: "周明远",
+    company: "穹顶智能",
+    title: "具身智能算法总监",
+    score: 86,
+    note: "等待客户反馈一面结论",
+    days: "停留 5 天",
+  },
+  liangchen: {
+    id: "liangchen",
+    name: "梁辰",
+    company: "矩阵机器人",
+    title: "多模态算法 Lead",
+    score: 82,
+    note: "二面安排在周五 14:00",
+    days: "进入 1 天",
+  },
+  gaoyuan: {
+    id: "gaoyuan",
+    name: "高远",
+    company: "启元动力",
+    title: "强化学习负责人",
+    score: 78,
+    note: "候选人期望总包 115 万",
+    days: "停留 3 天",
+  },
+  yangfan: {
+    id: "yangfan",
+    name: "杨帆",
+    company: "智行未来",
+    title: "机器人算法经理",
+    score: 88,
+    note: "已确认 9 月 16 日入职",
+    days: "8 月 20 日",
+  },
+  sunran: {
+    id: "sunran",
+    name: "孙然",
+    company: "云枢机器人",
+    title: "高级算法工程师",
+    score: 69,
+    note: "客户认为管理跨度不足",
+    days: "8 月 18 日",
+  },
+  wangyi: {
+    id: "wangyi",
+    name: "王奕",
+    company: "星澜机器人",
+    title: "机器人学习研究员",
+    score: null,
+    note: "候选人暂不考虑外部机会",
+    days: "8 月 17 日",
+  },
+};
+
+const initialPipelineStages = [
+  {
+    id: "reserve",
+    name: "储备",
+    tone: "reserve",
+    fixed: true,
+    people: ["zhaoxingyu", "hewenting", "jiangyifan"],
+  },
+  {
+    id: "recommended",
+    name: "已推荐",
+    tone: "active",
+    people: ["linhao", "chenchuning"],
+  },
+  { id: "interview-1", name: "一面", tone: "active", people: ["zhoumingyuan"] },
+  { id: "interview-2", name: "二面", tone: "active", people: ["liangchen"] },
+  { id: "salary", name: "谈薪", tone: "active", people: ["gaoyuan"] },
+  {
+    id: "joined",
+    name: "已入职",
+    tone: "success",
+    fixed: true,
+    people: ["yangfan"],
+  },
+  {
+    id: "rejected",
+    name: "已落选",
+    tone: "danger",
+    fixed: true,
+    people: ["sunran"],
+  },
+  {
+    id: "withdrawn",
+    name: "候选人放弃",
+    tone: "danger",
+    fixed: true,
+    people: ["wangyi"],
+  },
+  {
+    id: "unsuitable",
+    name: "候选人不合适",
+    tone: "danger",
+    fixed: true,
+    people: [],
+  },
 ];
+
+function scoreTone(score) {
+  if (score === null || score === undefined) return "unmatched";
+  if (score >= 90) return "strong";
+  if (score >= 80) return "good";
+  if (score >= 70) return "watch";
+  return "weak";
+}
+
+function MatchScore({ score, compact = false }) {
+  return (
+    <span
+      className={`s4-match-score is-${scoreTone(score)} ${compact ? "is-compact" : ""}`}
+    >
+      {score === null || score === undefined ? "未匹配" : `${score} 分`}
+    </span>
+  );
+}
 
 function CandidatePipeline() {
   const notify = useToast();
   const [view, setView] = useState("board");
   const [stageModal, setStageModal] = useState(false);
-  const [moveTarget, setMoveTarget] = useState(null);
+  const [stages, setStages] = useState(initialPipelineStages);
+  const [dragging, setDragging] = useState(null);
+  const [dragOver, setDragOver] = useState(null);
+  const [pendingMove, setPendingMove] = useState(null);
+  const [candidateOpen, setCandidateOpen] = useState(null);
   const [filter, setFilter] = useState("全部");
   const visibleGroups =
     filter === "全部"
-      ? pipelineGroups
-      : pipelineGroups.filter(([name]) => name === filter);
+      ? stages
+      : stages.filter((stage) => stage.name === filter);
+  const pipelineSummary = [
+    [
+      "储备",
+      stages.find((stage) => stage.id === "reserve")?.people.length || 0,
+    ],
+    [
+      "推进中",
+      stages
+        .filter((stage) => stage.tone === "active")
+        .reduce((total, stage) => total + stage.people.length, 0),
+    ],
+    [
+      "已入职",
+      stages.find((stage) => stage.id === "joined")?.people.length || 0,
+    ],
+    [
+      "失败",
+      stages
+        .filter((stage) => stage.tone === "danger")
+        .reduce((total, stage) => total + stage.people.length, 0),
+    ],
+  ];
+  const moveCandidate = (note) => {
+    if (!pendingMove) return;
+    setStages((current) =>
+      current.map((stage) => {
+        if (stage.id === pendingMove.from) {
+          return {
+            ...stage,
+            people: stage.people.filter((id) => id !== pendingMove.personId),
+          };
+        }
+        if (stage.id === pendingMove.to) {
+          return { ...stage, people: [...stage.people, pendingMove.personId] };
+        }
+        return stage;
+      }),
+    );
+    const person = pipelineCandidateSeed[pendingMove.personId];
+    notify(
+      `${person.name} 已进入“${pendingMove.toName}”${note ? "并记录备注" : ""}`,
+    );
+    setPendingMove(null);
+    setDragging(null);
+    setDragOver(null);
+  };
   return (
     <div className="s4-detail-stack">
       <div className="s4-pipeline-toolbar">
@@ -268,7 +683,7 @@ function CandidatePipeline() {
         <SelectMenu
           label="全部阶段"
           value={filter === "全部" ? "" : filter}
-          options={["全部", ...pipelineGroups.map(([name]) => name)]}
+          options={["全部", ...stages.map((stage) => stage.name)]}
           onChange={setFilter}
         />
         <Button size="sm" icon="settings" onClick={() => setStageModal(true)}>
@@ -284,12 +699,7 @@ function CandidatePipeline() {
         </Button>
       </div>
       <div className="s4-pipeline-summary">
-        {[
-          ["储备", 12],
-          ["推进中", 6],
-          ["已入职", 1],
-          ["失败", 5],
-        ].map(([label, count]) => (
+        {pipelineSummary.map(([label, count]) => (
           <article key={label}>
             <small>{label}</small>
             <b>{count}</b>
@@ -298,63 +708,123 @@ function CandidatePipeline() {
       </div>
       {view === "board" ? (
         <div className="s4-kanban">
-          {visibleGroups.map(([stageName, tone, people]) => (
-            <section className={`s4-kanban-${tone}`} key={stageName}>
+          {visibleGroups.map((stage) => (
+            <section
+              className={`s4-kanban-${stage.tone} ${dragOver === stage.id ? "is-drag-over" : ""}`}
+              key={stage.id}
+              onDragOver={(event) => {
+                event.preventDefault();
+                if (dragging?.from !== stage.id) setDragOver(stage.id);
+              }}
+              onDragLeave={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                  setDragOver(null);
+                }
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                let dragData = dragging;
+                if (!dragData) {
+                  try {
+                    dragData = JSON.parse(
+                      event.dataTransfer.getData("text/plain"),
+                    );
+                  } catch {
+                    dragData = null;
+                  }
+                }
+                if (dragData && dragData.from !== stage.id) {
+                  setPendingMove({
+                    ...dragData,
+                    to: stage.id,
+                    toName: stage.name,
+                  });
+                }
+                setDragOver(null);
+              }}
+            >
               <header>
-                <b>{stageName}</b>
-                <em>{people.length}</em>
+                <b>{stage.name}</b>
+                <em>{stage.people.length}</em>
               </header>
               <div>
-                {people.map((personName) => (
-                  <article key={personName}>
-                    <span>
-                      <b>{personName}</b>
-                      <small>
-                        {candidates.find(
-                          (candidate) => candidate.name === personName,
-                        )?.company || "星澜机器人"}
-                      </small>
-                    </span>
-                    <TagList
-                      items={[personName === "林昊" ? "91 分" : "84 分"]}
-                      tone="info"
-                    />
-                    <p>
-                      {personName === "周明远"
-                        ? "等待客户确认二面"
-                        : "最近推进：昨天"}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setMoveTarget({ name: personName, stage: stageName })
+                {stage.people.map((personId) => {
+                  const person = pipelineCandidateSeed[personId];
+                  return (
+                    <article
+                      draggable
+                      className={
+                        dragging?.personId === personId ? "is-dragging" : ""
                       }
+                      key={personId}
+                      onDragStart={(event) => {
+                        event.dataTransfer.effectAllowed = "move";
+                        const dragData = {
+                          personId,
+                          from: stage.id,
+                          fromName: stage.name,
+                        };
+                        event.dataTransfer.setData(
+                          "text/plain",
+                          JSON.stringify(dragData),
+                        );
+                        setDragging(dragData);
+                      }}
+                      onDragEnd={() => {
+                        setDragging(null);
+                        setDragOver(null);
+                      }}
+                      onClick={() => {
+                        if (!dragging)
+                          setCandidateOpen({ ...person, stage: stage.name });
+                      }}
                     >
-                      移动阶段
-                    </button>
-                  </article>
-                ))}
+                      <time>{person.days}</time>
+                      <span>
+                        <b>{person.name}</b>
+                        <small>
+                          {person.company} · {person.title}
+                        </small>
+                      </span>
+                      <MatchScore score={person.score} compact />
+                      <p>{person.note}</p>
+                    </article>
+                  );
+                })}
+                {!stage.people.length ? (
+                  <span className="s4-kanban-empty">拖动候选人到此阶段</span>
+                ) : null}
               </div>
             </section>
           ))}
         </div>
       ) : (
-        <PipelineList onMove={setMoveTarget} />
+        <PipelineList stages={stages} onOpen={setCandidateOpen} />
       )}
-      <StageConfigModal open={stageModal} close={() => setStageModal(false)} />
-      <MoveStageModal
-        target={moveTarget}
-        close={() => setMoveTarget(null)}
-        onSave={(next) => {
-          notify(`${moveTarget?.name} 已移动到“${next}”`);
-          setMoveTarget(null);
+      <StageConfigModal
+        open={stageModal}
+        close={() => setStageModal(false)}
+        initialStages={stages}
+        onSave={(nextStages) => {
+          setStages(nextStages);
+          setStageModal(false);
+          notify("岗位推进阶段已保存");
         }}
+      />
+      <StageMoveNoteModal
+        move={pendingMove}
+        close={() => setPendingMove(null)}
+        onSave={moveCandidate}
+      />
+      <PipelineCandidateModal
+        candidate={candidateOpen}
+        close={() => setCandidateOpen(null)}
       />
     </div>
   );
 }
 
-function PipelineList({ onMove }) {
+function PipelineList({ stages, onOpen }) {
   return (
     <div className="s4-compact-table">
       <header>
@@ -364,41 +834,57 @@ function PipelineList({ onMove }) {
         <span>备注</span>
         <span>操作</span>
       </header>
-      {pipelineGroups.flatMap(([stage, , people]) =>
-        people.map((name) => (
-          <article key={name}>
-            <b>
-              {name}
-              <small>
-                {candidates.find((item) => item.name === name)?.company || "—"}
-              </small>
-            </b>
-            <StatusBadge
-              tone={
-                stage === "已入职"
-                  ? "success"
-                  : stage === "失败"
-                    ? "danger"
-                    : "info"
-              }
-            >
-              {stage}
-            </StatusBadge>
-            <span>昨天 16:20</span>
-            <p>{stage === "失败" ? "当前岗位不再推进" : "等待下一步反馈"}</p>
-            <button type="button" onClick={() => onMove({ name, stage })}>
-              移动阶段
-            </button>
-          </article>
-        )),
+      {stages.flatMap((stage) =>
+        stage.people.map((personId) => {
+          const person = pipelineCandidateSeed[personId];
+          return (
+            <article key={personId}>
+              <b>
+                {person.name}
+                <small>
+                  {person.company} · {person.title}
+                </small>
+              </b>
+              <StatusBadge
+                tone={
+                  stage.tone === "success"
+                    ? "success"
+                    : stage.tone === "danger"
+                      ? "danger"
+                      : "info"
+                }
+              >
+                {stage.name}
+              </StatusBadge>
+              <MatchScore score={person.score} compact />
+              <p>{person.note}</p>
+              <button
+                type="button"
+                onClick={() => onOpen({ ...person, stage: stage.name })}
+              >
+                查看记录
+              </button>
+            </article>
+          );
+        }),
       )}
     </div>
   );
 }
 
-function StageConfigModal({ open, close }) {
-  const notify = useToast();
-  const [stages, setStages] = useState(positionDetail.stages);
+function StageConfigModal({ open, close, initialStages, onSave }) {
+  const [stages, setStages] = useState(initialStages);
+  const [dragging, setDragging] = useState(null);
+  const reorder = (targetId) => {
+    if (!dragging || dragging === targetId) return;
+    const from = stages.findIndex((stage) => stage.id === dragging);
+    const to = stages.findIndex((stage) => stage.id === targetId);
+    if (from < 0 || to < 0 || stages[from].fixed || stages[to].fixed) return;
+    const next = [...stages];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setStages(next);
+  };
   return (
     <Modal
       open={open}
@@ -409,28 +895,31 @@ function StageConfigModal({ open, close }) {
       footer={
         <>
           <Button onClick={close}>取消</Button>
-          <Button
-            tone="primary"
-            onClick={() => {
-              close();
-              notify("岗位推进阶段已保存");
-            }}
-          >
+          <Button tone="primary" onClick={() => onSave(stages)}>
             保存配置
           </Button>
         </>
       }
     >
       <div className="s4-stage-config">
-        {stages.map((stage, index) => (
-          <article key={stage}>
-            <Icon name="menu" />
+        {stages.map((stage) => (
+          <article
+            className={stage.fixed ? "is-fixed" : ""}
+            draggable={!stage.fixed}
+            key={stage.id}
+            onDragStart={() => setDragging(stage.id)}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={() => reorder(stage.id)}
+            onDragEnd={() => setDragging(null)}
+          >
+            <Icon name={stage.fixed ? "lock" : "menu"} />
             <TextInput
-              value={stage}
+              value={stage.name}
+              disabled={stage.fixed}
               onChange={(value) =>
                 setStages((current) =>
-                  current.map((item, itemIndex) =>
-                    itemIndex === index ? value : item,
+                  current.map((item) =>
+                    item.id === stage.id ? { ...item, name: value } : item,
                   ),
                 )
               }
@@ -438,23 +927,44 @@ function StageConfigModal({ open, close }) {
             <SelectMenu
               label="稳定分类"
               value={
-                index === 0
+                stage.category ||
+                (stage.id === "reserve"
                   ? "储备"
-                  : stage === "已入职"
+                  : stage.id === "joined"
                     ? "已入职"
-                    : index > 5
+                    : stage.tone === "danger"
                       ? "失败"
-                      : "推进中"
+                      : "推进中")
               }
               options={["储备", "推进中", "已入职", "失败"]}
-              onChange={() => {}}
+              onChange={(value) =>
+                setStages((current) =>
+                  current.map((item) =>
+                    item.id === stage.id
+                      ? {
+                          ...item,
+                          category: value,
+                          tone:
+                            value === "失败"
+                              ? "danger"
+                              : value === "已入职"
+                                ? "success"
+                                : value === "储备"
+                                  ? "reserve"
+                                  : "active",
+                        }
+                      : item,
+                  ),
+                )
+              }
+              disabled={stage.fixed}
             />
             <button
               type="button"
-              disabled={index < 2}
+              disabled={stage.fixed}
               onClick={() =>
                 setStages((current) =>
-                  current.filter((_, itemIndex) => itemIndex !== index),
+                  current.filter((item) => item.id !== stage.id),
                 )
               }
             >
@@ -465,7 +975,21 @@ function StageConfigModal({ open, close }) {
         <Button
           size="sm"
           icon="plus"
-          onClick={() => setStages((current) => [...current, "新阶段"])}
+          onClick={() =>
+            setStages((current) => {
+              const firstTerminal = current.findIndex(
+                (stage) => stage.id === "joined",
+              );
+              const next = [...current];
+              next.splice(firstTerminal, 0, {
+                id: `custom-${Date.now()}`,
+                name: "新阶段",
+                tone: "active",
+                people: [],
+              });
+              return next;
+            })
+          }
         >
           添加阶段
         </Button>
@@ -474,34 +998,25 @@ function StageConfigModal({ open, close }) {
   );
 }
 
-function MoveStageModal({ target, close, onSave }) {
-  const [next, setNext] = useState("一面");
+function StageMoveNoteModal({ move, close, onSave }) {
   const [note, setNote] = useState("");
   return (
     <Modal
-      open={Boolean(target)}
+      open={Boolean(move)}
       close={close}
-      title={`移动 ${target?.name || "候选人"}`}
-      description={`当前阶段：${target?.stage || "—"}`}
+      title={`移动 ${pipelineCandidateSeed[move?.personId]?.name || "候选人"}`}
+      description={`${move?.fromName || "—"} → ${move?.toName || "—"}`}
       footer={
         <>
           <Button onClick={close}>取消</Button>
-          <Button tone="primary" onClick={() => onSave(next)}>
+          <Button tone="primary" onClick={() => onSave(note)}>
             确认移动
           </Button>
         </>
       }
     >
       <div className="s4-form-grid">
-        <FormField label="目标阶段" required span={2}>
-          <SelectMenu
-            label="选择阶段"
-            value={next}
-            options={positionDetail.stages}
-            onChange={setNext}
-          />
-        </FormField>
-        <FormField label="转换备注" span={2}>
+        <FormField label="本次操作备注" span={2}>
           <TextArea
             value={note}
             onChange={setNote}
@@ -513,150 +1028,703 @@ function MoveStageModal({ target, close, onSave }) {
   );
 }
 
-function MatchingResults() {
+function PipelineCandidateModal({ candidate, close }) {
   const notify = useToast();
-  const [selected, setSelected] = useState(matchResults[0]?.id);
-  const [scope, setScope] = useState("全部结果");
-  const current =
-    matchResults.find((item) => item.id === selected) || matchResults[0];
-  const rows =
-    scope === "全部结果"
-      ? matchResults
-      : matchResults.filter((item) =>
-          scope === "推荐"
-            ? item.score >= 85 && item.roleGate !== "拒绝"
-            : item.roleGate === "拒绝",
-        );
+  const [note, setNote] = useState("");
+  const [editing, setEditing] = useState(false);
   return (
-    <div className="s4-match-workspace">
-      <aside>
+    <Modal
+      open={Boolean(candidate)}
+      close={close}
+      size="xl"
+      title={`${candidate?.name || "候选人"} · 完整推进记录`}
+      description={`${candidate?.company || "—"} · ${candidate?.title || "—"}`}
+    >
+      <div className="s4-pipeline-candidate-detail">
         <header>
           <span>
-            <b>匹配结果</b>
-            <small>资料版本：岗位 v3 · 策略 v12</small>
+            <StatusBadge tone="info">{candidate?.stage || "储备"}</StatusBadge>
+            <MatchScore score={candidate?.score} />
           </span>
+          <Button size="sm" onClick={() => notify("已打开候选人完整档案")}>
+            查看候选人档案
+          </Button>
+        </header>
+        <DefinitionGrid
+          columns={2}
+          items={[
+            ["当前公司", candidate?.company],
+            ["当前职位", candidate?.title],
+            ["进入阶段", candidate?.days],
+            ["最近备注", candidate?.note],
+          ]}
+        />
+        <section>
+          <header>
+            <h3>备注与推进时间线</h3>
+            <Button size="sm" icon="plus" onClick={() => setEditing(true)}>
+              添加备注
+            </Button>
+          </header>
+          {editing ? (
+            <div className="s4-pipeline-note-editor">
+              <TextArea
+                value={note}
+                onChange={setNote}
+                placeholder="记录沟通结果、阶段变化原因或下一步安排"
+              />
+              <div>
+                <Button size="sm" onClick={() => setEditing(false)}>
+                  取消
+                </Button>
+                <Button
+                  size="sm"
+                  tone="primary"
+                  disabled={!note.trim()}
+                  onClick={() => {
+                    setEditing(false);
+                    setNote("");
+                    notify("推进备注已添加");
+                  }}
+                >
+                  保存备注
+                </Button>
+              </div>
+            </div>
+          ) : null}
+          <ActivityTimeline
+            items={[
+              [
+                "今天 10:20",
+                candidate?.stage || "阶段更新",
+                candidate?.note || "等待下一步反馈",
+                "沈岚",
+              ],
+              [
+                "昨天 16:40",
+                "补充沟通备注",
+                "候选人确认可以在本周安排一次岗位沟通。",
+                "沈岚",
+              ],
+              [
+                "08-19 09:42",
+                "加入岗位储备",
+                "从人岗匹配结果加入当前岗位。",
+                "人岗匹配",
+              ],
+            ]}
+          />
+        </section>
+      </div>
+    </Modal>
+  );
+}
+
+const matchSurnames = [
+  "林",
+  "周",
+  "赵",
+  "陈",
+  "顾",
+  "许",
+  "沈",
+  "唐",
+  "陆",
+  "叶",
+  "韩",
+  "方",
+  "罗",
+  "蒋",
+  "伍",
+  "宋",
+];
+const matchGivenNames = [
+  "昊",
+  "明远",
+  "星羽",
+  "楚宁",
+  "言川",
+  "若航",
+  "亦辰",
+  "可欣",
+];
+const matchCompanies = [
+  "拓界机器人",
+  "穹顶智能",
+  "星澜机器人",
+  "灵跃科技",
+  "智行未来",
+  "银河通用",
+  "启元动力",
+  "矩阵机器人",
+];
+const matchTitles = [
+  "机器人学习负责人",
+  "VLA 算法负责人",
+  "具身智能算法总监",
+  "多模态算法 Lead",
+  "机器人基础模型专家",
+  "强化学习负责人",
+  "机器人算法经理",
+  "高级算法工程师",
+];
+
+const matchingCatalog = Array.from({ length: 128 }, (_, index) => {
+  const base = matchResults[index] || {};
+  const unmatched = index >= 120;
+  const score = unmatched ? null : Math.max(52, 96 - Math.floor(index / 3));
+  const roleGate = unmatched
+    ? "未匹配"
+    : index > 0 && index % 11 === 0
+      ? "拒绝"
+      : index > 0 && index % 5 === 0
+        ? "有条件"
+        : "通过";
+  const pipelineStages = ["储备", "已推荐", "一面", "二面", "谈薪"];
+  return {
+    ...base,
+    id: base.id || `match-${index + 1}`,
+    name:
+      base.name ||
+      `${matchSurnames[Math.floor(index / matchGivenNames.length)]}${matchGivenNames[index % matchGivenNames.length]}`,
+    company: base.company || matchCompanies[index % matchCompanies.length],
+    title: base.title || matchTitles[index % matchTitles.length],
+    score,
+    roleGate,
+    pipelineStage:
+      index < 8 && index % 2 === 0 ? pipelineStages[index % 5] : null,
+    reason:
+      base.reason ||
+      "候选人的机器人学习、真机部署和跨团队交付经历与岗位核心目标有较高重合，公开资料中可以确认其承担过关键技术决策。",
+    risk:
+      base.risk ||
+      (roleGate === "拒绝"
+        ? "当前角色层级或职业方向与岗位硬边界冲突，不进入可推荐范围。"
+        : roleGate === "有条件"
+          ? "当前职级或管理跨度高于目标岗位，需要先确认角色预期。"
+          : "最近两年的个人贡献、地点意愿和到岗时间仍需沟通核实。"),
+  };
+}).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+
+const matchTabs = [
+  { value: "all", label: "全部结果" },
+  { value: "passed", label: "角色适配通过" },
+  { value: "conditional", label: "有条件匹配" },
+  { value: "rejected", label: "硬门槛拒绝" },
+  { value: "pending", label: "未完成匹配" },
+  { value: "removed", label: "已移除" },
+];
+
+function MatchingResults() {
+  const navigate = useNavigate();
+  const notify = useToast();
+  const [selected, setSelected] = useState(matchingCatalog[0]?.id);
+  const [scope, setScope] = useState("all");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [removed, setRemoved] = useState(
+    () => new Set([matchingCatalog[17].id]),
+  );
+  const [removedReasons, setRemovedReasons] = useState({
+    [matchingCatalog[17].id]: "用户判断当前阶段不适合该岗位",
+  });
+  const [pipelineStages, setPipelineStages] = useState(() =>
+    Object.fromEntries(
+      matchingCatalog
+        .filter((item) => item.pipelineStage)
+        .map((item) => [item.id, item.pipelineStage]),
+    ),
+  );
+  const [runOpen, setRunOpen] = useState(false);
+  const [runMode, setRunMode] = useState("complete");
+  const [reportCandidate, setReportCandidate] = useState(null);
+  const [reportPrompt, setReportPrompt] = useState("");
+  const counts = useMemo(
+    () => ({
+      all: matchingCatalog.length - removed.size,
+      passed: matchingCatalog.filter(
+        (item) => item.roleGate === "通过" && !removed.has(item.id),
+      ).length,
+      conditional: matchingCatalog.filter(
+        (item) => item.roleGate === "有条件" && !removed.has(item.id),
+      ).length,
+      rejected: matchingCatalog.filter(
+        (item) => item.roleGate === "拒绝" && !removed.has(item.id),
+      ).length,
+      pending: matchingCatalog.filter(
+        (item) => item.roleGate === "未匹配" && !removed.has(item.id),
+      ).length,
+      removed: removed.size,
+    }),
+    [removed],
+  );
+  const rows = useMemo(() => {
+    const keyword = query.trim().toLowerCase();
+    return matchingCatalog.filter((item) => {
+      const isRemoved = removed.has(item.id);
+      const inScope =
+        scope === "removed"
+          ? isRemoved
+          : !isRemoved &&
+            (scope === "all" ||
+              (scope === "passed" && item.roleGate === "通过") ||
+              (scope === "conditional" && item.roleGate === "有条件") ||
+              (scope === "rejected" && item.roleGate === "拒绝") ||
+              (scope === "pending" && item.roleGate === "未匹配"));
+      return (
+        inScope &&
+        (!keyword ||
+          `${item.name} ${item.company} ${item.title}`
+            .toLowerCase()
+            .includes(keyword))
+      );
+    });
+  }, [query, removed, scope]);
+  const pages = Math.max(1, Math.ceil(rows.length / 10));
+  const visibleRows = rows.slice((page - 1) * 10, page * 10);
+  const current =
+    rows.find((item) => item.id === selected) ||
+    visibleRows[0] ||
+    matchingCatalog[0];
+  const changeScope = (value) => {
+    setScope(value);
+    setPage(1);
+    const next = matchingCatalog.find((item) => {
+      if (value === "removed") return removed.has(item.id);
+      if (removed.has(item.id)) return false;
+      return (
+        value === "all" ||
+        (value === "passed" && item.roleGate === "通过") ||
+        (value === "conditional" && item.roleGate === "有条件") ||
+        (value === "rejected" && item.roleGate === "拒绝") ||
+        (value === "pending" && item.roleGate === "未匹配")
+      );
+    });
+    if (next) setSelected(next.id);
+  };
+  const removeCandidate = (reason) => {
+    setRemoved((currentSet) => new Set([...currentSet, current.id]));
+    setRemovedReasons((currentReasons) => ({
+      ...currentReasons,
+      [current.id]: reason,
+    }));
+    notify(`${current.name} 已移到“已移除”`);
+  };
+  const restoreCandidate = () => {
+    setRemoved((currentSet) => {
+      const next = new Set(currentSet);
+      next.delete(current.id);
+      return next;
+    });
+    notify(`${current.name} 已恢复到匹配结果`);
+    changeScope("all");
+  };
+  return (
+    <div className="s4-match-shell">
+      <header className="s4-match-overview">
+        <span>
+          <small>匹配结果</small>
+          <b>128 位候选人完成本轮处理</b>
+          <p>岗位资料 v3 · 匹配策略 v12 · 结果按综合分倒序</p>
+        </span>
+        <div>
+          <Button
+            size="sm"
+            icon="activity"
+            onClick={() => {
+              setRunMode("complete");
+              setRunOpen(true);
+            }}
+          >
+            查看匹配过程
+          </Button>
           <Button
             size="sm"
             icon="refresh"
-            onClick={() => notify("已创建全量重新匹配任务", "info")}
+            onClick={() => {
+              setRunMode("running");
+              setRunOpen(true);
+            }}
           >
             重新匹配
           </Button>
-        </header>
-        <div className="s4-match-filters">
-          <SelectMenu
-            label="结果范围"
-            value={scope}
-            options={["全部结果", "推荐", "硬门槛拒绝"]}
-            onChange={setScope}
-          />
-          <span>共 {rows.length} 位</span>
         </div>
-        <div className="s4-match-result-list">
-          {rows.map((item) => (
+      </header>
+      <div className="s4-match-tabs">
+        <div
+          className="s1-tabs app-tabs"
+          role="tablist"
+          aria-label="匹配结果分类"
+        >
+          {matchTabs.map((item) => (
             <button
               type="button"
-              className={item.id === selected ? "is-active" : ""}
-              key={item.id}
-              onClick={() => setSelected(item.id)}
+              role="tab"
+              aria-selected={scope === item.value}
+              className={scope === item.value ? "is-active" : ""}
+              key={item.value}
+              onClick={() => changeScope(item.value)}
             >
-              <strong>{item.score}</strong>
-              <span>
-                <b>{item.name}</b>
-                <small>
-                  {item.company} · {item.title}
-                </small>
-                <em>
-                  {item.roleGate === "拒绝"
-                    ? "硬门槛拒绝"
-                    : item.roleGate === "有条件"
-                      ? "有条件匹配"
-                      : "角色适配通过"}
-                </em>
-              </span>
-              <Icon name="chevronRight" />
+              {item.label}
+              <em>{counts[item.value]}</em>
             </button>
           ))}
         </div>
-      </aside>
-      <section>
-        <header className="s4-match-detail-head">
-          <span>
-            <small>候选人匹配详情</small>
-            <h2>{current.name}</h2>
-            <p>
-              {current.company} · {current.title}
-            </p>
-          </span>
-          <strong>
-            {current.score}
-            <small>综合分</small>
-          </strong>
-        </header>
-        {current.roleGate === "拒绝" ? (
-          <StateBanner
-            tone="danger"
-            icon="warning"
-            title="硬性角色门槛未通过"
-            description="当前公开资料中的角色与岗位目标存在明显冲突，该候选人不进入推荐排序。"
+      </div>
+      <div className="s4-match-workspace">
+        <aside>
+          <div className="s4-match-filters">
+            <label className="s4-match-search">
+              <Icon name="search" />
+              <input
+                value={query}
+                placeholder="搜索姓名、公司或职位"
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setPage(1);
+                }}
+              />
+            </label>
+            <span>共 {rows.length} 位</span>
+          </div>
+          <div className="s4-match-result-list">
+            {visibleRows.map((item) => (
+              <button
+                type="button"
+                className={`${item.id === current.id ? "is-active" : ""} is-${scoreTone(item.score)}`}
+                key={item.id}
+                onClick={() => setSelected(item.id)}
+              >
+                <MatchScore score={item.score} compact />
+                <span>
+                  <b>{item.name}</b>
+                  <small>
+                    {item.company} · {item.title}
+                  </small>
+                  <em className={`is-${item.roleGate}`}>
+                    {item.roleGate === "拒绝"
+                      ? "硬门槛拒绝"
+                      : item.roleGate === "有条件"
+                        ? "有条件匹配"
+                        : item.roleGate === "未匹配"
+                          ? "等待匹配"
+                          : "角色适配通过"}
+                  </em>
+                  {pipelineStages[item.id] ? (
+                    <i>流程：{pipelineStages[item.id]}</i>
+                  ) : null}
+                </span>
+                <Icon name="chevronRight" />
+              </button>
+            ))}
+          </div>
+          <Pagination
+            page={page}
+            pages={pages}
+            pageSize={10}
+            onChange={setPage}
           />
-        ) : current.roleGate === "有条件" ? (
-          <StateBanner
-            tone="warning"
-            icon="warning"
-            title="有条件匹配"
-            description="能力经历匹配，但当前职级显著高于目标角色，综合分已做折扣。"
+        </aside>
+        <section>
+          <header className="s4-match-detail-head">
+            <span>
+              <small>候选人匹配详情</small>
+              <h2>{current.name}</h2>
+              <p>
+                {current.company} · {current.title}
+              </p>
+              {pipelineStages[current.id] ? (
+                <StatusBadge tone="info">
+                  流程中 · {pipelineStages[current.id]}
+                </StatusBadge>
+              ) : null}
+            </span>
+            <MatchScore score={current.score} />
+          </header>
+          <MatchGateSummary
+            item={current}
+            removedReason={removedReasons[current.id]}
           />
-        ) : (
-          <StateBanner
-            tone="success"
-            icon="check"
-            title="角色适配通过"
-            description="候选人当前职责和岗位目标在管理范围、交付责任与技术方向上匹配。"
-          />
-        )}
-        <div className="s4-score-breakdown">
-          {[
-            ["技能与经验", 94],
-            ["岗位角色", current.roleGate === "有条件" ? 68 : 92],
-            ["行业与场景", 90],
-            ["地点与意愿", 82],
-          ].map(([label, score]) => (
-            <div key={label}>
-              <span>
-                <b>{label}</b>
-                <em>{score}</em>
-              </span>
-              <i>
-                <b style={{ width: `${score}%` }} />
-              </i>
+          {current.score === null ? (
+            <div className="s4-match-pending-detail">
+              <Icon name="clock" />
+              <h3>尚未进行岗位匹配</h3>
+              <p>该候选人由用户手动加入候选池，资料已进入下一批匹配队列。</p>
+              <Button
+                tone="primary"
+                onClick={() => {
+                  setRunMode("running");
+                  setRunOpen(true);
+                }}
+              >
+                立即匹配此人
+              </Button>
             </div>
-          ))}
-        </div>
-        <FieldGroup title="推荐理由">
-          <p className="s4-long-copy">{current.reason}</p>
-        </FieldGroup>
-        <FieldGroup title="风险提示">
-          <p className="s4-long-copy">{current.risk}</p>
-        </FieldGroup>
-        <FieldGroup title="建议动作">
-          <ol className="s4-confirmed-requirements">
-            <li>核实最近两年真机部署项目中的个人贡献。</li>
-            <li>确认北京工作安排和团队管理范围预期。</li>
-          </ol>
-        </FieldGroup>
-        <footer>
-          <Button onClick={() => notify("已打开候选人详情")}>查看候选人</Button>
-          <Button
-            tone="primary"
-            disabled={current.roleGate === "拒绝"}
-            onClick={() => notify(`${current.name} 已加入岗位储备`)}
-          >
-            加入岗位储备
-          </Button>
-        </footer>
-      </section>
+          ) : (
+            <>
+              <div className="s4-score-breakdown">
+                {[
+                  ["技能与经验", Math.min(98, current.score + 2)],
+                  [
+                    "岗位角色",
+                    current.roleGate === "有条件"
+                      ? 68
+                      : current.roleGate === "拒绝"
+                        ? 42
+                        : Math.min(96, current.score),
+                  ],
+                  ["行业与场景", Math.max(62, current.score - 3)],
+                  ["地点与意愿", Math.max(58, current.score - 8)],
+                ].map(([label, score]) => (
+                  <div key={label}>
+                    <span>
+                      <b>{label}</b>
+                      <em>{score}</em>
+                    </span>
+                    <i>
+                      <b
+                        className={`is-${scoreTone(score)}`}
+                        style={{ width: `${score}%` }}
+                      />
+                    </i>
+                  </div>
+                ))}
+              </div>
+              <FieldGroup title="推荐理由">
+                <p className="s4-long-copy">{current.reason}</p>
+              </FieldGroup>
+              <FieldGroup title="风险提示">
+                <p className="s4-long-copy">{current.risk}</p>
+              </FieldGroup>
+              <FieldGroup title="建议动作">
+                <ol className="s4-confirmed-requirements">
+                  <li>核实最近两年真机部署项目中的个人贡献。</li>
+                  <li>确认北京工作安排、到岗时间和团队管理范围预期。</li>
+                </ol>
+              </FieldGroup>
+            </>
+          )}
+          <footer className="s4-match-actions">
+            <Button
+              onClick={() =>
+                navigate(`/candidates/${current.id}`, {
+                  state: { candidate: current },
+                })
+              }
+            >
+              查看候选人
+            </Button>
+            {removed.has(current.id) ? (
+              <Button tone="primary" icon="refresh" onClick={restoreCandidate}>
+                恢复到结果
+              </Button>
+            ) : (
+              <>
+                <Button
+                  tone="danger-outline"
+                  onClick={() => removeCandidate("从当前岗位匹配结果中移除")}
+                >
+                  从结果移除
+                </Button>
+                <Button
+                  tone="danger-outline"
+                  onClick={() =>
+                    removeCandidate("用户判断当前阶段不适合该岗位")
+                  }
+                >
+                  标记不合适
+                </Button>
+                {pipelineStages[current.id] ? (
+                  <Button
+                    icon="sparkles"
+                    onClick={() => setReportCandidate(current)}
+                  >
+                    生成推荐报告
+                  </Button>
+                ) : (
+                  <Button
+                    tone="primary"
+                    disabled={
+                      current.roleGate === "拒绝" || current.score === null
+                    }
+                    onClick={() => {
+                      setPipelineStages((stages) => ({
+                        ...stages,
+                        [current.id]: "储备",
+                      }));
+                      notify(`${current.name} 已加入岗位储备`);
+                    }}
+                  >
+                    加入岗位储备
+                  </Button>
+                )}
+              </>
+            )}
+          </footer>
+        </section>
+      </div>
+      <MatchRunModal
+        open={runOpen}
+        mode={runMode}
+        close={() => setRunOpen(false)}
+      />
+      <Modal
+        open={Boolean(reportCandidate)}
+        close={() => setReportCandidate(null)}
+        size="lg"
+        title={`为 ${reportCandidate?.name || "候选人"} 生成推荐报告`}
+        description="这会创建一项独立支线任务；可以继续通过对话补充要求和修改报告"
+        footer={
+          <>
+            <Button onClick={() => setReportCandidate(null)}>取消</Button>
+            <Button
+              tone="primary"
+              onClick={() => {
+                sessionStorage.setItem(
+                  "hunter-recommendation-task-prompt",
+                  reportPrompt ||
+                    "重点说明候选人的 VLA 落地能力、团队管理范围和岗位适配证据。",
+                );
+                setReportCandidate(null);
+                navigate("/tasks/task-recommend-linhao");
+              }}
+            >
+              创建并开始
+            </Button>
+          </>
+        }
+      >
+        <FormField label="报告要求">
+          <TextArea
+            value={reportPrompt}
+            onChange={setReportPrompt}
+            placeholder="例如：面向客户技术负责人，重点说明真机部署、团队管理和风险核实情况"
+          />
+        </FormField>
+      </Modal>
     </div>
+  );
+}
+
+function MatchGateSummary({ item, removedReason }) {
+  if (removedReason) {
+    return (
+      <div className="s4-match-gate is-removed">
+        <i>
+          <Icon name="trash" />
+        </i>
+        <span>
+          <b>已从当前结果中移除</b>
+          <p>{removedReason}。可以随时恢复，不会删除候选人档案。</p>
+        </span>
+      </div>
+    );
+  }
+  const config =
+    item.roleGate === "拒绝"
+      ? [
+          "danger",
+          "warning",
+          "硬性角色门槛未通过",
+          "角色层级或职业方向与岗位硬边界冲突，不进入推荐排序。",
+        ]
+      : item.roleGate === "有条件"
+        ? [
+            "warning",
+            "warning",
+            "有条件匹配",
+            "能力经历匹配，但当前职级或管理跨度偏高，综合分已做折扣。",
+          ]
+        : item.roleGate === "未匹配"
+          ? ["neutral", "clock", "等待匹配", "该候选人尚未完成本岗位匹配。"]
+          : [
+              "success",
+              "check",
+              "角色适配通过",
+              "当前职责与岗位目标在管理范围、交付责任和技术方向上匹配。",
+            ];
+  return (
+    <div className={`s4-match-gate is-${config[0]}`}>
+      <i>
+        <Icon name={config[1]} />
+      </i>
+      <span>
+        <b>{config[2]}</b>
+        <p>{config[3]}</p>
+      </span>
+    </div>
+  );
+}
+
+function MatchRunModal({ open, mode, close }) {
+  const running = mode === "running";
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="lg"
+      title={running ? "人岗匹配正在运行" : "人岗匹配运行过程"}
+      description="本轮使用岗位资料 v3、候选人资料版本和匹配策略 v12"
+      footer={
+        <Button onClick={close}>{running ? "在后台继续" : "关闭"}</Button>
+      }
+    >
+      <div className="s4-match-run-process">
+        <ProgressBar
+          value={running ? 58 : 100}
+          label={running ? "已处理 74 / 128 位候选人" : "128 位候选人处理完成"}
+        />
+        {[
+          [
+            "读取岗位与候选人资料",
+            "已完成",
+            "读取岗位 v3 与 128 位候选人当前资料版本。",
+            "success",
+          ],
+          [
+            "执行硬门槛检查",
+            "已完成",
+            "学历、工作年限与角色硬门槛已完成代码校验。",
+            "success",
+          ],
+          [
+            "评估角色适配与综合得分",
+            running ? "运行中" : "已完成",
+            running
+              ? "正在处理第 75 位候选人。"
+              : "88 位角色适配通过，21 位有条件匹配，10 位被硬门槛拒绝。",
+            running ? "info" : "success",
+          ],
+          [
+            "写入可审核结果",
+            running ? "等待" : "已完成",
+            running
+              ? "将在全部校验完成后统一交付。"
+              : "8 位资料不足的候选人保留在未完成匹配中，1 位已由用户移除。",
+            running ? "neutral" : "success",
+          ],
+        ].map(([title, status, detail, tone]) => (
+          <article key={title}>
+            <i className={`is-${tone}`}>
+              <Icon
+                name={
+                  tone === "success"
+                    ? "check"
+                    : tone === "info"
+                      ? "refresh"
+                      : "clock"
+                }
+              />
+            </i>
+            <span>
+              <b>{title}</b>
+              <p>{detail}</p>
+            </span>
+            <StatusBadge tone={tone}>{status}</StatusBadge>
+          </article>
+        ))}
+      </div>
+    </Modal>
   );
 }
 
@@ -665,43 +1733,98 @@ function RelatedWork() {
   return (
     <div className="s4-detail-stack">
       <FieldGroup title="业务主线">
-        <EntityLink
-          icon="route"
-          title="星澜机器人 · 具身智能团队招聘"
-          meta="运行中 · 等待候选人审核"
+        <button
+          type="button"
+          className="s4-related-mainline"
           onClick={() => navigate("/workstreams/position-vla")}
-        />
+        >
+          <i>
+            <Icon name="route" />
+          </i>
+          <span>
+            <small>岗位招聘</small>
+            <b>星澜机器人 · 具身智能团队招聘</b>
+            <p>持续汇总候选人召回、匹配、审核和岗位推进结果。</p>
+          </span>
+          <StatusBadge tone="warning">等待候选人审核</StatusBadge>
+          <Icon name="chevronRight" />
+        </button>
       </FieldGroup>
       <FieldGroup title="相关任务">
-        <div className="s4-task-records">
-          <article>
-            <i>
-              <Icon name="sparkles" />
-            </i>
-            <span>
-              <b>岗位深度解析</b>
-              <small>已完成 · 2026-08-19</small>
-              <p>生成岗位定位、对标企业、软性和隐性要求及寻访关键词。</p>
-            </span>
-            <StatusBadge tone="success">完成</StatusBadge>
-          </article>
-          <article>
-            <i>
-              <Icon name="users" />
-            </i>
-            <span>
-              <b>候选人全量匹配</b>
-              <small>已完成 · 今天 09:40</small>
-              <p>完成 18 位候选人匹配，发现 1 条结果因资料变化需要更新。</p>
-            </span>
-            <StatusBadge tone="warning">有更新</StatusBadge>
-          </article>
+        <div className="s4-related-work-grid">
+          {[
+            {
+              icon: "sparkles",
+              type: "岗位解析",
+              title: "具身智能 VLA 算法负责人岗位深度解析",
+              summary: "生成岗位定位、对标企业、软性和隐性要求及寻访关键词。",
+              status: "完成",
+              tone: "success",
+              time: "2026-08-19",
+              route: "/workstreams/position-vla",
+            },
+            {
+              icon: "users",
+              type: "人岗匹配",
+              title: "候选人全量匹配 · 资料版本 v3",
+              summary: "完成 128 位候选人匹配，8 位资料不足等待后续处理。",
+              status: "完成",
+              tone: "success",
+              time: "今天 09:40",
+              route: "/positions/position-vla?tab=matching",
+            },
+            {
+              icon: "file",
+              type: "推荐报告",
+              title: "为林昊生成客户推荐报告",
+              summary: "报告初稿已完成，等待补充项目贡献的量化说明。",
+              status: "等待用户",
+              tone: "warning",
+              time: "今天 10:16",
+              route: "/tasks/task-recommend-linhao",
+            },
+            {
+              icon: "search",
+              type: "公开资料核验",
+              title: "核实周明远最近任职与团队范围",
+              summary: "公开资料存在时间线差异，正在等待补充证据。",
+              status: "运行中",
+              tone: "info",
+              time: "已运行 12 分钟",
+              route: "/tasks/task-hand-team",
+            },
+          ].map((task) => (
+            <button
+              type="button"
+              key={task.title}
+              onClick={() => navigate(task.route)}
+            >
+              <header>
+                <i>
+                  <Icon name={task.icon} />
+                </i>
+                <small>{task.type}</small>
+                <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
+              </header>
+              <b>{task.title}</b>
+              <p>{task.summary}</p>
+              <footer>
+                <time>{task.time}</time>
+                <Icon name="chevronRight" />
+              </footer>
+            </button>
+          ))}
         </div>
       </FieldGroup>
       <FieldGroup title="活动记录">
         <ActivityTimeline
           items={[
-            ["今天 09:40", "匹配完成", "生成 18 条当前匹配结果。", "人岗匹配"],
+            [
+              "今天 09:40",
+              "匹配完成",
+              "完成 128 位候选人匹配并生成可审核结果。",
+              "人岗匹配",
+            ],
             [
               "昨天 17:21",
               "岗位资料更新",
@@ -721,98 +1844,6 @@ function RelatedWork() {
   );
 }
 
-function EditPositionModal({ open, close }) {
-  const notify = useToast();
-  const [name, setName] = useState(positionDetail.name);
-  const [status, setStatus] = useState(positionDetail.status);
-  const statusBlocked = status !== "招聘中";
-  return (
-    <Modal
-      open={open}
-      close={close}
-      size="xl"
-      title="编辑岗位资料"
-      description="当前 JD 和已确认要求在各自区域单独维护"
-      footer={
-        <>
-          <Button onClick={close}>取消</Button>
-          <Button
-            tone="primary"
-            disabled={statusBlocked}
-            onClick={() => {
-              close();
-              notify("岗位资料已保存");
-            }}
-          >
-            保存修改
-          </Button>
-        </>
-      }
-    >
-      <div className="s4-form-grid">
-        <FormField label="岗位名称" required>
-          <TextInput value={name} onChange={setName} />
-        </FormField>
-        <FormField label="招聘状态">
-          <SelectMenu
-            label="招聘状态"
-            value={status}
-            options={["招聘中", "已暂停", "已关闭"]}
-            onChange={setStatus}
-          />
-        </FormField>
-        <FormField label="招聘公司原文" required>
-          <TextInput value="星澜机器人" onChange={() => {}} />
-        </FormField>
-        <FormField label="正式公司关联">
-          <SelectMenu
-            label="选择公司"
-            value="星澜机器人"
-            options={["星澜机器人", "拓界机器人", "灵跃科技"]}
-            onChange={() => {}}
-          />
-        </FormField>
-        <FormField label="工作地点">
-          <TextInput value="北京 / 上海" onChange={() => {}} />
-        </FormField>
-        <FormField label="薪资范围">
-          <TextInput value="80 - 120 万 / 年" onChange={() => {}} />
-        </FormField>
-        <FormField label="最低工作年限">
-          <TextInput value="8" onChange={() => {}} />
-        </FormField>
-        <FormField label="学历要求">
-          <SelectMenu
-            label="学历要求"
-            value="硕士"
-            options={["不限", "本科", "硕士", "博士"]}
-            onChange={() => {}}
-          />
-        </FormField>
-        <FormField label="用户备注" span={2}>
-          <TextArea
-            value="客户优先希望候选人具备真机数据闭环经验。"
-            onChange={() => {}}
-          />
-        </FormField>
-      </div>
-      {statusBlocked ? (
-        <StateBanner
-          tone="warning"
-          icon="warning"
-          title="当前有 2 个运行中任务，暂时不能保存"
-          description="暂停或关闭岗位前，需要先停止岗位招聘主线和候选人匹配任务。"
-          action={
-            <Button size="sm" onClick={() => notify("已打开相关任务")}>
-              查看任务
-            </Button>
-          }
-        />
-      ) : null}
-    </Modal>
-  );
-}
-
 export function PositionDetailPage() {
   const { positionId } = useParams();
   const navigate = useNavigate();
@@ -822,7 +1853,6 @@ export function PositionDetailPage() {
   const item =
     positions.find((position) => position.id === positionId) ||
     (positionId === "position-vla" ? positionDetail : null);
-  const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   if (!item)
     return <NotFoundState label="岗位" onBack={() => navigate("/positions")} />;
@@ -841,7 +1871,6 @@ export function PositionDetailPage() {
           { label: "岗位资料 v3", tone: "info" },
         ]}
         onBack={() => navigate("/positions")}
-        onEdit={() => setEditOpen(true)}
         onDelete={() => setDeleteOpen(true)}
       >
         <Button
@@ -856,13 +1885,10 @@ export function PositionDetailPage() {
         value={tab}
         onChange={(value) => setParams({ tab: value })}
       />
-      {tab === "profile" ? (
-        <PositionProfile detail={detail} onEdit={() => setEditOpen(true)} />
-      ) : null}
+      {tab === "profile" ? <PositionProfile detail={detail} /> : null}
       {tab === "pipeline" ? <CandidatePipeline /> : null}
       {tab === "matching" ? <MatchingResults /> : null}
       {tab === "work" ? <RelatedWork /> : null}
-      <EditPositionModal open={editOpen} close={() => setEditOpen(false)} />
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}

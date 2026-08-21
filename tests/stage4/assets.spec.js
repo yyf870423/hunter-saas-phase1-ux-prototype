@@ -392,27 +392,88 @@ test("数据管理使用独立导航而不是全局导入按钮", async ({ page 
 
 test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) => {
   await page.goto("#/positions/position-vla?tab=pipeline");
-  await page.getByRole("button", { name: "移动阶段" }).first().click();
+  const firstCandidate = page.locator(".s4-kanban article").first();
+  const targetStage = page.locator(".s4-kanban > section").nth(2);
+  await firstCandidate.dragTo(targetStage);
   await expect(page.getByRole("dialog", { name: /移动/ })).toBeVisible();
-  const moveModal = page.getByRole("dialog", { name: /移动/ });
-  await moveModal.locator(".s4-select > button").click();
-  await page.getByRole("button", { name: "二面", exact: true }).click();
+  await page.getByLabel("本次操作备注").fill("客户希望优先安排技术沟通。");
   await page.getByRole("button", { name: "确认移动" }).click();
-  await expect(page.getByText(/已移动到“二面”/)).toBeVisible();
+  await expect(page.getByText(/已进入“一面”/)).toBeVisible();
+
+  await page.getByText("赵星羽", { exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: /赵星羽 · 完整推进记录/ }),
+  ).toBeVisible();
+  await expect(page.getByText("备注与推进时间线")).toBeVisible();
+  await page
+    .getByRole("dialog", { name: /赵星羽 · 完整推进记录/ })
+    .getByRole("button", { name: "关闭", exact: true })
+    .click();
+
+  await page.getByRole("button", { name: "配置阶段" }).click();
+  const stageModal = page.getByRole("dialog", { name: "配置岗位推进阶段" });
+  await expect(
+    stageModal.locator(".s4-stage-config article.is-fixed"),
+  ).toHaveCount(5);
+  await stageModal.getByRole("button", { name: "保存配置" }).click();
+  await expect(page.getByText("岗位推进阶段已保存")).toBeVisible();
 
   await page.getByRole("tab", { name: /匹配结果/ }).click();
-  await expect(page.getByText("综合分")).toBeVisible();
-  await page.getByRole("button", { name: /周明远/ }).click();
+  await expect(page.getByText("128 位候选人完成本轮处理")).toBeVisible();
+  await page.getByRole("tab", { name: /有条件匹配/ }).click();
+  await page.locator(".s4-match-result-list button").first().click();
   await expect(
     page.getByText("有条件匹配", { exact: true }).first(),
   ).toBeVisible();
+  await page.getByRole("button", { name: "标记不合适" }).click();
+  await page.getByRole("tab", { name: /已移除/ }).click();
+  await page.locator(".s4-match-result-list button").first().click();
+  await expect(page.getByText("已从当前结果中移除")).toBeVisible();
+  await page.getByRole("button", { name: "恢复到结果" }).click();
 
-  await page.getByRole("button", { name: "编辑" }).click();
-  const modal = page.getByRole("dialog", { name: "编辑岗位资料" });
+  await page.getByRole("tab", { name: /角色适配通过/ }).click();
+  await page.locator(".s4-match-result-list button").first().click();
+  const reportButton = page.getByRole("button", { name: "生成推荐报告" });
+  if (!(await reportButton.count())) {
+    await page.getByRole("button", { name: "加入岗位储备" }).click();
+  }
+  await page.getByRole("button", { name: "生成推荐报告" }).click();
+  await expect(
+    page.getByRole("dialog", { name: /生成推荐报告/ }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
+
+  await page.getByRole("button", { name: "查看匹配过程" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "人岗匹配运行过程" }),
+  ).toBeVisible();
+  await page
+    .getByRole("dialog", { name: "人岗匹配运行过程" })
+    .locator("footer")
+    .getByRole("button", { name: "关闭", exact: true })
+    .click();
+
+  await page.getByRole("tab", { name: "岗位资料" }).click();
+  await expect(page.getByRole("button", { name: "编辑" })).toHaveCount(0);
+  await page.getByRole("button", { name: "编辑资料" }).click();
+  const modal = page.getByRole("dialog", { name: "编辑岗位基本资料" });
   await modal.getByRole("button", { name: "招聘状态" }).click();
   await page.getByRole("button", { name: "已暂停", exact: true }).click();
   await expect(modal.getByText(/暂时不能保存/)).toBeVisible();
   await expect(modal.getByRole("button", { name: "保存修改" })).toBeDisabled();
+});
+
+test("大批量匹配结果中的模拟候选人可以进入完整档案", async ({ page }) => {
+  await page.goto("#/positions/position-vla?tab=matching");
+  await page.getByRole("button", { name: "下一页" }).click();
+  await page.locator(".s4-match-result-list button").first().click();
+  const selectedName = await page
+    .locator(".s4-match-detail-head h2")
+    .textContent();
+  await page.getByRole("button", { name: "查看候选人" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: selectedName }),
+  ).toBeVisible();
 });
 
 test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", async ({ page }) => {
