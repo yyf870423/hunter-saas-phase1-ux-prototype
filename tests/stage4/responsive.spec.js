@@ -67,6 +67,22 @@ test("阶段四公共筛选与数据管理生成桌面验收截图", async ({ pa
     path: "artifacts/stage4-company-industry.png",
     fullPage: true,
   });
+  await page.goto("#/patents");
+  await page.locator(".s4-tag-overflow").first().hover();
+  await page.waitForTimeout(160);
+  await page.screenshot({
+    path: "artifacts/stage4-custom-tooltip.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/patents");
+  await page.locator(".s4-academic-summary").first().hover();
+  await page.waitForTimeout(160);
+  await page.screenshot({
+    path: "artifacts/stage4-description-tooltip.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
   for (const [route, file] of [
     ["patents", "stage4-patents.png"],
     ["data/imports", "stage4-data-imports.png"],

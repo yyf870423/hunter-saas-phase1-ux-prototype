@@ -311,6 +311,32 @@ test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
   expect((await patentSummaries.first().textContent()).length).toBeGreaterThan(
     60,
   );
+  expect(
+    await patentSummaries
+      .first()
+      .evaluate((element) => getComputedStyle(element).webkitLineClamp),
+  ).toBe("3");
+  const firstVisibleTagBox = await page
+    .locator(".s4-academic-list article")
+    .first()
+    .locator(".s4-tag-list > .s4-tag")
+    .first()
+    .boundingBox();
+  const firstOverflowTagBox = await page
+    .locator(".s4-academic-list article")
+    .first()
+    .locator(".s4-tag-overflow")
+    .boundingBox();
+  expect(Math.abs(firstVisibleTagBox.y - firstOverflowTagBox.y)).toBeLessThan(
+    2,
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await patentSummaries.first().hover();
+  await expect(page.getByRole("tooltip")).toContainText(
+    "面向多任务机器人的操作策略训练方法",
+  );
+  await expect(page.getByRole("tooltip")).toHaveCSS("border-left-width", "3px");
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "专利类型", exact: true }).click();
   await page.getByRole("button", { name: "实用新型", exact: true }).click();
   await expect(page.getByText("灵巧手关节传动机构及机器人")).toBeVisible();

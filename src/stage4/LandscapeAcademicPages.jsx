@@ -99,7 +99,11 @@ export function MappingsListPage() {
                   </div>
                 ) : null}
               </header>
-              <TooltipText className="s4-landscape-goal" tip={item.goal}>
+              <TooltipText
+                className="s4-landscape-goal"
+                tip={item.goal}
+                clampLines={3}
+              >
                 {item.goal}
               </TooltipText>
               <dl>
@@ -851,7 +855,11 @@ function AcademicCardList({ kind }) {
                   ? item.authors.join("、")
                   : item.inventors.join("、")}
               </p>
-              <TooltipText className="s4-academic-summary" tip={item.summary}>
+              <TooltipText
+                className="s4-academic-summary"
+                tip={item.summary}
+                clampLines={3}
+              >
                 {item.summary}
               </TooltipText>
               <span>

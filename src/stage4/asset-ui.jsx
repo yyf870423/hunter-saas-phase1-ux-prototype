@@ -700,7 +700,7 @@ export function TagList({
     typeof maxVisible === "number" ? items.slice(0, maxVisible) : items;
   const hiddenItems = items.slice(visibleItems.length);
   return (
-    <span className="s4-tag-list">
+    <span className={`s4-tag-list ${hiddenItems.length ? "has-overflow" : ""}`}>
       {visibleItems.map((item) => (
         <span className={`s4-tag s4-tag-${tone}`} key={item}>
           {item}
@@ -1035,34 +1035,77 @@ export function ProgressBar({ value, label }) {
   );
 }
 
-export function TooltipText({ children, tip, className = "", force = false }) {
+export function TooltipText({
+  children,
+  tip,
+  className = "",
+  force = false,
+  clampLines,
+}) {
   const anchorRef = useRef(null);
   const [tooltip, setTooltip] = useState(null);
+  const isTruncated = (element) => {
+    if (
+      element.scrollWidth > element.clientWidth + 1 ||
+      element.scrollHeight > element.clientHeight + 1
+    )
+      return true;
+    if (!clampLines) return false;
+    const clone = element.cloneNode(true);
+    Object.assign(clone.style, {
+      position: "fixed",
+      left: "-10000px",
+      top: "0",
+      width: `${element.clientWidth}px`,
+      height: "auto",
+      minHeight: "0",
+      maxHeight: "none",
+      overflow: "visible",
+      display: "block",
+      WebkitLineClamp: "unset",
+      WebkitBoxOrient: "initial",
+      whiteSpace: "normal",
+      visibility: "hidden",
+      pointerEvents: "none",
+    });
+    document.body.appendChild(clone);
+    const fullHeight = clone.getBoundingClientRect().height;
+    clone.remove();
+    return fullHeight > element.clientHeight + 1;
+  };
   const show = () => {
     const element = anchorRef.current;
     if (!element || !tip) return;
-    const truncated =
-      element.scrollWidth > element.clientWidth + 1 ||
-      element.scrollHeight > element.clientHeight + 1;
-    if (!force && !truncated) return;
+    if (!force && !isTruncated(element)) return;
     const rect = element.getBoundingClientRect();
-    const width = Math.min(360, window.innerWidth - 24);
+    const width = Math.min(
+      Math.max(120, Array.from(String(tip)).length * 12 + 30),
+      360,
+      window.innerWidth - 24,
+    );
     const left = Math.min(
       Math.max(12, rect.left),
       window.innerWidth - width - 12,
     );
     const openAbove = window.innerHeight - rect.bottom < 120 && rect.top > 120;
+    const arrowLeft = Math.min(
+      Math.max(16, rect.left + rect.width / 2 - left),
+      width - 16,
+    );
     setTooltip({
       left,
       top: openAbove ? "auto" : rect.bottom + 7,
       bottom: openAbove ? window.innerHeight - rect.top + 7 : "auto",
       width,
+      placement: openAbove ? "above" : "below",
+      arrowLeft,
     });
   };
   return (
     <span
       ref={anchorRef}
-      className={`s4-tooltip ${className}`}
+      className={`s4-tooltip ${clampLines ? "is-line-clamped" : ""} ${className}`}
+      style={clampLines ? { "--s4-tooltip-lines": clampLines } : undefined}
       tabIndex="0"
       onMouseEnter={show}
       onMouseLeave={() => setTooltip(null)}
@@ -1073,9 +1116,15 @@ export function TooltipText({ children, tip, className = "", force = false }) {
       {tooltip
         ? createPortal(
             <span
-              className="s4-floating-tooltip"
+              className={`s4-floating-tooltip is-${tooltip.placement}`}
               role="tooltip"
-              style={tooltip}
+              style={{
+                left: tooltip.left,
+                top: tooltip.top,
+                bottom: tooltip.bottom,
+                width: tooltip.width,
+                "--s4-tooltip-arrow-left": `${tooltip.arrowLeft}px`,
+              }}
             >
               {tip}
             </span>,
