@@ -99,10 +99,20 @@ test("主题切换即时生效并记忆", async ({ page }) => {
 });
 
 test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
-  await page.getByRole("button", { name: "新建", exact: true }).click();
-  await page.getByRole("button", { name: /导入数据/ }).click();
+  const topbar = page.locator(".s1-topbar");
+  const importButton = topbar.getByRole("button", {
+    name: "导入数据",
+    exact: true,
+  });
+  await expect(importButton.locator('[data-icon="download"]')).toBeVisible();
+  await importButton.click();
   await expect(page).toHaveURL(/#\/data\/imports$/);
   await expect(page.getByRole("heading", { name: "数据导入" })).toBeVisible();
+  await page.goto("#/home");
+  await topbar.getByRole("button", { name: "新建工作", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: /手动新建资产/ }),
+  ).toBeVisible();
   await page.getByLabel(/查看 Agent 用量/).click();
   await expect(
     page.getByRole("heading", { name: "本月 Agent 用量" }),

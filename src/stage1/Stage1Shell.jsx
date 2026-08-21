@@ -329,6 +329,7 @@ function MobileNavigation({ open, close, mode, onSelect }) {
   const assets = navSections.slice(1).flatMap((section) => section.items);
   const more = [
     navSections[0].items[3],
+    { id: "imports", label: "导入数据", icon: "download" },
     { id: "usage", label: "订阅与用量", icon: "database" },
     { id: "settings", label: "设置", icon: "settings" },
   ];
@@ -376,7 +377,6 @@ function NewMenu({ open, close, onSelect }) {
     <div className="s1-new-menu" role="menu" ref={ref}>
       {[
         ["route", "新建工作", "直接说明目标，Hunter 会选择合适的推进方式"],
-        ["upload", "导入数据", "导入简历、岗位、公司、论文、专利或人才版图"],
         ["plus", "手动新建资产", "进入对应业务资产创建正式记录"],
       ].map(([icon, title, description]) => (
         <button type="button" key={title} onClick={() => onSelect(title)}>
@@ -462,6 +462,7 @@ export function Stage1Shell() {
       mappings: "/mappings",
       papers: "/papers",
       patents: "/patents",
+      imports: "/data/imports",
     };
     if (routes[item.id]) {
       navigate(routes[item.id]);
@@ -665,13 +666,20 @@ export function Stage1Shell() {
             <kbd>Ctrl K</kbd>
           </button>
           <div className="s1-topbar-actions">
+            <Button
+              className="s1-global-import"
+              icon="download"
+              onClick={() => navigate("/data/imports")}
+            >
+              导入数据
+            </Button>
             <div className="s1-new-menu-wrap">
               <Button
                 tone="primary"
                 icon="plus"
                 onClick={() => setNewOpen((current) => !current)}
               >
-                新建
+                新建工作
               </Button>
               <NewMenu
                 open={newOpen}
@@ -679,7 +687,6 @@ export function Stage1Shell() {
                 onSelect={(label) => {
                   setNewOpen(false);
                   if (label === "新建工作") navigate("/new");
-                  else if (label === "导入数据") navigate("/data/imports");
                   else if (label === "手动新建资产")
                     setAssetNavigationOpen(true);
                 }}

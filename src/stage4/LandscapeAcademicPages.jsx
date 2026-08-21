@@ -45,14 +45,6 @@ export function MappingsListPage() {
         count={controller.filtered.length}
         primaryLabel="新建人才版图"
         onPrimary={() => navigate("/mappings/new")}
-        actions={
-          <Button
-            icon="upload"
-            onClick={() => navigate("/data/imports?type=mapping")}
-          >
-            导入
-          </Button>
-        }
       />
       <FilterBar
         query={controller.query}
@@ -617,7 +609,7 @@ export function MappingCreatePage() {
         <aside className="s4-create-modes">
           {[
             ["natural", "message", "自然语言", "描述摸排目标"],
-            ["file", "upload", "导入文件", "Excel、FreeMind"],
+            ["file", "download", "导入文件", "Excel、FreeMind"],
             ["manual", "edit", "手工创建", "建立空版图"],
           ].map(([id, icon, label, meta]) => (
             <button
@@ -744,17 +736,9 @@ function AcademicCardList({ kind }) {
             : "管理专利信息、发明人、权利人和人物身份关系。"
         }
         count={controller.filtered.length}
-        primaryLabel={`导入${label}`}
-        primaryIcon="upload"
-        onPrimary={() => navigate(`/data/imports?type=${kind}`)}
-        actions={
-          <Button
-            icon="sparkles"
-            onClick={() => navigate(`/new?prompt=搜索具身智能方向${label}`)}
-          >
-            AI 搜索
-          </Button>
-        }
+        primaryLabel="AI 搜索"
+        primaryIcon="sparkles"
+        onPrimary={() => navigate(`/new?prompt=搜索具身智能方向${label}`)}
       />
       <FilterBar
         query={controller.query}
@@ -835,6 +819,7 @@ function AcademicCardList({ kind }) {
                   ? item.authors.join("、")
                   : item.inventors.join("、")}
               </p>
+              <p className="s4-academic-summary">{item.summary}</p>
               <span>
                 {kind === "papers"
                   ? item.institutions.join(" · ")

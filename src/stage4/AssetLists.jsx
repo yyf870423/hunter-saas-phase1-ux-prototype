@@ -18,6 +18,11 @@ import {
   useToast,
 } from "./asset-ui";
 import {
+  CandidateFilterBar,
+  FavoritePickerModal,
+  candidateFilterDefaults,
+} from "./CandidateFilters";
+import {
   candidates,
   companies,
   contacts,
@@ -46,13 +51,8 @@ const configs = {
       "industries",
     ],
     placeholder: "搜索姓名、公司、职位、技能、经历或原始简历内容",
-    filters: [
-      ["公司", ["星澜机器人", "拓界机器人", "灵跃科技", "上海人工智能实验室"]],
-      ["地点", ["北京", "上海", "深圳", "杭州", "广州"]],
-      ["学历", ["本科", "硕士", "博士"]],
-      ["行业", ["人工智能", "机器人", "智能制造"]],
-      ["收藏夹", ["VLA 重点人才", "本周联系", "长期观察"]],
-    ],
+    candidateFilters: true,
+    filters: [],
     defaultHidden: [],
     stickyEdges: true,
     tableMinWidth: 1600,
@@ -300,6 +300,14 @@ export function AssetListPage({ type }) {
   const [filterValues, setFilterValues] = useState(() =>
     Object.fromEntries(config.filters.map(([label]) => [label, []])),
   );
+  const [candidateFilters, setCandidateFilters] = useState(
+    candidateFilterDefaults,
+  );
+  const [candidateFolders, setCandidateFolders] = useState(() =>
+    Object.fromEntries(
+      candidates.map((candidate) => [candidate.id, candidate.folders]),
+    ),
+  );
   const [visibleColumns, setVisibleColumns] = useState(
     config.columns
       .filter(
@@ -312,38 +320,125 @@ export function AssetListPage({ type }) {
       .map((column) => column.key),
   );
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const filtered = useMemo(
+  const [favoritePickerOpen, setFavoritePickerOpen] = useState(false);
+  const candidateRows = useMemo(
     () =>
-      controller.filtered.filter((row) =>
-        config.filters.every(([label]) => {
-          const values = filterValues[label];
-          if (!values?.length) return true;
-          const key = {
-            公司: "company",
-            地点: "location",
-            学历: "education",
-            行业: "industries",
-            收藏夹: "folders",
-            招聘状态: "status",
-            状态: "status",
-            类别: "categories",
-          }[label];
-          const cell = row[key];
-          return values.some((value) =>
-            Array.isArray(cell)
-              ? cell.includes(value)
-              : String(cell || "").includes(value),
-          );
-        }),
-      ),
-    [config.filters, controller.filtered, filterValues],
+      controller.filtered.map((row) => ({
+        ...row,
+        folders: candidateFolders[row.id] || [],
+      })),
+    [candidateFolders, controller.filtered],
   );
+  const filtered = useMemo(() => {
+    if (type === "candidates") {
+      return candidateRows.filter((row) => {
+        if (
+          candidateFilters.companies.length &&
+          !candidateFilters.companies.includes(row.company)
+        )
+          return false;
+        if (
+          candidateFilters.industries.length &&
+          !candidateFilters.industries.some((item) =>
+            row.industries.includes(item),
+          )
+        )
+          return false;
+        if (
+          candidateFilters.education.length &&
+          !candidateFilters.education.includes(row.education)
+        )
+          return false;
+        if (
+          candidateFilters.locations.length &&
+          !candidateFilters.locations.includes(row.location)
+        )
+          return false;
+        if (candidateFilters.opportunity.length) {
+          const statuses = candidateFilters.opportunity.map(
+            (item) => item.split(" · ")[0],
+          );
+          if (!statuses.includes(row.opportunityStatus)) return false;
+        }
+        if (candidateFilters.pipeline === "在流程中" && !row.pipelineActive)
+          return false;
+        if (candidateFilters.pipeline === "不在流程中" && row.pipelineActive)
+          return false;
+        if (
+          candidateFilters.title.trim() &&
+          !row.title
+            .toLowerCase()
+            .includes(candidateFilters.title.trim().toLowerCase())
+        )
+          return false;
+        if (candidateFilters.favorite === "favorited" && !row.folders.length)
+          return false;
+        if (candidateFilters.favorite === "unfiled" && row.folders.length)
+          return false;
+        if (candidateFilters.favorite.startsWith("folder:")) {
+          const path = candidateFilters.favorite.slice("folder:".length);
+          if (
+            !row.folders.some(
+              (folder) => folder === path || folder.startsWith(`${path}/`),
+            )
+          )
+            return false;
+        }
+        if (
+          candidateFilters.yearsMin &&
+          Number.parseInt(row.experience, 10) <
+            Number.parseInt(candidateFilters.yearsMin, 10)
+        )
+          return false;
+        if (
+          candidateFilters.ageMin &&
+          row.age < Number.parseInt(candidateFilters.ageMin, 10)
+        )
+          return false;
+        if (
+          candidateFilters.ageMax &&
+          row.age > Number.parseInt(candidateFilters.ageMax, 10)
+        )
+          return false;
+        return true;
+      });
+    }
+    return controller.filtered.filter((row) =>
+      config.filters.every(([label]) => {
+        const values = filterValues[label];
+        if (!values?.length) return true;
+        const key = {
+          公司: "company",
+          地点: "location",
+          学历: "education",
+          行业: "industries",
+          收藏夹: "folders",
+          招聘状态: "status",
+          状态: "status",
+          类别: "categories",
+        }[label];
+        const cell = row[key];
+        return values.some((value) =>
+          Array.isArray(cell)
+            ? cell.includes(value)
+            : String(cell || "").includes(value),
+        );
+      }),
+    );
+  }, [
+    candidateFilters,
+    candidateRows,
+    config.filters,
+    controller.filtered,
+    filterValues,
+    type,
+  ]);
   const pages = Math.max(1, Math.ceil(filtered.length / 6));
   const filteredRows = filtered.slice(
     (controller.page - 1) * 6,
     controller.page * 6,
   );
-  useEffect(() => controller.setPage(1), [filterValues]);
+  useEffect(() => controller.setPage(1), [candidateFilters, filterValues]);
   const filterConfigs = config.filters.map(([label, options]) => ({
     label,
     value: filterValues[label],
@@ -362,25 +457,36 @@ export function AssetListPage({ type }) {
         count={filtered.length}
         primaryLabel={`新建${config.title}`}
         onPrimary={() => navigate(`/${type}/new`)}
-        actions={
-          <Button icon="upload" onClick={() => navigate("/data/imports")}>
-            导入
-          </Button>
-        }
       />
-      <FilterBar
-        query={controller.query}
-        setQuery={controller.setQuery}
-        placeholder={config.placeholder}
-        filters={filterConfigs}
-        trailing={
-          <ColumnMenu
-            columns={config.columns}
-            visible={visibleColumns}
-            onChange={setVisibleColumns}
-          />
-        }
-      />
+      {type === "candidates" ? (
+        <CandidateFilterBar
+          query={controller.query}
+          setQuery={controller.setQuery}
+          values={candidateFilters}
+          setValues={setCandidateFilters}
+          columnMenu={
+            <ColumnMenu
+              columns={config.columns}
+              visible={visibleColumns}
+              onChange={setVisibleColumns}
+            />
+          }
+        />
+      ) : (
+        <FilterBar
+          query={controller.query}
+          setQuery={controller.setQuery}
+          placeholder={config.placeholder}
+          filters={filterConfigs}
+          trailing={
+            <ColumnMenu
+              columns={config.columns}
+              visible={visibleColumns}
+              onChange={setVisibleColumns}
+            />
+          }
+        />
+      )}
       <BulkBar
         count={controller.selected.size}
         onClear={() => controller.setSelected(new Set())}
@@ -388,9 +494,8 @@ export function AssetListPage({ type }) {
         {type === "candidates" ? (
           <Button
             size="sm"
-            onClick={() =>
-              notify(`已为 ${controller.selected.size} 位候选人添加到收藏夹`)
-            }
+            icon="folder"
+            onClick={() => setFavoritePickerOpen(true)}
           >
             加入收藏夹
           </Button>
@@ -466,6 +571,27 @@ export function AssetListPage({ type }) {
         onConfirm={() => {
           notify(`“${deleteTarget?.name || deleteTarget?.title}”已进入回收站`);
           setDeleteTarget(null);
+        }}
+      />
+      <FavoritePickerModal
+        open={favoritePickerOpen}
+        count={controller.selected.size}
+        close={() => setFavoritePickerOpen(false)}
+        onConfirm={(folders) => {
+          setCandidateFolders((current) => {
+            const next = { ...current };
+            controller.selected.forEach((candidateId) => {
+              next[candidateId] = [
+                ...new Set([...(next[candidateId] || []), ...folders]),
+              ];
+            });
+            return next;
+          });
+          notify(
+            `已将 ${controller.selected.size} 位候选人加入 ${folders.length} 个收藏夹`,
+          );
+          controller.setSelected(new Set());
+          setFavoritePickerOpen(false);
         }}
       />
     </div>

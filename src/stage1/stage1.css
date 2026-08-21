@@ -2833,6 +2833,7 @@ input:focus-visible {
     gap: 6px;
   }
   .s1-topbar-actions .s1-new-menu-wrap,
+  .s1-topbar-actions .s1-global-import,
   .s1-topbar-actions > .s1-icon-button:first-of-type {
     display: none;
   }

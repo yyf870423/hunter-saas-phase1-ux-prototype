@@ -107,6 +107,7 @@ export function SelectMenu({
   onChange,
   multiple = false,
   searchable = false,
+  creatable = false,
   className = "",
 }) {
   const [open, setOpen] = useState(false);
@@ -176,10 +177,29 @@ export function SelectMenu({
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder={`搜索${label}`}
+                onKeyDown={(event) => {
+                  if (
+                    event.key === "Enter" &&
+                    creatable &&
+                    query.trim() &&
+                    !values.includes(query.trim())
+                  ) {
+                    event.preventDefault();
+                    choose(query.trim());
+                    setQuery("");
+                  }
+                }}
+                placeholder={
+                  creatable ? `输入${label}后按 Enter 添加` : `搜索${label}`
+                }
                 autoFocus
               />
             </label>
+          ) : null}
+          {creatable && query.trim() && !visible.includes(query.trim()) ? (
+            <div className="s4-select-create-hint">
+              按 Enter 添加“{query.trim()}”
+            </div>
           ) : null}
           <div className="s4-select-options">
             {visible.map((option) => (

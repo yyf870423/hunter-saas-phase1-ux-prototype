@@ -89,6 +89,9 @@ const paths = {
     "M8 15h4",
     "M8 19h4",
   ],
+  folder: [
+    "M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2h6.5A2.5 2.5 0 0 1 21 9.5v7a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16.5Z",
+  ],
   briefcase: ["M9 6V4h6v2", "M3 7h18v14H3Z", "M3 12h18", "M10 12v2h4v-2"],
   message: [
     "M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z",
@@ -147,6 +150,7 @@ export function Icon({ name, size = 18, className = "", label }) {
       strokeLinejoin="round"
       aria-hidden={label ? undefined : true}
       role={label ? "img" : undefined}
+      data-icon={name}
     >
       {label && <title>{label}</title>}
       {lines.map((d, index) => (

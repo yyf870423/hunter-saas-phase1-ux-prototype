@@ -24,6 +24,47 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
       page.getByRole("columnheader", { name: heading, exact: true }),
     ).toBeVisible();
   }
+  for (const filter of [
+    "公司",
+    "行业",
+    "学历",
+    "地点",
+    "机会情况",
+    "流程状态",
+    "收藏夹",
+  ]) {
+    await expect(
+      page.getByRole("button", { name: filter, exact: true }),
+    ).toBeVisible();
+  }
+  await expect(page.getByLabel("职位筛选")).toBeVisible();
+  await expect(page.getByLabel("最低工作年限")).toBeVisible();
+  await expect(page.getByLabel("最低年龄")).toBeVisible();
+  await expect(page.getByLabel("最高年龄")).toBeVisible();
+
+  await page.getByRole("button", { name: "行业", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "AI/互联网/IT" }),
+  ).toBeVisible();
+  await page.getByRole("checkbox", { name: "具身智能与机器人" }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "行业 · 1" })).toBeVisible();
+  await page.getByRole("button", { name: "行业 · 1" }).click();
+
+  await page.getByRole("button", { name: "收藏夹", exact: true }).click();
+  await expect(page.getByRole("radio", { name: /重点岗位人才/ })).toBeVisible();
+  await expect(
+    page.getByRole("radio", { name: /VLA 算法负责人/ }),
+  ).toBeVisible();
+  await page.getByRole("radio", { name: /VLA 算法负责人/ }).click();
+  await expect(
+    page
+      .locator(".s4-favorite-filter > button")
+      .getByText("VLA 算法负责人", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "收藏夹：VLA 算法负责人", exact: true })
+    .click();
   const tableWrap = page.locator(".s4-table-wrap");
   const beforeScroll = await tableWrap.evaluate((element) => {
     const name = element.querySelector("th.s4-data-col-name");
@@ -91,6 +132,22 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
   await page.getByLabel("设置显示列").click();
   await page.getByRole("checkbox", { name: "学历" }).click();
   await page.keyboard.press("Escape");
+
+  await page
+    .locator("tbody .s4-select-cell")
+    .getByRole("checkbox")
+    .first()
+    .click();
+  await page.getByRole("button", { name: "加入收藏夹" }).click();
+  const favoriteModal = page.getByRole("dialog", { name: "加入收藏夹" });
+  await expect(favoriteModal).toBeVisible();
+  await favoriteModal
+    .getByRole("button", { name: "展开VLA 算法负责人" })
+    .click();
+  await favoriteModal.getByRole("checkbox", { name: /优先联系/ }).click();
+  await favoriteModal.getByRole("checkbox", { name: /星澜机器人/ }).click();
+  await favoriteModal.getByRole("button", { name: "确认加入" }).click();
+  await expect(page.getByText(/已将 1 位候选人加入 2 个收藏夹/)).toBeVisible();
 
   await page.getByRole("button", { name: /林昊/ }).first().click();
   await expect(page).toHaveURL(/#\/candidates\/candidate-linhao$/);
@@ -199,6 +256,25 @@ test("阶段四次级控件不是装饰按钮", async ({ page }) => {
   await expect(page).toHaveURL(/candidates\/candidate-linhao/);
 });
 
+test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
+  await page.goto("#/papers");
+  const paperSummaries = page.locator(".s4-academic-summary");
+  await expect(paperSummaries).toHaveCount(4);
+  expect((await paperSummaries.first().textContent()).length).toBeGreaterThan(
+    70,
+  );
+  await expect(
+    page.locator(".s4-page-header").getByRole("button", { name: /导入/ }),
+  ).toHaveCount(0);
+
+  await page.goto("#/patents");
+  const patentSummaries = page.locator(".s4-academic-summary");
+  await expect(patentSummaries).toHaveCount(3);
+  expect((await patentSummaries.first().textContent()).length).toBeGreaterThan(
+    60,
+  );
+});
+
 test("论文作者身份和专利发明人身份使用同一审核边界", async ({ page }) => {
   await page.goto("#/papers/paper-vla-survey");
   await page.getByRole("button", { name: "审核作者身份" }).click();
@@ -221,6 +297,11 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
 
 test("导入、导出和回收站覆盖异步、重名和恢复冲突", async ({ page }) => {
   await page.goto("#/data/imports?type=mapping");
+  await expect(
+    page
+      .getByRole("button", { name: "新建导入" })
+      .locator('[data-icon="download"]'),
+  ).toBeVisible();
   const modal = page.getByRole("dialog", { name: "导入业务数据" });
   await modal.locator('input[type="file"]').setInputFiles({
     name: "具身智能 VLA 核心人才版图.xlsx",
@@ -239,6 +320,11 @@ test("导入、导出和回收站覆盖异步、重名和恢复冲突", async ({
   ).toBeVisible();
 
   await page.goto("#/data/exports");
+  await expect(
+    page
+      .getByRole("button", { name: "新建导出" })
+      .locator('[data-icon="upload"]'),
+  ).toBeVisible();
   await page.getByRole("button", { name: "新建导出" }).click();
   await page.getByLabel("文件名称").fill("候选人完整导出");
   await page.getByRole("button", { name: "开始生成" }).click();

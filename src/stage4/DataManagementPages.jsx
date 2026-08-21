@@ -89,7 +89,7 @@ export function ImportsPage() {
         title="数据导入"
         description="统一查看解析、查重、审核与写入结果；所有输入路径都会返回明确处理结论。"
         primaryLabel="新建导入"
-        primaryIcon="upload"
+        primaryIcon="download"
         onPrimary={() => setWizardOpen(true)}
         actions={
           <Button onClick={() => navigate("/data/exports")}>数据导出</Button>
@@ -427,7 +427,7 @@ export function ExportsPage() {
         title="数据导出"
         description="创建导出任务并管理限时下载文件。"
         primaryLabel="新建导出"
-        primaryIcon="download"
+        primaryIcon="upload"
         onPrimary={() => setCreateOpen(true)}
         actions={
           <Button onClick={() => navigate("/data/imports")}>数据导入</Button>
