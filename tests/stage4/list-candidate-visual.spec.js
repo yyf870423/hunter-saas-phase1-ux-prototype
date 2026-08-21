@@ -80,6 +80,66 @@ test("候选人创建、详情、审核与异常状态视觉完整", async ({ pa
   await assertNoConsoleErrors();
 });
 
+test("公司、联系人和招聘机会详情遵循分区编辑与完整岗位交互", async ({
+  page,
+}) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  await page.goto("#/companies/company-xinglan");
+  await expectNoHorizontalOverflow(page);
+  await page.screenshot({
+    path: `${output}/company-detail-section-editing.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "编辑基本资料" }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/company-basic-editor-aliases.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "取消" }).click();
+
+  await page.goto("#/companies/new");
+  await page.getByRole("button", { name: /公司调研/ }).click();
+  await page.screenshot({
+    path: `${output}/company-create-agent-composer.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/contacts/contact-chenyu");
+  await page.screenshot({
+    path: `${output}/contact-detail-section-editing.png`,
+    fullPage: true,
+  });
+  await page.goto("#/contacts/contact-chenyu?tab=timeline");
+  await page.screenshot({
+    path: `${output}/contact-timeline-crud.png`,
+    fullPage: true,
+  });
+
+  await page.goto("#/opportunities/opportunity-xinglan");
+  await page.screenshot({
+    path: `${output}/opportunity-detail-section-editing.png`,
+    fullPage: true,
+  });
+  await page.goto("#/opportunities/opportunity-xinglan?tab=directions");
+  await page.getByRole("button", { name: "形成岗位" }).first().click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: `${output}/opportunity-create-position-complete-jd.png`,
+    fullPage: true,
+  });
+  await page.getByRole("tab", { name: "关联已有岗位" }).click();
+  await page.locator(".s4-existing-position-flow .s4-select > button").click();
+  await page.getByRole("button", { name: "运动控制算法专家" }).click();
+  await page.screenshot({
+    path: `${output}/opportunity-link-existing-position.png`,
+    fullPage: true,
+  });
+  await assertNoConsoleErrors();
+});
+
 test("公共时间选择器展开态符合统一设计语言", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 900 });

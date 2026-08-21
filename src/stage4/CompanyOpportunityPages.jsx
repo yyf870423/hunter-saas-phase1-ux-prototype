@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { Composer } from "../stage2/automation-ui";
 import {
   ActivityTimeline,
   AssetPageHeader,
@@ -95,45 +96,52 @@ function CompactRelationTable({ type, rows, onOpen }) {
   );
 }
 
-function CompanyProfile({ onEdit }) {
+const companyCopySections = [
+  ["intro", "公司简介"],
+  ["financing", "融资、上市与市值"],
+  ["advantages", "公司优势与人才吸引点"],
+  ["benefits", "一般薪资与福利"],
+  ["interview", "一般面试流程"],
+  ["bases", "Base 地点与业务"],
+  ["requirements", "其他招聘要求"],
+  ["note", "用户备注"],
+];
+
+function CompanyProfile({ data, onEditSection }) {
   return (
     <div className="s4-detail-stack">
       <FieldGroup
         title="公司基本资料"
         action={
-          <Button size="sm" icon="edit" onClick={onEdit}>
-            编辑资料
+          <Button size="sm" icon="edit" onClick={() => onEditSection("basic")}>
+            编辑基本资料
           </Button>
         }
       >
         <DefinitionGrid
           items={[
-            ["公司名称", companyDetail.name],
-            ["官网", companyDetail.website],
-            ["总部与主要地点", companyDetail.location],
-            ["行业", <TagList items={companyDetail.industries} />],
-            [
-              "已确认名称变体",
-              <TagList items={companyDetail.aliases} tone="info" />,
-            ],
+            ["公司名称", data.name],
+            ["官网", data.website],
+            ["总部与主要地点", data.location],
+            ["行业", <TagList items={data.industries} />],
+            ["已确认名称变体", <TagList items={data.aliases} tone="info" />],
             ["最近更新", "今天 · 用户确认"],
           ]}
         />
       </FieldGroup>
-      {[
-        ["公司简介", companyDetail.intro],
-        ["融资、上市与市值", companyDetail.financing],
-        ["公司优势与人才吸引点", companyDetail.advantages],
-        ["一般薪资与福利", companyDetail.benefits],
-        ["一般面试流程", companyDetail.interview],
-        ["Base 地点与业务", companyDetail.bases],
-        ["其他招聘要求", companyDetail.requirements],
-        ["用户备注", companyDetail.note],
-      ].map(([title, value]) => (
-        <FieldGroup key={title} title={title}>
+      {companyCopySections.map(([key, title]) => (
+        <FieldGroup
+          key={key}
+          title={title}
+          action={
+            <Button size="sm" icon="edit" onClick={() => onEditSection(key)}>
+              编辑
+            </Button>
+          }
+        >
           <div className="s4-rich-company-copy">
-            {value.split("\n").map((line) => (
-              <p key={line}>{line}</p>
+            {(data[key] || "—").split("\n").map((line, index) => (
+              <p key={`${key}-${index}`}>{line}</p>
             ))}
           </div>
         </FieldGroup>
@@ -316,85 +324,99 @@ function CompanyRelated() {
   );
 }
 
-function CompanyEditor({ open, close }) {
+function CompanySectionEditor({ section, data, close, onSave }) {
   const notify = useToast();
-  const [name, setName] = useState(companyDetail.name);
-  const [intro, setIntro] = useState(companyDetail.intro);
-  const [industries, setIndustries] = useState(companyDetail.industries);
+  const [name, setName] = useState(data.name);
+  const [website, setWebsite] = useState(data.website);
+  const [location, setLocation] = useState(data.location);
+  const [industries, setIndustries] = useState(data.industries);
+  const [aliases, setAliases] = useState(data.aliases);
+  const [copy, setCopy] = useState("");
+  const sectionTitle =
+    section === "basic"
+      ? "公司基本资料"
+      : companyCopySections.find(([key]) => key === section)?.[1] || "公司资料";
+
+  useEffect(() => {
+    setName(data.name);
+    setWebsite(data.website);
+    setLocation(data.location);
+    setIndustries(data.industries);
+    setAliases(data.aliases);
+    setCopy(section && section !== "basic" ? data[section] || "" : "");
+  }, [data, section]);
+
+  const save = () => {
+    const patch =
+      section === "basic"
+        ? { name, website, location, industries, aliases }
+        : { [section]: copy };
+    onSave(patch);
+    close();
+    notify(`${sectionTitle}已保存`);
+  };
   return (
     <Modal
-      open={open}
+      open={Boolean(section)}
       close={close}
-      size="xl"
-      title="编辑公司资料"
-      description="用户备注不会被 Agent 或文件建议覆盖"
+      size={section === "basic" ? "xl" : "lg"}
+      title={`编辑${sectionTitle}`}
+      description={
+        section === "note"
+          ? "用户备注不会被 Agent 或文件建议覆盖"
+          : "本次修改只影响当前资料分组"
+      }
       footer={
         <>
           <Button onClick={close}>取消</Button>
           <Button
             tone="primary"
-            onClick={() => {
-              close();
-              notify("公司资料已保存");
-            }}
+            onClick={save}
+            disabled={section === "basic" && !name.trim()}
           >
             保存修改
           </Button>
         </>
       }
     >
-      <div className="s4-form-grid">
-        <FormField label="公司名称" required>
-          <TextInput value={name} onChange={setName} />
+      {section === "basic" ? (
+        <div className="s4-form-grid">
+          <FormField label="公司名称" required>
+            <TextInput value={name} onChange={setName} />
+          </FormField>
+          <FormField label="官网">
+            <TextInput value={website} onChange={setWebsite} />
+          </FormField>
+          <FormField label="总部与主要地点">
+            <TextInput value={location} onChange={setLocation} />
+          </FormField>
+          <FormField label="行业标签">
+            <IndustryCascade value={industries} onChange={setIndustries} />
+          </FormField>
+          <FormField
+            label="已确认名称变体"
+            span={2}
+            help="输入名称后按 Enter 添加，可删除不再使用的变体。"
+          >
+            <SelectMenu
+              label="名称变体"
+              value={aliases}
+              options={aliases}
+              onChange={setAliases}
+              multiple
+              searchable
+              creatable
+            />
+            <div className="s4-editor-tag-preview">
+              <TagList items={aliases} tone="info" />
+            </div>
+          </FormField>
+        </div>
+      ) : (
+        <FormField label={sectionTitle} required={section !== "note"}>
+          <TextArea value={copy} onChange={setCopy} rows={9} />
         </FormField>
-        <FormField label="行业标签">
-          <IndustryCascade value={industries} onChange={setIndustries} />
-        </FormField>
-        <FormField label="公司简介" span={2}>
-          <TextArea value={intro} onChange={setIntro} rows={5} />
-        </FormField>
-        <FormField label="融资、上市与市值" span={2}>
-          <TextArea
-            value={companyDetail.financing}
-            onChange={() => {}}
-            rows={4}
-          />
-        </FormField>
-        <FormField label="公司优势与人才吸引点" span={2}>
-          <TextArea
-            value={companyDetail.advantages}
-            onChange={() => {}}
-            rows={4}
-          />
-        </FormField>
-        <FormField label="一般薪资与福利" span={2}>
-          <TextArea
-            value={companyDetail.benefits}
-            onChange={() => {}}
-            rows={4}
-          />
-        </FormField>
-        <FormField label="一般面试流程" span={2}>
-          <TextArea
-            value={companyDetail.interview}
-            onChange={() => {}}
-            rows={4}
-          />
-        </FormField>
-        <FormField label="Base 地点与业务" span={2}>
-          <TextArea value={companyDetail.bases} onChange={() => {}} rows={5} />
-        </FormField>
-        <FormField label="其他招聘要求" span={2}>
-          <TextArea
-            value={companyDetail.requirements}
-            onChange={() => {}}
-            rows={4}
-          />
-        </FormField>
-        <FormField label="用户备注" span={2}>
-          <TextArea value={companyDetail.note} onChange={() => {}} rows={4} />
-        </FormField>
-      </div>
+      )}
     </Modal>
   );
 }
@@ -407,7 +429,11 @@ export function CompanyDetailPage() {
   const tab = params.get("tab") || "profile";
   const isDraft = params.get("state") === "draft";
   const item = companies.find((company) => company.id === companyId);
-  const [editOpen, setEditOpen] = useState(false);
+  const [editingSection, setEditingSection] = useState(null);
+  const [profileData, setProfileData] = useState(() => ({
+    ...companyDetail,
+    ...item,
+  }));
   const [deleteOpen, setDeleteOpen] = useState(false);
   if (!item)
     return <NotFoundState label="公司" onBack={() => navigate("/companies")} />;
@@ -424,8 +450,8 @@ export function CompanyDetailPage() {
     <div className="s4-detail-page">
       <DetailHeader
         icon="building"
-        title={detail.name}
-        subtitle={`${detail.location} · ${detail.industries.join(" / ")}`}
+        title={profileData.name}
+        subtitle={`${profileData.location} · ${profileData.industries.join(" / ")}`}
         badges={
           isDraft
             ? [
@@ -438,7 +464,6 @@ export function CompanyDetailPage() {
               ]
         }
         onBack={() => navigate("/companies")}
-        onEdit={tab === "profile" ? () => setEditOpen(true) : undefined}
         onDelete={isDraft ? undefined : () => setDeleteOpen(true)}
       >
         {isDraft ? (
@@ -467,11 +492,6 @@ export function CompanyDetailPage() {
           icon="warning"
           title="文件解析结果等待确认"
           description="检查并编辑每个字段后再创建公司；当前草稿不会出现在正式公司列表和关联关系中。"
-          action={
-            <Button size="sm" icon="edit" onClick={() => setEditOpen(true)}>
-              编辑草稿
-            </Button>
-          }
         />
       ) : (
         <DetailTabs
@@ -481,19 +501,26 @@ export function CompanyDetailPage() {
         />
       )}
       {tab === "profile" ? (
-        <CompanyProfile onEdit={() => setEditOpen(true)} />
+        <CompanyProfile data={profileData} onEditSection={setEditingSection} />
       ) : null}
       {tab === "recruiting" ? <CompanyRecruiting /> : null}
       {tab === "contacts" ? <CompanyContacts /> : null}
       {tab === "talents" ? <CompanyTalents /> : null}
       {tab === "mappings" ? <CompanyMappings /> : null}
       {tab === "work" ? <CompanyRelated /> : null}
-      <CompanyEditor open={editOpen} close={() => setEditOpen(false)} />
+      <CompanySectionEditor
+        section={editingSection}
+        data={profileData}
+        close={() => setEditingSection(null)}
+        onSave={(patch) =>
+          setProfileData((current) => ({ ...current, ...patch }))
+        }
+      />
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
         assetLabel="公司"
-        assetName={detail.name}
+        assetName={profileData.name}
         impact="联系人、招聘机会、岗位、候选人和人才版图不会删除；原始公司文本继续保留。"
         onConfirm={() => {
           setDeleteOpen(false);
@@ -619,6 +646,126 @@ function ContactEditor({ open, close, company = "" }) {
   );
 }
 
+function ContactSectionEditor({ section, contact, close, onSave }) {
+  const notify = useToast();
+  const [name, setName] = useState(contact.name);
+  const [region, setRegion] = useState(contact.region);
+  const [categories, setCategories] = useState(contact.categories);
+  const [phone, setPhone] = useState(contact.phone);
+  const [email, setEmail] = useState(contact.email);
+  const [company, setCompany] = useState(contact.company);
+  const [role, setRole] = useState(contact.role);
+  const [relationStatus, setRelationStatus] = useState("当前");
+  const [primary, setPrimary] = useState(true);
+
+  useEffect(() => {
+    setName(contact.name);
+    setRegion(contact.region);
+    setCategories(contact.categories);
+    setPhone(contact.phone);
+    setEmail(contact.email);
+    setCompany(contact.company);
+    setRole(contact.role);
+    setRelationStatus("当前");
+    setPrimary(true);
+  }, [contact, section]);
+
+  const save = () => {
+    onSave(
+      section === "basic"
+        ? { name, region, categories, phone, email }
+        : { company, role },
+    );
+    close();
+    notify(section === "basic" ? "联系人基本资料已保存" : "公司关系已保存");
+  };
+
+  return (
+    <Modal
+      open={Boolean(section)}
+      close={close}
+      size="lg"
+      title={section === "basic" ? "编辑联系人资料" : "编辑公司关系"}
+      description="本次修改只影响当前资料分组"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            onClick={save}
+            disabled={section === "basic" && !name.trim()}
+          >
+            保存修改
+          </Button>
+        </>
+      }
+    >
+      {section === "basic" ? (
+        <div className="s4-form-grid">
+          <FormField label="姓名或明确称呼" required>
+            <TextInput value={name} onChange={setName} />
+          </FormField>
+          <FormField label="所在地区">
+            <TextInput value={region} onChange={setRegion} />
+          </FormField>
+          <FormField label="类别" span={2}>
+            <SelectMenu
+              label="联系人类别"
+              value={categories}
+              options={[
+                "客户 HR",
+                "招聘负责人",
+                "投资人",
+                "顾问",
+                "中间介绍人",
+                "行业关系人",
+              ]}
+              onChange={setCategories}
+              multiple
+            />
+          </FormField>
+          <FormField label="手机">
+            <TextInput value={phone} onChange={setPhone} />
+          </FormField>
+          <FormField label="邮箱">
+            <TextInput value={email} onChange={setEmail} />
+          </FormField>
+        </div>
+      ) : (
+        <div className="s4-form-grid">
+          <FormField label="正式公司">
+            <SelectMenu
+              label="选择公司"
+              value={company}
+              options={companies.map((item) => item.name)}
+              onChange={setCompany}
+              searchable
+            />
+          </FormField>
+          <FormField label="职位或角色">
+            <TextInput value={role} onChange={setRole} />
+          </FormField>
+          <FormField label="关系状态">
+            <SelectMenu
+              label="关系状态"
+              value={relationStatus}
+              options={["当前", "历史"]}
+              onChange={setRelationStatus}
+            />
+          </FormField>
+          <FormField label="主要归属">
+            <CustomCheckbox
+              checked={primary}
+              onChange={setPrimary}
+              label="作为联系人默认展示的公司"
+            />
+          </FormField>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
 export function ContactDetailPage() {
   const { contactId } = useParams();
   const navigate = useNavigate();
@@ -626,8 +773,27 @@ export function ContactDetailPage() {
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") || "profile";
   const item = contacts.find((contact) => contact.id === contactId);
-  const [editOpen, setEditOpen] = useState(false);
+  const [editingSection, setEditingSection] = useState(null);
+  const [profile, setProfile] = useState(() => ({ ...item }));
   const [noteOpen, setNoteOpen] = useState(false);
+  const [note, setNote] = useState("");
+  const [editingNote, setEditingNote] = useState(null);
+  const [deleteNote, setDeleteNote] = useState(null);
+  const [timeline, setTimeline] = useState([
+    [
+      "昨天 18:20",
+      "邮件回复",
+      "确认 VLA 负责人岗位仍在招聘，希望先看 3 位高匹配候选人。",
+      item?.email || item?.name,
+    ],
+    [
+      "08-19 10:30",
+      "电话沟通",
+      "客户更关注真机数据闭环，纯研究背景优先级较低。",
+      "沈岚",
+    ],
+    ["08-12 14:10", "人工备注", "由启程资本刘健引荐，已完成首次沟通。", "沈岚"],
+  ]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   if (!item)
     return (
@@ -642,19 +808,12 @@ export function ContactDetailPage() {
     <div className="s4-detail-page">
       <DetailHeader
         icon="user"
-        title={item.name}
-        subtitle={`${item.company} · ${item.role}`}
-        badges={item.categories.map((label) => ({ label, tone: "info" }))}
+        title={profile.name}
+        subtitle={`${profile.company} · ${profile.role}`}
+        badges={profile.categories.map((label) => ({ label, tone: "info" }))}
         onBack={() => navigate("/contacts")}
-        onEdit={() => setEditOpen(true)}
         onDelete={() => setDeleteOpen(true)}
-      >
-        {tab === "timeline" ? (
-          <Button icon="plus" onClick={() => setNoteOpen(true)}>
-            添加沟通记录
-          </Button>
-        ) : null}
-      </DetailHeader>
+      />
       <DetailTabs
         tabs={contactTabs}
         value={tab}
@@ -662,24 +821,46 @@ export function ContactDetailPage() {
       />
       {tab === "profile" ? (
         <div className="s4-detail-stack">
-          <FieldGroup title="基本资料">
+          <FieldGroup
+            title="基本资料"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditingSection("basic")}
+              >
+                编辑联系方式
+              </Button>
+            }
+          >
             <DefinitionGrid
               items={[
-                ["姓名", item.name],
-                ["地区", item.region],
-                ["类别", <TagList items={item.categories} />],
-                ["手机", item.phone || "—"],
-                ["邮箱", item.email || "—"],
-                ["最近沟通", item.lastContact],
+                ["姓名", profile.name],
+                ["地区", profile.region],
+                ["类别", <TagList items={profile.categories} />],
+                ["手机", profile.phone || "—"],
+                ["邮箱", profile.email || "—"],
+                ["最近沟通", profile.lastContact],
               ]}
             />
           </FieldGroup>
-          <FieldGroup title="公司关系">
+          <FieldGroup
+            title="公司关系"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditingSection("company")}
+              >
+                编辑公司关系
+              </Button>
+            }
+          >
             <div className="s4-contact-company-relations">
               <article>
                 <span>
-                  <b>{item.company}</b>
-                  <small>{item.role} · 当前</small>
+                  <b>{profile.company}</b>
+                  <small>{profile.role} · 当前</small>
                 </span>
                 <StatusBadge tone="success">主要归属</StatusBadge>
                 <button
@@ -689,7 +870,7 @@ export function ContactDetailPage() {
                   查看公司
                 </button>
               </article>
-              {item.id === "contact-liujian" ? (
+              {profile.id === "contact-liujian" ? (
                 <article>
                   <span>
                     <b>远望创投</b>
@@ -724,28 +905,31 @@ export function ContactDetailPage() {
       ) : null}
       {tab === "timeline" ? (
         <div className="s4-detail-stack">
-          <FieldGroup title="跟进与沟通">
+          <FieldGroup
+            title="跟进与沟通"
+            description="真实沟通只保存一次；公司、机会和业务主线通过引用显示。"
+            action={
+              <Button
+                size="sm"
+                icon="plus"
+                onClick={() => {
+                  setEditingNote(null);
+                  setNote("");
+                  setNoteOpen(true);
+                }}
+              >
+                添加沟通记录
+              </Button>
+            }
+          >
             <ActivityTimeline
-              items={[
-                [
-                  "昨天 18:20",
-                  "邮件回复",
-                  "确认 VLA 负责人岗位仍在招聘，希望先看 3 位高匹配候选人。",
-                  item.email || item.name,
-                ],
-                [
-                  "08-19 10:30",
-                  "电话沟通",
-                  "客户更关注真机数据闭环，纯研究背景优先级较低。",
-                  "沈岚",
-                ],
-                [
-                  "08-12 14:10",
-                  "人工备注",
-                  "由启程资本刘健引荐，已完成首次沟通。",
-                  "沈岚",
-                ],
-              ]}
+              items={timeline}
+              onEdit={(entry, index) => {
+                setEditingNote(index);
+                setNote(entry[2]);
+                setNoteOpen(true);
+              }}
+              onDelete={(_, index) => setDeleteNote(index)}
             />
           </FieldGroup>
         </div>
@@ -770,15 +954,16 @@ export function ContactDetailPage() {
           </FieldGroup>
         </div>
       ) : null}
-      <ContactEditor
-        open={editOpen}
-        close={() => setEditOpen(false)}
-        company={item.company}
+      <ContactSectionEditor
+        section={editingSection}
+        contact={profile}
+        close={() => setEditingSection(null)}
+        onSave={(patch) => setProfile((current) => ({ ...current, ...patch }))}
       />
       <Modal
         open={noteOpen}
         close={() => setNoteOpen(false)}
-        title="添加沟通记录"
+        title={editingNote === null ? "添加沟通记录" : "编辑沟通记录"}
         description="电话、线下和其他人工结果由猎头补录"
         footer={
           <>
@@ -786,8 +971,20 @@ export function ContactDetailPage() {
             <Button
               tone="primary"
               onClick={() => {
+                if (!note.trim()) return;
+                setTimeline((current) =>
+                  editingNote === null
+                    ? [["刚刚", "人工备注", note, "沈岚"], ...current]
+                    : current.map((entry, index) =>
+                        index === editingNote
+                          ? [entry[0], entry[1], note, entry[3]]
+                          : entry,
+                      ),
+                );
                 setNoteOpen(false);
-                notify("沟通记录已添加");
+                notify(
+                  editingNote === null ? "沟通记录已添加" : "沟通记录已更新",
+                );
               }}
             >
               保存
@@ -813,15 +1010,45 @@ export function ContactDetailPage() {
             />
           </FormField>
           <FormField label="沟通内容" span={2}>
-            <TextArea value="" onChange={() => {}} rows={5} />
+            <TextArea value={note} onChange={setNote} rows={5} />
           </FormField>
         </div>
+      </Modal>
+      <Modal
+        open={deleteNote !== null}
+        close={() => setDeleteNote(null)}
+        title="删除沟通记录"
+        description="删除后不会影响联系人资料和其他沟通记录。"
+        footer={
+          <>
+            <Button onClick={() => setDeleteNote(null)}>取消</Button>
+            <Button
+              tone="danger"
+              onClick={() => {
+                setTimeline((current) =>
+                  current.filter((_, index) => index !== deleteNote),
+                );
+                setDeleteNote(null);
+                notify("沟通记录已删除");
+              }}
+            >
+              确认删除
+            </Button>
+          </>
+        }
+      >
+        <StateBanner
+          tone="warning"
+          icon="warning"
+          title="这条沟通记录将被删除"
+          description={deleteNote === null ? "" : timeline[deleteNote]?.[2]}
+        />
       </Modal>
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
         assetLabel="联系人"
-        assetName={item.name}
+        assetName={profile.name}
         impact="公司、招聘机会和业务主线不会删除；真实沟通作为历史引用保留。"
         onConfirm={() => {
           setDeleteOpen(false);
@@ -856,30 +1083,123 @@ function OpportunityDirections({ opportunity }) {
   const navigate = useNavigate();
   const notify = useToast();
   const [convert, setConvert] = useState(null);
-  const directions = [
+  const [manage, setManage] = useState(null);
+  const [unlinkTarget, setUnlinkTarget] = useState(null);
+  const [mode, setMode] = useState("create");
+  const [existingPositionId, setExistingPositionId] = useState("");
+  const [positionName, setPositionName] = useState("");
+  const [location, setLocation] = useState("北京 / 上海");
+  const [experience, setExperience] = useState("5 年及以上");
+  const [education, setEducation] = useState("硕士及以上，能力突出可放宽");
+  const [salary, setSalary] = useState("60 - 90 万 / 年");
+  const [skills, setSkills] = useState([]);
+  const [jd, setJd] = useState("");
+  const [note, setNote] = useState("");
+  const [directions, setDirections] = useState([
     {
+      id: "direction-vla",
       name: "VLA 算法负责人",
       requirement: "VLA、真机部署、团队管理",
       status: "已形成岗位",
       position: "具身智能 VLA 算法负责人",
+      positionId: "position-vla",
     },
     {
+      id: "direction-learning",
       name: "机器人学习工程师",
       requirement: "模仿学习、强化学习、数据闭环",
       status: "待处理",
+      location: "北京 / 上海",
+      experience: "5 年及以上",
+      education: "硕士及以上，能力突出可放宽",
+      salary: "60 - 90 万 / 年",
+      skills: ["模仿学习", "强化学习", "真机部署", "数据闭环"],
+      jd: `岗位职责
+1. 负责机器人模仿学习、强化学习和操作策略的训练、评测与真机部署。
+2. 建设从数据采集、清洗、训练到线上评测的数据闭环，并持续提升复杂操作任务成功率。
+3. 与 VLA、感知、控制和硬件团队协作，推动算法在双臂机器人产品中稳定落地。
+4. 参与关键技术方案评审，沉淀可复用的训练和部署工具。
+
+任职要求
+1. 计算机、自动化、机器人等相关专业硕士及以上学历，能力突出可放宽。
+2. 具备 5 年以上机器人学习、强化学习或模仿学习相关经验。
+3. 有真实机器人部署和数据闭环经验，能够独立定位训练与线上效果问题。
+4. 具备良好的跨团队沟通能力和工程交付意识。`,
     },
     {
+      id: "direction-data",
       name: "数据平台负责人",
       requirement: "机器人数据、MLOps、团队管理",
       status: "已关联岗位",
       position: "机器人数据平台负责人",
+      positionId: "position-platform",
     },
     {
+      id: "direction-simulation",
       name: "仿真平台工程师",
       requirement: "Isaac Sim、Sim2Real、Python",
       status: "待处理",
+      location: "北京",
+      experience: "3 年及以上",
+      education: "本科及以上",
+      salary: "45 - 70 万 / 年",
+      skills: ["Isaac Sim", "Sim2Real", "Python"],
+      jd: `岗位职责
+1. 建设基于 Isaac Sim 的机器人仿真、数据生成和评测环境。
+2. 优化 Sim2Real 流程，支持操作策略快速验证和真机迁移。
+3. 与算法、数据和硬件团队协作，维护可复用的仿真资产与测试工具。
+
+任职要求
+1. 本科及以上学历，具备 3 年以上机器人仿真或相关平台经验。
+2. 熟悉 Isaac Sim、Python 和常用机器人仿真工具。
+3. 有仿真到真机迁移、合成数据或自动评测经验。`,
     },
-  ];
+  ]);
+  const selectedPosition = positions.find(
+    (position) => position.id === existingPositionId,
+  );
+
+  const openConvert = (direction) => {
+    setConvert(direction);
+    setMode("create");
+    setExistingPositionId("");
+    setPositionName(direction.name);
+    setLocation(direction.location || "北京 / 上海");
+    setExperience(direction.experience || "3 年及以上");
+    setEducation(direction.education || "本科及以上");
+    setSalary(direction.salary || "面议");
+    setSkills(direction.skills || []);
+    setJd(direction.jd || "");
+    setNote("");
+  };
+
+  const completeConversion = () => {
+    if (!convert) return;
+    const nextPosition =
+      mode === "create"
+        ? { id: "position-vla", name: positionName }
+        : selectedPosition;
+    if (!nextPosition || (mode === "create" && !jd.trim())) return;
+    setDirections((current) =>
+      current.map((direction) =>
+        direction.id === convert.id
+          ? {
+              ...direction,
+              status: mode === "create" ? "已形成岗位" : "已关联岗位",
+              position: nextPosition.name,
+              positionId: nextPosition.id,
+            }
+          : direction,
+      ),
+    );
+    notify(
+      mode === "create"
+        ? "新岗位已创建并关联到招聘机会"
+        : "已有岗位已关联到招聘机会",
+    );
+    setConvert(null);
+  };
+
   return (
     <div className="s4-detail-stack">
       <StateBanner
@@ -900,7 +1220,7 @@ function OpportunityDirections({ opportunity }) {
       >
         <div className="s4-direction-list">
           {directions.map((item) => (
-            <article key={item.name}>
+            <article key={item.id}>
               <span>
                 <b>{item.name}</b>
                 <p>{item.requirement}</p>
@@ -911,24 +1231,23 @@ function OpportunityDirections({ opportunity }) {
                 {item.status}
               </StatusBadge>
               {item.position ? (
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate(
-                      item.position.includes("VLA")
-                        ? "/positions/position-vla"
-                        : "/positions/position-platform",
-                    )
-                  }
-                >
-                  {item.position}
-                  <Icon name="chevronRight" />
-                </button>
+                <div className="s4-direction-position-actions">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/positions/${item.positionId}`)}
+                  >
+                    {item.position}
+                    <Icon name="chevronRight" />
+                  </button>
+                  <Button size="sm" onClick={() => setManage(item)}>
+                    管理关联
+                  </Button>
+                </div>
               ) : (
                 <Button
                   size="sm"
                   tone="primary"
-                  onClick={() => setConvert(item)}
+                  onClick={() => openConvert(item)}
                 >
                   形成岗位
                 </Button>
@@ -940,49 +1259,341 @@ function OpportunityDirections({ opportunity }) {
       <Modal
         open={Boolean(convert)}
         close={() => setConvert(null)}
-        size="lg"
+        size="xl"
         title={`将“${convert?.name || "招聘方向"}”形成岗位`}
-        description="可以创建新岗位，也可以关联尚无来源机会的已有岗位"
+        description="先补齐并检查岗位资料，再创建新岗位或关联已有岗位"
         footer={
           <>
             <Button onClick={() => setConvert(null)}>取消</Button>
             <Button
               tone="primary"
-              onClick={() => {
-                setConvert(null);
-                notify("岗位已创建并关联到招聘机会");
-              }}
+              disabled={
+                mode === "create"
+                  ? !positionName.trim() || !jd.trim()
+                  : !existingPositionId
+              }
+              onClick={completeConversion}
             >
-              确认创建岗位
+              {mode === "create" ? "确认创建并关联" : "确认关联岗位"}
             </Button>
           </>
         }
       >
-        <div className="s4-choice-stack">
-          <CustomCheckbox
-            checked
-            onChange={() => {}}
-            label="创建新的正式岗位"
-          />
-          <DefinitionGrid
-            columns={2}
-            items={[
-              ["岗位名称", convert?.name],
-              ["招聘公司", opportunity.company],
-              ["基本要求", convert?.requirement],
-              ["来源机会", opportunity.title],
-            ]}
-          />
-          <button
-            type="button"
-            className="s4-alternate-action"
-            onClick={() => notify("已打开已有岗位选择")}
+        <div className="s4-direction-convert-workspace">
+          <div
+            className="s4-convert-mode-tabs"
+            role="tablist"
+            aria-label="岗位形成方式"
           >
-            改为关联已有岗位
-          </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === "create"}
+              className={mode === "create" ? "is-active" : ""}
+              onClick={() => setMode("create")}
+            >
+              <Icon name="plus" />
+              创建新岗位
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === "existing"}
+              className={mode === "existing" ? "is-active" : ""}
+              onClick={() => setMode("existing")}
+            >
+              <Icon name="link" />
+              关联已有岗位
+            </button>
+          </div>
+          {mode === "create" ? (
+            <div className="s4-direction-position-form">
+              <StateBanner
+                tone="info"
+                title="岗位资料来自招聘方向草稿"
+                description="请检查完整 JD 和招聘要求；确认后才会创建正式岗位。"
+              />
+              <div className="s4-form-grid">
+                <FormField label="岗位名称" required>
+                  <TextInput value={positionName} onChange={setPositionName} />
+                </FormField>
+                <FormField label="招聘公司">
+                  <TextInput value={opportunity.company} disabled />
+                </FormField>
+                <FormField label="工作地点">
+                  <TextInput value={location} onChange={setLocation} />
+                </FormField>
+                <FormField label="薪资范围">
+                  <TextInput value={salary} onChange={setSalary} />
+                </FormField>
+                <FormField label="最低工作年限">
+                  <TextInput value={experience} onChange={setExperience} />
+                </FormField>
+                <FormField label="学历要求及弹性">
+                  <TextInput value={education} onChange={setEducation} />
+                </FormField>
+                <FormField label="关键技能" span={2}>
+                  <SelectMenu
+                    label="关键技能"
+                    value={skills}
+                    options={skills}
+                    onChange={setSkills}
+                    multiple
+                    searchable
+                    creatable
+                  />
+                  <div className="s4-editor-tag-preview">
+                    <TagList items={skills} tone="info" />
+                  </div>
+                </FormField>
+                <FormField
+                  label="完整岗位 JD"
+                  required
+                  span={2}
+                  help="必须能够说明岗位职责和任职要求；可直接修改招聘方向生成的内容。"
+                >
+                  <TextArea value={jd} onChange={setJd} rows={16} />
+                </FormField>
+                <FormField label="用户备注" span={2}>
+                  <TextArea value={note} onChange={setNote} rows={4} />
+                </FormField>
+              </div>
+            </div>
+          ) : (
+            <div className="s4-existing-position-flow">
+              <FormField label="选择已有岗位" required>
+                <SelectMenu
+                  label="搜索岗位名称或公司"
+                  value={selectedPosition?.name || ""}
+                  options={positions.map((position) => position.name)}
+                  onChange={(name) =>
+                    setExistingPositionId(
+                      positions.find((position) => position.name === name)
+                        ?.id || "",
+                    )
+                  }
+                  searchable
+                />
+              </FormField>
+              {selectedPosition ? (
+                <section className="s4-existing-position-preview">
+                  <header>
+                    <span>
+                      <small>将要关联的岗位</small>
+                      <h3>{selectedPosition.name}</h3>
+                      <p>
+                        {selectedPosition.company} · {selectedPosition.location}
+                      </p>
+                    </span>
+                    <StatusFromText value={selectedPosition.status} />
+                  </header>
+                  <DefinitionGrid
+                    columns={2}
+                    items={[
+                      ["关键技能", <TagList items={selectedPosition.skills} />],
+                      ["匹配候选人", `${selectedPosition.matches} 位`],
+                      ["岗位资料", "资料已确认 · 可继续编辑"],
+                      ["当前来源机会", "尚未关联"],
+                    ]}
+                  />
+                  <div className="s4-existing-position-jd">
+                    <b>岗位要求摘要</b>
+                    <p>
+                      负责机器人数据、训练或仿真平台的规划与交付；具备相关平台建设、跨团队协作和工程落地经验。
+                    </p>
+                  </div>
+                </section>
+              ) : (
+                <StateBanner
+                  title="尚未选择岗位"
+                  description="选择后会显示公司、地点、状态、技能和岗位要求，确认无误再建立关联。"
+                />
+              )}
+            </div>
+          )}
         </div>
       </Modal>
+      <Modal
+        open={Boolean(manage)}
+        close={() => setManage(null)}
+        size="lg"
+        title="管理岗位关联"
+        description="招聘方向和正式岗位彼此独立，解除关联不会删除岗位。"
+        footer={
+          <>
+            <Button
+              tone="danger-outline"
+              onClick={() => {
+                setUnlinkTarget(manage);
+                setManage(null);
+              }}
+            >
+              解除关联
+            </Button>
+            <Button onClick={() => setManage(null)}>关闭</Button>
+            <Button
+              tone="primary"
+              onClick={() => navigate(`/positions/${manage?.positionId}`)}
+            >
+              查看岗位详情
+            </Button>
+          </>
+        }
+      >
+        <DefinitionGrid
+          columns={2}
+          items={[
+            ["招聘方向", manage?.name],
+            ["关联方式", manage?.status],
+            ["正式岗位", manage?.position],
+            ["来源机会", opportunity.title],
+          ]}
+        />
+      </Modal>
+      <Modal
+        open={Boolean(unlinkTarget)}
+        close={() => setUnlinkTarget(null)}
+        title="解除岗位关联"
+        description="岗位会继续保留，但不再显示为当前招聘方向形成的岗位。"
+        footer={
+          <>
+            <Button onClick={() => setUnlinkTarget(null)}>取消</Button>
+            <Button
+              tone="danger"
+              onClick={() => {
+                setDirections((current) =>
+                  current.map((direction) =>
+                    direction.id === unlinkTarget?.id
+                      ? {
+                          ...direction,
+                          status: "待处理",
+                          position: undefined,
+                          positionId: undefined,
+                        }
+                      : direction,
+                  ),
+                );
+                setUnlinkTarget(null);
+                notify("岗位关联已解除");
+              }}
+            >
+              确认解除
+            </Button>
+          </>
+        }
+      >
+        <StateBanner
+          tone="warning"
+          icon="warning"
+          title={`将解除“${unlinkTarget?.name || "招聘方向"}”与岗位的关联`}
+          description="招聘方向会恢复为待处理，可以之后重新创建或关联岗位。"
+        />
+      </Modal>
     </div>
+  );
+}
+
+function OpportunitySectionEditor({ section, opportunity, close, onSave }) {
+  const notify = useToast();
+  const [title, setTitle] = useState(opportunity.title);
+  const [company, setCompany] = useState(opportunity.company);
+  const [status, setStatus] = useState(opportunity.status);
+  const [people, setPeople] = useState("20 - 25 人");
+  const [period, setPeriod] = useState("2026.07 - 2026.12");
+  const [contact, setContact] = useState("陈雨");
+  const [copy, setCopy] = useState("");
+  const titleMap = {
+    basic: "机会资料",
+    summary: "招聘需求摘要",
+    evidence: "已确认依据",
+  };
+
+  useEffect(() => {
+    setTitle(opportunity.title);
+    setCompany(opportunity.company);
+    setStatus(opportunity.status);
+    setCopy(
+      section === "summary"
+        ? opportunity.summary
+        : section === "evidence"
+          ? opportunity.evidence
+          : "",
+    );
+  }, [opportunity, section]);
+
+  const save = () => {
+    if (section === "basic") onSave({ title, company, status });
+    if (section === "summary") onSave({ summary: copy });
+    if (section === "evidence") onSave({ evidence: copy });
+    close();
+    notify(`${titleMap[section] || "招聘机会资料"}已保存`);
+  };
+
+  return (
+    <Modal
+      open={Boolean(section)}
+      close={close}
+      size={section === "basic" ? "xl" : "lg"}
+      title={`编辑${titleMap[section] || "招聘机会资料"}`}
+      description="本次修改只影响当前资料分组"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button tone="primary" onClick={save}>
+            保存修改
+          </Button>
+        </>
+      }
+    >
+      {section === "basic" ? (
+        <div className="s4-form-grid">
+          <FormField label="机会名称" required>
+            <TextInput value={title} onChange={setTitle} />
+          </FormField>
+          <FormField label="所属公司" required>
+            <SelectMenu
+              label="选择公司"
+              value={company}
+              options={companies.map((item) => item.name)}
+              onChange={setCompany}
+              searchable
+            />
+          </FormField>
+          <FormField label="状态">
+            <SelectMenu
+              label="机会状态"
+              value={status}
+              options={["跟进中", "已完成", "已关闭"]}
+              onChange={setStatus}
+            />
+          </FormField>
+          <FormField label="预计人数">
+            <TextInput value={people} onChange={setPeople} />
+          </FormField>
+          <FormField label="预计时间">
+            <DatePicker
+              label="选择预计时间"
+              mode="month-range"
+              value={period}
+              onChange={setPeriod}
+            />
+          </FormField>
+          <FormField label="相关联系人">
+            <SelectMenu
+              label="选择联系人"
+              value={contact}
+              options={contacts.map((item) => item.name)}
+              onChange={setContact}
+              searchable
+            />
+          </FormField>
+        </div>
+      ) : (
+        <FormField label={titleMap[section]} required>
+          <TextArea value={copy} onChange={setCopy} rows={9} />
+        </FormField>
+      )}
+    </Modal>
   );
 }
 
@@ -995,7 +1606,8 @@ export function OpportunityDetailPage() {
   const item = opportunities.find(
     (opportunity) => opportunity.id === opportunityId,
   );
-  const [editOpen, setEditOpen] = useState(false);
+  const [editingSection, setEditingSection] = useState(null);
+  const [opportunity, setOpportunity] = useState(() => ({ ...item }));
   const [deleteOpen, setDeleteOpen] = useState(false);
   if (!item)
     return (
@@ -1013,17 +1625,16 @@ export function OpportunityDetailPage() {
     <div className="s4-detail-page">
       <DetailHeader
         icon="signal"
-        title={item.title}
-        subtitle={item.company}
+        title={opportunity.title}
+        subtitle={opportunity.company}
         badges={[
           {
-            label: item.status,
-            tone: item.status === "跟进中" ? "success" : "neutral",
+            label: opportunity.status,
+            tone: opportunity.status === "跟进中" ? "success" : "neutral",
           },
           { label: `${item.directions} 个招聘方向`, tone: "info" },
         ]}
         onBack={() => navigate("/opportunities")}
-        onEdit={() => setEditOpen(true)}
         onDelete={() => setDeleteOpen(true)}
       />
       <DetailTabs
@@ -1033,7 +1644,18 @@ export function OpportunityDetailPage() {
       />
       {tab === "profile" ? (
         <div className="s4-detail-stack">
-          <FieldGroup title="机会资料">
+          <FieldGroup
+            title="机会资料"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditingSection("basic")}
+              >
+                编辑资料
+              </Button>
+            }
+          >
             <DefinitionGrid
               items={[
                 [
@@ -1043,10 +1665,10 @@ export function OpportunityDetailPage() {
                     className="s4-inline-link"
                     onClick={() => navigate("/companies/company-xinglan")}
                   >
-                    {item.company}
+                    {opportunity.company}
                   </button>,
                 ],
-                ["状态", <StatusFromText value={item.status} />],
+                ["状态", <StatusFromText value={opportunity.status} />],
                 ["预计人数", "20 - 25 人"],
                 ["预计时间", "2026 年下半年"],
                 [
@@ -1063,12 +1685,34 @@ export function OpportunityDetailPage() {
               ]}
             />
           </FieldGroup>
-          <FieldGroup title="招聘需求摘要">
-            <p className="s4-long-copy">{item.summary}</p>
+          <FieldGroup
+            title="招聘需求摘要"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditingSection("summary")}
+              >
+                编辑
+              </Button>
+            }
+          >
+            <p className="s4-long-copy">{opportunity.summary}</p>
           </FieldGroup>
-          <FieldGroup title="已确认依据">
+          <FieldGroup
+            title="已确认依据"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditingSection("evidence")}
+              >
+                编辑
+              </Button>
+            }
+          >
             <p className="s4-long-copy">
-              {item.evidence}。客户明确表示 VLA
+              {opportunity.evidence}。客户明确表示 VLA
               算法负责人和数据平台负责人优先，其他方向可以分批推进。
             </p>
             <SourceList
@@ -1091,7 +1735,7 @@ export function OpportunityDetailPage() {
         </div>
       ) : null}
       {tab === "directions" ? (
-        <OpportunityDirections opportunity={item} />
+        <OpportunityDirections opportunity={opportunity} />
       ) : null}
       {tab === "work" ? (
         <div className="s4-detail-stack">
@@ -1124,16 +1768,19 @@ export function OpportunityDetailPage() {
           </FieldGroup>
         </div>
       ) : null}
-      <OpportunityEditor
-        open={editOpen}
-        close={() => setEditOpen(false)}
-        item={item}
+      <OpportunitySectionEditor
+        section={editingSection}
+        opportunity={opportunity}
+        close={() => setEditingSection(null)}
+        onSave={(patch) =>
+          setOpportunity((current) => ({ ...current, ...patch }))
+        }
       />
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
         assetLabel="招聘机会"
-        assetName={item.title}
+        assetName={opportunity.title}
         impact="已经形成的岗位、公司、联系人和业务主线不会删除，岗位保留来源机会的历史名称。"
         onConfirm={() => {
           setDeleteOpen(false);
@@ -1266,6 +1913,9 @@ export function CompanyCreatePage() {
   const [name, setName] = useState("");
   const [intro, setIntro] = useState("");
   const [industries, setIndustries] = useState([]);
+  const [agentPrompt, setAgentPrompt] = useState("");
+  const [agentAuthMode, setAgentAuthMode] = useState("confirm");
+  const [agentAttachments, setAgentAttachments] = useState([]);
   const create = () => {
     if (!name.trim()) {
       notify("请输入公司名称", "error");
@@ -1390,24 +2040,29 @@ export function CompanyCreatePage() {
                 输入公司名称和必要背景，Hunter
                 将使用公开网络资料形成完整公司草稿。
               </p>
-              <div className="s4-inline-agent-input">
-                <TextArea
-                  value={name}
-                  onChange={setName}
-                  placeholder="例如：调研星澜机器人，重点了解公司业务、融资、核心团队、岗位吸引力和招聘流程。"
-                  rows={5}
+              <div className="s4-agent-composer-shell">
+                <Composer
+                  value={agentPrompt}
+                  onChange={setAgentPrompt}
+                  onSend={(text, attachedFiles) => {
+                    const fileNames = attachedFiles
+                      .map((file) => file.name)
+                      .join("、");
+                    const prompt =
+                      text || `根据附件 ${fileNames} 调研并创建公司资料`;
+                    navigate(`/new?prompt=${encodeURIComponent(prompt)}`);
+                  }}
+                  authMode={agentAuthMode}
+                  onAuthChange={setAgentAuthMode}
+                  attachments={agentAttachments}
+                  onAttachmentsChange={setAgentAttachments}
+                  placeholder="例如：调研星澜机器人，重点了解业务、融资、核心团队、岗位吸引力和招聘流程"
                 />
-                <Button
-                  tone="primary"
-                  icon="send"
-                  disabled={!name.trim()}
-                  onClick={() =>
-                    navigate(`/new?prompt=${encodeURIComponent(name)}`)
-                  }
-                >
-                  开始调研
-                </Button>
               </div>
+              <small className="s4-agent-create-hint">
+                可直接粘贴链接，或添加文件与截图；Hunter
+                会先形成草稿，再由你确认写入。
+              </small>
             </div>
           )}
         </section>

@@ -187,8 +187,8 @@ test("公共筛选浮层不被容器裁切且行业统一使用两级多选", as
   await expect(page.getByText("星澜机器人", { exact: true })).toBeVisible();
 
   await page.goto("#/companies/company-xinglan");
-  await page.getByRole("button", { name: "编辑资料" }).click();
-  const editor = page.getByRole("dialog", { name: "编辑公司资料" });
+  await page.getByRole("button", { name: "编辑基本资料" }).click();
+  const editor = page.getByRole("dialog", { name: "编辑公司基本资料" });
   await editor.locator(".s4-cascade > button").click();
   await expect(page.locator("body > .s4-cascade-panel")).toBeVisible();
 });
@@ -621,22 +621,47 @@ test("推荐报告任务完成后回流岗位匹配详情", async ({ page }) => 
 test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", async ({ page }) => {
   await page.goto("#/companies/company-xinglan?state=draft");
   await expect(page.getByText("文件解析结果等待确认")).toBeVisible();
-  await page.getByRole("button", { name: "编辑草稿" }).click();
-  const editor = page.getByRole("dialog", { name: "编辑公司资料" });
+  await page.getByRole("button", { name: "编辑基本资料" }).click();
+  const editor = page.getByRole("dialog", { name: "编辑公司基本资料" });
   await editor.getByLabel("公司名称").fill("星澜机器人科技有限公司");
+  await expect(editor.getByText("已确认名称变体")).toBeVisible();
   await editor.getByRole("button", { name: "保存修改" }).click();
+
+  await page.goto("#/companies/new");
+  await page.getByRole("button", { name: /公司调研/ }).click();
+  await expect(
+    page.locator(".s4-agent-composer-shell .s2-composer"),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "执行前确认" })).toBeVisible();
 
   await page.goto("#/contacts/contact-chenyu?tab=timeline");
   await page.getByRole("button", { name: "添加沟通记录" }).click();
   await page.getByLabel("沟通内容").fill("客户确认下周安排候选人技术面。 ");
   await page.getByRole("button", { name: "保存" }).click();
   await expect(page.getByText("沟通记录已添加")).toBeVisible();
+  await page
+    .locator(".s4-timeline-actions")
+    .first()
+    .getByRole("button", { name: "编辑" })
+    .click();
+  await page.getByLabel("沟通内容").fill("客户确认下周二安排候选人技术面。");
+  await page.getByRole("button", { name: "保存" }).click();
+  await expect(page.getByText("沟通记录已更新")).toBeVisible();
 
   await page.goto("#/opportunities/opportunity-xinglan?tab=directions");
   await page.getByRole("button", { name: "形成岗位" }).first().click();
   await expect(page.getByRole("dialog", { name: /形成岗位/ })).toBeVisible();
-  await page.getByRole("button", { name: "确认创建岗位" }).click();
-  await expect(page.getByText("岗位已创建并关联到招聘机会")).toBeVisible();
+  await expect(page.getByLabel("完整岗位 JD")).toHaveValue(/岗位职责/);
+  await page.getByRole("button", { name: "确认创建并关联" }).click();
+  await expect(page.getByText("新岗位已创建并关联到招聘机会")).toBeVisible();
+
+  await page.getByRole("button", { name: "形成岗位" }).first().click();
+  await page.getByRole("tab", { name: "关联已有岗位" }).click();
+  await page.locator(".s4-existing-position-flow .s4-select > button").click();
+  await page.getByRole("button", { name: "运动控制算法专家" }).click();
+  await expect(page.getByText("将要关联的岗位")).toBeVisible();
+  await page.getByRole("button", { name: "确认关联岗位" }).click();
+  await expect(page.getByText("已有岗位已关联到招聘机会")).toBeVisible();
 });
 
 test("人才版图多视图、关系详情与写入决定可用", async ({ page }) => {
