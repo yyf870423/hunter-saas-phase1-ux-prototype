@@ -1077,7 +1077,13 @@ export function TooltipText({
   }, [eligible]);
   const show = () => {
     const element = anchorRef.current;
-    if (!element || !tip || !eligible) return;
+    if (!element || !tip) return;
+    const canShow = trigger === "hidden-tags" || isTruncated(element);
+    if (!canShow) {
+      if (eligible) setEligible(false);
+      return;
+    }
+    if (!eligible) setEligible(true);
     const rect = element.getBoundingClientRect();
     const width = Math.min(
       Math.max(120, Array.from(String(tip)).length * 12 + 30),

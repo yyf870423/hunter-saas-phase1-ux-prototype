@@ -436,6 +436,44 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
   expect(signalFeedBox.width).toBeLessThanOrEqual(signalPaneBox.width + 1);
 });
 
+test("所有业务资产的同组标签保持统一间距", async ({ page }) => {
+  for (const route of [
+    "#/candidates",
+    "#/positions",
+    "#/companies",
+    "#/contacts",
+    "#/papers",
+    "#/patents",
+  ]) {
+    await page.goto(route);
+    const groups = await page.locator(".s4-tag-list").evaluateAll((lists) =>
+      lists.map((list) => {
+        const style = getComputedStyle(list);
+        const children = Array.from(list.children).map((element) =>
+          element.getBoundingClientRect(),
+        );
+        const horizontalGaps = children.slice(1).flatMap((rect, index) => {
+          const previous = children[index];
+          return Math.abs(rect.top - previous.top) < 1
+            ? [rect.left - previous.right]
+            : [];
+        });
+        return {
+          columnGap: Number.parseFloat(style.columnGap),
+          rowGap: Number.parseFloat(style.rowGap),
+          horizontalGaps,
+        };
+      }),
+    );
+    expect(groups.length, `${route} 应显示标签组`).toBeGreaterThan(0);
+    for (const group of groups) {
+      expect(group.columnGap).toBe(8);
+      expect(group.rowGap).toBe(6);
+      for (const gap of group.horizontalGaps) expect(gap).toBeGreaterThan(7);
+    }
+  }
+});
+
 test("论文作者身份和专利发明人身份使用同一审核边界", async ({ page }) => {
   await page.goto("#/papers/paper-vla-survey");
   await page.getByRole("button", { name: "审核作者身份" }).click();

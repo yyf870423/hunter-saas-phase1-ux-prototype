@@ -160,7 +160,7 @@
 .s4-candidate-filter-chips {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   overflow-x: auto;
   padding: 0 10px 10px;
 }
@@ -1050,7 +1050,8 @@
   display: inline-flex;
   max-width: 100%;
   align-items: center;
-  gap: 5px;
+  column-gap: 8px;
+  row-gap: 6px;
   overflow: hidden;
   vertical-align: middle;
 }
@@ -4282,7 +4283,7 @@
 .s4-recycle-guidance {
   margin-bottom: 16px;
 }
-.s4-academic-main > span {
+.s4-academic-main > span:not([class]) {
   display: block;
   margin-bottom: 10px;
   color: var(--s1-muted);
