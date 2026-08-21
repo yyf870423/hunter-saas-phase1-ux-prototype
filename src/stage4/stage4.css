@@ -7723,34 +7723,70 @@
   padding: 17px 4px 0 0;
 }
 
-/* Pipeline board: one native horizontal scrollbar and separated card hierarchy. */
+/* Pipeline board: one product scrollbar and viewport-aware lane height. */
 .s4-kanban-shell {
   min-width: 0;
 }
 .s4-kanban {
   overflow-x: scroll;
-  padding-bottom: 9px;
-  scrollbar-width: auto;
-  scrollbar-color: color-mix(
-      in srgb,
-      var(--s1-accent) 45%,
-      var(--s1-line-strong)
-    )
-    var(--s1-canvas);
+  padding-bottom: 0;
+  scrollbar-width: none;
 }
 .s4-kanban::-webkit-scrollbar {
-  height: 9px;
+  display: none;
+  width: 0;
+  height: 0;
 }
-.s4-kanban::-webkit-scrollbar-track {
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 99px;
+.s4-kanban > section {
+  display: grid;
+  height: clamp(360px, calc(100vh - 358px), 620px);
+  min-height: 360px;
+  grid-template-rows: 42px minmax(0, 1fr);
 }
-.s4-kanban::-webkit-scrollbar-thumb {
-  min-width: 90px;
-  background: color-mix(in srgb, var(--s1-accent) 46%, var(--s1-line-strong));
-  border: 2px solid var(--s1-canvas);
+.s4-kanban section > div {
+  min-height: 0;
+  align-content: start;
+  overflow-y: auto;
+  scrollbar-color: var(--s1-line-strong) transparent;
+  scrollbar-width: thin;
+}
+.s4-kanban-scrollbar {
+  position: relative;
+  height: 12px;
+  margin: 10px 2px 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--s1-line) 72%, var(--s1-canvas));
+  border: 1px solid color-mix(in srgb, var(--s1-line-strong) 70%, transparent);
   border-radius: 99px;
+  cursor: pointer;
+  outline: none;
+}
+.s4-kanban-scrollbar:hover,
+.s4-kanban-scrollbar:focus-visible {
+  background: color-mix(in srgb, var(--s1-line-strong) 28%, var(--s1-canvas));
+  border-color: color-mix(in srgb, var(--s1-accent) 32%, var(--s1-line));
+}
+.s4-kanban-scrollbar:focus-visible {
+  box-shadow: 0 0 0 3px var(--s1-accent-soft);
+}
+.s4-kanban-scrollbar > span {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  min-width: 72px;
+  background: color-mix(in srgb, var(--s1-accent) 54%, var(--s1-line-strong));
+  border-radius: 99px;
+  cursor: grab;
+  transition:
+    background 120ms ease,
+    left 60ms linear;
+}
+.s4-kanban-scrollbar > span:hover {
+  background: color-mix(in srgb, var(--s1-accent) 72%, var(--s1-line-strong));
+}
+.s4-kanban-scrollbar > span:active {
+  cursor: grabbing;
+  background: var(--s1-accent);
 }
 .s4-kanban article > header {
   display: flex;
@@ -7931,11 +7967,28 @@
   background: var(--s1-danger-soft);
   border-color: color-mix(in srgb, var(--s1-danger) 25%, var(--s1-line));
 }
-.s4-match-result-list .s4-pipeline-stage-tag {
-  margin-top: 5px;
+.s4-match-person-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
 }
-.s4-match-detail-head .s4-pipeline-stage-tag {
-  margin-top: 8px;
+.s4-match-person-heading > b,
+.s4-match-person-heading > h2 {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s4-match-person-heading .s4-pipeline-stage-tag {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.s4-match-person-heading.is-detail {
+  margin-top: 4px;
+}
+.s4-match-person-heading.is-detail h2 {
+  margin: 0;
 }
 
 /* Recommendation reports are latest-file artifacts in matching and versioned in tasks. */

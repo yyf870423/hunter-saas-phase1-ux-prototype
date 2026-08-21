@@ -391,6 +391,7 @@ test("数据管理使用独立导航而不是全局导入按钮", async ({ page 
 });
 
 test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto("#/positions/position-vla?tab=pipeline");
   await expect(page.locator(".s4-kanban-scroll-control")).toHaveCount(0);
   await expect
@@ -401,6 +402,52 @@ test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) 
       })),
     )
     .toEqual({ overflow: "scroll", scrollable: true });
+  await expect(page.locator(".s4-kanban-scrollbar")).toHaveCount(1);
+  await expect(
+    page.getByRole("scrollbar", { name: "候选人流程横向位置" }),
+  ).toBeVisible();
+  await expect(page.locator(".s4-pipeline-toolbar .s4-select")).toHaveCount(0);
+  const laneSize = await page
+    .locator(".s4-kanban > section")
+    .first()
+    .evaluate((element) => ({
+      height: element.getBoundingClientRect().height,
+      minHeight: Number.parseFloat(getComputedStyle(element).minHeight),
+    }));
+  expect(laneSize.minHeight).toBe(360);
+  expect(laneSize.height).toBeGreaterThanOrEqual(360);
+  expect(laneSize.height).toBeLessThanOrEqual(620);
+  await expect
+    .poll(() =>
+      page
+        .locator(".s4-kanban section > div")
+        .first()
+        .evaluate((element) => getComputedStyle(element).overflowY),
+    )
+    .toBe("auto");
+  await page.setViewportSize({ width: 1280, height: 980 });
+  const expandedLaneHeight = await page
+    .locator(".s4-kanban > section")
+    .first()
+    .evaluate((element) => element.getBoundingClientRect().height);
+  expect(expandedLaneHeight).toBeGreaterThan(laneSize.height);
+  expect(expandedLaneHeight).toBeLessThanOrEqual(620);
+  const productScrollbar = page.getByRole("scrollbar", {
+    name: "候选人流程横向位置",
+  });
+  await productScrollbar.focus();
+  await productScrollbar.press("End");
+  await expect
+    .poll(() =>
+      page.locator(".s4-kanban").evaluate((element) => element.scrollLeft),
+    )
+    .toBeGreaterThan(0);
+  await productScrollbar.press("Home");
+  await expect
+    .poll(() =>
+      page.locator(".s4-kanban").evaluate((element) => element.scrollLeft),
+    )
+    .toBe(0);
   await expect(page.locator(".s4-stage-age.is-warning").first()).toBeVisible();
   await expect(page.locator(".s4-stage-age.is-high").first()).toBeVisible();
   await expect(page.locator(".s4-stage-age.is-danger").first()).toBeVisible();

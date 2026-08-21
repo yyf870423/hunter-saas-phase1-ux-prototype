@@ -47,7 +47,7 @@ export function buildRevisedRecommendationReport(candidateName = "林昊") {
   };
 }
 
-function reportMarkdown(report) {
+export function recommendationReportMarkdown(report) {
   return `# 候选人推荐报告\n\n## 推荐结论\n\n${report.summary}\n\n## 核心匹配证据\n\n${report.evidence
     .map((item) => `- ${item}`)
     .join("\n")}\n\n## 风险与待核实项\n\n${report.risks
@@ -56,7 +56,7 @@ function reportMarkdown(report) {
 }
 
 function downloadReport(report) {
-  const blob = new Blob([reportMarkdown(report)], {
+  const blob = new Blob([recommendationReportMarkdown(report)], {
     type: "text/markdown;charset=utf-8",
   });
   const url = URL.createObjectURL(blob);
@@ -112,6 +112,7 @@ export function RecommendationReportFile({
   report,
   versions,
   onRegenerate,
+  onPreview,
 }) {
   const notify = useToast();
   const availableVersions = useMemo(
@@ -134,7 +135,10 @@ export function RecommendationReportFile({
           </small>
         </span>
         <div>
-          <Button size="sm" onClick={() => setPreview(latest)}>
+          <Button
+            size="sm"
+            onClick={() => (onPreview ? onPreview(latest) : setPreview(latest))}
+          >
             在线查看
           </Button>
           <Button
@@ -155,7 +159,7 @@ export function RecommendationReportFile({
         </div>
       </div>
       <Modal
-        open={Boolean(preview)}
+        open={!onPreview && Boolean(preview)}
         close={() => setPreview(null)}
         size="xl"
         title="在线查看推荐报告"

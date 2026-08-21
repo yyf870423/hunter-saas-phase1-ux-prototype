@@ -80,6 +80,23 @@ test("截取候选人审核、支线任务和信号中心", async ({ page }) => 
     fullPage: true,
   });
   await page
+    .locator(".recommendation-report-file")
+    .last()
+    .getByRole("button", { name: "在线查看" })
+    .click();
+  await page.screenshot({
+    path: `${output}/desktop-recommendation-report-preview-md.png`,
+    fullPage: true,
+  });
+  const preview = page.getByRole("complementary", { name: "文件预览" });
+  await preview.locator(".s2-artifact-file-switch > button").click();
+  await preview.getByRole("option", { name: /匹配证据\.xlsx/ }).click();
+  await page.screenshot({
+    path: `${output}/desktop-recommendation-report-preview-xlsx.png`,
+    fullPage: true,
+  });
+  await preview.getByRole("button", { name: "关闭文件预览" }).click();
+  await page
     .locator(".s2-composer textarea")
     .fill("请突出量产交付经验，并把薪资风险放到最后。");
   await page.getByRole("button", { name: "发送" }).click();

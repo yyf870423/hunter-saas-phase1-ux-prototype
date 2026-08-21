@@ -22,6 +22,10 @@ import {
   UserMessage,
 } from "./automation-ui";
 import { sideTasks } from "./data";
+import {
+  buildRecommendationTaskArtifacts,
+  TaskArtifactPreview,
+} from "./TaskArtifactPreview";
 
 const tabs = [
   ["all", "全部"],
@@ -509,6 +513,14 @@ function RecommendationReportTask() {
   const latestReport = reportVersions[0];
   const initialReport = baseReportVersions[1];
   const reviewedReport = baseReportVersions[0];
+  const [previewArtifactId, setPreviewArtifactId] = useState(null);
+  const taskArtifacts = useMemo(
+    () => buildRecommendationTaskArtifacts(candidateName, reportVersions),
+    [candidateName, revised],
+  );
+  const previewArtifact = taskArtifacts.find(
+    (artifact) => artifact.id === previewArtifactId,
+  );
   useEffect(() => {
     if (candidateId) {
       sessionStorage.setItem(
@@ -563,7 +575,9 @@ function RecommendationReportTask() {
           </StatusBadge>
         </div>
       </header>
-      <div className="s2-task-detail-layout">
+      <div
+        className={`s2-task-detail-layout ${previewArtifact ? "has-artifact" : ""}`}
+      >
         <aside className="s2-task-context">
           <h2>任务上下文</h2>
           <dl>
@@ -600,6 +614,9 @@ function RecommendationReportTask() {
             <RecommendationReportFile
               candidateName={candidateName}
               report={initialReport}
+              onPreview={(item) =>
+                setPreviewArtifactId(`report-${item.version}`)
+              }
             />
             <UserMessage time="今天 10:20">
               把开头改得更适合直接发给客户，并补充团队规模，但不要删除风险提示。
@@ -608,6 +625,9 @@ function RecommendationReportTask() {
             <RecommendationReportFile
               candidateName={candidateName}
               report={reviewedReport}
+              onPreview={(item) =>
+                setPreviewArtifactId(`report-${item.version}`)
+              }
             />
             {revised ? (
               <>
@@ -618,6 +638,9 @@ function RecommendationReportTask() {
                 <RecommendationReportFile
                   candidateName={candidateName}
                   report={latestReport}
+                  onPreview={(item) =>
+                    setPreviewArtifactId(`report-${item.version}`)
+                  }
                 />
               </>
             ) : null}
@@ -670,6 +693,14 @@ function RecommendationReportTask() {
             />
           </div>
         </section>
+        {previewArtifact ? (
+          <TaskArtifactPreview
+            artifact={previewArtifact}
+            artifacts={taskArtifacts}
+            onSelect={setPreviewArtifactId}
+            onClose={() => setPreviewArtifactId(null)}
+          />
+        ) : null}
       </div>
     </div>
   );

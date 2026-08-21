@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
@@ -684,6 +684,8 @@ function StageAge({ candidate }) {
 
 function CandidatePipeline() {
   const notify = useToast();
+  const boardRef = useRef(null);
+  const scrollDragRef = useRef(null);
   const [view, setView] = useState("board");
   const [stageModal, setStageModal] = useState(false);
   const [stages, setStages] = useState(initialPipelineStages);
@@ -691,11 +693,25 @@ function CandidatePipeline() {
   const [dragOver, setDragOver] = useState(null);
   const [pendingMove, setPendingMove] = useState(null);
   const [candidateOpen, setCandidateOpen] = useState(null);
-  const [filter, setFilter] = useState("全部");
-  const visibleGroups =
-    filter === "全部"
-      ? stages
-      : stages.filter((stage) => stage.name === filter);
+  const [scrollMetrics, setScrollMetrics] = useState({
+    left: 0,
+    max: 0,
+    viewportRatio: 1,
+  });
+  const syncScrollMetrics = () => {
+    const board = boardRef.current;
+    if (!board) return;
+    setScrollMetrics({
+      left: board.scrollLeft,
+      max: Math.max(0, board.scrollWidth - board.clientWidth),
+      viewportRatio: Math.min(1, board.clientWidth / board.scrollWidth),
+    });
+  };
+  useEffect(() => {
+    syncScrollMetrics();
+    window.addEventListener("resize", syncScrollMetrics);
+    return () => window.removeEventListener("resize", syncScrollMetrics);
+  }, [stages, view]);
   const pipelineSummary = [
     [
       "储备",
@@ -763,12 +779,6 @@ function CandidatePipeline() {
             列表
           </button>
         </div>
-        <SelectMenu
-          label="全部阶段"
-          value={filter === "全部" ? "" : filter}
-          options={["全部", ...stages.map((stage) => stage.name)]}
-          onChange={setFilter}
-        />
         <Button size="sm" icon="settings" onClick={() => setStageModal(true)}>
           配置阶段
         </Button>
@@ -791,8 +801,12 @@ function CandidatePipeline() {
       </div>
       {view === "board" ? (
         <div className="s4-kanban-shell">
-          <div className="s4-kanban">
-            {visibleGroups.map((stage) => (
+          <div
+            className="s4-kanban"
+            ref={boardRef}
+            onScroll={syncScrollMetrics}
+          >
+            {stages.map((stage) => (
               <section
                 className={`s4-kanban-${stage.tone} ${dragOver === stage.id ? "is-drag-over" : ""}`}
                 key={stage.id}
@@ -883,6 +897,92 @@ function CandidatePipeline() {
                 </div>
               </section>
             ))}
+          </div>
+          <div
+            className="s4-kanban-scrollbar"
+            role="scrollbar"
+            aria-label="候选人流程横向位置"
+            aria-orientation="horizontal"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={
+              scrollMetrics.max
+                ? Math.round((scrollMetrics.left / scrollMetrics.max) * 100)
+                : 0
+            }
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (
+                !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)
+              )
+                return;
+              event.preventDefault();
+              const board = boardRef.current;
+              if (!board) return;
+              if (event.key === "Home") board.scrollLeft = 0;
+              else if (event.key === "End")
+                board.scrollLeft = scrollMetrics.max;
+              else
+                board.scrollBy({
+                  left: event.key === "ArrowRight" ? 220 : -220,
+                  behavior: "smooth",
+                });
+            }}
+            onPointerDown={(event) => {
+              if (event.target !== event.currentTarget) return;
+              const board = boardRef.current;
+              if (!board || !scrollMetrics.max) return;
+              const rect = event.currentTarget.getBoundingClientRect();
+              const ratio = Math.min(
+                1,
+                Math.max(0, (event.clientX - rect.left) / rect.width),
+              );
+              board.scrollLeft = ratio * scrollMetrics.max;
+            }}
+          >
+            <span
+              style={{
+                width: `${Math.max(12, scrollMetrics.viewportRatio * 100)}%`,
+                left: `${
+                  scrollMetrics.max
+                    ? (scrollMetrics.left / scrollMetrics.max) *
+                      (100 - Math.max(12, scrollMetrics.viewportRatio * 100))
+                    : 0
+                }%`,
+              }}
+              onPointerDown={(event) => {
+                const board = boardRef.current;
+                if (!board) return;
+                event.preventDefault();
+                event.currentTarget.setPointerCapture(event.pointerId);
+                scrollDragRef.current = {
+                  pointerId: event.pointerId,
+                  clientX: event.clientX,
+                  scrollLeft: board.scrollLeft,
+                  trackWidth:
+                    event.currentTarget.parentElement?.clientWidth || 1,
+                };
+              }}
+              onPointerMove={(event) => {
+                const drag = scrollDragRef.current;
+                const board = boardRef.current;
+                if (!drag || !board || drag.pointerId !== event.pointerId)
+                  return;
+                const delta = event.clientX - drag.clientX;
+                board.scrollLeft =
+                  drag.scrollLeft +
+                  delta * (board.scrollWidth / drag.trackWidth);
+              }}
+              onPointerUp={(event) => {
+                if (scrollDragRef.current?.pointerId === event.pointerId) {
+                  event.currentTarget.releasePointerCapture(event.pointerId);
+                  scrollDragRef.current = null;
+                }
+              }}
+              onPointerCancel={() => {
+                scrollDragRef.current = null;
+              }}
+            />
           </div>
         </div>
       ) : (
@@ -1533,7 +1633,15 @@ function MatchingResults() {
               >
                 <MatchScore score={item.score} compact />
                 <span>
-                  <b>{item.name}</b>
+                  <span className="s4-match-person-heading">
+                    <b>{item.name}</b>
+                    {pipelineStages[item.id] ? (
+                      <PipelineStageTag
+                        stage={pipelineStages[item.id]}
+                        prefix
+                      />
+                    ) : null}
+                  </span>
                   <small>
                     {item.company} · {item.title}
                   </small>
@@ -1546,9 +1654,6 @@ function MatchingResults() {
                           ? "等待匹配"
                           : "角色适配通过"}
                   </em>
-                  {pipelineStages[item.id] ? (
-                    <PipelineStageTag stage={pipelineStages[item.id]} prefix />
-                  ) : null}
                 </span>
                 <Icon name="chevronRight" />
               </button>
@@ -1565,13 +1670,15 @@ function MatchingResults() {
           <header className="s4-match-detail-head">
             <span>
               <small>候选人匹配详情</small>
-              <h2>{current.name}</h2>
+              <span className="s4-match-person-heading is-detail">
+                <h2>{current.name}</h2>
+                {pipelineStages[current.id] ? (
+                  <PipelineStageTag stage={pipelineStages[current.id]} prefix />
+                ) : null}
+              </span>
               <p>
                 {current.company} · {current.title}
               </p>
-              {pipelineStages[current.id] ? (
-                <PipelineStageTag stage={pipelineStages[current.id]} prefix />
-              ) : null}
             </span>
             <MatchScore score={current.score} />
           </header>

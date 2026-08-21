@@ -74,17 +74,37 @@ test("推荐报告任务按对话过程保留每次生成的文件", async ({ pa
     .locator(".recommendation-report-file")
     .filter({ hasText: /推荐报告-v2\.md/ });
   await v2File.getByRole("button", { name: "在线查看" }).click();
-  const preview = page.getByRole("dialog", { name: "在线查看推荐报告" });
-  await expect(preview.getByText("核心匹配证据")).toBeVisible();
-  await preview
-    .getByRole("button", { name: "关闭", exact: true })
-    .first()
-    .click();
+  const preview = page.getByRole("complementary", { name: "文件预览" });
+  await expect(preview).toBeVisible();
+  await expect(
+    preview.getByRole("heading", { name: "核心匹配证据" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("dialog", { name: "在线查看推荐报告" }),
+  ).toHaveCount(0);
+
+  const fileSwitch = preview.locator(".s2-artifact-file-switch > button");
+  for (const [name, label] of [
+    ["星澜机器人-客户推荐模板.docx", "Word 预览"],
+    ["林昊-公开履历.pdf", "PDF 预览"],
+    ["林昊-匹配证据.xlsx", "Excel 预览"],
+    ["林昊-证据来源.csv", "CSV 预览"],
+    ["林昊-客户预览.html", "HTML 预览"],
+  ]) {
+    await fileSwitch.click();
+    await preview.getByRole("option", { name: new RegExp(name) }).click();
+    await expect(preview.getByLabel(label)).toBeVisible();
+  }
+
+  await fileSwitch.click();
+  await preview.getByRole("option", { name: /推荐报告-v2\.md/ }).click();
 
   const downloadStarted = page.waitForEvent("download");
-  await v2File.getByRole("button", { name: "下载", exact: true }).click();
+  await preview.getByRole("button", { name: "下载", exact: true }).click();
   const download = await downloadStarted;
   expect(download.suggestedFilename()).toMatch(/推荐报告-v2\.md$/);
+  await preview.getByRole("button", { name: "关闭文件预览" }).click();
+  await expect(preview).toHaveCount(0);
 
   await page
     .locator(".s2-composer textarea")
