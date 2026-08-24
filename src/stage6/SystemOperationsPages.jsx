@@ -504,8 +504,8 @@ export function TaskDetailPage() {
             description={task.safeReason}
             action={
               <Button
-                tone="primary"
                 icon="refresh"
+                className="ops-safe-recovery-button"
                 onClick={() => setRecovery(true)}
               >
                 执行安全恢复
@@ -919,8 +919,13 @@ export function CapabilitiesPage() {
           { value: "health", label: "服务健康", count: capabilities.length },
           {
             value: "configuration",
-            label: "能力配置",
-            count: capabilityConfigurations.length,
+            label: "模型配置",
+            count: 4,
+          },
+          {
+            value: "data-sources",
+            label: "数据源配置",
+            count: capabilityConfigurations.length - 1,
           },
         ]}
       />
@@ -957,7 +962,7 @@ export function CapabilitiesPage() {
                   onClick={() => setSelectedCapability(item)}
                 >
                   <header>
-                    <span>
+                    <span className="ops-capability-name">
                       <i>
                         <Icon
                           name={
@@ -1002,15 +1007,19 @@ export function CapabilitiesPage() {
             </div>
           </>
         ) : role === "operator" ? (
-          <OpsState state="limited" label="能力配置" />
+          <OpsState
+            state="limited"
+            label={tab === "configuration" ? "模型配置" : "数据源配置"}
+          />
+        ) : tab === "configuration" ? (
+          <ModelConfigurationPanel />
         ) : (
           <>
-            <ModelConfigurationPanel />
             <OpsInlineState
               tone="info"
               icon="shield"
-              title="其他能力配置同样采用草稿、验证、确认三步"
-              description="下表用于公开网络搜索和学术数据配置；模型后端由上方企业模型网关独立管理。"
+              title="数据源配置采用草稿、验证、确认三步"
+              description="公开网络搜索和学术数据独立配置，不与模型后端共享路由、密钥或额度。"
             />
             <OpsTable
               columns={configColumns}

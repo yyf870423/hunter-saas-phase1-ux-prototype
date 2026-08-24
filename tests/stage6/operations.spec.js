@@ -198,16 +198,20 @@ test("企业模型网关可管理后端与路由，其他能力验证失败时�
   await backendDialog.getByRole("button", { name: "确认保存并生效" }).click();
   await expect(page.getByText("模型后端已加入资源池")).toBeVisible();
 
-  await page.getByRole("tab", { name: /任务路由/ }).click();
+  await page.getByRole("tab", { name: /任务模型分配/ }).click();
   await page
     .getByRole("button", { name: /深度调研/ })
     .first()
     .click();
-  await expect(
-    page.getByRole("dialog", { name: "编辑任务路由" }),
-  ).toBeVisible();
+  const routeDialog = page.getByRole("dialog", {
+    name: "编辑任务模型分配",
+  });
+  await expect(routeDialog).toBeVisible();
+  await expect(routeDialog.getByText("备用资源池顺序")).toBeVisible();
+  await routeDialog.getByRole("button", { name: /上移/ }).last().click();
   await page.getByRole("button", { name: "取消" }).click();
 
+  await page.getByRole("tab", { name: /数据源配置/ }).click();
   await page
     .getByRole("button", { name: /公开网络搜索/ })
     .first()

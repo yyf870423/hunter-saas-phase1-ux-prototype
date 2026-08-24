@@ -90,6 +90,22 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
     fullPage: true,
   });
   await page.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("tab", { name: /任务模型分配/ }).click();
+  await page
+    .getByRole("button", { name: /深度调研/ })
+    .first()
+    .click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: "artifacts/stage6-model-routing-modal.png",
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("tab", { name: /数据源配置/ }).click();
+  await page.screenshot({
+    path: "artifacts/stage6-data-sources.png",
+    fullPage: true,
+  });
   await page
     .getByRole("button", { name: /公开网络搜索/ })
     .first()

@@ -926,6 +926,13 @@
 .ops-detail-drawer .s1-drawer-body {
   padding: 20px 22px 30px;
 }
+.ops-detail-drawer .s1-status,
+.ops-detail-drawer .s1-status > span,
+.ops-adjustment-row .s1-status,
+.ops-adjustment-row .s1-status > span {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
 .ops-detail-stack {
   display: grid;
   gap: 16px;
@@ -1135,7 +1142,7 @@
 .ops-trial-layout,
 .ops-config-layout {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: 1fr;
   gap: 18px;
 }
 .ops-trial-layout > section,
@@ -1416,7 +1423,7 @@
   align-items: center;
   gap: 8px;
 }
-.ops-capability-grid header i {
+.ops-capability-name > i {
   display: grid;
   width: 28px;
   height: 28px;
@@ -1426,7 +1433,7 @@
   background: #eaf4ff;
   border-radius: 6px;
 }
-.ops-capability-grid header i svg {
+.ops-capability-name > i svg {
   width: 15px;
 }
 .ops-capability-grid header b {
@@ -1976,7 +1983,7 @@
 }
 .ops-model-form-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  grid-template-columns: 1fr;
   gap: 18px;
 }
 .ops-model-form-layout > section {
@@ -2018,6 +2025,70 @@
   color: #6e7781;
   font-size: 10px;
   line-height: 16px;
+}
+.ops-model-config > .ops-inline-state {
+  margin-bottom: 12px;
+}
+.ops-safe-recovery-button {
+  color: #087252 !important;
+  background: #ffffff !important;
+  border-color: #8dceb9 !important;
+}
+.ops-safe-recovery-button:hover {
+  background: #e9f8f2 !important;
+  border-color: #58b292 !important;
+}
+.ops-fallback-editor {
+  display: grid;
+  gap: 10px;
+}
+.ops-fallback-list {
+  display: grid;
+  gap: 6px;
+}
+.ops-fallback-list > div {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 30px 30px 30px;
+  min-height: 46px;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  background: #f7f9fb;
+  border: 1px solid #e1e6ea;
+  border-radius: 7px;
+}
+.ops-fallback-list > div > i {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  color: #176fbe;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  background: #e7f2fc;
+  border-radius: 6px;
+}
+.ops-fallback-list > div > span {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ops-fallback-list .s1-icon-button {
+  width: 28px;
+  height: 28px;
+}
+.ops-fallback-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.ops-fallback-add .s4-select,
+.ops-fallback-add .s4-select > button {
+  width: 100%;
 }
 
 .ops-review {

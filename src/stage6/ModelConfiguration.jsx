@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Button, Drawer, Modal, useToast } from "../stage1/ui";
+import { Button, Drawer, IconButton, Modal, useToast } from "../stage1/ui";
 import { FormField, SelectMenu, TextArea, TextInput } from "../stage4/asset-ui";
 import {
   modelBackends,
@@ -50,7 +50,7 @@ const backendColumns = [
 const routeColumns = [
   { key: "task", label: "任务类型", width: 190 },
   { key: "primary", label: "主资源池", width: 220 },
-  { key: "fallback", label: "降级顺序", width: 340 },
+  { key: "fallback", label: "备用资源池顺序", width: 340 },
   { key: "policy", label: "分配策略", width: 180 },
   { key: "retries", label: "最大重试", width: 100 },
   {
@@ -319,13 +319,29 @@ function BackendModal({ backend, close }) {
 function RouteModal({ route, close }) {
   const notify = useToast();
   const [primary, setPrimary] = useState(route.primary);
-  const [fallback, setFallback] = useState(route.fallback);
+  const [fallbacks, setFallbacks] = useState(
+    route.fallback.split("→").map((item) => item.trim()),
+  );
+  const [fallbackChoice, setFallbackChoice] = useState("");
   const [policy, setPolicy] = useState(route.policy);
+  const moveFallback = (index, direction) => {
+    const target = index + direction;
+    if (target < 0 || target >= fallbacks.length) return;
+    setFallbacks((current) => {
+      const next = [...current];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  };
+  const fallbackOptions = [
+    ...modelBackends.map((item) => item.name),
+    "人工处理队列",
+  ].filter((item) => item !== primary && !fallbacks.includes(item));
   return (
     <Modal
       open
       close={close}
-      title="编辑任务路由"
+      title="编辑任务模型分配"
       description={route.task}
       size="lg"
       footer={
@@ -348,12 +364,70 @@ function RouteModal({ route, close }) {
           <SelectMenu
             label="主资源池"
             value={primary}
-            onChange={setPrimary}
+            onChange={(value) => {
+              setPrimary(value);
+              setFallbacks((current) =>
+                current.filter((item) => item !== value),
+              );
+            }}
             options={modelBackends.map((item) => item.name)}
           />
         </FormField>
-        <FormField label="降级顺序" required span={2}>
-          <TextInput value={fallback} onChange={setFallback} />
+        <FormField
+          label="备用资源池顺序"
+          required
+          span={2}
+          help="主资源池不可用时，系统从上到下依次尝试"
+        >
+          <div className="ops-fallback-editor">
+            <div className="ops-fallback-list">
+              {fallbacks.map((item, index) => (
+                <div key={item}>
+                  <i>{index + 1}</i>
+                  <span>{item}</span>
+                  <IconButton
+                    icon="chevronUp"
+                    label={`上移 ${item}`}
+                    disabled={index === 0}
+                    onClick={() => moveFallback(index, -1)}
+                  />
+                  <IconButton
+                    icon="chevronDown"
+                    label={`下移 ${item}`}
+                    disabled={index === fallbacks.length - 1}
+                    onClick={() => moveFallback(index, 1)}
+                  />
+                  <IconButton
+                    icon="close"
+                    label={`移除 ${item}`}
+                    onClick={() =>
+                      setFallbacks((current) =>
+                        current.filter((value) => value !== item),
+                      )
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="ops-fallback-add">
+              <SelectMenu
+                label="选择备用资源池"
+                value={fallbackChoice}
+                onChange={setFallbackChoice}
+                options={fallbackOptions}
+              />
+              <Button
+                icon="plus"
+                disabled={!fallbackChoice}
+                onClick={() => {
+                  setFallbacks((current) => [...current, fallbackChoice]);
+                  setFallbackChoice("");
+                }}
+              >
+                添加备用
+              </Button>
+            </div>
+          </div>
         </FormField>
         <FormField label="分配策略" required span={2}>
           <SelectMenu
@@ -427,8 +501,12 @@ export function ModelConfigurationPanel() {
         label="模型配置范围"
         items={[
           { value: "backends", label: "模型后端", count: modelBackends.length },
-          { value: "routes", label: "任务路由", count: modelRoutes.length },
-          { value: "capacity", label: "额度与并发" },
+          {
+            value: "routes",
+            label: "任务模型分配",
+            count: modelRoutes.length,
+          },
+          { value: "capacity", label: "容量与成本限制" },
           {
             value: "versions",
             label: "配置版本",
@@ -444,53 +522,69 @@ export function ModelConfigurationPanel() {
         />
       ) : null}
       {tab === "routes" ? (
-        <OpsTable
-          columns={routeColumns}
-          rows={modelRoutes}
-          onRow={setEditingRoute}
-        />
+        <>
+          <OpsInlineState
+            tone="info"
+            icon="info"
+            title="为不同任务选择主模型与备用顺序"
+            description="例如深度调研优先使用 DeepSeek；主资源池不可用时，再按配置顺序切换备用资源池。"
+          />
+          <OpsTable
+            columns={routeColumns}
+            rows={modelRoutes}
+            onRow={setEditingRoute}
+          />
+        </>
       ) : null}
       {tab === "capacity" ? (
-        <div className="ops-model-policy-grid">
-          {[
-            [
-              "平台总并发",
-              modelCapacityPolicy.globalConcurrency,
-              "所有模型资源池的有效并发上限",
-            ],
-            [
-              "单工作空间并发",
-              modelCapacityPolicy.workspaceConcurrency,
-              "防止单一工作空间挤占平台容量",
-            ],
-            [
-              "负载均衡",
-              modelCapacityPolicy.balancing,
-              "在健康资源池之间分配请求",
-            ],
-            [
-              "异常密钥冷却",
-              modelCapacityPolicy.keyCooldown,
-              "冷却后自动重新健康检查",
-            ],
-            [
-              "失败摘除阈值",
-              modelCapacityPolicy.failureThreshold,
-              "达到阈值后退出分流",
-            ],
-            [
-              "预算预警 / 停止",
-              `${modelCapacityPolicy.budgetWarning} / ${modelCapacityPolicy.budgetStop}`,
-              "达到阈值时通知或停止非必要任务",
-            ],
-          ].map(([label, value, note]) => (
-            <article key={label}>
-              <small>{label}</small>
-              <b>{value}</b>
-              <p>{note}</p>
-            </article>
-          ))}
-        </div>
+        <>
+          <OpsInlineState
+            tone="info"
+            icon="info"
+            title="限制平台同时调用量与成本风险"
+            description="控制平台和单个工作空间可以同时运行多少模型请求，并在密钥异常或预算达到阈值时自动降载。"
+          />
+          <div className="ops-model-policy-grid">
+            {[
+              [
+                "平台总并发",
+                modelCapacityPolicy.globalConcurrency,
+                "所有模型资源池的有效并发上限",
+              ],
+              [
+                "单工作空间并发",
+                modelCapacityPolicy.workspaceConcurrency,
+                "防止单一工作空间挤占平台容量",
+              ],
+              [
+                "负载均衡",
+                modelCapacityPolicy.balancing,
+                "在健康资源池之间分配请求",
+              ],
+              [
+                "异常密钥冷却",
+                modelCapacityPolicy.keyCooldown,
+                "冷却后自动重新健康检查",
+              ],
+              [
+                "失败摘除阈值",
+                modelCapacityPolicy.failureThreshold,
+                "达到阈值后退出分流",
+              ],
+              [
+                "预算预警 / 停止",
+                `${modelCapacityPolicy.budgetWarning} / ${modelCapacityPolicy.budgetStop}`,
+                "达到阈值时通知或停止非必要任务",
+              ],
+            ].map(([label, value, note]) => (
+              <article key={label}>
+                <small>{label}</small>
+                <b>{value}</b>
+                <p>{note}</p>
+              </article>
+            ))}
+          </div>
+        </>
       ) : null}
       {tab === "versions" ? (
         <OpsTable
