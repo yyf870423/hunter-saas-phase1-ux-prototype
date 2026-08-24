@@ -25,14 +25,14 @@ const groups = [
       [
         "自动化授权",
         "/settings/automation",
-        "四类主线授权、强制门禁和自动执行确认",
+        "四类主线默认授权和自动执行影响确认",
       ],
-      ["连接", "/settings/connections", "发件邮箱和寻访 App 设备"],
+      ["连接", "/settings/connections", "个人发件邮箱和寻访 App 设备"],
       ["尚未连接", "/settings/connections?state=empty", "邮箱和设备空状态"],
       [
         "连接失败",
         "/settings/connections?state=error",
-        "连接异常、保留选择和重新授权",
+        "协议探测失败、手动设置和重新验证",
       ],
     ],
   },
@@ -43,6 +43,11 @@ const groups = [
     links: [
       ["订阅与用量", "/settings/subscription", "套餐、分类用量、预警和订单"],
       [
+        "从未订阅",
+        "/settings/subscription?state=none",
+        "未订阅权益说明和首次订阅入口",
+      ],
+      [
         "订阅到期",
         "/settings/subscription?state=limited",
         "付费能力受限但数据仍可访问",
@@ -51,12 +56,12 @@ const groups = [
       [
         "数据与隐私",
         "/settings/data-privacy",
-        "导出、回收站、诊断包、删除和注销",
+        "导出、回收站、诊断包和删除工作空间",
       ],
       [
-        "注销受限",
+        "删除受限",
         "/settings/data-privacy?state=limited",
-        "有效订阅阻塞账号注销",
+        "运行中的数据任务阻塞工作空间删除",
       ],
     ],
   },
@@ -130,9 +135,9 @@ export function SettingsReviewPage() {
             <p>桌面和移动端都从用户账户进入设置。</p>
           </article>
           <article>
-            <Icon name="lock" />
-            <b>门禁始终有效</b>
-            <p>自动执行不能关闭安全和数据写入检查。</p>
+            <Icon name="mail" />
+            <b>个人邮箱连接</b>
+            <p>优先自动探测协议，失败后再手动设置。</p>
           </article>
           <article>
             <Icon name="monitor" />

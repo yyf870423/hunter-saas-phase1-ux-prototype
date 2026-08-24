@@ -42,7 +42,7 @@ export const settingSections = [
   {
     id: "data-privacy",
     label: "数据与隐私",
-    description: "导出、恢复和账号删除",
+    description: "导出、恢复和工作空间",
     icon: "shield",
     route: "/settings/data-privacy",
   },

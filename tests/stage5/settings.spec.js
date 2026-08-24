@@ -24,6 +24,41 @@ test("个人资料支持分区编辑、校验和安全操作", async ({ page }) 
   await page.getByLabel("姓名*").fill("");
   await expect(page.getByText("请输入姓名")).toBeVisible();
   await page.getByLabel("姓名*").fill("沈岚");
+
+  await page.getByRole("button", { name: "更换头像" }).click();
+  await expect(page.getByRole("button", { name: "保存头像" })).toBeDisabled();
+  await page.locator("#s5-avatar-file").setInputFiles({
+    name: "unsupported-avatar.gif",
+    mimeType: "image/gif",
+    buffer: Buffer.from("not-a-supported-avatar"),
+  });
+  await expect(page.getByText("请选择 JPG、PNG 或 WebP 图片")).toBeVisible();
+  await page.locator("#s5-avatar-file").setInputFiles({
+    name: "shenlan-avatar.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
+  await expect(page.getByAltText("头像裁剪预览")).toBeVisible();
+  await page.getByLabel("缩放头像").fill("130");
+  await page.getByRole("button", { name: "取消" }).last().click();
+  await expect(page.locator(".s5-avatar-editor > i")).toHaveText("SL");
+
+  await page.getByRole("button", { name: "更换头像" }).click();
+  await page.locator("#s5-avatar-file").setInputFiles({
+    name: "shenlan-avatar.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
+  await page.getByRole("button", { name: "保存头像" }).click();
+  await expect(page.getByText("头像已更新")).toBeVisible();
+  await expect(page.locator(".s5-avatar-editor > i")).toHaveClass(/has-image/);
+
   await page.getByRole("button", { name: "保存" }).first().click();
   await expect(page.getByText("个人资料已保存")).toBeVisible();
 
@@ -63,10 +98,10 @@ test("通知页区分可配置通知和强制通知", async ({ page }) => {
   await assertNoConsoleErrors();
 });
 
-test("自动化授权支持三种统一模式并锁定强制门禁", async ({ page }) => {
+test("自动化授权支持三种统一模式且不展示内部门禁", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/settings/automation");
-  await expect(page.getByText("始终开启")).toHaveCount(4);
+  await expect(page.getByText("强制门禁")).toHaveCount(0);
   await page.getByRole("button", { name: "修改" }).first().click();
   await page.getByRole("radio", { name: /自动执行/ }).click();
   await expect(page.getByText(/不会自动发送邮件/)).toBeVisible();
@@ -78,18 +113,30 @@ test("自动化授权支持三种统一模式并锁定强制门禁", async ({ pa
   await assertNoConsoleErrors();
 });
 
-test("连接页覆盖邮箱授权、失败重试和设备连接", async ({ page }) => {
+test("连接页覆盖邮箱自动探测、手动协议和设备连接", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/settings/connections?state=empty");
   await page.getByRole("button", { name: "连接邮箱" }).click();
-  await page.getByRole("radio", { name: /腾讯企业邮箱/ }).click();
-  await page.getByRole("button", { name: "继续" }).click();
-  await page.getByRole("button", { name: "模拟授权失败" }).click();
-  await expect(page.getByText("授权未完成")).toBeVisible();
-  await page.getByRole("button", { name: "重新授权" }).click();
-  await page.getByRole("button", { name: "模拟授权完成" }).click();
+  await page.getByLabel("邮箱地址*").fill("shenlan@qq.com");
+  await page.getByLabel("邮箱密码或客户端授权码*").fill("mail-auth-code");
+  await page.getByRole("button", { name: "自动探测" }).click();
+  await expect(page.getByText("已识别为 QQ 邮箱")).toBeVisible();
+  await page.getByRole("button", { name: "验证并连接" }).click();
+  await expect(page.getByText("shenlan@qq.com 已连接")).toBeVisible();
   await page.getByRole("button", { name: "完成" }).click();
   await expect(page.getByText("发件邮箱已连接")).toBeVisible();
+
+  await page.getByRole("button", { name: "重新连接" }).click();
+  await page.getByLabel("邮箱地址*").fill("shenlan@xinglan-talent.cn");
+  await page.getByLabel("邮箱密码或客户端授权码*").fill("mail-auth-code");
+  await page.getByRole("button", { name: "自动探测" }).click();
+  await expect(page.getByText("未能自动识别邮箱配置")).toBeVisible();
+  await page.getByRole("button", { name: "手动设置" }).click();
+  await page.getByRole("button", { name: /收件协议/ }).click();
+  await page.getByRole("button", { name: "POP3", exact: true }).click();
+  await page.getByRole("button", { name: "验证并连接" }).click();
+  await expect(page.getByText(/已验证 SMTP 发件和 POP3 收件/)).toBeVisible();
+  await page.getByRole("button", { name: "完成" }).click();
 
   await page.getByRole("button", { name: "添加设备" }).first().click();
   await expect(page.getByText("H7K4-9Q2M")).toBeVisible();
@@ -100,18 +147,32 @@ test("连接页覆盖邮箱授权、失败重试和设备连接", async ({ page 
   await assertNoConsoleErrors();
 });
 
-test("订阅与隐私覆盖支付、到期和危险操作", async ({ page }) => {
+test("订阅与数据覆盖支付、无订阅、到期和危险操作", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/settings/subscription");
+  await expect(page.locator(".s5-plan-card > strong")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "更新支付方式" })).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole("button", { name: /下载收据/ })).toHaveCount(0);
   await page.getByRole("button", { name: "更换套餐" }).click();
   await page.getByRole("radio", { name: /专业版年付/ }).click();
+  await page.getByRole("radio", { name: /微信支付/ }).click();
   await page.getByRole("button", { name: "确认并支付" }).click();
   await expect(page.getByText("套餐已更新")).toBeVisible();
+
+  await page.goto("#/settings/subscription?state=none");
+  await expect(page.getByText("尚未订阅 Hunter")).toBeVisible();
+  await page.getByRole("button", { name: "选择订阅" }).click();
+  await expect(page.getByRole("radio", { name: /支付宝/ })).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
 
   await page.goto("#/settings/subscription?state=limited");
   await expect(page.getByText(/业务数据仍可查看和导出/)).toBeVisible();
 
   await page.goto("#/settings/data-privacy");
+  await expect(page.getByText("隐私边界")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "注销账号" })).toHaveCount(0);
   await page.getByRole("button", { name: "删除工作空间" }).click();
   await page.getByLabel(/输入“沈岚的猎头工作空间”确认/).fill("错误名称");
   await expect(page.getByText("输入内容不匹配")).toBeVisible();

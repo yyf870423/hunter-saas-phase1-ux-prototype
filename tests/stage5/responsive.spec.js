@@ -56,9 +56,28 @@ test("设置中心生成桌面、平板和手机验收截图", async ({ page }) 
 
 test("设置中心关键 Modal 生成验收截图", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
+
+  await page.goto("#/settings/profile");
+  await page.getByRole("button", { name: "编辑" }).first().click();
+  await page.getByRole("button", { name: "更换头像" }).click();
+  await page.locator("#s5-avatar-file").setInputFiles({
+    name: "shenlan-avatar.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: "artifacts/stage5-avatar-crop.png",
+    fullPage: true,
+  });
+
   await page.goto("#/settings/automation");
   await page.getByRole("button", { name: "修改" }).first().click();
   await page.getByRole("radio", { name: /自动执行/ }).click();
+  await page.waitForTimeout(220);
   await page.screenshot({
     path: "artifacts/stage5-automation-modal.png",
     fullPage: true,
@@ -66,13 +85,31 @@ test("设置中心关键 Modal 生成验收截图", async ({ page }) => {
 
   await page.goto("#/settings/connections?state=empty");
   await page.getByRole("button", { name: "连接邮箱" }).click();
+  await page.waitForTimeout(220);
   await page.screenshot({
     path: "artifacts/stage5-email-connect.png",
     fullPage: true,
   });
 
+  await page.getByLabel("邮箱地址*").fill("shenlan@xinglan-talent.cn");
+  await page.getByLabel("邮箱密码或客户端授权码*").fill("mail-auth-code");
+  await page.getByRole("button", { name: "自动探测" }).click();
+  await page.getByRole("button", { name: "手动设置" }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: "artifacts/stage5-email-manual-protocol.png",
+    fullPage: true,
+  });
+
+  await page.goto("#/settings/subscription?state=none");
+  await page.screenshot({
+    path: "artifacts/stage5-subscription-none.png",
+    fullPage: true,
+  });
+
   await page.goto("#/settings/data-privacy");
   await page.getByRole("button", { name: "删除工作空间" }).click();
+  await page.waitForTimeout(220);
   await page.screenshot({
     path: "artifacts/stage5-delete-workspace.png",
     fullPage: true,

@@ -6,7 +6,6 @@ import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import {
   ChoiceCard,
   InlineNotice,
-  LockedRule,
   MetricDonut,
   SettingRow,
   SettingsError,
@@ -33,13 +32,24 @@ function PageState({ state, clearState, rows = 4, children }) {
   return children;
 }
 
-function ModalActions({ cancel, confirm, confirmText = "保存", loading }) {
+function ModalActions({
+  cancel,
+  confirm,
+  confirmText = "保存",
+  loading,
+  confirmDisabled = false,
+}) {
   return (
     <>
       <Button onClick={cancel} disabled={loading}>
         取消
       </Button>
-      <Button tone="primary" onClick={confirm} loading={loading}>
+      <Button
+        tone="primary"
+        onClick={confirm}
+        loading={loading}
+        disabled={confirmDisabled}
+      >
         {confirmText}
       </Button>
     </>
@@ -58,6 +68,12 @@ export function ProfileSettingsPage() {
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [sessionOpen, setSessionOpen] = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const [avatarDraft, setAvatarDraft] = useState("");
+  const [avatarName, setAvatarName] = useState("");
+  const [avatarError, setAvatarError] = useState("");
+  const [avatarZoom, setAvatarZoom] = useState(100);
   const [passwords, setPasswords] = useState({ current: "", next: "" });
   const [newEmail, setNewEmail] = useState("");
   const [saving, setSaving] = useState(false);
@@ -69,6 +85,30 @@ export function ProfileSettingsPage() {
       done();
       notify(message);
     }, 520);
+  };
+
+  const openAvatarEditor = () => {
+    setAvatarDraft(avatarPreview);
+    setAvatarError("");
+    setAvatarZoom(100);
+    setAvatarOpen(true);
+  };
+
+  const selectAvatarFile = (file) => {
+    if (!file) return;
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setAvatarError("请选择 JPG、PNG 或 WebP 图片");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("图片不能超过 5 MB");
+      return;
+    }
+    setAvatarError("");
+    setAvatarName(file.name);
+    setAvatarDraft(URL.createObjectURL(file));
+    setAvatarZoom(100);
   };
 
   return (
@@ -111,11 +151,20 @@ export function ProfileSettingsPage() {
       >
         <div className="s5-profile-grid">
           <div className="s5-avatar-editor">
-            <i>SL</i>
+            <i
+              className={avatarPreview ? "has-image" : ""}
+              style={
+                avatarPreview
+                  ? { backgroundImage: `url(${avatarPreview})` }
+                  : undefined
+              }
+            >
+              {avatarPreview ? null : "SL"}
+            </i>
             <button
               type="button"
               disabled={!editingProfile}
-              onClick={() => notify("头像已更新", "info")}
+              onClick={openAvatarEditor}
             >
               更换头像
             </button>
@@ -158,6 +207,88 @@ export function ProfileSettingsPage() {
           </div>
         </div>
       </SettingsSection>
+
+      <Modal
+        open={avatarOpen}
+        close={() => setAvatarOpen(false)}
+        title="更换头像"
+        description="支持 JPG、PNG 或 WebP，文件不超过 5 MB。"
+        footer={
+          <ModalActions
+            cancel={() => setAvatarOpen(false)}
+            confirmText="保存头像"
+            confirm={() =>
+              save(() => {
+                setAvatarPreview(avatarDraft);
+                setAvatarOpen(false);
+              }, "头像已更新")
+            }
+            loading={saving}
+            confirmDisabled={!avatarDraft}
+          />
+        }
+      >
+        <div className="s5-avatar-modal">
+          <label
+            className="s5-avatar-upload"
+            htmlFor="s5-avatar-file"
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              selectAvatarFile(event.dataTransfer.files?.[0]);
+            }}
+          >
+            <Icon name="upload" />
+            <span>
+              <b>{avatarName || "选择头像图片"}</b>
+              <small>点击选择文件，也可以将图片拖到这里</small>
+            </span>
+            <em>{avatarName ? "重新选择" : "选择图片"}</em>
+          </label>
+          <input
+            id="s5-avatar-file"
+            className="s5-visually-hidden"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(event) => selectAvatarFile(event.target.files?.[0])}
+          />
+          {avatarError ? <p className="s5-field-error">{avatarError}</p> : null}
+          {avatarDraft ? (
+            <div className="s5-avatar-cropper">
+              <div className="s5-avatar-crop-viewport">
+                <img
+                  src={avatarDraft}
+                  alt="头像裁剪预览"
+                  style={{ transform: `scale(${avatarZoom / 100})` }}
+                />
+                <i />
+              </div>
+              <div className="s5-avatar-zoom">
+                <Icon name="minus" />
+                <label>
+                  <span>缩放头像</span>
+                  <input
+                    type="range"
+                    min="100"
+                    max="180"
+                    value={avatarZoom}
+                    onChange={(event) =>
+                      setAvatarZoom(Number(event.target.value))
+                    }
+                  />
+                </label>
+                <Icon name="plus" />
+              </div>
+              <small>缩放图片，使头像主体位于圆形区域内。</small>
+            </div>
+          ) : (
+            <div className="s5-avatar-placeholder">
+              <i>SL</i>
+              <span>选择图片后可在这里裁剪和预览</span>
+            </div>
+          )}
+        </div>
+      </Modal>
 
       <SettingsSection
         title="个人工作空间"
@@ -583,8 +714,7 @@ export function AutomationSettingsPage() {
         description="设置新工作的默认执行边界；运行中的工作可以单独调整。"
       />
       <InlineNotice>
-        默认使用“执行前确认”。授权只影响尚未执行的动作，不能关闭 Hunter
-        的强制门禁。
+        默认使用“执行前确认”。授权只影响尚未执行的动作，运行中的工作可以单独调整。
       </InlineNotice>
       <SettingsSection
         title="业务主线默认授权"
@@ -618,29 +748,6 @@ export function AutomationSettingsPage() {
               }
             />
           ))}
-        </div>
-      </SettingsSection>
-      <SettingsSection
-        title="强制门禁"
-        description="无论选择哪种授权，这些检查都不能关闭。"
-      >
-        <div className="s5-locked-grid">
-          <LockedRule
-            title="数据写入门禁"
-            description="身份、证据、Schema、去重和权限检查"
-          />
-          <LockedRule
-            title="执行边界门禁"
-            description="预算、数量、停止条件和防循环检查"
-          />
-          <LockedRule
-            title="必须人工处理"
-            description="正式推荐、面试、薪资、Offer 和录取决定"
-          />
-          <LockedRule
-            title="邮件逐封确认"
-            description="收件人、标题、正文和附件每次确认"
-          />
         </div>
       </SettingsSection>
       <Modal
@@ -686,7 +793,7 @@ export function AutomationSettingsPage() {
           />
           <ChoiceCard
             title="自动执行"
-            description="通过强制门禁后自动写入允许的业务数据；高风险动作仍由你处理。"
+            description="自动完成已授权的数据写入和低风险操作；高风险动作仍由你处理。"
             icon="activity"
             selected={draftMode === "自动执行"}
             onClick={() => setDraftMode("自动执行")}
@@ -709,17 +816,95 @@ export function ConnectionSettingsPage() {
   const [mailConnected, setMailConnected] = useState(!empty);
   const [deviceConnected, setDeviceConnected] = useState(!empty);
   const [mailModal, setMailModal] = useState(false);
-  const [mailStep, setMailStep] = useState(1);
-  const [provider, setProvider] = useState("腾讯企业邮箱");
-  const [mailError, setMailError] = useState(false);
+  const [mailStage, setMailStage] = useState("credentials");
+  const [mailAddress, setMailAddress] = useState(empty ? "" : "shenlan@qq.com");
+  const [mailSecret, setMailSecret] = useState("");
+  const [mailFieldError, setMailFieldError] = useState("");
+  const [detectedProvider, setDetectedProvider] = useState("");
+  const [incomingProtocol, setIncomingProtocol] = useState("IMAP");
+  const [mailServers, setMailServers] = useState({
+    smtpHost: "",
+    smtpPort: "465",
+    incomingHost: "",
+    incomingPort: "993",
+    encryption: "SSL/TLS",
+  });
   const [deviceModal, setDeviceModal] = useState(false);
   const [deviceWaiting, setDeviceWaiting] = useState(false);
   const [disconnect, setDisconnect] = useState(null);
 
   const resetMail = () => {
     setMailModal(false);
-    setMailStep(1);
-    setMailError(false);
+    setMailStage("credentials");
+    setMailFieldError("");
+    setDetectedProvider("");
+  };
+
+  const startMailDetection = () => {
+    if (!/^\S+@\S+\.\S+$/.test(mailAddress)) {
+      setMailFieldError("请输入有效邮箱地址");
+      return;
+    }
+    if (!mailSecret.trim()) {
+      setMailFieldError("请输入邮箱密码或客户端授权码");
+      return;
+    }
+    setMailFieldError("");
+    setMailStage("detecting");
+    window.setTimeout(() => {
+      const domain = mailAddress.split("@")[1]?.toLowerCase();
+      const knownProviders = {
+        "qq.com": ["QQ 邮箱", "smtp.qq.com", "imap.qq.com"],
+        "foxmail.com": ["Foxmail", "smtp.qq.com", "imap.qq.com"],
+        "163.com": ["网易 163 邮箱", "smtp.163.com", "imap.163.com"],
+        "gmail.com": ["Gmail", "smtp.gmail.com", "imap.gmail.com"],
+        "outlook.com": [
+          "Outlook",
+          "smtp-mail.outlook.com",
+          "outlook.office365.com",
+        ],
+        "hotmail.com": [
+          "Outlook",
+          "smtp-mail.outlook.com",
+          "outlook.office365.com",
+        ],
+      };
+      const detected = knownProviders[domain];
+      if (!detected) {
+        setMailServers((current) => ({
+          ...current,
+          smtpHost: `smtp.${domain || "example.com"}`,
+          incomingHost: `imap.${domain || "example.com"}`,
+        }));
+        setMailStage("detect-failed");
+        return;
+      }
+      setDetectedProvider(detected[0]);
+      setIncomingProtocol("IMAP");
+      setMailServers({
+        smtpHost: detected[1],
+        smtpPort: "465",
+        incomingHost: detected[2],
+        incomingPort: "993",
+        encryption: "SSL/TLS",
+      });
+      setMailStage("detected");
+    }, 650);
+  };
+
+  const verifyMailConnection = () => {
+    if (
+      !mailServers.smtpHost.trim() ||
+      !mailServers.smtpPort.trim() ||
+      !mailServers.incomingHost.trim() ||
+      !mailServers.incomingPort.trim()
+    ) {
+      setMailFieldError("请完整填写发件和收件服务器信息");
+      return;
+    }
+    setMailFieldError("");
+    setMailStage("verifying");
+    window.setTimeout(() => setMailStage("success"), 720);
   };
 
   return (
@@ -738,7 +923,7 @@ export function ConnectionSettingsPage() {
       ) : null}
       <SettingsSection
         title="发件邮箱"
-        description="Hunter 只跟踪由 Hunter 发出的邮件和对应回复。"
+        description="连接常用个人邮箱后，Hunter 使用邮箱协议发送邮件并读取对应回复。"
       >
         {mailConnected ? (
           <div className="s5-connection-card">
@@ -747,10 +932,10 @@ export function ConnectionSettingsPage() {
             </i>
             <span>
               <span>
-                <b>shenlan@xinglan-talent.cn</b>
+                <b>{mailAddress || "shenlan@qq.com"}</b>
                 <StatusBadge tone="success">已连接</StatusBadge>
               </span>
-              <small>腾讯企业邮箱 · 最近发送于今天 10:42</small>
+              <small>QQ 邮箱 · SMTP + IMAP · 最近发送于今天 10:42</small>
               <em>每封邮件仍需确认收件人、标题、正文和附件。</em>
             </span>
             <div>
@@ -772,8 +957,8 @@ export function ConnectionSettingsPage() {
             <span>
               <b>尚未连接发件邮箱</b>
               <small>
-                连接后可以在 Hunter
-                中确认邮件草稿并发送，收到回复后继续相关工作。
+                填写邮箱地址及邮箱密码或客户端授权码。Hunter
+                会自动探测可用协议，无法识别时再由你手动设置。
               </small>
             </span>
             <Button
@@ -857,31 +1042,42 @@ export function ConnectionSettingsPage() {
       <Modal
         open={mailModal}
         close={resetMail}
-        closeDisabled={mailStep === 2 && !mailError}
-        title={mailStep === 3 ? "邮箱连接完成" : "连接发件邮箱"}
-        description={`步骤 ${mailStep} / 3 · ${mailStep === 1 ? "选择邮箱" : mailStep === 2 ? "完成授权" : "检查连接"}`}
+        closeDisabled={mailStage === "detecting" || mailStage === "verifying"}
+        title={mailStage === "success" ? "邮箱连接完成" : "连接发件邮箱"}
+        description={
+          mailStage === "credentials"
+            ? "填写个人邮箱凭据，Hunter 会自动探测发件和收件配置。"
+            : mailStage === "manual"
+              ? "自动探测失败，请确认邮箱服务商提供的协议和服务器信息。"
+              : "验证邮箱协议和登录凭据。"
+        }
         footer={
-          mailStep === 1 ? (
+          mailStage === "credentials" ? (
             <>
               <Button onClick={resetMail}>取消</Button>
-              <Button tone="primary" onClick={() => setMailStep(2)}>
-                继续
+              <Button tone="primary" onClick={startMailDetection}>
+                自动探测
               </Button>
             </>
-          ) : mailStep === 2 ? (
-            <Button
-              tone="primary"
-              onClick={() => {
-                if (mailError) {
-                  setMailError(false);
-                  return;
-                }
-                setMailStep(3);
-              }}
-            >
-              {mailError ? "重新授权" : "模拟授权完成"}
-            </Button>
-          ) : (
+          ) : mailStage === "detected" || mailStage === "manual" ? (
+            <>
+              <Button onClick={() => setMailStage("credentials")}>
+                上一步
+              </Button>
+              <Button tone="primary" onClick={verifyMailConnection}>
+                验证并连接
+              </Button>
+            </>
+          ) : mailStage === "detect-failed" ? (
+            <>
+              <Button onClick={() => setMailStage("credentials")}>
+                修改邮箱
+              </Button>
+              <Button tone="primary" onClick={() => setMailStage("manual")}>
+                手动设置
+              </Button>
+            </>
+          ) : mailStage === "success" ? (
             <Button
               tone="primary"
               onClick={() => {
@@ -892,61 +1088,192 @@ export function ConnectionSettingsPage() {
             >
               完成
             </Button>
+          ) : (
+            <Button tone="primary" loading disabled>
+              正在验证
+            </Button>
           )
         }
       >
-        {mailStep === 1 ? (
-          <div
-            className="s5-choice-list"
-            role="radiogroup"
-            aria-label="邮箱类型"
-          >
-            {[
-              "腾讯企业邮箱",
-              "阿里企业邮箱",
-              "Microsoft 365",
-              "其他企业邮箱",
-            ].map((item) => (
-              <ChoiceCard
-                key={item}
-                title={item}
-                description={
-                  item === "其他企业邮箱"
-                    ? "使用标准 OAuth 或企业邮箱授权"
-                    : "通过服务商授权，不需要填写 API Key"
-                }
-                icon="mail"
-                selected={provider === item}
-                onClick={() => setProvider(item)}
+        {mailStage === "credentials" ? (
+          <div className="s5-modal-form">
+            <FormField label="邮箱地址" required>
+              <TextInput
+                value={mailAddress}
+                onChange={setMailAddress}
+                placeholder="name@example.com"
               />
-            ))}
+            </FormField>
+            <FormField
+              label="邮箱密码或客户端授权码"
+              required
+              hint="QQ、163 等邮箱通常需要先在邮箱设置中开启协议服务，并填写客户端授权码。"
+            >
+              <input
+                className="s4-input"
+                type="password"
+                value={mailSecret}
+                onChange={(event) => setMailSecret(event.target.value)}
+                placeholder="仅用于验证邮箱连接"
+              />
+            </FormField>
+            {mailFieldError ? (
+              <p className="s5-field-error">{mailFieldError}</p>
+            ) : null}
+            <InlineNotice>
+              发件固定使用 SMTP；收取回复优先使用
+              IMAP。只有自动探测失败时，才需要手动选择收件协议和服务器。
+            </InlineNotice>
           </div>
-        ) : mailStep === 2 ? (
-          mailError ? (
-            <div className="s5-connect-status is-error">
+        ) : mailStage === "detecting" ? (
+          <div className="s5-connect-status is-running">
+            <span className="s1-spinner" />
+            <b>正在探测邮箱配置</b>
+            <p>正在识别邮箱服务商、SMTP 发件配置和 IMAP 收件配置。</p>
+          </div>
+        ) : mailStage === "detected" ? (
+          <div className="s5-mail-detected">
+            <div className="s5-connect-status is-success is-compact">
               <i>
-                <Icon name="warning" />
+                <Icon name="check" />
               </i>
-              <b>授权未完成</b>
-              <p>授权页面已关闭或服务未响应。你的邮箱密码不会保存到 Hunter。</p>
+              <b>已识别为 {detectedProvider}</b>
+              <p>请确认配置后验证邮箱凭据。</p>
             </div>
-          ) : (
-            <div className="s5-connect-status is-running">
-              <span className="s1-spinner" />
-              <b>等待 {provider} 完成授权</b>
-              <p>授权窗口完成后返回这里，当前页面不会自动关闭。</p>
-              <button type="button" onClick={() => setMailError(true)}>
-                模拟授权失败
-              </button>
+            <dl>
+              <div>
+                <dt>发送邮件</dt>
+                <dd>
+                  SMTP · {mailServers.smtpHost}:{mailServers.smtpPort}
+                </dd>
+              </div>
+              <div>
+                <dt>读取回复</dt>
+                <dd>
+                  IMAP · {mailServers.incomingHost}:{mailServers.incomingPort}
+                </dd>
+              </div>
+              <div>
+                <dt>连接加密</dt>
+                <dd>{mailServers.encryption}</dd>
+              </div>
+            </dl>
+          </div>
+        ) : mailStage === "detect-failed" ? (
+          <div className="s5-connect-status is-error">
+            <i>
+              <Icon name="warning" />
+            </i>
+            <b>未能自动识别邮箱配置</b>
+            <p>
+              邮箱地址和密码已保留。你可以修改邮箱，或按照邮箱服务商提供的信息手动设置协议。
+            </p>
+          </div>
+        ) : mailStage === "manual" ? (
+          <div className="s5-mail-manual">
+            <InlineNotice>
+              SMTP 用于发送邮件，不能更换。收件协议推荐
+              IMAP；仅当邮箱服务商不支持 IMAP 时选择 POP3。
+            </InlineNotice>
+            <div className="s5-mail-server-grid">
+              <FormField label="发件协议">
+                <div className="s5-protocol-readonly">SMTP</div>
+              </FormField>
+              <FormField label="SMTP 服务器" required>
+                <TextInput
+                  value={mailServers.smtpHost}
+                  onChange={(value) =>
+                    setMailServers((current) => ({
+                      ...current,
+                      smtpHost: value,
+                    }))
+                  }
+                />
+              </FormField>
+              <FormField label="SMTP 端口" required>
+                <TextInput
+                  value={mailServers.smtpPort}
+                  onChange={(value) =>
+                    setMailServers((current) => ({
+                      ...current,
+                      smtpPort: value,
+                    }))
+                  }
+                />
+              </FormField>
+              <FormField label="收件协议" required>
+                <SelectMenu
+                  label="收件协议"
+                  value={incomingProtocol}
+                  options={["IMAP", "POP3"]}
+                  onChange={(value) => {
+                    setIncomingProtocol(value);
+                    setMailServers((current) => ({
+                      ...current,
+                      incomingPort: value === "IMAP" ? "993" : "995",
+                      incomingHost: current.incomingHost.replace(
+                        /^(imap|pop)\./,
+                        value === "IMAP" ? "imap." : "pop.",
+                      ),
+                    }));
+                  }}
+                />
+              </FormField>
+              <FormField label={`${incomingProtocol} 服务器`} required>
+                <TextInput
+                  value={mailServers.incomingHost}
+                  onChange={(value) =>
+                    setMailServers((current) => ({
+                      ...current,
+                      incomingHost: value,
+                    }))
+                  }
+                />
+              </FormField>
+              <FormField label={`${incomingProtocol} 端口`} required>
+                <TextInput
+                  value={mailServers.incomingPort}
+                  onChange={(value) =>
+                    setMailServers((current) => ({
+                      ...current,
+                      incomingPort: value,
+                    }))
+                  }
+                />
+              </FormField>
+              <FormField label="连接加密" required>
+                <SelectMenu
+                  label="连接加密"
+                  value={mailServers.encryption}
+                  options={["SSL/TLS", "STARTTLS"]}
+                  onChange={(value) =>
+                    setMailServers((current) => ({
+                      ...current,
+                      encryption: value,
+                    }))
+                  }
+                />
+              </FormField>
             </div>
-          )
+            {mailFieldError ? (
+              <p className="s5-field-error">{mailFieldError}</p>
+            ) : null}
+          </div>
+        ) : mailStage === "verifying" ? (
+          <div className="s5-connect-status is-running">
+            <span className="s1-spinner" />
+            <b>正在验证发件和收件能力</b>
+            <p>Hunter 会分别验证 SMTP 登录、测试邮件发送和收件协议连接。</p>
+          </div>
         ) : (
           <div className="s5-connect-status is-success">
             <i>
               <Icon name="check" />
             </i>
-            <b>shenlan@xinglan-talent.cn 已连接</b>
-            <p>已验证发件身份和回复跟踪权限，可以开始确认邮件草稿。</p>
+            <b>{mailAddress} 已连接</b>
+            <p>
+              已验证 SMTP 发件和 {incomingProtocol} 收件，可以开始确认邮件草稿。
+            </p>
           </div>
         )}
       </Modal>
@@ -1035,7 +1362,7 @@ export function ConnectionSettingsPage() {
       >
         <InlineNotice tone="warning" icon="warning">
           {disconnect === "mail"
-            ? "尚未发送的邮件草稿会保留，但发送前需要重新连接邮箱。"
+            ? "尚未发送的邮件草稿会保留，但发送和读取后续回复前需要重新连接邮箱。"
             : "正在运行的设备侧工作不会被远程停止，请同时在设备中结束工作。"}
         </InlineNotice>
       </Modal>
@@ -1048,10 +1375,11 @@ export function SubscriptionSettingsPage() {
   const notify = useToast();
   const limited = state === "limited";
   const empty = state === "empty";
+  const noSubscription = state === "none";
   const [planModal, setPlanModal] = useState(false);
   const [renewModal, setRenewModal] = useState(false);
-  const [paymentModal, setPaymentModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("专业版");
+  const [paymentMethod, setPaymentMethod] = useState("支付宝");
   const [autoRenew, setAutoRenew] = useState(true);
   const [saving, setSaving] = useState(false);
   const commit = (message, close) => {
@@ -1077,90 +1405,104 @@ export function SubscriptionSettingsPage() {
           </button>
         </InlineNotice>
       ) : null}
-      <section className="s5-plan-overview">
-        <div className="s5-plan-card">
+      {noSubscription ? (
+        <section className="s5-no-subscription">
+          <i>
+            <Icon name="creditCard" />
+          </i>
           <span>
-            <small>当前套餐</small>
-            <h2>{limited ? "专业版 · 已到期" : "专业版"}</h2>
-            <p>适合独立猎头持续经营客户、岗位、人才和版图。</p>
+            <small>当前订阅</small>
+            <h2>尚未订阅 Hunter</h2>
+            <p>
+              你可以浏览和导出已有业务数据；开始
+              Agent、自动化工作和付费数据处理前需要选择套餐。
+            </p>
           </span>
-          <strong>
-            ¥399<small>/ 月</small>
-          </strong>
-          <dl>
-            <div>
-              <dt>下次续订</dt>
-              <dd>{limited ? "已停止" : "2026 年 9 月 1 日"}</dd>
+          <Button tone="primary" onClick={() => setPlanModal(true)}>
+            选择订阅
+          </Button>
+        </section>
+      ) : (
+        <>
+          <section className="s5-plan-overview">
+            <div className="s5-plan-card">
+              <span>
+                <small>当前套餐</small>
+                <h2>{limited ? "专业版 · 已到期" : "专业版"}</h2>
+                <p>适合独立猎头持续经营客户、岗位、人才和版图。</p>
+              </span>
+              <dl>
+                <div>
+                  <dt>下次续订</dt>
+                  <dd>{limited ? "已停止" : "2026 年 9 月 1 日"}</dd>
+                </div>
+                <div>
+                  <dt>自动付费</dt>
+                  <dd>{paymentMethod}</dd>
+                </div>
+                <div>
+                  <dt>自动续订</dt>
+                  <dd>{autoRenew ? "已开启" : "已关闭"}</dd>
+                </div>
+              </dl>
+              <div>
+                <Button tone="primary" onClick={() => setPlanModal(true)}>
+                  {limited ? "恢复订阅" : "更换套餐"}
+                </Button>
+                {!limited ? (
+                  <Button onClick={() => setRenewModal(true)}>
+                    {autoRenew ? "关闭自动续订" : "开启自动续订"}
+                  </Button>
+                ) : null}
+              </div>
             </div>
-            <div>
-              <dt>支付方式</dt>
-              <dd>招商银行 · 6028</dd>
+            <div className="s5-usage-card">
+              <MetricDonut value={64} label="64%" caption="本月已使用" />
+              <div className="s5-usage-breakdown">
+                <span>
+                  <i style={{ "--usage": "72%" }} />
+                  <b>Agent 任务</b>
+                  <em>36 / 50 次</em>
+                </span>
+                <span>
+                  <i style={{ "--usage": "53%" }} />
+                  <b>公开网络搜索</b>
+                  <em>1,580 / 3,000 次</em>
+                </span>
+                <span>
+                  <i style={{ "--usage": "41%" }} />
+                  <b>数据处理</b>
+                  <em>8.2 / 20 GB</em>
+                </span>
+              </div>
             </div>
-            <div>
-              <dt>自动续订</dt>
-              <dd>{autoRenew ? "已开启" : "已关闭"}</dd>
+          </section>
+          <SettingsSection
+            title="额度预警"
+            description="达到用量边界前提前通知，避免运行中的工作意外停止。"
+          >
+            <div className="s5-setting-list">
+              <SettingRow
+                title="使用达到 70%"
+                description="站内通知和邮件提醒"
+                action={<Toggle label="70% 用量提醒" checked />}
+              />
+              <SettingRow
+                title="使用达到 90%"
+                description="站内通知和邮件提醒"
+                action={<Toggle label="90% 用量提醒" checked disabled />}
+              />
+              <SettingRow
+                title="额度耗尽"
+                description="必须通知，并停止创建新的付费任务"
+                action={<Toggle label="额度耗尽提醒" checked disabled />}
+              />
             </div>
-          </dl>
-          <div>
-            <Button tone="primary" onClick={() => setPlanModal(true)}>
-              {limited ? "恢复订阅" : "更换套餐"}
-            </Button>
-            <Button onClick={() => setPaymentModal(true)}>更新支付方式</Button>
-            {!limited ? (
-              <Button onClick={() => setRenewModal(true)}>
-                {autoRenew ? "关闭自动续订" : "开启自动续订"}
-              </Button>
-            ) : null}
-          </div>
-        </div>
-        <div className="s5-usage-card">
-          <MetricDonut value={64} label="64%" caption="本月已使用" />
-          <div className="s5-usage-breakdown">
-            <span>
-              <i style={{ "--usage": "72%" }} />
-              <b>Agent 任务</b>
-              <em>36 / 50 次</em>
-            </span>
-            <span>
-              <i style={{ "--usage": "53%" }} />
-              <b>公开网络搜索</b>
-              <em>1,580 / 3,000 次</em>
-            </span>
-            <span>
-              <i style={{ "--usage": "41%" }} />
-              <b>数据处理</b>
-              <em>8.2 / 20 GB</em>
-            </span>
-          </div>
-        </div>
-      </section>
-      <SettingsSection
-        title="额度预警"
-        description="达到用量边界前提前通知，避免运行中的工作意外停止。"
-      >
-        <div className="s5-setting-list">
-          <SettingRow
-            title="使用达到 70%"
-            description="站内通知和邮件提醒"
-            action={<Toggle label="70% 用量提醒" checked />}
-          />
-          <SettingRow
-            title="使用达到 90%"
-            description="站内通知和邮件提醒"
-            action={<Toggle label="90% 用量提醒" checked disabled />}
-          />
-          <SettingRow
-            title="额度耗尽"
-            description="强制通知，并停止创建新的付费任务"
-            action={<Toggle label="额度耗尽提醒" checked disabled />}
-          />
-        </div>
-      </SettingsSection>
-      <SettingsSection
-        title="订单记录"
-        description="查看历史支付结果和下载收据。"
-      >
-        {empty ? (
+          </SettingsSection>
+        </>
+      )}
+      <SettingsSection title="订单记录" description="查看历史支付结果。">
+        {empty || noSubscription ? (
           <div className="s5-orders-empty">
             <Icon name="receipt" />
             <b>还没有订单记录</b>
@@ -1180,13 +1522,6 @@ export function SubscriptionSettingsPage() {
                 </span>
                 <em>{order[2]}</em>
                 <StatusBadge tone="success">{order[3]}</StatusBadge>
-                <button
-                  type="button"
-                  onClick={() => notify(`${order[0]}收据已开始下载`, "info")}
-                >
-                  <Icon name="download" />
-                  下载收据
-                </button>
               </div>
             ))}
           </div>
@@ -1224,6 +1559,31 @@ export function SubscriptionSettingsPage() {
             />
           ))}
         </div>
+        <div className="s5-subscription-payment">
+          <span>
+            <b>支付方式</b>
+            <small>中国大陆阶段一支持支付宝和微信支付。</small>
+          </span>
+          <div className="s5-payment-options" role="radiogroup">
+            <ChoiceCard
+              title="支付宝"
+              description="确认后跳转支付宝完成首次支付"
+              selected={paymentMethod === "支付宝"}
+              icon="creditCard"
+              onClick={() => setPaymentMethod("支付宝")}
+            />
+            <ChoiceCard
+              title="微信支付"
+              description="确认后使用微信扫码完成首次支付"
+              selected={paymentMethod === "微信支付"}
+              icon="qrCode"
+              onClick={() => setPaymentMethod("微信支付")}
+            />
+          </div>
+          <InlineNotice>
+            订阅默认开启自动续订，后续续订继续使用首次支付时授权的方式；当前版本不提供更换自动付费方式。
+          </InlineNotice>
+        </div>
       </Modal>
       <Modal
         open={renewModal}
@@ -1256,37 +1616,6 @@ export function SubscriptionSettingsPage() {
           到期后 Agent 和付费功能会暂停，业务数据仍可查看和导出。
         </InlineNotice>
       </Modal>
-      <Modal
-        open={paymentModal}
-        close={() => setPaymentModal(false)}
-        title="更新支付方式"
-        description="新的支付方式将在下次续订时使用。"
-        footer={
-          <ModalActions
-            cancel={() => setPaymentModal(false)}
-            loading={saving}
-            confirm={() =>
-              commit("支付方式已更新", () => setPaymentModal(false))
-            }
-          />
-        }
-      >
-        <div className="s5-payment-options">
-          <ChoiceCard
-            title="微信支付"
-            description="通过微信扫码完成验证"
-            selected
-            icon="qrCode"
-            onClick={() => {}}
-          />
-          <ChoiceCard
-            title="银行卡"
-            description="招商银行尾号 6028"
-            icon="creditCard"
-            onClick={() => notify("已选择银行卡", "info")}
-          />
-        </div>
-      </Modal>
     </PageState>
   );
 }
@@ -1297,20 +1626,17 @@ export function DataPrivacySettingsPage() {
   const notify = useToast();
   const limited = state === "limited";
   const [diagnosticLoading, setDiagnosticLoading] = useState(false);
-  const [danger, setDanger] = useState(null);
+  const [danger, setDanger] = useState(false);
   const [confirmation, setConfirmation] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const workspaceName = "沈岚的猎头工作空间";
-  const blocked = danger === "account" && limited;
-  const confirmValid =
-    danger === "workspace"
-      ? confirmation === workspaceName
-      : confirmation === "注销账号";
+  const blocked = limited;
+  const confirmValid = confirmation === workspaceName;
   return (
     <PageState state={state} clearState={clearState}>
       <SettingsPageHeader
         title="数据与隐私"
-        description="管理数据带出、恢复、诊断和账号级危险操作。"
+        description="管理数据带出、恢复、诊断和工作空间操作。"
       />
       <SettingsSection
         title="数据带出与恢复"
@@ -1362,40 +1688,6 @@ export function DataPrivacySettingsPage() {
         </div>
       </SettingsSection>
       <SettingsSection
-        title="隐私边界"
-        description="阶段一默认使用最小数据访问原则。"
-      >
-        <div className="s5-privacy-principles">
-          <div>
-            <Icon name="shield" />
-            <span>
-              <b>运营人员不能查看业务内容</b>
-              <small>
-                运营后台只显示工作空间、订阅、用量、任务状态、错误码和脱敏诊断。
-              </small>
-            </span>
-          </div>
-          <div>
-            <Icon name="lock" />
-            <span>
-              <b>外部服务不暴露用户配置</b>
-              <small>
-                模型、搜索和学术数据服务由 Hunter 托管，并按数据边界处理。
-              </small>
-            </span>
-          </div>
-          <div>
-            <Icon name="database" />
-            <span>
-              <b>删除使用统一回收站</b>
-              <small>
-                正式业务资产删除后进入回收站，超过保留期才自动清理。
-              </small>
-            </span>
-          </div>
-        </div>
-      </SettingsSection>
-      <SettingsSection
         title="危险操作"
         description="这些操作会影响整个个人工作空间。"
         tone="danger"
@@ -1409,27 +1701,11 @@ export function DataPrivacySettingsPage() {
                 tone="danger"
                 size="sm"
                 onClick={() => {
-                  setDanger("workspace");
+                  setDanger(true);
                   setConfirmation("");
                 }}
               >
                 删除工作空间
-              </Button>
-            }
-          />
-          <SettingRow
-            title="注销 Hunter 账号"
-            description="账号将不能登录；注销前必须处理有效订阅并完成数据导出。"
-            action={
-              <Button
-                tone="danger"
-                size="sm"
-                onClick={() => {
-                  setDanger("account");
-                  setConfirmation("");
-                }}
-              >
-                注销账号
               </Button>
             }
           />
@@ -1442,7 +1718,7 @@ export function DataPrivacySettingsPage() {
           setDanger(null);
           setSubmitted(false);
         }}
-        title={danger === "workspace" ? "删除个人工作空间" : "注销 Hunter 账号"}
+        title="删除个人工作空间"
         description="该操作影响范围很大，请阅读说明后再继续。"
         size="sm"
         footer={
@@ -1453,10 +1729,7 @@ export function DataPrivacySettingsPage() {
               disabled={!confirmValid || blocked}
               onClick={() => {
                 setSubmitted(true);
-                notify(
-                  danger === "workspace" ? "删除申请已提交" : "注销申请已提交",
-                  "info",
-                );
+                notify("删除申请已提交", "info");
               }}
             >
               {submitted ? "申请已提交" : "确认提交"}
@@ -1466,21 +1739,14 @@ export function DataPrivacySettingsPage() {
       >
         {blocked ? (
           <InlineNotice tone="warning" icon="warning">
-            当前存在有效订阅，请先关闭自动续订并等待本周期结束，再提交注销申请。
+            当前仍有 2
+            项数据导出任务正在运行。请等待任务完成或取消任务后，再删除工作空间。
           </InlineNotice>
         ) : null}
         <div className="s5-danger-copy">
-          <p>
-            {danger === "workspace"
-              ? "删除后所有业务数据将不可继续编辑，正在运行的任务会停止。"
-              : "注销后账号将不能登录，工作空间随账号进入待清理状态。"}
-          </p>
+          <p>删除后所有业务数据将不可继续编辑，正在运行的任务会停止。</p>
           <FormField
-            label={
-              danger === "workspace"
-                ? `输入“${workspaceName}”确认`
-                : "输入“注销账号”确认"
-            }
+            label={`输入“${workspaceName}”确认`}
             required
             error={confirmation && !confirmValid ? "输入内容不匹配" : ""}
           >
