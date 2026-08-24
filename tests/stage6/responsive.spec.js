@@ -43,6 +43,8 @@ test("运营端关键页面生成桌面、平板和手机验收截图", async ({
     for (const [route, name] of [
       ["overview", "overview"],
       ["users-workspaces", "workspaces"],
+      ["subscriptions", "subscriptions"],
+      ["tasks", "tasks"],
       ["tasks/TASK-260824-019", "task-detail"],
       ["capabilities", "capabilities"],
     ]) {
@@ -77,8 +79,19 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
   });
 
   await page.goto("#/ops/capabilities?tab=configuration");
+  await page.screenshot({
+    path: "artifacts/stage6-model-configuration.png",
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "新增模型后端" }).click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: "artifacts/stage6-model-backend-modal.png",
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "取消" }).click();
   await page
-    .getByRole("button", { name: /大模型/ })
+    .getByRole("button", { name: /公开网络搜索/ })
     .first()
     .click();
   await page.getByRole("button", { name: "填入失败示例" }).click();
@@ -86,6 +99,39 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
   await expect(page.getByText("配置验证失败")).toBeVisible();
   await page.screenshot({
     path: "artifacts/stage6-config-validation-failed.png",
+    fullPage: true,
+  });
+
+  await page.goto("#/ops/users-workspaces");
+  await page
+    .getByRole("button", { name: /深蓝猎头工作室/ })
+    .first()
+    .click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: "artifacts/stage6-workspace-health-drawer.png",
+    fullPage: true,
+  });
+
+  await page.goto("#/ops/subscriptions");
+  await page
+    .getByRole("button", { name: /深蓝猎头工作室/ })
+    .first()
+    .click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: "artifacts/stage6-subscription-drawer.png",
+    fullPage: true,
+  });
+
+  await page.goto("#/ops/support");
+  await page
+    .getByRole("button", { name: /SUP-20260824-017/ })
+    .first()
+    .click();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: "artifacts/stage6-support-workflow-drawer.png",
     fullPage: true,
   });
 

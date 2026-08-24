@@ -136,7 +136,7 @@ function WorkspaceDrawer({ workspace, close }) {
       open
       close={close}
       title={workspace.name}
-      className="ops-detail-drawer"
+      className="ops-detail-drawer ops-workspace-drawer"
     >
       <div className="ops-detail-stack">
         <div className="ops-detail-heading">
@@ -146,19 +146,86 @@ function WorkspaceDrawer({ workspace, close }) {
           </span>
           <OpsStatus>{workspace.account}</OpsStatus>
         </div>
-        <OpsDefinitionList
-          items={[
-            ["所有者", workspace.owner],
-            ["登录邮箱", workspace.email],
-            ["创建时间", workspace.createdAt],
-            ["地区", workspace.region],
-            ["当前订阅", `${workspace.plan} · ${workspace.subscription}`],
-            ["用量", `${workspace.quota}%`],
-          ]}
-        />
         <OpsSection
-          title="任务健康"
-          description="引用任务中心的同一组脱敏数据。"
+          title="运营健康概览"
+          description="用于判断是否需要主动跟进，不展示用户业务内容。"
+        >
+          <div className="ops-workspace-health-grid">
+            <span>
+              <small>订阅状态</small>
+              <b>{workspace.plan}</b>
+              <OpsStatus>{workspace.subscription}</OpsStatus>
+            </span>
+            <span>
+              <small>任务用量</small>
+              <b>{workspace.quota}%</b>
+              <em>
+                <i style={{ width: `${workspace.quota}%` }} />
+              </em>
+            </span>
+            <span>
+              <small>任务健康</small>
+              <b>{workspace.taskCount} 个</b>
+              <OpsStatus>{workspace.health}</OpsStatus>
+            </span>
+            <span>
+              <small>存储空间</small>
+              <b>{workspace.storage}</b>
+              <OpsStatus>{workspace.storageRisk}</OpsStatus>
+            </span>
+          </div>
+        </OpsSection>
+        <OpsSection title="账号与联系信息">
+          <OpsDefinitionList
+            items={[
+              ["所有者", workspace.owner],
+              ["登录邮箱", workspace.email],
+              ["创建时间", workspace.createdAt],
+              ["服务地区", workspace.region],
+            ]}
+          />
+        </OpsSection>
+        <OpsSection title="需要运营关注">
+          <div className="ops-workspace-risks">
+            {workspace.health === "需关注" ? (
+              <span>
+                <i>
+                  <Icon name="warning" />
+                </i>
+                <b>任务成功率低于近 7 日基线</b>
+                <small>建议先查看失败任务聚类，不直接接触业务内容。</small>
+              </span>
+            ) : null}
+            {workspace.storageRisk !== "正常" ? (
+              <span>
+                <i>
+                  <Icon name="database" />
+                </i>
+                <b>存储空间接近上限</b>
+                <small>
+                  当前使用 {workspace.storage}，可提醒用户清理历史文件。
+                </small>
+              </span>
+            ) : null}
+            {workspace.subscription.includes("异常") ? (
+              <span>
+                <i>
+                  <Icon name="creditCard" />
+                </i>
+                <b>订阅支付需要处理</b>
+                <small>自动续订未成功，宽限期内不影响数据查看。</small>
+              </span>
+            ) : null}
+            {workspace.health !== "需关注" &&
+            workspace.storageRisk === "正常" &&
+            !workspace.subscription.includes("异常") ? (
+              <p className="ops-muted-copy">当前没有需要主动处理的运营风险。</p>
+            ) : null}
+          </div>
+        </OpsSection>
+        <OpsSection
+          title="最近任务"
+          description="仅展示该工作空间的脱敏任务摘要。"
           action={
             <Button
               size="sm"
@@ -173,7 +240,7 @@ function WorkspaceDrawer({ workspace, close }) {
         >
           <div className="ops-compact-table">
             {relatedTasks.length ? (
-              relatedTasks.map((task) => (
+              relatedTasks.slice(0, 3).map((task) => (
                 <button
                   type="button"
                   key={task.id}
@@ -185,7 +252,7 @@ function WorkspaceDrawer({ workspace, close }) {
                   <span>
                     <b>{task.id}</b>
                     <small>
-                      {task.type} · {task.phase}
+                      {task.scope} · {task.type} · {task.phase}
                     </small>
                   </span>
                   <OpsStatus>{task.status}</OpsStatus>
@@ -194,34 +261,6 @@ function WorkspaceDrawer({ workspace, close }) {
             ) : (
               <p className="ops-muted-copy">当前没有需要关注的运行任务。</p>
             )}
-          </div>
-        </OpsSection>
-        <OpsSection
-          title="存储占用"
-          description="只显示分类和容量，不展示文件名或内容。"
-        >
-          <div className="ops-storage-bars">
-            <span>
-              <b>结构化数据</b>
-              <i>
-                <em style={{ width: "48%" }} />
-              </i>
-              <small>3.2 GB</small>
-            </span>
-            <span>
-              <b>用户文件</b>
-              <i>
-                <em style={{ width: "34%" }} />
-              </i>
-              <small>2.3 GB</small>
-            </span>
-            <span>
-              <b>任务工作区</b>
-              <i>
-                <em style={{ width: "19%" }} />
-              </i>
-              <small>1.3 GB</small>
-            </span>
           </div>
         </OpsSection>
         <OpsSection title="关联记录">
@@ -701,6 +740,76 @@ const subscriptionColumns = [
   },
 ];
 
+function SubscriptionDrawer({ subscription, close, adjust }) {
+  if (!subscription) return null;
+  return (
+    <Drawer
+      open
+      close={close}
+      title={subscription.workspace}
+      className="ops-detail-drawer ops-subscription-drawer"
+    >
+      <div className="ops-detail-stack">
+        <div className="ops-detail-heading">
+          <span>
+            <small>{subscription.id}</small>
+            <h2>{subscription.plan}</h2>
+          </span>
+          <OpsStatus>{subscription.status}</OpsStatus>
+        </div>
+        <OpsSection title="当前订阅">
+          <OpsDefinitionList
+            items={[
+              ["订阅套餐", subscription.plan],
+              ["当前周期", subscription.period],
+              ["续订方式", subscription.renewal],
+              ["支付状态", subscription.payment],
+              ["任务用量", subscription.quota],
+              ["到期时间", subscription.expiresAt],
+            ]}
+          />
+        </OpsSection>
+        <OpsInlineState
+          tone="info"
+          icon="info"
+          title="例外权益调整"
+          description="仅用于系统故障补偿、延长试用，或经审批临时增加任务额度、并发和存储。正常套餐升降级应通过订阅流程完成。"
+        />
+        <OpsSection title="最近调整记录">
+          <div className="ops-compact-table">
+            {entitlementChanges.filter(
+              (item) => item.workspace === subscription.workspace,
+            ).length ? (
+              entitlementChanges
+                .filter((item) => item.workspace === subscription.workspace)
+                .map((item) => (
+                  <div className="ops-adjustment-row" key={item.id}>
+                    <span>
+                      <b>
+                        {item.type}：{item.before} → {item.after}
+                      </b>
+                      <small>
+                        {item.reason} · {item.createdAt}
+                      </small>
+                    </span>
+                    <OpsStatus>已生效</OpsStatus>
+                  </div>
+                ))
+            ) : (
+              <p className="ops-muted-copy">当前订阅没有人工调整记录。</p>
+            )}
+          </div>
+        </OpsSection>
+        <div className="ops-drawer-actions">
+          <Button tone="primary" onClick={() => adjust(subscription)}>
+            发起权益调整
+          </Button>
+        </div>
+      </div>
+    </Drawer>
+  );
+}
+
 function AdjustmentModal({ subscription, close }) {
   const notify = useToast();
   const [type, setType] = useState("任务额度");
@@ -721,7 +830,7 @@ function AdjustmentModal({ subscription, close }) {
     <Modal
       open
       close={close}
-      title="调整权益"
+      title="发起权益调整"
       description={subscription.workspace}
       size="lg"
       closeDisabled={saving}
@@ -736,7 +845,7 @@ function AdjustmentModal({ subscription, close }) {
             disabled={!reason.trim() || !value.trim()}
             onClick={save}
           >
-            确认调整
+            确认并生效
           </Button>
         </>
       }
@@ -813,6 +922,7 @@ export function SubscriptionsPage() {
         : ["id", "workspace", "plan"];
   const list = useOpsList(source, fields);
   const [selected, setSelected] = useState(null);
+  const [adjusting, setAdjusting] = useState(null);
   const switchTab = (value) => {
     const next = new URLSearchParams(params);
     next.set("tab", value);
@@ -856,7 +966,7 @@ export function SubscriptionsPage() {
     <div className="ops-page">
       <OpsPageHeader
         title="订阅与额度"
-        description="管理工作空间订阅、支付状态和权益调整；所有人工修改都保留审计记录。"
+        description="查看工作空间订阅与支付状态；例外权益调整必须说明原因并保留完整审计记录。"
       />
       <OpsTabs
         label="订阅与额度范围"
@@ -871,7 +981,7 @@ export function SubscriptionsPage() {
           { value: "orders", label: "支付订单", count: orders.length },
           {
             value: "adjustments",
-            label: "权益调整",
+            label: "调整记录",
             count: entitlementChanges.length,
           },
         ]}
@@ -959,9 +1069,17 @@ export function SubscriptionsPage() {
           total={list.filtered.length}
         />
       </OpsState>
-      <AdjustmentModal
+      <SubscriptionDrawer
         subscription={selected}
         close={() => setSelected(null)}
+        adjust={(subscription) => {
+          setSelected(null);
+          setAdjusting(subscription);
+        }}
+      />
+      <AdjustmentModal
+        subscription={adjusting}
+        close={() => setAdjusting(null)}
       />
     </div>
   );

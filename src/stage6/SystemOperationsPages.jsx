@@ -14,6 +14,7 @@ import {
   tasks,
 } from "./operations-data";
 import { useOpsRole } from "./OperationsShell";
+import { ModelConfigurationPanel } from "./ModelConfiguration";
 import {
   OpsDefinitionList,
   OpsFilterBar,
@@ -32,7 +33,14 @@ import {
 const taskColumns = [
   { key: "id", label: "任务编号", width: 180 },
   { key: "workspace", label: "工作空间", width: 210 },
-  { key: "type", label: "任务类型", width: 130 },
+  {
+    key: "scope",
+    label: "任务归属",
+    width: 110,
+    render: (row) => <OpsStatus>{row.scope}</OpsStatus>,
+  },
+  { key: "type", label: "执行类型", width: 140 },
+  { key: "parent", label: "所属主线", width: 170 },
   {
     key: "status",
     label: "状态",
@@ -148,6 +156,7 @@ export function TasksPage() {
         if (tab === "runs")
           return (
             (!filters.status?.length || filters.status.includes(item.status)) &&
+            (!filters.scope?.length || filters.scope.includes(item.scope)) &&
             (!filters.type?.length || filters.type.includes(item.type)) &&
             (!filters.resource || item.resource === filters.resource)
           );
@@ -162,7 +171,7 @@ export function TasksPage() {
     source,
     tab === "errors"
       ? ["code", "title", "taskTypes"]
-      : ["id", "workspace", "type", "status", "error"],
+      : ["id", "workspace", "scope", "type", "parent", "status", "error"],
   );
   const [selectedError, setSelectedError] = useState(
     errorGroups.find((item) => item.id === params.get("error")) || null,
@@ -212,7 +221,7 @@ export function TasksPage() {
     <div className="ops-page">
       <OpsPageHeader
         title="任务与故障"
-        description="使用脱敏任务元数据、错误码和调用链判断问题；无法证明安全时不提供恢复操作。"
+        description="统一查看业务主线、支线任务和系统后台任务的脱敏运行元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
       />
       <OpsTabs
         value={tab}
@@ -233,7 +242,7 @@ export function TasksPage() {
           onQuery={list.setQuery}
           placeholder={
             tab === "runs"
-              ? "搜索任务编号、工作空间、任务类型或错误码"
+              ? "搜索任务编号、工作空间、任务归属、执行类型或错误码"
               : "搜索错误码、分类或任务类型"
           }
           filters={
@@ -248,8 +257,22 @@ export function TasksPage() {
                     multiple: true,
                   },
                   {
-                    label: "任务类型",
-                    options: ["岗位解析", "候选人补全", "学术搜索", "公司调研"],
+                    label: "任务归属",
+                    options: ["业务主线", "支线任务", "系统后台任务"],
+                    value: filters.scope || [],
+                    onChange: (value) =>
+                      setFilters((current) => ({ ...current, scope: value })),
+                    multiple: true,
+                  },
+                  {
+                    label: "执行类型",
+                    options: [
+                      "岗位解析",
+                      "候选人补全",
+                      "学术搜索",
+                      "公司调研",
+                      "邮箱回复检查",
+                    ],
                     value: filters.type || [],
                     onChange: (value) =>
                       setFilters((current) => ({ ...current, type: value })),
@@ -422,7 +445,7 @@ export function TaskDetailPage() {
     {
       title: "任务创建并进入队列",
       meta: task.startedAt,
-      detail: `触发类型：用户操作 · 任务类型：${task.type}`,
+      detail: `触发方式：${task.trigger} · 任务归属：${task.scope} · 执行类型：${task.type}`,
       tone: "success",
     },
     {
@@ -495,7 +518,10 @@ export function TaskDetailPage() {
             <OpsDefinitionList
               items={[
                 ["工作空间", task.workspace],
-                ["任务类型", task.type],
+                ["任务归属", task.scope],
+                ["执行类型", task.type],
+                ["所属主线", task.parent],
+                ["触发方式", task.trigger],
                 ["状态", task.status],
                 ["当前阶段", task.phase],
                 ["开始时间", task.startedAt],
@@ -979,22 +1005,25 @@ export function CapabilitiesPage() {
           <OpsState state="limited" label="能力配置" />
         ) : (
           <>
+            <ModelConfigurationPanel />
             <OpsInlineState
               tone="info"
               icon="shield"
-              title="配置变更采用草稿、验证、确认三步"
-              description="验证失败时当前有效版本继续生效，密钥不会回显原值。"
+              title="其他能力配置同样采用草稿、验证、确认三步"
+              description="下表用于公开网络搜索和学术数据配置；模型后端由上方企业模型网关独立管理。"
             />
             <OpsTable
               columns={configColumns}
-              rows={capabilityConfigurations}
+              rows={capabilityConfigurations.filter(
+                (item) => item.capability !== "大模型",
+              )}
               onRow={setSelectedConfig}
             />
             <OpsPagination
               page={1}
               pages={1}
               onChange={() => {}}
-              total={capabilityConfigurations.length}
+              total={capabilityConfigurations.length - 1}
             />
           </>
         )}
@@ -1018,7 +1047,12 @@ function SupportDrawer({ record, close }) {
   const [status, setStatus] = useState(record.status);
   if (!record) return null;
   return (
-    <Drawer open close={close} title={record.id} className="ops-detail-drawer">
+    <Drawer
+      open
+      close={close}
+      title={record.id}
+      className="ops-detail-drawer ops-support-drawer"
+    >
       <div className="ops-detail-stack">
         <div className="ops-detail-heading">
           <span>
@@ -1027,23 +1061,83 @@ function SupportDrawer({ record, close }) {
           </span>
           <OpsStatus>{status}</OpsStatus>
         </div>
-        <OpsDefinitionList
-          items={[
-            ["问题分类", record.category],
-            ["用户描述摘要", record.summary],
-            ["诊断包", record.diagnostic],
-            ["创建时间", record.createdAt],
-            ["最近更新", record.updatedAt],
-            ["处理人", record.operator],
-          ]}
-        />
-        <OpsInlineState
-          tone="info"
-          icon="lock"
-          title="支持记录不包含业务正文"
-          description="如需进一步排障，应由用户主动提交新的诊断包或在产品内完成业务操作。"
-        />
-        <OpsSection title="处理记录">
+        <div className="ops-support-brief">
+          <small>用户反馈摘要</small>
+          <p>{record.summary}</p>
+          <span>
+            创建于 {record.createdAt} · 最近更新 {record.updatedAt}
+          </span>
+        </div>
+        <OpsSection
+          title="问题处理清单"
+          description="每一步都保留处理人和结论，避免只记录一条模糊状态。"
+        >
+          <div className="ops-support-checklist">
+            <span className="is-complete">
+              <i>
+                <Icon name="check" />
+              </i>
+              <b>确认问题范围</b>
+              <small>{record.category} · 已完成</small>
+            </span>
+            <span
+              className={record.diagnostic === "—" ? "is-muted" : "is-complete"}
+            >
+              <i>
+                <Icon name={record.diagnostic === "—" ? "minus" : "check"} />
+              </i>
+              <b>检查诊断信息</b>
+              <small>
+                {record.diagnostic === "—"
+                  ? "当前问题不需要诊断包"
+                  : `${record.diagnostic} 完整性检查通过`}
+              </small>
+            </span>
+            <span
+              className={status === "已解决" ? "is-complete" : "is-current"}
+            >
+              <i>
+                <Icon name={status === "已解决" ? "check" : "activity"} />
+              </i>
+              <b>回复用户并验证结果</b>
+              <small>
+                {status === "已解决"
+                  ? "用户已确认问题解决"
+                  : "等待处理人补充结论"}
+              </small>
+            </span>
+          </div>
+        </OpsSection>
+        <OpsSection title="关联诊断与任务">
+          <div className="ops-link-list">
+            {record.diagnostic !== "—" ? (
+              <button type="button">
+                <Icon name="file" />
+                <span>
+                  <b>{record.diagnostic}</b>
+                  <small>诊断包 · 已完成完整性检查</small>
+                </span>
+                <Icon name="chevronRight" />
+              </button>
+            ) : null}
+            {record.category === "任务运行异常" ? (
+              <button type="button">
+                <Icon name="activity" />
+                <span>
+                  <b>TASK-260824-019</b>
+                  <small>支线任务 · 学术搜索 · 失败</small>
+                </span>
+                <Icon name="chevronRight" />
+              </button>
+            ) : null}
+            {record.diagnostic === "—" && record.category !== "任务运行异常" ? (
+              <p className="ops-muted-copy">
+                当前支持记录没有关联诊断包或运行任务。
+              </p>
+            ) : null}
+          </div>
+        </OpsSection>
+        <OpsSection title="沟通与处理记录">
           <OpsTimeline
             items={[
               {
@@ -1054,11 +1148,11 @@ function SupportDrawer({ record, close }) {
               },
               {
                 title:
-                  record.diagnostic === "—" ? "等待必要信息" : "诊断包已关联",
+                  record.diagnostic === "—" ? "完成问题分类" : "诊断包已关联",
                 meta: record.updatedAt,
                 detail:
                   record.diagnostic === "—"
-                    ? "当前问题不需要诊断包。"
+                    ? `处理人 ${record.operator} 已确认当前问题不需要诊断包。`
                     : `${record.diagnostic} 已完成完整性检查。`,
                 tone: record.status === "已解决" ? "success" : "warning",
               },
@@ -1086,6 +1180,70 @@ function SupportDrawer({ record, close }) {
             标记已解决
           </Button>
         </div>
+      </div>
+    </Drawer>
+  );
+}
+
+function DiagnosticDrawer({ diagnostic, close }) {
+  if (!diagnostic) return null;
+  return (
+    <Drawer
+      open
+      close={close}
+      title={diagnostic.id}
+      className="ops-detail-drawer ops-diagnostic-drawer"
+    >
+      <div className="ops-detail-stack">
+        <div className="ops-detail-heading">
+          <span>
+            <small>用户主动提交的诊断包</small>
+            <h2>{diagnostic.workspace}</h2>
+          </span>
+          <OpsStatus>{diagnostic.status}</OpsStatus>
+        </div>
+        <div className="ops-diagnostic-integrity">
+          <i>
+            <Icon
+              name={diagnostic.checksum === "匹配" ? "shield" : "warning"}
+            />
+          </i>
+          <span>
+            <b>文件完整性：{diagnostic.checksum}</b>
+            <small>诊断内容已按隐私边界脱敏，不包含用户业务正文。</small>
+          </span>
+        </div>
+        <OpsSection title="运行环境">
+          <OpsDefinitionList
+            items={[
+              ["产品版本", diagnostic.version],
+              ["运行环境", diagnostic.environment],
+              ["生成时间", diagnostic.createdAt],
+              ["有效期", diagnostic.expiresAt],
+              ["关联任务", diagnostic.task],
+              ["解析状态", diagnostic.status],
+            ]}
+          />
+        </OpsSection>
+        <OpsSection
+          title="可用诊断信息"
+          description="只展示排障所需的系统状态和脱敏错误摘要。"
+        >
+          <div className="ops-diagnostic-sections">
+            <span>
+              <b>进程与任务目录</b>
+              <small>任务目录存在 · 父子进程关系正常</small>
+            </span>
+            <span>
+              <b>网络与能力调用</b>
+              <small>公开网络搜索出现 3 次 429，已进入降级路径</small>
+            </span>
+            <span>
+              <b>最近错误</b>
+              <small>SOURCE_RATE_LIMIT · 结果尚未写入</small>
+            </span>
+          </div>
+        </OpsSection>
       </div>
     </Drawer>
   );
@@ -1437,6 +1595,11 @@ export function SupportPage() {
       </OpsState>
       {selected && tab === "security" ? (
         <SecurityDrawer event={selected} close={() => setSelected(null)} />
+      ) : selected && tab === "diagnostics" ? (
+        <DiagnosticDrawer
+          diagnostic={selected}
+          close={() => setSelected(null)}
+        />
       ) : selected ? (
         <SupportDrawer record={selected} close={() => setSelected(null)} />
       ) : null}

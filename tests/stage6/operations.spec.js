@@ -45,6 +45,8 @@ test("工作空间详情、用户详情与试用审批保持数据联动", async
       .getByRole("dialog", { name: "深蓝猎头工作室" })
       .getByText("WS-20260518-0142"),
   ).toBeVisible();
+  await expect(page.getByText("运营健康概览")).toBeVisible();
+  await expect(page.getByText("需要运营关注")).toBeVisible();
   await page.getByRole("button", { name: "关闭" }).click();
 
   await page.getByRole("tab", { name: /用户账号/ }).click();
@@ -87,20 +89,28 @@ test("拒绝试用可选择发送标准结果说明", async ({ page }) => {
   await assertNoConsoleErrors();
 });
 
-test("订阅权益调整必须说明原因并生成反馈", async ({ page }) => {
+test("订阅详情区分正常订阅与例外权益调整", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/ops/subscriptions");
   await page
     .getByRole("button", { name: /深蓝猎头工作室/ })
     .first()
     .click();
-  const dialog = page.getByRole("dialog", { name: "调整权益" });
+  const subscription = page.getByRole("dialog", {
+    name: "深蓝猎头工作室",
+  });
+  await expect(subscription.getByText("当前订阅")).toBeVisible();
+  await expect(subscription.getByText("例外权益调整")).toBeVisible();
+  await subscription.getByRole("button", { name: "发起权益调整" }).click();
+  const dialog = page.getByRole("dialog", { name: "发起权益调整" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole("button", { name: "确认调整" })).toBeDisabled();
+  await expect(
+    dialog.getByRole("button", { name: "确认并生效" }),
+  ).toBeDisabled();
   await dialog
     .getByRole("textbox", { name: "调整原因*" })
     .fill("补偿系统重试产生的重复任务额度。");
-  await dialog.getByRole("button", { name: "确认调整" }).click();
+  await dialog.getByRole("button", { name: "确认并生效" }).click();
   await expect(page.getByText("权益调整已生效并生成审计记录")).toBeVisible();
   await assertNoConsoleErrors();
 });
@@ -125,6 +135,13 @@ test("运营筛选会真实改变列表且可以单独清空", async ({ page }) 
   await expect(page.getByText("TASK-260824-011")).toHaveCount(0);
   await page.getByRole("button", { name: "清空任务状态" }).click();
   await expect(page.getByText("TASK-260824-011").first()).toBeVisible();
+  await page.getByRole("button", { name: "任务归属", exact: true }).click();
+  await page
+    .locator(".s4-select-panel")
+    .getByRole("button", { name: "系统后台任务", exact: true })
+    .click();
+  await expect(page.getByText("邮箱回复检查").first()).toBeVisible();
+  await expect(page.getByText("TASK-260824-019")).toHaveCount(0);
   await assertNoConsoleErrors();
 });
 
@@ -154,11 +171,45 @@ test("任务详情区分可安全恢复和不可恢复", async ({ page }) => {
   await assertNoConsoleErrors();
 });
 
-test("能力配置验证失败时保留当前有效版本", async ({ page }) => {
+test("企业模型网关可管理后端与路由，其他能力验证失败时保留生效版本", async ({
+  page,
+}) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/ops/capabilities?tab=configuration");
+  await expect(page.getByText("模型后端与流量调度")).toBeVisible();
+  await expect(page.getByText("14 / 15")).toBeVisible();
+  await page.getByRole("button", { name: "新增模型后端" }).click();
+  const backendDialog = page.getByRole("dialog", { name: "新增模型后端" });
+  await expect(backendDialog.getByText("后端资源")).toBeVisible();
+  await backendDialog
+    .getByRole("textbox", { name: "资源池名称*" })
+    .fill("自建推理资源池");
+  await backendDialog
+    .getByRole("textbox", { name: "Base URL*" })
+    .fill("https://model.example.com/v1");
+  await backendDialog
+    .getByRole("textbox", { name: "可用模型*" })
+    .fill("hunter-research-v1");
+  await backendDialog
+    .getByRole("textbox", { name: "新增密钥*" })
+    .fill("sk-test-primary\nsk-test-secondary");
+  await backendDialog.getByRole("button", { name: "验证配置" }).click();
+  await expect(backendDialog.getByText("配置验证通过")).toBeVisible();
+  await backendDialog.getByRole("button", { name: "确认保存并生效" }).click();
+  await expect(page.getByText("模型后端已加入资源池")).toBeVisible();
+
+  await page.getByRole("tab", { name: /任务路由/ }).click();
   await page
-    .getByRole("button", { name: /大模型/ })
+    .getByRole("button", { name: /深度调研/ })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: "编辑任务路由" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
+
+  await page
+    .getByRole("button", { name: /公开网络搜索/ })
     .first()
     .click();
   const dialog = page.getByRole("dialog", { name: "编辑能力配置" });
@@ -205,7 +256,8 @@ test("支持、诊断包、审计和安全事件可切换查看", async ({ page 
   await expect(
     page.getByRole("dialog", { name: "SUP-20260824-017" }),
   ).toBeVisible();
-  await expect(page.getByText("支持记录不包含业务正文")).toBeVisible();
+  await expect(page.getByText("问题处理清单")).toBeVisible();
+  await expect(page.getByText("用户反馈摘要")).toBeVisible();
   await page.getByRole("button", { name: "标记已解决" }).click();
   await expect(page.getByText("支持记录已标记为已解决")).toBeVisible();
   await page.getByRole("button", { name: "关闭", exact: true }).click();
@@ -217,6 +269,15 @@ test("支持、诊断包、审计和安全事件可切换查看", async ({ page 
     await page.getByRole("tab", { name: new RegExp(tab) }).click();
     await expect(page.getByText(text).first()).toBeVisible();
   }
+  await page.getByRole("tab", { name: /诊断包/ }).click();
+  await page
+    .getByRole("button", { name: /DIAG-260824-031/ })
+    .first()
+    .click();
+  await expect(page.getByText("文件完整性：匹配")).toBeVisible();
+  await expect(page.getByText("可用诊断信息")).toBeVisible();
+  await page.getByRole("button", { name: "关闭", exact: true }).click();
+  await page.getByRole("tab", { name: /安全事件/ }).click();
   await page
     .getByRole("button", { name: /SEC-260824-006/ })
     .first()

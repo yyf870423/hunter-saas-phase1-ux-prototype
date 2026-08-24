@@ -34,7 +34,7 @@ export function OpsPageHeader({ eyebrow, title, description, actions }) {
 
 export function OpsTabs({ items, value, onChange, label = "页面内容" }) {
   return (
-    <div className="ops-tabs" role="tablist" aria-label={label}>
+    <div className="ops-tabs app-tabs" role="tablist" aria-label={label}>
       {items.map((item) => (
         <button
           type="button"
