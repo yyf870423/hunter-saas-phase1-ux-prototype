@@ -121,7 +121,10 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "本月 Agent 用量" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "知道了" }).click();
+  await page
+    .locator(".s1-modal > footer")
+    .getByRole("button", { name: "关闭" })
+    .click();
   await expect(
     page.getByRole("button", { name: "设置", exact: true }),
   ).toHaveCount(0);
@@ -132,7 +135,10 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
     accountMenu.getByRole("menuitem", { name: /设置/ }),
   ).toBeVisible();
   await accountMenu.getByRole("menuitem", { name: /设置/ }).click();
-  await expect(page.getByText("已打开设置")).toBeVisible();
+  await expect(page).toHaveURL(/#\/settings\/profile$/);
+  await expect(
+    page.getByRole("heading", { name: "个人资料", exact: true }).last(),
+  ).toBeVisible();
   await expect(accountMenu).toBeHidden();
 
   await page.getByRole("button", { name: "打开用户菜单" }).click();

@@ -50,6 +50,16 @@ import {
   PositionDetailPage,
 } from "./stage4/RecruitingPages";
 import { Stage4ReviewPage } from "./stage4/Stage4ReviewPage";
+import { SettingsLayout } from "./stage5/SettingsLayout";
+import {
+  AutomationSettingsPage,
+  ConnectionSettingsPage,
+  DataPrivacySettingsPage,
+  NotificationSettingsPage,
+  ProfileSettingsPage,
+  SubscriptionSettingsPage,
+} from "./stage5/SettingsPages";
+import { SettingsReviewPage } from "./stage5/SettingsReviewPage";
 
 export default function App() {
   return (
@@ -58,6 +68,7 @@ export default function App() {
       <Route path="/review" element={<Stage4ReviewPage />} />
       <Route path="/review/stage-1" element={<ReviewPage />} />
       <Route path="/review/stage-2" element={<Stage2ReviewPage />} />
+      <Route path="/review/settings" element={<SettingsReviewPage />} />
       <Route element={<Stage1Shell />}>
         <Route path="/home" element={<Dashboard />} />
         <Route path="/components" element={<ComponentsPage />} />
@@ -115,6 +126,15 @@ export default function App() {
         <Route path="/data/exports" element={<ExportsPage />} />
         <Route path="/recycle-bin" element={<RecycleBinPage />} />
         <Route path="/review/stage-4/states" element={<CommonStatesPage />} />
+        <Route path="/settings" element={<SettingsLayout />}>
+          <Route index element={<Navigate to="/settings/profile" replace />} />
+          <Route path="profile" element={<ProfileSettingsPage />} />
+          <Route path="notifications" element={<NotificationSettingsPage />} />
+          <Route path="automation" element={<AutomationSettingsPage />} />
+          <Route path="connections" element={<ConnectionSettingsPage />} />
+          <Route path="subscription" element={<SubscriptionSettingsPage />} />
+          <Route path="data-privacy" element={<DataPrivacySettingsPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/review" replace />} />
     </Routes>

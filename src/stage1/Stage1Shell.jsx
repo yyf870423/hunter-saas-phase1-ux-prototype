@@ -330,7 +330,6 @@ function MobileNavigation({ open, close, mode, onSelect }) {
     navSections[0].items[3],
     { id: "data", label: "数据管理", icon: "download" },
     { id: "usage", label: "订阅与用量", icon: "database" },
-    { id: "settings", label: "设置", icon: "settings" },
   ];
   const items = mode === "assets" ? assets : more;
   return (
@@ -357,6 +356,31 @@ function MobileNavigation({ open, close, mode, onSelect }) {
           </button>
         ))}
       </div>
+      {mode === "more" ? (
+        <section className="s1-mobile-account-section">
+          <header>
+            <i>SL</i>
+            <span>
+              <b>沈岚</b>
+              <small>个人工作空间</small>
+            </span>
+          </header>
+          <button
+            type="button"
+            onClick={() => {
+              onSelect({ id: "settings", label: "设置", icon: "settings" });
+              close();
+            }}
+          >
+            <Icon name="settings" />
+            <span>
+              <b>设置</b>
+              <small>个人资料、通知、授权与订阅</small>
+            </span>
+            <Icon name="chevronRight" />
+          </button>
+        </section>
+      ) : null}
     </Drawer>
   );
 }
@@ -472,7 +496,7 @@ export function Stage1Shell() {
       return;
     }
     if (item.id === "settings") {
-      notify("设置原型将在后续阶段提交", "info");
+      navigate("/settings/profile");
       return;
     }
     notify(`已选择“${item.label}”入口`, "info");
@@ -604,7 +628,7 @@ export function Stage1Shell() {
                     role="menuitem"
                     onClick={() => {
                       setAccountOpen(false);
-                      notify("已打开设置", "info");
+                      navigate("/settings/profile");
                     }}
                   >
                     <Icon name="settings" />
@@ -769,9 +793,18 @@ export function Stage1Shell() {
         title="本月 Agent 用量"
         description="仅实际运行的 Agent、公开网络搜索和数据处理任务消耗用量"
         footer={
-          <Button tone="primary" onClick={() => setUsageOpen(false)}>
-            知道了
-          </Button>
+          <>
+            <Button onClick={() => setUsageOpen(false)}>关闭</Button>
+            <Button
+              tone="primary"
+              onClick={() => {
+                setUsageOpen(false);
+                navigate("/settings/subscription");
+              }}
+            >
+              查看订阅与用量
+            </Button>
+          </>
         }
       >
         <div className="s1-usage-detail">

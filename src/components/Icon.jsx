@@ -140,6 +140,21 @@ const paths = {
   download: ["M12 3v12", "m7 10 5 5 5-5", "M5 21h14"],
   menu: ["M4 7h16", "M4 12h16", "M4 17h16"],
   logout: ["M10 17l5-5-5-5", "M15 12H3", "M21 3v18h-6"],
+  monitor: ["M3 4h18v13H3Z", "M8 21h8", "M12 17v4"],
+  shield: [
+    "M12 3 4 6.5v5.7c0 4.8 3.2 8 8 9.8 4.8-1.8 8-5 8-9.8V6.5Z",
+    "m9 12 2 2 4-4",
+  ],
+  creditCard: ["M3 6h18v13H3Z", "M3 10h18", "M7 15h4"],
+  receipt: ["M6 3h12v18l-3-2-3 2-3-2-3 2Z", "M9 8h6", "M9 12h6", "M9 16h3"],
+  qrCode: [
+    "M4 4h6v6H4Z",
+    "M14 4h6v6h-6Z",
+    "M4 14h6v6H4Z",
+    "M14 14h2v2h-2Z",
+    "M18 14h2v6h-6v-2",
+    "M14 18h2",
+  ],
 };
 
 export function Icon({ name, size = 18, className = "", label }) {
