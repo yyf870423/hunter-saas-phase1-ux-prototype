@@ -28,8 +28,11 @@
 | `OpsState`          | 页面级状态                           | loading、empty、error、permission-limited |
 | `OpsInlineState`    | 局部风险、权限和恢复说明             | info、success、warning、danger            |
 | `OpsStatus`         | 运营状态标签                         | neutral、info、success、warning、danger   |
+| `OpsSortableList`   | 模型资源池和数据源路由顺序拖拽       | normal、dragging、drop-target、removable  |
 
 公共 Button、IconButton、Modal、Drawer、Toast、SelectMenu、DatePicker、TextInput、TextArea 和 FormField 继续复用已审批的产品级组件，不使用浏览器默认控件样式。
+
+`OpsStatus` 继承产品级状态标签约束，圆点与文字必须作为不可拆分的单行组件显示。业务容器不得使用宽泛的 `span` 样式覆盖其内部布局。
 
 ## 三、业务专用组件
 

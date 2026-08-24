@@ -100,6 +100,31 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
     path: "artifacts/stage6-model-routing-modal.png",
     fullPage: true,
   });
+  const modelRouteItems = page
+    .getByRole("dialog", { name: "编辑任务模型分配" })
+    .getByRole("listitem");
+  await modelRouteItems.first().evaluate((element) => {
+    element.dispatchEvent(
+      new DragEvent("dragstart", {
+        bubbles: true,
+        dataTransfer: new DataTransfer(),
+      }),
+    );
+  });
+  await modelRouteItems.nth(1).evaluate((element) => {
+    element.dispatchEvent(
+      new DragEvent("dragover", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: new DataTransfer(),
+      }),
+    );
+  });
+  await expect(modelRouteItems.nth(1)).toHaveClass(/is-drop-target/);
+  await page.screenshot({
+    path: "artifacts/stage6-model-routing-drag.png",
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "取消" }).click();
   await page.getByRole("tab", { name: /数据源配置/ }).click();
   await page.screenshot({
@@ -110,6 +135,40 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
     .getByRole("button", { name: /公开网络搜索/ })
     .first()
     .click();
+  await expect(
+    page.getByRole("dialog", { name: "编辑能力配置" }),
+  ).toBeVisible();
+  await page.waitForTimeout(220);
+  await page.screenshot({
+    path: "artifacts/stage6-data-source-routing-modal.png",
+    fullPage: true,
+  });
+  const dataRouteItems = page
+    .getByRole("dialog", { name: "编辑能力配置" })
+    .getByRole("listitem");
+  await dataRouteItems.first().evaluate((element) => {
+    element.dispatchEvent(
+      new DragEvent("dragstart", {
+        bubbles: true,
+        dataTransfer: new DataTransfer(),
+      }),
+    );
+  });
+  await dataRouteItems.nth(1).evaluate((element) => {
+    element.dispatchEvent(
+      new DragEvent("dragover", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: new DataTransfer(),
+      }),
+    );
+  });
+  await expect(dataRouteItems.nth(1)).toHaveClass(/is-drop-target/);
+  await page.waitForTimeout(180);
+  await page.screenshot({
+    path: "artifacts/stage6-data-source-routing-drag.png",
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "填入失败示例" }).click();
   await page.getByRole("button", { name: "运行验证" }).click();
   await expect(page.getByText("配置验证失败")).toBeVisible();
@@ -163,5 +222,80 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
       path: `artifacts/stage6-${name}.png`,
       fullPage: true,
     });
+  }
+});
+
+test("全局状态标签的圆点与文字始终保持同一行", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 });
+  for (const route of [
+    "#/home",
+    "#/new",
+    "#/workstreams/position-vla",
+    "#/workstreams/client-xinglan",
+    "#/workstreams/mapping-embodied",
+    "#/workstreams/career-linhao",
+    "#/tasks",
+    "#/tasks/task-hand-team",
+    "#/signals",
+    "#/candidates",
+    "#/candidates/candidate-linhao",
+    "#/positions/position-vla?tab=profile",
+    "#/positions/position-vla?tab=pipeline",
+    "#/positions/position-vla?tab=matching",
+    "#/companies",
+    "#/companies/company-xinglan",
+    "#/contacts/contact-chenyu",
+    "#/opportunities/opportunity-xinglan",
+    "#/mappings",
+    "#/mappings/mapping-embodied?tab=overview",
+    "#/papers",
+    "#/papers/paper-vla-survey",
+    "#/patents",
+    "#/patents/patent-manipulation",
+    "#/data/imports?type=mapping",
+    "#/data/exports",
+    "#/recycle-bin",
+    "#/settings/profile",
+    "#/settings/notifications",
+    "#/settings/automation",
+    "#/settings/connections",
+    "#/settings/subscription",
+    "#/settings/data-privacy",
+    "#/ops/overview",
+    "#/ops/users-workspaces",
+    "#/ops/subscriptions",
+    "#/ops/tasks",
+    "#/ops/tasks/TASK-260824-019",
+    "#/ops/capabilities?tab=health",
+    "#/ops/capabilities?tab=configuration",
+    "#/ops/capabilities?tab=data-sources",
+    "#/ops/support",
+  ]) {
+    await page.goto(route);
+    const problems = await page.locator(".s1-status").evaluateAll((nodes) =>
+      nodes.flatMap((node) => {
+        const box = node.getBoundingClientRect();
+        if (!box.width || !box.height) return [];
+        const dot = node.querySelector(":scope > i");
+        const text = node.querySelector(":scope > span");
+        if (!text) return [`${node.textContent}: 缺少文本容器`];
+        const style = window.getComputedStyle(node);
+        const textStyle = window.getComputedStyle(text);
+        const textBox = text.getBoundingClientRect();
+        if (style.flexWrap !== "nowrap" || textStyle.whiteSpace !== "nowrap") {
+          return [`${node.textContent}: 允许换行`];
+        }
+        if (dot) {
+          const dotBox = dot.getBoundingClientRect();
+          const overlapsVertically =
+            dotBox.bottom >= textBox.top && dotBox.top <= textBox.bottom;
+          if (dotBox.right > textBox.left || !overlapsVertically) {
+            return [`${node.textContent}: 圆点与文字未保持同一行`];
+          }
+        }
+        return [];
+      }),
+    );
+    expect(problems, route).toEqual([]);
   }
 });

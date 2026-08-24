@@ -1349,7 +1349,7 @@
   background: #e8f3fd;
   border-radius: 6px;
 }
-.ops-call-chain span {
+.ops-call-chain > div > span:not(.s1-status) {
   display: grid;
 }
 .ops-call-chain b {
@@ -2042,13 +2042,14 @@
   display: grid;
   gap: 10px;
 }
-.ops-fallback-list {
+.ops-sortable-list {
   display: grid;
   gap: 6px;
 }
-.ops-fallback-list > div {
+.ops-sortable-list > div {
+  position: relative;
   display: grid;
-  grid-template-columns: 26px minmax(0, 1fr) 30px 30px 30px;
+  grid-template-columns: 18px 26px minmax(0, 1fr) auto;
   min-height: 46px;
   align-items: center;
   gap: 6px;
@@ -2056,8 +2057,24 @@
   background: #f7f9fb;
   border: 1px solid #e1e6ea;
   border-radius: 7px;
+  cursor: grab;
+  transition:
+    margin 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 150ms ease,
+    opacity 150ms ease,
+    background 150ms ease;
 }
-.ops-fallback-list > div > i {
+.ops-sortable-list > div:active {
+  cursor: grabbing;
+}
+.ops-sortable-list > div.has-remove {
+  grid-template-columns: 18px 26px minmax(0, 1fr) auto 30px;
+}
+.ops-sortable-list > div > svg {
+  width: 15px;
+  color: #7a838d;
+}
+.ops-sortable-list > div > i {
   display: grid;
   width: 24px;
   height: 24px;
@@ -2069,16 +2086,43 @@
   background: #e7f2fc;
   border-radius: 6px;
 }
-.ops-fallback-list > div > span {
+.ops-sortable-list > div > span {
   overflow: hidden;
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.ops-fallback-list .s1-icon-button {
+.ops-sortable-list > div > small {
+  color: #7b848e;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.ops-sortable-list .s1-icon-button {
   width: 28px;
   height: 28px;
+}
+.ops-sortable-list > div.is-dragging {
+  opacity: 0.42;
+  transform: scale(0.985);
+}
+.ops-sortable-list > div.is-drop-target {
+  margin-top: 48px;
+}
+.ops-sortable-list > div.is-drop-target::before {
+  position: absolute;
+  top: -42px;
+  right: 4px;
+  left: 4px;
+  display: grid;
+  height: 34px;
+  place-items: center;
+  color: var(--s1-accent);
+  font-size: 11px;
+  content: "放到这里";
+  background: var(--s1-accent-soft);
+  border: 1px dashed color-mix(in srgb, var(--s1-accent) 54%, var(--s1-line));
+  border-radius: 7px;
 }
 .ops-fallback-add {
   display: grid;
@@ -2519,6 +2563,16 @@
   }
   .ops-form-grid .s4-form-span-2 {
     grid-column: 1;
+  }
+  .ops-sortable-list > div,
+  .ops-sortable-list > div.has-remove {
+    grid-template-columns: 18px 26px minmax(0, 1fr) 30px;
+  }
+  .ops-sortable-list > div > small {
+    display: none;
+  }
+  .ops-sortable-list > div:not(.has-remove) {
+    grid-template-columns: 18px 26px minmax(0, 1fr);
   }
   .ops-review {
     padding: 34px 16px 48px;

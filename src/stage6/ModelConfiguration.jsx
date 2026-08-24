@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Button, Drawer, IconButton, Modal, useToast } from "../stage1/ui";
+import { Button, Drawer, Modal, useToast } from "../stage1/ui";
 import { FormField, SelectMenu, TextArea, TextInput } from "../stage4/asset-ui";
 import {
   modelBackends,
@@ -11,6 +11,7 @@ import {
   OpsDefinitionList,
   OpsInlineState,
   OpsSection,
+  OpsSortableList,
   OpsStatus,
   OpsTable,
   OpsTabs,
@@ -324,15 +325,6 @@ function RouteModal({ route, close }) {
   );
   const [fallbackChoice, setFallbackChoice] = useState("");
   const [policy, setPolicy] = useState(route.policy);
-  const moveFallback = (index, direction) => {
-    const target = index + direction;
-    if (target < 0 || target >= fallbacks.length) return;
-    setFallbacks((current) => {
-      const next = [...current];
-      [next[index], next[target]] = [next[target], next[index]];
-      return next;
-    });
-  };
   const fallbackOptions = [
     ...modelBackends.map((item) => item.name),
     "人工处理队列",
@@ -380,35 +372,16 @@ function RouteModal({ route, close }) {
           help="主资源池不可用时，系统从上到下依次尝试"
         >
           <div className="ops-fallback-editor">
-            <div className="ops-fallback-list">
-              {fallbacks.map((item, index) => (
-                <div key={item}>
-                  <i>{index + 1}</i>
-                  <span>{item}</span>
-                  <IconButton
-                    icon="chevronUp"
-                    label={`上移 ${item}`}
-                    disabled={index === 0}
-                    onClick={() => moveFallback(index, -1)}
-                  />
-                  <IconButton
-                    icon="chevronDown"
-                    label={`下移 ${item}`}
-                    disabled={index === fallbacks.length - 1}
-                    onClick={() => moveFallback(index, 1)}
-                  />
-                  <IconButton
-                    icon="close"
-                    label={`移除 ${item}`}
-                    onClick={() =>
-                      setFallbacks((current) =>
-                        current.filter((value) => value !== item),
-                      )
-                    }
-                  />
-                </div>
-              ))}
-            </div>
+            <OpsSortableList
+              label={`${route.task}备用资源池顺序`}
+              items={fallbacks}
+              onChange={setFallbacks}
+              onRemove={(item) =>
+                setFallbacks((current) =>
+                  current.filter((value) => value !== item),
+                )
+              }
+            />
             <div className="ops-fallback-add">
               <SelectMenu
                 label="选择备用资源池"

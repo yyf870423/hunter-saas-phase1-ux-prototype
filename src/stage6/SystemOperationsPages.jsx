@@ -22,6 +22,7 @@ import {
   OpsPageHeader,
   OpsPagination,
   OpsSection,
+  OpsSortableList,
   OpsState,
   OpsStatus,
   OpsTable,
@@ -724,7 +725,14 @@ function CapabilityDrawer({ capability, close }) {
 
 function ConfigurationModal({ config, close }) {
   const notify = useToast();
-  const [route, setRoute] = useState(config?.route || "");
+  const [routes, setRoutes] = useState(
+    config?.routeItems ||
+      config?.route
+        ?.split(/→|\+/)
+        .map((item) => item.trim())
+        .filter(Boolean) ||
+      [],
+  );
   const [quota, setQuota] = useState(config?.quota || "");
   const [newKey, setNewKey] = useState("");
   const [stage, setStage] = useState("edit");
@@ -733,7 +741,7 @@ function ConfigurationModal({ config, close }) {
   const validate = () => {
     setStage("validating");
     window.setTimeout(() => {
-      const shouldFail = route.includes("失效");
+      const shouldFail = routes.some((item) => item.includes("失效"));
       setFailed(shouldFail);
       setStage("validated");
     }, 750);
@@ -768,7 +776,7 @@ function ConfigurationModal({ config, close }) {
               tone="primary"
               icon="play"
               loading={stage === "validating"}
-              disabled={!route.trim() || !quota.trim()}
+              disabled={!routes.length || !quota.trim()}
               onClick={validate}
             >
               运行验证
@@ -782,7 +790,11 @@ function ConfigurationModal({ config, close }) {
           <h3>配置草稿</h3>
           <div className="ops-form-grid">
             <FormField label="路由与兜底顺序" required span={2}>
-              <TextInput value={route} onChange={setRoute} />
+              <OpsSortableList
+                label={`${config.capability}路由与兜底顺序`}
+                items={routes}
+                onChange={setRoutes}
+              />
             </FormField>
             <FormField label="额度与预算" required span={2}>
               <TextInput value={quota} onChange={setQuota} />
@@ -802,7 +814,7 @@ function ConfigurationModal({ config, close }) {
           <button
             type="button"
             className="ops-test-failure"
-            onClick={() => setRoute("主路由 → 失效兜底路由")}
+            onClick={() => setRoutes(["主路由", "失效兜底路由"])}
           >
             填入失败示例
           </button>

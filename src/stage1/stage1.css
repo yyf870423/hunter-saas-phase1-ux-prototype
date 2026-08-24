@@ -1025,8 +1025,10 @@ input:focus-visible {
 .s1-status {
   display: inline-flex;
   width: max-content;
-  max-width: 100%;
+  max-width: none;
   min-height: 22px;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
   padding: 2px 8px;
@@ -1037,6 +1039,13 @@ input:focus-visible {
   background: var(--s1-canvas);
   border: 1px solid var(--s1-line);
   border-radius: 11px;
+  white-space: nowrap;
+}
+
+.s1-status > span {
+  display: block;
+  min-width: max-content;
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 

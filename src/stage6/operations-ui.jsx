@@ -376,6 +376,88 @@ export function OpsStatus({ children, tone }) {
   );
 }
 
+export function OpsSortableList({ items, onChange, onRemove, label = "顺序" }) {
+  const [dragging, setDragging] = useState(null);
+  const [dropTarget, setDropTarget] = useState(null);
+  const reorder = (source, target) => {
+    if (!source || source === target) return;
+    const from = items.indexOf(source);
+    const to = items.indexOf(target);
+    if (from < 0 || to < 0) return;
+    const next = [...items];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    onChange(next);
+    setDropTarget(null);
+  };
+  const moveByKeyboard = (item, direction) => {
+    const from = items.indexOf(item);
+    const to = from + direction;
+    if (to < 0 || to >= items.length) return;
+    const next = [...items];
+    [next[from], next[to]] = [next[to], next[from]];
+    onChange(next);
+  };
+  return (
+    <div className="ops-sortable-list" role="list" aria-label={label}>
+      {items.map((item, index) => (
+        <div
+          className={`${onRemove ? "has-remove" : ""} ${dragging === item ? "is-dragging" : ""} ${dropTarget === item ? "is-drop-target" : ""}`.trim()}
+          data-sort-value={item}
+          draggable
+          key={item}
+          role="listitem"
+          tabIndex={0}
+          aria-label={`${item}，当前位置 ${index + 1}，可拖动排序`}
+          onDragStart={(event) => {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", item);
+            setDragging(item);
+            setDropTarget(null);
+          }}
+          onDragOver={(event) => {
+            if (dragging && dragging !== item) {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "move";
+              setDropTarget(item);
+            }
+          }}
+          onDrop={(event) => {
+            event.preventDefault();
+            reorder(dragging || event.dataTransfer.getData("text/plain"), item);
+          }}
+          onDragEnd={() => {
+            setDragging(null);
+            setDropTarget(null);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowUp") {
+              event.preventDefault();
+              moveByKeyboard(item, -1);
+            }
+            if (event.key === "ArrowDown") {
+              event.preventDefault();
+              moveByKeyboard(item, 1);
+            }
+          }}
+        >
+          <Icon name="menu" />
+          <i>{index + 1}</i>
+          <span>{item}</span>
+          <small>拖动调整顺序</small>
+          {onRemove ? (
+            <IconButton
+              icon="close"
+              label={`移除 ${item}`}
+              onClick={() => onRemove(item)}
+            />
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function useOpsList(items, fields, pageSize = 20) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
