@@ -161,13 +161,11 @@ export function ProfileSettingsPage() {
             >
               {avatarPreview ? null : "SL"}
             </i>
-            <button
-              type="button"
-              disabled={!editingProfile}
-              onClick={openAvatarEditor}
-            >
-              更换头像
-            </button>
+            {!editingProfile ? (
+              <button type="button" onClick={openAvatarEditor}>
+                更换头像
+              </button>
+            ) : null}
           </div>
           <div className="s5-profile-fields">
             {editingProfile ? (

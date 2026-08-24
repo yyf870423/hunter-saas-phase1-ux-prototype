@@ -58,7 +58,6 @@ test("设置中心关键 Modal 生成验收截图", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
 
   await page.goto("#/settings/profile");
-  await page.getByRole("button", { name: "编辑" }).first().click();
   await page.getByRole("button", { name: "更换头像" }).click();
   await page.locator("#s5-avatar-file").setInputFiles({
     name: "shenlan-avatar.png",

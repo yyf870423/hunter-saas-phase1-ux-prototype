@@ -20,11 +20,6 @@ test("桌面账户菜单和用量环可以进入设置", async ({ page }) => {
 test("个人资料支持分区编辑、校验和安全操作", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/settings/profile");
-  await page.getByRole("button", { name: "编辑" }).first().click();
-  await page.getByLabel("姓名*").fill("");
-  await expect(page.getByText("请输入姓名")).toBeVisible();
-  await page.getByLabel("姓名*").fill("沈岚");
-
   await page.getByRole("button", { name: "更换头像" }).click();
   await expect(page.getByRole("button", { name: "保存头像" })).toBeDisabled();
   await page.locator("#s5-avatar-file").setInputFiles({
@@ -58,6 +53,12 @@ test("个人资料支持分区编辑、校验和安全操作", async ({ page }) 
   await page.getByRole("button", { name: "保存头像" }).click();
   await expect(page.getByText("头像已更新")).toBeVisible();
   await expect(page.locator(".s5-avatar-editor > i")).toHaveClass(/has-image/);
+
+  await page.getByRole("button", { name: "编辑" }).first().click();
+  await expect(page.getByRole("button", { name: "更换头像" })).toHaveCount(0);
+  await page.getByLabel("姓名*").fill("");
+  await expect(page.getByText("请输入姓名")).toBeVisible();
+  await page.getByLabel("姓名*").fill("沈岚");
 
   await page.getByRole("button", { name: "保存" }).first().click();
   await expect(page.getByText("个人资料已保存")).toBeVisible();
