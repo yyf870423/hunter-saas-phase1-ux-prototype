@@ -209,8 +209,11 @@ test("企业模型网关可管理后端与路由，其他能力验证失败时�
   await expect(routeDialog).toBeVisible();
   await expect(routeDialog.getByText("备用资源池顺序")).toBeVisible();
   const fallbackItems = routeDialog.getByRole("listitem");
-  await fallbackItems.nth(1).dragTo(fallbackItems.nth(0));
+  await fallbackItems
+    .first()
+    .dragTo(routeDialog.locator(".ops-sortable-drop-zone").last());
   await expect(fallbackItems.first()).toContainText("OpenAI 复杂推理池");
+  await expect(fallbackItems.last()).toContainText("百炼高速资源池");
   await page.getByRole("button", { name: "取消" }).click();
 
   await page.getByRole("tab", { name: /数据源配置/ }).click();
@@ -221,8 +224,11 @@ test("企业模型网关可管理后端与路由，其他能力验证失败时�
   const dialog = page.getByRole("dialog", { name: "编辑能力配置" });
   const routeItems = dialog.getByRole("listitem");
   await expect(routeItems).toHaveCount(3);
-  await routeItems.first().dragTo(routeItems.nth(1));
+  await routeItems
+    .first()
+    .dragTo(dialog.locator(".ops-sortable-drop-zone").last());
   await expect(routeItems.first()).toContainText("Serper.dev 备用路由");
+  await expect(routeItems.last()).toContainText("百度搜索主路由");
   await dialog.getByPlaceholder("输入新密钥").fill("sk-test-redacted");
   await expect(dialog.getByPlaceholder("输入新密钥")).toHaveValue(
     "sk-test-redacted",

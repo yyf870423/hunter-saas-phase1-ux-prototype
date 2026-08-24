@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Icon } from "../components/Icon";
 import {
   Button,
@@ -378,17 +378,21 @@ export function OpsStatus({ children, tone }) {
 
 export function OpsSortableList({ items, onChange, onRemove, label = "顺序" }) {
   const [dragging, setDragging] = useState(null);
-  const [dropTarget, setDropTarget] = useState(null);
-  const reorder = (source, target) => {
-    if (!source || source === target) return;
+  const [dropIndex, setDropIndex] = useState(null);
+  const reorder = (source, insertionIndex) => {
+    if (!source || insertionIndex === null) return;
     const from = items.indexOf(source);
-    const to = items.indexOf(target);
-    if (from < 0 || to < 0) return;
+    if (from < 0 || insertionIndex < 0 || insertionIndex > items.length) return;
+    const to = insertionIndex > from ? insertionIndex - 1 : insertionIndex;
+    if (from === to) {
+      setDropIndex(null);
+      return;
+    }
     const next = [...items];
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
     onChange(next);
-    setDropTarget(null);
+    setDropIndex(null);
   };
   const moveByKeyboard = (item, direction) => {
     const from = items.indexOf(item);
@@ -398,61 +402,78 @@ export function OpsSortableList({ items, onChange, onRemove, label = "顺序" })
     [next[from], next[to]] = [next[to], next[from]];
     onChange(next);
   };
+  const dropZone = (index) => (
+    <div
+      className={`ops-sortable-drop-zone ${dragging ? "is-active" : ""} ${dropIndex === index ? "is-drop-target" : ""}`.trim()}
+      data-drop-index={index}
+      key={`drop-${index}`}
+      aria-hidden="true"
+      onDragEnter={(event) => {
+        if (!dragging) return;
+        event.preventDefault();
+        setDropIndex(index);
+      }}
+      onDragOver={(event) => {
+        if (!dragging) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        setDropIndex(index);
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        reorder(dragging || event.dataTransfer.getData("text/plain"), index);
+      }}
+    >
+      <span>放到这里</span>
+    </div>
+  );
   return (
     <div className="ops-sortable-list" role="list" aria-label={label}>
+      {dropZone(0)}
       {items.map((item, index) => (
-        <div
-          className={`${onRemove ? "has-remove" : ""} ${dragging === item ? "is-dragging" : ""} ${dropTarget === item ? "is-drop-target" : ""}`.trim()}
-          data-sort-value={item}
-          draggable
-          key={item}
-          role="listitem"
-          tabIndex={0}
-          aria-label={`${item}，当前位置 ${index + 1}，可拖动排序`}
-          onDragStart={(event) => {
-            event.dataTransfer.effectAllowed = "move";
-            event.dataTransfer.setData("text/plain", item);
-            setDragging(item);
-            setDropTarget(null);
-          }}
-          onDragOver={(event) => {
-            if (dragging && dragging !== item) {
-              event.preventDefault();
-              event.dataTransfer.dropEffect = "move";
-              setDropTarget(item);
-            }
-          }}
-          onDrop={(event) => {
-            event.preventDefault();
-            reorder(dragging || event.dataTransfer.getData("text/plain"), item);
-          }}
-          onDragEnd={() => {
-            setDragging(null);
-            setDropTarget(null);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "ArrowUp") {
-              event.preventDefault();
-              moveByKeyboard(item, -1);
-            }
-            if (event.key === "ArrowDown") {
-              event.preventDefault();
-              moveByKeyboard(item, 1);
-            }
-          }}
-        >
-          <Icon name="menu" />
-          <i>{index + 1}</i>
-          <span>{item}</span>
-          <small>拖动调整顺序</small>
-          {onRemove ? (
-            <IconButton
-              icon="close"
-              label={`移除 ${item}`}
-              onClick={() => onRemove(item)}
-            />
-          ) : null}
-        </div>
+        <Fragment key={item}>
+          <div
+            className={`${onRemove ? "has-remove" : ""} ${dragging === item ? "is-dragging" : ""}`.trim()}
+            data-sort-value={item}
+            draggable
+            role="listitem"
+            tabIndex={0}
+            aria-label={`${item}，当前位置 ${index + 1}，可拖动排序`}
+            onDragStart={(event) => {
+              event.dataTransfer.effectAllowed = "move";
+              event.dataTransfer.setData("text/plain", item);
+              setDragging(item);
+              setDropIndex(null);
+            }}
+            onDragEnd={() => {
+              setDragging(null);
+              setDropIndex(null);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowUp") {
+                event.preventDefault();
+                moveByKeyboard(item, -1);
+              }
+              if (event.key === "ArrowDown") {
+                event.preventDefault();
+                moveByKeyboard(item, 1);
+              }
+            }}
+          >
+            <Icon name="menu" />
+            <i>{index + 1}</i>
+            <span>{item}</span>
+            <small>拖动调整顺序</small>
+            {onRemove ? (
+              <IconButton
+                icon="close"
+                label={`移除 ${item}`}
+                onClick={() => onRemove(item)}
+              />
+            ) : null}
+          </div>
+          {dropZone(index + 1)}
+        </Fragment>
       ))}
     </div>
   );

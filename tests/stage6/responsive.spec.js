@@ -111,7 +111,10 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
       }),
     );
   });
-  await modelRouteItems.nth(1).evaluate((element) => {
+  const modelDropZones = page
+    .getByRole("dialog", { name: "编辑任务模型分配" })
+    .locator(".ops-sortable-drop-zone");
+  await modelDropZones.last().evaluate((element) => {
     element.dispatchEvent(
       new DragEvent("dragover", {
         bubbles: true,
@@ -120,7 +123,7 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
       }),
     );
   });
-  await expect(modelRouteItems.nth(1)).toHaveClass(/is-drop-target/);
+  await expect(modelDropZones.last()).toHaveClass(/is-drop-target/);
   await page.screenshot({
     path: "artifacts/stage6-model-routing-drag.png",
     fullPage: true,
@@ -154,7 +157,10 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
       }),
     );
   });
-  await dataRouteItems.nth(1).evaluate((element) => {
+  const dataDropZones = page
+    .getByRole("dialog", { name: "编辑能力配置" })
+    .locator(".ops-sortable-drop-zone");
+  await dataDropZones.last().evaluate((element) => {
     element.dispatchEvent(
       new DragEvent("dragover", {
         bubbles: true,
@@ -163,7 +169,7 @@ test("运营端关键 Modal 和状态生成验收截图", async ({ page }) => {
       }),
     );
   });
-  await expect(dataRouteItems.nth(1)).toHaveClass(/is-drop-target/);
+  await expect(dataDropZones.last()).toHaveClass(/is-drop-target/);
   await page.waitForTimeout(180);
   await page.screenshot({
     path: "artifacts/stage6-data-source-routing-drag.png",

@@ -15,20 +15,20 @@
 
 ## 二、运营端公共组件
 
-| 组件                | 职责                                 | 主要状态                                  |
-| ------------------- | ------------------------------------ | ----------------------------------------- |
-| `OpsPageHeader`     | 页面标题、口径说明和页面级动作       | normal                                    |
-| `OpsTabs`           | 模块内稳定对象切换                   | normal、active、overflow                  |
-| `OpsMetric`         | 趋势指标、周期对比和下钻             | normal、hover                             |
-| `OpsFilterBar`      | 搜索、单选、多选、时间范围和单项清空 | normal、open、selected、cleared           |
-| `OpsTable`          | 桌面运营表格和移动端分组记录         | loading、empty、normal                    |
-| `OpsPagination`     | 页码、总数和页大小                   | normal、disabled                          |
-| `OpsDefinitionList` | 详情元数据                           | normal                                    |
-| `OpsTimeline`       | 任务、支持、安全和审计时间线         | success、warning、danger                  |
-| `OpsState`          | 页面级状态                           | loading、empty、error、permission-limited |
-| `OpsInlineState`    | 局部风险、权限和恢复说明             | info、success、warning、danger            |
-| `OpsStatus`         | 运营状态标签                         | neutral、info、success、warning、danger   |
-| `OpsSortableList`   | 模型资源池和数据源路由顺序拖拽       | normal、dragging、drop-target、removable  |
+| 组件                | 职责                                                             | 主要状态                                  |
+| ------------------- | ---------------------------------------------------------------- | ----------------------------------------- |
+| `OpsPageHeader`     | 页面标题、口径说明和页面级动作                                   | normal                                    |
+| `OpsTabs`           | 模块内稳定对象切换                                               | normal、active、overflow                  |
+| `OpsMetric`         | 趋势指标、周期对比和下钻                                         | normal、hover                             |
+| `OpsFilterBar`      | 搜索、单选、多选、时间范围和单项清空                             | normal、open、selected、cleared           |
+| `OpsTable`          | 桌面运营表格和移动端分组记录                                     | loading、empty、normal                    |
+| `OpsPagination`     | 页码、总数和页大小                                               | normal、disabled                          |
+| `OpsDefinitionList` | 详情元数据                                                       | normal                                    |
+| `OpsTimeline`       | 任务、支持、安全和审计时间线                                     | success、warning、danger                  |
+| `OpsState`          | 页面级状态                                                       | loading、empty、error、permission-limited |
+| `OpsInlineState`    | 局部风险、权限和恢复说明                                         | info、success、warning、danger            |
+| `OpsStatus`         | 运营状态标签                                                     | neutral、info、success、warning、danger   |
+| `OpsSortableList`   | 模型资源池和数据源路由顺序拖拽；每行前后及列表末尾均提供稳定落点 | normal、dragging、drop-target、removable  |
 
 公共 Button、IconButton、Modal、Drawer、Toast、SelectMenu、DatePicker、TextInput、TextArea 和 FormField 继续复用已审批的产品级组件，不使用浏览器默认控件样式。
 
