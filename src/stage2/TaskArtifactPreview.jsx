@@ -86,7 +86,7 @@ export function buildRecommendationTaskArtifacts(candidateName, reports) {
       updatedAt: "今天 10:18",
       title: `${candidateName} · 客户推荐预览`,
       stats: [
-        ["综合匹配", "92"],
+        ["综合匹配", "94"],
         ["硬技能", "95"],
         ["角色适配", "88"],
       ],

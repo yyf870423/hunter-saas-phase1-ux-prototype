@@ -203,8 +203,6 @@ const candidateSeed = [
     "上海",
     "博士",
     "12 年",
-    "91",
-    "推进中",
   ],
   [
     "candidate-zhaoxingyu",
@@ -214,8 +212,6 @@ const candidateSeed = [
     "北京",
     "硕士",
     "9 年",
-    "94",
-    "储备",
   ],
   [
     "candidate-chenchuning",
@@ -225,8 +221,6 @@ const candidateSeed = [
     "深圳",
     "博士",
     "8 年",
-    "89",
-    "推进中",
   ],
   [
     "candidate-zhoumingyuan",
@@ -236,8 +230,6 @@ const candidateSeed = [
     "上海",
     "博士",
     "13 年",
-    "86",
-    "储备",
   ],
   [
     "candidate-hewenting",
@@ -247,8 +239,6 @@ const candidateSeed = [
     "上海",
     "博士",
     "6 年",
-    "84",
-    "储备",
   ],
   [
     "candidate-wangyi",
@@ -258,8 +248,6 @@ const candidateSeed = [
     "北京",
     "硕士",
     "5 年",
-    "78",
-    "待核实",
   ],
   [
     "candidate-jiangyifan",
@@ -269,8 +257,6 @@ const candidateSeed = [
     "北京",
     "博士",
     "7 年",
-    "82",
-    "储备",
   ],
   [
     "candidate-sunran",
@@ -280,8 +266,6 @@ const candidateSeed = [
     "杭州",
     "博士",
     "10 年",
-    "80",
-    "失败",
   ],
   [
     "candidate-gaoyuan",
@@ -291,8 +275,6 @@ const candidateSeed = [
     "深圳",
     "硕士",
     "11 年",
-    "77",
-    "储备",
   ],
   [
     "candidate-liangchen",
@@ -302,8 +284,6 @@ const candidateSeed = [
     "北京",
     "硕士",
     "9 年",
-    "75",
-    "已入职",
   ],
   [
     "candidate-yangfan",
@@ -313,8 +293,6 @@ const candidateSeed = [
     "广州",
     "本科",
     "6 年",
-    "73",
-    "储备",
   ],
   [
     "candidate-tangwen",
@@ -324,12 +302,61 @@ const candidateSeed = [
     "北京",
     "博士",
     "4 年",
-    "69",
-    "储备",
   ],
 ];
 
 const candidateAges = [37, 35, 34, 40, 33, 31, 36, 39, 38, 35, 32, 30];
+
+export const candidatePositionRelations = [
+  {
+    candidateId: "candidate-linhao",
+    positionId: "position-vla",
+    stage: "一面",
+    active: true,
+  },
+  {
+    candidateId: "candidate-zhaoxingyu",
+    positionId: "position-vla",
+    stage: "储备",
+    active: false,
+  },
+  {
+    candidateId: "candidate-chenchuning",
+    positionId: "position-vla",
+    stage: "推荐",
+    active: true,
+  },
+  {
+    candidateId: "candidate-zhoumingyuan",
+    positionId: "position-vla",
+    stage: "储备",
+    active: false,
+  },
+  {
+    candidateId: "candidate-hewenting",
+    positionId: "position-vla",
+    stage: "储备",
+    active: false,
+  },
+  {
+    candidateId: "candidate-wangyi",
+    positionId: "position-vla",
+    stage: "待核实",
+    active: true,
+  },
+  {
+    candidateId: "candidate-sunran",
+    positionId: "position-vla",
+    stage: "不合适",
+    active: false,
+  },
+  {
+    candidateId: "candidate-liangchen",
+    positionId: "position-vla",
+    stage: "已入职",
+    active: false,
+  },
+];
 
 export const candidates = candidateSeed.map((item, index) => ({
   id: item[0],
@@ -340,8 +367,10 @@ export const candidates = candidateSeed.map((item, index) => ({
   education: item[5],
   experience: item[6],
   age: candidateAges[index],
-  score: Number(item[7]),
-  pipeline: item[8],
+  pipeline:
+    candidatePositionRelations.find(
+      (relation) => relation.candidateId === item[0],
+    )?.stage || "未进入流程",
   industries:
     index % 2
       ? ["人工智能", "具身智能与机器人"]
@@ -354,7 +383,9 @@ export const candidates = candidateSeed.map((item, index) => ({
   opportunityStatus: ["是", "固定看", "是", "未标注", "固定看", "否"][
     index % 6
   ],
-  pipelineActive: !["储备", "失败", "已入职"].includes(item[8]),
+  pipelineActive: candidatePositionRelations.some(
+    (relation) => relation.candidateId === item[0] && relation.active,
+  ),
   folders:
     index < 3
       ? ["重点岗位人才/VLA 算法负责人/优先联系", "客户项目/星澜机器人"]
@@ -601,11 +632,11 @@ export const companies = [
     name: "星澜机器人",
     industries: ["具身智能与机器人", "人工智能", "工业自动化"],
     location: "北京、上海",
-    contacts: 4,
-    opportunities: 2,
-    positions: 3,
-    talents: 16,
-    progress: 8,
+    contacts: 2,
+    opportunities: 1,
+    positions: 2,
+    talents: 2,
+    progress: 6,
     updatedAt: "今天",
   },
   {
@@ -613,11 +644,11 @@ export const companies = [
     name: "拓界机器人",
     industries: ["具身智能与机器人", "工业自动化"],
     location: "上海",
-    contacts: 3,
+    contacts: 1,
     opportunities: 1,
-    positions: 2,
-    talents: 13,
-    progress: 5,
+    positions: 1,
+    talents: 1,
+    progress: 3,
     updatedAt: "昨天",
   },
   {
@@ -625,11 +656,11 @@ export const companies = [
     name: "灵跃科技",
     industries: ["具身智能与机器人", "智能硬件/消费电子"],
     location: "深圳、东莞",
-    contacts: 2,
+    contacts: 1,
     opportunities: 1,
-    positions: 4,
-    talents: 10,
-    progress: 9,
+    positions: 1,
+    talents: 1,
+    progress: 8,
     updatedAt: "2 天前",
   },
   {
@@ -637,10 +668,10 @@ export const companies = [
     name: "穹顶智能",
     industries: ["具身智能与机器人", "计算机软件"],
     location: "北京",
-    contacts: 1,
+    contacts: 0,
     opportunities: 1,
-    positions: 2,
-    talents: 7,
+    positions: 1,
+    talents: 1,
     progress: 4,
     updatedAt: "4 天前",
   },
@@ -649,10 +680,10 @@ export const companies = [
     name: "上海人工智能实验室",
     industries: ["学术/科研", "人工智能"],
     location: "上海",
-    contacts: 2,
+    contacts: 0,
     opportunities: 0,
-    positions: 1,
-    talents: 21,
+    positions: 0,
+    talents: 1,
     progress: 0,
     updatedAt: "08-10",
   },
@@ -686,7 +717,7 @@ export const contacts = [
     categories: ["招聘负责人", "客户 HR"],
     company: "星澜机器人",
     role: "招聘负责人",
-    phone: "138 **** 6217",
+    phone: "139 **** 4826",
     email: "yu.chen@xinglan-robotics.com",
     region: "北京",
     lastContact: "昨天 18:20",
@@ -820,64 +851,65 @@ export const landscapes = [
   },
 ];
 
-export const papers = [
+const paperRecords = [
   {
     id: "paper-vla-survey",
     title: "Vision-Language-Action Models for Robotics: A Survey",
     titleZh: "机器人视觉语言动作模型综述",
     year: 2026,
     venue: "IEEE T-PAMI",
-    authors: [
-      "Hao Lin",
-      "Mingyuan Zhou",
-      "Yifan Jiang",
-      "Wenting He",
-      "Xingyu Zhao",
-      "Chuning Chen",
-      "Rui Chen",
-      "Jiaqi Li",
-      "Yuchen Zhang",
-      "Zixuan Wang",
-      "Tianyi Liu",
-      "Mengqi Sun",
-      "Yuhan Gao",
-      "Shuo Yang",
-      "Wei Tang",
-      "Ziyang Xu",
-      "Han Chen",
-      "Qian Yu",
-      "Jingwen Luo",
-      "Daniel Wu",
-    ],
-    institutions: [
-      "Tuojie Robotics",
-      "Qiongding AI",
-      "Shanghai AI Laboratory",
-      "Shanghai Jiao Tong University",
-      "Tsinghua University",
-      "Zhejiang University",
-      "Tuojie Robotics",
-      "Shanghai AI Laboratory",
-      "Qiongding AI",
-      "Peking University",
-      "Tuojie Robotics",
-      "Fudan University",
-      "Shanghai AI Laboratory",
-      "Tsinghua University",
-      "Zhejiang University",
-      "Qiongding AI",
-      "Tuojie Robotics",
-      "Shanghai Jiao Tong University",
-      "Shanghai AI Laboratory",
-      "Qiongding AI",
+    authorships: [
+      ["Hao Lin", ["Tuojie Robotics"]],
+      ["Mingyuan Zhou", ["Qiongding AI"]],
+      ["Yifan Jiang", ["Shanghai AI Laboratory"]],
+      ["Wenting He", ["Shanghai Jiao Tong University"]],
+      ["Xingyu Zhao", ["Tsinghua University"]],
+      ["Chuning Chen", ["Zhejiang University"]],
+      ["Rui Chen", ["Tuojie Robotics"]],
+      ["Jiaqi Li", ["Shanghai AI Laboratory"]],
+      ["Yuchen Zhang", ["Qiongding AI"]],
+      ["Zixuan Wang", ["Peking University"]],
+      ["Tianyi Liu", ["Tuojie Robotics"]],
+      ["Mengqi Sun", ["Fudan University"]],
+      ["Yuhan Gao", ["Shanghai AI Laboratory"]],
+      ["Shuo Yang", ["Tsinghua University"]],
+      ["Wei Tang", ["Zhejiang University"]],
+      ["Ziyang Xu", ["Qiongding AI"]],
+      ["Han Chen", ["Tuojie Robotics"]],
+      ["Qian Yu", ["Shanghai Jiao Tong University"]],
+      ["Jingwen Luo", ["Shanghai AI Laboratory"]],
+      ["Daniel Wu", ["Qiongding AI"]],
     ],
     citations: 42,
     tags: ["VLA", "机器人学习", "多模态决策"],
     summary:
       "系统梳理视觉语言动作模型在机器人感知、语言理解、动作生成和真实环境部署中的主要技术路线，并比较端到端策略、分层规划与模块化控制在不同任务中的适用边界。作者进一步归纳互联网数据、仿真数据、遥操作轨迹和真机回流数据的训练作用，分析模型规模、动作表示、控制频率与跨机器人迁移之间的关系。论文还汇总长程任务、开放词汇泛化、实时推理、安全约束和评测一致性方面的主要问题，并给出覆盖数据建设、模型训练、在线部署和失败样本回流的研究议程，为判断团队技术积累与候选人研究方向提供较完整的依据。",
+    abstractOriginal:
+      "Vision-language-action models unify multimodal perception, language understanding, and robot control. This survey reviews model architectures, data pipelines, evaluation protocols, and real-world deployment challenges.",
+    abstractZh:
+      "视觉语言动作模型将多模态感知、语言理解和机器人控制统一起来。本文系统总结模型架构、数据流程、评测方法和真实机器人部署中的关键问题。",
+    doi: "10.1109/TPAMI.2026.1234567",
+    openAlexId: "W4401234567",
+    arxivId: "2603.01452",
     relation: "2 位已关联",
     source: "OpenAlex",
     originalUrl: "https://arxiv.org/abs/2603.01452",
+    sourceRecords: [
+      {
+        title: "OpenAlex",
+        description: "论文元数据、作者机构和被引指标",
+        meta: "2026-08-20 获取",
+        status: "可访问",
+        href: "https://openalex.org/W4401234567",
+      },
+      {
+        title: "arXiv 原文",
+        description: "PDF 与摘要原文",
+        meta: "2026-08-20 获取",
+        status: "可访问",
+        href: "https://arxiv.org/abs/2603.01452",
+      },
+    ],
   },
   {
     id: "paper-diffusion",
@@ -885,14 +917,40 @@ export const papers = [
     titleZh: "面向泛化机器人操作的扩散策略",
     year: 2025,
     venue: "CoRL",
-    authors: ["Xingyu Zhao", "Chuning Chen"],
-    institutions: ["Xinglan Robotics", "Lingyue AI"],
+    authorships: [
+      ["Xingyu Zhao", ["Xinglan Robotics"]],
+      ["Chuning Chen", ["Lingyue AI"]],
+    ],
     citations: 68,
     tags: ["扩散策略", "机器人操作", "泛化学习"],
     summary:
       "提出面向多任务机器人操作的条件扩散策略，通过统一动作表示、视觉条件编码和跨场景数据增强提升新物体、新摆放与新任务下的泛化能力。实验覆盖桌面抓取、双臂协同、工具使用和连续装配，并在多种真实机器人平台上比较行为克隆、动作分块与扩散策略的稳定性。论文详细报告训练数据规模、采样步数、控制频率和推理延迟对成功率的影响，同时分析遮挡、接触误差、长程动作累积和分布外物体导致的失败模式。结果表明，结合失败轨迹回流与分阶段数据配比后，策略在少样本新任务上的适配速度和真实环境鲁棒性均有明显提升。",
+    abstractOriginal:
+      "We introduce a conditional diffusion policy for generalizable multi-task robot manipulation and evaluate it across grasping, bimanual coordination, tool use, and assembly.",
+    abstractZh:
+      "本文提出面向多任务机器人操作的条件扩散策略，并在抓取、双臂协同、工具使用和装配任务中验证其泛化能力。",
+    doi: "10.5555/corl.2025.1842",
+    openAlexId: "W4410987654",
+    arxivId: "2507.08421",
     relation: "1 位待确认",
     source: "OpenAlex / Crossref",
+    originalUrl: "https://arxiv.org/abs/2507.08421",
+    sourceRecords: [
+      {
+        title: "OpenAlex",
+        description: "论文元数据、作者机构和被引指标",
+        meta: "2026-08-19 获取",
+        status: "可访问",
+        href: "https://openalex.org/W4410987654",
+      },
+      {
+        title: "Crossref",
+        description: "DOI 与发表信息",
+        meta: "2026-08-19 获取",
+        status: "可访问",
+        href: "https://doi.org/10.5555/corl.2025.1842",
+      },
+    ],
   },
   {
     id: "paper-dataclosed",
@@ -900,14 +958,40 @@ export const papers = [
     titleZh: "大规模机器人学习的数据闭环",
     year: 2025,
     venue: "RSS",
-    authors: ["Wenting He", "Hao Lin"],
-    institutions: ["Shanghai AI Laboratory", "Tuojie Robotics"],
+    authorships: [
+      ["Wenting He", ["Shanghai AI Laboratory"]],
+      ["Hao Lin", ["Tuojie Robotics"]],
+    ],
     citations: 31,
     tags: ["数据闭环", "真机部署", "持续学习"],
     summary:
       "围绕大规模真机学习的数据采集、失败样本回流、质量筛选、版本管理和持续训练建立完整闭环，重点讨论如何降低人工标注、重复采集与无效训练成本。系统将线上执行记录按照任务阶段、失败原因、环境变化和数据新颖度自动分层，再结合人工抽检形成可追溯的数据集版本。论文比较随机回流、困难样本优先和覆盖度驱动三种策略，结果显示按失败类型组织回流数据能够显著提高新任务上线速度与策略迭代效率。作者还讨论多机器人并行采集、隐私数据清洗、模型回归测试和线上安全门禁，为评估候选人在机器人数据平台及工程落地方面的实际经验提供了具体证据。",
+    abstractOriginal:
+      "We present a production data loop for large-scale robot learning that prioritizes failure cases, maintains traceable dataset versions, and validates every model update before deployment.",
+    abstractZh:
+      "本文提出面向大规模机器人学习的生产级数据闭环，重点处理失败样本优先回流、数据集版本追踪和模型上线前验证。",
+    doi: null,
+    openAlexId: "W4398876123",
+    arxivId: "2505.10983",
     relation: "2 位已关联",
     source: "arXiv",
+    originalUrl: "https://arxiv.org/abs/2505.10983",
+    sourceRecords: [
+      {
+        title: "arXiv 原文",
+        description: "摘要与 PDF 原文",
+        meta: "2026-08-18 获取",
+        status: "可访问",
+        href: "https://arxiv.org/abs/2505.10983",
+      },
+      {
+        title: "OpenAlex",
+        description: "作者机构与引用关系",
+        meta: "2026-08-18 获取",
+        status: "可访问",
+        href: "https://openalex.org/W4398876123",
+      },
+    ],
   },
   {
     id: "paper-sim2real",
@@ -915,16 +999,50 @@ export const papers = [
     titleZh: "基于动作先验的可扩展仿真到现实迁移",
     year: 2024,
     venue: "ICRA",
-    authors: ["Chen Liang", "Yuan Gao"],
-    institutions: ["Galbot", "Tencent Robotics X"],
+    authorships: [
+      ["Chen Liang", ["Galbot"]],
+      ["Yuan Gao", ["Tencent Robotics X"]],
+    ],
     citations: 97,
     tags: ["Sim2Real", "强化学习", "动作先验"],
     summary:
       "使用可迁移的动作先验与分层强化学习方法缩小仿真环境和真实机器人之间的差异，使策略能够在少量真机数据下完成快速适配。方法先从多任务仿真数据中学习低层动作表示，再通过少量真实轨迹校准高层策略和安全约束。实验覆盖移动操作、抓取放置与动态避障，并系统分析传感器噪声、动力学偏差、接触模型误差和动作延迟对迁移效果的影响。论文还比较域随机化、系统辨识和离线强化学习的组合方式，给出不同硬件条件下的数据需求与失败案例，为判断算法研究是否具备真实机器人部署经验提供了较完整的参考。",
+    abstractOriginal:
+      "We combine transferable action priors with hierarchical reinforcement learning to reduce the amount of real-world data required for sim-to-real adaptation.",
+    abstractZh:
+      "本文结合可迁移动作先验与分层强化学习，降低仿真策略迁移到真实机器人所需的真机数据量。",
+    doi: "10.1109/ICRA57147.2024.10610234",
+    openAlexId: "W4387654012",
+    arxivId: null,
     relation: "未关联",
     source: "Crossref",
+    originalUrl: "https://doi.org/10.1109/ICRA57147.2024.10610234",
+    sourceRecords: [
+      {
+        title: "Crossref",
+        description: "DOI、会议与作者信息",
+        meta: "2026-08-17 获取",
+        status: "可访问",
+        href: "https://doi.org/10.1109/ICRA57147.2024.10610234",
+      },
+      {
+        title: "OpenAlex",
+        description: "作者机构与被引指标",
+        meta: "2026-08-17 获取",
+        status: "可访问",
+        href: "https://openalex.org/W4387654012",
+      },
+    ],
   },
 ];
+
+export const papers = paperRecords.map((paper) => ({
+  ...paper,
+  authors: paper.authorships.map(([name]) => name),
+  institutions: [
+    ...new Set(paper.authorships.flatMap(([, institutions]) => institutions)),
+  ],
+}));
 
 export const patents = [
   {
@@ -937,6 +1055,9 @@ export const patents = [
     publicationNo: "CN118765432A",
     applicationDate: "2026-03-18",
     grantDate: "—",
+    legalStatus: "公开，等待实质审查",
+    legalStatusSource: "国家知识产权局公开数据",
+    legalStatusObservedAt: "2026-08-20 核验",
     tags: ["操作策略", "VLA", "多任务机器人"],
     summary:
       "该专利公开一种面向多任务机器人的操作策略训练方法，将多视角视觉、自然语言指令、机器人状态和动作轨迹编码为统一训练样本，并依据任务难度、操作阶段和失败类型进行分层采样。训练过程中通过动作片段预测、失败样本回放与安全约束联合优化策略稳定性，部署阶段则根据执行置信度切换自主控制和人工接管。方案覆盖抓取、放置、插接、装配和工具使用等连续操作任务，同时描述数据采集、样本清洗、训练版本管理和真机效果回流的完整流程。其权利要求还涉及跨机器人动作映射与在线校准，可用于判断发明人在 VLA、多任务操作及真实机器人数据闭环方面的技术参与程度。",
@@ -952,6 +1073,9 @@ export const patents = [
     publicationNo: "CN117654321A",
     applicationDate: "2025-08-09",
     grantDate: "2026-06-20",
+    legalStatus: "授权有效",
+    legalStatusSource: "国家知识产权局公开数据",
+    legalStatusObservedAt: "2026-08-20 核验",
     tags: ["灵巧手", "精密传动", "关节机构"],
     summary:
       "该专利涉及灵巧手关节的紧凑传动机构，通过差动组件、柔性连接、预紧结构和模块化关节壳体降低回差，并提高狭小空间内的扭矩输出能力。传动路径将驱动器、减速组件、位置检测和过载保护集成在可独立拆装的关节模块中，以便快速维护和更换。说明书进一步讨论多指协同控制所需的重复定位精度、热管理、线束布置和碰撞保护，并给出不同指节尺寸下的结构参数与装配关系。该方案兼顾原型验证和批量制造需求，可用于判断相关发明人在精密传动、灵巧手结构、工程验证及量产导入方面的实际技术贡献。",
@@ -967,6 +1091,9 @@ export const patents = [
     publicationNo: "CN117998877A",
     applicationDate: "2025-10-11",
     grantDate: "—",
+    legalStatus: "公开，等待实质审查",
+    legalStatusSource: "国家知识产权局公开数据",
+    legalStatusObservedAt: "2026-08-20 核验",
     tags: ["数据闭环", "机器人学习", "样本筛选"],
     summary:
       "该专利提出机器人训练数据的自动筛选、质量评分和回流系统，可按照任务阶段、失败类型、数据新颖度与传感器完整性识别高价值样本。系统从机器人线上执行记录中提取视频、状态、动作和人工接管片段，通过规则门禁与学习模型共同判断数据质量，再将有效样本自动转化为可复用训练集。方案保留样本来源、设备版本、标注状态、模型版本和处理记录，支持按任务或问题类型生成增量数据集。说明书还描述人工抽检、隐私清洗、异常样本隔离和训练后回归验证流程，可帮助用户判断发明人在机器人数据平台、持续学习和工程质量体系中的具体参与范围。",

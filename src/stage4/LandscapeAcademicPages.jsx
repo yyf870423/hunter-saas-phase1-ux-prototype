@@ -1790,6 +1790,7 @@ function PersonIdentityReview({
 function AcademicPeopleList({
   people,
   institutions = [],
+  authorships,
   kind,
   linkedPeople,
   reviewStates = {},
@@ -1800,8 +1801,14 @@ function AcademicPeopleList({
   const moreRef = useRef(null);
   const panelRef = useRef(null);
   const noun = kind === "paper" ? "作者" : "发明人";
-  const visiblePeople = people.slice(0, 5);
-  const hiddenPeople = people.slice(5);
+  const personRecords = authorships
+    ? authorships.map(([name, affiliations]) => ({ name, affiliations }))
+    : people.map((name, index) => ({
+        name,
+        affiliations: institutions[index] ? [institutions[index]] : [],
+      }));
+  const visiblePeople = personRecords.slice(0, 5);
+  const hiddenPeople = personRecords.slice(5);
   useEffect(() => {
     if (!moreOpen) return undefined;
     const close = (event) => {
@@ -1821,12 +1828,13 @@ function AcademicPeopleList({
       document.removeEventListener("keydown", escape);
     };
   }, [moreOpen]);
-  const personItem = (person, index) => {
+  const personItem = (record, index) => {
+    const person = record.name;
     const linkedCandidateId = linkedPeople[person] || null;
     const linked = Boolean(linkedCandidateId);
     const institution =
       kind === "paper"
-        ? institutions[index] || institutions[0] || "机构待补充"
+        ? record.affiliations.join("、") || "机构待补充"
         : "原始发明人署名";
     return (
       <article key={person}>
@@ -1901,8 +1909,8 @@ function AcademicPeopleList({
               </button>
             </header>
             <div className="s4-authorship-list">
-              {hiddenPeople.map((person, hiddenIndex) =>
-                personItem(person, hiddenIndex + 5),
+              {hiddenPeople.map((record, hiddenIndex) =>
+                personItem(record, hiddenIndex + 5),
               )}
             </div>
           </FloatingPanel>
@@ -1949,20 +1957,15 @@ export function PaperDetailPage() {
         <FieldGroup title="论文摘要">
           <h3>原始摘要</h3>
           <p className="s4-long-copy">
-            Vision-language-action models unify multimodal perception, language
-            understanding, and robot control. This survey reviews model
-            architectures, data pipelines, evaluation protocols, and real-world
-            deployment challenges.
+            {item.abstractOriginal || "未获取原始摘要"}
           </p>
           <h3>中文摘要</h3>
-          <p className="s4-long-copy">
-            视觉语言动作模型将多模态感知、语言理解和机器人控制统一起来。本文系统总结模型架构、数据流程、评测方法和真实机器人部署中的关键问题。
-          </p>
+          <p className="s4-long-copy">{item.abstractZh || item.summary}</p>
         </FieldGroup>
         <FieldGroup title="作者与机构">
           <AcademicPeopleList
             people={item.authors}
-            institutions={item.institutions}
+            authorships={item.authorships}
             kind="paper"
             linkedPeople={identityLinks}
             reviewStates={reviewStates}
@@ -1972,47 +1975,38 @@ export function PaperDetailPage() {
             onReview={(person, index) =>
               setIdentityPerson({
                 person,
-                institution: item.institutions[index] || item.institutions[0],
+                institution:
+                  item.authorships[index]?.[1]?.join("、") || "机构待补充",
               })
             }
           />
         </FieldGroup>
         <FieldGroup title="成果身份与来源">
           <div className="s4-identifier-list">
-            <span>
-              <b>DOI</b>
-              <p>10.1109/TPAMI.2026.1234567</p>
-            </span>
-            <span>
-              <b>OpenAlex Work ID</b>
-              <p>W4401234567</p>
-            </span>
-            <span>
-              <b>arXiv</b>
-              <p>2603.01452</p>
-            </span>
+            {item.doi ? (
+              <span>
+                <b>DOI</b>
+                <p>{item.doi}</p>
+              </span>
+            ) : null}
+            {item.openAlexId ? (
+              <span>
+                <b>OpenAlex Work ID</b>
+                <p>{item.openAlexId}</p>
+              </span>
+            ) : null}
+            {item.arxivId ? (
+              <span>
+                <b>arXiv</b>
+                <p>{item.arxivId}</p>
+              </span>
+            ) : null}
             <span>
               <b>数据来源</b>
               <p>{item.source}</p>
             </span>
           </div>
-          <SourceList
-            items={[
-              {
-                title: "OpenAlex",
-                description: "论文元数据、作者机构和被引指标",
-                meta: "2026-08-20 获取",
-                status: "可访问",
-              },
-              {
-                title: "arXiv 原文",
-                description: "PDF 与摘要原文",
-                meta: "2026-08-20 获取",
-                status: "可访问",
-                href: item.originalUrl,
-              },
-            ]}
-          />
+          <SourceList items={item.sourceRecords} />
         </FieldGroup>
         <FieldGroup title="人才版图">
           <EntityLink
@@ -2099,9 +2093,7 @@ export function PatentDetailPage() {
       />
       <div className="s4-detail-stack">
         <FieldGroup title="专利摘要">
-          <p className="s4-long-copy">
-            本发明公开一种面向多任务机器人的操作策略训练方法，通过统一视觉、语言和动作表示，并结合真实机器人失败样本回流，提升不同操作任务之间的迁移效率和真实场景成功率。
-          </p>
+          <p className="s4-long-copy">{item.summary}</p>
           <TagList items={item.tags} tone="info" />
         </FieldGroup>
         <FieldGroup title="申请与权利信息">
@@ -2112,9 +2104,10 @@ export function PatentDetailPage() {
               ["公开号", item.publicationNo],
               ["申请日", item.applicationDate],
               ["授权日", item.grantDate],
+              ["法律状态", item.legalStatus],
               [
-                "法律状态",
-                item.grantDate === "—" ? "公开，等待实质审查" : "授权有效",
+                "状态核验",
+                `${item.legalStatusSource} · ${item.legalStatusObservedAt}`,
               ],
             ]}
           />

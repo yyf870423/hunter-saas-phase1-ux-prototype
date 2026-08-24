@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import {
+  formatCny,
+  subscriptionPlanChoices,
+  subscriptionPlans,
+} from "../shared/productCatalog";
 import { FormField, SelectMenu, TextInput } from "../stage4/asset-ui";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import {
@@ -1460,7 +1465,9 @@ export function SubscriptionSettingsPage() {
                 <span>
                   <i style={{ "--usage": "72%" }} />
                   <b>Agent 任务</b>
-                  <em>36 / 50 次</em>
+                  <em>
+                    36 / {subscriptionPlans.professional.agentTaskQuota} 次
+                  </em>
                 </span>
                 <span>
                   <i style={{ "--usage": "53%" }} />
@@ -1509,9 +1516,24 @@ export function SubscriptionSettingsPage() {
         ) : (
           <div className="s5-order-list">
             {[
-              ["2026 年 8 月 1 日", "专业版月度订阅", "¥399.00", "支付成功"],
-              ["2026 年 7 月 1 日", "专业版月度订阅", "¥399.00", "支付成功"],
-              ["2026 年 6 月 1 日", "专业版月度订阅", "¥399.00", "支付成功"],
+              [
+                "2026 年 8 月 1 日",
+                "专业版月度订阅",
+                formatCny(subscriptionPlans.professional.monthlyPrice),
+                "支付成功",
+              ],
+              [
+                "2026 年 7 月 1 日",
+                "专业版月度订阅",
+                formatCny(subscriptionPlans.professional.monthlyPrice),
+                "支付成功",
+              ],
+              [
+                "2026 年 6 月 1 日",
+                "专业版月度订阅",
+                formatCny(subscriptionPlans.professional.monthlyPrice),
+                "支付成功",
+              ],
             ].map((order) => (
               <div key={order[0]}>
                 <span>
@@ -1542,11 +1564,7 @@ export function SubscriptionSettingsPage() {
         }
       >
         <div className="s5-plan-choices" role="radiogroup">
-          {[
-            ["基础版", "¥199 / 月", "20 次 Agent 任务，适合轻量使用"],
-            ["专业版", "¥399 / 月", "50 次 Agent 任务和完整自动化能力"],
-            ["专业版年付", "¥3,990 / 年", "相当于免费使用两个月"],
-          ].map(([title, price, description]) => (
+          {subscriptionPlanChoices.map(({ title, price, description }) => (
             <ChoiceCard
               key={title}
               title={title}

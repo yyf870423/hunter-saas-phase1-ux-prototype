@@ -987,7 +987,7 @@ function TimelineTab({ candidate }) {
         open={noteOpen}
         close={() => setNoteOpen(false)}
         title={editingIndex === null ? "添加跟进记录" : "编辑跟进记录"}
-        description="可以记录电话、线下沟通或其他人工信息"
+        description="记录猎头人工获得的沟通结果，不要求维护沟通渠道类型"
         footer={
           <>
             <Button onClick={() => setNoteOpen(false)}>取消</Button>
@@ -1027,14 +1027,6 @@ function TimelineTab({ candidate }) {
               label="选择发生时间"
               mode="datetime"
               value="2026-08-21 14:30"
-              onChange={() => {}}
-            />
-          </FormField>
-          <FormField label="记录类型">
-            <SelectMenu
-              label="选择类型"
-              value="人工备注"
-              options={["人工备注", "电话沟通", "线下沟通", "其他"]}
               onChange={() => {}}
             />
           </FormField>

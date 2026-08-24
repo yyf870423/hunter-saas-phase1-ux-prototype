@@ -813,7 +813,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
 function AdjustmentModal({ subscription, close }) {
   const notify = useToast();
   const [type, setType] = useState("任务额度");
-  const [value, setValue] = useState("120");
+  const [value, setValue] = useState("5");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
   if (!subscription) return null;
@@ -876,8 +876,8 @@ function AdjustmentModal({ subscription, close }) {
         </FormField>
         <div className="ops-impact-preview">
           <b>调整影响</b>
-          <span>当前任务额度：4,800</span>
-          <span>调整后任务额度：4,920</span>
+          <span>当前 Agent 任务额度：50 次</span>
+          <span>调整后 Agent 任务额度：55 次</span>
           <span>影响周期：当前订阅周期</span>
           <span>本操作将记录操作者、原因和调整前后值。</span>
         </div>

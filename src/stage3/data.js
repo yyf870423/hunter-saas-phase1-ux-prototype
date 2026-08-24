@@ -1520,7 +1520,7 @@ export const careerMatches = [
     company: "星澜机器人",
     location: "北京",
     status: "招聘中",
-    score: 92,
+    score: 94,
     recommendation: "优先沟通",
     tone: "success",
     reason: "VLA 产品落地、机器人学习和 8 人团队管理经历与岗位高度重合。",

@@ -222,7 +222,7 @@ export function TasksPage() {
     <div className="ops-page">
       <OpsPageHeader
         title="任务与故障"
-        description="统一查看业务主线、支线任务和系统后台任务的脱敏运行元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
+        description="统一查看主线内部任务、独立支线任务和系统后台短任务的脱敏运行元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
       />
       <OpsTabs
         value={tab}
@@ -259,7 +259,7 @@ export function TasksPage() {
                   },
                   {
                     label: "任务归属",
-                    options: ["业务主线", "支线任务", "系统后台任务"],
+                    options: ["主线内部任务", "支线任务", "系统后台任务"],
                     value: filters.scope || [],
                     onChange: (value) =>
                       setFilters((current) => ({ ...current, scope: value })),

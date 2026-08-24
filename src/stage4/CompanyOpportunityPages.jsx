@@ -86,7 +86,7 @@ function CompactRelationTable({ type, rows, onOpen }) {
                 <small>{row.location}</small>
               </b>
               <span>{row.title}</span>
-              <span>拓界机器人 · 当前</span>
+              <span>{row.company} · 当前</span>
               <StatusBadge tone="success">已确认</StatusBadge>
             </>
           )}
@@ -125,7 +125,8 @@ function CompanyProfile({ data, onEditSection }) {
             ["总部与主要地点", data.location],
             ["行业", <TagList items={data.industries} />],
             ["已确认名称变体", <TagList items={data.aliases} tone="info" />],
-            ["最近更新", "今天 · 用户确认"],
+            ["最近更新", "今天 · 公司基本资料已由用户确认"],
+            ["待核实内容", "薪资福利与面试周期仍需随具体岗位复核"],
           ]}
         />
       </FieldGroup>
@@ -152,14 +153,37 @@ function CompanyProfile({ data, onEditSection }) {
 
 function CompanyRecruiting() {
   const navigate = useNavigate();
+  const companyName = "星澜机器人";
+  const companyOpportunities = opportunities.filter(
+    (item) => item.company === companyName,
+  );
+  const companyPositions = positions.filter(
+    (item) => item.company === companyName,
+  );
+  const progressingCandidates = companyPositions.reduce(
+    (total, position) => total + position.progress,
+    0,
+  );
+  const hiredCandidates = companyPositions.reduce(
+    (total, position) => total + position.hired,
+    0,
+  );
   return (
     <div className="s4-detail-stack">
       <div className="s4-metric-grid">
         {[
-          ["招聘机会", 2, "1 条跟进中"],
-          ["招聘岗位", 3, "2 个招聘中"],
-          ["候选人推进", 8, "5 人在面试"],
-          ["已入职", 1, "过去 90 天"],
+          [
+            "招聘机会",
+            companyOpportunities.length,
+            `${companyOpportunities.filter((item) => item.status === "跟进中").length} 条跟进中`,
+          ],
+          [
+            "招聘岗位",
+            companyPositions.length,
+            `${companyPositions.filter((item) => item.status === "招聘中").length} 个招聘中`,
+          ],
+          ["候选人推进", progressingCandidates, "当前仍在招聘流程"],
+          ["已入职", hiredCandidates, "全部关联岗位"],
         ].map(([label, value, meta]) => (
           <article key={label}>
             <small>{label}</small>
@@ -170,17 +194,15 @@ function CompanyRecruiting() {
       </div>
       <FieldGroup title="招聘机会">
         <div className="s4-entity-grid">
-          {opportunities
-            .filter((item) => item.company === "星澜机器人")
-            .map((item) => (
-              <EntityLink
-                key={item.id}
-                icon="signal"
-                title={item.title}
-                meta={`${item.status} · ${item.positions} 个岗位`}
-                onClick={() => navigate(`/opportunities/${item.id}`)}
-              />
-            ))}
+          {companyOpportunities.map((item) => (
+            <EntityLink
+              key={item.id}
+              icon="signal"
+              title={item.title}
+              meta={`${item.status} · ${item.positions} 个岗位`}
+              onClick={() => navigate(`/opportunities/${item.id}`)}
+            />
+          ))}
         </div>
       </FieldGroup>
       <FieldGroup
@@ -189,7 +211,7 @@ function CompanyRecruiting() {
       >
         <CompactRelationTable
           type="positions"
-          rows={positions.filter((item) => item.company === "星澜机器人")}
+          rows={companyPositions}
           onOpen={(item) => navigate(`/positions/${item.id}`)}
         />
       </FieldGroup>
@@ -237,7 +259,7 @@ function CompanyTalents() {
       <FieldGroup title="当前与历史任职人才">
         <CompactRelationTable
           type="candidates"
-          rows={candidates.filter((_, index) => index < 6)}
+          rows={candidates.filter((item) => item.company === "星澜机器人")}
           onOpen={(item) => navigate(`/candidates/${item.id}`)}
         />
       </FieldGroup>
@@ -307,9 +329,16 @@ function CompanyRelated() {
           items={[
             {
               title: "公司调研",
-              description: "官网、融资公告与公开招聘资料",
+              description:
+                "官网、融资公告与公开招聘资料；公司简介和融资信息已核验",
               meta: "今天 09:32 · Agent",
               status: "已确认",
+            },
+            {
+              title: "薪资福利线索",
+              description: "来自近期候选人沟通摘要，可能随岗位和职级变化",
+              meta: "昨天 17:40 · 人工补充",
+              status: "待核实",
             },
             {
               title: "用户维护",
@@ -964,7 +993,7 @@ export function ContactDetailPage() {
         open={noteOpen}
         close={() => setNoteOpen(false)}
         title={editingNote === null ? "添加沟通记录" : "编辑沟通记录"}
-        description="电话、线下和其他人工结果由猎头补录"
+        description="记录猎头人工获得的沟通结果，不要求维护沟通渠道类型"
         footer={
           <>
             <Button onClick={() => setNoteOpen(false)}>取消</Button>
@@ -993,14 +1022,6 @@ export function ContactDetailPage() {
         }
       >
         <div className="s4-form-grid">
-          <FormField label="沟通方式">
-            <SelectMenu
-              label="选择方式"
-              value="电话"
-              options={["电话", "线下", "微信", "其他"]}
-              onChange={() => {}}
-            />
-          </FormField>
           <FormField label="发生时间">
             <DatePicker
               label="选择发生时间"

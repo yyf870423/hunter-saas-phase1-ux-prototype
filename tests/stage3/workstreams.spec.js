@@ -229,7 +229,7 @@ test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ pa
     page.getByRole("button", { name: /具身智能 VLA 算法负责人/ }),
   ).toHaveAttribute("aria-selected", "true");
   await expect(page.locator(".s3-match-list strong").first()).toContainText(
-    "92",
+    "94",
   );
   await page.getByRole("button", { name: /机器人策略学习技术总监/ }).click();
   await expect(
