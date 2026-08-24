@@ -114,3 +114,25 @@ test("设置中心关键 Modal 生成验收截图", async ({ page }) => {
     fullPage: true,
   });
 });
+
+test("设置中心关键状态生成详细设计截图", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const states = [
+    ["profile-loading", "#/settings/profile?state=loading"],
+    ["profile-error", "#/settings/profile?state=error"],
+    ["notifications-limited", "#/settings/notifications?state=limited"],
+    ["connections-empty", "#/settings/connections?state=empty"],
+    ["connections-error", "#/settings/connections?state=error"],
+    ["subscription-none", "#/settings/subscription?state=none"],
+    ["subscription-limited", "#/settings/subscription?state=limited"],
+    ["data-limited", "#/settings/data-privacy?state=limited"],
+  ];
+
+  for (const [name, route] of states) {
+    await page.goto(route);
+    await page.screenshot({
+      path: `artifacts/stage5-states/${name}.png`,
+      fullPage: true,
+    });
+  }
+});
