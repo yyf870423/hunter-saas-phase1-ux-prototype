@@ -60,6 +60,19 @@ import {
   SubscriptionSettingsPage,
 } from "./stage5/SettingsPages";
 import { SettingsReviewPage } from "./stage5/SettingsReviewPage";
+import { OperationsShell } from "./stage6/OperationsShell";
+import { OverviewPage } from "./stage6/OverviewPage";
+import {
+  SubscriptionsPage,
+  UsersWorkspacesPage,
+} from "./stage6/ManagementPages";
+import {
+  CapabilitiesPage,
+  SupportPage,
+  TaskDetailPage,
+  TasksPage,
+} from "./stage6/SystemOperationsPages";
+import { OperationsReviewPage } from "./stage6/OperationsReviewPage";
 
 export default function App() {
   return (
@@ -69,6 +82,17 @@ export default function App() {
       <Route path="/review/stage-1" element={<ReviewPage />} />
       <Route path="/review/stage-2" element={<Stage2ReviewPage />} />
       <Route path="/review/settings" element={<SettingsReviewPage />} />
+      <Route path="/review/operations" element={<OperationsReviewPage />} />
+      <Route element={<OperationsShell />}>
+        <Route path="/ops" element={<Navigate to="/ops/overview" replace />} />
+        <Route path="/ops/overview" element={<OverviewPage />} />
+        <Route path="/ops/users-workspaces" element={<UsersWorkspacesPage />} />
+        <Route path="/ops/subscriptions" element={<SubscriptionsPage />} />
+        <Route path="/ops/tasks" element={<TasksPage />} />
+        <Route path="/ops/tasks/:taskId" element={<TaskDetailPage />} />
+        <Route path="/ops/capabilities" element={<CapabilitiesPage />} />
+        <Route path="/ops/support" element={<SupportPage />} />
+      </Route>
       <Route element={<Stage1Shell />}>
         <Route path="/home" element={<Dashboard />} />
         <Route path="/components" element={<ComponentsPage />} />

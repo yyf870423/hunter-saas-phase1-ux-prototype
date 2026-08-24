@@ -8,6 +8,7 @@ import "./stage2/stage2.css";
 import "./stage3/stage3.css";
 import "./stage4/stage4.css";
 import "./stage5/stage5.css";
+import "./stage6/stage6.css";
 import "./components/components.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
