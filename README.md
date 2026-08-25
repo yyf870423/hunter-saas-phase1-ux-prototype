@@ -10,7 +10,6 @@
 4. **原型阶段四：业务资产与数据管理**，已经通过人类审批并冻结。
 5. **原型阶段五：用户设置中心**，已经通过人类审批并完成详细设计。
 6. **原型阶段六：独立运营端**，高保真原型已完成，等待人类审批。
-7. **原型阶段七：公开首页与认证 Moodboard**，三套设计方向已完成，等待人类选择。
 
 在线原型：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/review>
 
@@ -41,10 +40,6 @@
 - 任务与故障：`#/ops/tasks`
 - 系统能力：`#/ops/capabilities`
 - 支持与审计：`#/ops/support`
-- 首页与认证 Moodboard 总入口：`#/moodboards`
-- AI 招聘编排中枢：`#/moodboards/orchestration`
-- 人才智能图谱：`#/moodboards/graph`
-- AI 人才观测站：`#/moodboards/observatory`
 
 当前阶段成果和明确边界见 `docs/current-achievements.md`。运营端经产品负责人审批后再进入正式详细设计。
 
@@ -77,7 +72,6 @@ E2E 覆盖桌面、iPad、iPhone、亮暗主题、导航、搜索、通知、浮
 - `src/stage4/`：业务资产、导入导出、回收站和审核流程。
 - `src/stage5/`：用户设置中心。
 - `src/stage6/`：独立运营端页面壳、六个运营模块和运营组件。
-- `src/stage7/`：公开首页、三套 3D 场景、用户认证和运营端认证 Moodboard。
 - `docs/current-achievements.md`：当前已审批成果、质量基线和未完成范围。
 - `docs/stage-1-plan.md`：阶段一实施与审批边界。
 - `docs/stage-1-interaction-coverage.md`：交互覆盖清单。
@@ -89,6 +83,3 @@ E2E 覆盖桌面、iPad、iPhone、亮暗主题、导航、搜索、通知、浮
 - `docs/stage-6-component-boundary.md`：运营端组件和隐私数据边界。
 - `docs/stage-6-interaction-coverage.md`：运营端交互与关键状态覆盖。
 - `docs/stage-6-cross-review.md`：运营端发布前交叉 Review 结论。
-- `docs/stage-7-public-home-auth-direction.md`：首页与认证设计方向和参考结论。
-- `docs/stage-7-moodboard-spec.md`：三套 Moodboard 的 Token、场景和组件规格。
-- `docs/stage-7-interaction-coverage.md`：阶段七交互、状态和验收入口。

@@ -73,21 +73,11 @@ import {
   TasksPage,
 } from "./stage6/SystemOperationsPages";
 import { OperationsReviewPage } from "./stage6/OperationsReviewPage";
-import {
-  MoodboardIndex,
-  MoodboardRoute,
-  OpsLoginPage,
-  UserAuthPage,
-} from "./stage7/Stage7Pages";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/review" replace />} />
-      <Route path="/moodboards" element={<MoodboardIndex />} />
-      <Route path="/moodboards/:themeId" element={<MoodboardRoute />} />
-      <Route path="/moodboards/:themeId/auth" element={<UserAuthPage />} />
-      <Route path="/moodboards/:themeId/ops-login" element={<OpsLoginPage />} />
       <Route path="/review" element={<Stage4ReviewPage />} />
       <Route path="/review/stage-1" element={<ReviewPage />} />
       <Route path="/review/stage-2" element={<Stage2ReviewPage />} />
