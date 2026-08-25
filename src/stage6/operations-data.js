@@ -183,6 +183,8 @@ export const users = [
   {
     id: "usr-001",
     name: "沈岚",
+    phone: "138 **** 8000",
+    wechat: "已绑定",
     email: "shenlan@deepblue-talent.cn",
     verified: "已验证",
     security: "正常",
@@ -193,6 +195,8 @@ export const users = [
   {
     id: "usr-002",
     name: "周予安",
+    phone: "139 **** 4826",
+    wechat: "已绑定",
     email: "zhouyuan@qichen-search.com",
     verified: "已验证",
     security: "正常",
@@ -203,6 +207,8 @@ export const users = [
   {
     id: "usr-003",
     name: "林嘉昕",
+    phone: "186 **** 0921",
+    wechat: "未绑定",
     email: "jiaxin@farview-recruit.cn",
     verified: "已验证",
     security: "需要验证",
@@ -213,6 +219,8 @@ export const users = [
   {
     id: "usr-004",
     name: "顾清越",
+    phone: "137 **** 6832",
+    wechat: "已绑定",
     email: "qingyue@zhixing-talent.com",
     verified: "已验证",
     security: "正常",
@@ -223,6 +231,8 @@ export const users = [
   {
     id: "usr-005",
     name: "陈屿川",
+    phone: "135 **** 9018",
+    wechat: "已绑定",
     email: "yuchuan@lighthouse-search.cn",
     verified: "已验证",
     security: "正常",

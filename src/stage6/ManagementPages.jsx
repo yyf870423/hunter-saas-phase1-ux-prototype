@@ -94,7 +94,7 @@ const userColumns = [
   {
     key: "name",
     label: "用户",
-    width: 180,
+    width: 150,
     render: (row) => (
       <span className="ops-primary-cell">
         <b>{row.name}</b>
@@ -102,25 +102,26 @@ const userColumns = [
       </span>
     ),
   },
-  { key: "email", label: "登录邮箱", width: 240 },
+  { key: "phone", label: "登录手机号", width: 130 },
+  { key: "email", label: "联系邮箱", width: 185 },
   {
     key: "verified",
     label: "邮箱状态",
-    width: 120,
+    width: 100,
     render: (row) => <OpsStatus>{row.verified}</OpsStatus>,
   },
   {
     key: "security",
     label: "安全状态",
-    width: 120,
+    width: 100,
     render: (row) => <OpsStatus>{row.security}</OpsStatus>,
   },
-  { key: "workspace", label: "所属工作空间", width: 200 },
-  { key: "lastLogin", label: "最近登录", width: 130 },
+  { key: "workspace", label: "所属工作空间", width: 170 },
+  { key: "lastLogin", label: "最近登录", width: 110 },
   {
     key: "status",
     label: "账号状态",
-    width: 110,
+    width: 100,
     render: (row) => <OpsStatus>{row.status}</OpsStatus>,
   },
 ];
@@ -179,7 +180,7 @@ function WorkspaceDrawer({ workspace, close }) {
           <OpsDefinitionList
             items={[
               ["所有者", workspace.owner],
-              ["登录邮箱", workspace.email],
+              ["联系邮箱", workspace.email],
               ["创建时间", workspace.createdAt],
               ["服务地区", workspace.region],
             ]}
@@ -668,8 +669,10 @@ export function UsersWorkspacesPage() {
             <OpsDefinitionList
               items={[
                 ["用户编号", selectedUser.id],
-                ["登录邮箱", selectedUser.email],
-                ["邮箱验证", selectedUser.verified],
+                ["登录手机号", selectedUser.phone],
+                ["微信登录", selectedUser.wechat],
+                ["联系邮箱", selectedUser.email],
+                ["邮箱状态", selectedUser.verified],
                 ["账号状态", selectedUser.status],
                 ["安全状态", selectedUser.security],
                 ["最近登录", selectedUser.lastLogin],

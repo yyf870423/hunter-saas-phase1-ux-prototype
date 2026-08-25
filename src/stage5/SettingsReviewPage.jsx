@@ -8,10 +8,14 @@ const groups = [
     title: "个人与通知",
     description: "个人身份、工作空间、登录安全和通知偏好。",
     links: [
-      ["个人资料", "/settings/profile", "分区编辑、修改邮箱、密码和登录会话"],
+      [
+        "个人资料",
+        "/settings/profile",
+        "分区编辑、登录身份、联系邮箱和登录会话",
+      ],
       ["通知", "/settings/notifications", "站内、邮件、强制通知和摘要频率"],
       [
-        "邮箱未验证",
+        "联系邮箱未验证",
         "/settings/notifications?state=limited",
         "邮件渠道禁用和恢复操作",
       ],

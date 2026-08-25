@@ -67,7 +67,7 @@ function OpsGlobalSearch({ open, close }) {
       open={open}
       close={close}
       title="运营搜索"
-      description="搜索工作空间编号、登录邮箱、任务编号或错误码"
+      description="搜索工作空间编号、登录手机号、联系邮箱、任务编号或错误码"
       size="lg"
     >
       <div className="ops-global-search">

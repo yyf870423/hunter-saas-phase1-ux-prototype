@@ -63,13 +63,18 @@ test("个人资料支持分区编辑、校验和安全操作", async ({ page }) 
   await page.getByRole("button", { name: "保存" }).first().click();
   await expect(page.getByText("个人资料已保存")).toBeVisible();
 
-  await page.getByRole("button", { name: "修改密码" }).click();
-  await page.getByLabel("当前密码*").fill("correct-password");
-  await page.getByLabel("新密码*").fill("short");
-  await expect(page.getByText("至少输入 10 个字符")).toBeVisible();
-  await page.getByLabel("新密码*").fill("hunter-safe-password");
-  await page.getByRole("button", { name: "保存" }).last().click();
-  await expect(page.getByText("密码已更新")).toBeVisible();
+  await page.getByRole("button", { name: "更换手机号" }).click();
+  await page.getByLabel("新手机号*").fill("138");
+  await expect(page.getByText("请输入有效的 11 位手机号")).toBeVisible();
+  await page.getByLabel("新手机号*").fill("13900139000");
+  await page.getByLabel("短信验证码*").fill("123456");
+  await page.getByRole("button", { name: "验证并更换" }).click();
+  await expect(page.getByText("登录手机号已更新")).toBeVisible();
+
+  await page.getByRole("button", { name: "管理绑定" }).click();
+  await expect(page.getByText(/仍可使用已验证手机号登录/)).toBeVisible();
+  await page.getByRole("button", { name: "解除绑定" }).click();
+  await expect(page.getByText("微信登录已解除绑定")).toBeVisible();
 
   await page.getByRole("button", { name: "退出其他会话" }).click();
   await expect(
@@ -94,7 +99,7 @@ test("通知页区分可配置通知和强制通知", async ({ page }) => {
   await expect(page.getByText("通知设置已保存")).toBeVisible();
 
   await page.goto("#/settings/notifications?state=limited");
-  await expect(page.getByText(/邮箱尚未验证/)).toBeVisible();
+  await expect(page.getByText(/联系邮箱尚未验证/)).toBeVisible();
   await expect(taskMail).toBeDisabled();
   await assertNoConsoleErrors();
 });

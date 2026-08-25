@@ -70,7 +70,8 @@ export function ProfileSettingsPage() {
   const [workspace, setWorkspace] = useState("沈岚的猎头工作空间");
   const [language, setLanguage] = useState("简体中文");
   const [timezone, setTimezone] = useState("中国标准时间 UTC+8");
-  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [phoneOpen, setPhoneOpen] = useState(false);
+  const [wechatOpen, setWechatOpen] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [sessionOpen, setSessionOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
@@ -79,7 +80,9 @@ export function ProfileSettingsPage() {
   const [avatarName, setAvatarName] = useState("");
   const [avatarError, setAvatarError] = useState("");
   const [avatarZoom, setAvatarZoom] = useState(100);
-  const [passwords, setPasswords] = useState({ current: "", next: "" });
+  const [newPhone, setNewPhone] = useState("");
+  const [phoneCode, setPhoneCode] = useState("");
+  const [wechatBound, setWechatBound] = useState(true);
   const [newEmail, setNewEmail] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -188,22 +191,30 @@ export function ProfileSettingsPage() {
                   <dd>{name}</dd>
                 </div>
                 <div>
-                  <dt>登录邮箱</dt>
+                  <dt>登录手机号</dt>
                   <dd>
-                    shenlan@hunter-demo.cn
+                    138 **** 8000
                     <StatusBadge tone="success" dot={false}>
                       已验证
                     </StatusBadge>
                   </dd>
                 </div>
+                <div>
+                  <dt>微信</dt>
+                  <dd>{wechatBound ? "沈岚 · 已绑定" : "未绑定"}</dd>
+                </div>
+                <div>
+                  <dt>联系邮箱</dt>
+                  <dd>shenlan@hunter-demo.cn</dd>
+                </div>
               </dl>
             )}
             {editingProfile ? (
               <div className="s5-readonly-field">
-                <span>登录邮箱</span>
+                <span>联系邮箱</span>
                 <b>shenlan@hunter-demo.cn</b>
                 <button type="button" onClick={() => setEmailOpen(true)}>
-                  修改邮箱
+                  修改联系邮箱
                 </button>
               </div>
             ) : null}
@@ -370,16 +381,31 @@ export function ProfileSettingsPage() {
 
       <SettingsSection
         title="登录与安全"
-        description="管理密码和当前账号的登录设备。"
+        description="管理登录身份和当前账号的登录设备。"
       >
         <div className="s5-setting-list">
           <SettingRow
-            icon="lock"
-            title="登录密码"
-            description="上次修改于 2026 年 7 月 18 日"
+            icon="phone"
+            title="登录手机号"
+            description="138 **** 8000 · 已验证"
             action={
-              <Button size="sm" onClick={() => setPasswordOpen(true)}>
-                修改密码
+              <Button size="sm" onClick={() => setPhoneOpen(true)}>
+                更换手机号
+              </Button>
+            }
+          />
+          <SettingRow
+            icon="message"
+            title="微信登录"
+            description={wechatBound ? "沈岚 · 已绑定" : "尚未绑定"}
+            status={
+              <StatusBadge tone={wechatBound ? "success" : "warning"}>
+                {wechatBound ? "已绑定" : "待绑定"}
+              </StatusBadge>
+            }
+            action={
+              <Button size="sm" onClick={() => setWechatOpen(true)}>
+                {wechatBound ? "管理绑定" : "绑定微信"}
               </Button>
             }
           />
@@ -407,15 +433,15 @@ export function ProfileSettingsPage() {
       <Modal
         open={emailOpen}
         close={() => setEmailOpen(false)}
-        title="修改登录邮箱"
-        description="新邮箱验证完成后才会替换当前登录邮箱。"
+        title="修改联系邮箱"
+        description="联系邮箱用于接收通知，不作为 Hunter 的登录身份。"
         footer={
           <ModalActions
             cancel={() => setEmailOpen(false)}
-            confirmText="发送验证邮件"
+            confirmText="保存联系邮箱"
             confirm={() => {
               if (!/^\S+@\S+\.\S+$/.test(newEmail)) return;
-              save(() => setEmailOpen(false), "验证邮件已发送");
+              save(() => setEmailOpen(false), "联系邮箱已更新");
             }}
             loading={saving}
           />
@@ -437,61 +463,84 @@ export function ProfileSettingsPage() {
       </Modal>
 
       <Modal
-        open={passwordOpen}
-        close={() => setPasswordOpen(false)}
-        title="修改密码"
-        description="更新后其他设备会保持登录，可在登录会话中手动退出。"
+        open={phoneOpen}
+        close={() => setPhoneOpen(false)}
+        title="更换登录手机号"
+        description="验证新手机号后替换当前登录手机号，其他登录方式不受影响。"
         footer={
           <ModalActions
-            cancel={() => setPasswordOpen(false)}
+            cancel={() => setPhoneOpen(false)}
+            confirmText="验证并更换"
             confirm={() => {
-              if (!passwords.current || passwords.next.length < 10) return;
-              save(() => setPasswordOpen(false), "密码已更新");
+              if (!/^1\d{10}$/.test(newPhone) || !phoneCode.trim()) return;
+              save(() => setPhoneOpen(false), "登录手机号已更新");
             }}
             loading={saving}
+            confirmDisabled={!/^1\d{10}$/.test(newPhone) || !phoneCode.trim()}
           />
         }
       >
         <div className="s5-modal-form">
           <FormField
-            label="当前密码"
-            required
-            error={passwords.current === "wrong" ? "当前密码不正确" : ""}
-          >
-            <input
-              className="s4-input"
-              type="password"
-              value={passwords.current}
-              onChange={(event) =>
-                setPasswords((value) => ({
-                  ...value,
-                  current: event.target.value,
-                }))
-              }
-            />
-          </FormField>
-          <FormField
-            label="新密码"
+            label="新手机号"
             required
             error={
-              passwords.next && passwords.next.length < 10
-                ? "至少输入 10 个字符"
+              newPhone && !/^1\d{10}$/.test(newPhone)
+                ? "请输入有效的 11 位手机号"
                 : ""
             }
           >
-            <input
-              className="s4-input"
-              type="password"
-              value={passwords.next}
-              onChange={(event) =>
-                setPasswords((value) => ({
-                  ...value,
-                  next: event.target.value,
-                }))
-              }
+            <TextInput
+              value={newPhone}
+              onChange={setNewPhone}
+              placeholder="请输入新手机号"
+            />
+          </FormField>
+          <FormField label="短信验证码" required>
+            <TextInput
+              value={phoneCode}
+              onChange={setPhoneCode}
+              placeholder="请输入验证码"
             />
           </FormField>
         </div>
+      </Modal>
+
+      <Modal
+        open={wechatOpen}
+        close={() => setWechatOpen(false)}
+        title={wechatBound ? "管理微信登录" : "绑定微信登录"}
+        description={
+          wechatBound
+            ? "解除绑定后仍可使用已验证手机号登录。"
+            : "使用微信扫码完成绑定，绑定后可以直接扫码登录。"
+        }
+        size="sm"
+        footer={
+          <>
+            <Button onClick={() => setWechatOpen(false)}>取消</Button>
+            <Button
+              tone={wechatBound ? "danger" : "primary"}
+              onClick={() =>
+                save(
+                  () => {
+                    setWechatBound((value) => !value);
+                    setWechatOpen(false);
+                  },
+                  wechatBound ? "微信登录已解除绑定" : "微信登录已绑定",
+                )
+              }
+            >
+              {wechatBound ? "解除绑定" : "开始绑定"}
+            </Button>
+          </>
+        }
+      >
+        <InlineNotice tone={wechatBound ? "warning" : "info"}>
+          {wechatBound
+            ? "当前账号仍保留已验证手机号，不会因解除微信绑定而无法登录。"
+            : "原型使用模拟扫码，不会调用真实微信开放平台。"}
+        </InlineNotice>
       </Modal>
 
       <Modal
@@ -563,7 +612,7 @@ export function NotificationSettingsPage() {
       />
       {limited ? (
         <InlineNotice tone="warning" icon="warning">
-          邮箱尚未验证，邮件通知暂不可用。站内通知不会受到影响。
+          联系邮箱尚未验证，邮件通知暂不可用。站内通知不会受到影响。
           <button
             type="button"
             onClick={() => notify("验证邮件已重新发送", "info")}
