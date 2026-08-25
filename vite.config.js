@@ -11,6 +11,7 @@ export default defineConfig({
         manualChunks: {
           markdown: ["react-markdown", "remark-gfm"],
           react: ["react", "react-dom", "react-router-dom"],
+          three: ["three"],
         },
       },
     },
