@@ -1,0 +1,34 @@
+Use case: ui-mockup
+Asset type: third high-fidelity desktop landing-page moodboard comp for Hunter, 16:10 landscape, complete hero plus a visible second-fold transition
+Primary request: Explore a third composition within the already approved Hunter “Evidence Choreography” visual system. This Chinese SaaS homepage is for boutique executive-search owners and senior headhunters. It must unmistakably show that Hunter converts one business goal into an ongoing evidence-driven workstream, while key judgments remain human-controlled.
+Input images: Image 1 is Hunter's existing product UI reference. Carry over only the registry navy #06193A, action blue #0070F7, light canvas, thin-rule precision, professional typographic character, and restrained status semantics. Do NOT reuse its sidebar, dashboard composition, cards, screenshots, or exact content layout.
+Surface structure, in order:
+1. A minimal transparent top navigation over the hero: HUNTER on the left, three quiet Chinese links in the center, “查看工作流” as text, and one blue “申请产品演示” button on the right.
+2. Hero is divided by one strong vertical fold seam at about 62% width. The left side is warm paper and contains a huge 3-line Chinese thesis, short subheadline, and one dominant blue CTA. A small business-goal slip enters near the top edge and feeds a thin evidence spine downward through the typography.
+3. The right 38% is a full-height deep registry-navy stage, not a card. Within it, translucent light dossier strips move vertically through four numbered stages: 01 研究, 02 证据, 03 人工判断, 04 继续推进. The strips are partially cropped by top and bottom so the workflow feels continuous.
+4. The amber human-judgment sheet physically straddles the vertical fold seam, half on paper and half on navy, with the decision “优先联系周岚” and a blue approval control. It is the only large accent object.
+5. At the bottom, the paper ground peels into the second fold as a wide proof statement and a narrow real-product interaction window labeled “演示数据 · 岗位招聘主线”, proving the visual language can hold real UI without becoming a screenshot wall.
+Focal moment: the single amber human-judgment sheet crossing the fold between evidence and action. Quiet all secondary annotations.
+Visual world: “Evidence Choreography” — boutique due-diligence dossier room combined with contemporary stage mechanics. High-end light editorial web design, dramatic scale contrast, precise registration marks, transparent acetate, binding lines, intentional cropping, disciplined navy field.
+Text (verbatim, Chinese):
+"HUNTER"
+"不是问答。是一条持续推进的业务主线。"
+"让每一个\n猎头目标，\n都有证据地向前。"
+"Hunter 自动组织研究、维护任务和业务资产；到关键判断与外部动作时，把决定权交回给你。"
+"申请产品演示"
+"查看真实工作流"
+"目标 · 寻找具身智能 VLA 算法负责人"
+"01 研究"
+"02 证据"
+"03 人工判断"
+"04 继续推进"
+"需要你判断"
+"优先联系周岚"
+"批准并继续"
+"演示数据 · 岗位招聘主线"
+"研究不停在报告里，决定之后，业务继续向前。"
+Style/medium: realistic shippable high-fidelity responsive website UI mockup, not concept art, not a poster, not an app dashboard.
+Typography: extremely large heavy Chinese sans on the paper side, compact editorial grotesk labels on the navy stage, highly readable body text. No Inter, no Roboto, no bubbly or playful HR type, no excessive monospace.
+Color palette: #F7F8F5 paper, #06193A registry navy, #0070F7 Hunter blue, #FFB000 evidence amber, #171717 carbon, #D9DEE7 rule.
+Materials/textures: subtle warm paper grain, translucent acetate, printed register marks, narrow binding rules, almost no shadows.
+Constraints: one dominant vertical fold; practical navigation and obvious CTA; readable Chinese; show the subject region by region; enough second fold to prove continuation; no fake metrics, client logos, testimonials, prices, certifications, portraits, faces, stock photos, decorative 3D objects, gradients, rounded bento grids, feature-card wall, dashboard screenshot wall, dark cyberpunk, purple, glowing AI orbs, watermark.

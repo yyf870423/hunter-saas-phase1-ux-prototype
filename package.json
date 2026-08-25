@@ -13,7 +13,10 @@
     "capture": "playwright test tests/stage1/visual.spec.js"
   },
   "dependencies": {
+    "@fontsource-variable/familjen-grotesk": "^5.3.0",
+    "@fontsource-variable/noto-sans-sc": "^5.3.0",
     "@vitejs/plugin-react": "^5.0.2",
+    "qrcode": "^1.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-markdown": "^10.1.0",

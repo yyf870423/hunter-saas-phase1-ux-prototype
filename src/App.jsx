@@ -1,4 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { LandingPage } from "./landing/LandingPage";
+import { UserAuthPage } from "./auth/UserAuthPage";
+import { OpsLoginPage } from "./auth/OpsLoginPage";
 import { ComponentsPage } from "./stage1/ComponentsPage";
 import { Dashboard } from "./stage1/Dashboard";
 import { ReviewPage } from "./stage1/ReviewPage";
@@ -77,7 +80,9 @@ import { OperationsReviewPage } from "./stage6/OperationsReviewPage";
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/review" replace />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<UserAuthPage />} />
+      <Route path="/ops/login" element={<OpsLoginPage />} />
       <Route path="/review" element={<Stage4ReviewPage />} />
       <Route path="/review/stage-1" element={<ReviewPage />} />
       <Route path="/review/stage-2" element={<Stage2ReviewPage />} />

@@ -1,0 +1,7 @@
+{
+  "approved": false,
+  "status": "awaiting_user_approval",
+  "promptFile": ".impeccable/mocks/prompts/spine-theatre-v2.txt",
+  "referenceComp": ".impeccable/mocks/decision/evidence-choreography-spine-theatre.png",
+  "selectionNote": "用户已锁定第一张的结构；v2 只增强右侧运行机制的动感与科技感。"
+}

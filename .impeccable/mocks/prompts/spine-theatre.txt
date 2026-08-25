@@ -1,0 +1,33 @@
+Use case: ui-mockup
+Asset type: high-fidelity desktop landing-page moodboard comp, 16:10 landscape, showing the complete hero and the beginning of the second fold
+Primary request: Design Hunter's homepage as a shipped marketing surface for Chinese boutique executive-search owners and senior headhunters. The visitor must understand in three seconds that Hunter turns one business goal into a continuously advancing, evidence-driven workstream and returns key judgments to the human.
+Input images: Image 1 is an existing Hunter product UI reference. Carry over only its registry navy #06193A, action blue #0070F7, warm white/light-gray canvas, precise thin rules, compact professional type character, and controlled status colors. Do NOT reuse Image 1's dashboard layout, sidebar, cards, exact copy, or screen composition.
+Surface structure, in order:
+1. A slim 72px white navigation bar: HUNTER wordmark on the left, four quiet Chinese text links, and a single blue CTA on the right.
+2. Hero takes about 760px height on warm paper #F7F8F5. Left 5 columns hold a small thesis line, an enormous 2-line Chinese headline, a concise subheadline, primary and secondary actions. Right 7 columns are one dominant evidence choreography, not a set of independent cards.
+3. The choreography begins with one compact business-goal slip, feeds into a continuous deep-navy evidence spine, passes through translucent dossier sheets labeled as research, evidence, next task, and stops at one amber human-signoff gate before continuing.
+4. The bottom 190px reveals the next fold: a quiet full-width workflow strip with four named steps connected by the same spine, proving the visual system can continue beyond the hero.
+Focal moment: the amber human-signoff gate where the evidence spine pauses, with one clear decision and the next step visible. Keep all other regions quieter.
+Visual world: “Evidence Choreography” — boutique M&A due-diligence room meets contemporary stage mechanics. Warm white paper ground, navy binding rules, transparent acetate evidence sheets, index tabs, crop marks, tiny blue-pencil annotations, one evidence-amber signoff. High-end editorial composition, aggressive scale and overlaps, professional and controlled.
+Text (verbatim, Chinese):
+"HUNTER"
+"不是问答。是一条持续推进的业务主线。"
+"让每一个猎头目标，\n都有证据地向前。"
+"Hunter 自动组织研究、维护任务和业务资产；到关键判断与外部动作时，把决定权交回给你。"
+"申请产品演示"
+"查看真实工作流"
+"演示数据 · 岗位招聘主线"
+"目标"
+"寻找具身智能 VLA 算法负责人"
+"研究"
+"证据"
+"需要你判断"
+"是否优先联系周岚？"
+"批准并继续"
+"下一步"
+"准备首轮接触材料"
+Style/medium: realistic high-fidelity responsive website UI mockup, not concept art, not a poster, not a dashboard screenshot. Sophisticated contemporary editorial web design with readable hierarchy.
+Typography: very large black Chinese sans headline, compact Latin grotesk for labels and numbers, precise body text. No Inter, no Roboto, no bubbly type, no excessive monospace.
+Color palette: #F7F8F5 paper, #06193A registry navy, #0070F7 Hunter blue, #FFB000 evidence amber, #171717 carbon, #D9DEE7 rules.
+Materials/textures: subtle paper grain, translucent acetate, printed index tabs, 1px binding rules. Almost no shadows; depth comes from overlap and transparency.
+Constraints: one dominant visual move; enough second fold to prove continuation; exact CTA hierarchy; practical navigation; readable Chinese; no invented metrics, customer logos, testimonials, prices, certifications, portraits, faces, stock photos, decorative 3D objects, gradients, glassmorphism, rounded bento cards, dashboard screenshot wall, dark cyberpunk, purple, floating AI orbs, watermark.

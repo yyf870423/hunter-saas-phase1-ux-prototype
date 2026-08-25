@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";
+import "@fontsource-variable/noto-sans-sc";
+import "@fontsource-variable/familjen-grotesk";
 import App from "./App";
 import { ToastProvider } from "./stage1/ui";
 import "./stage1/stage1.css";

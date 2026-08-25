@@ -1,0 +1,7 @@
+{
+  "approved": true,
+  "status": "approved_for_build",
+  "promptFile": ".impeccable/mocks/prompts/spine-theatre-v3-login.txt",
+  "referenceComp": ".impeccable/mocks/decision/evidence-choreography-spine-theatre-v2.png",
+  "selectionNote": "用户要求从 moodboard 进入完整页面构建；该稿作为获批的首屏视觉北极星。"
+}

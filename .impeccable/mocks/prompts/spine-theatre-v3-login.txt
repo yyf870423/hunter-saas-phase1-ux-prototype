@@ -1,0 +1,7 @@
+Use case: precise-object-edit
+Asset type: selected Hunter landing-page moodboard comp
+Input images: Image 1 is the edit target.
+Primary request: Add exactly one utility navigation entry labeled “登录” to the top-right navigation bar, immediately to the left of the existing blue “申请产品演示” button.
+Text (verbatim): "登录"
+Visual treatment: deep registry-navy text, medium weight, same typographic character as the other top navigation links; no filled background, no border, no icon. Keep approximately 22px horizontal spacing between “登录” and the blue CTA.
+Constraints: change only the top-right navigation area needed to add “登录”. Preserve the canvas dimensions, crop, HUNTER wordmark, all existing navigation labels, the blue CTA and its size, the complete hero, every Chinese word, all evidence sheets, optical track, colors, motion effects, typography, spacing, bottom workflow strip, and every other pixel as closely as possible. Do not add any other text, button, icon, menu, divider, or visual effect. No watermark.

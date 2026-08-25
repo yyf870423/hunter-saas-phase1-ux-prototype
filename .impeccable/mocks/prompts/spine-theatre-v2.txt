@@ -1,0 +1,14 @@
+Use case: precise-object-edit
+Asset type: targeted v2 of the selected Hunter landing-page hero comp
+Input images: Image 1 is the edit target and selected composition. Image 2 is the original Hunter product UI style anchor.
+Primary request: Keep Image 1's entire page topology, copy, navigation, left-side headline hierarchy, CTA placement, pale background ratio, right-side evidence sequence, and bottom four-step strip. Change only the right-side evidence choreography and its immediate background so the system visibly feels in motion and technologically advanced.
+Changes to make:
+1. Replace the flat static navy rail behind the five evidence sheets with a precise optical evidence track: a narrow deep-navy core carrying one directional electric-blue-to-signal-cyan scan pulse, thin data ticks, and restrained forward velocity streaks.
+2. Put the evidence sheets at visibly different depth stages: the goal sheet is just entering from the lower-left in slight perspective; research is being scanned with a crisp cyan light edge; evidence is aligned and sharp; the amber human-decision sheet is fully stopped and face-on; the next-step sheet is accelerating out to the upper-right with a short controlled motion echo.
+3. Add subtle refractive/diffraction edges to the translucent sheets and a faint pale-cyan optical field only behind the moving mechanism. Preserve a mostly white/light page.
+4. Make the spine curve or kink once through the sequence so the trajectory feels choreographed rather than a flat horizontal bar. Keep the order and labels completely readable.
+5. Keep amber exclusive to the human judgment gate. Keep Hunter blue as CTA and active-system color. Use signal cyan #00C8FF only for live scanning and movement.
+Focal moment: the amber “需要你判断” sheet visibly brakes the blue-cyan moving track; motion resumes toward “下一步”.
+Invariants: preserve Image 1's aspect ratio, crop, top navigation, HUNTER wordmark, all Chinese copy, the full left 42% of the hero, headline line breaks, both CTAs, the bottom four-step explanation, overall warm-light palette, precise thin-rule professional character, and existing content hierarchy. Preserve Image 2 only as palette and precision reference; do not import its dashboard.
+Style/medium: shippable high-fidelity website UI, light premium SaaS with kinetic optical instrumentation; a captured frame of a working system, not a poster, not concept art.
+Constraints: no new sections, no new claims, no portraits, no customer logos, no fake metrics, no purple, no full-page gradient, no dark cyberpunk, no floating particles, no glowing orb, no glassmorphism cards, no 3D gadgets, no rounded bento layout, no excessive bloom, no watermark. The technology must come from functional scanning, depth, trajectory and state change, not decorative effects.
