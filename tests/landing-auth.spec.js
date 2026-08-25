@@ -191,6 +191,13 @@ test("user auth supports validation, QR login and registration", async ({
 }) => {
   await page.goto("./#/login");
 
+  await page.getByLabel("手机号").focus();
+  await expect(page.getByLabel("手机号")).toHaveCSS("box-shadow", "none");
+  await expect(page.locator(".auth-input-wrap").first()).toHaveCSS(
+    "box-shadow",
+    "none",
+  );
+
   await page.getByRole("button", { name: "登录", exact: true }).click();
   await expect(page.getByText("请输入有效的 11 位手机号")).toBeVisible();
   await expect(page.getByText("请输入 4–6 位数字验证码")).toBeVisible();

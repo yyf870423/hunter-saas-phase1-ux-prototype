@@ -352,14 +352,11 @@
   align-items: center;
   border: 1px solid #cdd6e1;
   background: #fff;
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+  transition: border-color 160ms ease;
 }
 
 .auth-input-wrap:focus-within {
   border-color: var(--auth-blue);
-  box-shadow: 0 0 0 3px rgba(0, 112, 247, 0.1);
 }
 
 .auth-field.has-error .auth-input-wrap {
@@ -374,6 +371,10 @@
   outline: 0;
   color: var(--auth-ink);
   background: transparent;
+}
+
+.auth-input-wrap input:focus-visible {
+  box-shadow: none;
 }
 
 .auth-input-wrap input::placeholder {
