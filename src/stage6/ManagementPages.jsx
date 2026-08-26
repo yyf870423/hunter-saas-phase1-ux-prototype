@@ -395,7 +395,7 @@ function TrialModal({ item, close }) {
               <FormField label="试用期限（天）" required>
                 <TextInput value={days} onChange={setDays} />
               </FormField>
-              <FormField label="初始任务额度" required>
+              <FormField label="初始 Agent 用量" required>
                 <TextInput value={quota} onChange={setQuota} />
               </FormField>
               <FormField label="并发上限" required>
@@ -776,7 +776,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
           tone="info"
           icon="info"
           title="例外权益调整"
-          description="仅用于系统故障补偿、延长试用，或经审批临时增加任务额度、并发和存储。正常套餐升降级应通过订阅流程完成。"
+          description="仅用于系统故障补偿、延长试用，或经审批临时增加 Agent 用量、并发和存储。正常套餐升降级应通过订阅流程完成。"
         />
         <OpsSection title="最近调整记录">
           <div className="ops-compact-table">
@@ -815,7 +815,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
 
 function AdjustmentModal({ subscription, close }) {
   const notify = useToast();
-  const [type, setType] = useState("任务额度");
+  const [type, setType] = useState("Agent 用量");
   const [value, setValue] = useState("5");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
@@ -859,7 +859,7 @@ function AdjustmentModal({ subscription, close }) {
             label="调整类型"
             value={type}
             onChange={setType}
-            options={["任务额度", "试用期限", "并发上限", "存储额度"]}
+            options={["Agent 用量", "试用期限", "并发上限", "存储额度"]}
           />
         </FormField>
         <FormField label="增加数量" required>
@@ -879,8 +879,8 @@ function AdjustmentModal({ subscription, close }) {
         </FormField>
         <div className="ops-impact-preview">
           <b>调整影响</b>
-          <span>当前 Agent 任务额度：50 次</span>
-          <span>调整后 Agent 任务额度：55 次</span>
+          <span>当前 Agent 用量：50 次</span>
+          <span>调整后 Agent 用量：55 次</span>
           <span>影响周期：当前订阅周期</span>
           <span>本操作将记录操作者、原因和调整前后值。</span>
         </div>
@@ -1046,7 +1046,12 @@ export function SubscriptionsPage() {
                 : [
                     {
                       label: "权益类型",
-                      options: ["任务额度", "试用期限", "并发上限", "存储额度"],
+                      options: [
+                        "Agent 用量",
+                        "试用期限",
+                        "并发上限",
+                        "存储额度",
+                      ],
                       value: filters.type || "",
                       onChange: (value) =>
                         setFilters((current) => ({ ...current, type: value })),

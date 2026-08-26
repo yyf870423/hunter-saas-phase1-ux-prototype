@@ -21,12 +21,12 @@ export const subscriptionPlanChoices = [
   {
     title: subscriptionPlans.basic.name,
     price: `¥${subscriptionPlans.basic.monthlyPrice} / 月`,
-    description: `${subscriptionPlans.basic.agentTaskQuota} 次 Agent 任务，${subscriptionPlans.basic.description}`,
+    description: `${subscriptionPlans.basic.agentTaskQuota} 次 Agent 用量，${subscriptionPlans.basic.description}`,
   },
   {
     title: subscriptionPlans.professional.name,
     price: `¥${subscriptionPlans.professional.monthlyPrice} / 月`,
-    description: `${subscriptionPlans.professional.agentTaskQuota} 次 Agent 任务和${subscriptionPlans.professional.description}`,
+    description: `${subscriptionPlans.professional.agentTaskQuota} 次 Agent 用量和${subscriptionPlans.professional.description}`,
   },
   {
     title: subscriptionPlans.professional.yearlyName,

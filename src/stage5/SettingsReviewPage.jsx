@@ -29,7 +29,7 @@ const groups = [
       [
         "自动化授权",
         "/settings/automation",
-        "四类工作默认授权和自动执行影响确认",
+        "新工作统一默认授权和自动执行影响确认",
       ],
       ["连接", "/settings/connections", "个人发件邮箱和寻访 App 设备"],
       ["尚未连接", "/settings/connections?state=empty", "邮箱和设备空状态"],
@@ -65,7 +65,7 @@ const groups = [
       [
         "删除受限",
         "/settings/data-privacy?state=limited",
-        "运行中的数据任务阻塞工作空间删除",
+        "运行中的数据处理阻塞工作空间删除",
       ],
     ],
   },

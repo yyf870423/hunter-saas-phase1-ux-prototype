@@ -109,7 +109,7 @@ test("订阅详情区分正常订阅与例外权益调整", async ({ page }) => 
   ).toBeDisabled();
   await dialog
     .getByRole("textbox", { name: "调整原因*" })
-    .fill("补偿系统重试产生的重复任务额度。");
+    .fill("补偿系统重试产生的重复 Agent 用量。");
   await dialog.getByRole("button", { name: "确认并生效" }).click();
   await expect(page.getByText("权益调整已生效并生成审计记录")).toBeVisible();
   await assertNoConsoleErrors();
@@ -135,7 +135,7 @@ test("运营筛选会真实改变列表且可以单独清空", async ({ page }) 
   await expect(page.getByText("TASK-260824-011")).toHaveCount(0);
   await page.getByRole("button", { name: "清空任务状态" }).click();
   await expect(page.getByText("TASK-260824-011").first()).toBeVisible();
-  await page.getByRole("button", { name: "任务归属", exact: true }).click();
+  await page.getByRole("button", { name: "执行归属", exact: true }).click();
   await page
     .locator(".s4-select-panel")
     .getByRole("button", { name: "系统后台任务", exact: true })
@@ -148,6 +148,10 @@ test("运营筛选会真实改变列表且可以单独清空", async ({ page }) 
 test("任务详情区分可安全恢复和不可恢复", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/ops/tasks/TASK-260824-019");
+  await expect(page.getByText("具身智能核心人才版图")).toBeVisible();
+  await expect(page.getByText("WORK-260824-006")).toBeVisible();
+  await expect(page.getByText("相关任务执行", { exact: true })).toBeVisible();
+  await expect(page.getByText("所属主线", { exact: true })).toHaveCount(0);
   await expect(page.getByText("可以执行受控恢复")).toBeVisible();
   await page.getByRole("button", { name: "执行安全恢复" }).click();
   const dialog = page.getByRole("dialog", { name: "执行安全恢复" });

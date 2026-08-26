@@ -119,7 +119,7 @@ Agent 只能把变化归入既有标签，不能动态新增、改名或排序�
 1. 阶段审核入口：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/review>。
 2. 新建工作：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/new>。
 3. 工作列表：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works>。
-4. 独立工作详情：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/task-hand-team>。
+4. 人物身份核验工作：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/task-hand-team>。
 5. 信号中心：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/signals>。
 6. 工作台：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/home>。
 7. 公共组件：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/components>。

@@ -575,7 +575,7 @@ export function ProfileSettingsPage() {
 const notificationRows = [
   ["decision", "需要我处理", "待确认、待授权和需要补充信息", true, true, true],
   ["reply", "外部回复", "邮件回复、新简历和附件到达", true, true, true],
-  ["task", "任务状态", "完成、失败、暂停和等待外部", true, true, false],
+  ["task", "工作状态", "完成、失败、暂停和等待外部", true, true, false],
   ["signal", "高优先级信号", "即将失效的机会和强信号", true, true, false],
   ["app", "寻访 App", "结果提交、设备授权和版本异常", true, true, false],
   ["billing", "额度与订阅", "额度不足、预算上限和订阅到期", true, true, true],
@@ -693,7 +693,7 @@ export function NotificationSettingsPage() {
       </SettingsSection>
       <SettingsSection
         title="低优先级摘要"
-        description="普通任务进展和观察信号可以合并提醒，减少打断。"
+        description="普通工作进展和观察信号可以合并提醒，减少打断。"
       >
         <div className="s5-summary-choice">
           <SelectMenu
@@ -714,51 +714,17 @@ export function NotificationSettingsPage() {
   );
 }
 
-const automationRows = [
-  [
-    "client",
-    "客户开发",
-    "自动寻找潜在客户、招聘信号和联系人",
-    "执行前确认",
-    "building",
-  ],
-  [
-    "position",
-    "岗位招聘",
-    "解析岗位、公开找人、匹配和候选人分级",
-    "执行前确认",
-    "briefcase",
-  ],
-  [
-    "mapping",
-    "人才摸排",
-    "探索公司、组织、方向、人物和关系",
-    "仅分析",
-    "route",
-  ],
-  [
-    "candidate",
-    "候选人求职",
-    "核实求职意愿并匹配系统内岗位",
-    "执行前确认",
-    "user",
-  ],
-];
-
 export function AutomationSettingsPage() {
   const { state, clearState } = usePageState();
   const notify = useToast();
-  const [modes, setModes] = useState(() =>
-    Object.fromEntries(automationRows.map(([id, , , mode]) => [id, mode])),
-  );
-  const [editing, setEditing] = useState(null);
+  const [mode, setMode] = useState("执行前确认");
+  const [editing, setEditing] = useState(false);
   const [draftMode, setDraftMode] = useState("执行前确认");
   const [saving, setSaving] = useState(false);
-  const open = (id) => {
-    setEditing(id);
-    setDraftMode(modes[id]);
+  const open = () => {
+    setEditing(true);
+    setDraftMode(mode);
   };
-  const active = automationRows.find(([id]) => id === editing);
   return (
     <PageState state={state} clearState={clearState}>
       <SettingsPageHeader
@@ -769,54 +735,51 @@ export function AutomationSettingsPage() {
         默认使用“执行前确认”。授权只影响尚未执行的动作，运行中的工作可以单独调整。
       </InlineNotice>
       <SettingsSection
-        title="工作默认授权"
-        description="每类业务可以使用不同默认值，之后创建的新工作会继承该设置。"
+        title="新工作默认授权"
+        description="所有新创建的工作继承同一默认值；进入工作后仍可单独调整。"
       >
         <div className="s5-automation-list">
-          {automationRows.map(([id, title, description, , icon]) => (
-            <SettingRow
-              key={id}
-              icon={icon}
-              title={title}
-              description={description}
-              meta="上次修改于 2026 年 8 月 18 日"
-              status={
-                <StatusBadge
-                  tone={
-                    modes[id] === "自动执行"
-                      ? "warning"
-                      : modes[id] === "仅分析"
-                        ? "neutral"
-                        : "info"
-                  }
-                >
-                  {modes[id]}
-                </StatusBadge>
-              }
-              action={
-                <Button size="sm" onClick={() => open(id)}>
-                  修改
-                </Button>
-              }
-            />
-          ))}
+          <SettingRow
+            icon="activity"
+            title="所有新工作"
+            description="适用于从新建入口、信号或业务资产启动的工作"
+            meta="上次修改于 2026 年 8 月 18 日"
+            status={
+              <StatusBadge
+                tone={
+                  mode === "自动执行"
+                    ? "warning"
+                    : mode === "仅分析"
+                      ? "neutral"
+                      : "info"
+                }
+              >
+                {mode}
+              </StatusBadge>
+            }
+            action={
+              <Button size="sm" onClick={open}>
+                修改
+              </Button>
+            }
+          />
         </div>
       </SettingsSection>
       <Modal
-        open={Boolean(editing)}
-        close={() => setEditing(null)}
-        title={active ? `修改${active[1]}默认授权` : "修改默认授权"}
+        open={editing}
+        close={() => setEditing(false)}
+        title="修改新工作默认授权"
         description="修改后只影响新创建且未单独指定授权的工作。"
         size="lg"
         footer={
           <ModalActions
-            cancel={() => setEditing(null)}
+            cancel={() => setEditing(false)}
             confirm={() => {
               setSaving(true);
               window.setTimeout(() => {
-                setModes((current) => ({ ...current, [editing]: draftMode }));
+                setMode(draftMode);
                 setSaving(false);
-                setEditing(null);
+                setEditing(false);
                 notify("默认授权已更新");
               }, 520);
             }}
@@ -1513,7 +1476,7 @@ export function SubscriptionSettingsPage() {
               <div className="s5-usage-breakdown">
                 <span>
                   <i style={{ "--usage": "72%" }} />
-                  <b>Agent 任务</b>
+                  <b>Agent 用量</b>
                   <em>
                     36 / {subscriptionPlans.professional.agentTaskQuota} 次
                   </em>
@@ -1548,7 +1511,7 @@ export function SubscriptionSettingsPage() {
               />
               <SettingRow
                 title="额度耗尽"
-                description="必须通知，并停止创建新的付费任务"
+                description="必须通知，并停止创建新的付费工作"
                 action={<Toggle label="额度耗尽提醒" checked disabled />}
               />
             </div>
@@ -1760,7 +1723,7 @@ export function DataPrivacySettingsPage() {
         <div className="s5-danger-list">
           <SettingRow
             title="删除个人工作空间"
-            description="所有业务资产、工作、任务和文件进入待清理状态；保留期内可联系客服恢复。"
+            description="所有业务资产、工作及相关文件进入待清理状态；保留期内可联系客服恢复。"
             action={
               <Button
                 tone="danger"
@@ -1809,7 +1772,7 @@ export function DataPrivacySettingsPage() {
           </InlineNotice>
         ) : null}
         <div className="s5-danger-copy">
-          <p>删除后所有业务数据将不可继续编辑，正在运行的任务会停止。</p>
+          <p>删除后所有业务数据将不可继续编辑，正在运行的工作会停止。</p>
           <FormField
             label={`输入“${workspaceName}”确认`}
             required

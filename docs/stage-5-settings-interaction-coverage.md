@@ -21,7 +21,7 @@
 | 导出全部数据       | 数据与隐私     | ActionRow                          | 进入数据导出               | 创建失败、订阅到期仍可用                         |
 | 创建诊断包         | 数据与隐私     | AsyncAction                        | 创建异步任务               | 创建失败、脱敏说明                               |
 | 进入回收站         | 数据与隐私     | ActionRow                          | 打开回收站                 | 无数据空状态                                     |
-| 删除工作空间       | 数据与隐私     | TypedConfirmModal                  | 输入名称后确认             | 名称错误、有效任务阻塞                           |
+| 删除工作空间       | 数据与隐私     | TypedConfirmModal                  | 输入名称后确认             | 名称错误、运行中的数据处理阻塞                   |
 | 切换设置项         | 全部           | SettingsNav、MobileSectionSelector | 保留状态切换               | 未保存离开确认                                   |
 | 响应式操作         | 全部           | ResponsiveShell                    | 桌面、iPad、iPhone 可操作  | 无横向溢出、浮层不截断                           |
 

@@ -84,14 +84,22 @@ test("运营指标有统计口径，周期检查任务不占用长任务资源",
   expect(overviewMetrics.every((metric) => metric.definition)).toBe(true);
   expect(
     overviewMetrics.find((metric) => metric.id === "tasks").definition,
-  ).toContain("系统后台短任务");
+  ).toContain("系统后台任务");
   expect(new Set(tasks.map((task) => task.scope))).toEqual(
-    new Set(["主线内部任务", "支线任务", "系统后台任务"]),
+    new Set(["工作执行", "相关任务执行", "系统后台任务"]),
   );
   expect(
     tasks
-      .filter((task) => task.scope === "主线内部任务")
-      .every((task) => task.parent.startsWith("MAIN-")),
+      .filter((task) => task.scope !== "系统后台任务")
+      .every(
+        (task) =>
+          task.workId.startsWith("WORK-") && Boolean(task.workTitle.trim()),
+      ),
+  ).toBe(true);
+  expect(
+    tasks
+      .filter((task) => task.scope === "系统后台任务")
+      .every((task) => task.workId === "—"),
   ).toBe(true);
   const mailCheck = tasks.find((task) => task.type === "邮箱回复检查");
   expect(mailCheck.status).toBe("已完成");

@@ -36,12 +36,25 @@ const taskColumns = [
   { key: "workspace", label: "工作空间", width: 210 },
   {
     key: "scope",
-    label: "任务归属",
-    width: 110,
+    label: "执行归属",
+    width: 130,
     render: (row) => <OpsStatus>{row.scope}</OpsStatus>,
   },
   { key: "type", label: "执行类型", width: 140 },
-  { key: "parent", label: "所属主线", width: 170 },
+  {
+    key: "workTitle",
+    label: "所属工作",
+    width: 230,
+    render: (row) =>
+      row.workId === "—" ? (
+        "—"
+      ) : (
+        <span className="ops-primary-cell">
+          <b>{row.workTitle}</b>
+          <small>{row.workId}</small>
+        </span>
+      ),
+  },
   {
     key: "status",
     label: "状态",
@@ -172,7 +185,16 @@ export function TasksPage() {
     source,
     tab === "errors"
       ? ["code", "title", "taskTypes"]
-      : ["id", "workspace", "scope", "type", "parent", "status", "error"],
+      : [
+          "id",
+          "workspace",
+          "scope",
+          "type",
+          "workTitle",
+          "workId",
+          "status",
+          "error",
+        ],
   );
   const [selectedError, setSelectedError] = useState(
     errorGroups.find((item) => item.id === params.get("error")) || null,
@@ -222,7 +244,7 @@ export function TasksPage() {
     <div className="ops-page">
       <OpsPageHeader
         title="任务与故障"
-        description="统一查看主线内部任务、独立支线任务和系统后台短任务的脱敏运行元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
+        description="统一查看工作执行、相关任务执行和系统后台任务的脱敏运行元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
       />
       <OpsTabs
         value={tab}
@@ -243,7 +265,7 @@ export function TasksPage() {
           onQuery={list.setQuery}
           placeholder={
             tab === "runs"
-              ? "搜索任务编号、工作空间、任务归属、执行类型或错误码"
+              ? "搜索任务编号、工作空间、所属工作、执行归属、执行类型或错误码"
               : "搜索错误码、分类或任务类型"
           }
           filters={
@@ -258,8 +280,8 @@ export function TasksPage() {
                     multiple: true,
                   },
                   {
-                    label: "任务归属",
-                    options: ["主线内部任务", "支线任务", "系统后台任务"],
+                    label: "执行归属",
+                    options: ["工作执行", "相关任务执行", "系统后台任务"],
                     value: filters.scope || [],
                     onChange: (value) =>
                       setFilters((current) => ({ ...current, scope: value })),
@@ -446,7 +468,7 @@ export function TaskDetailPage() {
     {
       title: "任务创建并进入队列",
       meta: task.startedAt,
-      detail: `触发方式：${task.trigger} · 任务归属：${task.scope} · 执行类型：${task.type}`,
+      detail: `触发方式：${task.trigger} · 执行归属：${task.scope} · 执行类型：${task.type}`,
       tone: "success",
     },
     {
@@ -519,9 +541,14 @@ export function TaskDetailPage() {
             <OpsDefinitionList
               items={[
                 ["工作空间", task.workspace],
-                ["任务归属", task.scope],
+                ["执行归属", task.scope],
                 ["执行类型", task.type],
-                ["所属主线", task.parent],
+                [
+                  "所属工作",
+                  task.workId === "—"
+                    ? "系统后台任务，不关联用户工作"
+                    : `${task.workTitle} · ${task.workId}`,
+                ],
                 ["触发方式", task.trigger],
                 ["状态", task.status],
                 ["当前阶段", task.phase],
@@ -1146,7 +1173,7 @@ function SupportDrawer({ record, close }) {
                 <Icon name="activity" />
                 <span>
                   <b>TASK-260824-019</b>
-                  <small>支线任务 · 学术搜索 · 失败</small>
+                  <small>相关任务执行 · 学术搜索 · 失败</small>
                 </span>
                 <Icon name="chevronRight" />
               </button>
