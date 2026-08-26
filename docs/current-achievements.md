@@ -17,8 +17,8 @@
 
 ## 二、已经确定的公共交互
 
-1. 用户只通过一个自然语言入口新建工作，不在开始前选择业务主线或支线任务。Hunter 根据范围和生命周期判断直接完成、建立业务主线或创建支线任务，用户可以用自然语言纠正判断。
-2. 业务主线和支线任务共用对话式工作区。用户消息使用有边界的输入块；Hunter 回复使用统一 Markdown 渲染，不要求 Agent 生成 HTML、CSS 或专用视觉组件。
+1. 用户只通过一个自然语言入口新建工作，不在开始前或查看时选择业务主线、支线任务。Hunter 根据范围和生命周期决定直接完成或进入工作区，用户可以用自然语言纠正执行计划。
+2. 所有可管理工作共用统一列表、历史栏和对话式工作区。持续工作、独立工作和相关执行任务的差异只保留在内部编排与运营诊断中；用户侧只显示“工作”和所属工作内的“相关任务”。
 3. 执行计划位于输入框上方并默认收起。每个步骤持续更新完成、运行、等待、暂停和调整状态；新信息只重做受影响范围。
 4. 少量只读结果直接在对话中显示，中量结果在当前页检查区查看，大量且需要业务操作的结果使用 Hunter 受控审核组件。
 5. 授权模式固定为“仅分析”“执行前确认”“自动执行”，可以在运行过程中切换，只影响尚未执行的动作，不能关闭 Hunter 的结构、安全、权限和写入门禁；用户主动添加的文件随消息直接上传，邮件发送仍需逐次确认。
@@ -118,8 +118,8 @@ Agent 只能把变化归入既有标签，不能动态新增、改名或排序�
 
 1. 阶段审核入口：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/review>。
 2. 新建工作：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/new>。
-3. 支线任务列表：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks>。
-4. 支线任务详情：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/task-hand-team>。
+3. 工作列表：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works>。
+4. 独立工作详情：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/task-hand-team>。
 5. 信号中心：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/signals>。
 6. 工作台：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/home>。
 7. 公共组件：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/components>。
@@ -128,10 +128,10 @@ Agent 只能把变化归入既有标签，不能动态新增、改名或排序�
 
 ### 8.2 四类业务主线
 
-1. 客户开发：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/workstreams/client-xinglan>。专用状态包括 `waiting`、`no-contact` 和 `reply`。
-2. 岗位招聘：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/workstreams/position-vla>。专用状态包括 `waiting`、`review`、`no-candidate`、`candidate-reply`、`local-waiting`、`stale-task` 和 `merge-conflict`。
-3. 人才摸排：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/workstreams/mapping-embodied>。专用状态包括 `waiting`、`conflict` 和 `gaps`。
-4. 候选人求职：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/workstreams/career-linhao>。专用状态包括 `waiting`、`no-position` 和 `new-resume`。
+1. 客户开发：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/client-xinglan>。专用状态包括 `waiting`、`no-contact` 和 `reply`。
+2. 岗位招聘：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/position-vla>。专用状态包括 `waiting`、`review`、`no-candidate`、`candidate-reply`、`local-waiting`、`stale-task` 和 `merge-conflict`。
+3. 人才摸排：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/mapping-embodied>。专用状态包括 `waiting`、`conflict` 和 `gaps`。
+4. 候选人求职：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/career-linhao>。专用状态包括 `waiting`、`no-position` 和 `new-resume`。
 
 四类主线均可在对应 URL 后附加 `?state=loading`、`?state=stream-error`、`?state=limited` 或 `?state=error`，直接检查加载、流式中断、权限受限和失败状态。完整状态和操作步骤以 `docs/stage-3-interaction-coverage.md` 为准。
 

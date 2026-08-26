@@ -24,15 +24,15 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
   return (
     <section className="s1-mainline-section" aria-labelledby="mainline-title">
       <SectionHeading
-        eyebrow="业务主线"
+        eyebrow="重点工作"
         title="继续最重要的工作"
-        description="Hunter 已按等待处理、业务影响和最近变化整理当前主线。"
+        description="Hunter 已按等待处理、业务影响和最近变化整理当前工作。"
         action={
           <Button
             tone="ghost"
             size="sm"
             icon="chevronRight"
-            onClick={() => onOpen("全部业务主线")}
+            onClick={() => onOpen("全部工作")}
           >
             查看全部
           </Button>
@@ -71,11 +71,11 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
             icon="chevronRight"
             onClick={() => onOpen(selected.title)}
           >
-            进入业务主线
+            继续工作
           </Button>
         </article>
-        <div className="s1-mainline-switcher" aria-label="其他活跃业务主线">
-          <span>其他活跃主线</span>
+        <div className="s1-mainline-switcher" aria-label="其他进行中的工作">
+          <span>其他进行中的工作</span>
           {alternatives.map((item) => (
             <button
               type="button"
@@ -107,14 +107,14 @@ function TaskPanel({ state, onOpen, onRetry }) {
         className="s1-support-panel s1-local-error"
         aria-labelledby="task-title"
       >
-        <SectionHeading eyebrow="支线任务" title="需要关注的任务" />
+        <SectionHeading eyebrow="相关任务" title="需要关注的执行" />
         <div className="s1-local-state">
           <i>
             <Icon name="warning" />
           </i>
           <div>
             <b>任务摘要暂时无法加载</b>
-            <p>业务主线和重点信号仍可正常使用。</p>
+            <p>重点工作和信号仍可正常使用。</p>
           </div>
           <Button size="sm" icon="refresh" onClick={onRetry}>
             重新加载
@@ -126,10 +126,10 @@ function TaskPanel({ state, onOpen, onRetry }) {
   return (
     <section className="s1-support-panel" aria-labelledby="task-title">
       <SectionHeading
-        eyebrow="支线任务"
-        title="需要关注的任务"
+        eyebrow="相关任务"
+        title="需要关注的执行"
         action={
-          <Button tone="ghost" size="sm" onClick={() => onOpen("全部支线任务")}>
+          <Button tone="ghost" size="sm" onClick={() => onOpen("全部工作")}>
             查看全部
           </Button>
         }
@@ -297,8 +297,15 @@ export function Dashboard() {
       navigate("/new");
       return;
     }
-    if (title === "全部业务主线" || title === "具身智能 VLA 算法负责人") {
-      navigate("/workstreams/position-vla");
+    if (title === "全部工作") {
+      navigate("/works");
+      return;
+    }
+    const work = [...mainlines, ...sideTasks].find(
+      (item) => item.title === title,
+    );
+    if (work) {
+      navigate(`/works/${work.id}`);
       return;
     }
     notify(`已选择“${title}”，完整业务剧本将在原型阶段三提交`, "info");
@@ -307,7 +314,7 @@ export function Dashboard() {
     const next = new URLSearchParams(params);
     next.delete("state");
     setParams(next, { replace: true });
-    notify("支线任务摘要已重新加载", "success");
+    notify("相关任务摘要已重新加载", "success");
   };
 
   if (state === "loading") return <LoadingDashboard />;
@@ -325,8 +332,8 @@ export function Dashboard() {
           </div>
         </header>
         <EmptyState
-          title="还没有业务主线"
-          description="可以从客户开发、岗位招聘、人才摸排或候选人求职开始，后续工作会在同一条主线中持续推进。"
+          title="还没有工作"
+          description="可以从客户开发、岗位招聘、人才摸排或候选人求职开始，Hunter 会根据目标持续推进或直接交付。"
           action={
             <Button
               tone="primary"
@@ -338,7 +345,7 @@ export function Dashboard() {
           }
         />
         <div className="s1-empty-support">
-          <span>支线任务会在主线需要独立处理时出现</span>
+          <span>相关任务会在工作需要拆分执行时出现</span>
           <span>值得关注的外部变化会显示在信号中心</span>
         </div>
       </div>
@@ -351,7 +358,7 @@ export function Dashboard() {
         <div>
           <small>2026 年 8 月 19 日 · 星期三</small>
           <h1>上午好，沈岚</h1>
-          <p>你有 1 条业务主线等待继续，2 个支线任务需要关注。</p>
+          <p>你有 1 项工作等待继续，2 个相关任务需要关注。</p>
         </div>
         <Button
           tone="primary"

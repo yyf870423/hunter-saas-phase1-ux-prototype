@@ -4,24 +4,32 @@ import {
   trackConsoleErrors,
 } from "../stage1/helpers";
 
-test("四类业务主线可以从同一历史区切换且内容不同", async ({ page }) => {
+test("四类持续工作可以从同一工作历史区切换且内容不同", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/workstreams/client-xinglan");
   await expect(
     page.getByRole("heading", { name: "星澜机器人招聘合作" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: /具身智能核心人才版图/ }).click();
-  await expect(page).toHaveURL(/workstreams\/mapping-embodied/);
+  await page
+    .locator(".s2-history-list > button")
+    .filter({ hasText: "具身智能核心人才版图" })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/works\/mapping-embodied/);
   await expect(
     page.getByRole("heading", { name: "具身智能核心人才版图" }),
   ).toBeVisible();
   await page.getByRole("button", { name: /林昊职业机会/ }).click();
-  await expect(page).toHaveURL(/workstreams\/career-linhao/);
+  await expect(page).toHaveURL(/works\/career-linhao/);
   await expect(
     page.getByRole("heading", { name: "林昊职业机会" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: /具身智能 VLA 算法负责人/ }).click();
-  await expect(page).toHaveURL(/workstreams\/position-vla/);
+  await page
+    .locator(".s2-history-list > button")
+    .filter({ hasText: "具身智能 VLA 算法负责人" })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/works\/position-vla/);
   await assertNoConsoleErrors();
 });
 
@@ -241,7 +249,7 @@ test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ pa
   await expect(page.getByText("推荐理由", { exact: true })).toBeVisible();
   await expect(page.getByText("风险提示", { exact: true })).toBeVisible();
   await expect(page.getByText("建议沟通要点", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "返回主线并继续" }).click();
+  await page.getByRole("button", { name: "返回工作并继续" }).click();
   await expect(page.getByText("请由你本人联系林昊")).toBeVisible();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
   await input.fill("已经联系，暂时还没有回复。");

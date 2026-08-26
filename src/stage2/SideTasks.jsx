@@ -20,8 +20,9 @@ import {
   PlanList,
   PlanUpdate,
   UserMessage,
+  WorkHistory,
 } from "./automation-ui";
-import { sideTasks } from "./data";
+import { workItems } from "./data";
 import {
   buildRecommendationTaskArtifacts,
   TaskArtifactPreview,
@@ -34,30 +35,32 @@ const tabs = [
   ["finished", "已结束"],
 ];
 
-function taskInTab(task, tab) {
+function workInTab(work, tab) {
   if (tab === "running")
-    return ["运行中", "重试中", "排队中"].includes(task.status);
+    return ["推进中", "进行中", "运行中", "重试中", "排队中"].includes(
+      work.status,
+    );
   if (tab === "waiting")
-    return ["等待用户", "等待外部", "已暂停", "失败"].includes(task.status);
-  if (tab === "finished") return ["完成", "已取消"].includes(task.status);
+    return ["等待用户", "等待外部", "已暂停", "失败"].includes(work.status);
+  if (tab === "finished") return ["完成", "已取消"].includes(work.status);
   return true;
 }
 
-export function SideTasksPage() {
+export function WorksPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [tab, setTab] = useState("all");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [deleteTask, setDeleteTask] = useState(null);
-  const [rows, setRows] = useState(sideTasks);
+  const [deleteWork, setDeleteWork] = useState(null);
+  const [rows, setRows] = useState(workItems);
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     return rows.filter(
-      (task) =>
-        taskInTab(task, tab) &&
+      (work) =>
+        workInTab(work, tab) &&
         (!keyword ||
-          `${task.title} ${task.type} ${task.object}`
+          `${work.title} ${work.category} ${work.object}`
             .toLowerCase()
             .includes(keyword)),
     );
@@ -66,10 +69,10 @@ export function SideTasksPage() {
     <div className="s2-page s2-module-page">
       <header className="s2-page-heading">
         <div>
-          <small>独立、有边界的探索工作</small>
-          <h1>支线任务</h1>
+          <small>持续推进与独立交付</small>
+          <h1>工作</h1>
           <p>
-            主线内部任务只在所属主线中查看，这里仅显示能够独立运行和交付结果的任务。
+            查看所有可独立管理的工作；执行过程中拆出的相关任务保留在所属工作内。
           </p>
         </div>
         <Button tone="primary" icon="plus" onClick={() => navigate("/new")}>
@@ -81,7 +84,7 @@ export function SideTasksPage() {
           <div
             className="s2-module-tabs app-tabs"
             role="tablist"
-            aria-label="任务状态"
+            aria-label="工作状态"
           >
             {tabs.map(([value, label]) => (
               <button
@@ -96,7 +99,7 @@ export function SideTasksPage() {
                 }}
               >
                 {label}
-                <em>{rows.filter((task) => taskInTab(task, value)).length}</em>
+                <em>{rows.filter((work) => workInTab(work, value)).length}</em>
               </button>
             ))}
           </div>
@@ -106,56 +109,56 @@ export function SideTasksPage() {
               setQuery(next);
               setPage(1);
             }}
-            placeholder="搜索任务、类型或关联对象"
+            placeholder="搜索工作、业务场景或关联对象"
           />
         </div>
         {visible.length ? (
           <div className="s2-task-table">
             <div className="s2-task-table-head">
-              <span>任务</span>
-              <span>任务类型</span>
+              <span>工作</span>
+              <span>业务场景</span>
               <span>关联对象</span>
               <span>状态</span>
               <span>最近活动</span>
               <span>操作</span>
             </div>
-            {visible.slice((page - 1) * 5, page * 5).map((task) => (
+            {visible.slice((page - 1) * 5, page * 5).map((work) => (
               <div
                 className="s2-task-row"
                 role="link"
                 tabIndex={0}
-                key={task.id}
-                onClick={() => navigate(`/tasks/${task.id}`)}
+                key={work.id}
+                onClick={() => navigate(`/works/${work.id}`)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
-                    navigate(`/tasks/${task.id}`);
+                    navigate(`/works/${work.id}`);
                   }
                 }}
               >
                 <span>
-                  <b>{task.title}</b>
-                  <small>{task.summary}</small>
+                  <b>{work.title}</b>
+                  <small>{work.summary}</small>
                 </span>
-                <span>{task.type}</span>
-                <span>{task.object}</span>
+                <span>{work.category}</span>
+                <span>{work.object}</span>
                 <span>
-                  <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
+                  <StatusBadge tone={work.tone}>{work.status}</StatusBadge>
                 </span>
-                <time>{task.time}</time>
+                <time>{work.time}</time>
                 <span
                   className="s2-row-actions"
                   onClick={(event) => event.stopPropagation()}
                 >
                   <IconButton
                     icon="chevronRight"
-                    label={`查看 ${task.title}`}
-                    onClick={() => navigate(`/tasks/${task.id}`)}
+                    label={`查看 ${work.title}`}
+                    onClick={() => navigate(`/works/${work.id}`)}
                   />
                   <IconButton
                     icon="trash"
-                    label={`删除 ${task.title}`}
-                    onClick={() => setDeleteTask(task)}
+                    label={`删除 ${work.title}`}
+                    onClick={() => setDeleteWork(work)}
                   />
                 </span>
               </div>
@@ -164,8 +167,8 @@ export function SideTasksPage() {
         ) : (
           <div className="s2-empty">
             <Icon name="task" />
-            <h2>没有符合条件的支线任务</h2>
-            <p>可以调整状态或搜索条件，也可以新建一项独立探索任务。</p>
+            <h2>没有符合条件的工作</h2>
+            <p>可以调整状态或搜索条件，也可以直接描述一项新的业务目标。</p>
             <Button
               tone="secondary"
               onClick={() => {
@@ -197,23 +200,23 @@ export function SideTasksPage() {
         </footer>
       </section>
       <Modal
-        open={Boolean(deleteTask)}
-        close={() => setDeleteTask(null)}
-        title="删除支线任务"
-        description="任务将进入回收站，30 天内可以恢复。"
+        open={Boolean(deleteWork)}
+        close={() => setDeleteWork(null)}
+        title="删除工作"
+        description="工作将进入回收站，30 天内可以恢复。"
         footer={
           <>
-            <Button tone="secondary" onClick={() => setDeleteTask(null)}>
+            <Button tone="secondary" onClick={() => setDeleteWork(null)}>
               取消
             </Button>
             <Button
               tone="danger"
               onClick={() => {
                 setRows((items) =>
-                  items.filter((item) => item.id !== deleteTask.id),
+                  items.filter((item) => item.id !== deleteWork.id),
                 );
-                setDeleteTask(null);
-                notify("支线任务已移入回收站", "success");
+                setDeleteWork(null);
+                notify("工作已移入回收站", "success");
               }}
             >
               删除并移入回收站
@@ -253,16 +256,37 @@ const taskPlan = [
   },
 ];
 
-export function SideTaskDetail() {
-  const { taskId } = useParams();
+export function SideTaskDetail({ taskId: taskIdOverride }) {
+  const { taskId: routeTaskId, workstreamId } = useParams();
+  const taskId = taskIdOverride || routeTaskId || workstreamId;
   return taskId === "task-recommend-linhao" ? (
-    <RecommendationReportTask />
+    <RecommendationReportTask taskId={taskId} />
   ) : (
-    <IdentityReviewTask />
+    <IdentityReviewTask taskId={taskId || "task-hand-team"} />
   );
 }
 
-function IdentityReviewTask() {
+function TaskWorkspaceShell({ currentId, children }) {
+  const navigate = useNavigate();
+  const [historyCollapsed, setHistoryCollapsed] = useState(false);
+  return (
+    <div className="s2-page s2-workspace">
+      <WorkHistory
+        items={workItems}
+        collapsed={historyCollapsed}
+        currentId={currentId}
+        onToggle={() => setHistoryCollapsed((value) => !value)}
+        onCreate={() => navigate("/new")}
+        onSelect={(item) => navigate(`/works/${item.id}`)}
+      />
+      <section className="s2-workstream-main s2-task-detail-page">
+        {children}
+      </section>
+    </div>
+  );
+}
+
+function IdentityReviewTask({ taskId }) {
   const navigate = useNavigate();
   const notify = useToast();
   const [paused, setPaused] = useState(false);
@@ -320,11 +344,11 @@ function IdentityReviewTask() {
           tone: "warning",
         };
   return (
-    <div className="s2-page s2-task-detail-page">
+    <TaskWorkspaceShell currentId={taskId}>
       <header className="s2-detail-header">
-        <button type="button" onClick={() => navigate("/tasks")}>
+        <button type="button" onClick={() => navigate("/works")}>
           <Icon name="chevronLeft" />
-          返回支线任务
+          返回全部工作
         </button>
         <div>
           <small>人物身份核验</small>
@@ -354,7 +378,7 @@ function IdentityReviewTask() {
       </header>
       <div className="s2-task-detail-layout">
         <aside className="s2-task-context">
-          <h2>任务上下文</h2>
+          <h2>工作上下文</h2>
           <dl>
             <div>
               <dt>任务目标</dt>
@@ -455,8 +479,8 @@ function IdentityReviewTask() {
       <Modal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
-        title="删除支线任务"
-        description="任务将进入回收站，30 天内可以恢复。"
+        title="删除工作"
+        description="工作将进入回收站，30 天内可以恢复。"
         footer={
           <>
             <Button tone="secondary" onClick={() => setDeleteOpen(false)}>
@@ -466,8 +490,8 @@ function IdentityReviewTask() {
               tone="danger"
               onClick={() => {
                 setDeleteOpen(false);
-                navigate("/tasks");
-                notify("支线任务已移入回收站", "success");
+                navigate("/works");
+                notify("工作已移入回收站", "success");
               }}
             >
               删除并移入回收站
@@ -476,15 +500,15 @@ function IdentityReviewTask() {
         }
       >
         <div className="s2-confirm-copy">
-          <p>任务对话、计划和尚未写入正式资产的专属文件会一起进入回收站。</p>
+          <p>工作对话、计划和尚未写入正式资产的专属文件会一起进入回收站。</p>
           <p>人才版图中已经确认的正式人物记录不会删除。</p>
         </div>
       </Modal>
-    </div>
+    </TaskWorkspaceShell>
   );
 }
 
-function RecommendationReportTask() {
+function RecommendationReportTask({ taskId }) {
   const navigate = useNavigate();
   const notify = useToast();
   const [composer, setComposer] = useState("");
@@ -552,11 +576,11 @@ function RecommendationReportTask() {
     },
   ];
   return (
-    <div className="s2-page s2-task-detail-page">
+    <TaskWorkspaceShell currentId={taskId}>
       <header className="s2-detail-header">
-        <button type="button" onClick={() => navigate("/tasks")}>
+        <button type="button" onClick={() => navigate("/works")}>
           <Icon name="chevronLeft" />
-          返回支线任务
+          返回全部工作
         </button>
         <div>
           <small>候选人推荐报告</small>
@@ -579,7 +603,7 @@ function RecommendationReportTask() {
         className={`s2-task-detail-layout ${previewArtifact ? "has-artifact" : ""}`}
       >
         <aside className="s2-task-context">
-          <h2>任务上下文</h2>
+          <h2>工作上下文</h2>
           <dl>
             <div>
               <dt>任务目标</dt>
@@ -702,6 +726,6 @@ function RecommendationReportTask() {
           />
         ) : null}
       </div>
-    </div>
+    </TaskWorkspaceShell>
   );
 }

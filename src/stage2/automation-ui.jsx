@@ -615,7 +615,7 @@ export function RuntimeBar({
   );
 }
 
-export function WorkstreamHistory({
+export function WorkHistory({
   items,
   collapsed,
   onToggle,
@@ -637,12 +637,12 @@ export function WorkstreamHistory({
   return (
     <aside className={`s2-history ${collapsed ? "is-collapsed" : ""}`}>
       <header>
-        {collapsed ? null : <b>业务主线</b>}
+        {collapsed ? null : <b>工作</b>}
         <div>
           <IconButton icon="plus" label="新建工作" onClick={onCreate} />
           <IconButton
             icon={collapsed ? "panelRight" : "panelLeft"}
-            label={collapsed ? "展开主线列表" : "收起主线列表"}
+            label={collapsed ? "展开工作列表" : "收起工作列表"}
             onClick={onToggle}
           />
         </div>
@@ -677,7 +677,7 @@ export function WorkstreamHistory({
           <SearchField
             value={query}
             onChange={setQuery}
-            placeholder="搜索业务主线"
+            placeholder="搜索工作"
           />
           <div className="s2-history-list">
             {visible.map((item) => (

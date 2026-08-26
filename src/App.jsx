@@ -7,7 +7,7 @@ import { Dashboard } from "./stage1/Dashboard";
 import { ReviewPage } from "./stage1/ReviewPage";
 import { Stage1Shell } from "./stage1/Stage1Shell";
 import { NewWork } from "./stage2/NewWork";
-import { SideTaskDetail, SideTasksPage } from "./stage2/SideTasks";
+import { SideTaskDetail, WorksPage } from "./stage2/SideTasks";
 import { SignalsPage } from "./stage2/Signals";
 import { Stage2ReviewPage } from "./stage2/Stage2ReviewPage";
 import { WorkstreamRoute } from "./stage3/WorkstreamRoute";
@@ -102,6 +102,8 @@ export default function App() {
         <Route path="/home" element={<Dashboard />} />
         <Route path="/components" element={<ComponentsPage />} />
         <Route path="/new" element={<NewWork />} />
+        <Route path="/works" element={<WorksPage />} />
+        <Route path="/works/:workstreamId" element={<WorkstreamRoute />} />
         <Route
           path="/workstreams/new"
           element={<Navigate to="/new" replace />}
@@ -110,7 +112,7 @@ export default function App() {
           path="/workstreams/:workstreamId"
           element={<WorkstreamRoute />}
         />
-        <Route path="/tasks" element={<SideTasksPage />} />
+        <Route path="/tasks" element={<Navigate to="/works" replace />} />
         <Route path="/tasks/new" element={<Navigate to="/new" replace />} />
         <Route path="/tasks/:taskId" element={<SideTaskDetail />} />
         <Route path="/signals" element={<SignalsPage />} />

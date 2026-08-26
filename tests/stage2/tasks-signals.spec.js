@@ -4,28 +4,59 @@ import {
   trackConsoleErrors,
 } from "../stage1/helpers";
 
-test("支线任务列表支持分类、搜索、详情和删除", async ({ page }) => {
-  const assertNoConsoleErrors = trackConsoleErrors(page);
+test("导航、列表和详情只使用统一工作概念", async ({ page }) => {
+  await page.goto("#/home");
+  await expect(
+    page.getByRole("button", { name: "工作", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "业务主线", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "支线任务", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "工作", exact: true }).click();
+  await expect(page).toHaveURL(/#\/works$/);
+  await expect(
+    page.getByRole("heading", { name: "工作", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(".s2-task-row")
+      .filter({ hasText: "具身智能 VLA 算法负责人" })
+      .first(),
+  ).toBeVisible();
+  await page
+    .getByPlaceholder("搜索工作、业务场景或关联对象")
+    .fill("核验灵巧手");
+  await expect(
+    page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
+  ).toBeVisible();
+
   await page.goto("#/tasks");
+  await expect(page).toHaveURL(/#\/works$/);
+});
+
+test("统一工作列表支持分类、搜索、详情和删除", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/works");
   await page.getByRole("tab", { name: /等待处理/ }).click();
   await expect(
     page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
   ).toBeVisible();
-  await page.getByPlaceholder("搜索任务、类型或关联对象").fill("赵星羽");
+  await page.getByPlaceholder("搜索工作、业务场景或关联对象").fill("赵星羽");
   await expect(
     page.locator(".s2-task-row").filter({ hasText: "消歧赵星羽" }),
   ).toBeVisible();
   await page.getByLabel("删除 消歧赵星羽的论文与任职身份").click();
-  await expect(
-    page.getByRole("heading", { name: "删除支线任务" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "删除工作" })).toBeVisible();
   await page.getByRole("button", { name: "取消" }).click();
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
 
-test("支线任务详情支持补充资料、恢复和结果回流", async ({ page }) => {
-  await page.goto("#/tasks/task-hand-team");
+test("独立工作详情支持补充资料、恢复和结果回流", async ({ page }) => {
+  await page.goto("#/works/task-hand-team");
   await expect(page.getByRole("heading", { name: "当前判断" })).toBeVisible();
   await expect(page.locator(".s2-markdown-table")).toBeVisible();
   await expect(page.getByText("查看技术信息")).toHaveCount(0);
@@ -66,7 +97,7 @@ test("支线任务详情支持补充资料、恢复和结果回流", async ({ pa
 });
 
 test("推荐报告任务按对话过程保留每次生成的文件", async ({ page }) => {
-  await page.goto("#/tasks/task-recommend-linhao");
+  await page.goto("#/works/task-recommend-linhao");
   await expect(page.getByText(/推荐报告-v1\.md/)).toBeVisible();
   await expect(page.getByText(/推荐报告-v2\.md/)).toBeVisible();
   await expect(page.getByRole("button", { name: "历史版本" })).toHaveCount(0);
@@ -114,13 +145,13 @@ test("推荐报告任务按对话过程保留每次生成的文件", async ({ pa
   await expect(page.locator(".recommendation-report-file")).toHaveCount(3);
 });
 
-test("统一新建入口可进入支线任务或直接完成", async ({ page }) => {
+test("统一新建入口可进入独立工作或直接完成", async ({ page }) => {
   await page.goto("#/new");
   const input = page.getByPlaceholder(/例如：为星澜机器人/);
   await input.fill("核验人才版图中的两位周明远是不是同一个人");
   await input.press("Enter");
-  await expect(page.getByText(/我会创建独立支线任务/)).toBeVisible();
-  await expect(page).toHaveURL(/#\/tasks\/task-hand-team$/, {
+  await expect(page.getByText(/范围有限、交付明确的核验工作/)).toBeVisible();
+  await expect(page).toHaveURL(/#\/works\/task-hand-team$/, {
     timeout: 5_000,
   });
   await expect(page.getByText(/两位周明远是不是同一个人/)).toBeVisible();
@@ -157,15 +188,15 @@ test("统一新建入口覆盖歧义、失败、权限受限和旧路由", async
   await expect(page).toHaveURL(/#\/new$/);
 });
 
-test("新建工作和支线任务的普通回复统一由动态 Markdown 渲染", async ({
+test("新建工作和独立工作的普通回复统一由动态 Markdown 渲染", async ({
   page,
 }) => {
   const routes = [
     ["#/new?state=direct", "候选人跟进摘要"],
-    ["#/new?state=mainline", "建立一条岗位招聘业务主线"],
-    ["#/new?state=task", "创建独立支线任务"],
+    ["#/new?state=mainline", "持续汇总系统候选人"],
+    ["#/new?state=task", "范围有限、交付明确的核验工作"],
     ["#/new?state=clarify", "还缺少一个会改变推进方式的信息"],
-    ["#/tasks/task-hand-team", "当前判断"],
+    ["#/works/task-hand-team", "当前判断"],
   ];
 
   for (const [route, marker] of routes) {

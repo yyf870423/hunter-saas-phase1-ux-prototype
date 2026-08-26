@@ -4,19 +4,15 @@ import { StatusBadge } from "../stage1/ui";
 
 const reviewLinks = [
   [
-    "业务主线渐进演示",
-    "/workstreams/position-vla",
+    "持续工作渐进演示",
+    "/works/position-vla",
     "从第一条用户输入开始，逐步出现回复、计划、任务、结果和审核",
   ],
+  ["新建工作", "/new", "一个自然语言入口，由 Hunter 决定直接处理或进入工作区"],
+  ["统一工作列表", "/works", "持续工作与独立工作统一分类、搜索、分页和删除"],
   [
-    "新建工作",
-    "/new",
-    "一个自然语言入口，由 Hunter 决定直接处理、支线任务或业务主线",
-  ],
-  ["支线任务列表", "/tasks", "独立任务分类、搜索、分页、详情和删除"],
-  [
-    "支线任务详情",
-    "/tasks/task-hand-team",
+    "独立工作详情",
+    "/works/task-hand-team",
     "等待用户、补充信息、恢复和结果回流",
   ],
   ["信号中心", "/signals", "合并来源、观察、忽略、失效和转化"],
@@ -31,15 +27,11 @@ const reviewLinks = [
     "/new?state=direct",
     "可立即完成的小工作在当前对话返回 Markdown 结果",
   ],
+  ["持续推进工作", "/new?state=mainline", "说明持续推进原因，再进入统一工作区"],
   [
-    "建立业务主线",
-    "/new?state=mainline",
-    "说明长期推进理由，再进入业务主线工作区",
-  ],
-  [
-    "创建支线任务",
+    "独立交付工作",
     "/new?state=task",
-    "说明有限范围和交付边界，再进入独立支线任务",
+    "说明有限范围和交付边界，再进入统一工作区",
   ],
   [
     "推进方式判断失败",
@@ -53,32 +45,32 @@ const reviewLinks = [
   ],
   [
     "加载状态",
-    "/workstreams/position-vla?state=loading",
+    "/works/position-vla?state=loading",
     "工作区骨架保持稳定，不出现布局跳动",
   ],
   [
     "流式失败",
-    "/workstreams/position-vla?state=stream-error",
+    "/works/position-vla?state=stream-error",
     "保留已生成内容并从当前检查点继续",
   ],
   [
     "本机协作异常",
-    "/workstreams/position-vla?state=limited",
+    "/works/position-vla?state=limited",
     "本机暂不可用时保留云端进展，并允许下载任务后继续",
   ],
   [
     "等待本机结果",
-    "/workstreams/position-vla?state=local-waiting",
-    "云端结果先行可见，本机批次尚未返回时不阻塞主线",
+    "/works/position-vla?state=local-waiting",
+    "云端结果先行可见，本机批次尚未返回时不阻塞当前工作",
   ],
   [
     "旧版本结果回流",
-    "/workstreams/position-vla?state=stale-task",
+    "/works/position-vla?state=stale-task",
     "岗位发生更新后，旧任务结果按最新版本重新匹配",
   ],
   [
     "候选人合并冲突",
-    "/workstreams/position-vla?state=merge-conflict",
+    "/works/position-vla?state=merge-conflict",
     "本机批次与云端候选人疑似同人时等待用户决定",
   ],
   ["阶段一工作台", "/home", "已审批并冻结的全局框架与工作台"],
@@ -97,10 +89,10 @@ export function Stage2ReviewPage() {
         <StatusBadge tone="info">阶段二待审批</StatusBadge>
         <h1>自动化通用交互框架</h1>
         <p>
-          本轮只审批业务主线、支线任务和信号中心的通用交互。四类业务主线的完整业务剧本、正式业务资产和运营端仍属于后续阶段。
+          本轮审批统一工作区、相关任务和信号中心的通用交互。四类业务流程、正式业务资产和运营端仍属于后续阶段。
         </p>
-        <Link className="s1-review-primary" to="/workstreams/position-vla">
-          进入渐进式业务主线演示
+        <Link className="s1-review-primary" to="/works/position-vla">
+          进入渐进式工作演示
           <Icon name="chevronRight" />
         </Link>
       </header>
@@ -108,7 +100,7 @@ export function Stage2ReviewPage() {
         <div>
           <small>01</small>
           <h2>页面入口</h2>
-          <p>建议先观察渐进式主线，再检查大型审核、独立支线和信号转化。</p>
+          <p>建议先观察渐进式工作，再检查大型审核、独立工作和信号转化。</p>
         </div>
         <div className="s1-review-links">
           {reviewLinks.map(([title, route, description]) => (
@@ -132,9 +124,7 @@ export function Stage2ReviewPage() {
           <article>
             <Icon name="check" />
             <b>对象边界</b>
-            <p>
-              业务主线、内部任务、独立支线和信号在页面位置、状态与去向上是否容易区分。
-            </p>
+            <p>工作、相关任务和信号在页面位置、状态与去向上是否容易区分。</p>
           </article>
           <article>
             <Icon name="task" />

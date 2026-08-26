@@ -3,8 +3,7 @@ export const navSections = [
     label: "核心工作",
     items: [
       { id: "home", label: "工作台", icon: "home", route: "/home" },
-      { id: "workstreams", label: "业务主线", icon: "route" },
-      { id: "tasks", label: "支线任务", icon: "task", count: 2 },
+      { id: "works", label: "工作", icon: "route", count: 2 },
       { id: "signals", label: "信号中心", icon: "signal", count: 3 },
     ],
   },
@@ -213,7 +212,7 @@ export const notifications = [
   },
   {
     id: "notification-2",
-    type: "支线任务",
+    type: "工作更新",
     title: "赵星羽身份消歧需要处理",
     source: "VLA 候选人审核",
     time: "18 分钟前",
@@ -240,7 +239,7 @@ export const notifications = [
 export const searchItems = [
   ...mainlines.map((item) => ({
     id: item.id,
-    group: "业务主线",
+    group: "工作",
     icon: "route",
     title: item.title,
     meta: `${item.type} · ${item.status}`,
@@ -248,7 +247,7 @@ export const searchItems = [
   })),
   ...sideTasks.map((item) => ({
     id: item.id,
-    group: "支线任务",
+    group: "工作",
     icon: "task",
     title: item.title,
     meta: `${item.type} · ${item.status}`,
@@ -284,6 +283,7 @@ export const searchItems = [
     icon: "briefcase",
     title: "具身智能 VLA 算法负责人",
     meta: "星澜机器人 · 北京",
-    summary: "负责 VLA 模型、机器人学习和算法团队建设，岗位招聘主线正在推进。",
+    summary:
+      "负责 VLA 模型、机器人学习和算法团队建设，对应岗位招聘工作正在推进。",
   },
 ];

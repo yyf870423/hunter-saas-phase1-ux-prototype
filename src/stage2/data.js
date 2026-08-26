@@ -8,6 +8,8 @@ export const workstreamHistory = [
     tone: "info",
     time: "刚刚",
     pinned: true,
+    summary:
+      "系统候选人、公开资料和本机返回结果正在持续合并，18 位候选人等待审核。",
   },
   {
     id: "client-xinglan",
@@ -18,6 +20,7 @@ export const workstreamHistory = [
     tone: "warning",
     time: "12 分钟前",
     pinned: true,
+    summary: "两条招聘信号已经核验，等待确认优先联系人和后续联系内容。",
   },
   {
     id: "mapping-embodied",
@@ -27,6 +30,7 @@ export const workstreamHistory = [
     status: "进行中",
     tone: "success",
     time: "今天 08:40",
+    summary: "已覆盖八家公司和三十七位确认人物，正在补充五个关键角色。",
   },
   {
     id: "career-linhao",
@@ -36,6 +40,7 @@ export const workstreamHistory = [
     status: "等待外部",
     tone: "neutral",
     time: "昨天 18:26",
+    summary: "已完成系统岗位匹配，等待猎头回填候选人的联系结果。",
   },
 ];
 
@@ -429,6 +434,17 @@ export const sideTasks = sideTaskRows.map(
   }),
 );
 
+export const workItems = [
+  ...workstreamHistory.map((item) => ({
+    ...item,
+    category: item.type,
+  })),
+  ...sideTasks.map((item) => ({
+    ...item,
+    category: item.type,
+  })),
+];
+
 export const signals = [
   {
     id: "signal-cloudchip",
@@ -486,9 +502,9 @@ export const signals = [
     tone: "success",
     time: "8 月 18 日",
     evidence: 5,
-    summary: "已转化为岗位招聘主线“具身智能 VLA 算法负责人”。",
+    summary: "已转化为岗位招聘工作“具身智能 VLA 算法负责人”。",
     sources: ["客户沟通", "岗位 JD", "公司招聘页", "团队成员动态", "猎头补充"],
-    changes: ["已创建正式岗位", "已启动岗位招聘主线"],
+    changes: ["已创建正式岗位", "已启动岗位招聘工作"],
   },
   {
     id: "signal-expired",

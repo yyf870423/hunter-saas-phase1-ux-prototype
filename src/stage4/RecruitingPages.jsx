@@ -474,7 +474,7 @@ function PositionSectionEditor({ section, close, onSave }) {
           tone="warning"
           icon="warning"
           title="当前有 2 个运行中任务，暂时不能保存"
-          description="暂停或关闭岗位前，需要先停止岗位招聘主线和候选人匹配任务。"
+          description="暂停或关闭岗位前，需要先停止对应的岗位招聘工作和候选人匹配任务。"
         />
       ) : null}
     </Modal>
@@ -1553,7 +1553,7 @@ function MatchingResults() {
       JSON.stringify(candidate),
     );
     sessionStorage.setItem("hunter-matching-selected-candidate", candidate.id);
-    navigate("/tasks/task-recommend-linhao");
+    navigate("/works/task-recommend-linhao");
   };
   return (
     <div className="s4-match-shell">
@@ -1759,7 +1759,7 @@ function MatchingResults() {
                   <b>未生成过推荐报告</b>
                   <small>
                     {pipelineStages[current.id]
-                      ? "可创建支线任务生成报告，完成后最新文件会显示在这里。"
+                      ? "可新建工作生成报告，完成后最新文件会显示在这里。"
                       : "候选人加入岗位流程后，才可以生成面向客户的推荐报告。"}
                   </small>
                 </span>
@@ -1837,7 +1837,7 @@ function MatchingResults() {
         close={() => setReportCandidate(null)}
         size="lg"
         title={`为 ${reportCandidate?.name || "候选人"} 生成推荐报告`}
-        description="这会创建一项独立支线任务；可以继续通过对话补充要求和修改报告"
+        description="这会创建一项独立工作；可以继续通过对话补充要求和修改报告"
         footer={
           <>
             <Button onClick={() => setReportCandidate(null)}>取消</Button>
@@ -1992,11 +1992,11 @@ function RelatedWork() {
   const navigate = useNavigate();
   return (
     <div className="s4-detail-stack">
-      <FieldGroup title="业务主线">
+      <FieldGroup title="相关工作">
         <button
           type="button"
           className="s4-related-mainline"
-          onClick={() => navigate("/workstreams/position-vla")}
+          onClick={() => navigate("/works/position-vla")}
         >
           <i>
             <Icon name="route" />
@@ -2021,7 +2021,7 @@ function RelatedWork() {
               status: "完成",
               tone: "success",
               time: "2026-08-19",
-              route: "/workstreams/position-vla",
+              route: "/works/position-vla",
             },
             {
               icon: "users",
@@ -2041,7 +2041,7 @@ function RelatedWork() {
               status: "等待用户",
               tone: "warning",
               time: "今天 10:16",
-              route: "/tasks/task-recommend-linhao",
+              route: "/works/task-recommend-linhao",
             },
             {
               icon: "search",
@@ -2051,7 +2051,7 @@ function RelatedWork() {
               status: "运行中",
               tone: "info",
               time: "已运行 12 分钟",
-              route: "/tasks/task-hand-team",
+              route: "/works/task-hand-team",
             },
           ].map((task) => (
             <button
@@ -2154,7 +2154,7 @@ export function PositionDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="岗位"
         assetName={detail.name}
-        impact="候选人档案和公司不会删除；岗位推进、匹配与业务主线保留已删除引用，30 天内可恢复。"
+        impact="候选人档案和公司不会删除；岗位推进、匹配与相关工作保留已删除引用，30 天内可恢复。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("岗位已进入回收站");

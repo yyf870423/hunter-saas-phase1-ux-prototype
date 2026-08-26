@@ -94,9 +94,7 @@ function SearchDialog({ open, close }) {
       close={close}
       title={selected ? "搜索结果摘要" : "全局搜索"}
       description={
-        selected
-          ? "查看命中原因和当前业务状态"
-          : "搜索业务主线、支线任务、信号和正式业务资产"
+        selected ? "查看命中原因和当前业务状态" : "搜索工作、信号和正式业务资产"
       }
       size="lg"
     >
@@ -327,7 +325,6 @@ function DesktopAssetNavigation({ open, close, onSelect, triggerRef }) {
 function MobileNavigation({ open, close, mode, onSelect }) {
   const assets = navSections.slice(1).flatMap((section) => section.items);
   const more = [
-    navSections[0].items[3],
     { id: "data", label: "数据管理", icon: "download" },
     { id: "usage", label: "订阅与用量", icon: "database" },
   ];
@@ -474,8 +471,7 @@ export function Stage1Shell() {
   const selectNavigation = (item) => {
     const routes = {
       home: "/home",
-      workstreams: "/workstreams/position-vla",
-      tasks: "/tasks",
+      works: "/works",
       signals: "/signals",
       candidates: "/candidates",
       positions: "/positions",
@@ -527,12 +523,10 @@ export function Stage1Shell() {
                   className={(() => {
                     if (item.id === "home")
                       return location.pathname === "/home" ? "is-active" : "";
-                    if (item.id === "workstreams")
-                      return location.pathname.startsWith("/workstreams")
-                        ? "is-active"
-                        : "";
-                    if (item.id === "tasks")
-                      return location.pathname.startsWith("/tasks")
+                    if (item.id === "works")
+                      return location.pathname.startsWith("/works") ||
+                        location.pathname.startsWith("/workstreams") ||
+                        location.pathname.startsWith("/tasks")
                         ? "is-active"
                         : "";
                     if (item.id === "signals")
@@ -698,7 +692,7 @@ export function Stage1Shell() {
             onClick={() => setSearchOpen(true)}
           >
             <Icon name="search" />
-            <span>搜索主线、任务和业务资产</span>
+            <span>搜索工作、信号和业务资产</span>
             <kbd>Ctrl K</kbd>
           </button>
           <div className="s1-topbar-actions">
@@ -737,7 +731,7 @@ export function Stage1Shell() {
           </div>
         </header>
         <main
-          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/workstreams") || location.pathname.startsWith("/tasks/") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""}`}
+          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/works/") || location.pathname.startsWith("/workstreams") || location.pathname.startsWith("/tasks/") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""}`}
         >
           <Outlet />
         </main>
@@ -746,8 +740,8 @@ export function Stage1Shell() {
       <nav className="s1-mobile-tabs" aria-label="移动端主导航">
         {[
           ["home", "工作台", "home"],
-          ["route", "业务主线", "workstreams"],
-          ["task", "支线任务", "tasks"],
+          ["route", "工作", "works"],
+          ["signal", "信号", "signals"],
           ["database", "业务资产", "assets"],
           ["menu", "更多", "more"],
         ].map(([icon, label, id]) => (
@@ -756,9 +750,11 @@ export function Stage1Shell() {
             key={id}
             className={
               (id === "home" && location.pathname === "/home") ||
-              (id === "workstreams" &&
-                location.pathname.startsWith("/workstreams")) ||
-              (id === "tasks" && location.pathname.startsWith("/tasks"))
+              (id === "works" &&
+                (location.pathname.startsWith("/works") ||
+                  location.pathname.startsWith("/workstreams") ||
+                  location.pathname.startsWith("/tasks"))) ||
+              (id === "signals" && location.pathname.startsWith("/signals"))
                 ? "is-active"
                 : ""
             }

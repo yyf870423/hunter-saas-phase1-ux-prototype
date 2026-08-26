@@ -1523,7 +1523,7 @@ export function CandidateDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="候选人"
         assetName={candidate.name}
-        impact="岗位推进、匹配历史和业务主线会保留已删除引用；公司、岗位、论文和专利不会被删除。"
+        impact="岗位推进、匹配历史和相关工作会保留已删除引用；公司、岗位、论文和专利不会被删除。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("候选人已进入回收站");
@@ -1948,7 +1948,7 @@ export function IdentityMergeReviewPage() {
         <div className="s4-preserved-relations">
           <StateBanner
             title="正式关系不会因资料合并而丢失"
-            description="岗位推进、匹配历史、公司经历、论文、专利、人才版图和业务主线继续关联到保留档案。"
+            description="岗位推进、匹配历史、公司经历、论文、专利、人才版图和相关工作继续关联到保留档案。"
           />
           <div className="s4-entity-grid">
             <EntityLink

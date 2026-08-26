@@ -18,7 +18,7 @@ test("iPhone 使用底部导航并打开资产抽屉", async ({ page }) => {
   await assertNoConsoleErrors();
 });
 
-test("iPhone 搜索、通知和主线切换可用", async ({ page }) => {
+test("iPhone 搜索、通知和重点工作切换可用", async ({ page }) => {
   await page.goto("#/home");
   await page.locator(".s1-search-trigger").click();
   await expect(
@@ -36,9 +36,7 @@ test("iPhone 搜索、通知和主线切换可用", async ({ page }) => {
 
 test("iPhone 空状态和权限状态可读", async ({ page }) => {
   await page.goto("#/home?state=empty");
-  await expect(
-    page.getByRole("heading", { name: "还没有业务主线" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "还没有工作" })).toBeVisible();
   await page.goto("#/home?state=limited");
   await expect(page.getByText("本机协作暂不可用")).toBeVisible();
 });

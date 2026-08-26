@@ -1760,7 +1760,7 @@ export const businessScenarios = {
         id: "rematch",
         title: "更新档案并局部重新匹配",
         detail: "先显示档案变化与合并摘要，再重做受影响岗位。",
-        requirement: "有合适岗位时由用户确认交给岗位招聘主线。",
+        requirement: "有合适岗位时由用户确认交给对应的岗位招聘工作。",
         doneAt: 7,
       },
     ],

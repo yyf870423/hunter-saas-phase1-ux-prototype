@@ -11,14 +11,14 @@ import {
   IdentityConflictReview,
   RuntimeBar,
   UserMessage,
-  WorkstreamHistory,
+  WorkHistory,
 } from "./automation-ui";
 import {
   candidates,
   evidenceRows,
   internalTasks,
   planSteps,
-  workstreamHistory,
+  workItems,
 } from "./data";
 import { CandidateReviewWorkspace, InspectionPanel } from "./ReviewWorkspace";
 
@@ -89,7 +89,7 @@ export function WorkstreamHeader({
         <div className="s2-more-wrap" ref={menuRef}>
           <IconButton
             icon="more"
-            label="更多主线操作"
+            label="更多工作操作"
             onClick={() => setMenuOpen((open) => !open)}
           />
           {menuOpen ? (
@@ -113,7 +113,7 @@ export function WorkstreamHeader({
                 }}
               >
                 <Icon name="logout" />
-                终止业务主线
+                终止工作
               </button>
               <button
                 type="button"
@@ -124,7 +124,7 @@ export function WorkstreamHeader({
                 }}
               >
                 <Icon name="trash" />
-                删除业务主线
+                删除工作
               </button>
             </div>
           ) : null}
@@ -575,13 +575,13 @@ export function AutomationWorkspace() {
     <div
       className={`s2-page s2-workspace ${inspection ? "has-inspector" : ""}`}
     >
-      <WorkstreamHistory
-        items={workstreamHistory}
+      <WorkHistory
+        items={workItems}
         collapsed={historyCollapsed}
         currentId="position-vla"
         onToggle={() => setHistoryCollapsed((value) => !value)}
         onCreate={() => navigate("/new")}
-        onSelect={(item) => navigate(`/workstreams/${item.id}`)}
+        onSelect={(item) => navigate(`/works/${item.id}`)}
       />
       <section className="s2-workstream-main">
         <WorkstreamHeader
@@ -934,7 +934,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                   }}
                   onSend={() => {
                     setContactStage("waiting");
-                    notify("邮件已发送，后续回复会回到当前主线", "success");
+                    notify("邮件已发送，后续回复会回到当前工作", "success");
                   }}
                 />
               </HunterReply>
@@ -948,7 +948,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                   <small>等待外部</small>
                   <b>等待 3 位候选人回复邮件</b>
                   <p>
-                    邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到本主线；猎头在系统外获得的新信息也可以作为普通跟进记录补充。
+                    邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到当前工作；猎头在系统外获得的新信息也可以作为普通跟进记录补充。
                   </p>
                   <em>
                     最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 ·
@@ -985,9 +985,9 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
               <div className="s2-system-state is-danger">
                 <Icon name="warning" />
                 <span>
-                  <b>业务主线已终止</b>
+                  <b>工作已终止</b>
                   <small>
-                    对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建主线。
+                    对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建工作。
                   </small>
                 </span>
               </div>
@@ -1095,7 +1095,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
       <Modal
         open={terminateOpen}
         close={() => setTerminateOpen(false)}
-        title="终止业务主线"
+        title="终止工作"
         description="终止表示这项业务不再继续，不会删除历史和已确认成果。"
         footer={
           <>
@@ -1110,7 +1110,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                 setTerminateOpen(false);
               }}
             >
-              终止主线
+              终止工作
             </Button>
           </>
         }
@@ -1126,7 +1126,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
       <Modal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
-        title="删除业务主线"
+        title="删除工作"
         description="删除只适用于误建或不希望保留的内容。"
         footer={
           <>
@@ -1138,7 +1138,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
               onClick={() => {
                 setDeleteOpen(false);
                 navigate("/home");
-                notify("业务主线已移入回收站，30 天内可以恢复", "success");
+                notify("工作已移入回收站，30 天内可以恢复", "success");
               }}
             >
               删除并移入回收站
@@ -1148,7 +1148,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
       >
         <div className="s2-confirm-copy">
           <p>
-            当前内部任务将安全停止；尚未写入正式资产的对话、计划和专属文件随主线进入回收站。
+            当前内部任务将安全停止；尚未写入正式资产的对话、计划和专属文件随工作进入回收站。
           </p>
           <p>已确认写入的候选人、岗位和其他正式业务资产不会删除。</p>
         </div>

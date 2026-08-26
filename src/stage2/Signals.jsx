@@ -226,17 +226,17 @@ export function SignalsPage() {
               <h3>建议行动</h3>
               <p>
                 {selected.status === "已转化"
-                  ? "该信号已经转化并保留去向，可以查看关联业务主线。"
-                  : "建议先核验公司当前招聘需求和关键联系人，再决定是否启动客户开发主线。"}
+                  ? "该信号已经转化并保留去向，可以查看关联工作。"
+                  : "建议先核验公司当前招聘需求和关键联系人，再决定是否启动客户开发工作。"}
               </p>
             </section>
             <footer>
               {selected.status === "已转化" ? (
                 <Button
                   tone="primary"
-                  onClick={() => navigate("/workstreams/position-vla")}
+                  onClick={() => navigate("/works/position-vla")}
                 >
-                  查看关联主线
+                  查看关联工作
                 </Button>
               ) : (
                 <Button tone="primary" onClick={() => setConvertOpen(true)}>
@@ -299,7 +299,7 @@ export function SignalsPage() {
                   "已转化",
                   convertType === "new"
                     ? "信号已作为新工作的已知信息"
-                    : "信号已关联现有业务主线",
+                    : "信号已关联现有工作",
                 );
                 if (convertType === "new") {
                   sessionStorage.setItem(
@@ -324,12 +324,12 @@ export function SignalsPage() {
             [
               "new",
               "启动新工作",
-              "Hunter 根据目标判断直接处理、创建支线任务或建立业务主线。",
+              "Hunter 根据目标制定执行计划，直接处理或持续推进。",
             ],
             [
               "existing",
               "关联现有工作",
-              "把证据补充到已经存在的业务主线，不创建重复任务。",
+              "把证据补充到已经存在的工作，不创建重复记录。",
             ],
           ].map(([value, title, description]) => (
             <button

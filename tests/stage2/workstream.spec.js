@@ -17,10 +17,10 @@ async function waitForReview(page) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("#/workstreams/position-vla");
+  await page.goto("#/works/position-vla");
 });
 
-test("业务主线从第一条输入渐进推进到审核节点", async ({ page }) => {
+test("持续工作从第一条输入渐进推进到审核节点", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await expect(
     page.getByText(/为星澜机器人“具身智能 VLA 算法负责人”岗位做多渠道找人/),
@@ -180,28 +180,24 @@ test("授权切换、暂停、终止与删除确认可用", async ({ page }) => 
   await page.getByRole("button", { name: /执行前确认/ }).click();
   await page.getByRole("option", { name: /仅分析/ }).click();
   await expect(page.getByText(/授权模式已切换为“仅分析”/)).toBeVisible();
-  await page.getByRole("button", { name: "暂停" }).click();
+  await page.getByRole("button", { name: "暂停", exact: true }).click();
   await expect(page.getByRole("button", { name: "继续" })).toBeVisible();
-  await page.getByRole("button", { name: "更多主线操作" }).click();
-  await page.getByRole("button", { name: "终止业务主线" }).click();
-  await expect(
-    page.getByRole("heading", { name: "终止业务主线" }),
-  ).toBeVisible();
+  await page.getByRole("button", { name: "更多工作操作" }).click();
+  await page.getByRole("button", { name: "终止工作" }).click();
+  await expect(page.getByRole("heading", { name: "终止工作" })).toBeVisible();
   await page.getByRole("button", { name: "取消" }).click();
-  await page.getByRole("button", { name: "更多主线操作" }).click();
-  await page.getByRole("button", { name: "删除业务主线" }).click();
-  await expect(
-    page.getByRole("heading", { name: "删除业务主线" }),
-  ).toBeVisible();
+  await page.getByRole("button", { name: "更多工作操作" }).click();
+  await page.getByRole("button", { name: "删除工作" }).click();
+  await expect(page.getByRole("heading", { name: "删除工作" })).toBeVisible();
 });
 
-test("新建工作判断为业务主线后进入主线工作区", async ({ page }) => {
+test("新建工作判断为持续工作后进入统一工作区", async ({ page }) => {
   await page.goto("#/new");
   const input = page.getByPlaceholder(/例如：为星澜机器人/);
   await input.fill("为星澜机器人 VLA 算法负责人岗位持续寻找合适候选人");
   await input.press("Enter");
-  await expect(page.getByText(/我会建立一条岗位招聘业务主线/)).toBeVisible();
-  await expect(page).toHaveURL(/#\/workstreams\/position-vla$/, {
+  await expect(page.getByText(/我会保留完整工作上下文/)).toBeVisible();
+  await expect(page).toHaveURL(/#\/works\/position-vla$/, {
     timeout: 5_000,
   });
   await expect(
@@ -210,17 +206,17 @@ test("新建工作判断为业务主线后进入主线工作区", async ({ page 
 });
 
 test("加载、流式中断和本机协作受限状态都可恢复", async ({ page }) => {
-  await page.goto("#/workstreams/position-vla?state=loading");
+  await page.goto("#/works/position-vla?state=loading");
   await expect(page.locator(".s2-workspace-loading")).toBeVisible();
 
-  await page.goto("#/workstreams/position-vla?state=stream-error");
+  await page.goto("#/works/position-vla?state=stream-error");
   await expect(page.getByText("回复生成中断")).toBeVisible();
   await page.getByRole("button", { name: "继续生成" }).click();
   await expect(page.getByText("云端检索已开始")).toBeVisible({
     timeout: 8_000,
   });
 
-  await page.goto("#/workstreams/position-vla?state=limited");
+  await page.goto("#/works/position-vla?state=limited");
   await expect(page.getByText("本机协作暂不可用").first()).toBeVisible();
   const handoffSpacing = await page
     .locator(".s2-permission-state--handoff")

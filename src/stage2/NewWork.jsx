@@ -32,18 +32,18 @@ function OutcomeReply({ outcome, prompt }) {
   if (outcome === "mainline") {
     return (
       <HunterReply
-        markdown={`这项工作需要持续汇总系统候选人、公开资料和本机返回结果，并在审核、邮件联系和等待回复后继续推进。我会建立一条岗位招聘业务主线：云端工作立即开始，需要本机处理的部分会生成本地任务，由你选择何时继续。
+        markdown={`这项工作需要持续汇总系统候选人、公开资料和本机返回结果，并在审核、邮件联系和等待回复后继续推进。我会保留完整工作上下文并持续更新计划：云端工作立即开始，需要本机处理的部分会生成相关任务，由你选择何时继续。
 
-> 正在建立业务主线，并保留当前输入、附件和授权方式。`}
+> 正在创建工作，并保留当前输入、附件和授权方式。`}
       />
     );
   }
   if (outcome === "task") {
     return (
       <HunterReply
-        markdown={`这是一项范围有限、交付明确的一次性核验。我会创建独立支线任务；核验完成后，结果会回到对应的人才版图，不会自动合并人物。
+        markdown={`这是一项范围有限、交付明确的核验工作。我会直接执行并交付结论；核验完成后，结果会回到对应的人才版图，不会自动合并人物。
 
-> 正在创建支线任务，并保留当前输入、附件和授权方式。`}
+> 正在创建工作，并保留当前输入、附件和授权方式。`}
       />
     );
   }
@@ -53,7 +53,7 @@ function OutcomeReply({ outcome, prompt }) {
       ? [
           "公司聚焦边缘侧机器人芯片，近期公开信息出现团队扩张信号。",
           "目前证据只能支持一次性判断，尚不足以确认正式招聘需求。",
-          "如需持续寻找负责人和招聘机会，可以继续建立客户开发主线。",
+          "如需持续寻找负责人和招聘机会，可以继续新建客户开发工作。",
         ]
       : [
           "技术能力满足岗位要求，系统设计和跨团队协作评价较好。",
@@ -62,7 +62,7 @@ function OutcomeReply({ outcome, prompt }) {
         ];
     return (
       <HunterReply
-        markdown={`这项工作可以在当前对话中直接完成，不需要建立业务主线或支线任务。
+        markdown={`这项工作可以在当前对话中直接完成，不需要建立单独的工作记录。
 
 ## ${isCompanySummary ? "云脉芯能公开信息摘要" : "候选人跟进摘要"}
 
@@ -114,10 +114,10 @@ export function NewWork() {
     const timer = window.setTimeout(() => {
       if (status === "mainline") {
         sessionStorage.setItem("hunter-new-workstream-prompt", submittedPrompt);
-        navigate("/workstreams/position-vla");
+        navigate("/works/position-vla");
       } else {
         sessionStorage.setItem("hunter-new-task-prompt", submittedPrompt);
-        navigate("/tasks/task-hand-team");
+        navigate("/works/task-hand-team");
       }
     }, 1_250);
     return () => window.clearTimeout(timer);
@@ -160,7 +160,7 @@ export function NewWork() {
           <h1>新建工作</h1>
           <p>
             直接说明想完成什么。Hunter
-            会判断是立即处理、创建支线任务，还是建立需要持续推进的业务主线。
+            会根据目标复杂度制定计划，直接处理或持续推进；你不需要选择工作类型。
           </p>
         </header>
 
@@ -169,9 +169,7 @@ export function NewWork() {
             <Icon name="warning" />
             <span>
               <b>当前工作空间不能创建新工作</b>
-              <small>
-                你仍可查看已有主线和任务；请联系工作空间管理员处理权限。
-              </small>
+              <small>你仍可查看已有工作；请联系工作空间管理员处理权限。</small>
             </span>
           </div>
         ) : null}
@@ -202,9 +200,7 @@ export function NewWork() {
                     onClick={() => chooseOutcome("mainline")}
                   >
                     <b>持续跟踪并寻找联系人</b>
-                    <small>
-                      建立客户开发业务主线，后续继续接收变化和回复。
-                    </small>
+                    <small>保留客户开发上下文，后续继续接收变化和回复。</small>
                   </button>
                 </div>
               </HunterReply>
@@ -267,8 +263,8 @@ export function NewWork() {
 
         <footer>
           <Icon name="info" />
-          无需预先选择业务主线或支线任务。Hunter
-          会说明采用的推进方式；如判断不符合预期，可以直接在对话中纠正。
+          无需预先选择工作类型。Hunter
+          会说明执行计划、等待点和结束条件；如不符合预期，可以直接在对话中纠正。
         </footer>
       </section>
     </div>

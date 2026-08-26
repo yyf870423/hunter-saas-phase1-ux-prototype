@@ -62,7 +62,7 @@ test("通知计数使用正圆标记", async ({ page }) => {
 });
 
 test("全局搜索支持结果、详情和无结果", async ({ page }) => {
-  await page.getByRole("button", { name: /搜索主线/ }).click();
+  await page.getByRole("button", { name: /搜索工作/ }).click();
   const input = page.getByPlaceholder("输入姓名、公司、岗位或任务名称");
   await input.fill("星澜机器人");
   await expect(

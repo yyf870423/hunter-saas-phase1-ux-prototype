@@ -607,7 +607,7 @@ test("推荐报告任务完成后回流岗位匹配详情", async ({ page }) => 
     .getByLabel("报告要求")
     .fill("突出候选人的真机部署和团队管理范围。");
   await page.getByRole("button", { name: "创建并开始" }).click();
-  await expect(page).toHaveURL(/tasks\/task-recommend-linhao/);
+  await expect(page).toHaveURL(/works\/task-recommend-linhao/);
   await page
     .locator(".s2-composer textarea")
     .fill("请突出量产交付经验，并把薪资风险放到最后。");
@@ -855,7 +855,7 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
 }) => {
   for (const route of [
     "#/home",
-    "#/tasks",
+    "#/works",
     "#/signals",
     "#/candidates",
     "#/candidates/candidate-linhao",
@@ -918,7 +918,7 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
     "rgb(229, 231, 235)",
   );
 
-  await page.goto("#/tasks");
+  await page.goto("#/works");
   const activeTab = page.locator(
     '.app-tabs [role="tab"][aria-selected="true"]',
   );

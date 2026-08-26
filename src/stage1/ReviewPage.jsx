@@ -24,7 +24,7 @@ export function ReviewPage() {
         <StatusBadge tone="info">阶段一待审批</StatusBadge>
         <h1>全局框架与工作台</h1>
         <p>
-          本轮只审批全局导航、工作台信息优先级、基础组件、状态设计和响应式结构。业务主线、支线任务、业务资产和运营端将在后续阶段分别提交。
+          本轮只审批全局导航、工作台信息优先级、基础组件、状态设计和响应式结构。工作、信号、业务资产和运营端将在后续阶段分别提交。
         </p>
         <Link className="s1-review-primary" to="/home">
           进入工作台原型
@@ -67,7 +67,7 @@ export function ReviewPage() {
             <Icon name="clock" />
             <b>后续阶段</b>
             <p>
-              对话式业务主线、支线任务、信号中心、业务资产、设置与运营端完整交互。
+              对话式工作、相关任务、信号中心、业务资产、设置与运营端完整交互。
             </p>
           </article>
         </div>

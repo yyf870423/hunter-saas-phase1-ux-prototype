@@ -20,9 +20,9 @@ test("局部错误可独立恢复", async ({ page }) => {
   await page.goto("#/home?state=error");
   await page.getByRole("button", { name: "重新加载" }).click();
   await expect(page).toHaveURL(/#\/home$/);
-  await expect(page.getByText("支线任务摘要已重新加载")).toBeVisible();
+  await expect(page.getByText("相关任务摘要已重新加载")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "需要关注的任务" }),
+    page.getByRole("heading", { name: "需要关注的执行" }),
   ).toBeVisible();
 });
 

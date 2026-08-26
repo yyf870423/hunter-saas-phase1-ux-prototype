@@ -27,10 +27,10 @@ test("行动队列默认收起并可展开", async ({ page }) => {
   await expect(page.locator(".s1-action-list")).toHaveCount(0);
 });
 
-test("业务主线入口进入阶段二工作区", async ({ page }) => {
+test("重点工作入口进入统一工作区", async ({ page }) => {
   await page.getByRole("button", { name: /具身智能 VLA 算法负责人/ }).click();
-  await page.getByRole("button", { name: "进入业务主线" }).click();
-  await expect(page).toHaveURL(/#\/workstreams\/position-vla$/);
+  await page.getByRole("button", { name: "继续工作" }).click();
+  await expect(page).toHaveURL(/#\/works\/position-vla$/);
   await expect(
     page.getByRole("heading", { name: "具身智能 VLA 算法负责人" }),
   ).toBeVisible();

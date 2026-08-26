@@ -199,7 +199,7 @@ export function WorkflowProof() {
           <strong>具身智能 VLA 算法负责人</strong>
           <span>演示数据</span>
         </div>
-        <Link to="/workstreams/position-vla">
+        <Link to="/works/position-vla">
           打开完整寻访线 <Icon name="external" />
         </Link>
       </div>

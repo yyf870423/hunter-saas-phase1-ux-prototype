@@ -769,7 +769,7 @@ export function AutomationSettingsPage() {
         默认使用“执行前确认”。授权只影响尚未执行的动作，运行中的工作可以单独调整。
       </InlineNotice>
       <SettingsSection
-        title="业务主线默认授权"
+        title="工作默认授权"
         description="每类业务可以使用不同默认值，之后创建的新工作会继承该设置。"
       >
         <div className="s5-automation-list">
@@ -1760,7 +1760,7 @@ export function DataPrivacySettingsPage() {
         <div className="s5-danger-list">
           <SettingRow
             title="删除个人工作空间"
-            description="所有业务资产、主线、任务和文件进入待清理状态；保留期内可联系客服恢复。"
+            description="所有业务资产、工作、任务和文件进入待清理状态；保留期内可联系客服恢复。"
             action={
               <Button
                 tone="danger"

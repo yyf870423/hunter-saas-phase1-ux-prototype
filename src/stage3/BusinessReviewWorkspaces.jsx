@@ -254,7 +254,9 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
       <footer className="s3-review-footer">
         <span>
           <b>确认保存 {selected.size} 项结果</b>
-          <small>对外联系将在返回主线后单独确认对象、渠道和消息内容。</small>
+          <small>
+            对外联系将在返回当前工作后单独确认对象、渠道和消息内容。
+          </small>
         </span>
         <Button
           tone="primary"
@@ -660,7 +662,7 @@ export function PositionMatchReviewWorkspace({ matches, onClose, onContinue }) {
           </small>
         </span>
         <Button tone="primary" onClick={onContinue}>
-          返回主线并继续
+          返回工作并继续
         </Button>
       </footer>
     </section>
