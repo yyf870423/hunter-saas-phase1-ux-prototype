@@ -377,29 +377,6 @@ function IdentityReviewTask({ taskId }) {
         </div>
       </header>
       <div className="s2-task-detail-layout">
-        <aside className="s2-task-context">
-          <h2>工作上下文</h2>
-          <dl>
-            <div>
-              <dt>任务目标</dt>
-              <dd>确认两组公开记录是否对应同一位灵巧手团队负责人。</dd>
-            </div>
-            <div>
-              <dt>交付去向</dt>
-              <dd>星澜机器人人才版图 · 人物与关系</dd>
-            </div>
-            <div>
-              <dt>执行边界</dt>
-              <dd>只分析和给出身份建议，不自动合并人物。</dd>
-            </div>
-            <div>
-              <dt>最近检查点</dt>
-              <dd>
-                {resolved ? "身份建议已写回审核结果" : "三项证据已完成比较"}
-              </dd>
-            </div>
-          </dl>
-        </aside>
         <section className="s2-task-conversation">
           <div className="s2-task-timeline">
             <UserMessage time="今天 08:54">
@@ -602,27 +579,6 @@ function RecommendationReportTask({ taskId }) {
       <div
         className={`s2-task-detail-layout ${previewArtifact ? "has-artifact" : ""}`}
       >
-        <aside className="s2-task-context">
-          <h2>工作上下文</h2>
-          <dl>
-            <div>
-              <dt>任务目标</dt>
-              <dd>生成可以直接用于客户推荐的候选人报告。</dd>
-            </div>
-            <div>
-              <dt>报告要求</dt>
-              <dd>{reportRequirement}</dd>
-            </div>
-            <div>
-              <dt>资料版本</dt>
-              <dd>岗位 v3 · 候选人 v6 · 匹配策略 v12</dd>
-            </div>
-            <div>
-              <dt>执行边界</dt>
-              <dd>只生成和修改报告，不自动发送给客户。</dd>
-            </div>
-          </dl>
-        </aside>
         <section className="s2-task-conversation">
           <div className="s2-task-timeline">
             <UserMessage time="今天 10:08">{reportRequirement}</UserMessage>

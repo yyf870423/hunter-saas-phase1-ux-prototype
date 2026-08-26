@@ -57,6 +57,7 @@ test("统一工作列表支持分类、搜索、详情和删除", async ({ page 
 
 test("独立工作详情支持补充资料、恢复和结果回流", async ({ page }) => {
   await page.goto("#/works/task-hand-team");
+  await expect(page.getByText("工作上下文", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "当前判断" })).toBeVisible();
   await expect(page.locator(".s2-markdown-table")).toBeVisible();
   await expect(page.getByText("查看技术信息")).toHaveCount(0);
@@ -98,6 +99,7 @@ test("独立工作详情支持补充资料、恢复和结果回流", async ({ pa
 
 test("推荐报告任务按对话过程保留每次生成的文件", async ({ page }) => {
   await page.goto("#/works/task-recommend-linhao");
+  await expect(page.getByText("工作上下文", { exact: true })).toHaveCount(0);
   await expect(page.getByText(/推荐报告-v1\.md/)).toBeVisible();
   await expect(page.getByText(/推荐报告-v2\.md/)).toBeVisible();
   await expect(page.getByRole("button", { name: "历史版本" })).toHaveCount(0);
