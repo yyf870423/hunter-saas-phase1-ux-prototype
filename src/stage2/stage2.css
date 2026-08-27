@@ -2505,8 +2505,24 @@
   margin-left: 5px;
   font-style: normal;
 }
+.s2-list-filters {
+  display: flex;
+  width: min(548px, 48vw);
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
 .s2-list-toolbar .s1-search-field {
-  width: min(360px, 34vw);
+  min-width: 220px;
+  flex: 1 1 360px;
+  height: 34px;
+}
+.s2-list-toolbar .s2-scenario-filter {
+  flex: 0 0 auto;
+}
+.s2-list-toolbar .s2-scenario-filter > button {
+  min-width: 132px;
   height: 34px;
 }
 .s2-task-table-head,
@@ -3898,8 +3914,11 @@
   .s2-module-tabs button {
     flex: 0 0 auto;
   }
-  .s2-list-toolbar .s1-search-field {
+  .s2-list-filters {
     width: 100%;
+  }
+  .s2-list-toolbar .s1-search-field {
+    min-width: 0;
   }
   .s2-task-table-head {
     display: none;

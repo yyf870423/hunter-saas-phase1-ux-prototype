@@ -434,14 +434,27 @@ export const sideTasks = sideTaskRows.map(
   }),
 );
 
+const sideTaskBusinessScenarios = {
+  "task-recommend-linhao": "岗位招聘",
+  "task-hand-team": "人才摸排",
+  "task-shlab": "人才摸排",
+  "task-zhaoxingyu": "岗位招聘",
+  "task-li-auto": "客户开发",
+  "task-patent": "人才摸排",
+  "task-cloudchip": "客户开发",
+  "task-role": "候选人求职",
+};
+
 export const workItems = [
   ...workstreamHistory.map((item) => ({
     ...item,
     category: item.type,
+    scenario: item.type,
   })),
   ...sideTasks.map((item) => ({
     ...item,
     category: item.type,
+    scenario: sideTaskBusinessScenarios[item.id],
   })),
 ];
 

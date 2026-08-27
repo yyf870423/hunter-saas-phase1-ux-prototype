@@ -6533,6 +6533,9 @@
   border: 0;
   outline: 0;
 }
+.s4-match-search input:focus-visible {
+  box-shadow: none;
+}
 .s4-match-result-list {
   min-height: 0;
   flex: 1;

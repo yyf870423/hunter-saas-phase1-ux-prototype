@@ -51,6 +51,24 @@ test("统一工作列表支持分类、搜索、详情和删除", async ({ page 
   await page.getByLabel("删除 消歧赵星羽的论文与任职身份").click();
   await expect(page.getByRole("heading", { name: "删除工作" })).toBeVisible();
   await page.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("tab", { name: /全部/ }).click();
+  await page.getByPlaceholder("搜索工作、业务场景或关联对象").fill("");
+  await page.getByRole("button", { name: "业务场景", exact: true }).click();
+  await page.getByRole("button", { name: "人才摸排", exact: true }).click();
+  await expect(page.locator(".s2-task-row")).toHaveCount(4);
+  await expect(
+    page.getByRole("link", { name: /^具身智能核心人才版图 / }),
+  ).toBeVisible();
+  await expect(
+    page.locator(".s2-task-row").filter({ hasText: "星澜机器人招聘合作" }),
+  ).toHaveCount(0);
+  const search = page.getByPlaceholder("搜索工作、业务场景或关联对象");
+  await search.focus();
+  await expect(search).toHaveCSS("box-shadow", "none");
+  await expect(page.locator(".s1-search-field").last()).not.toHaveCSS(
+    "box-shadow",
+    "none",
+  );
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });

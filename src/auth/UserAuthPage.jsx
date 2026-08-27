@@ -19,6 +19,9 @@ export function UserAuthPage() {
   const [notice, setNotice] = useState("");
   const [countdown, setCountdown] = useState(0);
   const [qrState, setQrState] = useState({ status: "idle", src: "" });
+  const isRegister = mode.startsWith("register");
+  const isWechat = mode === "wechat" || mode === "register-wechat";
+  const authMethod = isWechat ? "wechat" : "phone";
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -38,7 +41,7 @@ export function UserAuthPage() {
   }, [countdown]);
 
   useEffect(() => {
-    if (mode !== "wechat" || qrState.src) return undefined;
+    if (!isWechat || qrState.src) return undefined;
     let cancelled = false;
     setQrState({ status: "loading", src: "" });
     QRCode.toDataURL(
@@ -59,7 +62,7 @@ export function UserAuthPage() {
     return () => {
       cancelled = true;
     };
-  }, [mode, qrState.src]);
+  }, [isWechat, qrState.src]);
 
   const switchMode = (nextMode) => {
     setMode(nextMode);
@@ -68,16 +71,17 @@ export function UserAuthPage() {
     setStatus("idle");
   };
 
-  const handleLoginTabKeyDown = (event) => {
+  const handleAuthTabKeyDown = (event) => {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
       return;
     }
     event.preventDefault();
-    const nextMode =
+    const method =
       event.key === "ArrowLeft" || event.key === "Home" ? "phone" : "wechat";
+    const nextMode = isRegister ? `register-${method}` : method;
     switchMode(nextMode);
     window.requestAnimationFrame(() => {
-      document.getElementById(`auth-tab-${nextMode}`)?.focus();
+      document.getElementById(`auth-tab-${method}`)?.focus();
     });
   };
 
@@ -102,20 +106,27 @@ export function UserAuthPage() {
     }, 650);
   };
 
+  const completeWechatAuth = () => {
+    if (isRegister && !agreed) {
+      setErrors({ agreed: "注册前需要同意服务条款与隐私说明" });
+      return;
+    }
+    setErrors({});
+    completeAuth();
+  };
+
   const submitPhone = (event) => {
     event.preventDefault();
     const nextErrors = {};
     if (!phonePattern.test(phone))
       nextErrors.phone = "请输入有效的 11 位手机号";
     if (!/^\d{4,6}$/.test(code)) nextErrors.code = "请输入 4–6 位数字验证码";
-    if (mode === "register" && !name.trim()) nextErrors.name = "请输入你的姓名";
-    if (mode === "register" && !agreed)
+    if (isRegister && !name.trim()) nextErrors.name = "请输入你的姓名";
+    if (isRegister && !agreed)
       nextErrors.agreed = "注册前需要同意服务条款与隐私说明";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length === 0) completeAuth();
   };
-
-  const isRegister = mode === "register";
 
   return (
     <main className="auth-page auth-user-page">
@@ -145,55 +156,57 @@ export function UserAuthPage() {
             </p>
           </div>
 
-          {!isRegister ? (
-            <div
-              className="auth-tabs"
-              role="tablist"
-              aria-label="登录方式"
-              data-mode={mode}
+          <div
+            className="auth-tabs"
+            role="tablist"
+            aria-label={isRegister ? "注册方式" : "登录方式"}
+            data-mode={authMethod}
+          >
+            <button
+              id="auth-tab-phone"
+              type="button"
+              role="tab"
+              aria-selected={authMethod === "phone"}
+              aria-controls="auth-panel-phone"
+              tabIndex={authMethod === "phone" ? 0 : -1}
+              className={authMethod === "phone" ? "is-active" : ""}
+              onClick={() =>
+                switchMode(isRegister ? "register-phone" : "phone")
+              }
+              onKeyDown={handleAuthTabKeyDown}
             >
-              <button
-                id="auth-tab-phone"
-                type="button"
-                role="tab"
-                aria-selected={mode === "phone"}
-                aria-controls="auth-panel-phone"
-                tabIndex={mode === "phone" ? 0 : -1}
-                className={mode === "phone" ? "is-active" : ""}
-                onClick={() => switchMode("phone")}
-                onKeyDown={handleLoginTabKeyDown}
-              >
-                <span className="auth-tab-icon">
-                  <Icon name="phone" />
-                </span>
-                <span className="auth-tab-copy">
-                  <strong>手机号登录</strong>
-                  <small>手机号 + 验证码</small>
-                </span>
-              </button>
-              <button
-                id="auth-tab-wechat"
-                type="button"
-                role="tab"
-                aria-selected={mode === "wechat"}
-                aria-controls="auth-panel-wechat"
-                tabIndex={mode === "wechat" ? 0 : -1}
-                className={mode === "wechat" ? "is-active" : ""}
-                onClick={() => switchMode("wechat")}
-                onKeyDown={handleLoginTabKeyDown}
-              >
-                <span className="auth-tab-icon">
-                  <Icon name="qrCode" />
-                </span>
-                <span className="auth-tab-copy">
-                  <strong>微信扫码</strong>
-                  <small>微信扫一扫</small>
-                </span>
-              </button>
-            </div>
-          ) : null}
+              <span className="auth-tab-icon">
+                <Icon name="phone" />
+              </span>
+              <span className="auth-tab-copy">
+                <strong>{isRegister ? "手机号注册" : "手机号登录"}</strong>
+                <small>手机号 + 验证码</small>
+              </span>
+            </button>
+            <button
+              id="auth-tab-wechat"
+              type="button"
+              role="tab"
+              aria-selected={authMethod === "wechat"}
+              aria-controls="auth-panel-wechat"
+              tabIndex={authMethod === "wechat" ? 0 : -1}
+              className={authMethod === "wechat" ? "is-active" : ""}
+              onClick={() =>
+                switchMode(isRegister ? "register-wechat" : "wechat")
+              }
+              onKeyDown={handleAuthTabKeyDown}
+            >
+              <span className="auth-tab-icon">
+                <Icon name="qrCode" />
+              </span>
+              <span className="auth-tab-copy">
+                <strong>{isRegister ? "微信扫码注册" : "微信扫码"}</strong>
+                <small>微信扫一扫</small>
+              </span>
+            </button>
+          </div>
 
-          {mode === "wechat" ? (
+          {isWechat ? (
             <div
               className="auth-wechat"
               id="auth-panel-wechat"
@@ -204,14 +217,20 @@ export function UserAuthPage() {
                 className={`auth-qr ${qrState.status === "loading" ? "is-loading" : ""}`}
               >
                 {qrState.src ? (
-                  <img src={qrState.src} alt="Hunter 微信登录演示二维码" />
+                  <img
+                    src={qrState.src}
+                    alt={`Hunter 微信${isRegister ? "注册" : "登录"}演示二维码`}
+                  />
                 ) : (
                   <Icon name="qrCode" size={54} />
                 )}
                 <span>演示二维码</span>
               </div>
-              <h3>使用微信扫码登录</h3>
-              <p>打开微信扫一扫，在手机端确认后继续。</p>
+              <h3>使用微信扫码{isRegister ? "注册" : "登录"}</h3>
+              <p>
+                打开微信扫一扫，在手机端确认后
+                {isRegister ? "创建账号" : "继续"}。
+              </p>
               {qrState.status === "error" ? (
                 <AuthStatus tone="error">
                   二维码生成失败，请刷新页面重试。
@@ -221,10 +240,35 @@ export function UserAuthPage() {
                 type="button"
                 className="auth-submit auth-ghost-submit"
                 disabled={qrState.status !== "ready" || status === "submitting"}
-                onClick={completeAuth}
+                onClick={completeWechatAuth}
               >
-                {status === "submitting" ? "正在确认…" : "模拟已在手机确认"}
+                {status === "submitting"
+                  ? "正在确认…"
+                  : isRegister
+                    ? "模拟已在手机确认并注册"
+                    : "模拟已在手机确认"}
               </button>
+              {isRegister ? (
+                <label
+                  className={`auth-consent auth-wechat-consent ${errors.agreed ? "has-error" : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(event) => {
+                      setAgreed(event.target.checked);
+                      setErrors((current) => ({ ...current, agreed: "" }));
+                    }}
+                  />
+                  <span className="auth-checkbox">
+                    <Icon name="check" size={13} />
+                  </span>
+                  <span>我已阅读并同意服务条款与隐私说明</span>
+                  {errors.agreed ? (
+                    <small role="alert">{errors.agreed}</small>
+                  ) : null}
+                </label>
+              ) : null}
               <small className="auth-prototype-note">
                 原型演示：未接入微信开放平台。
               </small>
@@ -233,8 +277,8 @@ export function UserAuthPage() {
             <form
               className="auth-form"
               id="auth-panel-phone"
-              role={isRegister ? undefined : "tabpanel"}
-              aria-label={isRegister ? undefined : "登录内容"}
+              role="tabpanel"
+              aria-label={isRegister ? "注册表单" : "登录表单"}
               onSubmit={submitPhone}
               noValidate
             >
@@ -324,7 +368,10 @@ export function UserAuthPage() {
           {!isRegister ? (
             <p className="auth-switch">
               还没有账号？{" "}
-              <button type="button" onClick={() => switchMode("register")}>
+              <button
+                type="button"
+                onClick={() => switchMode("register-phone")}
+              >
                 注册账号
               </button>
             </p>

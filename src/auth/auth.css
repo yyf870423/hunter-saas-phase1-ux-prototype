@@ -606,6 +606,11 @@
 .auth-wechat .auth-submit {
   max-width: 260px;
 }
+.auth-wechat-consent {
+  width: min(320px, 100%);
+  margin-top: 18px;
+  text-align: left;
+}
 .auth-prototype-note {
   margin-top: 10px;
   color: #9aa5b5;

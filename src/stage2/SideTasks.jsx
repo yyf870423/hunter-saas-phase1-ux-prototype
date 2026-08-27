@@ -14,6 +14,7 @@ import {
   StatusBadge,
   useToast,
 } from "../stage1/ui";
+import { SelectMenu } from "../stage4/asset-ui";
 import {
   Composer,
   HunterReply,
@@ -35,6 +36,14 @@ const tabs = [
   ["finished", "已结束"],
 ];
 
+const businessScenarios = [
+  "全部业务场景",
+  "客户开发",
+  "岗位招聘",
+  "人才摸排",
+  "候选人求职",
+];
+
 function workInTab(work, tab) {
   if (tab === "running")
     return ["推进中", "进行中", "运行中", "重试中", "排队中"].includes(
@@ -51,6 +60,7 @@ export function WorksPage() {
   const notify = useToast();
   const [tab, setTab] = useState("all");
   const [query, setQuery] = useState("");
+  const [scenario, setScenario] = useState("");
   const [page, setPage] = useState(1);
   const [deleteWork, setDeleteWork] = useState(null);
   const [rows, setRows] = useState(workItems);
@@ -59,12 +69,13 @@ export function WorksPage() {
     return rows.filter(
       (work) =>
         workInTab(work, tab) &&
+        (!scenario || work.scenario === scenario) &&
         (!keyword ||
-          `${work.title} ${work.category} ${work.object}`
+          `${work.title} ${work.category} ${work.scenario} ${work.object}`
             .toLowerCase()
             .includes(keyword)),
     );
-  }, [query, rows, tab]);
+  }, [query, rows, scenario, tab]);
   return (
     <div className="s2-page s2-module-page">
       <header className="s2-page-heading">
@@ -103,14 +114,26 @@ export function WorksPage() {
               </button>
             ))}
           </div>
-          <SearchField
-            value={query}
-            onChange={(next) => {
-              setQuery(next);
-              setPage(1);
-            }}
-            placeholder="搜索工作、业务场景或关联对象"
-          />
+          <div className="s2-list-filters">
+            <SearchField
+              value={query}
+              onChange={(next) => {
+                setQuery(next);
+                setPage(1);
+              }}
+              placeholder="搜索工作、业务场景或关联对象"
+            />
+            <SelectMenu
+              className="s2-scenario-filter"
+              label="业务场景"
+              value={scenario}
+              options={businessScenarios}
+              onChange={(next) => {
+                setScenario(next === "全部业务场景" ? "" : next);
+                setPage(1);
+              }}
+            />
+          </div>
         </div>
         {visible.length ? (
           <div className="s2-task-table">
@@ -140,7 +163,7 @@ export function WorksPage() {
                   <b>{work.title}</b>
                   <small>{work.summary}</small>
                 </span>
-                <span>{work.category}</span>
+                <span>{work.scenario}</span>
                 <span>{work.object}</span>
                 <span>
                   <StatusBadge tone={work.tone}>{work.status}</StatusBadge>
@@ -174,6 +197,7 @@ export function WorksPage() {
               onClick={() => {
                 setTab("all");
                 setQuery("");
+                setScenario("");
               }}
             >
               清空条件

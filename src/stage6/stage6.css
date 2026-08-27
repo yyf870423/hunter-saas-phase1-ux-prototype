@@ -734,6 +734,9 @@
   background: transparent;
   font-size: 12px;
 }
+.ops-search input:focus-visible {
+  box-shadow: none;
+}
 .ops-search button {
   display: grid;
   width: 26px;
@@ -1591,6 +1594,9 @@
   border: 0;
   outline: 0;
   background: transparent;
+}
+.ops-global-search label input:focus-visible {
+  box-shadow: none;
 }
 .ops-global-search label button {
   display: grid;

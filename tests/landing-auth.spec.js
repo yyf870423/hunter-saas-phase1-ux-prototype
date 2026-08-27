@@ -220,6 +220,7 @@ test("user auth supports validation, QR login and registration", async ({
   await expect(
     page.getByRole("checkbox", { name: /服务条款与隐私说明/ }),
   ).toBeVisible();
+  await expect(page.getByRole("tab", { name: /微信扫码注册/ })).toBeVisible();
 });
 
 test("phone login hands off to the existing console", async ({ page }) => {
@@ -255,6 +256,29 @@ test("phone registration hands off to the existing console", async ({
   await page.getByLabel("验证码").fill("123456");
   await page.getByRole("checkbox", { name: /服务条款与隐私说明/ }).check();
   await page.getByRole("button", { name: "注册并进入 Hunter" }).click();
+
+  await expect(page).toHaveURL(/#\/home$/);
+});
+
+test("wechat registration validates consent and hands off to the console", async ({
+  page,
+}) => {
+  await page.goto("./#/login");
+  await page.getByRole("button", { name: "注册账号" }).click();
+  await page.getByRole("tab", { name: /微信扫码注册/ }).click();
+  await expect(
+    page.getByRole("img", { name: "Hunter 微信注册演示二维码" }),
+  ).toBeVisible();
+
+  const confirm = page.getByRole("button", {
+    name: "模拟已在手机确认并注册",
+  });
+  await confirm.click();
+  await expect(
+    page.getByText("注册前需要同意服务条款与隐私说明"),
+  ).toBeVisible();
+  await page.getByRole("checkbox", { name: /服务条款与隐私说明/ }).check();
+  await confirm.click();
 
   await expect(page).toHaveURL(/#\/home$/);
 });
