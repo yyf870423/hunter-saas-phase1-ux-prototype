@@ -261,8 +261,8 @@
   padding: 0 8px;
   color: var(--s1-muted);
   font-size: 12px;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
+  background: var(--s1-tag-bg);
+  border: 1px solid var(--s1-tag-border);
   border-radius: 6px;
 }
 .s4-candidate-number-filters input {
@@ -5922,11 +5922,11 @@
   align-items: center;
   gap: 8px;
   padding: 0 14px;
-  color: #fff;
+  color: var(--s1-action-ink);
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
-  background: var(--s1-accent);
+  background: var(--s1-action-fill);
   border-radius: 7px;
 }
 .s4-review-primary svg {

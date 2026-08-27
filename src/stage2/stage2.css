@@ -1311,9 +1311,9 @@
   box-shadow: none;
 }
 .s2-composer-toolbar > .s1-icon-button:last-child {
-  color: #fff;
-  background: var(--s1-accent);
-  border-color: var(--s1-accent);
+  color: var(--s1-action-ink);
+  background: var(--s1-action-fill);
+  border-color: var(--s1-action-border);
 }
 
 .s2-auth-select {
