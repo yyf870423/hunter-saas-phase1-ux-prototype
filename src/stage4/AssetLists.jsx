@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { TableDeleteButton } from "../stage1/ui";
 import {
   AssetListState,
   AssetPageHeader,
@@ -280,14 +281,10 @@ function RowActions({ row, type, onDelete }) {
       >
         <Icon name="chevronRight" />
       </button>
-      <button
-        type="button"
-        className="is-danger"
-        aria-label={`删除${row.name || row.title}`}
+      <TableDeleteButton
+        label={`删除${row.name || row.title}`}
         onClick={() => onDelete(row)}
-      >
-        <Icon name="trash" />
-      </button>
+      />
     </div>
   );
 }

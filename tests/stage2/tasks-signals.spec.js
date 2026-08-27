@@ -40,6 +40,18 @@ test("导航、列表和详情只使用统一工作概念", async ({ page }) => 
 test("统一工作列表支持分类、搜索、详情和删除", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/works");
+  await expect(
+    page.locator(".s2-page-heading").getByRole("button", {
+      name: "新建工作",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await expect(
+    page.locator(".s1-topbar").getByRole("button", {
+      name: "新建工作",
+      exact: true,
+    }),
+  ).toHaveCount(1);
   await page.getByRole("tab", { name: /等待处理/ }).click();
   await expect(
     page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
@@ -48,7 +60,13 @@ test("统一工作列表支持分类、搜索、详情和删除", async ({ page 
   await expect(
     page.locator(".s2-task-row").filter({ hasText: "消歧赵星羽" }),
   ).toBeVisible();
-  await page.getByLabel("删除 消歧赵星羽的论文与任职身份").click();
+  const deleteButton = page.getByLabel("删除 消歧赵星羽的论文与任职身份");
+  await expect(deleteButton).toHaveClass(/s1-table-delete-button/);
+  await expect(deleteButton).toHaveCSS("color", "rgb(196, 43, 51)");
+  await page.getByRole("button", { name: "切换深色模式" }).click();
+  await expect(deleteButton).toHaveCSS("color", "rgb(255, 107, 113)");
+  await page.getByRole("button", { name: "切换亮色模式" }).click();
+  await deleteButton.click();
   await expect(page.getByRole("heading", { name: "删除工作" })).toBeVisible();
   await page.getByRole("button", { name: "取消" }).click();
   await page.getByRole("tab", { name: /全部/ }).click();

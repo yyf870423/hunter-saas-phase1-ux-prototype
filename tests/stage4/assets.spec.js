@@ -7,6 +7,11 @@ import {
 test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/candidates");
+  const tableDeleteButton = page
+    .locator(".s4-row-actions .s1-table-delete-button")
+    .first();
+  await expect(tableDeleteButton).toBeVisible();
+  await expect(tableDeleteButton).toHaveCSS("color", "rgb(196, 43, 51)");
   for (const heading of [
     "姓名",
     "公司",

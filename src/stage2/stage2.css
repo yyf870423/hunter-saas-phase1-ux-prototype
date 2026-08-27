@@ -2594,9 +2594,14 @@
   background: transparent;
   box-shadow: none;
 }
-.s2-row-actions .s1-icon-button:last-child:hover {
+.s2-row-actions .s1-table-delete-button {
+  color: var(--s1-danger);
+  border-color: transparent;
+}
+.s2-row-actions .s1-table-delete-button:hover {
   color: var(--s1-danger);
   background: var(--s1-danger-soft);
+  border-color: color-mix(in srgb, var(--s1-danger) 28%, var(--s1-line));
 }
 .s2-pagination {
   display: flex;

@@ -97,6 +97,17 @@ export function IconButton({ icon, label, badge, className = "", ...props }) {
   );
 }
 
+export function TableDeleteButton({ label, className = "", ...props }) {
+  return (
+    <IconButton
+      icon="trash"
+      label={label}
+      className={`s1-table-delete-button ${className}`.trim()}
+      {...props}
+    />
+  );
+}
+
 export function StatusBadge({ children, tone = "neutral", dot = true }) {
   return (
     <span className={`s1-status s1-status-${tone}`}>

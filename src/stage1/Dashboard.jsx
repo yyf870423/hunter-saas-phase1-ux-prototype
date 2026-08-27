@@ -360,13 +360,6 @@ export function Dashboard() {
           <h1>上午好，沈岚</h1>
           <p>你有 1 项工作等待继续，2 个相关任务需要关注。</p>
         </div>
-        <Button
-          tone="primary"
-          icon="plus"
-          onClick={() => openPlaceholder("新建工作")}
-        >
-          新建工作
-        </Button>
       </header>
 
       {state === "limited" ? (

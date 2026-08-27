@@ -12,6 +12,7 @@ import {
   Modal,
   SearchField,
   StatusBadge,
+  TableDeleteButton,
   useToast,
 } from "../stage1/ui";
 import { SelectMenu } from "../stage4/asset-ui";
@@ -86,9 +87,6 @@ export function WorksPage() {
             查看所有可独立管理的工作；执行过程中拆出的相关任务保留在所属工作内。
           </p>
         </div>
-        <Button tone="primary" icon="plus" onClick={() => navigate("/new")}>
-          新建工作
-        </Button>
       </header>
       <section className="s2-list-panel">
         <div className="s2-list-toolbar">
@@ -178,8 +176,7 @@ export function WorksPage() {
                     label={`查看 ${work.title}`}
                     onClick={() => navigate(`/works/${work.id}`)}
                   />
-                  <IconButton
-                    icon="trash"
+                  <TableDeleteButton
                     label={`删除 ${work.title}`}
                     onClick={() => setDeleteWork(work)}
                   />

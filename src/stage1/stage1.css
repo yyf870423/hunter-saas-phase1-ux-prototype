@@ -1057,6 +1057,27 @@ input:focus-visible {
   border-color: color-mix(in srgb, var(--s1-accent) 30%, var(--s1-line));
 }
 
+.s1-table-delete-button {
+  color: var(--s1-danger);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.s1-table-delete-button:hover {
+  color: var(--s1-danger);
+  background: var(--s1-danger-soft);
+  border-color: color-mix(in srgb, var(--s1-danger) 28%, var(--s1-line));
+}
+
+.s1-table-delete-button:focus-visible {
+  color: var(--s1-danger);
+  background: var(--s1-danger-soft);
+  box-shadow:
+    0 0 0 2px var(--s1-surface),
+    0 0 0 4px color-mix(in srgb, var(--s1-danger) 48%, transparent);
+}
+
 .s1-icon-button em {
   position: absolute;
   top: -5px;

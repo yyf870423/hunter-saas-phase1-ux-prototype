@@ -101,6 +101,12 @@ test("主题切换即时生效并记忆", async ({ page }) => {
 test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   const topbar = page.locator(".s1-topbar");
   await expect(
+    page.locator(".s1-dashboard-head").getByRole("button", {
+      name: "新建工作",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await expect(
     topbar.getByRole("button", { name: "导入数据", exact: true }),
   ).toHaveCount(0);
   const dataManagementButton = page.getByRole("button", {

@@ -1341,9 +1341,13 @@
   color: var(--s1-accent);
   background: var(--s1-accent-soft);
 }
-.s4-row-actions button.is-danger:hover {
+.s4-row-actions .s1-table-delete-button {
+  color: var(--s1-danger);
+}
+.s4-row-actions .s1-table-delete-button:hover {
   color: var(--s1-danger);
   background: var(--s1-danger-soft);
+  border-color: color-mix(in srgb, var(--s1-danger) 28%, var(--s1-line));
 }
 .s4-row-actions svg {
   width: 14px;
