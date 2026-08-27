@@ -91,8 +91,16 @@ test("通知支持未读筛选和全部已读", async ({ page }) => {
 });
 
 test("主题切换即时生效并记忆", async ({ page }) => {
+  const sidebar = page.locator(".s1-sidebar");
+  const activeNavigation = page
+    .locator(".s1-nav-section nav > button.is-active")
+    .first();
+  await expect(sidebar).toHaveCSS("background-color", "rgb(246, 248, 251)");
+  await expect(activeNavigation).toHaveCSS("color", "rgb(11, 79, 163)");
   await page.getByRole("button", { name: "切换深色模式" }).click();
   await expect(page.locator(".s1-app")).toHaveAttribute("data-theme", "dark");
+  await expect(sidebar).toHaveCSS("background-color", "rgb(17, 24, 34)");
+  await expect(activeNavigation).toHaveCSS("color", "rgb(255, 255, 255)");
   await page.reload();
   await expect(page.locator(".s1-app")).toHaveAttribute("data-theme", "dark");
   await page.getByRole("button", { name: "切换亮色模式" }).click();
