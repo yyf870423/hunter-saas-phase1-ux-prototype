@@ -48,6 +48,9 @@
   --s1-warning-soft: #fff7db;
   --s1-danger: #c42b33;
   --s1-danger-soft: #fff0f0;
+  --s1-danger-action: #c42b33;
+  --s1-danger-action-hover: #aa222b;
+  --s1-danger-action-soft: #fff0f0;
   --s1-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(0, 0, 0, 0.02),
     0 4px 8px -4px rgba(0, 0, 0, 0.08), 0 16px 24px -8px rgba(0, 0, 0, 0.09);
@@ -139,6 +142,9 @@ input:focus-visible {
   --s1-warning-soft: #382405;
   --s1-danger: #ff6b71;
   --s1-danger-soft: #3a171a;
+  --s1-danger-action: #b9575f;
+  --s1-danger-action-hover: #ad4f58;
+  --s1-danger-action-soft: #2a1a1c;
   --s1-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 3px rgba(0, 0, 0, 0.36),
     0 16px 32px -10px rgba(0, 0, 0, 0.62);
@@ -1032,8 +1038,13 @@ input:focus-visible {
 
 .s1-button-danger {
   color: var(--s1-action-ink);
-  background: var(--s1-danger);
-  border-color: var(--s1-danger);
+  background: var(--s1-danger-action);
+  border-color: var(--s1-danger-action);
+}
+
+.s1-button-danger:hover:not(:disabled) {
+  background: var(--s1-danger-action-hover);
+  border-color: var(--s1-danger-action-hover);
 }
 
 .s1-button:active,
@@ -1062,24 +1073,24 @@ input:focus-visible {
 }
 
 .s1-table-delete-button {
-  color: var(--s1-danger);
+  color: var(--s1-danger-action);
   background: transparent;
   border-color: transparent;
   box-shadow: none;
 }
 
 .s1-table-delete-button:hover {
-  color: var(--s1-danger);
-  background: var(--s1-danger-soft);
-  border-color: color-mix(in srgb, var(--s1-danger) 28%, var(--s1-line));
+  color: var(--s1-danger-action);
+  background: var(--s1-danger-action-soft);
+  border-color: color-mix(in srgb, var(--s1-danger-action) 28%, var(--s1-line));
 }
 
 .s1-table-delete-button:focus-visible {
-  color: var(--s1-danger);
-  background: var(--s1-danger-soft);
+  color: var(--s1-danger-action);
+  background: var(--s1-danger-action-soft);
   box-shadow:
     0 0 0 2px var(--s1-surface),
-    0 0 0 4px color-mix(in srgb, var(--s1-danger) 48%, transparent);
+    0 0 0 4px color-mix(in srgb, var(--s1-danger-action) 42%, transparent);
 }
 
 .s1-icon-button em {

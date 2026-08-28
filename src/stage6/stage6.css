@@ -1,10 +1,17 @@
 .ops-app {
   min-height: 100vh;
   color: var(--s1-ink);
-  background: #f7f8fa;
-  --ops-nav: #07152d;
-  --ops-nav-hover: #102746;
-  --ops-nav-active: #123a6d;
+  background: var(--s1-canvas);
+  --ops-nav: var(--s1-nav);
+  --ops-nav-ink: var(--s1-nav-ink);
+  --ops-nav-muted: var(--s1-nav-muted);
+  --ops-nav-subtle: var(--s1-nav-subtle);
+  --ops-nav-hover: var(--s1-nav-hover);
+  --ops-nav-active: var(--s1-nav-active);
+  --ops-nav-active-ink: var(--s1-nav-active-ink);
+  --ops-nav-line: var(--s1-nav-line);
+  --ops-nav-badge: var(--s1-nav-badge);
+  --ops-nav-avatar: var(--s1-nav-avatar);
   --ops-blue: #076dd7;
   --ops-blue-soft: #eef6ff;
   --ops-cyan: #0a7f95;
@@ -16,23 +23,28 @@
   z-index: 50;
   inset: 0 auto 0 0;
   display: flex;
-  width: 68px;
+  width: 64px;
   flex-direction: column;
-  color: #fff;
+  overflow: visible;
+  color: var(--ops-nav-ink);
   background: var(--ops-nav);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  transition: width 180ms ease;
+  border-right: 1px solid var(--ops-nav-line);
+  transition:
+    width 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
 }
 
 .ops-app.nav-expanded .ops-sidebar {
-  width: 236px;
+  width: 224px;
 }
 
 .ops-sidebar-brand {
   display: flex;
-  min-height: 68px;
+  height: 64px;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 14px;
   border: 0;
   color: inherit;
   background: transparent;
@@ -43,7 +55,7 @@
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
 }
 
 .ops-brand > i {
@@ -52,17 +64,18 @@
   height: 36px;
   flex: 0 0 36px;
   place-items: center;
-  color: #fff;
-  background: #0879ec;
-  border-radius: 9px;
+  color: #ffffff;
+  background: var(--s1-accent);
+  border-radius: 8px;
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.18),
-    0 8px 22px rgba(0, 112, 247, 0.22);
+    0 2px 6px rgba(0, 112, 247, 0.2);
 }
 
 .ops-brand > span {
   display: grid;
   min-width: 0;
+  color: var(--ops-nav-ink);
   text-align: left;
 }
 .ops-brand b {
@@ -70,30 +83,34 @@
   line-height: 21px;
 }
 .ops-brand small {
-  color: #9db1cd;
+  overflow: hidden;
+  color: var(--ops-nav-muted);
   font-size: 12px;
   line-height: 16px;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .ops-sidebar > nav,
 .ops-mobile-overlay aside > nav {
   display: grid;
-  gap: 4px;
-  padding: 10px;
+  gap: 3px;
+  padding: 14px 8px;
 }
 
 .ops-sidebar nav a,
 .ops-mobile-overlay nav a {
   position: relative;
   display: flex;
-  height: 42px;
+  width: 100%;
+  height: 40px;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
+  overflow: hidden;
   padding: 0 12px;
-  color: #aebed4;
+  color: var(--ops-nav-muted);
   text-decoration: none;
-  border-radius: 7px;
+  border-radius: 8px;
   transition:
     color 140ms ease,
     background 140ms ease;
@@ -101,58 +118,66 @@
 
 .ops-sidebar nav a:hover,
 .ops-mobile-overlay nav a:hover {
-  color: #fff;
+  color: var(--ops-nav-ink);
   background: var(--ops-nav-hover);
 }
 .ops-sidebar nav a.is-active,
 .ops-mobile-overlay nav a.is-active {
-  color: #fff;
+  color: var(--ops-nav-active-ink);
   background: var(--ops-nav-active);
-  box-shadow: inset 3px 0 #42a5ff;
+  box-shadow: none;
 }
 .ops-sidebar nav a svg,
 .ops-mobile-overlay nav a svg {
-  width: 19px;
-  flex: 0 0 19px;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
 }
 .ops-sidebar nav a span,
 .ops-mobile-overlay nav a span {
   overflow: hidden;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   white-space: nowrap;
 }
 .ops-sidebar nav a em,
 .ops-mobile-overlay nav a em {
-  display: grid;
-  min-width: 20px;
-  height: 20px;
+  min-width: 18px;
   margin-left: auto;
-  place-items: center;
-  color: #fff;
-  font-size: 11px;
+  padding: 1px 5px;
+  color: var(--ops-nav-muted);
+  font-size: 12px;
   font-style: normal;
-  background: #d23c47;
-  border-radius: 999px;
+  text-align: center;
+  background: var(--ops-nav-badge);
+  border-radius: 8px;
+  opacity: 0;
+}
+.ops-app.nav-expanded .ops-sidebar nav a em,
+.ops-mobile-overlay nav a em {
+  opacity: 1;
 }
 
 .ops-sidebar-foot {
   position: relative;
+  display: grid;
+  gap: 4px;
   margin-top: auto;
-  padding: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px;
+  border-top: 1px solid var(--ops-nav-line);
 }
 .ops-account {
   display: flex;
   width: 100%;
-  height: 48px;
+  height: 44px;
   align-items: center;
   gap: 10px;
-  padding: 6px 8px;
+  overflow: hidden;
+  padding: 0 7px;
   border: 0;
-  color: #fff;
+  color: var(--ops-nav-ink);
   background: transparent;
-  border-radius: 7px;
+  border-radius: 8px;
   cursor: pointer;
 }
 .ops-account:hover {
@@ -164,11 +189,11 @@
   height: 32px;
   flex: 0 0 32px;
   place-items: center;
-  color: #d9eaff;
+  color: var(--ops-nav-ink);
   font-size: 12px;
   font-style: normal;
   font-weight: 700;
-  background: #1b4d7e;
+  background: var(--ops-nav-avatar);
   border-radius: 8px;
 }
 .ops-account > span {
@@ -181,7 +206,7 @@
   line-height: 18px;
 }
 .ops-account small {
-  color: #9db1cd;
+  color: var(--ops-nav-subtle);
   font-size: 11px;
   line-height: 15px;
   white-space: nowrap;
@@ -189,18 +214,18 @@
 .ops-account > svg {
   width: 15px;
   margin-left: auto;
-  color: #9db1cd;
+  color: var(--ops-nav-subtle);
 }
 .ops-account-menu {
   position: absolute;
   z-index: 80;
-  bottom: 66px;
-  left: 10px;
+  bottom: 0;
+  left: calc(100% + 10px);
   display: grid;
   width: 280px;
   overflow: hidden;
   color: var(--s1-ink);
-  background: #fff;
+  background: var(--s1-surface-raised);
   border: 1px solid var(--s1-line);
   border-radius: 10px;
   box-shadow: var(--s1-shadow);
@@ -228,7 +253,7 @@
   cursor: pointer;
 }
 .ops-account-menu button:hover {
-  background: #f4f7fb;
+  background: var(--s1-accent-soft);
 }
 .ops-account-menu button svg:last-child {
   margin-left: auto;
@@ -240,26 +265,62 @@
   color: var(--s1-muted);
   font-size: 11px;
   line-height: 17px;
-  background: #f6f8fb;
+  background: var(--s1-surface-strong);
   border-radius: 6px;
+}
+
+.ops-sidebar-toggle {
+  display: flex;
+  width: 100%;
+  height: 36px;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  padding: 0 12px;
+  color: var(--ops-nav-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.ops-sidebar-toggle:hover {
+  color: var(--ops-nav-ink);
+  background: var(--ops-nav-hover);
+}
+
+.ops-sidebar-toggle svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.ops-sidebar-toggle span {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .ops-topbar {
   position: fixed;
   z-index: 40;
-  inset: 0 0 auto 68px;
+  inset: 0 0 auto 64px;
   display: flex;
-  height: 68px;
+  height: 56px;
   align-items: center;
   gap: 18px;
   padding: 0 24px;
-  background: rgba(255, 255, 255, 0.94);
-  border-bottom: 1px solid #e7e9ed;
+  background: color-mix(in srgb, var(--s1-surface) 92%, transparent);
+  border-bottom: 1px solid var(--s1-line);
   backdrop-filter: blur(16px);
   transition: left 180ms ease;
 }
 .ops-app.nav-expanded .ops-topbar {
-  left: 236px;
+  left: 224px;
 }
 .ops-topbar-title {
   display: grid;
@@ -334,12 +395,12 @@
 .ops-main {
   min-width: 0;
   min-height: 100vh;
-  margin-left: 68px;
-  padding-top: 68px;
+  margin-left: 64px;
+  padding-top: 56px;
   transition: margin-left 180ms ease;
 }
 .ops-app.nav-expanded .ops-main {
-  margin-left: 236px;
+  margin-left: 224px;
 }
 .ops-page {
   width: min(1480px, 100%);
@@ -2383,13 +2444,16 @@
     width: min(300px, 84vw);
     height: 100%;
     flex-direction: column;
-    color: #fff;
+    color: var(--ops-nav-ink);
     background: var(--ops-nav);
     box-shadow: 18px 0 40px rgba(0, 0, 0, 0.2);
     animation: ops-slide-in 180ms ease-out;
   }
   .ops-mobile-overlay .ops-sidebar-foot {
     margin-top: auto;
+  }
+  .ops-mobile-overlay .ops-sidebar-toggle {
+    display: none;
   }
   .ops-mobile-overlay .ops-account-menu {
     position: fixed;

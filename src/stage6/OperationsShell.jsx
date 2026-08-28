@@ -147,6 +147,7 @@ function AlertsDrawer({ open, close }) {
 
 export function OperationsShell() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -162,8 +163,11 @@ export function OperationsShell() {
       <button
         type="button"
         className="ops-sidebar-brand"
-        aria-label={expanded ? "收起运营导航" : "展开运营导航"}
-        onClick={() => setExpanded((value) => !value)}
+        aria-label="返回运营概况"
+        onClick={() => {
+          navigate("/ops/overview");
+          setMobileOpen(false);
+        }}
       >
         <OpsBrand expanded={expanded} />
       </button>
@@ -229,6 +233,15 @@ export function OperationsShell() {
             <p>角色切换仅用于原型验收，正式产品由管理员分配。</p>
           </div>
         ) : null}
+        <button
+          type="button"
+          className="ops-sidebar-toggle"
+          aria-label={expanded ? "收起运营导航" : "展开运营导航"}
+          onClick={() => setExpanded((value) => !value)}
+        >
+          <Icon name={expanded ? "panelLeft" : "panelRight"} />
+          {expanded ? <span>收起导航</span> : null}
+        </button>
       </div>
     </>
   );

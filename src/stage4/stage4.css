@@ -66,15 +66,15 @@
 }
 
 .s1-button-danger-outline {
-  color: var(--s1-danger);
+  color: var(--s1-danger-action);
   background: transparent;
-  border-color: color-mix(in srgb, var(--s1-danger) 40%, var(--s1-line));
+  border-color: color-mix(in srgb, var(--s1-danger-action) 40%, var(--s1-line));
 }
 
 .s1-button-danger-outline:hover:not(:disabled) {
   color: #fff;
-  background: var(--s1-danger);
-  border-color: var(--s1-danger);
+  background: var(--s1-danger-action-hover);
+  border-color: var(--s1-danger-action-hover);
 }
 
 .s4-filter-bar {
@@ -1342,12 +1342,12 @@
   background: var(--s1-accent-soft);
 }
 .s4-row-actions .s1-table-delete-button {
-  color: var(--s1-danger);
+  color: var(--s1-danger-action);
 }
 .s4-row-actions .s1-table-delete-button:hover {
-  color: var(--s1-danger);
-  background: var(--s1-danger-soft);
-  border-color: color-mix(in srgb, var(--s1-danger) 28%, var(--s1-line));
+  color: var(--s1-danger-action);
+  background: var(--s1-danger-action-soft);
+  border-color: color-mix(in srgb, var(--s1-danger-action) 28%, var(--s1-line));
 }
 .s4-row-actions svg {
   width: 14px;
@@ -2379,8 +2379,8 @@
   background: var(--s1-control-hover);
 }
 .s4-timeline-actions button.is-danger:hover {
-  color: var(--s1-danger);
-  background: var(--s1-danger-soft);
+  color: var(--s1-danger-action);
+  background: var(--s1-danger-action-soft);
 }
 .s4-timeline-actions svg {
   width: 13px;
@@ -2842,7 +2842,7 @@
   background: var(--s1-accent-soft);
 }
 .s4-file-list article > div button.is-danger {
-  color: var(--s1-danger);
+  color: var(--s1-danger-action);
 }
 
 .s4-file-preview {
@@ -5642,7 +5642,7 @@
   gap: 8px;
 }
 .s4-recycle-table article > div button.is-danger {
-  color: var(--s1-danger);
+  color: var(--s1-danger-action);
 }
 .s4-import-step {
   display: grid;
