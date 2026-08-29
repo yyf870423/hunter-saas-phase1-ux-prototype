@@ -25,6 +25,7 @@ export function SignalsPage() {
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [convertOpen, setConvertOpen] = useState(false);
   const [convertType, setConvertType] = useState("new");
+  const [scanCreateRequest, setScanCreateRequest] = useState(0);
   const selected =
     signals.find((signal) => signal.id === selectedId) || signals[0];
   const visible = useMemo(() => {
@@ -70,31 +71,45 @@ export function SignalsPage() {
           </p>
         </div>
       </header>
-      <div
-        className="s2-signal-view-tabs app-tabs"
-        role="tablist"
-        aria-label="信号中心视图"
-      >
-        {[
-          ["signals", "信号"],
-          ["periodic", "周期扫描"],
-        ].map(([value, label]) => (
-          <button
-            type="button"
-            role="tab"
-            aria-selected={view === value}
-            className={view === value ? "is-active" : ""}
-            key={value}
-            onClick={() =>
-              setSearchParams(value === "signals" ? {} : { view: "periodic" })
-            }
+      <div className="s2-signal-view-bar">
+        <div
+          className="s2-signal-view-tabs app-tabs"
+          role="tablist"
+          aria-label="信号中心视图"
+        >
+          {[
+            ["signals", "信号"],
+            ["periodic", "周期扫描"],
+          ].map(([value, label]) => (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={view === value}
+              className={view === value ? "is-active" : ""}
+              key={value}
+              onClick={() =>
+                setSearchParams(value === "signals" ? {} : { view: "periodic" })
+              }
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {view === "periodic" ? (
+          <Button
+            tone="primary"
+            icon="plus"
+            onClick={() => setScanCreateRequest((value) => value + 1)}
           >
-            {label}
-          </button>
-        ))}
+            新建周期扫描
+          </Button>
+        ) : null}
       </div>
       {view === "periodic" ? (
-        <PeriodicSignalScans onOpenSignals={() => setSearchParams({})} />
+        <PeriodicSignalScans
+          createRequest={scanCreateRequest}
+          onOpenSignals={() => setSearchParams({})}
+        />
       ) : (
         <>
           <section className="s2-signal-shell">

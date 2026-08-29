@@ -85,6 +85,7 @@ test("信号中心分类完整且主从区域没有横向溢出", async ({ page 
     .evaluateAll((nodes) =>
       nodes.map((node) => node.getBoundingClientRect().width),
     );
+  const signalTop = (await page.locator(".s2-signal-shell").boundingBox()).y;
   expect(panes[1]).toBeGreaterThan(panes[0]);
   await page.goto("#/signals?view=periodic");
   const periodicPanes = await page
@@ -92,8 +93,10 @@ test("信号中心分类完整且主从区域没有横向溢出", async ({ page 
     .evaluateAll((nodes) =>
       nodes.map((node) => node.getBoundingClientRect().width),
     );
+  const periodicTop = (await page.locator(".s2-signal-shell").boundingBox()).y;
   expect(periodicPanes[0]).toBeCloseTo(panes[0], 0);
   expect(periodicPanes[1]).toBeCloseTo(panes[1], 0);
+  expect(periodicTop).toBeCloseTo(signalTop, 0);
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
@@ -131,7 +134,11 @@ test("周期扫描支持查看、运行、暂停和编辑配置", async ({ page 
 
 test("周期扫描在移动端可以进入详情并返回", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/signals");
+  const signalTop = (await page.locator(".s2-signal-shell").boundingBox()).y;
   await page.goto("#/signals?view=periodic");
+  const periodicTop = (await page.locator(".s2-signal-shell").boundingBox()).y;
+  expect(periodicTop).toBeCloseTo(signalTop, 0);
   await page
     .locator(".s2-scan-list > button")
     .filter({ hasText: "AI 创业公司核心岗位招聘" })

@@ -3236,11 +3236,22 @@
   border-top: 1px solid var(--s1-line);
 }
 /* Signals */
+.s2-signal-view-bar {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: -7px 0 14px;
+}
+.s2-signal-view-bar > .s1-button {
+  flex: 0 0 auto;
+}
 .s2-signal-view-tabs.app-tabs {
   width: fit-content;
   min-height: 40px;
   gap: 22px;
-  margin: -7px 0 14px;
+  margin: 0;
   border-bottom: 0;
 }
 .s2-signal-view-tabs.app-tabs > button {
@@ -3602,14 +3613,6 @@
 }
 
 /* Periodic signal scans */
-.s2-scan-actions {
-  display: flex;
-  min-height: 44px;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-bottom: 10px;
-}
 .s2-scan-shell {
   min-height: 680px;
 }

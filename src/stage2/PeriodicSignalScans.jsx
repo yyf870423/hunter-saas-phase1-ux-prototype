@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Icon } from "../components/Icon";
 import {
   Button,
@@ -222,7 +222,7 @@ function GeneratedSignals({ scan, onOpenSignal }) {
   );
 }
 
-export function PeriodicSignalScans({ onOpenSignals }) {
+export function PeriodicSignalScans({ createRequest, onOpenSignals }) {
   const notify = useToast();
   const [scans, setScans] = useState(initialScans);
   const [tab, setTab] = useState("全部");
@@ -248,11 +248,12 @@ export function PeriodicSignalScans({ onOpenSignals }) {
     );
   }, [query, scans, tab]);
 
-  const openCreate = () => {
+  useEffect(() => {
+    if (!createRequest) return;
     setEditing(null);
     setDraft(emptyDraft);
     setFormOpen(true);
-  };
+  }, [createRequest]);
   const openEdit = () => {
     setEditing(selected.id);
     setDraft({
@@ -381,11 +382,6 @@ export function PeriodicSignalScans({ onOpenSignals }) {
   if (!selected) return null;
   return (
     <>
-      <div className="s2-scan-actions">
-        <Button tone="primary" icon="plus" onClick={openCreate}>
-          新建周期扫描
-        </Button>
-      </div>
       <section className="s2-signal-shell s2-scan-shell">
         <div className="s2-signal-list-pane">
           <div className="s2-signal-toolbar">
