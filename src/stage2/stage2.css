@@ -3618,7 +3618,6 @@
 }
 .s2-scan-shell {
   min-height: 680px;
-  grid-template-columns: minmax(390px, 0.78fr) minmax(0, 1.22fr);
 }
 .s2-scan-list {
   min-width: 0;

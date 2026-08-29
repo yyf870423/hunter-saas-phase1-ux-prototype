@@ -86,6 +86,14 @@ test("信号中心分类完整且主从区域没有横向溢出", async ({ page 
       nodes.map((node) => node.getBoundingClientRect().width),
     );
   expect(panes[1]).toBeGreaterThan(panes[0]);
+  await page.goto("#/signals?view=periodic");
+  const periodicPanes = await page
+    .locator(".s2-signal-shell > *")
+    .evaluateAll((nodes) =>
+      nodes.map((node) => node.getBoundingClientRect().width),
+    );
+  expect(periodicPanes[0]).toBeCloseTo(panes[0], 0);
+  expect(periodicPanes[1]).toBeCloseTo(panes[1], 0);
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
