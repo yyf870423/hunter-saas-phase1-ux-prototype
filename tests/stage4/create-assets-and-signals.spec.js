@@ -90,6 +90,52 @@ test("信号中心分类完整且主从区域没有横向溢出", async ({ page 
   await assertNoConsoleErrors();
 });
 
+test("周期扫描支持查看、运行、暂停和编辑配置", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("#/signals?view=periodic");
+  await expect(page.getByRole("heading", { name: "信号中心" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "具身智能新公司与融资动态" }),
+  ).toBeVisible();
+  await expect(page.getByRole("tab", { name: "扫描配置" })).toBeVisible();
+  await page.getByRole("tab", { name: /执行记录/ }).click();
+  await expect(page.getByText("核验 73 家公司")).toBeVisible();
+  await page.getByRole("tab", { name: /产生的信号/ }).click();
+  await expect(page.getByText("维拓智能完成数千万元天使轮融资")).toBeVisible();
+  await page.getByRole("button", { name: "立即运行" }).click();
+  await expect(page.getByRole("button", { name: "正在运行" })).toBeDisabled();
+  await expect(
+    page.getByText("本轮扫描完成，产生 2 条待处理信号"),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "暂停", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "继续", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "编辑" }).click();
+  await expect(
+    page.getByRole("heading", { name: "编辑周期扫描" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "关闭", exact: true }).click();
+  await expectNoHorizontalOverflow(page);
+  await assertNoConsoleErrors();
+});
+
+test("周期扫描在移动端可以进入详情并返回", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/signals?view=periodic");
+  await page
+    .locator(".s2-scan-list > button")
+    .filter({ hasText: "AI 创业公司核心岗位招聘" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "AI 创业公司核心岗位招聘" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "返回周期扫描列表" }).click();
+  await expect(page.getByPlaceholder("搜索周期扫描名称或范围")).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+});
+
 test("移动端新建页面和资产类型选择没有横向溢出", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("#/contacts/new");
