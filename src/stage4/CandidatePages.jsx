@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   useLocation,
   useNavigate,
@@ -35,6 +35,12 @@ import {
   useToast,
 } from "./asset-ui";
 import {
+  AssetAiProcessBanner,
+  AssetAiProcessDrawer,
+  AssetAiProcessHistory,
+  AssetAiReviewWorkspace,
+} from "./AssetAiProcessing";
+import {
   candidateDetail,
   candidates,
   matchResults,
@@ -49,6 +55,164 @@ const candidateTabs = [
   { value: "matching", label: "匹配与推进" },
   { value: "relations", label: "关联信息" },
 ];
+
+const candidateAiSuggestions = [
+  {
+    label: "当前公司与职位",
+    meta: "职业概览建议",
+    current: "拓界机器人 · 机器人学习负责人；当前职位待本人核实。",
+    suggestion:
+      "拓界机器人 · 机器人学习负责人（公开资料显示 2023 年至今）。负责机器人学习与 VLA 方向，管理 12 人算法团队；当前任职状态仍待本人核实。",
+    reason:
+      "公开职业资料、GitHub 简介与最新简历对公司和职责描述一致，但没有候选人本人确认，因此补充团队范围并保留待核实状态。",
+    source: "当前简历 · LinkedIn 公开资料 · GitHub 主页",
+  },
+  {
+    label: "工作经历",
+    meta: "经历补充建议",
+    current:
+      "2023 年至今，拓界机器人，机器人学习负责人。负责机器人学习算法与项目交付。",
+    suggestion:
+      "2023 年至今，拓界机器人，机器人学习负责人。带领 12 人团队建设 VLA 训练、真机评测与失败样本回流链路，推动仓储和柔性制造场景的策略模型稳定交付。",
+    reason:
+      "最新简历补充了团队规模；公开项目说明和技术分享给出了数据闭环、真机评测及交付场景，可形成更完整的职责描述。",
+    source: "林昊_机器人学习负责人_2026.pdf · 公开技术分享",
+  },
+  {
+    label: "教育经历",
+    meta: "教育信息建议",
+    current: "上海交通大学 · 控制科学与工程 · 硕士。",
+    suggestion:
+      "上海交通大学 · 控制科学与工程 · 硕士（2014—2017）；研究方向为机器人运动规划与强化学习。",
+    reason:
+      "学校和学位与当前资料一致；论文作者主页补充了就读时间和研究方向，需要用户确认后写入正式经历。",
+    source: "当前简历 · 论文作者主页",
+  },
+  {
+    label: "技能与行业",
+    meta: "标签归一建议",
+    current: "VLA、强化学习、机器人学习、真机部署、团队管理。",
+    suggestion:
+      "VLA、机器人学习、强化学习、模仿学习、真机部署、机器人数据闭环、算法团队管理；行业归入机器人、人工智能。",
+    reason:
+      "根据项目经历补充模仿学习和数据闭环，并把原始表达归一为现有标准技能与行业标签，便于搜索和匹配。",
+    source: "当前简历 · 项目作品集 · Hunter 标准标签",
+  },
+  {
+    label: "公开资料链接",
+    meta: "公开来源建议",
+    current: "LinkedIn、GitHub。",
+    suggestion:
+      "保留已验证的 LinkedIn 与 GitHub 链接；新增个人学术主页和 Google Scholar 公开主页，并标记最近验证时间为今天。",
+    reason:
+      "两个新增页面的姓名、工作单位与研究方向均与当前候选人一致，仍需用户确认身份后成为正式链接。",
+    source: "公开网络搜索 · 候选人身份交叉验证",
+  },
+  {
+    label: "论文与专利",
+    meta: "人物关联建议",
+    current: "已关联 1 篇论文、1 项专利。",
+    suggestion:
+      "新增关联论文《Data-Centric Robot Learning with Failure Replay》；作者单位和履历时间一致，但存在同名作者可能，建议保留为待确认关联。",
+    reason:
+      "作者姓名、单位和研究方向均匹配，但缺少邮箱或 ORCID 等稳定标识，不能直接确认是同一人。",
+    source: "OpenAlex · 论文主页 · 当前候选人资料",
+  },
+];
+
+function buildCandidateAiRecord(state = "complete") {
+  const planStates = {
+    running: ["complete", "running", "pending", "pending"],
+    review: ["complete", "complete", "complete", "complete"],
+    failed: ["complete", "failed", "pending", "pending"],
+    complete: ["complete", "complete", "complete", "complete"],
+  }[state];
+  const details = [
+    ["读取候选人资料", "已读取资料版本 v6、简历、公开链接和已有关联。"],
+    [
+      "检索与核验公开资料",
+      state === "failed"
+        ? "公开资料读取中断，已保留成功读取的来源和原始输入。"
+        : "核验职业主页、项目、论文和专利中的身份线索。",
+    ],
+    ["生成字段建议", "对经历、技能、链接和学术成果生成字段级建议。"],
+    ["形成审核结果", "建议通过结构检查，等待用户确认后写入资料。"],
+  ];
+  const plan = details.map(([title, detail], index) => {
+    const itemState = planStates[index];
+    return {
+      title,
+      detail,
+      state: itemState,
+      label:
+        itemState === "complete"
+          ? "已完成"
+          : itemState === "running"
+            ? "运行中"
+            : itemState === "failed"
+              ? "失败"
+              : "等待",
+    };
+  });
+  const active = state !== "complete";
+  return {
+    id: active ? "candidate-enrichment-v7" : "candidate-enrichment-v6",
+    type: "候选人信息补全",
+    title: active ? "补全林昊的候选人资料" : "公开资料补全 · 资料版本 v6",
+    target: "林昊",
+    source: "候选人详情 · 资料版本 v6",
+    state,
+    startedAt: active ? "今天 10:42" : "8 月 19 日 18:12",
+    updatedAt:
+      state === "running"
+        ? "刚刚"
+        : state === "review"
+          ? "今天 10:46"
+          : state === "failed"
+            ? "今天 10:44"
+            : "8 月 19 日 18:20",
+    summary:
+      state === "running"
+        ? "正在核验职业经历、公开主页和学术成果。"
+        : state === "review"
+          ? "已生成 6 项建议，等待确认后更新候选人资料。"
+          : state === "failed"
+            ? "公开资料读取中断，已保留成功结果，可直接重试。"
+            : "已补充职业经历、标准技能、公开链接和一项学术成果。",
+    plan,
+    runs: [
+      {
+        id: active ? "run-7" : "run-6",
+        label: active ? "运行 #7" : "运行 #6",
+        time: active ? "今天 10:42" : "8 月 19 日 18:12 · 8 分 06 秒",
+        detail:
+          state === "failed"
+            ? "公开资料读取中断，没有改动正式候选人资料。"
+            : state === "running"
+              ? "已完成简历读取，正在核验公开职业资料。"
+              : state === "review"
+                ? "已形成 6 项字段建议，正式资料尚未改变。"
+                : "用户确认 5 项建议后形成候选人资料版本 v6。",
+        status:
+          state === "failed"
+            ? "失败"
+            : state === "running"
+              ? "运行中"
+              : state === "review"
+                ? "待审核"
+                : "完成",
+        tone:
+          state === "failed"
+            ? "danger"
+            : state === "running"
+              ? "info"
+              : state === "review"
+                ? "warning"
+                : "success",
+      },
+    ],
+  };
+}
 
 function CandidateSectionEditModal({ section, close, candidate }) {
   const notify = useToast();
@@ -245,11 +409,38 @@ function CandidateSectionEditModal({ section, close, candidate }) {
   );
 }
 
-function ProfileTab({ candidate, hasIdentityIssue = false }) {
+function ProfileTab({
+  candidate,
+  hasIdentityIssue = false,
+  aiState,
+  aiRecord,
+  onOpenAiSetup,
+  onOpenAiDetails,
+  onOpenAiReview,
+  onStopAi,
+  onRetryAi,
+}) {
   const navigate = useNavigate();
   const [editSection, setEditSection] = useState(null);
   return (
     <div className="s4-detail-stack">
+      <AssetAiProcessBanner
+        state={aiState}
+        title="候选人信息补全"
+        description={aiRecord.summary}
+        target={aiRecord.target}
+        onDetails={onOpenAiDetails}
+        onPrimary={aiState === "review" ? onOpenAiReview : onRetryAi}
+        primaryLabel={
+          aiState === "review"
+            ? "审核补全结果"
+            : aiState === "failed"
+              ? "重新运行"
+              : undefined
+        }
+        onSecondary={onStopAi}
+        secondaryLabel={aiState === "running" ? "停止" : undefined}
+      />
       <section className="s4-candidate-review-strip">
         <article className="is-warning">
           <i>
@@ -295,11 +486,7 @@ function ProfileTab({ candidate, hasIdentityIssue = false }) {
             >
               编辑职业概览
             </Button>
-            <Button
-              size="sm"
-              icon="sparkles"
-              onClick={() => navigate("/new?prompt=补全林昊的候选人资料")}
-            >
+            <Button size="sm" icon="sparkles" onClick={onOpenAiSetup}>
               启动信息补全
             </Button>
           </div>
@@ -466,6 +653,77 @@ function ProfileTab({ candidate, hasIdentityIssue = false }) {
         candidate={candidate}
       />
     </div>
+  );
+}
+
+function CandidateAiStartModal({ open, close, onStart }) {
+  const [scope, setScope] = useState([
+    "工作与教育经历",
+    "技能与行业",
+    "公开资料链接",
+    "论文与专利",
+  ]);
+  const options = [
+    "工作与教育经历",
+    "技能与行业",
+    "公开资料链接",
+    "论文与专利",
+  ];
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="lg"
+      title="补全当前候选人资料"
+      description="处理结果保存在当前候选人，确认前不会修改正式资料，也不会新增工作"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            icon="sparkles"
+            disabled={!scope.length}
+            onClick={() => onStart({ scope })}
+          >
+            开始补全
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-ai-start-form">
+        <section className="s4-ai-target-summary">
+          <i>
+            <Icon name="users" />
+          </i>
+          <span>
+            <small>处理对象</small>
+            <b>林昊</b>
+            <p>拓界机器人 · 机器人学习负责人 · 候选人资料 v6</p>
+          </span>
+        </section>
+        <FormField
+          label="本次补全范围"
+          help="Hunter 使用现有资料和公开网络信息，逐项生成待审核建议。"
+        >
+          <SelectMenu
+            label="选择补全范围"
+            value={scope}
+            options={options}
+            multiple
+            onChange={setScope}
+          />
+        </FormField>
+        <section className="s4-ai-write-policy">
+          <Icon name="lock" />
+          <span>
+            <b>审核后更新</b>
+            <p>
+              身份冲突和同名作者不会自动确认；只有选中的建议会写入候选人资料。
+            </p>
+          </span>
+        </section>
+      </div>
+    </Modal>
   );
 }
 
@@ -1250,7 +1508,7 @@ function MatchingTab({ onRematch, refreshing }) {
   );
 }
 
-function RelationsTab() {
+function RelationsTab({ processingRecords, onOpenProcessing }) {
   const navigate = useNavigate();
   return (
     <div className="s4-detail-stack">
@@ -1318,7 +1576,7 @@ function RelationsTab() {
             {
               title: "公开职业资料",
               description: "LinkedIn 公开履历和 GitHub 主页",
-              meta: "2026-08-19 · 信息补全任务",
+              meta: "2026-08-19 · 信息补全 AI 处理",
               status: "已验证",
             },
             {
@@ -1329,6 +1587,15 @@ function RelationsTab() {
             },
           ]}
           onOpen={() => navigate("/sources/candidate-linhao")}
+        />
+      </FieldGroup>
+      <FieldGroup
+        title="AI 处理记录"
+        description="当前候选人的信息补全和匹配计算记录，不进入工作列表。"
+      >
+        <AssetAiProcessHistory
+          records={processingRecords}
+          onOpen={onOpenProcessing}
         />
       </FieldGroup>
     </div>
@@ -1343,6 +1610,9 @@ export function CandidateDetailPage() {
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") || "profile";
   const state = params.get("state") || "normal";
+  const aiState = params.get("ai") || "idle";
+  const aiPanel = params.get("panel") || "";
+  const aiTimerRef = useRef(null);
   const linkedCandidate = location.state?.candidate;
   const candidate = linkedCandidate
     ? { ...candidateDetail, ...linkedCandidate }
@@ -1352,6 +1622,56 @@ export function CandidateDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rematchOpen, setRematchOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const updateQuery = (changes) => {
+    const next = new URLSearchParams(params);
+    Object.entries(changes).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === "")
+        next.delete(key);
+      else next.set(key, value);
+    });
+    setParams(next);
+  };
+  const setAiState = (nextState) =>
+    updateQuery({
+      tab: "profile",
+      ai: nextState === "idle" ? null : nextState,
+      panel: null,
+      process: null,
+    });
+  const startAiProcessing = () => {
+    if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+    setAiState("running");
+    aiTimerRef.current = window.setTimeout(() => {
+      updateQuery({ tab: "profile", ai: "review", panel: null, process: null });
+      notify("候选人信息补全完成，6 项建议等待审核", "info");
+    }, 4200);
+  };
+  useEffect(
+    () => () => {
+      if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+    },
+    [],
+  );
+  useEffect(() => {
+    const active = ["running", "review", "failed"].includes(aiState);
+    const payload = active
+      ? {
+          state: aiState,
+          title: "候选人信息补全",
+          target: "林昊",
+          route: `/candidates/candidate-linhao?tab=profile&ai=${aiState}&panel=details&process=candidate-enrichment-v7`,
+        }
+      : null;
+    if (payload)
+      sessionStorage.setItem(
+        "hunter-active-ai-process",
+        JSON.stringify(payload),
+      );
+    else sessionStorage.removeItem("hunter-active-ai-process");
+    window.dispatchEvent(
+      new CustomEvent("hunter:ai-processing", { detail: payload }),
+    );
+  }, [aiState]);
   if (!candidate)
     return (
       <NotFoundState label="候选人" onBack={() => navigate("/candidates")} />
@@ -1411,6 +1731,16 @@ export function CandidateDetailPage() {
         </Button>
       </div>
     );
+  const aiRecord = buildCandidateAiRecord(
+    ["running", "review", "failed"].includes(aiState) ? aiState : "complete",
+  );
+  const processingRecords = ["running", "review", "failed"].includes(aiState)
+    ? [aiRecord, buildCandidateAiRecord("complete")]
+    : [buildCandidateAiRecord("complete")];
+  const selectedProcessId = params.get("process");
+  const selectedProcessingRecord =
+    processingRecords.find((record) => record.id === selectedProcessId) ||
+    processingRecords[0];
   return (
     <div className="s4-detail-page">
       {state === "limited" ? (
@@ -1462,12 +1792,49 @@ export function CandidateDetailPage() {
       <DetailTabs
         tabs={candidateTabs}
         value={tab}
-        onChange={(value) => setParams({ tab: value })}
+        onChange={(value) =>
+          updateQuery({ tab: value, panel: null, process: null })
+        }
       />
-      {tab === "profile" ? (
+      {tab === "profile" && aiState === "review" && aiPanel === "review" ? (
+        <AssetAiReviewWorkspace
+          assetLabel="候选人资料"
+          currentVersion="v6"
+          nextVersion="v7"
+          title="审核候选人补全结果"
+          suggestions={candidateAiSuggestions}
+          initialSelected={[
+            "当前公司与职位",
+            "工作经历",
+            "教育经历",
+            "技能与行业",
+            "公开资料链接",
+          ]}
+          sourceLabel="当前简历 · 公开职业资料"
+          onBack={() => updateQuery({ panel: null, process: null })}
+          onApply={(selected) => {
+            updateQuery({ tab: "profile", ai: "complete", panel: null });
+            notify(`已确认 ${selected.length} 项建议，候选人资料更新为 v7`);
+          }}
+        />
+      ) : null}
+      {tab === "profile" && !(aiState === "review" && aiPanel === "review") ? (
         <ProfileTab
           candidate={{ ...candidateDetail, ...candidate }}
           hasIdentityIssue={state === "identity-conflict"}
+          aiState={aiState}
+          aiRecord={aiRecord}
+          onOpenAiSetup={() => setAiState("setup")}
+          onOpenAiDetails={() =>
+            updateQuery({ panel: "details", process: aiRecord.id })
+          }
+          onOpenAiReview={() => updateQuery({ panel: "review" })}
+          onStopAi={() => {
+            if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+            setAiState("idle");
+            notify("候选人信息补全已停止，正式资料没有变化", "info");
+          }}
+          onRetryAi={startAiProcessing}
         />
       ) : null}
       {tab === "experience" ? (
@@ -1481,7 +1848,36 @@ export function CandidateDetailPage() {
           onRematch={() => setRematchOpen(true)}
         />
       ) : null}
-      {tab === "relations" ? <RelationsTab /> : null}
+      {tab === "relations" ? (
+        <RelationsTab
+          processingRecords={processingRecords}
+          onOpenProcessing={(record) =>
+            updateQuery({ panel: "details", process: record.id })
+          }
+        />
+      ) : null}
+      <CandidateAiStartModal
+        open={aiState === "setup"}
+        close={() => setAiState("idle")}
+        onStart={startAiProcessing}
+      />
+      <AssetAiProcessDrawer
+        open={aiPanel === "details"}
+        close={() => updateQuery({ panel: null, process: null })}
+        record={selectedProcessingRecord}
+        primaryLabel={
+          selectedProcessingRecord.state === "review"
+            ? "审核补全结果"
+            : selectedProcessingRecord.state === "failed"
+              ? "重新运行"
+              : undefined
+        }
+        onPrimary={() => {
+          if (selectedProcessingRecord.state === "review")
+            updateQuery({ tab: "profile", panel: "review" });
+          else startAiProcessing();
+        }}
+      />
       <Modal
         open={rematchOpen}
         close={() => setRematchOpen(false)}
@@ -2354,7 +2750,7 @@ export function SourceEvidencePage() {
                 ["最近核实", "2026-08-19"],
                 ["可信状态", "已验证"],
                 ["支持字段", "当前公司、当前职位"],
-                ["执行任务", "候选人信息补全 · 2026-08-19"],
+                ["处理记录", "候选人信息补全 · 2026-08-19"],
               ]}
             />
           </FieldGroup>

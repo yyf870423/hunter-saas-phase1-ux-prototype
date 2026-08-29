@@ -1,5 +1,12 @@
+import { useState } from "react";
 import { Icon } from "../components/Icon";
-import { Button, DefinitionGrid, Drawer, StatusBadge } from "./asset-ui";
+import {
+  Button,
+  CustomCheckbox,
+  DefinitionGrid,
+  Drawer,
+  StatusBadge,
+} from "./asset-ui";
 
 const stateMeta = {
   running: {
@@ -222,5 +229,239 @@ export function AssetAiProcessDrawer({
         </footer>
       </div>
     </Drawer>
+  );
+}
+
+export function AssetAiReviewWorkspace({
+  assetLabel,
+  currentVersion,
+  nextVersion,
+  title,
+  description = "逐项查看建议及原内容；未选择的内容继续保留在本次处理记录中。",
+  suggestions,
+  initialSelected,
+  sourceLabel,
+  onBack,
+  onApply,
+}) {
+  const initialLabels =
+    initialSelected ||
+    suggestions
+      .filter((item) => item.selected !== false)
+      .map((item) => item.label);
+  const [selected, setSelected] = useState(initialLabels);
+  const [activeField, setActiveField] = useState(suggestions[0]?.label || "");
+  const [mobileView, setMobileView] = useState("suggestion");
+  const activeIndex = suggestions.findIndex(
+    (item) => item.label === activeField,
+  );
+  const activeSuggestion = suggestions[Math.max(activeIndex, 0)];
+  const toggle = (label, checked) =>
+    setSelected((current) =>
+      checked
+        ? [...new Set([...current, label])]
+        : current.filter((item) => item !== label),
+    );
+  const moveTo = (index) => {
+    const item = suggestions[index];
+    if (!item) return;
+    setActiveField(item.label);
+    setMobileView("suggestion");
+  };
+  if (!activeSuggestion) return null;
+  return (
+    <section className="s4-ai-review-workspace" aria-label={title}>
+      <header className="s4-ai-review-heading">
+        <div>
+          <button type="button" onClick={onBack}>
+            <Icon name="chevronLeft" />
+            返回{assetLabel}
+          </button>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
+        <span>
+          <StatusBadge tone="warning">
+            {suggestions.length} 项建议待审核
+          </StatusBadge>
+          <small>
+            当前{assetLabel} {currentVersion}
+          </small>
+        </span>
+      </header>
+      <div className="s4-ai-review-body">
+        <div className="s4-ai-review-summary">
+          <Icon name="info" />
+          <span>
+            已选择 {selected.length} 项；确认后形成{assetLabel} {nextVersion}
+            ，未选择的建议仍可从 AI 处理记录中查看。
+          </span>
+        </div>
+        <div className="s4-ai-review-layout">
+          <nav className="s4-ai-review-fields" aria-label="待审核字段">
+            <header>
+              <b>字段目录</b>
+              <small>{suggestions.length} 项建议</small>
+            </header>
+            <div>
+              {suggestions.map((item) => {
+                const isActive = item.label === activeSuggestion.label;
+                const isSelected = selected.includes(item.label);
+                return (
+                  <article
+                    className={isActive ? "is-active" : ""}
+                    key={item.label}
+                  >
+                    <button
+                      type="button"
+                      aria-current={isActive ? "true" : undefined}
+                      onClick={() => {
+                        setActiveField(item.label);
+                        setMobileView("suggestion");
+                      }}
+                    >
+                      <span>
+                        <b>{item.label}</b>
+                        <small>{item.meta || "AI 处理建议"}</small>
+                      </span>
+                      <Icon name="chevronRight" />
+                    </button>
+                    <CustomCheckbox
+                      checked={isSelected}
+                      onChange={(checked) => toggle(item.label, checked)}
+                      ariaLabel={`${isSelected ? "取消选择" : "选择"}${item.label}建议`}
+                    />
+                  </article>
+                );
+              })}
+            </div>
+          </nav>
+
+          <section className="s4-ai-review-detail">
+            <header>
+              <span>
+                <small>正在审核</small>
+                <h3>{activeSuggestion.label}</h3>
+              </span>
+              <StatusBadge
+                tone={
+                  selected.includes(activeSuggestion.label)
+                    ? "success"
+                    : "neutral"
+                }
+              >
+                {selected.includes(activeSuggestion.label)
+                  ? "已选择"
+                  : "未选择"}
+              </StatusBadge>
+            </header>
+
+            <div
+              className="s4-ai-review-mobile-switch"
+              role="tablist"
+              aria-label="审核内容"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mobileView === "suggestion"}
+                className={mobileView === "suggestion" ? "is-active" : ""}
+                onClick={() => setMobileView("suggestion")}
+              >
+                AI 建议
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mobileView === "current"}
+                className={mobileView === "current" ? "is-active" : ""}
+                onClick={() => setMobileView("current")}
+              >
+                当前内容
+              </button>
+            </div>
+
+            <div className="s4-ai-review-panels">
+              <article
+                className={`s4-ai-review-suggestion ${
+                  mobileView === "suggestion" ? "is-mobile-active" : ""
+                }`}
+              >
+                <header>
+                  <span>
+                    <Icon name="sparkles" />
+                    AI 建议
+                  </span>
+                  <small>
+                    建议写入{assetLabel} {nextVersion}
+                  </small>
+                </header>
+                <p>{activeSuggestion.suggestion}</p>
+              </article>
+
+              <aside
+                className={`s4-ai-review-inspector ${
+                  mobileView === "current" ? "is-mobile-active" : ""
+                }`}
+              >
+                <section>
+                  <small>当前内容</small>
+                  <p>{activeSuggestion.current}</p>
+                </section>
+                <section>
+                  <small>修改依据</small>
+                  <p>{activeSuggestion.reason}</p>
+                </section>
+                <footer>
+                  <Icon name="file" />
+                  <span>
+                    <small>参考来源</small>
+                    <b>{activeSuggestion.source || sourceLabel}</b>
+                  </span>
+                </footer>
+              </aside>
+            </div>
+
+            <footer className="s4-ai-review-field-nav">
+              <Button
+                size="sm"
+                icon="chevronLeft"
+                disabled={activeIndex <= 0}
+                onClick={() => moveTo(activeIndex - 1)}
+              >
+                上一项
+              </Button>
+              <span>
+                {activeIndex + 1} / {suggestions.length}
+              </span>
+              <Button
+                size="sm"
+                disabled={activeIndex >= suggestions.length - 1}
+                onClick={() => moveTo(activeIndex + 1)}
+              >
+                下一项
+              </Button>
+            </footer>
+          </section>
+          <footer className="s4-ai-review-actions">
+            <span>
+              {selected.length
+                ? `将更新 ${selected.length} 个字段`
+                : "尚未选择任何建议"}
+            </span>
+            <div>
+              <Button onClick={onBack}>稍后处理</Button>
+              <Button
+                tone="primary"
+                disabled={!selected.length}
+                onClick={() => onApply(selected)}
+              >
+                确认所选 {selected.length} 项
+              </Button>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </section>
   );
 }

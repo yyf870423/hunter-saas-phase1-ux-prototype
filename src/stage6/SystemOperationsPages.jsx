@@ -43,7 +43,7 @@ const taskColumns = [
   { key: "type", label: "执行类型", width: 140 },
   {
     key: "workTitle",
-    label: "所属工作",
+    label: "所属对象",
     width: 230,
     render: (row) =>
       row.workId === "—" ? (
@@ -544,9 +544,9 @@ export function TaskDetailPage() {
                 ["执行归属", task.scope],
                 ["执行类型", task.type],
                 [
-                  "所属工作",
+                  "所属对象",
                   task.workId === "—"
-                    ? "系统后台任务，不关联用户工作"
+                    ? "系统后台任务，不关联用户业务对象"
                     : `${task.workTitle} · ${task.workId}`,
                 ],
                 ["触发方式", task.trigger],

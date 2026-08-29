@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { Composer } from "../stage2/automation-ui";
@@ -28,6 +28,12 @@ import {
   TextInput,
   useToast,
 } from "./asset-ui";
+import {
+  AssetAiProcessBanner,
+  AssetAiProcessDrawer,
+  AssetAiProcessHistory,
+  AssetAiReviewWorkspace,
+} from "./AssetAiProcessing";
 import { IndustryCascade } from "./CandidateFilters";
 import {
   candidates,
@@ -107,9 +113,193 @@ const companyCopySections = [
   ["note", "用户备注"],
 ];
 
-function CompanyProfile({ data, onEditSection }) {
+const companyAiSuggestions = [
+  {
+    label: "公司简介",
+    meta: "公开资料调研建议",
+    current:
+      "星澜机器人是一家面向仓储和柔性制造场景的具身智能公司，总部位于北京。",
+    suggestion:
+      "星澜机器人成立于 2021 年，总部位于北京，在上海设有算法和客户交付团队。公司面向仓储、柔性制造和商业服务场景提供具身智能机器人及 VLA 软件平台，核心产品已进入多家制造企业试点。",
+    reason:
+      "官网、近期产品发布和招聘页面均强调 VLA 软件平台、制造场景试点及北京/上海双地团队，可补足当前简介中的产品与交付信息。",
+    source: "公司官网 · 产品发布 · 公开招聘页面",
+  },
+  {
+    label: "融资、上市与市值",
+    meta: "融资信息建议",
+    current: "已完成 A 轮融资，投资方信息待核实。",
+    suggestion:
+      "2025 年 11 月完成数亿元 A 轮融资，由远望创投领投，启明创投与老股东跟投。公司未上市，公开资料未披露最新估值。",
+    reason:
+      "融资新闻稿和领投机构公告信息一致；未找到公司或投资方披露的估值，因此不推测市值或估值。",
+    source: "公司融资新闻稿 · 远望创投公告",
+  },
+  {
+    label: "公司优势与人才吸引点",
+    meta: "招聘价值建议",
+    current: "团队技术背景较强，有真实机器人落地场景。",
+    suggestion:
+      "对 VLA、机器人学习、数据闭环和真机系统方向的人才吸引力较强：技术团队能直接参与路线决策，拥有连续真机数据和制造客户场景；算法负责人可同时影响模型、硬件与交付体系。需要关注创业团队节奏快、职责边界变化较大的适应要求。",
+    reason:
+      "核心团队履历、岗位描述与客户案例共同支持技术影响力和数据场景优势；组织快速扩张带来的职责变化属于需要向候选人说明的风险。",
+    source: "核心团队公开履历 · 招聘 JD · 客户案例",
+  },
+  {
+    label: "一般薪资与福利",
+    meta: "待核实建议",
+    current: "薪资按岗位和职级面议，可提供期权。",
+    suggestion:
+      "公开岗位显示核心算法岗以固定月薪 + 年终奖 + 期权为主；负责人岗位薪资需要单独沟通。补充商业保险、餐补和弹性办公信息，但全部标记为待具体岗位核实。",
+    reason:
+      "招聘页面和两条候选人沟通记录给出了相同的薪资结构，具体金额和期权比例没有稳定证据，因此只补充结构并保留待核实状态。",
+    source: "公开招聘页面 · 候选人沟通摘要",
+  },
+  {
+    label: "一般面试流程",
+    meta: "流程建议",
+    current: "技术面、负责人面和 HR 面，约 2—3 周。",
+    suggestion:
+      "通常包括 HR 初筛、2 轮技术面、技术负责人或创始人终面、HR 薪资沟通，共 2—4 周。算法负责人岗位可能增加技术方案讨论或现场机器人案例复盘，具体轮次随团队调整。",
+    reason:
+      "近期公开面经和候选人沟通记录的主流程一致；负责人岗位存在额外技术讨论，但样本有限，因此不写成固定流程。",
+    source: "近期公开面经 · 候选人沟通记录",
+  },
+  {
+    label: "Base 地点与业务",
+    meta: "地点信息建议",
+    current: "北京总部；上海设有研发团队。",
+    suggestion:
+      "北京：总部、机器人本体和系统研发；上海：VLA 算法、数据平台与重点客户交付。部分客户现场岗位需要短期出差，最终 Base 以具体岗位为准。",
+    reason:
+      "官网地址、岗位招聘地点和团队公开活动可相互印证两地分工；出差要求只在部分岗位出现，因此保留岗位级确认。",
+    source: "公司官网 · 招聘岗位 · 团队公开活动",
+  },
+];
+
+function buildCompanyAiRecord(state = "complete") {
+  const planStates = {
+    running: ["complete", "running", "pending", "pending"],
+    review: ["complete", "complete", "complete", "complete"],
+    failed: ["complete", "failed", "pending", "pending"],
+    complete: ["complete", "complete", "complete", "complete"],
+  }[state];
+  const details = [
+    ["读取公司资料", "已读取公司资料、关联岗位、招聘机会和已有来源。"],
+    [
+      "检索公开证据",
+      state === "failed"
+        ? "部分公开页面读取失败，成功来源和原始输入已保留。"
+        : "检索官网、融资公告、招聘页面、团队履历和公开面经。",
+    ],
+    ["交叉核验信息", "区分已确认事实、待核实线索和无法证明的内容。"],
+    ["形成审核结果", "生成字段级建议，等待用户确认后更新公司资料。"],
+  ];
+  const plan = details.map(([title, detail], index) => {
+    const itemState = planStates[index];
+    return {
+      title,
+      detail,
+      state: itemState,
+      label:
+        itemState === "complete"
+          ? "已完成"
+          : itemState === "running"
+            ? "运行中"
+            : itemState === "failed"
+              ? "失败"
+              : "等待",
+    };
+  });
+  const active = state !== "complete";
+  return {
+    id: active ? "company-research-v4" : "company-research-v3",
+    type: "公司调研更新",
+    title: active ? "更新星澜机器人公司资料" : "公司公开资料调研 · v3",
+    target: "星澜机器人",
+    source: "公司详情 · 已确认资料",
+    state,
+    startedAt: active ? "今天 11:08" : "8 月 21 日 09:18",
+    updatedAt:
+      state === "running"
+        ? "刚刚"
+        : state === "review"
+          ? "今天 11:14"
+          : state === "failed"
+            ? "今天 11:10"
+            : "8 月 21 日 09:32",
+    summary:
+      state === "running"
+        ? "正在核验融资、团队、招聘与 Base 地点信息。"
+        : state === "review"
+          ? "已生成 6 项建议，等待确认后更新公司资料。"
+          : state === "failed"
+            ? "公开页面读取失败，已保留成功来源，可直接重试。"
+            : "已确认公司简介、融资信息、人才吸引点和 Base 分工。",
+    plan,
+    runs: [
+      {
+        id: active ? "run-4" : "run-3",
+        label: active ? "运行 #4" : "运行 #3",
+        time: active ? "今天 11:08" : "8 月 21 日 09:18 · 14 分 20 秒",
+        detail:
+          state === "failed"
+            ? "公开页面读取失败，没有改动正式公司资料。"
+            : state === "running"
+              ? "官网和融资公告已读取，正在核验招聘与团队信息。"
+              : state === "review"
+                ? "已形成 6 项字段建议，正式公司资料尚未改变。"
+                : "用户确认调研建议后更新公司资料。",
+        status:
+          state === "failed"
+            ? "失败"
+            : state === "running"
+              ? "运行中"
+              : state === "review"
+                ? "待审核"
+                : "完成",
+        tone:
+          state === "failed"
+            ? "danger"
+            : state === "running"
+              ? "info"
+              : state === "review"
+                ? "warning"
+                : "success",
+      },
+    ],
+  };
+}
+
+function CompanyProfile({
+  data,
+  onEditSection,
+  aiState,
+  aiRecord,
+  onOpenAiDetails,
+  onOpenAiReview,
+  onStopAi,
+  onRetryAi,
+}) {
   return (
     <div className="s4-detail-stack">
+      <AssetAiProcessBanner
+        state={aiState}
+        title="公司调研更新"
+        description={aiRecord.summary}
+        target={aiRecord.target}
+        onDetails={onOpenAiDetails}
+        onPrimary={aiState === "review" ? onOpenAiReview : onRetryAi}
+        primaryLabel={
+          aiState === "review"
+            ? "审核调研结果"
+            : aiState === "failed"
+              ? "重新运行"
+              : undefined
+        }
+        onSecondary={onStopAi}
+        secondaryLabel={aiState === "running" ? "停止" : undefined}
+      />
       <FieldGroup
         title="公司基本资料"
         action={
@@ -304,7 +494,7 @@ function CompanyMappings() {
   );
 }
 
-function CompanyRelated() {
+function CompanyRelated({ processingRecords, onOpenProcessing }) {
   const navigate = useNavigate();
   return (
     <div className="s4-detail-stack">
@@ -349,7 +539,73 @@ function CompanyRelated() {
           ]}
         />
       </FieldGroup>
+      <FieldGroup
+        title="AI 处理记录"
+        description="当前公司的调研、资料整理和核验记录，不进入工作列表。"
+      >
+        <AssetAiProcessHistory
+          records={processingRecords}
+          onOpen={onOpenProcessing}
+        />
+      </FieldGroup>
     </div>
+  );
+}
+
+function CompanyAiStartModal({ open, close, onStart }) {
+  const [focus, setFocus] = useState(
+    "重点核验最近一轮融资、核心技术团队、对算法负责人的吸引点，以及北京和上海团队的业务分工。",
+  );
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="lg"
+      title="更新当前公司调研"
+      description="调研建议保存在当前公司，确认前不会修改正式资料，也不会新增工作"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            icon="sparkles"
+            disabled={!focus.trim()}
+            onClick={() => onStart({ focus })}
+          >
+            开始调研
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-ai-start-form">
+        <section className="s4-ai-target-summary">
+          <i>
+            <Icon name="building" />
+          </i>
+          <span>
+            <small>处理对象</small>
+            <b>星澜机器人</b>
+            <p>北京 / 上海 · 机器人 / 人工智能 · 已确认公司资料</p>
+          </span>
+        </section>
+        <FormField
+          label="本次调研重点"
+          required
+          help="补充你希望重点核验的业务、团队或招聘信息。"
+        >
+          <TextArea value={focus} onChange={setFocus} rows={5} />
+        </FormField>
+        <section className="s4-ai-write-policy">
+          <Icon name="lock" />
+          <span>
+            <b>审核后更新</b>
+            <p>
+              无法交叉验证的信息会标记为待核实；只有选中的建议会写入公司资料。
+            </p>
+          </span>
+        </section>
+      </div>
+    </Modal>
   );
 }
 
@@ -457,6 +713,9 @@ export function CompanyDetailPage() {
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") || "profile";
   const isDraft = params.get("state") === "draft";
+  const aiState = params.get("ai") || "idle";
+  const aiPanel = params.get("panel") || "";
+  const aiTimerRef = useRef(null);
   const item = companies.find((company) => company.id === companyId);
   const [editingSection, setEditingSection] = useState(null);
   const [profileData, setProfileData] = useState(() => ({
@@ -464,6 +723,56 @@ export function CompanyDetailPage() {
     ...item,
   }));
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const updateQuery = (changes) => {
+    const next = new URLSearchParams(params);
+    Object.entries(changes).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === "")
+        next.delete(key);
+      else next.set(key, value);
+    });
+    setParams(next);
+  };
+  const setAiState = (nextState) =>
+    updateQuery({
+      tab: "profile",
+      ai: nextState === "idle" ? null : nextState,
+      panel: null,
+      process: null,
+    });
+  const startAiProcessing = () => {
+    if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+    setAiState("running");
+    aiTimerRef.current = window.setTimeout(() => {
+      updateQuery({ tab: "profile", ai: "review", panel: null, process: null });
+      notify("公司调研完成，6 项建议等待审核", "info");
+    }, 4200);
+  };
+  useEffect(
+    () => () => {
+      if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+    },
+    [],
+  );
+  useEffect(() => {
+    const active = ["running", "review", "failed"].includes(aiState);
+    const payload = active
+      ? {
+          state: aiState,
+          title: "公司调研更新",
+          target: "星澜机器人",
+          route: `/companies/company-xinglan?tab=profile&ai=${aiState}&panel=details&process=company-research-v4`,
+        }
+      : null;
+    if (payload)
+      sessionStorage.setItem(
+        "hunter-active-ai-process",
+        JSON.stringify(payload),
+      );
+    else sessionStorage.removeItem("hunter-active-ai-process");
+    window.dispatchEvent(
+      new CustomEvent("hunter:ai-processing", { detail: payload }),
+    );
+  }, [aiState]);
   if (!item)
     return <NotFoundState label="公司" onBack={() => navigate("/companies")} />;
   const detail = { ...companyDetail, ...item };
@@ -475,6 +784,16 @@ export function CompanyDetailPage() {
     { value: "mappings", label: "人才版图" },
     { value: "work", label: "相关工作" },
   ];
+  const aiRecord = buildCompanyAiRecord(
+    ["running", "review", "failed"].includes(aiState) ? aiState : "complete",
+  );
+  const processingRecords = ["running", "review", "failed"].includes(aiState)
+    ? [aiRecord, buildCompanyAiRecord("complete")]
+    : [buildCompanyAiRecord("complete")];
+  const selectedProcessId = params.get("process");
+  const selectedProcessingRecord =
+    processingRecords.find((record) => record.id === selectedProcessId) ||
+    processingRecords[0];
   return (
     <div className="s4-detail-page">
       <DetailHeader
@@ -507,10 +826,7 @@ export function CompanyDetailPage() {
             确认创建公司
           </Button>
         ) : tab === "profile" ? (
-          <Button
-            icon="sparkles"
-            onClick={() => navigate("/new?prompt=调研并更新星澜机器人公司资料")}
-          >
+          <Button icon="sparkles" onClick={() => setAiState("setup")}>
             更新调研
           </Button>
         ) : null}
@@ -526,17 +842,104 @@ export function CompanyDetailPage() {
         <DetailTabs
           tabs={detailTabs}
           value={tab}
-          onChange={(value) => setParams({ tab: value })}
+          onChange={(value) =>
+            updateQuery({ tab: value, panel: null, process: null })
+          }
         />
       )}
-      {tab === "profile" ? (
-        <CompanyProfile data={profileData} onEditSection={setEditingSection} />
+      {tab === "profile" && aiState === "review" && aiPanel === "review" ? (
+        <AssetAiReviewWorkspace
+          assetLabel="公司资料"
+          currentVersion="v3"
+          nextVersion="v4"
+          title="审核公司调研结果"
+          suggestions={companyAiSuggestions}
+          initialSelected={[
+            "公司简介",
+            "融资、上市与市值",
+            "公司优势与人才吸引点",
+            "一般面试流程",
+            "Base 地点与业务",
+          ]}
+          sourceLabel="公司官网 · 融资公告 · 公开招聘资料"
+          onBack={() => updateQuery({ panel: null, process: null })}
+          onApply={(selected) => {
+            const keyByLabel = {
+              公司简介: "intro",
+              "融资、上市与市值": "financing",
+              公司优势与人才吸引点: "advantages",
+              一般薪资与福利: "benefits",
+              一般面试流程: "interview",
+              "Base 地点与业务": "bases",
+            };
+            setProfileData((current) => {
+              const patch = {};
+              selected.forEach((label) => {
+                const key = keyByLabel[label];
+                const suggestion = companyAiSuggestions.find(
+                  (item) => item.label === label,
+                )?.suggestion;
+                if (key && suggestion) patch[key] = suggestion;
+              });
+              return { ...current, ...patch };
+            });
+            updateQuery({ tab: "profile", ai: "complete", panel: null });
+            notify(`已确认 ${selected.length} 项建议，公司资料更新为 v4`);
+          }}
+        />
+      ) : null}
+      {tab === "profile" && !(aiState === "review" && aiPanel === "review") ? (
+        <CompanyProfile
+          data={profileData}
+          onEditSection={setEditingSection}
+          aiState={aiState}
+          aiRecord={aiRecord}
+          onOpenAiDetails={() =>
+            updateQuery({ panel: "details", process: aiRecord.id })
+          }
+          onOpenAiReview={() => updateQuery({ panel: "review" })}
+          onStopAi={() => {
+            if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+            setAiState("idle");
+            notify("公司调研已停止，正式资料没有变化", "info");
+          }}
+          onRetryAi={startAiProcessing}
+        />
       ) : null}
       {tab === "recruiting" ? <CompanyRecruiting /> : null}
       {tab === "contacts" ? <CompanyContacts /> : null}
       {tab === "talents" ? <CompanyTalents /> : null}
       {tab === "mappings" ? <CompanyMappings /> : null}
-      {tab === "work" ? <CompanyRelated /> : null}
+      {tab === "work" ? (
+        <CompanyRelated
+          processingRecords={processingRecords}
+          onOpenProcessing={(record) =>
+            updateQuery({ panel: "details", process: record.id })
+          }
+        />
+      ) : null}
+      <CompanyAiStartModal
+        open={!isDraft && aiState === "setup"}
+        close={() => setAiState("idle")}
+        onStart={startAiProcessing}
+      />
+      <AssetAiProcessDrawer
+        open={!isDraft && aiPanel === "details"}
+        close={() => updateQuery({ panel: null, process: null })}
+        record={selectedProcessingRecord}
+        primaryLabel={
+          selectedProcessingRecord.state === "review"
+            ? "审核调研结果"
+            : selectedProcessingRecord.state === "failed"
+              ? "重新运行"
+              : undefined
+        }
+        onPrimary={() => {
+          if (selectedProcessingRecord.state === "review")
+            updateQuery({ tab: "profile", panel: "review" });
+          else startAiProcessing();
+        }}
+      />
       <CompanySectionEditor
         section={editingSection}
         data={profileData}

@@ -86,15 +86,22 @@ test("运营指标有统计口径，周期检查任务不占用长任务资源",
     overviewMetrics.find((metric) => metric.id === "tasks").definition,
   ).toContain("系统后台任务");
   expect(new Set(tasks.map((task) => task.scope))).toEqual(
-    new Set(["工作执行", "相关任务执行", "系统后台任务"]),
+    new Set(["工作执行", "相关任务执行", "资产 AI 处理", "系统后台任务"]),
   );
   expect(
     tasks
       .filter((task) => task.scope !== "系统后台任务")
-      .every(
-        (task) =>
-          task.workId.startsWith("WORK-") && Boolean(task.workTitle.trim()),
-      ),
+      .every((task) => task.workId !== "—" && Boolean(task.workTitle.trim())),
+  ).toBe(true);
+  expect(
+    tasks
+      .filter((task) => ["工作执行", "相关任务执行"].includes(task.scope))
+      .every((task) => task.workId.startsWith("WORK-")),
+  ).toBe(true);
+  expect(
+    tasks
+      .filter((task) => task.scope === "资产 AI 处理")
+      .every((task) => !task.workId.startsWith("WORK-")),
   ).toBe(true);
   expect(
     tasks

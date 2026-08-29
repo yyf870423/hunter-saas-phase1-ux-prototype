@@ -161,3 +161,89 @@ test("手机和平板端处理状态、审核与详情无横向溢出", async ({
   });
   await assertNoConsoleErrors();
 });
+
+test("候选人信息补全在候选人详情内完成运行和字段审核", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("#/candidates/candidate-linhao?tab=profile");
+
+  await page.getByRole("button", { name: "启动信息补全" }).click();
+  const setup = page.getByRole("dialog", { name: "补全当前候选人资料" });
+  await expect(setup).toContainText("不会新增工作");
+  await expect(setup).toContainText("候选人资料 v6");
+  await setup.getByRole("button", { name: "开始补全" }).click();
+  await expect(page).toHaveURL(/ai=running/);
+  await expect(page.getByLabel("候选人信息补全，运行中")).toBeVisible();
+
+  await page.goto(
+    "#/candidates/candidate-linhao?tab=profile&ai=review&panel=review",
+  );
+  const review = page.getByRole("region", { name: "审核候选人补全结果" });
+  await expect(review.getByRole("checkbox")).toHaveCount(6);
+  await expect(review).toContainText("当前简历 · LinkedIn 公开资料");
+  await review.getByRole("button", { name: /论文与专利/ }).click();
+  await expect(review).toContainText("存在同名作者可能");
+  await page.screenshot({
+    path: `${output}/candidate-review-desktop.png`,
+    fullPage: true,
+  });
+  await review.getByRole("button", { name: /确认所选 5 项/ }).click();
+  await expect(page.getByText("候选人资料更新为 v7")).toBeVisible();
+
+  await page.goto("#/candidates/candidate-linhao?tab=relations&ai=review");
+  await expect(
+    page.getByRole("heading", { name: "AI 处理记录" }),
+  ).toBeVisible();
+  await expect(page.getByText("补全林昊的候选人资料")).toBeVisible();
+  await assertNoConsoleErrors();
+});
+
+test("已有公司调研留在公司详情并共享同一套审核交互", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("#/companies/company-xinglan?tab=profile");
+
+  await page.getByRole("button", { name: "更新调研" }).click();
+  const setup = page.getByRole("dialog", { name: "更新当前公司调研" });
+  await expect(setup).toContainText("不会新增工作");
+  await expect(setup).toContainText("星澜机器人");
+  await setup.getByRole("button", { name: "开始调研" }).click();
+  await expect(page).toHaveURL(/ai=running/);
+  await expect(page.getByLabel("公司调研更新，运行中")).toBeVisible();
+
+  await page.goto(
+    "#/companies/company-xinglan?tab=profile&ai=review&panel=review",
+  );
+  const review = page.getByRole("region", { name: "审核公司调研结果" });
+  await expect(review.getByRole("checkbox")).toHaveCount(6);
+  await review.getByRole("button", { name: /融资、上市与市值/ }).click();
+  await expect(review).toContainText("未找到公司或投资方披露的估值");
+  await page.screenshot({
+    path: `${output}/company-review-desktop.png`,
+    fullPage: true,
+  });
+  await review.getByRole("button", { name: /确认所选 5 项/ }).click();
+  await expect(page.getByText("公司资料更新为 v4")).toBeVisible();
+
+  await page.goto("#/companies/company-xinglan?tab=work&ai=review");
+  await expect(
+    page.getByRole("heading", { name: "AI 处理记录" }),
+  ).toBeVisible();
+  await expect(page.getByText("更新星澜机器人公司资料")).toBeVisible();
+  await assertNoConsoleErrors();
+});
+
+test("候选人和公司 AI 审核在手机端无横向溢出", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const url of [
+    "#/candidates/candidate-linhao?tab=profile&ai=setup",
+    "#/candidates/candidate-linhao?tab=profile&ai=review&panel=review",
+    "#/companies/company-xinglan?tab=profile&ai=setup",
+    "#/companies/company-xinglan?tab=profile&ai=review&panel=review",
+  ]) {
+    await page.goto(url);
+    await expectNoHorizontalOverflow(page);
+  }
+  await assertNoConsoleErrors();
+});
