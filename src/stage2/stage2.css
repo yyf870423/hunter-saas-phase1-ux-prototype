@@ -3271,22 +3271,28 @@
   overflow-x: auto;
 }
 .s2-signal-tabs.app-tabs > button {
-  height: 30px;
-  min-height: 30px;
+  height: 36px;
+  min-height: 36px;
   flex: 0 0 auto;
   gap: 4px;
   padding: 0;
   color: var(--s1-muted);
   font-size: 12px;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
   cursor: pointer;
+}
+.s2-signal-tabs.app-tabs > button:hover {
+  color: var(--s1-ink);
+  background: transparent;
+  border-bottom-color: color-mix(in srgb, var(--s1-accent) 28%, var(--s1-line));
 }
 .s2-signal-tabs.app-tabs > button.is-active {
   color: var(--s1-accent);
-  background: var(--s1-accent-soft);
-  border-color: color-mix(in srgb, var(--s1-accent) 18%, var(--s1-line));
+  background: transparent;
+  border-bottom-color: var(--s1-accent);
 }
 .s2-signal-tabs.app-tabs > button em {
   min-width: 18px;
