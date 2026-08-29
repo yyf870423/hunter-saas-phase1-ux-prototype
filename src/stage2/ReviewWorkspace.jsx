@@ -34,7 +34,7 @@ export function InspectionPanel({ item, onClose }) {
     <aside className="s2-inspector" aria-label="当前检查内容">
       <header>
         <span>
-          <small>{isTask ? item.kindLabel || "相关任务" : "证据集合"}</small>
+          <small>{isTask ? item.kindLabel || "相关处理" : "证据集合"}</small>
           <h2>{item.title}</h2>
         </span>
         <IconButton icon="close" label="关闭检查区" onClick={onClose} />
@@ -432,7 +432,7 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
         </div>
         <div className="s2-review-direct-actions" aria-label="批量处理动作">
           <small>
-            点击后为已勾选候选人建立岗位储备关系并返回当前工作；未勾选候选人继续保留在本轮结果中，不会自动联系候选人。
+            点击后为已勾选候选人建立岗位储备关系并返回当前任务；未勾选候选人继续保留在本轮结果中，不会自动联系候选人。
           </small>
           <div>
             <Button

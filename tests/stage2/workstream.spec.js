@@ -17,10 +17,10 @@ async function waitForReview(page) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("#/works/position-vla");
+  await page.goto("#/tasks/position-vla");
 });
 
-test("持续工作从第一条输入渐进推进到审核节点", async ({ page }) => {
+test("持续任务从第一条输入渐进推进到审核节点", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await expect(
     page.getByText(/为星澜机器人“具身智能 VLA 算法负责人”岗位做多渠道找人/),
@@ -56,7 +56,7 @@ test("持续工作从第一条输入渐进推进到审核节点", async ({ page 
   await expect(
     page.locator(".s2-runtime .s2-plan-list li.is-waiting"),
   ).toHaveCount(1);
-  const relatedTasks = page.getByRole("button", { name: /相关任务/ });
+  const relatedTasks = page.getByRole("button", { name: /相关处理/ });
   await expect(relatedTasks).toContainText("3 项完成 · 1 项等待用户");
   await relatedTasks.click();
   await expect(
@@ -64,9 +64,9 @@ test("持续工作从第一条输入渐进推进到审核节点", async ({ page 
       hasText: "按决定继续后续动作",
     }),
   ).toContainText("等待用户");
-  await page.getByRole("button", { name: /准备本地任务并接收结果/ }).click();
+  await page.getByRole("button", { name: /准备本机处理并接收结果/ }).click();
   await expect(
-    page.getByRole("heading", { name: "准备本地任务并接收结果" }),
+    page.getByRole("heading", { name: "准备本机处理并接收结果" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "关闭检查区" }).click();
   await expectNoHorizontalOverflow(page);
@@ -182,22 +182,22 @@ test("授权切换、暂停、终止与删除确认可用", async ({ page }) => 
   await expect(page.getByText(/授权模式已切换为“仅分析”/)).toBeVisible();
   await page.getByRole("button", { name: "暂停", exact: true }).click();
   await expect(page.getByRole("button", { name: "继续" })).toBeVisible();
-  await page.getByRole("button", { name: "更多工作操作" }).click();
-  await page.getByRole("button", { name: "终止工作" }).click();
-  await expect(page.getByRole("heading", { name: "终止工作" })).toBeVisible();
+  await page.getByRole("button", { name: "更多任务操作" }).click();
+  await page.getByRole("button", { name: "终止任务" }).click();
+  await expect(page.getByRole("heading", { name: "终止任务" })).toBeVisible();
   await page.getByRole("button", { name: "取消" }).click();
-  await page.getByRole("button", { name: "更多工作操作" }).click();
-  await page.getByRole("button", { name: "删除工作" }).click();
-  await expect(page.getByRole("heading", { name: "删除工作" })).toBeVisible();
+  await page.getByRole("button", { name: "更多任务操作" }).click();
+  await page.getByRole("button", { name: "删除任务" }).click();
+  await expect(page.getByRole("heading", { name: "删除任务" })).toBeVisible();
 });
 
-test("新建工作判断为持续工作后进入统一工作区", async ({ page }) => {
+test("新建任务判断为持续任务后进入统一任务区", async ({ page }) => {
   await page.goto("#/new");
   const input = page.getByPlaceholder(/例如：为星澜机器人/);
   await input.fill("为星澜机器人 VLA 算法负责人岗位持续寻找合适候选人");
   await input.press("Enter");
-  await expect(page.getByText(/我会保留完整工作上下文/)).toBeVisible();
-  await expect(page).toHaveURL(/#\/works\/position-vla$/, {
+  await expect(page.getByText(/我会保留完整任务上下文/)).toBeVisible();
+  await expect(page).toHaveURL(/#\/tasks\/position-vla$/, {
     timeout: 5_000,
   });
   await expect(
@@ -206,17 +206,17 @@ test("新建工作判断为持续工作后进入统一工作区", async ({ page 
 });
 
 test("加载、流式中断和本机协作受限状态都可恢复", async ({ page }) => {
-  await page.goto("#/works/position-vla?state=loading");
+  await page.goto("#/tasks/position-vla?state=loading");
   await expect(page.locator(".s2-workspace-loading")).toBeVisible();
 
-  await page.goto("#/works/position-vla?state=stream-error");
+  await page.goto("#/tasks/position-vla?state=stream-error");
   await expect(page.getByText("回复生成中断")).toBeVisible();
   await page.getByRole("button", { name: "继续生成" }).click();
   await expect(page.getByText("云端检索已开始")).toBeVisible({
     timeout: 8_000,
   });
 
-  await page.goto("#/works/position-vla?state=limited");
+  await page.goto("#/tasks/position-vla?state=limited");
   await expect(page.getByText("本机协作暂不可用").first()).toBeVisible();
   const handoffSpacing = await page
     .locator(".s2-permission-state--handoff")
@@ -271,15 +271,15 @@ test("文件随消息直接上传且不再二次确认", async ({ page }) => {
 });
 
 test("本机结果等待、岗位版本变化和身份冲突都有独立状态", async ({ page }) => {
-  await page.goto("#/workstreams/position-vla?state=local-waiting");
+  await page.goto("#/tasks/position-vla?state=local-waiting");
   await expect(page.getByText("等待本机结果")).toBeVisible();
   await expect(page.getByText(/云端已经形成 9 位候选人/)).toBeVisible();
 
-  await page.goto("#/workstreams/position-vla?state=stale-task");
-  await expect(page.getByText(/本地任务使用的是上一版本/)).toBeVisible();
+  await page.goto("#/tasks/position-vla?state=stale-task");
+  await expect(page.getByText(/本机处理使用的是上一版本/)).toBeVisible();
   await expect(page.getByText(/按照最新岗位重新匹配/)).toBeVisible();
 
-  await page.goto("#/workstreams/position-vla?state=merge-conflict");
+  await page.goto("#/tasks/position-vla?state=merge-conflict");
   await expect(page.getByText(/林昊的资料存在冲突/)).toBeVisible();
   await expect(page.getByText("合并前资料对比")).toBeVisible();
   const identityTable = page.locator(".s2-identity-differences table");

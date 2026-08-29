@@ -94,7 +94,7 @@ function SearchDialog({ open, close }) {
       close={close}
       title={selected ? "搜索结果摘要" : "全局搜索"}
       description={
-        selected ? "查看命中原因和当前业务状态" : "搜索工作、信号和正式业务资产"
+        selected ? "查看命中原因和当前业务状态" : "搜索任务、信号和正式业务资产"
       }
       size="lg"
     >
@@ -396,7 +396,7 @@ function NewMenu({ open, close, onSelect }) {
   return (
     <div className="s1-new-menu" role="menu" ref={ref}>
       {[
-        ["route", "新建工作", "直接说明目标，Hunter 会选择合适的推进方式"],
+        ["route", "新建任务", "直接说明目标，Hunter 会选择合适的推进方式"],
         ["plus", "手动新建资产", "进入对应业务资产创建正式记录"],
       ].map(([icon, title, description]) => (
         <button type="button" key={title} onClick={() => onSelect(title)}>
@@ -578,7 +578,7 @@ export function Stage1Shell() {
   const selectNavigation = (item) => {
     const routes = {
       home: "/home",
-      works: "/works",
+      tasks: "/tasks",
       signals: "/signals",
       candidates: "/candidates",
       positions: "/positions",
@@ -630,10 +630,10 @@ export function Stage1Shell() {
                   className={(() => {
                     if (item.id === "home")
                       return location.pathname === "/home" ? "is-active" : "";
-                    if (item.id === "works")
-                      return location.pathname.startsWith("/works") ||
-                        location.pathname.startsWith("/workstreams") ||
-                        location.pathname.startsWith("/tasks")
+                    if (item.id === "tasks")
+                      return location.pathname.startsWith("/tasks") ||
+                        location.pathname.startsWith("/works") ||
+                        location.pathname.startsWith("/workstreams")
                         ? "is-active"
                         : "";
                     if (item.id === "signals")
@@ -799,7 +799,7 @@ export function Stage1Shell() {
             onClick={() => setSearchOpen(true)}
           >
             <Icon name="search" />
-            <span>搜索工作、信号和业务资产</span>
+            <span>搜索任务、信号和业务资产</span>
             <kbd>Ctrl K</kbd>
           </button>
           <div className="s1-topbar-actions">
@@ -840,14 +840,14 @@ export function Stage1Shell() {
                 icon="plus"
                 onClick={() => setNewOpen((current) => !current)}
               >
-                新建工作
+                新建任务
               </Button>
               <NewMenu
                 open={newOpen}
                 close={() => setNewOpen(false)}
                 onSelect={(label) => {
                   setNewOpen(false);
-                  if (label === "新建工作") navigate("/new");
+                  if (label === "新建任务") navigate("/new");
                   else if (label === "手动新建资产") setAssetCreateOpen(true);
                 }}
               />
@@ -877,7 +877,7 @@ export function Stage1Shell() {
       <nav className="s1-mobile-tabs" aria-label="移动端主导航">
         {[
           ["home", "工作台", "home"],
-          ["route", "工作", "works"],
+          ["route", "任务", "tasks"],
           ["signal", "信号", "signals"],
           ["database", "业务资产", "assets"],
           ["menu", "更多", "more"],
@@ -887,7 +887,7 @@ export function Stage1Shell() {
             key={id}
             className={
               (id === "home" && location.pathname === "/home") ||
-              (id === "works" &&
+              (id === "tasks" &&
                 (location.pathname.startsWith("/works") ||
                   location.pathname.startsWith("/workstreams") ||
                   location.pathname.startsWith("/tasks"))) ||

@@ -602,7 +602,7 @@ test("大批量匹配结果中的模拟候选人可以进入完整档案", async
   ).toBeVisible();
 });
 
-test("推荐报告任务完成后回流岗位匹配详情", async ({ page }) => {
+test("推荐报告资产 AI 处理完成后回流岗位匹配详情", async ({ page }) => {
   await page.goto("#/positions/position-vla?tab=matching");
   await page.getByRole("tab", { name: /角色适配通过/ }).click();
   await page.locator(".s4-match-result-list button").nth(1).click();
@@ -611,14 +611,14 @@ test("推荐报告任务完成后回流岗位匹配详情", async ({ page }) => 
   await page
     .getByLabel("报告要求")
     .fill("突出候选人的真机部署和团队管理范围。");
-  await page.getByRole("button", { name: "创建并开始" }).click();
-  await expect(page).toHaveURL(/works\/task-recommend-linhao/);
+  await page.getByRole("button", { name: "开始生成" }).click();
+  await expect(page).toHaveURL(/positions\/position-vla\?tab=matching&report=/);
   await page
     .locator(".s2-composer textarea")
     .fill("请突出量产交付经验，并把薪资风险放到最后。");
   await page.getByRole("button", { name: "发送" }).click();
   await expect(page.getByText(/推荐报告-v3\.md/)).toBeVisible();
-  await page.getByRole("button", { name: "查看岗位匹配" }).click();
+  await page.getByRole("button", { name: "返回人岗匹配" }).click();
   await expect(page).toHaveURL(/positions\/position-vla\?tab=matching/);
   await expect(page.getByText(/推荐报告-v3\.md/)).toBeVisible();
 });
@@ -860,7 +860,7 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
 }) => {
   for (const route of [
     "#/home",
-    "#/works",
+    "#/tasks",
     "#/signals",
     "#/candidates",
     "#/candidates/candidate-linhao",
@@ -923,7 +923,7 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
     "rgb(229, 231, 235)",
   );
 
-  await page.goto("#/works");
+  await page.goto("#/tasks");
   const activeTab = page.locator(
     '.app-tabs [role="tab"][aria-selected="true"]',
   );

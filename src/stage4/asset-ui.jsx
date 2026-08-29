@@ -1548,7 +1548,9 @@ export function TooltipText({
   const anchorRef = useRef(null);
   const showTimerRef = useRef(null);
   const tooltipId = useId();
-  const [eligible, setEligible] = useState(trigger === "hidden-tags");
+  const [eligible, setEligible] = useState(
+    trigger === "hidden-tags" || trigger === "always",
+  );
   const [tooltip, setTooltip] = useState(null);
   const isTruncated = (element) => {
     return (
@@ -1561,10 +1563,17 @@ export function TooltipText({
     if (!element) return undefined;
     const update = () =>
       setEligible(
-        trigger === "hidden-tags" || Boolean(tip && isTruncated(element)),
+        trigger === "hidden-tags" ||
+          trigger === "always" ||
+          Boolean(tip && isTruncated(element)),
       );
     update();
-    if (trigger === "hidden-tags" || !window.ResizeObserver) return undefined;
+    if (
+      trigger === "hidden-tags" ||
+      trigger === "always" ||
+      !window.ResizeObserver
+    )
+      return undefined;
     const observer = new ResizeObserver(update);
     observer.observe(element);
     return () => observer.disconnect();
@@ -1581,7 +1590,8 @@ export function TooltipText({
   const show = () => {
     const element = anchorRef.current;
     if (!element || !tip) return;
-    const canShow = trigger === "hidden-tags" || isTruncated(element);
+    const canShow =
+      trigger === "hidden-tags" || trigger === "always" || isTruncated(element);
     if (!canShow) {
       if (eligible) setEligible(false);
       return;
@@ -1623,7 +1633,7 @@ export function TooltipText({
       ref={anchorRef}
       className={`s4-tooltip ${clampLines ? "is-line-clamped" : ""} ${className}`}
       style={clampLines ? { "--s4-tooltip-lines": clampLines } : undefined}
-      tabIndex={eligible ? 0 : undefined}
+      tabIndex={eligible && trigger !== "always" ? 0 : undefined}
       aria-describedby={tooltip ? tooltipId : undefined}
       onMouseEnter={showWithDelay}
       onMouseLeave={hide}

@@ -9,7 +9,7 @@ test("右上角手动新建资产先选择类型再进入对应页面", async ({
   await page.goto("#/home");
   await page
     .locator(".s1-topbar")
-    .getByRole("button", { name: "新建工作" })
+    .getByRole("button", { name: "新建任务" })
     .click();
   await page.getByRole("button", { name: /手动新建资产/ }).click();
   await expect(
@@ -159,9 +159,9 @@ test("移动端新建页面和资产类型选择没有横向溢出", async ({ pa
   await expectNoHorizontalOverflow(page);
 });
 
-test("工作详情左侧搜索框保持在侧栏范围内", async ({ page }) => {
+test("任务详情左侧搜索框保持在侧栏范围内", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("#/works/position-vla");
+  await page.goto("#/tasks/position-vla");
   const sidebarBox = await page.locator(".s2-history").boundingBox();
   const searchBox = await page
     .locator(".s2-history > .s1-search-field")

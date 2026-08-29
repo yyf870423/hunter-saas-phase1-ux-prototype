@@ -9,12 +9,12 @@ export function AuthBrand({ compact = false }) {
       </Link>
       {!compact ? (
         <div className="auth-brand-copy">
-          <span>持续主线 · 证据驱动</span>
+          <span>持续推进 · 证据驱动</span>
           <h1>
             <span>继续推进，</span>
             <span>而不是重新开始。</span>
           </h1>
-          <p>回到你的业务主线，查看证据变化、人工判断与下一步行动。</p>
+          <p>回到你的任务，查看执行进度、人工判断与下一步行动。</p>
         </div>
       ) : null}
       <div className="auth-brand-track" aria-hidden="true">

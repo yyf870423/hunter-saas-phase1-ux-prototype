@@ -181,7 +181,7 @@ export function LandingPage() {
                 </button>
                 <Link
                   className="lp-button lp-button-text"
-                  to="/works/position-vla"
+                  to="/tasks/position-vla"
                 >
                   看 VLA 岗位怎么找人
                   <Icon name="chevronRight" />
@@ -249,7 +249,7 @@ export function LandingPage() {
                   用“具身智能 VLA
                   算法负责人”演示：先定义什么人算合适，再跨渠道召回、核验身份、去重补证，最后把候选池交给猎头筛选。所有内容均为演示数据。
                 </p>
-                <Link to="/works/position-vla">
+                <Link to="/tasks/position-vla">
                   看完整寻访线 <Icon name="external" />
                 </Link>
               </div>
@@ -360,7 +360,7 @@ export function LandingPage() {
               </button>
               <Link
                 className="lp-button lp-button-inverse-text"
-                to="/works/position-vla"
+                to="/tasks/position-vla"
               >
                 先看 VLA 岗位怎么找人 <Icon name="external" />
               </Link>

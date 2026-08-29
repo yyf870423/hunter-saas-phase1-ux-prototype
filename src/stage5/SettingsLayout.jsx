@@ -21,7 +21,7 @@ export const settingSections = [
   {
     id: "automation",
     label: "自动化授权",
-    description: "新工作的默认执行边界",
+    description: "新任务的默认执行边界",
     icon: "activity",
     route: "/settings/automation",
   },

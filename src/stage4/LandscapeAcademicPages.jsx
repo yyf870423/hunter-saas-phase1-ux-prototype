@@ -745,14 +745,14 @@ function LandscapeBusiness() {
           ))}
         </div>
       </FieldGroup>
-      <FieldGroup title="相关工作">
+      <FieldGroup title="关联任务">
         {workstreamLinks.map((workstream) => (
           <EntityLink
             icon="route"
             title={workstream}
             meta="运行中 · 3 项目标正在推进"
             key={workstream}
-            onClick={() => navigate("/works/mapping-embodied")}
+            onClick={() => navigate("/tasks/mapping-embodied")}
           />
         ))}
       </FieldGroup>
@@ -776,7 +776,7 @@ function LandscapeBusiness() {
         close={() => setEditOpen(false)}
         size="lg"
         title="编辑相关业务"
-        description="这里只维护人才版图与现有业务资产的关联，不复制岗位或相关工作。"
+        description="这里只维护人才版图与现有业务资产的关联，不复制岗位或任务。"
         footer={
           <>
             <Button onClick={() => setEditOpen(false)}>取消</Button>
@@ -807,9 +807,9 @@ function LandscapeBusiness() {
               searchable
             />
           </FormField>
-          <FormField label="关联工作" span={2}>
+          <FormField label="关联任务" span={2}>
             <SelectMenu
-              label="选择工作"
+              label="选择任务"
               value={workstreamLinks}
               options={[
                 "具身智能 VLA 人才摸排",
@@ -936,7 +936,7 @@ export function MappingDetailPage() {
       >
         <Button
           icon="sparkles"
-          onClick={() => navigate("/works/mapping-embodied")}
+          onClick={() => navigate("/tasks/mapping-embodied")}
         >
           继续摸排
         </Button>
@@ -1079,7 +1079,7 @@ export function MappingCreatePage() {
             <>
               <header>
                 <h2>建立空版图</h2>
-                <p>只创建范围和目标，后续可以手工或通过相关工作补充关系。</p>
+                <p>只创建范围和目标，后续可以手工或通过任务补充关系。</p>
               </header>
               <div className="s4-form-grid">
                 <FormField label="版图名称" required span={2}>

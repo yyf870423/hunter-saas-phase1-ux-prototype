@@ -6,8 +6,8 @@ const stateLinks = [
   ["正常状态", "/home", "工作台完整业务层级与主要交互"],
   ["加载状态", "/home?state=loading", "局部骨架与稳定布局"],
   ["空状态", "/home?state=empty", "首次使用与新建引导"],
-  ["局部错误", "/home?state=error", "支线失败但其他区域可用"],
-  ["本机协作异常", "/home?state=limited", "本机不可用时云端继续工作"],
+  ["局部错误", "/home?state=error", "部分运行失败但其他区域可用"],
+  ["本机协作异常", "/home?state=limited", "本机不可用时云端继续任务"],
   ["组件状态", "/components", "本阶段公共组件与状态"],
 ];
 
@@ -24,7 +24,7 @@ export function ReviewPage() {
         <StatusBadge tone="info">阶段一待审批</StatusBadge>
         <h1>全局框架与工作台</h1>
         <p>
-          本轮只审批全局导航、工作台信息优先级、基础组件、状态设计和响应式结构。工作、信号、业务资产和运营端将在后续阶段分别提交。
+          本轮只审批全局导航、工作台信息优先级、基础组件、状态设计和响应式结构。任务、信号、业务资产和运营端将在后续阶段分别提交。
         </p>
         <Link className="s1-review-primary" to="/home">
           进入工作台原型
@@ -67,7 +67,7 @@ export function ReviewPage() {
             <Icon name="clock" />
             <b>后续阶段</b>
             <p>
-              对话式工作、相关任务、信号中心、业务资产、设置与运营端完整交互。
+              对话式任务、运行追踪、信号中心、业务资产、设置与运营端完整交互。
             </p>
           </article>
         </div>

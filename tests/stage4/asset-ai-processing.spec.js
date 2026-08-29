@@ -11,7 +11,7 @@ test.beforeAll(async () => {
   await mkdir(output, { recursive: true });
 });
 
-test("岗位 AI 解析依附岗位运行，不创建新工作", async ({ page }) => {
+test("岗位 AI 解析依附岗位运行，不创建任务", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#/positions/position-vla?tab=profile");
@@ -19,7 +19,7 @@ test("岗位 AI 解析依附岗位运行，不创建新工作", async ({ page })
   await page.getByRole("button", { name: "AI 解析", exact: true }).click();
   const setup = page.getByRole("dialog", { name: "AI 解析当前岗位" });
   await expect(setup).toBeVisible();
-  await expect(setup).toContainText("不会新增工作");
+  await expect(setup).toContainText("不会新增任务");
   await expect(setup).toContainText("具身智能 VLA 算法负责人");
   await page.waitForTimeout(220);
   await page.screenshot({
@@ -42,7 +42,7 @@ test("岗位 AI 解析依附岗位运行，不创建新工作", async ({ page })
   await page.getByRole("button", { name: "查看处理详情" }).click();
   const detail = page.getByRole("dialog", { name: "AI 处理详情" });
   await expect(detail).toContainText("处理对象");
-  await expect(detail).toContainText("所属目标级工作");
+  await expect(detail.getByText("关联任务", { exact: true })).toHaveCount(0);
   await expect(detail).toContainText("执行计划");
   await expect(detail).toContainText("运行记录");
   await page.waitForTimeout(220);
@@ -103,11 +103,11 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   await expect(page).toHaveURL(/ai=running/);
 
   await page.goto("#/positions/position-vla?tab=work&ai=review");
-  await expect(page.getByRole("heading", { name: "相关工作" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "关联任务" })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "AI 处理记录" }),
   ).toBeVisible();
-  await expect(page.getByText("不进入工作列表")).toBeVisible();
+  await expect(page.getByText("不进入任务列表")).toBeVisible();
   await expect(page.getByText("重新解析具身智能 VLA 算法负责人")).toBeVisible();
   await page.waitForTimeout(220);
   await page.screenshot({
@@ -115,7 +115,7 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
     fullPage: true,
   });
 
-  await page.goto("#/works");
+  await page.goto("#/tasks");
   await expect(page.getByText("岗位 AI 解析", { exact: true })).toHaveCount(0);
   await expect(page.getByText("重新解析具身智能 VLA 算法负责人")).toHaveCount(
     0,
@@ -169,7 +169,7 @@ test("候选人信息补全在候选人详情内完成运行和字段审核", as
 
   await page.getByRole("button", { name: "启动信息补全" }).click();
   const setup = page.getByRole("dialog", { name: "补全当前候选人资料" });
-  await expect(setup).toContainText("不会新增工作");
+  await expect(setup).toContainText("不会新增任务");
   await expect(setup).toContainText("候选人资料 v6");
   await setup.getByRole("button", { name: "开始补全" }).click();
   await expect(page).toHaveURL(/ai=running/);
@@ -205,7 +205,7 @@ test("已有公司调研留在公司详情并共享同一套审核交互", async
 
   await page.getByRole("button", { name: "更新调研" }).click();
   const setup = page.getByRole("dialog", { name: "更新当前公司调研" });
-  await expect(setup).toContainText("不会新增工作");
+  await expect(setup).toContainText("不会新增任务");
   await expect(setup).toContainText("星澜机器人");
   await setup.getByRole("button", { name: "开始调研" }).click();
   await expect(page).toHaveURL(/ai=running/);

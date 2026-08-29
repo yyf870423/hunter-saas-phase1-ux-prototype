@@ -164,7 +164,7 @@ function ScanConfig({ scan }) {
           </div>
           <div>
             <dt>结果处理</dt>
-            <dd>与已有信号查重合并后进入信号中心，不自动启动工作</dd>
+            <dd>与已有信号查重合并后进入信号中心，不自动启动任务</dd>
           </div>
         </dl>
       </section>
@@ -592,7 +592,7 @@ export function PeriodicSignalScans({ createRequest, onOpenSignals }) {
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
         title="删除周期扫描"
-        description="删除后停止后续扫描；已经产生的信号和已转化工作不会被删除。"
+        description="删除后停止后续扫描；已经产生的信号和已转化任务不会被删除。"
         footer={
           <>
             <Button tone="secondary" onClick={() => setDeleteOpen(false)}>

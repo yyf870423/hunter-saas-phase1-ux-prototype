@@ -675,7 +675,7 @@ function CandidateAiStartModal({ open, close, onStart }) {
       close={close}
       size="lg"
       title="补全当前候选人资料"
-      description="处理结果保存在当前候选人，确认前不会修改正式资料，也不会新增工作"
+      description="处理结果保存在当前候选人，确认前不会修改正式资料，也不会新增任务"
       footer={
         <>
           <Button onClick={close}>取消</Button>
@@ -1591,7 +1591,7 @@ function RelationsTab({ processingRecords, onOpenProcessing }) {
       </FieldGroup>
       <FieldGroup
         title="AI 处理记录"
-        description="当前候选人的信息补全和匹配计算记录，不进入工作列表。"
+        description="当前候选人的信息补全和匹配计算记录，不进入任务列表。"
       >
         <AssetAiProcessHistory
           records={processingRecords}
@@ -1919,7 +1919,7 @@ export function CandidateDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="候选人"
         assetName={candidate.name}
-        impact="岗位推进、匹配历史和相关工作会保留已删除引用；公司、岗位、论文和专利不会被删除。"
+        impact="岗位推进、匹配历史和关联任务会保留已删除引用；公司、岗位、论文和专利不会被删除。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("候选人已进入回收站");
@@ -2344,7 +2344,7 @@ export function IdentityMergeReviewPage() {
         <div className="s4-preserved-relations">
           <StateBanner
             title="正式关系不会因资料合并而丢失"
-            description="岗位推进、匹配历史、公司经历、论文、专利、人才版图和相关工作继续关联到保留档案。"
+            description="岗位推进、匹配历史、公司经历、论文、专利、人才版图和关联任务继续关联到保留档案。"
           />
           <div className="s4-entity-grid">
             <EntityLink

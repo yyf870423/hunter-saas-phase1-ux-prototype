@@ -1,24 +1,24 @@
 # Hunter SaaS 阶段一原型当前成果基线
 
-> 记录日期：2026-08-24。
+> 记录日期：2026-08-30。
 >
-> 当前状态：原型阶段一至阶段五已经通过人类审批；原型阶段六运营端已经完成交叉 Review、稳定态截图复核和自动化验证，等待人类审批。本文档用于后续产品讨论、原型设计和详细设计时统一边界，不代表生产代码已经实现。
+> 当前状态：原型阶段一至阶段六已完成；用户侧对象已统一为“任务、资产 AI、运行、信号”四层口径。本文档用于后续产品讨论、原型设计和详细设计时统一边界，不代表生产代码已经实现。详细边界见 `docs/unified-task-model.md`。
 
 ## 一、原型阶段状态
 
 | 阶段       | 范围                   | 审批状态     | 主要交付                                                                             |
 | ---------- | ---------------------- | ------------ | ------------------------------------------------------------------------------------ |
 | 原型阶段一 | 全局框架与工作台       | 已审批并冻结 | 桌面与移动导航、工作台、搜索、通知、用量、用户菜单、主题、基础组件和必要状态         |
-| 原型阶段二 | 自动化通用交互框架     | 已审批并冻结 | 统一新建工作、业务主线对话、动态执行计划、内部任务、授权模式、支线任务和信号中心     |
-| 原型阶段三 | 四类业务主线完整流程   | 已审批并冻结 | 客户开发、岗位招聘、人才摸排、候选人求职的渐进过程、分支、等待、审核、恢复和结束条件 |
+| 原型阶段二 | 自动化通用交互框架     | 已审批并冻结 | 统一新建任务、任务对话、动态执行计划、内部运行、授权模式和信号中心                   |
+| 原型阶段三 | 四类业务任务完整流程   | 已审批并冻结 | 客户开发、岗位招聘、人才摸排、候选人求职的渐进过程、分支、等待、审核、恢复和结束条件 |
 | 原型阶段四 | 业务资产与统一数据管理 | 已审批并冻结 | 八类正式资产、身份与重复处理、关系投影、导入导出、回收站和公共异常状态               |
 | 原型阶段五 | 用户设置中心           | 已审批       | 个人资料、通知、自动化授权、连接、订阅与数据设置，以及关键状态和详细设计             |
-| 原型阶段六 | 独立运营端             | 等待审批     | 运营概况、用户与工作空间、订阅与额度、任务与故障、系统能力、支持与审计               |
+| 原型阶段六 | 独立运营端             | 已完成       | 运营概况、用户与工作空间、订阅与额度、运行与故障、系统能力、支持与审计               |
 
 ## 二、已经确定的公共交互
 
-1. 用户只通过一个自然语言入口新建工作，不在开始前或查看时选择业务主线、支线任务。Hunter 根据范围和生命周期决定直接完成或进入工作区，用户可以用自然语言纠正执行计划。
-2. 所有可管理工作共用统一列表、历史栏和对话式工作区。持续工作、独立工作和相关执行任务的差异只保留在内部编排与运营诊断中；用户侧只显示“工作”和所属工作内的“相关任务”。
+1. 用户只通过一个自然语言入口新建任务，不在开始前或查看时选择业务主线、支线任务或内部类型。Hunter 根据目标复杂度决定一步完成或生成执行计划，用户可以用自然语言纠正计划。
+2. 所有任务共用统一列表、历史栏和对话式工作区。一步完成与持续推进只影响计划和运行方式，不形成两套用户入口；任务内部运行只在所属任务中查看。
 3. 执行计划位于输入框上方并默认收起。每个步骤持续更新完成、运行、等待、暂停和调整状态；新信息只重做受影响范围。
 4. 少量只读结果直接在对话中显示，中量结果在当前页检查区查看，大量且需要业务操作的结果使用 Hunter 受控审核组件。
 5. 授权模式固定为“仅分析”“执行前确认”“自动执行”，可以在运行过程中切换，只影响尚未执行的动作，不能关闭 Hunter 的结构、安全、权限和写入门禁；用户主动添加的文件随消息直接上传，邮件发送仍需逐次确认。
@@ -26,7 +26,7 @@
 7. 正式写入和外部动作使用结构化业务命令。用户可以通过自然语言或受控组件表达决定，两种入口映射到同一命令和对象范围。
 8. 桌面、iPad 和 iPhone 保持相同核心能力；移动端可以改变布局，但不能删减关键操作。
 
-## 三、四类业务主线成果
+## 三、四类业务任务成果
 
 ### 3.1 客户开发
 
@@ -36,7 +36,7 @@
 
 已覆盖岗位理解、云端公开来源和系统候选人检索、在本机继续、候选人批次持续合并、候选人补全与去重、人岗匹配、候选人审核、加入岗位储备、邮件草稿确认、等待回复和新简历回流。无候选人通过门禁时解释原因，不自动放宽硬门槛。
 
-认证人才平台自动化不在云端运行。当前云端原型只覆盖本地任务准备、选择设备或下载、等待本机结果、批次返回、身份合并和增量审核；Hunter 本地助手自身原型后续单独设计。
+认证人才平台自动化不在云端运行。当前云端原型只覆盖本机处理准备、选择设备或下载、等待本机结果、批次返回、身份合并和增量审核；Hunter 本地助手自身原型后续单独设计。
 
 ### 3.3 人才摸排
 
@@ -71,7 +71,7 @@ Agent 只能把变化归入既有标签，不能动态新增、改名或排序�
 1. 当前已审批功能基线为原型阶段一至阶段五；原型阶段六尚未冻结。
 2. 构建命令：`npm run build`，当前通过。
 3. 自动化命令：`npm run test:e2e -- --reporter=line`。
-4. 最新完整结果：`154 passed`；原型阶段六专项结果为 `15 passed`。
+4. 2026-08-30 统一任务模型调整后的最新完整结果：`190 passed`。
 5. 自动化覆盖桌面、iPad、iPhone、亮暗主题、页面状态、渐进对话、执行计划、审核、恢复、控制台错误和页面级横向溢出。
 6. 阶段四候选人列表、岗位资料、JD 历史全文、自适应流程泳道、唯一产品横向滚动轨道、三级时效提示、推进记录抽屉、岗位匹配、流程阶段姓名标签、推荐报告逐次文件交付、任务通用文件右侧预览和人才版图已完成桌面、iPad 与 iPhone 截图复核；公司与联系人分区编辑、联系人沟通记录增删改、公司调研统一输入、招聘机会完整 JD 新建岗位及关联已有岗位、人才版图目标管理、关系证据预览、业务资产跳转、冲突批次与相关业务编辑均已完成稳定态截图复核。
 7. 构建只有 Vite 的原型包体积提示，不影响功能和验收；生产实现需要按路由拆包。
@@ -80,11 +80,9 @@ Agent 只能把变化归入既有标签，不能动态新增、改名或排序�
 
 以下内容没有被当前审批覆盖，不能按“已完成设计”理解：
 
-1. 原型阶段六运营端尚未获得产品负责人审批，不能按已冻结设计理解。
-2. 运营端正式详细设计尚未编写，必须在原型审批后确定篇数和边界。
-3. 生产级数据 Schema、关系存储方案、Agent 工具协议、任务调度和并发恢复技术方案。
-4. 正式 PRD、技术方案和生产代码实现。
-5. Hunter 本地助手的页面、设置、平台运行、候选人选择和本地清理原型。
+1. 生产级数据 Schema、关系存储方案、Agent 工具协议、任务调度和并发恢复技术方案。
+2. 正式 PRD、技术方案和生产代码实现。
+3. Hunter 本地助手的页面、设置、平台运行、候选人选择和本地清理原型。
 
 后续阶段不能通过修改已审批公共交互来规避新问题。发现公共框架不足时，需要先记录原因、更新相应原型文档并重新审批。
 
@@ -117,21 +115,21 @@ Agent 只能把变化归入既有标签，不能动态新增、改名或排序�
 ### 8.1 总入口与公共页面
 
 1. 阶段审核入口：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/review>。
-2. 新建工作：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/new>。
-3. 工作列表：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works>。
-4. 人物身份核验工作：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/task-hand-team>。
+2. 新建任务：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/new>。
+3. 任务列表：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks>。
+4. 人物身份核验任务：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/task-hand-team>。
 5. 信号中心：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/signals>。
 6. 工作台：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/home>。
 7. 公共组件：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/components>。
 
-新建工作的目标歧义、分类中、直接完成、建立主线、创建支线、失败和权限受限状态，分别使用 `#/new?state=clarify`、`classifying`、`direct`、`mainline`、`task`、`error` 和 `limited` 验收。
+新建任务的目标歧义、判断中、一步完成、持续推进、有限范围、失败和权限受限状态，分别使用 `#/new?state=clarify`、`classifying`、`direct`、`mainline`、`task`、`error` 和 `limited` 验收。状态参数只用于原型验收，不是用户可选的任务类型。
 
-### 8.2 四类业务主线
+### 8.2 四类业务任务
 
-1. 客户开发：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/client-xinglan>。专用状态包括 `waiting`、`no-contact` 和 `reply`。
-2. 岗位招聘：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/position-vla>。专用状态包括 `waiting`、`review`、`no-candidate`、`candidate-reply`、`local-waiting`、`stale-task` 和 `merge-conflict`。
-3. 人才摸排：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/mapping-embodied>。专用状态包括 `waiting`、`conflict` 和 `gaps`。
-4. 候选人求职：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/works/career-linhao>。专用状态包括 `waiting`、`no-position` 和 `new-resume`。
+1. 客户开发：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/client-xinglan>。专用状态包括 `waiting`、`no-contact` 和 `reply`。
+2. 岗位招聘：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/position-vla>。专用状态包括 `waiting`、`review`、`no-candidate`、`candidate-reply`、`local-waiting`、`stale-task` 和 `merge-conflict`。
+3. 人才摸排：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/mapping-embodied>。专用状态包括 `waiting`、`conflict` 和 `gaps`。
+4. 候选人求职：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/career-linhao>。专用状态包括 `waiting`、`no-position` 和 `new-resume`。
 
 四类主线均可在对应 URL 后附加 `?state=loading`、`?state=stream-error`、`?state=limited` 或 `?state=error`，直接检查加载、流式中断、权限受限和失败状态。完整状态和操作步骤以 `docs/stage-3-interaction-coverage.md` 为准。
 

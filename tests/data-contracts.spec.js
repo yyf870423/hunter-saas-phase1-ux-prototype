@@ -13,7 +13,7 @@ import {
 import { subscriptionPlans } from "../src/shared/productCatalog";
 import { orders, overviewMetrics, tasks } from "../src/stage6/operations-data";
 
-test("业务主线历史与工作台使用同一当前状态", () => {
+test("任务历史与工作台使用同一当前状态", () => {
   const currentById = new Map(mainlines.map((item) => [item.id, item.status]));
   for (const item of workstreamHistory) {
     expect(item.status, item.id).toBe(currentById.get(item.id));
@@ -84,28 +84,28 @@ test("运营指标有统计口径，周期检查任务不占用长任务资源",
   expect(overviewMetrics.every((metric) => metric.definition)).toBe(true);
   expect(
     overviewMetrics.find((metric) => metric.id === "tasks").definition,
-  ).toContain("系统后台任务");
+  ).toContain("系统运行");
   expect(new Set(tasks.map((task) => task.scope))).toEqual(
-    new Set(["工作执行", "相关任务执行", "资产 AI 处理", "系统后台任务"]),
+    new Set(["任务运行", "任务步骤运行", "资产 AI 运行", "系统运行"]),
   );
   expect(
     tasks
-      .filter((task) => task.scope !== "系统后台任务")
+      .filter((task) => task.scope !== "系统运行")
       .every((task) => task.workId !== "—" && Boolean(task.workTitle.trim())),
   ).toBe(true);
   expect(
     tasks
-      .filter((task) => ["工作执行", "相关任务执行"].includes(task.scope))
+      .filter((task) => ["任务运行", "任务步骤运行"].includes(task.scope))
       .every((task) => task.workId.startsWith("WORK-")),
   ).toBe(true);
   expect(
     tasks
-      .filter((task) => task.scope === "资产 AI 处理")
+      .filter((task) => task.scope === "资产 AI 运行")
       .every((task) => !task.workId.startsWith("WORK-")),
   ).toBe(true);
   expect(
     tasks
-      .filter((task) => task.scope === "系统后台任务")
+      .filter((task) => task.scope === "系统运行")
       .every((task) => task.workId === "—"),
   ).toBe(true);
   const mailCheck = tasks.find((task) => task.type === "邮箱回复检查");

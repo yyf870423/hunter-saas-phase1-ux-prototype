@@ -65,7 +65,7 @@ const groups = [
       [
         "公司详情",
         "/companies/company-xinglan",
-        "资料、招聘业务、联系人、任职人才、版图与工作",
+        "资料、招聘业务、联系人、任职人才、版图与任务",
       ],
       ["新建公司", "/companies/new", "手动、文件和 Agent 三种输入"],
       [

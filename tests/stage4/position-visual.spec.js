@@ -11,7 +11,7 @@ test.beforeAll(async () => {
   await mkdir(output, { recursive: true });
 });
 
-test("岗位资料、流程、匹配与相关工作桌面视觉门禁", async ({ page }) => {
+test("岗位资料、流程、匹配与关联任务桌面视觉门禁", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 900 });
 

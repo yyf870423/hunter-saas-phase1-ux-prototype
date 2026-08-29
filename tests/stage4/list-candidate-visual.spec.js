@@ -12,7 +12,7 @@ test.beforeAll(async () => {
 });
 
 const listPages = [
-  ["works", "工作"],
+  ["tasks", "任务"],
   ["signals", "信号中心"],
   ["candidates", "候选人"],
   ["positions", "岗位"],

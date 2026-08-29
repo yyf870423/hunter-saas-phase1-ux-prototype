@@ -2663,6 +2663,19 @@
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
 }
+.s2-recommendation-asset-workspace {
+  display: grid;
+  height: calc(100vh - 104px);
+  min-height: 620px;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s2-recommendation-asset-workspace .s2-task-detail-layout {
+  overflow: hidden;
+}
 .s2-detail-header {
   display: grid;
   min-height: 86px;

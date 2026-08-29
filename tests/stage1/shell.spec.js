@@ -62,7 +62,7 @@ test("通知计数使用正圆标记", async ({ page }) => {
 });
 
 test("全局搜索支持结果、详情和无结果", async ({ page }) => {
-  await page.getByRole("button", { name: /搜索工作/ }).click();
+  await page.getByRole("button", { name: /搜索任务/ }).click();
   const input = page.getByPlaceholder("输入姓名、公司、岗位或任务名称");
   await input.fill("星澜机器人");
   await expect(
@@ -110,7 +110,7 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   const topbar = page.locator(".s1-topbar");
   await expect(
     page.locator(".s1-dashboard-head").getByRole("button", {
-      name: "新建工作",
+      name: "新建任务",
       exact: true,
     }),
   ).toHaveCount(0);
@@ -127,7 +127,7 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   await expect(page).toHaveURL(/#\/data\/imports$/);
   await expect(page.getByRole("heading", { name: "数据导入" })).toBeVisible();
   await page.goto("#/home");
-  await topbar.getByRole("button", { name: "新建工作", exact: true }).click();
+  await topbar.getByRole("button", { name: "新建任务", exact: true }).click();
   await expect(
     page.getByRole("button", { name: /手动新建资产/ }),
   ).toBeVisible();

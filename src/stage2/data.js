@@ -276,7 +276,7 @@ export const planSteps = [
   },
   {
     id: "recall",
-    title: "云端检索并准备本地任务",
+    title: "云端检索并准备本机处理",
     detail: "系统候选人、公开网络、论文专利与本机渠道并行处理。",
     requirement: "多渠道找人；北京优先，异地人选保留地点意愿风险。",
   },
@@ -311,7 +311,7 @@ export const internalTasks = [
   },
   {
     id: "internal-local-handoff",
-    title: "准备本地任务并接收结果",
+    title: "准备本机处理并接收结果",
     status: "完成",
     tone: "success",
     action: "本机返回 12 位候选人，已进入云端合并门禁",
@@ -673,11 +673,24 @@ export const workItems = [
     category: item.type,
     scenario: item.type,
   })),
-  ...sideTasks.map((item) => ({
-    ...item,
-    category: item.type,
-    scenario: sideTaskBusinessScenarios[item.id],
-  })),
+  {
+    ...sideTasks.find((item) => item.id === "task-hand-team"),
+    category: "身份核验",
+    scenario: sideTaskBusinessScenarios["task-hand-team"],
+  },
+  {
+    id: "task-interview-summary",
+    title: "整理林昊的面试反馈",
+    type: "信息整理",
+    object: "候选人林昊",
+    status: "完成",
+    tone: "success",
+    time: "今天 09:31",
+    owner: "沈岚",
+    category: "信息整理",
+    scenario: "岗位招聘",
+    summary: "一步完成三条面试反馈的归纳，没有生成执行计划。",
+  },
 ];
 
 export const signals = [
@@ -737,9 +750,9 @@ export const signals = [
     tone: "success",
     time: "8 月 18 日",
     evidence: 5,
-    summary: "已转化为岗位招聘工作“具身智能 VLA 算法负责人”。",
+    summary: "已转化为岗位招聘任务“具身智能 VLA 算法负责人”。",
     sources: ["客户沟通", "岗位 JD", "公司招聘页", "团队成员动态", "猎头补充"],
-    changes: ["已创建正式岗位", "已启动岗位招聘工作"],
+    changes: ["已创建正式岗位", "已启动岗位招聘任务"],
   },
   {
     id: "signal-expired",

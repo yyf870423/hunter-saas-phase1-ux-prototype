@@ -69,7 +69,7 @@ export function AssetAiProcessBanner({
         <p>{description}</p>
         <small>
           处理对象：{target}
-          {work ? ` · 所属工作：${work}` : ""}
+          {work ? ` · 关联任务：${work}` : ""}
         </small>
       </div>
       <footer>
@@ -167,7 +167,7 @@ export function AssetAiProcessDrawer({
                 <Icon name="route" />
               </i>
               <span>
-                <small>所属目标级工作</small>
+                <small>关联任务</small>
                 <b>{record.work}</b>
               </span>
               <Icon name="chevronRight" />

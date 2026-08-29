@@ -1606,7 +1606,7 @@ export const businessScenarios = {
       },
       {
         id: "opportunity",
-        title: "形成招聘机会与后续工作",
+        title: "形成招聘机会与后续安排",
         detail: "收到回复后整理需求；完整 JD 先形成岗位草稿。",
         requirement: "信息不完整时不能伪造正式岗位。",
         doneAt: 7,
@@ -1760,7 +1760,7 @@ export const businessScenarios = {
         id: "rematch",
         title: "更新档案并局部重新匹配",
         detail: "先显示档案变化与合并摘要，再重做受影响岗位。",
-        requirement: "有合适岗位时由用户确认交给对应的岗位招聘工作。",
+        requirement: "有合适岗位时由用户确认交给对应的岗位招聘任务。",
         doneAt: 7,
       },
     ],

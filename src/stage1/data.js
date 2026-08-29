@@ -1,9 +1,9 @@
 export const navSections = [
   {
-    label: "核心工作",
+    label: "核心业务",
     items: [
       { id: "home", label: "工作台", icon: "home", route: "/home" },
-      { id: "works", label: "工作", icon: "route", count: 2 },
+      { id: "tasks", label: "任务", icon: "route", count: 2 },
       { id: "signals", label: "信号中心", icon: "signal", count: 3 },
     ],
   },
@@ -64,7 +64,7 @@ export const mainlines = [
     facts: [
       ["本批新增", "18 位"],
       ["资料更新", "4 位"],
-      ["当前工作", "身份合并与审核"],
+      ["当前处理", "身份合并与审核"],
     ],
     next: "待首批资料补全后审核候选人，并决定进入联系名单的范围。",
   },
@@ -104,9 +104,10 @@ export const mainlines = [
   },
 ];
 
-export const sideTasks = [
+export const runSummaries = [
   {
     id: "task-hand-team",
+    parentTaskId: "mapping-embodied",
     title: "核验灵巧手团队负责人",
     type: "身份核验",
     object: "星澜机器人人才版图",
@@ -117,6 +118,7 @@ export const sideTasks = [
   },
   {
     id: "task-shlab",
+    parentTaskId: "mapping-embodied",
     title: "补充上海人工智能实验室具身智能团队",
     type: "公开资料调研",
     object: "具身智能核心人才版图",
@@ -127,6 +129,7 @@ export const sideTasks = [
   },
   {
     id: "task-zhaoxingyu",
+    parentTaskId: "position-vla",
     title: "消歧赵星羽的论文与任职身份",
     type: "人物消歧",
     object: "VLA 候选人审核",
@@ -196,7 +199,7 @@ export const actionItems = [
     id: "action-local-handoff",
     title: "处理本机协作异常",
     source: "岗位招聘 · VLA 候选人寻访",
-    meta: "云端工作继续，本地任务等待重新接收",
+    meta: "云端任务继续，本地处理等待重新接收",
     tone: "danger",
   },
 ];
@@ -212,7 +215,7 @@ export const notifications = [
   },
   {
     id: "notification-2",
-    type: "工作更新",
+    type: "任务更新",
     title: "赵星羽身份消歧需要处理",
     source: "VLA 候选人审核",
     time: "18 分钟前",
@@ -239,19 +242,11 @@ export const notifications = [
 export const searchItems = [
   ...mainlines.map((item) => ({
     id: item.id,
-    group: "工作",
+    group: "任务",
     icon: "route",
     title: item.title,
     meta: `${item.type} · ${item.status}`,
     summary: item.summary,
-  })),
-  ...sideTasks.map((item) => ({
-    id: item.id,
-    group: "工作",
-    icon: "task",
-    title: item.title,
-    meta: `${item.type} · ${item.status}`,
-    summary: item.detail,
   })),
   ...signals.map((item) => ({
     id: item.id,
@@ -284,6 +279,6 @@ export const searchItems = [
     title: "具身智能 VLA 算法负责人",
     meta: "星澜机器人 · 北京",
     summary:
-      "负责 VLA 模型、机器人学习和算法团队建设，对应岗位招聘工作正在推进。",
+      "负责 VLA 模型、机器人学习和算法团队建设，对应岗位招聘任务正在推进。",
   },
 ];

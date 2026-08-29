@@ -37,7 +37,7 @@ for (const scenario of [
     test(`截取 ${scenario[2]} ${viewport.name} 主线`, async ({ page }) => {
       const assertNoConsoleErrors = trackConsoleErrors(page);
       await page.setViewportSize(viewport);
-      await page.goto(`#/workstreams/${scenario[0]}`);
+      await page.goto(`#/tasks/${scenario[0]}`);
       await expect(page.getByText(scenario[1])).toBeVisible({
         timeout: 10_000,
       });
@@ -74,7 +74,7 @@ test("截取三类业务审核工作区", async ({ page }) => {
       "match-review",
     ],
   ]) {
-    await page.goto(`#/workstreams/${scenario[0]}`);
+    await page.goto(`#/tasks/${scenario[0]}`);
     await expect(page.getByText(scenario[1])).toBeVisible({ timeout: 10_000 });
     await page.getByRole("button", { name: scenario[2] }).click();
     if (scenario[3] === "contact-review" || scenario[3] === "match-review") {
@@ -106,7 +106,7 @@ test("截取三类业务审核工作区", async ({ page }) => {
 
 test("人才摸排关系影响区域宽于左侧变化列表", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("#/workstreams/mapping-embodied");
+  await page.goto("#/tasks/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -139,7 +139,7 @@ test("人才摸排关系影响区域宽于左侧变化列表", async ({ page }) 
 
 test("截取人才摸排变化项对应的关系影响", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("#/workstreams/mapping-embodied");
+  await page.goto("#/tasks/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -174,7 +174,7 @@ test("截取人才摸排变化项对应的关系影响", async ({ page }) => {
 
 test("截取移动端人才摸排关系画布", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#/workstreams/mapping-embodied");
+  await page.goto("#/tasks/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -225,7 +225,7 @@ test("截取阶段三等待、冲突和资料回流状态", async ({ page }) => 
       "career-new-resume",
     ],
   ]) {
-    await page.goto(`#/workstreams/${route}`);
+    await page.goto(`#/tasks/${route}`);
     await expect(page.getByText(marker)).toBeVisible({ timeout: 10_000 });
     await expectConversationAtLatest(page);
     await expectNoHorizontalOverflow(page);
@@ -251,7 +251,7 @@ test("截取岗位招聘的审核、外部等待和简历回流状态", async ({
       "position-candidate-reply",
     ],
   ]) {
-    await page.goto(`#/workstreams/${route}`);
+    await page.goto(`#/tasks/${route}`);
     await expect(page.getByText(marker)).toBeVisible({ timeout: 10_000 });
     await expectConversationAtLatest(page);
     await expectNoHorizontalOverflow(page);
@@ -264,7 +264,7 @@ test("截取岗位招聘的审核、外部等待和简历回流状态", async ({
 
 test("截取岗位招聘无候选人结果", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("#/workstreams/position-vla?state=no-candidate");
+  await page.goto("#/tasks/position-vla?state=no-candidate");
   await expect(page.getByText("本轮没有候选人通过岗位门禁")).toBeVisible();
   await expectNoHorizontalOverflow(page);
   await page.screenshot({
@@ -275,7 +275,7 @@ test("截取岗位招聘无候选人结果", async ({ page }) => {
 
 test("截取客户开发邮件逐次确认", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("#/workstreams/client-xinglan");
+  await page.goto("#/tasks/client-xinglan");
   await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
     timeout: 10_000,
   });

@@ -6,6 +6,14 @@ import { businessScenarios } from "./data";
 
 export function WorkstreamRoute() {
   const { workstreamId } = useParams();
+  if (workstreamId === "task-recommend-linhao") {
+    return (
+      <Navigate
+        to="/positions/position-vla?tab=matching&report=linhao"
+        replace
+      />
+    );
+  }
   if (workstreamId?.startsWith("task-")) {
     return <SideTaskDetail taskId={workstreamId} />;
   }
@@ -18,5 +26,5 @@ export function WorkstreamRoute() {
       />
     );
   }
-  return <Navigate to="/works/position-vla" replace />;
+  return <Navigate to="/tasks/position-vla" replace />;
 }

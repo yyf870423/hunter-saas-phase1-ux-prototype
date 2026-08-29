@@ -584,8 +584,8 @@ export function RuntimeBar({
               onClick={() => setTasksOpen((value) => !value)}
             >
               <span>
-                <b>相关任务</b>
-                <small>{taskSummary || `${tasks.length} 项任务`}</small>
+                <b>相关处理</b>
+                <small>{taskSummary || `${tasks.length} 项处理`}</small>
               </span>
               <Icon name={tasksOpen ? "chevronUp" : "chevronDown"} />
             </button>
@@ -637,12 +637,12 @@ export function WorkHistory({
   return (
     <aside className={`s2-history ${collapsed ? "is-collapsed" : ""}`}>
       <header>
-        {collapsed ? null : <b>工作</b>}
+        {collapsed ? null : <b>任务</b>}
         <div>
-          <IconButton icon="plus" label="新建工作" onClick={onCreate} />
+          <IconButton icon="plus" label="新建任务" onClick={onCreate} />
           <IconButton
             icon={collapsed ? "panelRight" : "panelLeft"}
-            label={collapsed ? "展开工作列表" : "收起工作列表"}
+            label={collapsed ? "展开任务列表" : "收起任务列表"}
             onClick={onToggle}
           />
         </div>
@@ -677,7 +677,7 @@ export function WorkHistory({
           <SearchField
             value={query}
             onChange={setQuery}
-            placeholder="搜索工作"
+            placeholder="搜索任务"
           />
           <div className="s2-history-list">
             {visible.map((item) => (

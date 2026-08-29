@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
-import { actionItems, mainlines, sideTasks, signals } from "./data";
+import { actionItems, mainlines, runSummaries, signals } from "./data";
 import { Button, EmptyState, Skeleton, StatusBadge, useToast } from "./ui";
 
 function SectionHeading({ eyebrow, title, description, action }) {
@@ -24,15 +24,15 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
   return (
     <section className="s1-mainline-section" aria-labelledby="mainline-title">
       <SectionHeading
-        eyebrow="重点工作"
-        title="继续最重要的工作"
-        description="Hunter 已按等待处理、业务影响和最近变化整理当前工作。"
+        eyebrow="重点任务"
+        title="继续最重要的任务"
+        description="Hunter 已按等待处理、业务影响和最近变化整理当前任务。"
         action={
           <Button
             tone="ghost"
             size="sm"
             icon="chevronRight"
-            onClick={() => onOpen("全部工作")}
+            onClick={() => onOpen("全部任务")}
           >
             查看全部
           </Button>
@@ -71,11 +71,11 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
             icon="chevronRight"
             onClick={() => onOpen(selected.title)}
           >
-            继续工作
+            继续任务
           </Button>
         </article>
-        <div className="s1-mainline-switcher" aria-label="其他进行中的工作">
-          <span>其他进行中的工作</span>
+        <div className="s1-mainline-switcher" aria-label="其他进行中的任务">
+          <span>其他进行中的任务</span>
           {alternatives.map((item) => (
             <button
               type="button"
@@ -100,21 +100,21 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
   );
 }
 
-function TaskPanel({ state, onOpen, onRetry }) {
+function RunPanel({ state, onOpen, onRetry }) {
   if (state === "error") {
     return (
       <section
         className="s1-support-panel s1-local-error"
         aria-labelledby="task-title"
       >
-        <SectionHeading eyebrow="相关任务" title="需要关注的执行" />
+        <SectionHeading eyebrow="运行动态" title="需要关注的执行" />
         <div className="s1-local-state">
           <i>
             <Icon name="warning" />
           </i>
           <div>
-            <b>任务摘要暂时无法加载</b>
-            <p>重点工作和信号仍可正常使用。</p>
+            <b>运行摘要暂时无法加载</b>
+            <p>重点任务和信号仍可正常使用。</p>
           </div>
           <Button size="sm" icon="refresh" onClick={onRetry}>
             重新加载
@@ -126,16 +126,16 @@ function TaskPanel({ state, onOpen, onRetry }) {
   return (
     <section className="s1-support-panel" aria-labelledby="task-title">
       <SectionHeading
-        eyebrow="相关任务"
+        eyebrow="运行动态"
         title="需要关注的执行"
         action={
-          <Button tone="ghost" size="sm" onClick={() => onOpen("全部工作")}>
-            查看全部
+          <Button tone="ghost" size="sm" onClick={() => onOpen("全部任务")}>
+            查看任务
           </Button>
         }
       />
       <div className="s1-task-list">
-        {sideTasks.map((task) => (
+        {runSummaries.map((task) => (
           <button
             type="button"
             key={task.id}
@@ -293,19 +293,22 @@ export function Dashboard() {
   const notify = useToast();
   const state = params.get("state") || "normal";
   const openPlaceholder = (title) => {
-    if (title === "新建工作") {
+    if (title === "新建任务") {
       navigate("/new");
       return;
     }
-    if (title === "全部工作") {
-      navigate("/works");
+    if (title === "全部任务") {
+      navigate("/tasks");
       return;
     }
-    const work = [...mainlines, ...sideTasks].find(
-      (item) => item.title === title,
-    );
+    const work = mainlines.find((item) => item.title === title);
     if (work) {
-      navigate(`/works/${work.id}`);
+      navigate(`/tasks/${work.id}`);
+      return;
+    }
+    const run = runSummaries.find((item) => item.title === title);
+    if (run) {
+      navigate(`/tasks/${run.parentTaskId}`);
       return;
     }
     notify(`已选择“${title}”，完整业务剧本将在原型阶段三提交`, "info");
@@ -314,7 +317,7 @@ export function Dashboard() {
     const next = new URLSearchParams(params);
     next.delete("state");
     setParams(next, { replace: true });
-    notify("相关任务摘要已重新加载", "success");
+    notify("运行摘要已重新加载", "success");
   };
 
   if (state === "loading") return <LoadingDashboard />;
@@ -332,20 +335,20 @@ export function Dashboard() {
           </div>
         </header>
         <EmptyState
-          title="还没有工作"
-          description="可以从客户开发、岗位招聘、人才摸排或候选人求职开始，Hunter 会根据目标持续推进或直接交付。"
+          title="还没有任务"
+          description="可以从客户开发、岗位招聘、人才摸排或候选人求职开始，Hunter 会根据目标决定一步完成或持续推进。"
           action={
             <Button
               tone="primary"
               icon="plus"
-              onClick={() => openPlaceholder("新建工作")}
+              onClick={() => openPlaceholder("新建任务")}
             >
-              新建工作
+              新建任务
             </Button>
           }
         />
         <div className="s1-empty-support">
-          <span>相关任务会在工作需要拆分执行时出现</span>
+          <span>任务执行产生的运行进度会回到对应任务</span>
           <span>值得关注的外部变化会显示在信号中心</span>
         </div>
       </div>
@@ -358,7 +361,7 @@ export function Dashboard() {
         <div>
           <small>2026 年 8 月 19 日 · 星期三</small>
           <h1>上午好，沈岚</h1>
-          <p>你有 1 项工作等待继续，2 个相关任务需要关注。</p>
+          <p>你有 1 项任务等待继续，2 项运行需要关注。</p>
         </div>
       </header>
 
@@ -369,7 +372,7 @@ export function Dashboard() {
           </i>
           <div>
             <b>本机协作暂不可用</b>
-            <p>云端检索和已有结果继续保留，可稍后在本机继续或下载本地任务。</p>
+            <p>云端检索和已有结果继续保留，可稍后在本机继续或下载处理包。</p>
           </div>
           <Button
             size="sm"
@@ -386,7 +389,7 @@ export function Dashboard() {
         onOpen={openPlaceholder}
       />
       <div className="s1-support-grid">
-        <TaskPanel
+        <RunPanel
           state={state}
           onOpen={openPlaceholder}
           onRetry={recoverTasks}

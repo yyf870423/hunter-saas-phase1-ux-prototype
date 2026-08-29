@@ -89,7 +89,7 @@ export function WorkstreamHeader({
         <div className="s2-more-wrap" ref={menuRef}>
           <IconButton
             icon="more"
-            label="更多工作操作"
+            label="更多任务操作"
             onClick={() => setMenuOpen((open) => !open)}
           />
           {menuOpen ? (
@@ -113,7 +113,7 @@ export function WorkstreamHeader({
                 }}
               >
                 <Icon name="logout" />
-                终止工作
+                终止任务
               </button>
               <button
                 type="button"
@@ -124,7 +124,7 @@ export function WorkstreamHeader({
                 }}
               >
                 <Icon name="trash" />
-                删除工作
+                删除任务
               </button>
             </div>
           ) : null}
@@ -472,7 +472,7 @@ export function AutomationWorkspace() {
     ? {
         title: "计划已根据新信息调整",
         detail:
-          "保留已经完成的工作，只暂停并重做受影响的当前步骤；继续后从此检查点推进。",
+          "保留已经完成的步骤，只暂停并重做受影响的当前步骤；继续后从此检查点推进。",
         requirement: latestPlanRequirement,
         changes: [
           {
@@ -492,7 +492,7 @@ export function AutomationWorkspace() {
       ? {
           title: "计划已暂停",
           detail:
-            "当前步骤、检查点和已有结果均已保留，继续后不会重复已完成工作。",
+            "当前步骤、检查点和已有结果均已保留，继续后不会重复已完成步骤。",
           time: "刚刚",
           tone: "warning",
         }
@@ -521,7 +521,7 @@ export function AutomationWorkspace() {
               ? {
                   title: "岗位边界已确认",
                   detail:
-                    "云端候选人和公开资料检索已经开始；本机任务由用户选择设备后继续。",
+                    "云端候选人和公开资料检索已经开始；本机处理由用户选择设备后继续。",
                   time: "09:02",
                   tone: "info",
                 }
@@ -581,7 +581,7 @@ export function AutomationWorkspace() {
         currentId="position-vla"
         onToggle={() => setHistoryCollapsed((value) => !value)}
         onCreate={() => navigate("/new")}
-        onSelect={(item) => navigate(`/works/${item.id}`)}
+        onSelect={(item) => navigate(`/tasks/${item.id}`)}
       />
       <section className="s2-workstream-main">
         <WorkstreamHeader
@@ -675,7 +675,7 @@ export function AutomationWorkspace() {
                 <span>
                   <b>本机协作暂不可用</b>
                   <small>
-                    云端检索和已有结果继续保留。可以稍后在本机继续，或下载本地任务。
+                    云端检索和已有结果继续保留。可以稍后在本机继续，或下载处理包。
                   </small>
                 </span>
                 <Button
@@ -693,7 +693,7 @@ export function AutomationWorkspace() {
                 <span>
                   <b>论文与专利人物线索处理失败</b>
                   <small>
-                    系统候选人、公开资料和本机返回结果已经保留。可以只重试失败来源，不重新执行整轮工作。
+                    系统候选人、公开资料和本机返回结果已经保留。可以只重试失败来源，不重新执行整轮任务。
                   </small>
                 </span>
                 <Button
@@ -718,7 +718,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                     icon={handoffComplete ? "check" : "download"}
                     onClick={() => setHandoffOpen(true)}
                   >
-                    {handoffComplete ? "本地任务已准备" : "在本机继续"}
+                    {handoffComplete ? "本机处理已准备" : "在本机继续"}
                   </Button>
                   <small>
                     {handoffComplete
@@ -735,7 +735,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                   <b>等待本机结果</b>
                   <small>
                     云端已经形成 9
-                    位候选人，尚未收到本机结果。本机任务可能仍在处理，也可能尚未启动；新结果返回后会随时合并，不需要等待全部来源结束。
+                    位候选人，尚未收到本机结果。本机处理可能仍在进行，也可能尚未启动；新结果返回后会随时合并，不需要等待全部来源结束。
                   </small>
                 </span>
               </div>
@@ -744,9 +744,9 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
               <div className="s2-permission-state">
                 <Icon name="warning" />
                 <span>
-                  <b>岗位信息已更新，本地任务使用的是上一版本</b>
+                  <b>岗位信息已更新，本机处理使用的是上一版本</b>
                   <small>
-                    已返回候选人仍会接收，但会按照最新岗位重新匹配；后续本地任务将使用新版本。
+                    已返回候选人仍会接收，但会按照最新岗位重新匹配；后续本机处理将使用新版本。
                   </small>
                 </span>
               </div>
@@ -934,7 +934,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                   }}
                   onSend={() => {
                     setContactStage("waiting");
-                    notify("邮件已发送，后续回复会回到当前工作", "success");
+                    notify("邮件已发送，后续回复会回到当前任务", "success");
                   }}
                 />
               </HunterReply>
@@ -948,7 +948,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                   <small>等待外部</small>
                   <b>等待 3 位候选人回复邮件</b>
                   <p>
-                    邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到当前工作；猎头在系统外获得的新信息也可以作为普通跟进记录补充。
+                    邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到当前任务；猎头在系统外获得的新信息也可以作为普通跟进记录补充。
                   </p>
                   <em>
                     最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 ·
@@ -985,9 +985,9 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
               <div className="s2-system-state is-danger">
                 <Icon name="warning" />
                 <span>
-                  <b>工作已终止</b>
+                  <b>任务已终止</b>
                   <small>
-                    对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建工作。
+                    对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建任务。
                   </small>
                 </span>
               </div>
@@ -1032,7 +1032,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
         open={handoffOpen}
         close={() => setHandoffOpen(false)}
         title="在本机继续"
-        description="选择已连接设备处理本地任务；云端工作会继续运行。"
+        description="选择已连接设备继续本机处理；云端处理会继续运行。"
         size="lg"
       >
         <div className="s2-handoff-options">
@@ -1058,7 +1058,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                 setHandoffComplete(true);
                 setPhase((current) => Math.max(current, 3));
                 setHandoffOpen(false);
-                notify("本地任务已准备，云端将继续接收返回结果", "success");
+                notify("本机处理已准备，云端将继续接收返回结果", "success");
               }}
             >
               在此设备继续
@@ -1069,7 +1069,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
               <Icon name="download" />
             </i>
             <span>
-              <b>下载本地任务</b>
+              <b>下载处理包</b>
               <small>
                 适用于当前设备不可用时；处理完成后可将结果导回 Hunter。
               </small>
@@ -1081,21 +1081,21 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                 setHandoffComplete(true);
                 setPhase((current) => Math.max(current, 3));
                 setHandoffOpen(false);
-                notify("本地任务已下载，云端工作继续运行", "success");
+                notify("处理包已下载，云端处理继续运行", "success");
               }}
             >
               下载任务
             </Button>
           </section>
           <p>
-            本地任务包含岗位信息和已确认的筛选范围，不包含云端账号凭据。云端不会登录或控制需要认证的人才网站。
+            处理包包含岗位信息和已确认的筛选范围，不包含云端账号凭据。云端不会登录或控制需要认证的人才网站。
           </p>
         </div>
       </Modal>
       <Modal
         open={terminateOpen}
         close={() => setTerminateOpen(false)}
-        title="终止工作"
+        title="终止任务"
         description="终止表示这项业务不再继续，不会删除历史和已确认成果。"
         footer={
           <>
@@ -1110,14 +1110,14 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                 setTerminateOpen(false);
               }}
             >
-              终止工作
+              终止任务
             </Button>
           </>
         }
       >
         <div className="s2-confirm-copy">
           <p>
-            将停止 1 个等待审核的内部任务；18
+            将停止 1 个等待审核的内部处理；18
             位候选人审核结果、已写入的正式资产和来源证据继续保留。
           </p>
           <p>本轮没有已经发生且无法撤销的外部动作。</p>
@@ -1126,7 +1126,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
       <Modal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
-        title="删除工作"
+        title="删除任务"
         description="删除只适用于误建或不希望保留的内容。"
         footer={
           <>
@@ -1138,7 +1138,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
               onClick={() => {
                 setDeleteOpen(false);
                 navigate("/home");
-                notify("工作已移入回收站，30 天内可以恢复", "success");
+                notify("任务已移入回收站，30 天内可以恢复", "success");
               }}
             >
               删除并移入回收站
@@ -1148,7 +1148,7 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
       >
         <div className="s2-confirm-copy">
           <p>
-            当前内部任务将安全停止；尚未写入正式资产的对话、计划和专属文件随工作进入回收站。
+            当前内部处理将安全停止；尚未写入正式资产的对话、计划和专属文件随任务进入回收站。
           </p>
           <p>已确认写入的候选人、岗位和其他正式业务资产不会删除。</p>
         </div>

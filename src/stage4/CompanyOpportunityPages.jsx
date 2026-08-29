@@ -498,19 +498,19 @@ function CompanyRelated({ processingRecords, onOpenProcessing }) {
   const navigate = useNavigate();
   return (
     <div className="s4-detail-stack">
-      <FieldGroup title="相关工作">
+      <FieldGroup title="关联任务">
         <div className="s4-entity-grid">
           <EntityLink
             icon="route"
             title="星澜机器人客户开发"
             meta="等待联系人确认"
-            onClick={() => navigate("/works/client-xinglan")}
+            onClick={() => navigate("/tasks/client-xinglan")}
           />
           <EntityLink
             icon="route"
             title="星澜机器人具身智能团队招聘"
             meta="候选人审核中"
-            onClick={() => navigate("/works/position-vla")}
+            onClick={() => navigate("/tasks/position-vla")}
           />
         </div>
       </FieldGroup>
@@ -541,7 +541,7 @@ function CompanyRelated({ processingRecords, onOpenProcessing }) {
       </FieldGroup>
       <FieldGroup
         title="AI 处理记录"
-        description="当前公司的调研、资料整理和核验记录，不进入工作列表。"
+        description="当前公司的调研、资料整理和核验记录，不进入任务列表。"
       >
         <AssetAiProcessHistory
           records={processingRecords}
@@ -562,7 +562,7 @@ function CompanyAiStartModal({ open, close, onStart }) {
       close={close}
       size="lg"
       title="更新当前公司调研"
-      description="调研建议保存在当前公司，确认前不会修改正式资料，也不会新增工作"
+      description="调研建议保存在当前公司，确认前不会修改正式资料，也不会新增任务"
       footer={
         <>
           <Button onClick={close}>取消</Button>
@@ -782,7 +782,7 @@ export function CompanyDetailPage() {
     { value: "contacts", label: "联系人", count: detail.contacts },
     { value: "talents", label: "任职人才", count: detail.talents },
     { value: "mappings", label: "人才版图" },
-    { value: "work", label: "相关工作" },
+    { value: "work", label: "关联任务" },
   ];
   const aiRecord = buildCompanyAiRecord(
     ["running", "review", "failed"].includes(aiState) ? aiState : "complete",
@@ -1339,7 +1339,7 @@ export function ContactDetailPage() {
         <div className="s4-detail-stack">
           <FieldGroup
             title="跟进与沟通"
-            description="真实沟通只保存一次；公司、机会和相关工作通过引用显示。"
+            description="真实沟通只保存一次；公司、机会和关联任务通过引用显示。"
             action={
               <Button
                 size="sm"
@@ -1376,12 +1376,12 @@ export function ContactDetailPage() {
               onClick={() => navigate("/opportunities/opportunity-xinglan")}
             />
           </FieldGroup>
-          <FieldGroup title="相关工作">
+          <FieldGroup title="关联任务">
             <EntityLink
               icon="route"
               title="星澜机器人客户开发"
               meta="等待联系人确认"
-              onClick={() => navigate("/works/client-xinglan")}
+              onClick={() => navigate("/tasks/client-xinglan")}
             />
           </FieldGroup>
         </div>
@@ -1473,7 +1473,7 @@ export function ContactDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="联系人"
         assetName={profile.name}
-        impact="公司、招聘机会和相关工作不会删除；真实沟通作为历史引用保留。"
+        impact="公司、招聘机会和关联任务不会删除；真实沟通作为历史引用保留。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("联系人已进入回收站");
@@ -2159,7 +2159,7 @@ export function OpportunityDetailPage() {
   const opportunityTabs = [
     { value: "profile", label: "机会资料" },
     { value: "directions", label: "招聘方向", count: item.directions },
-    { value: "work", label: "相关工作" },
+    { value: "work", label: "关联任务" },
   ];
   return (
     <div className="s4-detail-page">
@@ -2221,7 +2221,7 @@ export function OpportunityDetailPage() {
                     陈雨 · 招聘负责人
                   </button>,
                 ],
-                ["创建方式", "客户开发工作"],
+                ["创建方式", "客户开发任务"],
               ]}
             />
           </FieldGroup>
@@ -2279,12 +2279,12 @@ export function OpportunityDetailPage() {
       ) : null}
       {tab === "work" ? (
         <div className="s4-detail-stack">
-          <FieldGroup title="相关工作">
+          <FieldGroup title="关联任务">
             <EntityLink
               icon="route"
               title="星澜机器人客户开发"
               meta="已确认招聘需求"
-              onClick={() => navigate("/works/client-xinglan")}
+              onClick={() => navigate("/tasks/client-xinglan")}
             />
           </FieldGroup>
           <FieldGroup title="活动记录">
@@ -2300,7 +2300,7 @@ export function OpportunityDetailPage() {
                 [
                   "08-18 09:30",
                   "创建机会",
-                  "从客户开发工作写入正式招聘机会。",
+                  "从客户开发任务写入正式招聘机会。",
                   "Hunter",
                 ],
               ]}
@@ -2321,7 +2321,7 @@ export function OpportunityDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="招聘机会"
         assetName={opportunity.title}
-        impact="已经形成的岗位、公司、联系人和相关工作不会删除，岗位保留来源机会的历史名称。"
+        impact="已经形成的岗位、公司、联系人和关联任务不会删除，岗位保留来源机会的历史名称。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("招聘机会已进入回收站");

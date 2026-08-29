@@ -152,7 +152,7 @@ export function UserAuthPage() {
             <p>
               {isRegister
                 ? "创建账号后继续进入现有工作台。"
-                : "选择一种方式回到你的业务主线。"}
+                : "选择一种方式回到你的任务。"}
             </p>
           </div>
 

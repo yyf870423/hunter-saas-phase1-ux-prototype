@@ -32,18 +32,18 @@ function OutcomeReply({ outcome, prompt }) {
   if (outcome === "mainline") {
     return (
       <HunterReply
-        markdown={`这项工作需要持续汇总系统候选人、公开资料和本机返回结果，并在审核、邮件联系和等待回复后继续推进。我会保留完整工作上下文并持续更新计划：云端工作立即开始，需要本机处理的部分会生成相关任务，由你选择何时继续。
+        markdown={`这项任务需要持续汇总系统候选人、公开资料和本机返回结果，并在审核、邮件联系和等待回复后继续推进。我会保留完整任务上下文并持续更新计划：云端处理立即开始，需要本机处理的部分会作为相关处理显示，由你选择何时继续。
 
-> 正在创建工作，并保留当前输入、附件和授权方式。`}
+> 正在创建任务，并保留当前输入、附件和授权方式。`}
       />
     );
   }
   if (outcome === "task") {
     return (
       <HunterReply
-        markdown={`这是一项范围有限、交付明确的核验工作。我会直接执行并交付结论；核验完成后，结果会回到对应的人才版图，不会自动合并人物。
+        markdown={`这是一项范围有限、交付明确的核验任务。我会直接执行并交付结论；核验完成后，结果会回到对应的人才版图，不会自动合并人物。
 
-> 正在创建工作，并保留当前输入、附件和授权方式。`}
+> 正在创建任务，并保留当前输入、附件和授权方式。`}
       />
     );
   }
@@ -53,7 +53,7 @@ function OutcomeReply({ outcome, prompt }) {
       ? [
           "公司聚焦边缘侧机器人芯片，近期公开信息出现团队扩张信号。",
           "目前证据只能支持一次性判断，尚不足以确认正式招聘需求。",
-          "如需持续寻找负责人和招聘机会，可以继续新建客户开发工作。",
+          "如需持续寻找负责人和招聘机会，可以继续新建客户开发任务。",
         ]
       : [
           "技术能力满足岗位要求，系统设计和跨团队协作评价较好。",
@@ -62,13 +62,13 @@ function OutcomeReply({ outcome, prompt }) {
         ];
     return (
       <HunterReply
-        markdown={`这项工作可以在当前对话中直接完成，不需要建立单独的工作记录。
+        markdown={`这项任务可以一步完成，不需要生成执行计划。结果和输入仍会保留在任务记录中。
 
 ## ${isCompanySummary ? "云脉芯能公开信息摘要" : "候选人跟进摘要"}
 
 ${details.map((item) => `- ${item}`).join("\n")}
 
-可以继续补充信息，或直接提出下一项工作。`}
+可以继续补充信息，或直接提出下一项任务。`}
       />
     );
   }
@@ -110,14 +110,18 @@ export function NewWork() {
   }, [forcedState, status, submittedPrompt]);
 
   useEffect(() => {
-    if (forcedState || !["mainline", "task"].includes(status)) return undefined;
+    if (forcedState || !["mainline", "task", "direct"].includes(status))
+      return undefined;
     const timer = window.setTimeout(() => {
       if (status === "mainline") {
         sessionStorage.setItem("hunter-new-workstream-prompt", submittedPrompt);
-        navigate("/works/position-vla");
+        navigate("/tasks/position-vla");
+      } else if (status === "task") {
+        sessionStorage.setItem("hunter-new-task-prompt", submittedPrompt);
+        navigate("/tasks/task-hand-team");
       } else {
         sessionStorage.setItem("hunter-new-task-prompt", submittedPrompt);
-        navigate("/works/task-hand-team");
+        navigate("/tasks/task-interview-summary");
       }
     }, 1_250);
     return () => window.clearTimeout(timer);
@@ -157,10 +161,10 @@ export function NewWork() {
           <span>
             <Icon name="sparkles" />
           </span>
-          <h1>新建工作</h1>
+          <h1>新建任务</h1>
           <p>
             直接说明想完成什么。Hunter
-            会根据目标复杂度制定计划，直接处理或持续推进；你不需要选择工作类型。
+            会根据目标复杂度决定一步完成或持续推进；你不需要选择任务类型。
           </p>
         </header>
 
@@ -168,8 +172,8 @@ export function NewWork() {
           <div className="s2-new-work-limited" role="alert">
             <Icon name="warning" />
             <span>
-              <b>当前工作空间不能创建新工作</b>
-              <small>你仍可查看已有工作；请联系工作空间管理员处理权限。</small>
+              <b>当前工作空间不能创建新任务</b>
+              <small>你仍可查看已有任务；请联系工作空间管理员处理权限。</small>
             </span>
           </div>
         ) : null}
@@ -180,7 +184,7 @@ export function NewWork() {
             {status === "classifying" ? (
               <HunterReply
                 streaming
-                markdown="我正在判断这项工作的范围、持续时间，以及是否需要等待外部反馈或拆分任务。"
+                markdown="我正在判断这项任务的范围、持续时间，以及是否需要等待外部反馈或组织多步处理。"
               />
             ) : null}
             <OutcomeReply outcome={status} prompt={submittedPrompt} />
@@ -193,14 +197,14 @@ export function NewWork() {
                 <div className="s2-new-work-choices">
                   <button type="button" onClick={() => chooseOutcome("direct")}>
                     <b>只整理当前信息</b>
-                    <small>完成本次分析后结束，不建立持续工作。</small>
+                    <small>完成本次分析后结束，任务记录仍会保留。</small>
                   </button>
                   <button
                     type="button"
                     onClick={() => chooseOutcome("mainline")}
                   >
                     <b>持续跟踪并寻找联系人</b>
-                    <small>保留客户开发上下文，后续继续接收变化和回复。</small>
+                    <small>保留任务上下文，后续继续接收变化和回复。</small>
                   </button>
                 </div>
               </HunterReply>
@@ -209,7 +213,7 @@ export function NewWork() {
               <div className="s2-local-error" role="alert">
                 <Icon name="warning" />
                 <span>
-                  <b>暂时无法判断推进方式</b>
+                  <b>暂时无法判断任务推进方式</b>
                   <small>
                     你的输入和附件已经保留，可以重新判断或继续补充目标。
                   </small>
@@ -240,7 +244,9 @@ export function NewWork() {
           placeholder="例如：为星澜机器人的 VLA 算法负责人岗位持续寻找合适候选人"
           streaming={status === "classifying"}
           onStop={reset}
-          disabled={isLimited || ["mainline", "task"].includes(status)}
+          disabled={
+            isLimited || ["mainline", "task", "direct"].includes(status)
+          }
         />
 
         {!hasConversation && !isLimited ? (
@@ -263,7 +269,7 @@ export function NewWork() {
 
         <footer>
           <Icon name="info" />
-          无需预先选择工作类型。Hunter
+          无需预先选择任务类型。Hunter
           会说明执行计划、等待点和结束条件；如不符合预期，可以直接在对话中纠正。
         </footer>
       </section>

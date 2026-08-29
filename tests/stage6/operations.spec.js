@@ -16,7 +16,7 @@ test("运营端六个模块可通过独立导航访问", async ({ page }) => {
     ["运营概况", "overview", "运营概况"],
     ["用户与工作空间", "users-workspaces", "用户与工作空间"],
     ["订阅与额度", "subscriptions", "订阅与额度"],
-    ["任务与故障", "tasks", "任务与故障"],
+    ["运行与故障", "tasks", "运行与故障"],
     ["系统能力", "capabilities", "系统能力"],
     ["支持与审计", "support", "支持与审计"],
   ]) {
@@ -126,31 +126,31 @@ test("运营筛选会真实改变列表且可以单独清空", async ({ page }) 
   await expect(page.getByText("深蓝猎头工作室").first()).toBeVisible();
 
   await page.goto("#/ops/tasks");
-  await page.getByRole("button", { name: "任务状态", exact: true }).click();
+  await page.getByRole("button", { name: "运行状态", exact: true }).click();
   await page
     .locator(".s4-select-panel")
     .getByRole("button", { name: "失败", exact: true })
     .click();
   await expect(page.getByText("TASK-260824-019").first()).toBeVisible();
   await expect(page.getByText("TASK-260824-011")).toHaveCount(0);
-  await page.getByRole("button", { name: "清空任务状态" }).click();
+  await page.getByRole("button", { name: "清空运行状态" }).click();
   await expect(page.getByText("TASK-260824-011").first()).toBeVisible();
   await page.getByRole("button", { name: "执行归属", exact: true }).click();
   await page
     .locator(".s4-select-panel")
-    .getByRole("button", { name: "系统后台任务", exact: true })
+    .getByRole("button", { name: "系统运行", exact: true })
     .click();
   await expect(page.getByText("邮箱回复检查").first()).toBeVisible();
   await expect(page.getByText("TASK-260824-019")).toHaveCount(0);
   await assertNoConsoleErrors();
 });
 
-test("任务详情区分可安全恢复和不可恢复", async ({ page }) => {
+test("运行详情区分可安全恢复和不可恢复", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/ops/tasks/TASK-260824-019");
   await expect(page.getByText("具身智能核心人才版图")).toBeVisible();
   await expect(page.getByText("WORK-260824-006")).toBeVisible();
-  await expect(page.getByText("相关任务执行", { exact: true })).toBeVisible();
+  await expect(page.getByText("任务步骤运行", { exact: true })).toBeVisible();
   await expect(page.getByText("所属主线", { exact: true })).toHaveCount(0);
   await expect(page.getByText("可以执行受控恢复")).toBeVisible();
   await page.getByRole("button", { name: "执行安全恢复" }).click();

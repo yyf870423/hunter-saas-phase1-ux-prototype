@@ -81,10 +81,11 @@ export function WorksPage() {
     <div className="s2-page s2-module-page">
       <header className="s2-page-heading">
         <div>
-          <small>持续推进与独立交付</small>
-          <h1>工作</h1>
+          <small>一步完成与持续推进</small>
+          <h1>任务</h1>
           <p>
-            查看所有可独立管理的工作；执行过程中拆出的相关任务保留在所属工作内。
+            查看你主动创建的任务；资产 AI
+            处理和任务内部运行保留在对应资产或任务中。
           </p>
         </div>
       </header>
@@ -93,7 +94,7 @@ export function WorksPage() {
           <div
             className="s2-module-tabs app-tabs"
             role="tablist"
-            aria-label="工作状态"
+            aria-label="任务状态"
           >
             {tabs.map(([value, label]) => (
               <button
@@ -119,7 +120,7 @@ export function WorksPage() {
                 setQuery(next);
                 setPage(1);
               }}
-              placeholder="搜索工作、业务场景或关联对象"
+              placeholder="搜索任务、业务场景或关联对象"
             />
             <SelectMenu
               className="s2-scenario-filter"
@@ -136,7 +137,7 @@ export function WorksPage() {
         {visible.length ? (
           <div className="s2-task-table">
             <div className="s2-task-table-head">
-              <span>工作</span>
+              <span>任务</span>
               <span>业务场景</span>
               <span>关联对象</span>
               <span>状态</span>
@@ -149,11 +150,11 @@ export function WorksPage() {
                 role="link"
                 tabIndex={0}
                 key={work.id}
-                onClick={() => navigate(`/works/${work.id}`)}
+                onClick={() => navigate(`/tasks/${work.id}`)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
-                    navigate(`/works/${work.id}`);
+                    navigate(`/tasks/${work.id}`);
                   }
                 }}
               >
@@ -174,7 +175,7 @@ export function WorksPage() {
                   <IconButton
                     icon="chevronRight"
                     label={`查看 ${work.title}`}
-                    onClick={() => navigate(`/works/${work.id}`)}
+                    onClick={() => navigate(`/tasks/${work.id}`)}
                   />
                   <TableDeleteButton
                     label={`删除 ${work.title}`}
@@ -187,7 +188,7 @@ export function WorksPage() {
         ) : (
           <div className="s2-empty">
             <Icon name="task" />
-            <h2>没有符合条件的工作</h2>
+            <h2>没有符合条件的任务</h2>
             <p>可以调整状态或搜索条件，也可以直接描述一项新的业务目标。</p>
             <Button
               tone="secondary"
@@ -223,8 +224,8 @@ export function WorksPage() {
       <Modal
         open={Boolean(deleteWork)}
         close={() => setDeleteWork(null)}
-        title="删除工作"
-        description="工作将进入回收站，30 天内可以恢复。"
+        title="删除任务"
+        description="任务将进入回收站，30 天内可以恢复。"
         footer={
           <>
             <Button tone="secondary" onClick={() => setDeleteWork(null)}>
@@ -237,7 +238,7 @@ export function WorksPage() {
                   items.filter((item) => item.id !== deleteWork.id),
                 );
                 setDeleteWork(null);
-                notify("工作已移入回收站", "success");
+                notify("任务已移入回收站", "success");
               }}
             >
               删除并移入回收站
@@ -280,8 +281,8 @@ const taskPlan = [
 export function SideTaskDetail({ taskId: taskIdOverride }) {
   const { taskId: routeTaskId, workstreamId } = useParams();
   const taskId = taskIdOverride || routeTaskId || workstreamId;
-  return taskId === "task-recommend-linhao" ? (
-    <RecommendationReportTask taskId={taskId} />
+  return taskId === "task-interview-summary" ? (
+    <OneStepSummaryTask taskId={taskId} />
   ) : (
     <IdentityReviewTask taskId={taskId || "task-hand-team"} />
   );
@@ -298,7 +299,7 @@ function TaskWorkspaceShell({ currentId, children }) {
         currentId={currentId}
         onToggle={() => setHistoryCollapsed((value) => !value)}
         onCreate={() => navigate("/new")}
-        onSelect={(item) => navigate(`/works/${item.id}`)}
+        onSelect={(item) => navigate(`/tasks/${item.id}`)}
       />
       <section className="s2-workstream-main s2-task-detail-page">
         {children}
@@ -367,9 +368,9 @@ function IdentityReviewTask({ taskId }) {
   return (
     <TaskWorkspaceShell currentId={taskId}>
       <header className="s2-detail-header">
-        <button type="button" onClick={() => navigate("/works")}>
+        <button type="button" onClick={() => navigate("/tasks")}>
           <Icon name="chevronLeft" />
-          返回全部工作
+          返回全部任务
         </button>
         <div>
           <small>人物身份核验</small>
@@ -477,8 +478,8 @@ function IdentityReviewTask({ taskId }) {
       <Modal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
-        title="删除工作"
-        description="工作将进入回收站，30 天内可以恢复。"
+        title="删除任务"
+        description="任务将进入回收站，30 天内可以恢复。"
         footer={
           <>
             <Button tone="secondary" onClick={() => setDeleteOpen(false)}>
@@ -488,8 +489,8 @@ function IdentityReviewTask({ taskId }) {
               tone="danger"
               onClick={() => {
                 setDeleteOpen(false);
-                navigate("/works");
-                notify("工作已移入回收站", "success");
+                navigate("/tasks");
+                notify("任务已移入回收站", "success");
               }}
             >
               删除并移入回收站
@@ -498,7 +499,7 @@ function IdentityReviewTask({ taskId }) {
         }
       >
         <div className="s2-confirm-copy">
-          <p>工作对话、计划和尚未写入正式资产的专属文件会一起进入回收站。</p>
+          <p>任务对话、计划和尚未写入正式资产的专属文件会一起进入回收站。</p>
           <p>人才版图中已经确认的正式人物记录不会删除。</p>
         </div>
       </Modal>
@@ -506,8 +507,80 @@ function IdentityReviewTask({ taskId }) {
   );
 }
 
-function RecommendationReportTask({ taskId }) {
+function OneStepSummaryTask({ taskId }) {
   const navigate = useNavigate();
+  const notify = useToast();
+  const [composer, setComposer] = useState("");
+  const [attachments, setAttachments] = useState([]);
+  const [authMode, setAuthMode] = useState("confirm");
+  const [updated, setUpdated] = useState(false);
+  return (
+    <TaskWorkspaceShell currentId={taskId}>
+      <header className="s2-detail-header">
+        <button type="button" onClick={() => navigate("/tasks")}>
+          <Icon name="chevronLeft" />
+          返回全部任务
+        </button>
+        <div>
+          <small>岗位招聘 · 信息整理</small>
+          <h1>整理林昊的面试反馈</h1>
+          <p>关联：候选人林昊 · 具身智能 VLA 算法负责人</p>
+        </div>
+        <div>
+          <StatusBadge tone="success">完成</StatusBadge>
+        </div>
+      </header>
+      <div className="s2-task-detail-layout">
+        <section className="s2-task-conversation">
+          <div className="s2-task-timeline">
+            <UserMessage time="今天 09:30">
+              {sessionStorage.getItem("hunter-new-task-prompt") ||
+                "把这三条面试反馈整理为候选人跟进摘要。"}
+            </UserMessage>
+            <HunterReply
+              markdown={`已完成整理。这项任务只有一个处理步骤，因此没有生成执行计划。
+
+## 面试反馈摘要
+
+- 技术能力满足岗位要求，系统设计和跨团队协作评价较好；
+- 候选人希望进一步确认汇报对象、团队规模和年度奖金结构；
+- 建议两天内补充岗位信息，再确认下一轮面试时间。
+
+摘要已保留在本次任务记录中，尚未写入候选人跟进记录。`}
+            />
+            {updated ? (
+              <>
+                <UserMessage time="刚刚">
+                  把团队规模和奖金结构标记成下次必须确认的事项。
+                </UserMessage>
+                <HunterReply markdown="已调整摘要，并将团队规模和奖金结构列为下次沟通必须确认的事项。" />
+              </>
+            ) : null}
+          </div>
+          <div className="s2-task-composer-dock">
+            <Composer
+              value={composer}
+              onChange={setComposer}
+              onSend={() => {
+                setUpdated(true);
+                setComposer("");
+                setAttachments([]);
+                notify("任务结果已更新", "success");
+              }}
+              authMode={authMode}
+              onAuthChange={setAuthMode}
+              attachments={attachments}
+              onAttachmentsChange={setAttachments}
+              placeholder="继续补充要求，或上传需要一起整理的资料"
+            />
+          </div>
+        </section>
+      </div>
+    </TaskWorkspaceShell>
+  );
+}
+
+export function RecommendationReportWorkspace({ onClose }) {
   const notify = useToast();
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
@@ -526,7 +599,7 @@ function RecommendationReportTask({ taskId }) {
   const candidateName =
     sessionStorage.getItem("hunter-recommendation-candidate") || "林昊";
   const reportRequirement =
-    sessionStorage.getItem("hunter-recommendation-task-prompt") ||
+    sessionStorage.getItem("hunter-recommendation-report-prompt") ||
     "面向客户技术负责人，重点说明真机部署、团队管理和风险核实情况。";
   const baseReportVersions = buildRecommendationReportVersions(candidateName);
   const reportVersions = revised
@@ -574,11 +647,11 @@ function RecommendationReportTask({ taskId }) {
     },
   ];
   return (
-    <TaskWorkspaceShell currentId={taskId}>
+    <section className="s2-page s2-recommendation-asset-workspace">
       <header className="s2-detail-header">
-        <button type="button" onClick={() => navigate("/works")}>
+        <button type="button" onClick={onClose}>
           <Icon name="chevronLeft" />
-          返回全部工作
+          返回人岗匹配
         </button>
         <div>
           <small>候选人推荐报告</small>
@@ -586,12 +659,6 @@ function RecommendationReportTask({ taskId }) {
           <p>关联：具身智能 VLA 算法负责人 · {candidateName}</p>
         </div>
         <div>
-          <Button
-            size="sm"
-            onClick={() => navigate("/positions/position-vla?tab=matching")}
-          >
-            查看岗位匹配
-          </Button>
           <StatusBadge tone={revised ? "success" : "warning"}>
             {revised ? "完成" : "等待用户"}
           </StatusBadge>
@@ -703,6 +770,6 @@ function RecommendationReportTask({ taskId }) {
           />
         ) : null}
       </div>
-    </TaskWorkspaceShell>
+    </section>
   );
 }

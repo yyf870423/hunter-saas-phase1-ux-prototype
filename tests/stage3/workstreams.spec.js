@@ -4,9 +4,9 @@ import {
   trackConsoleErrors,
 } from "../stage1/helpers";
 
-test("四类持续工作可以从同一工作历史区切换且内容不同", async ({ page }) => {
+test("四类持续任务可以从同一任务历史区切换且内容不同", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
-  await page.goto("#/workstreams/client-xinglan");
+  await page.goto("#/tasks/client-xinglan");
   await expect(
     page.getByRole("heading", { name: "星澜机器人招聘合作" }),
   ).toBeVisible();
@@ -15,12 +15,12 @@ test("四类持续工作可以从同一工作历史区切换且内容不同", as
     .filter({ hasText: "具身智能核心人才版图" })
     .first()
     .click();
-  await expect(page).toHaveURL(/works\/mapping-embodied/);
+  await expect(page).toHaveURL(/tasks\/mapping-embodied/);
   await expect(
     page.getByRole("heading", { name: "具身智能核心人才版图" }),
   ).toBeVisible();
   await page.getByRole("button", { name: /林昊职业机会/ }).click();
-  await expect(page).toHaveURL(/works\/career-linhao/);
+  await expect(page).toHaveURL(/tasks\/career-linhao/);
   await expect(
     page.getByRole("heading", { name: "林昊职业机会" }),
   ).toBeVisible();
@@ -29,14 +29,14 @@ test("四类持续工作可以从同一工作历史区切换且内容不同", as
     .filter({ hasText: "具身智能 VLA 算法负责人" })
     .first()
     .click();
-  await expect(page).toHaveURL(/works\/position-vla/);
+  await expect(page).toHaveURL(/tasks\/position-vla/);
   await assertNoConsoleErrors();
 });
 
 test("客户开发完成联系人审核、联系授权、外部等待和招聘机会回流", async ({
   page,
 }) => {
-  await page.goto("#/workstreams/client-xinglan");
+  await page.goto("#/tasks/client-xinglan");
   await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -81,7 +81,7 @@ test("客户开发完成联系人审核、联系授权、外部等待和招聘�
 test("客户开发没有联系人时展示可执行缺口而不生成虚假联系人", async ({
   page,
 }) => {
-  await page.goto("#/workstreams/client-xinglan?state=no-contact");
+  await page.goto("#/tasks/client-xinglan?state=no-contact");
   await expect(
     page.getByText("暂未找到可以直接联系的招聘负责人"),
   ).toBeVisible();
@@ -93,7 +93,7 @@ test("客户开发没有联系人时展示可执行缺口而不生成虚假联�
 });
 
 test("人才摸排分批审核公司、人物、冲突和待补充信息", async ({ page }) => {
-  await page.goto("#/workstreams/mapping-embodied");
+  await page.goto("#/tasks/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -125,7 +125,7 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
 });
 
 test("人才摸排每条变化显示对应关系影响并保持同一审核决定", async ({ page }) => {
-  await page.goto("#/workstreams/mapping-embodied");
+  await page.goto("#/tasks/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -191,7 +191,7 @@ test("人才摸排关系画布缩放可重置且移动端不产生页面横向�
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#/workstreams/mapping-embodied");
+  await page.goto("#/tasks/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -212,13 +212,13 @@ test("人才摸排关系画布缩放可重置且移动端不产生页面横向�
   await expectNoHorizontalOverflow(page);
 });
 
-test("相关任务详情使用人才摸排自己的结果去向和检查点", async ({ page }) => {
-  await page.goto("#/workstreams/mapping-embodied");
+test("相关处理详情使用人才摸排自己的结果去向和检查点", async ({ page }) => {
+  await page.goto("#/tasks/mapping-embodied");
   await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
   await page.getByRole("button", { name: "执行计划" }).click();
-  await page.getByRole("button", { name: /相关任务/ }).click();
+  await page.getByRole("button", { name: /相关处理/ }).click();
   await page.getByRole("button", { name: /人物关系与联系路径/ }).click();
   await expect(
     page.getByText("具身智能核心人才版图 · 本批次增量更新"),
@@ -228,7 +228,7 @@ test("相关任务详情使用人才摸排自己的结果去向和检查点", as
 });
 
 test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ page }) => {
-  await page.goto("#/workstreams/career-linhao");
+  await page.goto("#/tasks/career-linhao");
   await expect(page.getByText("系统内有 3 个岗位值得查看")).toBeVisible({
     timeout: 10_000,
   });
@@ -249,7 +249,7 @@ test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ pa
   await expect(page.getByText("推荐理由", { exact: true })).toBeVisible();
   await expect(page.getByText("风险提示", { exact: true })).toBeVisible();
   await expect(page.getByText("建议沟通要点", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "返回工作并继续" }).click();
+  await page.getByRole("button", { name: "返回任务并继续" }).click();
   await expect(page.getByText("请由你本人联系林昊")).toBeVisible();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
   await input.fill("已经联系，暂时还没有回复。");
@@ -259,7 +259,7 @@ test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ pa
 });
 
 test("候选人求职新简历只触发受影响岗位重匹配", async ({ page }) => {
-  await page.goto("#/workstreams/career-linhao?state=new-resume");
+  await page.goto("#/tasks/career-linhao?state=new-resume");
   await expect(
     page.getByText("新简历已合并，2 个岗位需要重新判断"),
   ).toBeVisible();
@@ -268,7 +268,7 @@ test("候选人求职新简历只触发受影响岗位重匹配", async ({ page 
 });
 
 test("岗位招聘在入岗位储备后单独确认联系并接收新简历", async ({ page }) => {
-  await page.goto("#/workstreams/position-vla?state=review");
+  await page.goto("#/tasks/position-vla?state=review");
   await page.getByRole("button", { name: /打开候选人审核/ }).click();
   await page.getByRole("button", { name: "加入岗位储备" }).click();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
@@ -289,7 +289,7 @@ test("岗位招聘在入岗位储备后单独确认联系并接收新简历", as
 });
 
 test("岗位招聘无候选人时解释原因且不放宽硬门槛", async ({ page }) => {
-  await page.goto("#/workstreams/position-vla?state=no-candidate");
+  await page.goto("#/tasks/position-vla?state=no-candidate");
   await expect(page.getByText("本轮没有候选人通过岗位门禁")).toBeVisible();
   await expect(page.getByText(/角色层级明显不匹配/)).toBeVisible();
   await expect(page.getByText(/不会为了凑数量放宽/)).toBeVisible();
@@ -304,17 +304,17 @@ for (const scenario of [
   "career-linhao",
 ]) {
   test(`${scenario} 覆盖加载、中断、权限受限和局部失败`, async ({ page }) => {
-    await page.goto(`#/workstreams/${scenario}?state=loading`);
+    await page.goto(`#/tasks/${scenario}?state=loading`);
     await expect(page.locator(".s2-workspace-loading")).toBeVisible();
-    await page.goto(`#/workstreams/${scenario}?state=stream-error`);
+    await page.goto(`#/tasks/${scenario}?state=stream-error`);
     await expect(page.getByText("回复生成中断")).toBeVisible();
     await page.getByRole("button", { name: "继续生成" }).click();
     await expect(page.getByText("回复生成中断")).toHaveCount(0);
-    await page.goto(`#/workstreams/${scenario}?state=limited`);
+    await page.goto(`#/tasks/${scenario}?state=limited`);
     await expect(page.locator(".s2-permission-state")).toBeVisible();
     await page.getByRole("button", { name: "处理权限" }).click();
     await expect(page.getByText("已打开对应权限处理入口")).toBeVisible();
-    await page.goto(`#/workstreams/${scenario}?state=error`);
+    await page.goto(`#/tasks/${scenario}?state=error`);
     await expect(page.locator(".s2-local-error")).toBeVisible();
     await page.getByRole("button", { name: "重试失败步骤" }).click();
     await expect(page.locator(".s2-local-error")).toHaveCount(0);
@@ -323,7 +323,7 @@ for (const scenario of [
 
 test("移动端客户联系人和候选人岗位详情可查看并返回", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#/workstreams/client-xinglan");
+  await page.goto("#/tasks/client-xinglan");
   await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -343,7 +343,7 @@ test("客户开发邮件草稿使用独立编辑组件且需要逐次确认", as
     { width: 390, height: 844 },
   ]) {
     await page.setViewportSize(viewport);
-    await page.goto("#/workstreams/client-xinglan");
+    await page.goto("#/tasks/client-xinglan");
     await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
       timeout: 10_000,
     });
@@ -383,7 +383,7 @@ test("客户开发邮件草稿使用独立编辑组件且需要逐次确认", as
   }
 });
 
-test("四类业务主线的 Markdown 标题列表引用和表格保持统一渲染", async ({
+test("四类业务任务的 Markdown 标题列表引用和表格保持统一渲染", async ({
   page,
 }) => {
   const scenarios = [
@@ -395,7 +395,7 @@ test("四类业务主线的 Markdown 标题列表引用和表格保持统一渲�
   const coveredTags = new Set();
 
   for (const [route, marker] of scenarios) {
-    await page.goto(`#/workstreams/${route}`);
+    await page.goto(`#/tasks/${route}`);
     await expect(page.getByText(marker)).toBeVisible({ timeout: 10_000 });
     const audit = await page
       .locator(".s2-hunter-reply")
@@ -432,7 +432,7 @@ test("四类业务主线的 Markdown 标题列表引用和表格保持统一渲�
   }
 });
 
-test("业务主线普通回复不再依赖场景专用对话卡片", async ({ page }) => {
+test("任务普通回复不再依赖场景专用对话卡片", async ({ page }) => {
   const scenarios = [
     ["client-xinglan?state=reply", "回复已形成一条招聘机会"],
     ["position-vla?state=review", "首批候选人已经可以审核"],
@@ -441,7 +441,7 @@ test("业务主线普通回复不再依赖场景专用对话卡片", async ({ pa
   ];
 
   for (const [route, marker] of scenarios) {
-    await page.goto(`#/workstreams/${route}`);
+    await page.goto(`#/tasks/${route}`);
     await expect(page.getByText(marker, { exact: false }).first()).toBeVisible({
       timeout: 10_000,
     });

@@ -32,7 +32,7 @@ import {
 } from "./operations-ui";
 
 const taskColumns = [
-  { key: "id", label: "任务编号", width: 180 },
+  { key: "id", label: "运行编号", width: 180 },
   { key: "workspace", label: "工作空间", width: 210 },
   {
     key: "scope",
@@ -97,15 +97,15 @@ function ErrorDrawer({ error, close }) {
           items={[
             ["发生次数", `${error.count} 次`],
             ["影响工作空间", `${error.workspaces} 个`],
-            ["影响任务类型", error.taskTypes],
+            ["影响运行类型", error.taskTypes],
             ["关联能力", error.capability],
             ["首次发生", error.firstSeen],
             ["最近发生", error.lastSeen],
           ]}
         />
         <OpsSection
-          title="代表任务"
-          description="只显示任务元数据和错误上下文。"
+          title="代表运行"
+          description="只显示运行元数据和错误上下文。"
         >
           <div className="ops-link-list">
             {representative.map((task) => (
@@ -135,13 +135,13 @@ function ErrorDrawer({ error, close }) {
               {
                 title: "错误分类已聚合",
                 meta: error.firstSeen,
-                detail: "系统使用相同错误码聚合受影响任务。",
+                detail: "系统使用相同错误码聚合受影响运行。",
                 tone: "success",
               },
               {
                 title: "已启用可用降级路径",
                 meta: "今天 15:54",
-                detail: "现有任务继续运行，新任务优先走兜底能力。",
+                detail: "现有运行继续执行，后续运行优先走兜底能力。",
                 tone: "warning",
               },
               {
@@ -231,7 +231,7 @@ export function TasksPage() {
       width: 140,
       render: (row) => `${row.workspaces} 个`,
     },
-    { key: "taskTypes", label: "影响任务类型", width: 240 },
+    { key: "taskTypes", label: "影响运行类型", width: 240 },
     { key: "lastSeen", label: "最近发生", width: 140 },
     {
       key: "status",
@@ -243,21 +243,21 @@ export function TasksPage() {
   return (
     <div className="ops-page">
       <OpsPageHeader
-        title="任务与故障"
-        description="统一查看工作执行、相关任务执行和系统后台任务的脱敏运行元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
+        title="运行与故障"
+        description="统一查看任务运行、任务步骤运行、资产 AI 运行和系统运行的脱敏元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
       />
       <OpsTabs
         value={tab}
         onChange={switchTab}
-        label="任务与故障范围"
+        label="运行与故障范围"
         items={[
-          { value: "runs", label: "任务运行", count: tasks.length },
+          { value: "runs", label: "运行记录", count: tasks.length },
           { value: "errors", label: "错误中心", count: errorGroups.length },
         ]}
       />
       <OpsState
         state={state}
-        label={tab === "runs" ? "任务运行" : "错误中心"}
+        label={tab === "runs" ? "运行记录" : "错误中心"}
         onRetry={() => switchTab(tab)}
       >
         <OpsFilterBar
@@ -265,14 +265,14 @@ export function TasksPage() {
           onQuery={list.setQuery}
           placeholder={
             tab === "runs"
-              ? "搜索任务编号、工作空间、所属工作、执行归属、执行类型或错误码"
-              : "搜索错误码、分类或任务类型"
+              ? "搜索运行编号、工作空间、所属对象、执行归属、执行类型或错误码"
+              : "搜索错误码、分类或运行类型"
           }
           filters={
             tab === "runs"
               ? [
                   {
-                    label: "任务状态",
+                    label: "运行状态",
                     options: ["运行中", "需处理", "失败", "已完成", "已取消"],
                     value: filters.status || [],
                     onChange: (value) =>
@@ -281,7 +281,12 @@ export function TasksPage() {
                   },
                   {
                     label: "执行归属",
-                    options: ["工作执行", "相关任务执行", "系统后台任务"],
+                    options: [
+                      "任务运行",
+                      "任务步骤运行",
+                      "资产 AI 运行",
+                      "系统运行",
+                    ],
                     value: filters.scope || [],
                     onChange: (value) =>
                       setFilters((current) => ({ ...current, scope: value })),
@@ -325,7 +330,7 @@ export function TasksPage() {
                   },
                   {
                     label: "关联能力",
-                    options: ["大模型", "公开网络搜索", "邮件", "任务执行"],
+                    options: ["大模型", "公开网络搜索", "邮件", "执行调度"],
                     value: filters.capability || "",
                     onChange: (value) =>
                       setFilters((current) => ({
@@ -466,7 +471,7 @@ export function TaskDetailPage() {
   const [recovery, setRecovery] = useState(false);
   const timeline = [
     {
-      title: "任务创建并进入队列",
+      title: "运行创建并进入队列",
       meta: task.startedAt,
       detail: `触发方式：${task.trigger} · 执行归属：${task.scope} · 执行类型：${task.type}`,
       tone: "success",
@@ -482,7 +487,7 @@ export function TaskDetailPage() {
       meta: task.duration,
       detail:
         task.error === "—"
-          ? "任务按照执行计划继续推进。"
+          ? "运行按照执行计划继续推进。"
           : `检测到 ${task.error}，业务数据未写入。`,
       tone: task.error === "—" ? "info" : "danger",
     },
@@ -495,17 +500,17 @@ export function TaskDetailPage() {
         onClick={() => navigate("/ops/tasks")}
       >
         <Icon name="chevronLeft" />
-        返回任务与故障
+        返回运行与故障
       </button>
       <OpsPageHeader
         eyebrow={`${task.workspace} · ${task.type}`}
         title={task.id}
-        description="此页面仅显示任务元数据、脱敏调用链和安全恢复判断，不展示用户业务内容。"
+        description="此页面仅显示运行元数据、脱敏调用链和安全恢复判断，不展示用户业务内容。"
         actions={<OpsStatus>{task.status}</OpsStatus>}
       />
       <OpsState
         state={state}
-        label="任务详情"
+        label="运行详情"
         onRetry={() => {
           const next = new URLSearchParams(params);
           next.delete("state");
@@ -537,7 +542,7 @@ export function TaskDetailPage() {
           />
         ) : null}
         <div className="ops-task-detail-grid">
-          <OpsSection title="任务状态">
+          <OpsSection title="运行状态">
             <OpsDefinitionList
               items={[
                 ["工作空间", task.workspace],
@@ -546,7 +551,7 @@ export function TaskDetailPage() {
                 [
                   "所属对象",
                   task.workId === "—"
-                    ? "系统后台任务，不关联用户业务对象"
+                    ? "系统运行，不关联用户业务对象"
                     : `${task.workTitle} · ${task.workId}`,
                 ],
                 ["触发方式", task.trigger],
@@ -559,7 +564,7 @@ export function TaskDetailPage() {
                 ["资源状态", task.resource],
                 ["错误分类", task.error],
                 ["用量", task.usage],
-                ["任务输入与结果", "受隐私边界保护，不向运营端展示"],
+                ["运行输入与结果", "受隐私边界保护，不向运营端展示"],
               ]}
             />
           </OpsSection>
@@ -1156,7 +1161,7 @@ function SupportDrawer({ record, close }) {
             </span>
           </div>
         </OpsSection>
-        <OpsSection title="关联诊断与任务">
+        <OpsSection title="关联诊断与运行">
           <div className="ops-link-list">
             {record.diagnostic !== "—" ? (
               <button type="button">
@@ -1168,19 +1173,19 @@ function SupportDrawer({ record, close }) {
                 <Icon name="chevronRight" />
               </button>
             ) : null}
-            {record.category === "任务运行异常" ? (
+            {record.category === "运行记录异常" ? (
               <button type="button">
                 <Icon name="activity" />
                 <span>
                   <b>TASK-260824-019</b>
-                  <small>相关任务执行 · 学术搜索 · 失败</small>
+                  <small>任务步骤运行 · 学术搜索 · 失败</small>
                 </span>
                 <Icon name="chevronRight" />
               </button>
             ) : null}
-            {record.diagnostic === "—" && record.category !== "任务运行异常" ? (
+            {record.diagnostic === "—" && record.category !== "运行记录异常" ? (
               <p className="ops-muted-copy">
-                当前支持记录没有关联诊断包或运行任务。
+                当前支持记录没有关联诊断包或运行记录。
               </p>
             ) : null}
           </div>
@@ -1268,7 +1273,7 @@ function DiagnosticDrawer({ diagnostic, close }) {
               ["运行环境", diagnostic.environment],
               ["生成时间", diagnostic.createdAt],
               ["有效期", diagnostic.expiresAt],
-              ["关联任务", diagnostic.task],
+              ["关联运行", diagnostic.task],
               ["解析状态", diagnostic.status],
             ]}
           />
@@ -1428,7 +1433,7 @@ export function SupportPage() {
         { key: "version", label: "产品版本", width: 120 },
         { key: "createdAt", label: "生成时间", width: 130 },
         { key: "expiresAt", label: "有效期", width: 120 },
-        { key: "task", label: "关联任务", width: 180 },
+        { key: "task", label: "关联运行", width: 180 },
         { key: "environment", label: "环境摘要", width: 230 },
         {
           key: "status",
@@ -1540,7 +1545,7 @@ export function SupportPage() {
                   {
                     label: "问题分类",
                     options: [
-                      "任务运行异常",
+                      "运行记录异常",
                       "支付问题",
                       "试用范围",
                       "账号使用",

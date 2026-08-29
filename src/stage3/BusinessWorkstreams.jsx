@@ -262,7 +262,7 @@ ${createMarkdownTable(
 
 已经检查官网、公开职业资料和现有联系人，定位到两条角色线索，但都缺少可以验证的自然人身份或联系方式。
 
-> 可以新建“寻找星澜机器人招聘联系路径”的独立工作，或等待你补充自己的 HR、投资人和行业关系。当前工作不会猜测姓名或反复发送无效请求。`}
+> 可以新建“寻找星澜机器人招聘联系路径”的独立任务，或等待你补充自己的 HR、投资人和行业关系。当前任务不会猜测姓名或反复发送无效请求。`}
         >
           <ReviewEntry
             icon="route"
@@ -319,7 +319,7 @@ ${createMarkdownTable(
             onCancel={() => notify("邮件草稿已保留，本次没有发送", "info")}
             onSend={() => {
               setPhase(5);
-              notify("邮件已发送，回复会回到当前工作", "success");
+              notify("邮件已发送，回复会回到当前任务", "success");
             }}
           />
         </HunterReply>
@@ -327,7 +327,7 @@ ${createMarkdownTable(
       {phase === 5 ? (
         <ExternalWaitState
           title="等待陈雨回复招聘合作邮件"
-          description="邮件已于今天 09:26 发送。邮件回复会自动回到当前工作；猎头在系统外获得的新信息也可以作为普通跟进记录补充。"
+          description="邮件已于今天 09:26 发送。邮件回复会自动回到当前任务；猎头在系统外获得的新信息也可以作为普通跟进记录补充。"
           meta="最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 · 7 天后标记长期未回复"
           onAddResult={() =>
             notify("可以在下方输入回复内容，或上传邮件截图和附件", "info")
@@ -350,7 +350,7 @@ ${createMarkdownTable(
 | 联系人 | 陈雨 · 招聘负责人 |
 | 仍缺信息 | 完整 JD、汇报关系、薪酬范围、合作预算 |
 
-> 如果后续收到完整 JD，Hunter 会先生成岗位草稿；用户确认后再创建正式岗位并启动对应工作。`}
+> 如果后续收到完整 JD，Hunter 会先生成岗位草稿；用户确认后再创建正式岗位并启动对应任务。`}
         />
       ) : null}
     </>
@@ -478,7 +478,7 @@ ${createMarkdownTable(
               {
                 value: "explore",
                 label: "继续探索缺失负责人",
-                description: "创建一条范围有限的人物探索支线。",
+                description: "创建一项范围有限的人物探索处理。",
               },
               {
                 value: "finish",
@@ -489,7 +489,7 @@ ${createMarkdownTable(
             onSelect={(option) =>
               notify(
                 option.value === "explore"
-                  ? "已准备人物探索支线，确认范围后开始"
+                  ? "已准备人物探索处理，确认范围后开始"
                   : "本轮摸排已结束，待补充信息继续保留在人才版图",
                 "success",
               )
@@ -587,7 +587,7 @@ function CareerTimeline({
         <HunterReply
           markdown={`## 当前没有合适的系统内岗位
 
-7 个有效岗位均未通过角色层级或硬技能门槛。Hunter 不会为了维持工作进度而放宽硬门槛，也不会转去搜索公开市场职位。
+7 个有效岗位均未通过角色层级或硬技能门槛。Hunter 不会为了维持任务进度而放宽硬门槛，也不会转去搜索公开市场职位。
 
 > 可以先由你联系林昊核实真实意愿并补充资料。本轮结束后，未来系统出现新的合适岗位时会形成新的候选人动向或岗位匹配提醒。`}
         />
@@ -623,7 +623,7 @@ function CareerTimeline({
 | 新增量产双臂机器人项目 | 拓界岗位的产品落地风险降低 |
 | 明确只考虑北京或远程 | 上海、深圳岗位降级，不再优先建议 |
 
-> 如果林昊确认有意愿，可以由你选择把他交给星澜或其他岗位招聘工作；正式推荐和后续推进仍由猎头处理。`}
+> 如果林昊确认有意愿，可以由你选择把他交给星澜或其他岗位招聘任务；正式推荐和后续推进仍由猎头处理。`}
         />
       ) : null}
     </>
@@ -783,7 +783,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         {
           text: fullText,
           result:
-            "已把这条回复写回当前工作，正在整理招聘需求、确认依据和仍缺信息。",
+            "已把这条回复写回当前任务，正在整理招聘需求、确认依据和仍缺信息。",
         },
       ]);
       setPhase(6);
@@ -797,7 +797,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
           result:
             nextPhase === 6
               ? "已收到新的候选人信息。我会先展示档案变化与合并结果，再只重做受影响岗位的匹配。"
-              : "已记录本次人工跟进，当前工作进入等待外部；等待期间不持续消耗 Agent 用量。",
+              : "已记录本次人工跟进，当前任务进入等待外部；等待期间不持续消耗 Agent 用量。",
         },
       ]);
       setPhase(nextPhase);
@@ -807,7 +807,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         {
           text: fullText,
           result:
-            "已记录这项决定。Hunter 会在当前工作边界内继续处理，并在产生正式写入或外部影响前再次检查授权。",
+            "已记录这项决定。Hunter 会在当前任务边界内继续处理，并在产生正式写入或外部影响前再次检查授权。",
         },
       ]);
     }
@@ -927,7 +927,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         currentId={scenarioId}
         onToggle={() => setHistoryCollapsed((value) => !value)}
         onCreate={() => navigate("/new")}
-        onSelect={(item) => navigate(`/works/${item.id}`)}
+        onSelect={(item) => navigate(`/tasks/${item.id}`)}
       />
       <section className="s2-workstream-main">
         <WorkstreamHeader
@@ -1030,7 +1030,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                         : "候选人附件读取权限不足"}
                   </b>
                   <small>
-                    只暂停受影响的内部任务，其他来源和已经形成的结果继续保留。
+                    只暂停受影响的内部处理，其他来源和已经形成的结果继续保留。
                   </small>
                 </span>
                 <Button
@@ -1061,7 +1061,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
               <div className="s2-system-state is-danger">
                 <Icon name="warning" />
                 <span>
-                  <b>工作已终止</b>
+                  <b>任务已终止</b>
                   <small>对话、任务、审核结果和正式资产引用已保留。</small>
                 </span>
               </div>
@@ -1111,7 +1111,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
       <Modal
         open={terminateOpen}
         close={() => setTerminateOpen(false)}
-        title="终止工作"
+        title="终止任务"
         description="终止表示这项业务不再继续，不会删除历史和已确认成果。"
         footer={
           <>
@@ -1126,22 +1126,22 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 setTerminateOpen(false);
               }}
             >
-              终止工作
+              终止任务
             </Button>
           </>
         }
       >
         <div className="s2-confirm-copy">
           <p>
-            排队、运行和等待中的内部任务会安全停止；已确认的正式资产、来源证据和已经发生的外部动作继续保留。
+            排队、运行和等待中的内部处理会安全停止；已确认的正式资产、来源证据和已经发生的外部动作继续保留。
           </p>
-          <p>终止后可以查看历史，但需要新的业务目标时应新建工作。</p>
+          <p>终止后可以查看历史，但需要新的业务目标时应新建任务。</p>
         </div>
       </Modal>
       <Modal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
-        title="删除工作"
+        title="删除任务"
         description="删除只适用于误建或不希望保留的内容。"
         footer={
           <>
@@ -1153,7 +1153,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
               onClick={() => {
                 setDeleteOpen(false);
                 navigate("/home");
-                notify("工作已移入回收站，30 天内可以恢复", "success");
+                notify("任务已移入回收站，30 天内可以恢复", "success");
               }}
             >
               删除并移入回收站
@@ -1162,7 +1162,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         }
       >
         <div className="s2-confirm-copy">
-          <p>当前任务会先安全停止；工作专属的对话、计划和文件进入回收站。</p>
+          <p>当前任务会先安全停止；任务专属的对话、计划和文件进入回收站。</p>
           <p>
             公司、联系人、招聘机会、岗位、候选人和人才版图等正式资产不会被删除。
           </p>

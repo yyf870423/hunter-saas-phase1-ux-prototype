@@ -88,7 +88,7 @@ test("个人资料支持分区编辑、校验和安全操作", async ({ page }) 
 test("通知页区分可配置通知和强制通知", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/settings/notifications");
-  const taskMail = page.getByRole("switch", { name: "工作状态邮件通知" });
+  const taskMail = page.getByRole("switch", { name: "任务状态邮件通知" });
   await expect(taskMail).toBeChecked();
   await taskMail.click();
   await expect(taskMail).not.toBeChecked();
@@ -108,7 +108,7 @@ test("自动化授权支持三种统一模式且不展示内部门禁", async ({
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/settings/automation");
   await expect(page.getByText("强制门禁")).toHaveCount(0);
-  await expect(page.getByText("所有新工作", { exact: true })).toBeVisible();
+  await expect(page.getByText("所有新任务", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "修改" })).toHaveCount(1);
   await expect(page.getByText("客户开发", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "修改" }).click();

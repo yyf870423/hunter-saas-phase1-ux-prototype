@@ -1594,6 +1594,12 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: var(--s4-tooltip-lines);
 }
+.s4-tooltip.s4-action-tooltip {
+  display: inline-flex;
+  max-width: none;
+  overflow: visible;
+  white-space: normal;
+}
 .s4-floating-tooltip {
   position: fixed;
   z-index: 999;

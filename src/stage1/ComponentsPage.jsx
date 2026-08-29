@@ -123,9 +123,9 @@ export function ComponentsPage() {
         <article>
           <EmptyState
             icon="route"
-            title="还没有工作"
-            description="从一个真实目标开始，Hunter 会整理后续工作。"
-            action={<Button tone="primary">新建工作</Button>}
+            title="还没有任务"
+            description="从一个真实目标开始，Hunter 会整理后续步骤。"
+            action={<Button tone="primary">新建任务</Button>}
           />
         </article>
         <article className="s1-permission-sample">

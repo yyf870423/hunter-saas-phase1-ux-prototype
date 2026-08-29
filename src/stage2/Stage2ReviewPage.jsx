@@ -4,35 +4,31 @@ import { StatusBadge } from "../stage1/ui";
 
 const reviewLinks = [
   [
-    "持续工作渐进演示",
-    "/works/position-vla",
-    "从第一条用户输入开始，逐步出现回复、计划、任务、结果和审核",
+    "持续任务渐进演示",
+    "/tasks/position-vla",
+    "从第一条用户输入开始，逐步出现回复、计划、运行、结果和审核",
   ],
-  ["新建工作", "/new", "一个自然语言入口，由 Hunter 决定直接处理或进入工作区"],
-  ["统一工作列表", "/works", "持续工作与独立工作统一分类、搜索、分页和删除"],
+  ["新建任务", "/new", "一个自然语言入口，由 Hunter 决定一步完成或持续推进"],
+  ["任务列表", "/tasks", "用户主动创建的任务统一搜索、分类、分页和删除"],
   [
-    "独立工作详情",
-    "/works/task-hand-team",
+    "有限范围任务",
+    "/tasks/task-hand-team",
     "等待用户、补充信息、恢复和结果回流",
   ],
   ["信号中心", "/signals", "合并来源、观察、忽略、失效和转化"],
   [
     "推进方式判断中",
     "/new?state=classifying",
-    "保留用户输入，流式说明正在判断工作范围和生命周期",
+    "保留用户输入，流式说明正在判断任务范围和推进方式",
   ],
   ["目标歧义确认", "/new?state=clarify", "只追问一个会改变推进方式的关键问题"],
   [
     "直接完成",
     "/new?state=direct",
-    "可立即完成的小工作在当前对话返回 Markdown 结果",
+    "可立即完成的任务在当前对话返回 Markdown 结果",
   ],
-  ["持续推进工作", "/new?state=mainline", "说明持续推进原因，再进入统一工作区"],
-  [
-    "独立交付工作",
-    "/new?state=task",
-    "说明有限范围和交付边界，再进入统一工作区",
-  ],
+  ["持续推进任务", "/new?state=mainline", "说明持续推进原因，再进入任务详情"],
+  ["有限范围任务", "/new?state=task", "说明有限范围和交付边界，再进入任务详情"],
   [
     "推进方式判断失败",
     "/new?state=error",
@@ -45,32 +41,32 @@ const reviewLinks = [
   ],
   [
     "加载状态",
-    "/works/position-vla?state=loading",
-    "工作区骨架保持稳定，不出现布局跳动",
+    "/tasks/position-vla?state=loading",
+    "任务详情骨架保持稳定，不出现布局跳动",
   ],
   [
     "流式失败",
-    "/works/position-vla?state=stream-error",
+    "/tasks/position-vla?state=stream-error",
     "保留已生成内容并从当前检查点继续",
   ],
   [
     "本机协作异常",
-    "/works/position-vla?state=limited",
+    "/tasks/position-vla?state=limited",
     "本机暂不可用时保留云端进展，并允许下载任务后继续",
   ],
   [
     "等待本机结果",
-    "/works/position-vla?state=local-waiting",
-    "云端结果先行可见，本机批次尚未返回时不阻塞当前工作",
+    "/tasks/position-vla?state=local-waiting",
+    "云端结果先行可见，本机批次尚未返回时不阻塞当前任务",
   ],
   [
     "旧版本结果回流",
-    "/works/position-vla?state=stale-task",
+    "/tasks/position-vla?state=stale-task",
     "岗位发生更新后，旧任务结果按最新版本重新匹配",
   ],
   [
     "候选人合并冲突",
-    "/works/position-vla?state=merge-conflict",
+    "/tasks/position-vla?state=merge-conflict",
     "本机批次与云端候选人疑似同人时等待用户决定",
   ],
   ["阶段一工作台", "/home", "已审批并冻结的全局框架与工作台"],
@@ -89,10 +85,10 @@ export function Stage2ReviewPage() {
         <StatusBadge tone="info">阶段二待审批</StatusBadge>
         <h1>自动化通用交互框架</h1>
         <p>
-          本轮审批统一工作区、相关任务和信号中心的通用交互。四类业务流程、正式业务资产和运营端仍属于后续阶段。
+          本轮审批统一任务详情、运行追踪和信号中心的通用交互。四类业务流程、正式业务资产和运营端仍属于后续阶段。
         </p>
-        <Link className="s1-review-primary" to="/works/position-vla">
-          进入渐进式工作演示
+        <Link className="s1-review-primary" to="/tasks/position-vla">
+          进入渐进式任务演示
           <Icon name="chevronRight" />
         </Link>
       </header>
@@ -100,7 +96,7 @@ export function Stage2ReviewPage() {
         <div>
           <small>01</small>
           <h2>页面入口</h2>
-          <p>建议先观察渐进式工作，再检查大型审核、独立工作和信号转化。</p>
+          <p>建议先观察渐进式任务，再检查大型审核、一步完成任务和信号转化。</p>
         </div>
         <div className="s1-review-links">
           {reviewLinks.map(([title, route, description]) => (
@@ -124,7 +120,7 @@ export function Stage2ReviewPage() {
           <article>
             <Icon name="check" />
             <b>对象边界</b>
-            <p>工作、相关任务和信号在页面位置、状态与去向上是否容易区分。</p>
+            <p>任务、运行和信号在页面位置、状态与去向上是否容易区分。</p>
           </article>
           <article>
             <Icon name="task" />
@@ -155,7 +151,7 @@ export function Stage2ReviewPage() {
         </div>
         <div className="s1-review-viewports">
           <span>
-            <b>本轮包含</b>通用工作区、计划、任务、结果、审核、授权和信号处理
+            <b>本轮包含</b>任务详情、计划、运行、结果、审核、授权和信号处理
           </span>
           <span>
             <b>阶段三</b>客户开发、岗位招聘、人才摸排、候选人求职完整剧本

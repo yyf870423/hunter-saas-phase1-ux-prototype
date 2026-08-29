@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { RecommendationReportWorkspace } from "../stage2/SideTasks";
 import {
   buildRecommendationReportVersions,
   buildRevisedRecommendationReport,
@@ -29,6 +30,7 @@ import {
   TagList,
   TextArea,
   TextInput,
+  TooltipText,
   useToast,
 } from "./asset-ui";
 import {
@@ -42,12 +44,13 @@ const tabs = [
   { value: "profile", label: "岗位资料" },
   { value: "pipeline", label: "候选人流程", count: 11 },
   { value: "matching", label: "匹配结果", count: 128 },
-  { value: "work", label: "相关工作" },
+  { value: "work", label: "关联任务" },
 ];
 
-const positionAiWorkTitle = "星澜机器人 · 具身智能团队招聘";
 const positionAiSupplement =
   "客户强调这是能直接参与技术路线决策的负责人岗位，需要同时判断候选人的技术深度、真机落地经验和团队管理跨度。";
+const positionMatchingTooltip =
+  "使用 Hunter 中已有候选人计算与当前岗位的适配程度，不会从外部平台或公开网络寻找新候选人。";
 
 function buildPositionAiRecord(state = "complete") {
   const planByState = {
@@ -122,7 +125,6 @@ function buildPositionAiRecord(state = "complete") {
         : "重新解析具身智能 VLA 算法负责人",
     target: "具身智能 VLA 算法负责人",
     source: "岗位详情 · 当前岗位 JD",
-    work: positionAiWorkTitle,
     state,
     startedAt: state === "complete" ? "8 月 19 日 16:42" : "今天 10:26",
     updatedAt:
@@ -165,6 +167,96 @@ function buildPositionAiRecord(state = "complete") {
               tone: "success",
             },
           ],
+  };
+}
+
+function buildPositionMatchingRecord() {
+  return {
+    id: "position-matching-v12",
+    type: "人岗匹配",
+    title: "128 位候选人人岗匹配",
+    target: "具身智能 VLA 算法负责人",
+    source: "岗位详情 · 人岗匹配",
+    state: "complete",
+    startedAt: "今天 09:34",
+    updatedAt: "今天 09:40",
+    summary: "已完成硬门槛、角色适配和综合得分计算，结果等待业务处理。",
+    plan: [
+      {
+        title: "读取岗位与候选人资料",
+        detail: "读取岗位资料 v3 和 128 位候选人的当前资料版本。",
+        state: "complete",
+        label: "已完成",
+      },
+      {
+        title: "计算门槛与适配结果",
+        detail: "完成硬门槛、角色适配和综合得分计算。",
+        state: "complete",
+        label: "已完成",
+      },
+      {
+        title: "保存可审核结果",
+        detail: "匹配结果已保存到当前岗位，不会自动推进候选人流程。",
+        state: "complete",
+        label: "已完成",
+      },
+    ],
+    runs: [
+      {
+        id: "matching-run-12",
+        label: "运行 #12",
+        time: "今天 09:34 · 6 分 18 秒",
+        detail: "完成 128 位候选人处理并保存当前结果。",
+        status: "完成",
+        tone: "success",
+      },
+    ],
+  };
+}
+
+function buildRecommendationReportRecord() {
+  return {
+    id: "recommendation-report-linhao",
+    type: "推荐报告",
+    title: "林昊 · 客户推荐报告",
+    target: "具身智能 VLA 算法负责人 × 林昊",
+    source: "人岗匹配详情",
+    state: "complete",
+    startedAt: "今天 10:08",
+    updatedAt: "今天 10:20",
+    summary: "已生成并保留两版报告，可从匹配详情继续通过对话调整。",
+    plan: [
+      {
+        title: "读取匹配证据",
+        detail: "读取岗位、候选人和当前匹配结论。",
+        state: "complete",
+        label: "已完成",
+      },
+      {
+        title: "生成报告文件",
+        detail: "报告文件已经保存到当前候选人的匹配结果。",
+        state: "complete",
+        label: "已完成",
+      },
+    ],
+    runs: [
+      {
+        id: "report-run-2",
+        label: "运行 #2",
+        time: "今天 10:20 · 42 秒",
+        detail: "根据用户反馈生成第二版推荐报告。",
+        status: "完成",
+        tone: "success",
+      },
+      {
+        id: "report-run-1",
+        label: "运行 #1",
+        time: "今天 10:08 · 1 分 16 秒",
+        detail: "生成推荐报告初稿。",
+        status: "完成",
+        tone: "success",
+      },
+    ],
   };
 }
 
@@ -472,7 +564,7 @@ function PositionAiStartModal({ open, close, onStart }) {
       close={close}
       size="lg"
       title="AI 解析当前岗位"
-      description="处理结果保存在当前岗位，确认前不会修改正式资料，也不会新增工作"
+      description="处理结果保存在当前岗位，确认前不会修改正式资料，也不会新增任务"
       footer={
         <>
           <Button onClick={close}>取消</Button>
@@ -958,7 +1050,7 @@ function PositionSectionEditor({ section, close, onSave }) {
           tone="warning"
           icon="warning"
           title="当前有 2 个运行中任务，暂时不能保存"
-          description="暂停或关闭岗位前，需要先停止对应的岗位招聘工作和候选人匹配任务。"
+          description="暂停或关闭岗位前，需要先停止对应的岗位招聘任务和候选人匹配任务。"
         />
       ) : null}
     </Modal>
@@ -990,7 +1082,7 @@ const pipelineCandidateSeed = {
     company: "银河通用",
     title: "机器人算法专家",
     score: null,
-    note: "手动加入，尚未进行岗位匹配",
+    note: "手动加入，尚未进行人岗匹配",
     stageDays: 0,
   },
   linhao: {
@@ -2024,9 +2116,9 @@ function MatchingResults() {
     notify(`${current.name} 已恢复到匹配结果`);
     changeScope("all");
   };
-  const startReportTask = (candidate, requirement) => {
+  const startReportProcessing = (candidate, requirement) => {
     sessionStorage.setItem(
-      "hunter-recommendation-task-prompt",
+      "hunter-recommendation-report-prompt",
       requirement ||
         "重点说明候选人的 VLA 落地能力、团队管理范围和岗位适配证据。",
     );
@@ -2037,7 +2129,9 @@ function MatchingResults() {
       JSON.stringify(candidate),
     );
     sessionStorage.setItem("hunter-matching-selected-candidate", candidate.id);
-    navigate("/works/task-recommend-linhao");
+    navigate(
+      `/positions/position-vla?tab=matching&report=${encodeURIComponent(candidate.id)}`,
+    );
   };
   return (
     <div className="s4-match-shell">
@@ -2173,7 +2267,7 @@ function MatchingResults() {
           {current.score === null ? (
             <div className="s4-match-pending-detail">
               <Icon name="clock" />
-              <h3>尚未进行岗位匹配</h3>
+              <h3>尚未进行人岗匹配</h3>
               <p>该候选人由用户手动加入候选池，资料已进入下一批匹配队列。</p>
               <Button
                 tone="primary"
@@ -2234,7 +2328,7 @@ function MatchingResults() {
               <RecommendationReportFile
                 candidateName={current.name}
                 report={reportFiles[current.id][0]}
-                onRegenerate={() => startReportTask(current)}
+                onRegenerate={() => startReportProcessing(current)}
               />
             ) : (
               <div className="s4-report-empty">
@@ -2243,7 +2337,7 @@ function MatchingResults() {
                   <b>未生成过推荐报告</b>
                   <small>
                     {pipelineStages[current.id]
-                      ? "可新建工作生成报告，完成后最新文件会显示在这里。"
+                      ? "可生成并持续调整报告，最新文件会显示在这里。"
                       : "候选人加入岗位流程后，才可以生成面向客户的推荐报告。"}
                   </small>
                 </span>
@@ -2277,7 +2371,7 @@ function MatchingResults() {
               <>
                 <Button
                   tone="danger-outline"
-                  onClick={() => removeCandidate("从当前岗位匹配结果中移除")}
+                  onClick={() => removeCandidate("从当前人岗匹配结果中移除")}
                 >
                   从结果移除
                 </Button>
@@ -2321,7 +2415,7 @@ function MatchingResults() {
         close={() => setReportCandidate(null)}
         size="lg"
         title={`为 ${reportCandidate?.name || "候选人"} 生成推荐报告`}
-        description="这会创建一项独立工作；可以继续通过对话补充要求和修改报告"
+        description="报告保存在当前岗位与候选人的匹配结果中，可以持续通过对话补充要求和修改"
         footer={
           <>
             <Button onClick={() => setReportCandidate(null)}>取消</Button>
@@ -2330,10 +2424,10 @@ function MatchingResults() {
               onClick={() => {
                 const candidate = reportCandidate;
                 setReportCandidate(null);
-                startReportTask(candidate, reportPrompt);
+                startReportProcessing(candidate, reportPrompt);
               }}
             >
-              创建并开始
+              开始生成
             </Button>
           </>
         }
@@ -2476,11 +2570,11 @@ function RelatedWork({ processingRecords, onOpenProcessing }) {
   const navigate = useNavigate();
   return (
     <div className="s4-detail-stack">
-      <FieldGroup title="相关工作">
+      <FieldGroup title="关联任务">
         <button
           type="button"
           className="s4-related-mainline"
-          onClick={() => navigate("/works/position-vla")}
+          onClick={() => navigate("/tasks/position-vla")}
         >
           <i>
             <Icon name="route" />
@@ -2496,7 +2590,7 @@ function RelatedWork({ processingRecords, onOpenProcessing }) {
       </FieldGroup>
       <FieldGroup
         title="AI 处理记录"
-        description="当前岗位上的解析、匹配与内容生成记录，不进入工作列表。"
+        description="当前岗位上的解析、匹配与内容生成记录，不进入任务列表。"
       >
         <AssetAiProcessHistory
           records={processingRecords}
@@ -2600,13 +2694,26 @@ export function PositionDetailPage() {
   const aiRecord = buildPositionAiRecord(
     ["running", "review", "failed"].includes(aiState) ? aiState : "complete",
   );
-  const processingRecords = ["running", "review", "failed"].includes(aiState)
-    ? [aiRecord, buildPositionAiRecord("complete")]
-    : [buildPositionAiRecord("complete")];
+  const processingRecords = [
+    ...(["running", "review", "failed"].includes(aiState)
+      ? [aiRecord, buildPositionAiRecord("complete")]
+      : [buildPositionAiRecord("complete")]),
+    buildPositionMatchingRecord(),
+    buildRecommendationReportRecord(),
+  ];
   const selectedProcessId = params.get("process");
   const selectedProcessingRecord =
     processingRecords.find((record) => record.id === selectedProcessId) ||
     processingRecords[0];
+  if (params.get("report")) {
+    return (
+      <RecommendationReportWorkspace
+        onClose={() =>
+          updateQuery({ tab: "matching", report: null, panel: null })
+        }
+      />
+    );
+  }
   return (
     <div className="s4-detail-page">
       <DetailHeader
@@ -2623,6 +2730,21 @@ export function PositionDetailPage() {
         onBack={() => navigate("/positions")}
         onDelete={() => setDeleteOpen(true)}
       >
+        <TooltipText
+          className="s4-action-tooltip"
+          tip={positionMatchingTooltip}
+          trigger="always"
+        >
+          <Button
+            icon="users"
+            aria-label={`人岗匹配：${positionMatchingTooltip}`}
+            onClick={() =>
+              updateQuery({ tab: "matching", panel: null, process: null })
+            }
+          >
+            人岗匹配
+          </Button>
+        </TooltipText>
         <Button
           icon="sparkles"
           onClick={() => navigate(`/new?prompt=为${detail.name}寻找候选人`)}
@@ -2683,7 +2805,7 @@ export function PositionDetailPage() {
         open={aiPanel === "details"}
         close={() => updateQuery({ panel: null, process: null })}
         record={selectedProcessingRecord}
-        onOpenWork={() => navigate("/works/position-vla")}
+        onOpenWork={() => navigate("/tasks/position-vla")}
         primaryLabel={
           selectedProcessingRecord.state === "review"
             ? "审核解析结果"
@@ -2702,7 +2824,7 @@ export function PositionDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="岗位"
         assetName={detail.name}
-        impact="候选人档案和公司不会删除；岗位推进、匹配与相关工作保留已删除引用，30 天内可恢复。"
+        impact="候选人档案和公司不会删除；岗位推进、匹配与关联任务保留已删除引用，30 天内可恢复。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("岗位已进入回收站");

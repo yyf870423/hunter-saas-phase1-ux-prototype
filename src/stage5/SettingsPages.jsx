@@ -575,7 +575,7 @@ export function ProfileSettingsPage() {
 const notificationRows = [
   ["decision", "需要我处理", "待确认、待授权和需要补充信息", true, true, true],
   ["reply", "外部回复", "邮件回复、新简历和附件到达", true, true, true],
-  ["task", "工作状态", "完成、失败、暂停和等待外部", true, true, false],
+  ["task", "任务状态", "完成、失败、暂停和等待外部", true, true, false],
   ["signal", "高优先级信号", "即将失效的机会和强信号", true, true, false],
   ["app", "寻访 App", "结果提交、设备授权和版本异常", true, true, false],
   ["billing", "额度与订阅", "额度不足、预算上限和订阅到期", true, true, true],
@@ -603,7 +603,7 @@ export function NotificationSettingsPage() {
     <PageState state={state} clearState={clearState}>
       <SettingsPageHeader
         title="通知"
-        description="选择重要事项的提醒方式，避免错过需要处理的工作。"
+        description="选择重要事项的提醒方式，避免错过需要处理的任务。"
         actions={
           <Button tone="primary" loading={saving} onClick={save}>
             保存设置
@@ -693,7 +693,7 @@ export function NotificationSettingsPage() {
       </SettingsSection>
       <SettingsSection
         title="低优先级摘要"
-        description="普通工作进展和观察信号可以合并提醒，减少打断。"
+        description="普通任务进展和观察信号可以合并提醒，减少打断。"
       >
         <div className="s5-summary-choice">
           <SelectMenu
@@ -729,20 +729,20 @@ export function AutomationSettingsPage() {
     <PageState state={state} clearState={clearState}>
       <SettingsPageHeader
         title="自动化授权"
-        description="设置新工作的默认执行边界；运行中的工作可以单独调整。"
+        description="设置新任务的默认执行边界；运行中的任务可以单独调整。"
       />
       <InlineNotice>
-        默认使用“执行前确认”。授权只影响尚未执行的动作，运行中的工作可以单独调整。
+        默认使用“执行前确认”。授权只影响尚未执行的动作，运行中的任务可以单独调整。
       </InlineNotice>
       <SettingsSection
-        title="新工作默认授权"
-        description="所有新创建的工作继承同一默认值；进入工作后仍可单独调整。"
+        title="新任务默认授权"
+        description="所有新创建的任务继承同一默认值；进入任务后仍可单独调整。"
       >
         <div className="s5-automation-list">
           <SettingRow
             icon="activity"
-            title="所有新工作"
-            description="适用于从新建入口、信号或业务资产启动的工作"
+            title="所有新任务"
+            description="适用于从新建入口或信号启动的任务"
             meta="上次修改于 2026 年 8 月 18 日"
             status={
               <StatusBadge
@@ -768,8 +768,8 @@ export function AutomationSettingsPage() {
       <Modal
         open={editing}
         close={() => setEditing(false)}
-        title="修改新工作默认授权"
-        description="修改后只影响新创建且未单独指定授权的工作。"
+        title="修改新任务默认授权"
+        description="修改后只影响新创建且未单独指定授权的任务。"
         size="lg"
         footer={
           <ModalActions
@@ -1378,7 +1378,7 @@ export function ConnectionSettingsPage() {
         <InlineNotice tone="warning" icon="warning">
           {disconnect === "mail"
             ? "尚未发送的邮件草稿会保留，但发送和读取后续回复前需要重新连接邮箱。"
-            : "正在运行的设备侧工作不会被远程停止，请同时在设备中结束工作。"}
+            : "正在运行的设备侧处理不会被远程停止，请同时在设备中结束处理。"}
         </InlineNotice>
       </Modal>
     </PageState>
@@ -1430,7 +1430,7 @@ export function SubscriptionSettingsPage() {
             <h2>尚未订阅 Hunter</h2>
             <p>
               你可以浏览和导出已有业务数据；开始
-              Agent、自动化工作和付费数据处理前需要选择套餐。
+              Agent、自动化任务和付费数据处理前需要选择套餐。
             </p>
           </span>
           <Button tone="primary" onClick={() => setPlanModal(true)}>
@@ -1496,7 +1496,7 @@ export function SubscriptionSettingsPage() {
           </section>
           <SettingsSection
             title="额度预警"
-            description="达到用量边界前提前通知，避免运行中的工作意外停止。"
+            description="达到用量边界前提前通知，避免运行中的任务意外停止。"
           >
             <div className="s5-setting-list">
               <SettingRow
@@ -1511,7 +1511,7 @@ export function SubscriptionSettingsPage() {
               />
               <SettingRow
                 title="额度耗尽"
-                description="必须通知，并停止创建新的付费工作"
+                description="必须通知，并停止创建新的付费任务"
                 action={<Toggle label="额度耗尽提醒" checked disabled />}
               />
             </div>
@@ -1723,7 +1723,7 @@ export function DataPrivacySettingsPage() {
         <div className="s5-danger-list">
           <SettingRow
             title="删除个人工作空间"
-            description="所有业务资产、工作及相关文件进入待清理状态；保留期内可联系客服恢复。"
+            description="所有业务资产、任务及相关文件进入待清理状态；保留期内可联系客服恢复。"
             action={
               <Button
                 tone="danger"
@@ -1772,7 +1772,7 @@ export function DataPrivacySettingsPage() {
           </InlineNotice>
         ) : null}
         <div className="s5-danger-copy">
-          <p>删除后所有业务数据将不可继续编辑，正在运行的工作会停止。</p>
+          <p>删除后所有业务数据将不可继续编辑，正在运行的任务会停止。</p>
           <FormField
             label={`输入“${workspaceName}”确认`}
             required

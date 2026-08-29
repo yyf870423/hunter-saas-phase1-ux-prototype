@@ -11,7 +11,7 @@
 | 微信扫码登录   | 用户认证页“微信扫码”           | WeChatAuth    | 展示真实生成的演示二维码，模拟确认后进入 `#/home` | 生成中、生成失败、按钮禁用                   | 已覆盖 |
 | 注册账号       | 用户认证页“注册账号”           | RegisterForm  | 填写手机号、验证码和姓名后进入 `#/home`           | 必填缺失、手机号错误、未同意条款、提交中禁用 | 已覆盖 |
 | 运营登录       | 独立地址 `#/ops/login`         | OpsLoginPage  | 用户名密码校验后进入 `#/ops/overview`             | 字段缺失、提交中禁用；首页无入口             | 已覆盖 |
-| 查看真实寻访   | Hero / 寻访区                  | WorkflowLink  | 进入 `#/workstreams/position-vla`                 | 不修改演示数据                               | 已覆盖 |
+| 查看真实寻访   | Hero / 寻访区                  | WorkflowLink  | 进入 `#/tasks/position-vla`                       | 不修改演示数据                               | 已覆盖 |
 | 切换 Hero 阶段 | Hero 证据片                    | EvidenceRail  | 点击后切换 active 阶段                            | reduced-motion 停止自动轮播                  | 已覆盖 |
 | 切换寻访证明   | 真实寻访区                     | WorkflowProof | Tabs 切换后立即更新内容与状态                     | 本地演示数据不显示虚假 loading               | 已覆盖 |
 | 拿岗位演示     | 顶部 / Hero / 末尾 CTA         | DemoDialog    | 打开表单、填写、提交、成功                        | 必填缺失、联系方式无效、提交中禁用           | 已覆盖 |

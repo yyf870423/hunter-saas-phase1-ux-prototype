@@ -24,12 +24,12 @@ const groups = [
   {
     number: "02",
     title: "自动化与连接",
-    description: "新工作的默认执行边界和云端可识别的外部连接。",
+    description: "新任务的默认执行边界和云端可识别的外部连接。",
     links: [
       [
         "自动化授权",
         "/settings/automation",
-        "新工作统一默认授权和自动执行影响确认",
+        "新任务统一默认授权和自动执行影响确认",
       ],
       ["连接", "/settings/connections", "个人发件邮箱和寻访 App 设备"],
       ["尚未连接", "/settings/connections?state=empty", "邮箱和设备空状态"],

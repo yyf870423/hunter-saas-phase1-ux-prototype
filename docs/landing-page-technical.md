@@ -55,7 +55,7 @@ src/auth/
 - 手机号登录 / 注册使用基本大陆手机号和验证码非空校验，模拟成功后进入 `/home`。
 - 微信二维码由 `qrcode` 生成演示 Data URL，页面明确标注“演示二维码”；模拟确认后进入 `/home`。
 - 运营登录页 `/ops/login` 仅校验用户名、密码非空，模拟成功后进入 `/ops/overview`；不从首页或用户登录页链接到该路由。
-- 查看工作流使用 `Link` 指向 `/workstreams/position-vla`。
+- 查看真实寻访使用 `Link` 指向 `/tasks/position-vla`。
 - 页面导航使用 `scrollIntoView`，避免 HashRouter 与原生锚点冲突。
 
 ## 6. 样式与组件复用

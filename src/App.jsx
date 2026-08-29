@@ -102,7 +102,9 @@ export default function App() {
         <Route path="/home" element={<Dashboard />} />
         <Route path="/components" element={<ComponentsPage />} />
         <Route path="/new" element={<NewWork />} />
-        <Route path="/works" element={<WorksPage />} />
+        <Route path="/tasks" element={<WorksPage />} />
+        <Route path="/tasks/:workstreamId" element={<WorkstreamRoute />} />
+        <Route path="/works" element={<Navigate to="/tasks" replace />} />
         <Route path="/works/:workstreamId" element={<WorkstreamRoute />} />
         <Route
           path="/workstreams/new"
@@ -112,9 +114,7 @@ export default function App() {
           path="/workstreams/:workstreamId"
           element={<WorkstreamRoute />}
         />
-        <Route path="/tasks" element={<Navigate to="/works" replace />} />
         <Route path="/tasks/new" element={<Navigate to="/new" replace />} />
-        <Route path="/tasks/:taskId" element={<SideTaskDetail />} />
         <Route path="/signals" element={<SignalsPage />} />
         <Route path="/candidates" element={<CandidatesListPage />} />
         <Route path="/candidates/new" element={<CandidateCreatePage />} />

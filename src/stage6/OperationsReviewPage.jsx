@@ -35,14 +35,14 @@ const groups = [
     ],
   },
   {
-    title: "任务与故障",
-    description: "脱敏任务、错误聚合和受控恢复。",
+    title: "运行与故障",
+    description: "脱敏运行记录、错误聚合和受控恢复。",
     links: [
-      ["任务运行", "/ops/tasks"],
+      ["运行记录", "/ops/tasks"],
       ["错误中心", "/ops/tasks?tab=errors"],
-      ["可安全恢复任务", "/ops/tasks/TASK-260824-019"],
-      ["不可安全恢复任务", "/ops/tasks/TASK-260824-018"],
-      ["任务详情加载", "/ops/tasks/TASK-260824-019?state=loading"],
+      ["可安全恢复运行", "/ops/tasks/TASK-260824-019"],
+      ["不可安全恢复运行", "/ops/tasks/TASK-260824-018"],
+      ["运行详情加载", "/ops/tasks/TASK-260824-019?state=loading"],
     ],
   },
   {
@@ -76,7 +76,7 @@ export function OperationsReviewPage() {
         <span>Hunter SaaS 阶段一</span>
         <h1>运营端 UX 原型验收</h1>
         <p>
-          运营端与用户产品完全分离；只展示运营元数据、脱敏任务上下文和用户主动提交的诊断信息。
+          运营端与用户产品完全分离；只展示运营元数据、脱敏运行上下文和用户主动提交的诊断信息。
         </p>
         <div>
           <b>设计方向</b>

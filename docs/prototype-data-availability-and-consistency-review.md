@@ -1,5 +1,7 @@
 # Hunter SaaS 原型数据可获得性与一致性审查
 
+> 2026-08-30 补充：用户侧对象已经统一为“任务”，运营侧按任务运行、任务步骤运行、资产 AI 运行和系统运行分类。本文旧分类仅用于追溯当时发现的数据问题，当前口径以 `docs/unified-task-model.md` 为准。
+
 > 审查日期：2026-08-25  
 > 当前原型：`hunter-saas-phase1-ux-prototype`，提交 `5f368e1`  
 > 历史原型：`hunter-saas-phase1-prototype`，提交 `050faa2`  
