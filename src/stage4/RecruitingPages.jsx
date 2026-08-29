@@ -171,7 +171,6 @@ function buildPositionAiRecord(state = "complete") {
 function PositionProfile({
   detail,
   aiState,
-  aiPanel,
   aiRecord,
   onOpenAiSetup,
   onOpenAiDetails,
@@ -180,7 +179,6 @@ function PositionProfile({
   onStartAi,
   onStopAi,
   onRetryAi,
-  onApplyAi,
 }) {
   const navigate = useNavigate();
   const notify = useToast();
@@ -459,11 +457,6 @@ function PositionProfile({
         close={onCloseAiPanel}
         onStart={onStartAi}
       />
-      <PositionAiReviewModal
-        open={aiState === "review" && aiPanel === "review"}
-        close={onCloseAiPanel}
-        onApply={onApplyAi}
-      />
     </div>
   );
 }
@@ -543,7 +536,7 @@ function PositionAiStartModal({ open, close, onStart }) {
   );
 }
 
-function PositionAiReviewModal({ open, close, onApply }) {
+function PositionAiReviewWorkspace({ onBack, onApply }) {
   const [selected, setSelected] = useState([
     "岗位定位",
     "软性与隐性要求",
@@ -582,15 +575,72 @@ function PositionAiReviewModal({ open, close, onApply }) {
         : current.filter((item) => item !== label),
     );
   return (
-    <Modal
-      open={open}
-      close={close}
-      size="xl"
-      title="审核岗位解析结果"
-      description="逐项查看建议及原内容；未选择的内容继续保留在本次处理记录中"
-      footer={
-        <>
-          <Button onClick={close}>稍后处理</Button>
+    <section className="s4-ai-review-workspace" aria-label="审核岗位解析结果">
+      <header className="s4-ai-review-heading">
+        <div>
+          <button type="button" onClick={onBack}>
+            <Icon name="chevronLeft" />
+            返回岗位资料
+          </button>
+          <h2>审核岗位解析结果</h2>
+          <p>逐项查看建议及原内容；未选择的内容继续保留在本次处理记录中。</p>
+        </div>
+        <span>
+          <StatusBadge tone="warning">4 项建议待审核</StatusBadge>
+          <small>当前岗位资料 v3</small>
+        </span>
+      </header>
+      <div className="s4-ai-review-body">
+        <div className="s4-ai-review-summary">
+          <Icon name="info" />
+          <span>
+            已选择 {selected.length} 项；应用后形成岗位资料
+            v4，未选择的建议仍可从 AI 处理记录中查看。
+          </span>
+        </div>
+        <div className="s4-ai-review-list">
+          {suggestions.map((item) => (
+            <article
+              className={selected.includes(item.label) ? "is-selected" : ""}
+              key={item.label}
+            >
+              <header>
+                <CustomCheckbox
+                  checked={selected.includes(item.label)}
+                  onChange={(checked) => toggle(item.label, checked)}
+                  label={item.label}
+                />
+                {item.label === "岗位 JD" ? (
+                  <StatusBadge tone="neutral">未纳入本次范围</StatusBadge>
+                ) : null}
+              </header>
+              <div className="s4-ai-review-change">
+                <section className="is-current">
+                  <small>当前内容</small>
+                  <p>{item.current}</p>
+                </section>
+                <div className="s4-ai-review-direction" aria-hidden="true">
+                  <span />
+                  <em>建议更新为</em>
+                  <span />
+                </div>
+                <section className="is-suggestion">
+                  <small>AI 建议</small>
+                  <p>{item.suggestion}</p>
+                </section>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+      <footer className="s4-ai-review-actions">
+        <span>
+          {selected.length
+            ? `将更新 ${selected.length} 个字段`
+            : "尚未选择任何建议"}
+        </span>
+        <div>
+          <Button onClick={onBack}>稍后处理</Button>
           <Button
             tone="primary"
             disabled={!selected.length}
@@ -598,48 +648,9 @@ function PositionAiReviewModal({ open, close, onApply }) {
           >
             应用所选 {selected.length} 项
           </Button>
-        </>
-      }
-    >
-      <div className="s4-ai-review-summary">
-        <StatusBadge tone="warning">4 项建议待审核</StatusBadge>
-        <span>当前岗位资料仍为 v3，应用后形成 v4。</span>
-      </div>
-      <div className="s4-ai-review-list">
-        {suggestions.map((item) => (
-          <article
-            className={selected.includes(item.label) ? "is-selected" : ""}
-            key={item.label}
-          >
-            <header>
-              <CustomCheckbox
-                checked={selected.includes(item.label)}
-                onChange={(checked) => toggle(item.label, checked)}
-                label={item.label}
-              />
-              {item.label === "岗位 JD" ? (
-                <StatusBadge tone="neutral">未纳入本次范围</StatusBadge>
-              ) : null}
-            </header>
-            <div className="s4-ai-review-change">
-              <section className="is-current">
-                <small>当前内容</small>
-                <p>{item.current}</p>
-              </section>
-              <div className="s4-ai-review-direction" aria-hidden="true">
-                <span />
-                <em>建议更新为</em>
-                <span />
-              </div>
-              <section className="is-suggestion">
-                <small>AI 建议</small>
-                <p>{item.suggestion}</p>
-              </section>
-            </div>
-          </article>
-        ))}
-      </div>
-    </Modal>
+        </div>
+      </footer>
+    </section>
   );
 }
 
@@ -2491,11 +2502,19 @@ export function PositionDetailPage() {
           updateQuery({ tab: value, panel: null, process: null })
         }
       />
-      {tab === "profile" ? (
+      {tab === "profile" && aiState === "review" && aiPanel === "review" ? (
+        <PositionAiReviewWorkspace
+          onBack={() => updateQuery({ panel: null, process: null })}
+          onApply={(selected) => {
+            updateQuery({ tab: "profile", ai: "complete", panel: null });
+            notify(`已应用 ${selected.length} 项建议，岗位资料更新为 v4`);
+          }}
+        />
+      ) : null}
+      {tab === "profile" && !(aiState === "review" && aiPanel === "review") ? (
         <PositionProfile
           detail={detail}
           aiState={aiState}
-          aiPanel={aiPanel}
           aiRecord={aiRecord}
           onOpenAiSetup={() => setAiState("setup")}
           onOpenAiDetails={() =>
@@ -2513,10 +2532,6 @@ export function PositionDetailPage() {
             notify("岗位 AI 解析已停止，正式岗位资料没有变化", "info");
           }}
           onRetryAi={startAiProcessing}
-          onApplyAi={(selected) => {
-            updateQuery({ tab: "profile", ai: "complete", panel: null });
-            notify(`已应用 ${selected.length} 项建议，岗位资料更新为 v4`);
-          }}
         />
       ) : null}
       {tab === "pipeline" ? <CandidatePipeline /> : null}

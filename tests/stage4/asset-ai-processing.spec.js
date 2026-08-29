@@ -61,7 +61,7 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   await page.goto("#/positions/position-vla?tab=profile&ai=review");
   await expect(page.getByLabel("岗位 AI 解析，等待审核")).toBeVisible();
   await page.getByRole("button", { name: "审核解析结果" }).click();
-  const review = page.getByRole("dialog", { name: "审核岗位解析结果" });
+  const review = page.getByRole("region", { name: "审核岗位解析结果" });
   await expect(review).toContainText("当前内容");
   await expect(review).toContainText("AI 建议");
   await expect(review.getByRole("checkbox")).toHaveCount(4);
