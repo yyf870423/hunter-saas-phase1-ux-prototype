@@ -3096,6 +3096,9 @@
   border: 1px solid var(--s1-line);
   border-radius: 8px;
 }
+.s4-create-layout-direct {
+  grid-template-columns: minmax(0, 1fr);
+}
 .s4-create-modes {
   padding: 10px;
   background: var(--s1-canvas);

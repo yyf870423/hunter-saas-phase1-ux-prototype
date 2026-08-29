@@ -413,6 +413,80 @@ function NewMenu({ open, close, onSelect }) {
   );
 }
 
+const manualAssetTypes = [
+  {
+    label: "公司",
+    icon: "building",
+    description: "建立公司资料与招聘关联",
+    route: "/companies/new",
+  },
+  {
+    label: "联系人",
+    icon: "users",
+    description: "记录联系人身份与公司关系",
+    route: "/contacts/new",
+  },
+  {
+    label: "招聘机会",
+    icon: "sparkles",
+    description: "沉淀已经确认的招聘需求",
+    route: "/opportunities/new",
+  },
+  {
+    label: "岗位",
+    icon: "briefcase",
+    description: "录入岗位资料与招聘要求",
+    route: "/positions/new",
+  },
+  {
+    label: "候选人",
+    icon: "user",
+    description: "录入候选人或上传简历",
+    route: "/candidates/new",
+  },
+  {
+    label: "人才版图",
+    icon: "database",
+    description: "建立人才摸排目标和范围",
+    route: "/mappings/new",
+  },
+];
+
+function AssetCreateDialog({ open, close, onSelect }) {
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="lg"
+      title="选择资产类型"
+      description="选择后直接进入对应的新建页面"
+      footer={<Button onClick={close}>取消</Button>}
+    >
+      <div className="s1-asset-create-grid">
+        {manualAssetTypes.map((item) => (
+          <button
+            type="button"
+            key={item.route}
+            onClick={() => onSelect(item.route)}
+          >
+            <i>
+              <Icon name={item.icon} />
+            </i>
+            <span>
+              <b>{item.label}</b>
+              <small>{item.description}</small>
+            </span>
+            <Icon name="chevronRight" />
+          </button>
+        ))}
+      </div>
+      <p className="s1-asset-create-note">
+        论文和专利通过数据管理导入，避免手动录入缺少必要标识与来源证据。
+      </p>
+    </Modal>
+  );
+}
+
 export function Stage1Shell() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -429,6 +503,7 @@ export function Stage1Shell() {
   const [usageOpen, setUsageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [assetNavigationOpen, setAssetNavigationOpen] = useState(false);
+  const [assetCreateOpen, setAssetCreateOpen] = useState(false);
   const [mobileMode, setMobileMode] = useState(null);
   const assetTriggerRef = useRef(null);
   const accountRef = useRef(null);
@@ -710,8 +785,7 @@ export function Stage1Shell() {
                 onSelect={(label) => {
                   setNewOpen(false);
                   if (label === "新建工作") navigate("/new");
-                  else if (label === "手动新建资产")
-                    setAssetNavigationOpen(true);
+                  else if (label === "手动新建资产") setAssetCreateOpen(true);
                 }}
               />
             </div>
@@ -782,6 +856,14 @@ export function Stage1Shell() {
         close={() => setMobileMode(null)}
         mode={mobileMode}
         onSelect={selectNavigation}
+      />
+      <AssetCreateDialog
+        open={assetCreateOpen}
+        close={() => setAssetCreateOpen(false)}
+        onSelect={(route) => {
+          setAssetCreateOpen(false);
+          navigate(route);
+        }}
       />
       <Modal
         open={usageOpen}

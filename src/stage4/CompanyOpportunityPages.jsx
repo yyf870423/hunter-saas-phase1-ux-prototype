@@ -1083,18 +1083,134 @@ export function ContactDetailPage() {
 
 export function ContactCreatePage() {
   const navigate = useNavigate();
+  const notify = useToast();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [region, setRegion] = useState("");
+  const [note, setNote] = useState("");
+  const [categories, setCategories] = useState(["客户 HR"]);
+  const [company, setCompany] = useState("");
+  const [role, setRole] = useState("");
+  const [relationStatus, setRelationStatus] = useState("当前");
+  const [primary, setPrimary] = useState(true);
+  const [submitted, setSubmitted] = useState(false);
+  const create = () => {
+    setSubmitted(true);
+    if (!name.trim() || (!phone.trim() && !email.trim() && !company)) return;
+    notify("联系人已创建");
+    navigate("/contacts/contact-chenyu");
+  };
   return (
-    <div className="s4-page">
+    <div className="s4-create-page">
       <AssetPageHeader
         eyebrow="联系人"
         title="新建联系人"
         description="联系人可以属于多家公司，也可以在确认后与候选人建立同一自然人关系。"
-        actions={
-          <Button onClick={() => navigate("/contacts")}>返回列表</Button>
-        }
+        actions={<Button onClick={() => navigate("/contacts")}>取消</Button>}
       />
-      <div className="s4-inline-form-shell">
-        <ContactEditor open close={() => navigate("/contacts")} />
+      <div className="s4-create-layout s4-create-layout-direct">
+        <section className="s4-create-workspace">
+          <header>
+            <h2>联系人资料</h2>
+            <p>
+              只有姓名不能创建正式联系人，请同时补充联系方式或已确认的公司关系。
+            </p>
+          </header>
+          <div className="s4-form-grid">
+            <FormField
+              label="姓名或明确称呼"
+              required
+              error={submitted && !name.trim() ? "请输入姓名或明确称呼" : ""}
+            >
+              <TextInput
+                value={name}
+                onChange={setName}
+                placeholder="例如：陈雨"
+              />
+            </FormField>
+            <FormField label="类别" required>
+              <SelectMenu
+                label="选择类别"
+                value={categories}
+                options={[
+                  "客户 HR",
+                  "招聘负责人",
+                  "投资人",
+                  "顾问",
+                  "中间介绍人",
+                  "行业关系人",
+                ]}
+                onChange={setCategories}
+                multiple
+              />
+            </FormField>
+            <FormField label="手机">
+              <TextInput value={phone} onChange={setPhone} />
+            </FormField>
+            <FormField label="邮箱">
+              <TextInput value={email} onChange={setEmail} />
+            </FormField>
+            <FormField label="所在地区">
+              <TextInput
+                value={region}
+                onChange={setRegion}
+                placeholder="例如：北京"
+              />
+            </FormField>
+            <FormField label="用户备注">
+              <TextInput value={note} onChange={setNote} />
+            </FormField>
+          </div>
+          <section className="s4-subform">
+            <header>
+              <span>
+                <h3>公司关系</h3>
+                <p>
+                  首条关系用于说明联系人的当前或历史归属，创建后可以继续添加。
+                </p>
+              </span>
+            </header>
+            <div className="s4-company-relation-row">
+              <SelectMenu
+                label="选择公司"
+                value={company}
+                options={companies.map((item) => item.name)}
+                onChange={setCompany}
+                searchable
+              />
+              <TextInput
+                value={role}
+                onChange={setRole}
+                placeholder="职位或角色"
+              />
+              <SelectMenu
+                label="关系状态"
+                value={relationStatus}
+                options={["当前", "历史"]}
+                onChange={setRelationStatus}
+              />
+              <CustomCheckbox
+                checked={primary}
+                onChange={setPrimary}
+                label="主要归属"
+              />
+            </div>
+          </section>
+          {submitted && !phone.trim() && !email.trim() && !company ? (
+            <StateBanner
+              tone="danger"
+              icon="warning"
+              title="身份信息不足"
+              description="请补充手机、邮箱或已确认公司关系中的至少一项。"
+            />
+          ) : null}
+          <footer>
+            <Button tone="primary" onClick={create}>
+              创建联系人
+            </Button>
+          </footer>
+        </section>
       </div>
     </div>
   );
@@ -1909,18 +2025,129 @@ function OpportunityEditor({ open, close, item = null }) {
 
 export function OpportunityCreatePage() {
   const navigate = useNavigate();
+  const notify = useToast();
+  const [title, setTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [summary, setSummary] = useState("");
+  const [evidence, setEvidence] = useState("");
+  const [headcount, setHeadcount] = useState("");
+  const [period, setPeriod] = useState("");
+  const [contact, setContact] = useState("");
+  const [status, setStatus] = useState("跟进中");
+  const [submitted, setSubmitted] = useState(false);
+  const create = () => {
+    setSubmitted(true);
+    if (!title.trim() || !company || !summary.trim() || !evidence.trim())
+      return;
+    notify("招聘机会已创建");
+    navigate("/opportunities/opportunity-xinglan");
+  };
   return (
-    <div className="s4-page">
+    <div className="s4-create-page">
       <AssetPageHeader
         eyebrow="招聘机会"
         title="新建招聘机会"
         description="把已经确认存在的招聘需求沉淀为正式机会，再逐步拆分岗位。"
         actions={
-          <Button onClick={() => navigate("/opportunities")}>返回列表</Button>
+          <Button onClick={() => navigate("/opportunities")}>取消</Button>
         }
       />
-      <div className="s4-inline-form-shell">
-        <OpportunityEditor open close={() => navigate("/opportunities")} />
+      <div className="s4-create-layout s4-create-layout-direct">
+        <section className="s4-create-workspace">
+          <header>
+            <h2>招聘机会资料</h2>
+            <p>只有已经确认存在招聘需求时，才创建正式招聘机会。</p>
+          </header>
+          <div className="s4-form-grid">
+            <FormField
+              label="机会名称"
+              required
+              error={submitted && !title.trim() ? "请输入机会名称" : ""}
+            >
+              <TextInput
+                value={title}
+                onChange={setTitle}
+                placeholder="例如：星澜机器人具身智能团队扩张"
+              />
+            </FormField>
+            <FormField
+              label="所属公司"
+              required
+              error={submitted && !company ? "请选择所属公司" : ""}
+            >
+              <SelectMenu
+                label="选择公司"
+                value={company}
+                options={companies.map((item) => item.name)}
+                onChange={setCompany}
+                searchable
+              />
+            </FormField>
+            <FormField
+              label="招聘需求摘要"
+              required
+              span={2}
+              error={submitted && !summary.trim() ? "请输入招聘需求摘要" : ""}
+            >
+              <TextArea
+                value={summary}
+                onChange={setSummary}
+                rows={5}
+                placeholder="说明已确认的招聘方向、优先级、团队阶段和岗位背景。"
+              />
+            </FormField>
+            <FormField
+              label="已确认存在需求的依据"
+              required
+              span={2}
+              error={submitted && !evidence.trim() ? "请说明需求确认依据" : ""}
+            >
+              <TextArea
+                value={evidence}
+                onChange={setEvidence}
+                rows={4}
+                placeholder="例如：客户 HR 已邮件确认团队扩张计划与优先招聘方向。"
+              />
+            </FormField>
+            <FormField label="预计人数">
+              <TextInput
+                value={headcount}
+                onChange={setHeadcount}
+                placeholder="例如：20 - 25"
+              />
+            </FormField>
+            <FormField label="预计时间">
+              <DatePicker
+                label="选择预计时间"
+                mode="month-range"
+                value={period}
+                onChange={setPeriod}
+              />
+            </FormField>
+            <FormField label="相关联系人">
+              <SelectMenu
+                label="选择联系人"
+                value={contact}
+                options={contacts.map((item) => item.name)}
+                onChange={setContact}
+                searchable
+              />
+            </FormField>
+            <FormField label="状态">
+              <SelectMenu
+                label="状态"
+                value={status}
+                options={["跟进中", "已完成", "已关闭"]}
+                onChange={setStatus}
+              />
+            </FormField>
+          </div>
+          <footer>
+            <Button tone="primary" onClick={create}>
+              创建招聘机会
+            </Button>
+          </footer>
+        </section>
       </div>
     </div>
   );

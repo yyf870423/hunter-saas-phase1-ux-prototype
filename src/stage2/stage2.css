@@ -74,6 +74,8 @@
 }
 
 .s2-history > .s1-search-field {
+  width: auto;
+  min-width: 0;
   height: 34px;
   margin: 0 10px 10px;
   border-radius: 6px;
@@ -3238,7 +3240,7 @@
   position: relative;
   display: grid;
   min-height: 650px;
-  grid-template-columns: minmax(340px, 0.64fr) minmax(600px, 1.36fr);
+  grid-template-columns: minmax(370px, 0.72fr) minmax(0, 1.28fr);
   overflow: hidden;
   background: var(--s1-surface);
   border: 1px solid var(--s1-line);
@@ -3260,16 +3262,20 @@
 .s2-signal-toolbar .s1-search-field {
   height: 34px;
 }
-.s2-signal-tabs {
+.s2-signal-tabs.app-tabs {
   display: flex;
-  gap: 3px;
+  min-height: 38px;
+  align-items: flex-end;
+  gap: 8px;
   margin-top: 9px;
   overflow-x: auto;
 }
-.s2-signal-tabs button {
+.s2-signal-tabs.app-tabs > button {
   height: 30px;
+  min-height: 30px;
   flex: 0 0 auto;
-  padding: 0 8px;
+  gap: 4px;
+  padding: 0;
   color: var(--s1-muted);
   font-size: 12px;
   background: transparent;
@@ -3277,13 +3283,17 @@
   border-radius: 6px;
   cursor: pointer;
 }
-.s2-signal-tabs button.is-active {
+.s2-signal-tabs.app-tabs > button.is-active {
   color: var(--s1-accent);
   background: var(--s1-accent-soft);
   border-color: color-mix(in srgb, var(--s1-accent) 18%, var(--s1-line));
 }
-.s2-signal-tabs em {
-  margin-left: 4px;
+.s2-signal-tabs.app-tabs > button em {
+  min-width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0 4px;
+  line-height: 18px;
   font-style: normal;
 }
 .s2-signal-list-label {
