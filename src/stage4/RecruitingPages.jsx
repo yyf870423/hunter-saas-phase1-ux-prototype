@@ -587,7 +587,7 @@ function PositionAiReviewModal({ open, close, onApply }) {
       close={close}
       size="xl"
       title="审核岗位解析结果"
-      description="逐项比较当前内容和 AI 建议；未选择的内容继续保留在本次处理记录中"
+      description="逐项查看建议及原内容；未选择的内容继续保留在本次处理记录中"
       footer={
         <>
           <Button onClick={close}>稍后处理</Button>
@@ -621,12 +621,17 @@ function PositionAiReviewModal({ open, close, onApply }) {
                 <StatusBadge tone="neutral">未纳入本次范围</StatusBadge>
               ) : null}
             </header>
-            <div>
-              <section>
+            <div className="s4-ai-review-change">
+              <section className="is-current">
                 <small>当前内容</small>
                 <p>{item.current}</p>
               </section>
-              <section>
+              <div className="s4-ai-review-direction" aria-hidden="true">
+                <span />
+                <em>建议更新为</em>
+                <span />
+              </div>
+              <section className="is-suggestion">
                 <small>AI 建议</small>
                 <p>{item.suggestion}</p>
               </section>
