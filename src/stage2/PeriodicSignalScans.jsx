@@ -382,7 +382,6 @@ export function PeriodicSignalScans({ onOpenSignals }) {
   return (
     <>
       <div className="s2-scan-actions">
-        <p>周期扫描只持续发现和合并信号，不会自动启动工作。</p>
         <Button tone="primary" icon="plus" onClick={openCreate}>
           新建周期扫描
         </Button>

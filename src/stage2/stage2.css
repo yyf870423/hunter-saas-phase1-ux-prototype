@@ -3606,15 +3606,9 @@
   display: flex;
   min-height: 44px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   margin-bottom: 10px;
-}
-.s2-scan-actions p {
-  margin: 0;
-  color: var(--s1-muted);
-  font-size: 12px;
-  line-height: 18px;
 }
 .s2-scan-shell {
   min-height: 680px;
