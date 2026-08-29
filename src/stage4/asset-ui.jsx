@@ -53,7 +53,13 @@ export function AssetPageHeader({
   );
 }
 
-export function CustomCheckbox({ checked, onChange, label, disabled = false }) {
+export function CustomCheckbox({
+  checked,
+  onChange,
+  label,
+  ariaLabel,
+  disabled = false,
+}) {
   const [draftChecked, setDraftChecked] = useState(Boolean(checked));
   useEffect(() => setDraftChecked(Boolean(checked)), [checked]);
   const toggle = () => {
@@ -66,6 +72,7 @@ export function CustomCheckbox({ checked, onChange, label, disabled = false }) {
       type="button"
       role="checkbox"
       aria-checked={draftChecked}
+      aria-label={ariaLabel}
       className={`s4-checkbox ${draftChecked ? "is-checked" : ""}`}
       disabled={disabled}
       onClick={toggle}

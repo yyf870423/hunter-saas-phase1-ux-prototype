@@ -654,7 +654,7 @@ function PositionAiReviewWorkspace({ onBack, onApply }) {
                     <CustomCheckbox
                       checked={isSelected}
                       onChange={(checked) => toggle(item.label, checked)}
-                      label={isSelected ? "应用" : "保留"}
+                      ariaLabel={`${isSelected ? "取消应用" : "应用"}${item.label}建议`}
                     />
                   </article>
                 );

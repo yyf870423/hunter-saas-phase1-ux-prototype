@@ -8716,23 +8716,15 @@
   color: var(--s1-accent);
 }
 .s4-ai-review-fields article > .s4-checkbox {
-  width: 64px;
+  width: 36px;
   min-height: 36px;
   justify-content: center;
-  gap: 5px;
-  padding-right: 8px;
+  padding-right: 5px;
 }
 .s4-ai-review-fields article > .s4-checkbox > i {
   width: 15px;
   height: 15px;
   flex-basis: 15px;
-}
-.s4-ai-review-fields article > .s4-checkbox > span {
-  flex: 0 0 auto;
-  overflow: visible;
-  font-size: 11px;
-  white-space: nowrap;
-  text-overflow: clip;
 }
 .s4-ai-review-detail {
   display: grid;
