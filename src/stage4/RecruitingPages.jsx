@@ -31,6 +31,11 @@ import {
   TextInput,
   useToast,
 } from "./asset-ui";
+import {
+  AssetAiProcessBanner,
+  AssetAiProcessDrawer,
+  AssetAiProcessHistory,
+} from "./AssetAiProcessing";
 import { matchResults, positionDetail, positions } from "./data";
 
 const tabs = [
@@ -40,7 +45,143 @@ const tabs = [
   { value: "work", label: "相关工作" },
 ];
 
-function PositionProfile({ detail }) {
+const positionAiWorkTitle = "星澜机器人 · 具身智能团队招聘";
+const positionAiSupplement =
+  "客户强调这是能直接参与技术路线决策的负责人岗位，需要同时判断候选人的技术深度、真机落地经验和团队管理跨度。";
+
+function buildPositionAiRecord(state = "complete") {
+  const planByState = {
+    running: ["complete", "running", "pending", "pending"],
+    review: ["complete", "complete", "complete", "complete"],
+    failed: ["complete", "failed", "pending", "pending"],
+    complete: ["complete", "complete", "complete", "complete"],
+  };
+  const planStates = planByState[state] || planByState.complete;
+  const plan = [
+    ["读取岗位资料", "已读取 JD v3、三项确认要求和现有岗位解析。"],
+    [
+      "分析岗位定位",
+      state === "failed"
+        ? "模型响应中断，已保留读取结果和原始输入。"
+        : "分析岗位层级、职责边界、上下游关系与可能风险。",
+    ],
+    ["生成寻访建议", "生成软性与隐性要求、对标企业和寻访关键词。"],
+    ["形成审核结果", "把建议转换为字段级差异，等待用户确认后写入。"],
+  ].map(([title, detail], index) => {
+    const itemState = planStates[index];
+    return {
+      title,
+      detail,
+      state: itemState,
+      label:
+        itemState === "complete"
+          ? "已完成"
+          : itemState === "running"
+            ? "运行中"
+            : itemState === "failed"
+              ? "失败"
+              : "等待",
+    };
+  });
+  const currentRun = {
+    id: "run-4",
+    label: "运行 #4",
+    time:
+      state === "running"
+        ? "今天 10:26 · 已运行 1 分 18 秒"
+        : "今天 10:26 · 2 分 41 秒",
+    detail:
+      state === "failed"
+        ? "读取岗位资料后，模型连接中断。原始输入和已完成步骤均已保留。"
+        : state === "running"
+          ? "正在分析岗位定位和角色边界。"
+          : "已生成 4 项字段建议，正式岗位资料尚未改变。",
+    status:
+      state === "failed"
+        ? "失败"
+        : state === "running"
+          ? "运行中"
+          : state === "review"
+            ? "待审核"
+            : "完成",
+    tone:
+      state === "failed"
+        ? "danger"
+        : state === "running"
+          ? "info"
+          : state === "review"
+            ? "warning"
+            : "success",
+  };
+  return {
+    id: state === "complete" ? "position-analysis-v3" : "position-analysis-v4",
+    type: "岗位 AI 解析",
+    title:
+      state === "complete"
+        ? "岗位深度解析 · 资料版本 v3"
+        : "重新解析具身智能 VLA 算法负责人",
+    target: "具身智能 VLA 算法负责人",
+    source: "岗位详情 · 当前岗位 JD",
+    work: positionAiWorkTitle,
+    state,
+    startedAt: state === "complete" ? "8 月 19 日 16:42" : "今天 10:26",
+    updatedAt:
+      state === "running"
+        ? "刚刚"
+        : state === "review"
+          ? "今天 10:29"
+          : state === "failed"
+            ? "今天 10:27"
+            : "8 月 19 日 16:45",
+    summary:
+      state === "running"
+        ? "正在分析岗位定位、角色边界与寻访关键词。"
+        : state === "review"
+          ? "已生成 4 项建议，等待确认后更新当前岗位。"
+          : state === "failed"
+            ? "模型连接中断，已保留原输入和完成步骤，可直接重试。"
+            : "已确认岗位定位、软性与隐性要求及 5 组寻访关键词。",
+    plan,
+    runs:
+      state === "complete"
+        ? [
+            {
+              id: "run-3",
+              label: "运行 #3",
+              time: "8 月 19 日 16:42 · 2 分 08 秒",
+              detail: "一次完成并通过结构检查，用户确认后写入岗位资料 v3。",
+              status: "完成",
+              tone: "success",
+            },
+          ]
+        : [
+            currentRun,
+            {
+              id: "run-3",
+              label: "运行 #3",
+              time: "8 月 19 日 16:42 · 2 分 08 秒",
+              detail: "完成上一版岗位解析，并形成岗位资料 v3。",
+              status: "完成",
+              tone: "success",
+            },
+          ],
+  };
+}
+
+function PositionProfile({
+  detail,
+  aiState,
+  aiPanel,
+  aiRecord,
+  onOpenAiSetup,
+  onOpenAiDetails,
+  onOpenAiReview,
+  onCloseAiPanel,
+  onStartAi,
+  onStopAi,
+  onRetryAi,
+  onApplyAi,
+}) {
   const navigate = useNavigate();
   const notify = useToast();
   const [versionOpen, setVersionOpen] = useState(false);
@@ -74,6 +215,24 @@ function PositionProfile({ detail }) {
     jdVersions.find((item) => item.id === selectedVersion) || jdVersions[0];
   return (
     <div className="s4-detail-stack">
+      <AssetAiProcessBanner
+        state={aiState}
+        title="岗位 AI 解析"
+        description={aiRecord.summary}
+        target={aiRecord.target}
+        work={aiRecord.work}
+        onDetails={onOpenAiDetails}
+        onPrimary={aiState === "review" ? onOpenAiReview : onRetryAi}
+        primaryLabel={
+          aiState === "review"
+            ? "审核解析结果"
+            : aiState === "failed"
+              ? "重新运行"
+              : undefined
+        }
+        onSecondary={onStopAi}
+        secondaryLabel={aiState === "running" ? "停止" : undefined}
+      />
       <FieldGroup
         title="岗位基本资料"
         action={
@@ -131,13 +290,7 @@ function PositionProfile({ detail }) {
             <Button size="sm" onClick={() => setVersionOpen(true)}>
               版本历史
             </Button>
-            <Button
-              size="sm"
-              icon="sparkles"
-              onClick={() =>
-                navigate("/new?prompt=重新解析具身智能 VLA 算法负责人岗位")
-              }
-            >
+            <Button size="sm" icon="sparkles" onClick={onOpenAiSetup}>
               AI 解析
             </Button>
           </div>
@@ -301,7 +454,187 @@ function PositionProfile({ detail }) {
           notify(`${label}已保存`);
         }}
       />
+      <PositionAiStartModal
+        open={aiState === "setup"}
+        close={onCloseAiPanel}
+        onStart={onStartAi}
+      />
+      <PositionAiReviewModal
+        open={aiState === "review" && aiPanel === "review"}
+        close={onCloseAiPanel}
+        onApply={onApplyAi}
+      />
     </div>
+  );
+}
+
+function PositionAiStartModal({ open, close, onStart }) {
+  const [supplement, setSupplement] = useState(positionAiSupplement);
+  const [includeJd, setIncludeJd] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const valid = Boolean(supplement.trim());
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="lg"
+      title="AI 解析当前岗位"
+      description="处理结果保存在当前岗位，确认前不会修改正式资料，也不会新增工作"
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            icon="sparkles"
+            onClick={() => {
+              setSubmitted(true);
+              if (valid) onStart({ supplement, includeJd });
+            }}
+          >
+            开始解析
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-ai-start-form">
+        <section className="s4-ai-target-summary">
+          <i>
+            <Icon name="briefcase" />
+          </i>
+          <span>
+            <small>处理对象</small>
+            <b>具身智能 VLA 算法负责人</b>
+            <p>星澜机器人 · 岗位资料 v3 · 当前岗位 JD</p>
+          </span>
+        </section>
+        <FormField
+          label="补充说明"
+          required
+          help="补充客户口径、岗位重点或公开 JD 中没有写清楚的信息。"
+          error={submitted && !valid ? "请输入本次解析需要关注的补充信息" : ""}
+        >
+          <TextArea
+            rows={5}
+            value={supplement}
+            onChange={setSupplement}
+            placeholder="例如：客户更看重真机落地和团队管理经验……"
+          />
+        </FormField>
+        <div className="s4-ai-scope-options">
+          <span>
+            <b>本次处理范围</b>
+            <small>岗位解析、软性与隐性要求、对标企业、寻访关键词</small>
+          </span>
+          <CustomCheckbox
+            checked={includeJd}
+            onChange={setIncludeJd}
+            label="同时生成岗位 JD 更新建议"
+          />
+        </div>
+        <section className="s4-ai-write-policy">
+          <Icon name="lock" />
+          <span>
+            <b>审核后更新</b>
+            <p>Hunter 先生成字段级建议；只有你确认的内容才会写入当前岗位。</p>
+          </span>
+        </section>
+      </div>
+    </Modal>
+  );
+}
+
+function PositionAiReviewModal({ open, close, onApply }) {
+  const [selected, setSelected] = useState([
+    "岗位定位",
+    "软性与隐性要求",
+    "寻访关键词",
+  ]);
+  const suggestions = [
+    {
+      label: "岗位定位",
+      current: "负责具身智能 VLA 算法方向，兼顾团队管理与真机项目交付。",
+      suggestion:
+        "面向量产交付的 VLA 算法负责人。核心不是单点模型研究，而是统筹数据、训练、评测和真机部署闭环，并承担 8—12 人团队的技术路线与交付责任。",
+    },
+    {
+      label: "软性与隐性要求",
+      current: "需要较强的跨团队协作能力和客户项目意识。",
+      suggestion:
+        "需要能在模型效果、硬件约束和客户交付时间之间做取舍；候选人若长期只负责研究原型、缺少真机失败复盘或团队管理跨度不足，匹配分应适当降低。",
+    },
+    {
+      label: "寻访关键词",
+      current: "VLA + 机器人学习；强化学习 + 真机部署；多模态 + 算法负责人",
+      suggestion:
+        "VLA + 真机部署；机器人学习 + 技术负责人；多模态策略 + 数据闭环；强化学习 + 量产交付；具身智能 + 团队管理",
+    },
+    {
+      label: "岗位 JD",
+      current: "岗位资料 v3，不在默认处理范围内。",
+      suggestion:
+        "补充数据闭环、评测体系和跨硬件协同职责；将“熟悉强化学习”收紧为具备真机策略学习或机器人数据闭环经验。",
+    },
+  ];
+  const toggle = (label, checked) =>
+    setSelected((current) =>
+      checked
+        ? [...new Set([...current, label])]
+        : current.filter((item) => item !== label),
+    );
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="xl"
+      title="审核岗位解析结果"
+      description="逐项比较当前内容和 AI 建议；未选择的内容继续保留在本次处理记录中"
+      footer={
+        <>
+          <Button onClick={close}>稍后处理</Button>
+          <Button
+            tone="primary"
+            disabled={!selected.length}
+            onClick={() => onApply(selected)}
+          >
+            应用所选 {selected.length} 项
+          </Button>
+        </>
+      }
+    >
+      <div className="s4-ai-review-summary">
+        <StatusBadge tone="warning">4 项建议待审核</StatusBadge>
+        <span>当前岗位资料仍为 v3，应用后形成 v4。</span>
+      </div>
+      <div className="s4-ai-review-list">
+        {suggestions.map((item) => (
+          <article
+            className={selected.includes(item.label) ? "is-selected" : ""}
+            key={item.label}
+          >
+            <header>
+              <CustomCheckbox
+                checked={selected.includes(item.label)}
+                onChange={(checked) => toggle(item.label, checked)}
+                label={item.label}
+              />
+              {item.label === "岗位 JD" ? (
+                <StatusBadge tone="neutral">未纳入本次范围</StatusBadge>
+              ) : null}
+            </header>
+            <div>
+              <section>
+                <small>当前内容</small>
+                <p>{item.current}</p>
+              </section>
+              <section>
+                <small>AI 建议</small>
+                <p>{item.suggestion}</p>
+              </section>
+            </div>
+          </article>
+        ))}
+      </div>
+    </Modal>
   );
 }
 
@@ -1988,7 +2321,7 @@ function MatchRunModal({ open, mode, close }) {
   );
 }
 
-function RelatedWork() {
+function RelatedWork({ processingRecords, onOpenProcessing }) {
   const navigate = useNavigate();
   return (
     <div className="s4-detail-stack">
@@ -2010,71 +2343,14 @@ function RelatedWork() {
           <Icon name="chevronRight" />
         </button>
       </FieldGroup>
-      <FieldGroup title="相关任务">
-        <div className="s4-related-work-grid">
-          {[
-            {
-              icon: "sparkles",
-              type: "岗位解析",
-              title: "具身智能 VLA 算法负责人岗位深度解析",
-              summary: "生成岗位定位、对标企业、软性和隐性要求及寻访关键词。",
-              status: "完成",
-              tone: "success",
-              time: "2026-08-19",
-              route: "/works/position-vla",
-            },
-            {
-              icon: "users",
-              type: "人岗匹配",
-              title: "候选人全量匹配 · 资料版本 v3",
-              summary: "完成 128 位候选人匹配，8 位资料不足等待后续处理。",
-              status: "完成",
-              tone: "success",
-              time: "今天 09:40",
-              route: "/positions/position-vla?tab=matching",
-            },
-            {
-              icon: "file",
-              type: "推荐报告",
-              title: "为林昊生成客户推荐报告",
-              summary: "报告初稿已完成，等待补充项目贡献的量化说明。",
-              status: "等待用户",
-              tone: "warning",
-              time: "今天 10:16",
-              route: "/works/task-recommend-linhao",
-            },
-            {
-              icon: "search",
-              type: "公开资料核验",
-              title: "核实周明远最近任职与团队范围",
-              summary: "公开资料存在时间线差异，正在等待补充证据。",
-              status: "运行中",
-              tone: "info",
-              time: "已运行 12 分钟",
-              route: "/works/task-hand-team",
-            },
-          ].map((task) => (
-            <button
-              type="button"
-              key={task.title}
-              onClick={() => navigate(task.route)}
-            >
-              <header>
-                <i>
-                  <Icon name={task.icon} />
-                </i>
-                <small>{task.type}</small>
-                <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
-              </header>
-              <b>{task.title}</b>
-              <p>{task.summary}</p>
-              <footer>
-                <time>{task.time}</time>
-                <Icon name="chevronRight" />
-              </footer>
-            </button>
-          ))}
-        </div>
+      <FieldGroup
+        title="AI 处理记录"
+        description="当前岗位上的解析、匹配与内容生成记录，不进入工作列表。"
+      >
+        <AssetAiProcessHistory
+          records={processingRecords}
+          onOpen={onOpenProcessing}
+        />
       </FieldGroup>
       <FieldGroup title="活动记录">
         <ActivityTimeline
@@ -2110,13 +2386,76 @@ export function PositionDetailPage() {
   const notify = useToast();
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") || "profile";
+  const aiState = params.get("ai") || "idle";
+  const aiPanel = params.get("panel") || "";
+  const aiTimerRef = useRef(null);
   const item =
     positions.find((position) => position.id === positionId) ||
     (positionId === "position-vla" ? positionDetail : null);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const updateQuery = (changes) => {
+    const next = new URLSearchParams(params);
+    Object.entries(changes).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === "")
+        next.delete(key);
+      else next.set(key, value);
+    });
+    setParams(next);
+  };
+  const setAiState = (state) =>
+    updateQuery({
+      tab: "profile",
+      ai: state === "idle" ? null : state,
+      panel: null,
+      process: null,
+    });
+  const startAiProcessing = () => {
+    if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+    setAiState("running");
+    aiTimerRef.current = window.setTimeout(() => {
+      updateQuery({ tab: "profile", ai: "review", panel: null, process: null });
+      notify("岗位 AI 解析完成，4 项建议等待审核", "info");
+    }, 4200);
+  };
+  useEffect(
+    () => () => {
+      if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+    },
+    [],
+  );
+  useEffect(() => {
+    const active = ["running", "review", "failed"].includes(aiState);
+    const payload = active
+      ? {
+          state: aiState,
+          title: "岗位 AI 解析",
+          target: "具身智能 VLA 算法负责人",
+          route: `/positions/position-vla?tab=profile&ai=${aiState}&panel=details&process=position-analysis-v4`,
+        }
+      : null;
+    if (payload)
+      sessionStorage.setItem(
+        "hunter-active-ai-process",
+        JSON.stringify(payload),
+      );
+    else sessionStorage.removeItem("hunter-active-ai-process");
+    window.dispatchEvent(
+      new CustomEvent("hunter:ai-processing", { detail: payload }),
+    );
+  }, [aiState]);
   if (!item)
     return <NotFoundState label="岗位" onBack={() => navigate("/positions")} />;
   const detail = { ...positionDetail, ...item };
+  const aiRecord = buildPositionAiRecord(
+    ["running", "review", "failed"].includes(aiState) ? aiState : "complete",
+  );
+  const processingRecords = ["running", "review", "failed"].includes(aiState)
+    ? [aiRecord, buildPositionAiRecord("complete")]
+    : [buildPositionAiRecord("complete")];
+  const selectedProcessId = params.get("process");
+  const selectedProcessingRecord =
+    processingRecords.find((record) => record.id === selectedProcessId) ||
+    processingRecords[0];
   return (
     <div className="s4-detail-page">
       <DetailHeader
@@ -2143,12 +2482,66 @@ export function PositionDetailPage() {
       <DetailTabs
         tabs={tabs}
         value={tab}
-        onChange={(value) => setParams({ tab: value })}
+        onChange={(value) =>
+          updateQuery({ tab: value, panel: null, process: null })
+        }
       />
-      {tab === "profile" ? <PositionProfile detail={detail} /> : null}
+      {tab === "profile" ? (
+        <PositionProfile
+          detail={detail}
+          aiState={aiState}
+          aiPanel={aiPanel}
+          aiRecord={aiRecord}
+          onOpenAiSetup={() => setAiState("setup")}
+          onOpenAiDetails={() =>
+            updateQuery({ panel: "details", process: aiRecord.id })
+          }
+          onOpenAiReview={() => updateQuery({ panel: "review" })}
+          onCloseAiPanel={() => {
+            if (aiState === "setup") setAiState("idle");
+            else updateQuery({ panel: null, process: null });
+          }}
+          onStartAi={startAiProcessing}
+          onStopAi={() => {
+            if (aiTimerRef.current) window.clearTimeout(aiTimerRef.current);
+            setAiState("idle");
+            notify("岗位 AI 解析已停止，正式岗位资料没有变化", "info");
+          }}
+          onRetryAi={startAiProcessing}
+          onApplyAi={(selected) => {
+            updateQuery({ tab: "profile", ai: "complete", panel: null });
+            notify(`已应用 ${selected.length} 项建议，岗位资料更新为 v4`);
+          }}
+        />
+      ) : null}
       {tab === "pipeline" ? <CandidatePipeline /> : null}
       {tab === "matching" ? <MatchingResults /> : null}
-      {tab === "work" ? <RelatedWork /> : null}
+      {tab === "work" ? (
+        <RelatedWork
+          processingRecords={processingRecords}
+          onOpenProcessing={(record) =>
+            updateQuery({ panel: "details", process: record.id })
+          }
+        />
+      ) : null}
+      <AssetAiProcessDrawer
+        open={aiPanel === "details"}
+        close={() => updateQuery({ panel: null, process: null })}
+        record={selectedProcessingRecord}
+        onOpenWork={() => navigate("/works/position-vla")}
+        primaryLabel={
+          selectedProcessingRecord.state === "review"
+            ? "审核解析结果"
+            : selectedProcessingRecord.state === "failed"
+              ? "重新运行"
+              : undefined
+        }
+        onPrimary={() => {
+          if (selectedProcessingRecord.state === "review")
+            updateQuery({ tab: "profile", panel: "review" });
+          else startAiProcessing();
+        }}
+      />
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}

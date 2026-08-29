@@ -955,6 +955,48 @@ input:focus-visible {
   gap: 7px;
 }
 
+.s1-active-process-entry {
+  display: inline-flex;
+  height: 32px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  color: var(--s1-accent);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  background: var(--s1-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 24%, var(--s1-line));
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.s1-active-process-entry:hover {
+  border-color: color-mix(in srgb, var(--s1-accent) 48%, var(--s1-line));
+}
+
+.s1-active-process-entry svg {
+  width: 14px;
+  height: 14px;
+}
+
+.s1-active-process-entry.is-running svg {
+  animation: s1-spin 1.2s linear infinite;
+}
+
+.s1-active-process-entry.is-review {
+  color: var(--s1-warning);
+  background: var(--s1-warning-soft);
+  border-color: color-mix(in srgb, var(--s1-warning) 26%, var(--s1-line));
+}
+
+.s1-active-process-entry.is-failed {
+  color: var(--s1-danger);
+  background: var(--s1-danger-soft);
+  border-color: color-mix(in srgb, var(--s1-danger) 26%, var(--s1-line));
+}
+
 .s1-new-menu-wrap {
   position: relative;
 }
@@ -3042,6 +3084,14 @@ input:focus-visible {
   .s1-topbar-actions {
     position: static;
     gap: 6px;
+  }
+  .s1-active-process-entry {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+  .s1-active-process-entry span {
+    display: none;
   }
   .s1-topbar-actions .s1-new-menu-wrap,
   .s1-topbar-actions .s1-global-import,

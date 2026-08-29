@@ -505,6 +505,15 @@ export function Stage1Shell() {
   const [assetNavigationOpen, setAssetNavigationOpen] = useState(false);
   const [assetCreateOpen, setAssetCreateOpen] = useState(false);
   const [mobileMode, setMobileMode] = useState(null);
+  const [activeAiProcess, setActiveAiProcess] = useState(() => {
+    try {
+      return JSON.parse(
+        sessionStorage.getItem("hunter-active-ai-process") || "null",
+      );
+    } catch {
+      return null;
+    }
+  });
   const assetTriggerRef = useRef(null);
   const accountRef = useRef(null);
   const [notificationItems, setNotificationItems] =
@@ -517,6 +526,29 @@ export function Stage1Shell() {
   useEffect(() => {
     localStorage.setItem("hunter-nav-expanded", expanded ? "1" : "0");
   }, [expanded]);
+  useEffect(() => {
+    const syncActiveAiProcess = (event) => {
+      if (event.detail !== undefined) {
+        setActiveAiProcess(event.detail);
+        return;
+      }
+      try {
+        setActiveAiProcess(
+          JSON.parse(
+            sessionStorage.getItem("hunter-active-ai-process") || "null",
+          ),
+        );
+      } catch {
+        setActiveAiProcess(null);
+      }
+    };
+    window.addEventListener("hunter:ai-processing", syncActiveAiProcess);
+    window.addEventListener("storage", syncActiveAiProcess);
+    return () => {
+      window.removeEventListener("hunter:ai-processing", syncActiveAiProcess);
+      window.removeEventListener("storage", syncActiveAiProcess);
+    };
+  }, []);
   useEffect(() => {
     const onKeyDown = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -771,6 +803,37 @@ export function Stage1Shell() {
             <kbd>Ctrl K</kbd>
           </button>
           <div className="s1-topbar-actions">
+            {activeAiProcess ? (
+              <button
+                type="button"
+                className={`s1-active-process-entry is-${activeAiProcess.state}`}
+                aria-label={`${activeAiProcess.title}，${activeAiProcess.target}，${
+                  activeAiProcess.state === "running"
+                    ? "运行中"
+                    : activeAiProcess.state === "review"
+                      ? "等待审核"
+                      : "处理失败"
+                }`}
+                onClick={() => navigate(activeAiProcess.route)}
+              >
+                <Icon
+                  name={
+                    activeAiProcess.state === "running"
+                      ? "refresh"
+                      : activeAiProcess.state === "review"
+                        ? "clock"
+                        : "warning"
+                  }
+                />
+                <span>
+                  {activeAiProcess.state === "running"
+                    ? "1 项处理中"
+                    : activeAiProcess.state === "review"
+                      ? "1 项待审核"
+                      : "1 项处理失败"}
+                </span>
+              </button>
+            ) : null}
             <div className="s1-new-menu-wrap">
               <Button
                 tone="primary"
