@@ -65,12 +65,30 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   await expect(review).toContainText("当前内容");
   await expect(review).toContainText("AI 建议");
   await expect(review.getByRole("checkbox")).toHaveCount(4);
+  await expect(
+    review.getByRole("navigation", { name: "待审核字段" }),
+  ).toBeVisible();
+  await review.getByRole("button", { name: /软性与隐性要求/ }).click();
+  await expect(
+    review.getByRole("heading", { name: "软性与隐性要求" }),
+  ).toBeVisible();
+  await expect(review).toContainText("模型效果、硬件约束和客户交付时间");
+  await expect(review).toContainText(
+    "单纯写“跨团队协作”不足以支持后续匹配判断",
+  );
+  await review
+    .locator(".s4-ai-review-fields article.is-active")
+    .getByRole("checkbox")
+    .click();
+  await expect(
+    review.getByRole("button", { name: /应用所选 2 项/ }),
+  ).toBeVisible();
   await page.waitForTimeout(220);
   await page.screenshot({
     path: `${output}/review-desktop.png`,
     fullPage: true,
   });
-  await review.getByRole("button", { name: /应用所选 3 项/ }).click();
+  await review.getByRole("button", { name: /应用所选 2 项/ }).click();
   await expect(page).toHaveURL(/ai=complete/);
   await expect(page.getByText("岗位资料更新为 v4")).toBeVisible();
 
@@ -105,7 +123,7 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   await assertNoConsoleErrors();
 });
 
-test("手机端处理状态、审核与详情无横向溢出", async ({ page }) => {
+test("手机和平板端处理状态、审核与详情无横向溢出", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
 
@@ -122,9 +140,23 @@ test("手机端处理状态、审核与详情无横向溢出", async ({ page }) 
   await page.goto(
     "#/positions/position-vla?tab=profile&ai=review&panel=review",
   );
+  const review = page.getByRole("region", { name: "审核岗位解析结果" });
+  await review.getByRole("tab", { name: "当前内容" }).click();
+  await expect(review.getByText("兼顾团队管理与真机项目交付")).toBeVisible();
   await page.waitForTimeout(220);
   await page.screenshot({
     path: `${output}/review-mobile.png`,
+    fullPage: true,
+  });
+
+  await page.setViewportSize({ width: 820, height: 1180 });
+  await page.goto(
+    "#/positions/position-vla?tab=profile&ai=review&panel=review",
+  );
+  await expectNoHorizontalOverflow(page);
+  await expect(page.getByRole("tab", { name: "AI 建议" })).toBeVisible();
+  await page.screenshot({
+    path: `${output}/review-tablet.png`,
     fullPage: true,
   });
   await assertNoConsoleErrors();

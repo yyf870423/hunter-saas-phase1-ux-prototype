@@ -542,38 +542,58 @@ function PositionAiReviewWorkspace({ onBack, onApply }) {
     "软性与隐性要求",
     "寻访关键词",
   ]);
+  const [activeField, setActiveField] = useState("岗位定位");
+  const [mobileView, setMobileView] = useState("suggestion");
   const suggestions = [
     {
       label: "岗位定位",
       current: "负责具身智能 VLA 算法方向，兼顾团队管理与真机项目交付。",
       suggestion:
         "面向量产交付的 VLA 算法负责人。核心不是单点模型研究，而是统筹数据、训练、评测和真机部署闭环，并承担 8—12 人团队的技术路线与交付责任。",
+      reason:
+        "JD 多次强调量产、真机闭环和团队管理；用户补充说明要求候选人能统筹数据、训练和部署，因此将岗位从单一算法研究收紧为交付型技术负责人。",
     },
     {
       label: "软性与隐性要求",
       current: "需要较强的跨团队协作能力和客户项目意识。",
       suggestion:
         "需要能在模型效果、硬件约束和客户交付时间之间做取舍；候选人若长期只负责研究原型、缺少真机失败复盘或团队管理跨度不足，匹配分应适当降低。",
+      reason:
+        "岗位需要同时协调算法、硬件和客户项目，单纯写“跨团队协作”不足以支持后续匹配判断，因此补充可验证的取舍能力和风险信号。",
     },
     {
       label: "寻访关键词",
       current: "VLA + 机器人学习；强化学习 + 真机部署；多模态 + 算法负责人",
       suggestion:
         "VLA + 真机部署；机器人学习 + 技术负责人；多模态策略 + 数据闭环；强化学习 + 量产交付；具身智能 + 团队管理",
+      reason:
+        "现有关键词偏技术主题，缺少交付和管理信号。新增组合用于覆盖技术负责人、量产交付和数据闭环等候选人表达。",
     },
     {
       label: "岗位 JD",
       current: "岗位资料 v3，不在默认处理范围内。",
       suggestion:
         "补充数据闭环、评测体系和跨硬件协同职责；将“熟悉强化学习”收紧为具备真机策略学习或机器人数据闭环经验。",
+      reason:
+        "本次解析没有获得更新岗位 JD 的授权，因此只保留建议，不会默认写入岗位资料。",
     },
   ];
+  const activeIndex = suggestions.findIndex(
+    (item) => item.label === activeField,
+  );
+  const activeSuggestion = suggestions[Math.max(activeIndex, 0)];
   const toggle = (label, checked) =>
     setSelected((current) =>
       checked
         ? [...new Set([...current, label])]
         : current.filter((item) => item !== label),
     );
+  const moveTo = (index) => {
+    const item = suggestions[index];
+    if (!item) return;
+    setActiveField(item.label);
+    setMobileView("suggestion");
+  };
   return (
     <section className="s4-ai-review-workspace" aria-label="审核岗位解析结果">
       <header className="s4-ai-review-heading">
@@ -598,58 +618,173 @@ function PositionAiReviewWorkspace({ onBack, onApply }) {
             v4，未选择的建议仍可从 AI 处理记录中查看。
           </span>
         </div>
-        <div className="s4-ai-review-list">
-          {suggestions.map((item) => (
-            <article
-              className={selected.includes(item.label) ? "is-selected" : ""}
-              key={item.label}
+        <div className="s4-ai-review-layout">
+          <nav className="s4-ai-review-fields" aria-label="待审核字段">
+            <header>
+              <b>字段目录</b>
+              <small>{suggestions.length} 项建议</small>
+            </header>
+            <div>
+              {suggestions.map((item) => {
+                const isActive = item.label === activeSuggestion.label;
+                const isSelected = selected.includes(item.label);
+                return (
+                  <article
+                    className={isActive ? "is-active" : ""}
+                    key={item.label}
+                  >
+                    <button
+                      type="button"
+                      aria-current={isActive ? "true" : undefined}
+                      onClick={() => {
+                        setActiveField(item.label);
+                        setMobileView("suggestion");
+                      }}
+                    >
+                      <span>
+                        <b>{item.label}</b>
+                        <small>
+                          {item.label === "岗位 JD"
+                            ? "本次范围外建议"
+                            : "岗位解析建议"}
+                        </small>
+                      </span>
+                      <Icon name="chevronRight" />
+                    </button>
+                    <CustomCheckbox
+                      checked={isSelected}
+                      onChange={(checked) => toggle(item.label, checked)}
+                      label={isSelected ? "应用" : "保留"}
+                    />
+                  </article>
+                );
+              })}
+            </div>
+          </nav>
+
+          <section className="s4-ai-review-detail">
+            <header>
+              <span>
+                <small>正在审核</small>
+                <h3>{activeSuggestion.label}</h3>
+              </span>
+              <StatusBadge
+                tone={
+                  selected.includes(activeSuggestion.label)
+                    ? "success"
+                    : "neutral"
+                }
+              >
+                {selected.includes(activeSuggestion.label)
+                  ? "将应用"
+                  : "保留当前内容"}
+              </StatusBadge>
+            </header>
+
+            <div
+              className="s4-ai-review-mobile-switch"
+              role="tablist"
+              aria-label="审核内容"
             >
-              <header>
-                <CustomCheckbox
-                  checked={selected.includes(item.label)}
-                  onChange={(checked) => toggle(item.label, checked)}
-                  label={item.label}
-                />
-                {item.label === "岗位 JD" ? (
-                  <StatusBadge tone="neutral">未纳入本次范围</StatusBadge>
-                ) : null}
-              </header>
-              <div className="s4-ai-review-change">
-                <section className="is-current">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mobileView === "suggestion"}
+                className={mobileView === "suggestion" ? "is-active" : ""}
+                onClick={() => setMobileView("suggestion")}
+              >
+                AI 建议
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mobileView === "current"}
+                className={mobileView === "current" ? "is-active" : ""}
+                onClick={() => setMobileView("current")}
+              >
+                当前内容
+              </button>
+            </div>
+
+            <div className="s4-ai-review-panels">
+              <article
+                className={`s4-ai-review-suggestion ${
+                  mobileView === "suggestion" ? "is-mobile-active" : ""
+                }`}
+              >
+                <header>
+                  <span>
+                    <Icon name="sparkles" />
+                    AI 建议
+                  </span>
+                  <small>建议写入岗位资料 v4</small>
+                </header>
+                <p>{activeSuggestion.suggestion}</p>
+              </article>
+
+              <aside
+                className={`s4-ai-review-inspector ${
+                  mobileView === "current" ? "is-mobile-active" : ""
+                }`}
+              >
+                <section>
                   <small>当前内容</small>
-                  <p>{item.current}</p>
+                  <p>{activeSuggestion.current}</p>
                 </section>
-                <div className="s4-ai-review-direction" aria-hidden="true">
-                  <span />
-                  <em>建议更新为</em>
-                  <span />
-                </div>
-                <section className="is-suggestion">
-                  <small>AI 建议</small>
-                  <p>{item.suggestion}</p>
+                <section>
+                  <small>修改依据</small>
+                  <p>{activeSuggestion.reason}</p>
                 </section>
-              </div>
-            </article>
-          ))}
+                <footer>
+                  <Icon name="file" />
+                  <span>
+                    <small>参考来源</small>
+                    <b>岗位 JD v3 · 用户补充说明</b>
+                  </span>
+                </footer>
+              </aside>
+            </div>
+
+            <footer className="s4-ai-review-field-nav">
+              <Button
+                size="sm"
+                icon="chevronLeft"
+                disabled={activeIndex <= 0}
+                onClick={() => moveTo(activeIndex - 1)}
+              >
+                上一项
+              </Button>
+              <span>
+                {activeIndex + 1} / {suggestions.length}
+              </span>
+              <Button
+                size="sm"
+                disabled={activeIndex >= suggestions.length - 1}
+                onClick={() => moveTo(activeIndex + 1)}
+              >
+                下一项
+              </Button>
+            </footer>
+          </section>
+          <footer className="s4-ai-review-actions">
+            <span>
+              {selected.length
+                ? `将更新 ${selected.length} 个字段`
+                : "尚未选择任何建议"}
+            </span>
+            <div>
+              <Button onClick={onBack}>稍后处理</Button>
+              <Button
+                tone="primary"
+                disabled={!selected.length}
+                onClick={() => onApply(selected)}
+              >
+                应用所选 {selected.length} 项
+              </Button>
+            </div>
+          </footer>
         </div>
       </div>
-      <footer className="s4-ai-review-actions">
-        <span>
-          {selected.length
-            ? `将更新 ${selected.length} 个字段`
-            : "尚未选择任何建议"}
-        </span>
-        <div>
-          <Button onClick={onBack}>稍后处理</Button>
-          <Button
-            tone="primary"
-            disabled={!selected.length}
-            onClick={() => onApply(selected)}
-          >
-            应用所选 {selected.length} 项
-          </Button>
-        </div>
-      </footer>
     </section>
   );
 }
