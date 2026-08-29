@@ -8696,7 +8696,7 @@
 }
 .s4-ai-review-fields article > button b {
   overflow: hidden;
-  font-size: 12px;
+  font-size: 13px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -8704,7 +8704,7 @@
   margin-top: 3px;
   overflow: hidden;
   color: var(--s1-subtle);
-  font-size: 10px;
+  font-size: 11px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -8730,7 +8730,7 @@
 .s4-ai-review-fields article > .s4-checkbox > span {
   flex: 0 0 auto;
   overflow: visible;
-  font-size: 10px;
+  font-size: 11px;
   white-space: nowrap;
   text-overflow: clip;
 }
@@ -8757,7 +8757,7 @@
 }
 .s4-ai-review-detail > header > span > small {
   color: var(--s1-subtle);
-  font-size: 10px;
+  font-size: 11px;
 }
 .s4-ai-review-detail > header h3 {
   margin: 3px 0 0;
@@ -8798,15 +8798,15 @@
 }
 .s4-ai-review-suggestion > header small {
   color: var(--s1-subtle);
-  font-size: 10px;
+  font-size: 11px;
   white-space: nowrap;
 }
 .s4-ai-review-suggestion > p {
   max-width: 72ch;
-  margin: 24px 0 0;
+  margin: 20px 0 0;
   color: var(--s1-ink);
-  font-size: 15px;
-  line-height: 27px;
+  font-size: 13px;
+  line-height: 22px;
   white-space: pre-wrap;
 }
 .s4-ai-review-inspector {
@@ -8829,14 +8829,14 @@
 .s4-ai-review-inspector section small,
 .s4-ai-review-inspector footer small {
   color: var(--s1-subtle);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 650;
 }
 .s4-ai-review-inspector section p {
   margin: 7px 0 0;
   color: var(--s1-muted);
-  font-size: 12px;
-  line-height: 20px;
+  font-size: 13px;
+  line-height: 21px;
 }
 .s4-ai-review-inspector > footer {
   display: grid;
@@ -8857,7 +8857,7 @@
   display: block;
   margin-top: 2px;
   overflow: hidden;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -9346,8 +9346,8 @@
   }
   .s4-ai-review-suggestion > p {
     margin-top: 18px;
-    font-size: 14px;
-    line-height: 24px;
+    font-size: 13px;
+    line-height: 22px;
   }
   .s4-ai-review-inspector {
     padding: 16px;
