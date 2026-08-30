@@ -8,9 +8,6 @@ async function waitForReview(page) {
   await expect(page.getByText("云端检索已开始")).toBeVisible({
     timeout: 10_000,
   });
-  await page.getByRole("button", { name: "在本机继续" }).click();
-  await expect(page.getByRole("heading", { name: "在本机继续" })).toBeVisible();
-  await page.getByRole("button", { name: "在此设备继续" }).click();
   await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -64,9 +61,9 @@ test("持续任务从第一条输入渐进推进到审核节点", async ({ page 
       hasText: "按决定继续后续动作",
     }),
   ).toContainText("等待用户");
-  await page.getByRole("button", { name: /准备本机处理并接收结果/ }).click();
+  await page.getByRole("button", { name: /读取用户上传的候选人资料/ }).click();
   await expect(
-    page.getByRole("heading", { name: "准备本机处理并接收结果" }),
+    page.getByRole("heading", { name: "读取用户上传的候选人资料" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "关闭检查区" }).click();
   await expectNoHorizontalOverflow(page);
@@ -181,7 +178,9 @@ test("授权切换、暂停、终止与删除确认可用", async ({ page }) => 
   await page.getByRole("option", { name: /仅分析/ }).click();
   await expect(page.getByText(/授权模式已切换为“仅分析”/)).toBeVisible();
   await page.getByRole("button", { name: "暂停", exact: true }).click();
-  await expect(page.getByRole("button", { name: "继续" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "继续", exact: true }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "更多任务操作" }).click();
   await page.getByRole("button", { name: "终止任务" }).click();
   await expect(page.getByRole("heading", { name: "终止任务" })).toBeVisible();
@@ -205,7 +204,7 @@ test("新建任务判断为持续任务后进入统一任务区", async ({ page 
   ).toBeVisible();
 });
 
-test("加载、流式中断和本机协作受限状态都可恢复", async ({ page }) => {
+test("加载、流式中断和公开来源受限状态都可恢复", async ({ page }) => {
   await page.goto("#/tasks/position-vla?state=loading");
   await expect(page.locator(".s2-workspace-loading")).toBeVisible();
 
@@ -217,29 +216,9 @@ test("加载、流式中断和本机协作受限状态都可恢复", async ({ pa
   });
 
   await page.goto("#/tasks/position-vla?state=limited");
-  await expect(page.getByText("本机协作暂不可用").first()).toBeVisible();
-  const handoffSpacing = await page
-    .locator(".s2-permission-state--handoff")
-    .evaluate((element) => {
-      const current = element.getBoundingClientRect();
-      const previous = element.previousElementSibling.getBoundingClientRect();
-      const next = element.nextElementSibling.getBoundingClientRect();
-      return {
-        above: Math.round(current.top - previous.bottom),
-        below: Math.round(next.top - current.bottom),
-      };
-    });
-  expect(handoffSpacing.above).toBeGreaterThanOrEqual(12);
-  expect(handoffSpacing.below).toBeGreaterThanOrEqual(12);
-  expect(
-    Math.abs(handoffSpacing.above - handoffSpacing.below),
-  ).toBeLessThanOrEqual(6);
-  await page.getByRole("button", { name: "查看处理方式" }).click();
-  await expect(page.getByRole("heading", { name: "在本机继续" })).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "在此设备继续" }),
-  ).toBeDisabled();
-  await expect(page.getByRole("button", { name: "下载任务" })).toBeEnabled();
+  await expect(page.getByText("部分公开来源暂不可用").first()).toBeVisible();
+  await expect(page.getByText(/可以稍后单独重试/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "在本机继续" })).toHaveCount(0);
 });
 
 test("附件格式失败使用局部反馈且可以关闭", async ({ page }) => {
@@ -270,21 +249,20 @@ test("文件随消息直接上传且不再二次确认", async ({ page }) => {
   ).toHaveCount(0);
 });
 
-test("本机结果等待、岗位版本变化和身份冲突都有独立状态", async ({ page }) => {
-  await page.goto("#/tasks/position-vla?state=local-waiting");
-  await expect(page.getByText("等待本机结果")).toBeVisible();
-  await expect(page.getByText(/云端已经形成 9 位候选人/)).toBeVisible();
-
-  await page.goto("#/tasks/position-vla?state=stale-task");
-  await expect(page.getByText(/本机处理使用的是上一版本/)).toBeVisible();
-  await expect(page.getByText(/按照最新岗位重新匹配/)).toBeVisible();
+test("上传简历批次和身份冲突都有独立状态", async ({ page }) => {
+  await page.goto("#/tasks/position-vla?state=resume-batch");
+  await expect(page.getByText("VLA 候选人简历（12 份）.zip")).toBeVisible();
+  const uploadedResumeTable = page
+    .locator(".s2-markdown-table")
+    .filter({ hasText: "用户上传简历" });
+  await expect(uploadedResumeTable).toContainText("12 位");
 
   await page.goto("#/tasks/position-vla?state=merge-conflict");
   await expect(page.getByText(/林昊的资料存在冲突/)).toBeVisible();
   await expect(page.getByText("合并前资料对比")).toBeVisible();
   const identityTable = page.locator(".s2-identity-differences table");
   await expect(identityTable).toContainText("系统候选人记录");
-  await expect(identityTable).toContainText("本机返回资料");
+  await expect(identityTable).toContainText("用户上传简历");
   await expect(identityTable).toContainText("手机号后四位");
   await expect(identityTable).toContainText("开始时间相差 2 个月");
   await page.setViewportSize({ width: 390, height: 844 });

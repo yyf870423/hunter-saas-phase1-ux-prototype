@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
-import { Button } from "../stage1/ui";
-import { Composer, HunterReply, UserMessage } from "./automation-ui";
+import {
+  Composer,
+  DecisionRequest,
+  HunterReply,
+  UserMessage,
+} from "./automation-ui";
 
 const starterPrompts = [
   "为星澜机器人的 VLA 算法负责人岗位持续寻找合适候选人",
@@ -17,7 +21,6 @@ const forcedPrompts = {
   task: starterPrompts[1],
   direct: starterPrompts[2],
   clarify: starterPrompts[3],
-  error: starterPrompts[0],
 };
 
 function classifyWork(prompt) {
@@ -32,7 +35,7 @@ function OutcomeReply({ outcome, prompt }) {
   if (outcome === "mainline") {
     return (
       <HunterReply
-        markdown={`这项任务需要持续汇总系统候选人、公开资料和本机返回结果，并在审核、邮件联系和等待回复后继续推进。我会保留完整任务上下文并持续更新计划：云端处理立即开始，需要本机处理的部分会作为相关处理显示，由你选择何时继续。
+        markdown={`这项任务需要持续汇总系统候选人、人才版图、公开资料和用户主动上传的简历，并在审核、邮件联系和等待回复后继续推进。我会保留完整任务上下文并持续更新计划；新资料上传后会先经过身份判断、查重和匹配，再进入审核。
 
 > 正在创建任务，并保留当前输入、附件和授权方式。`}
       />
@@ -62,9 +65,7 @@ function OutcomeReply({ outcome, prompt }) {
         ];
     return (
       <HunterReply
-        markdown={`这项任务可以一步完成，不需要生成执行计划。结果和输入仍会保留在任务记录中。
-
-## ${isCompanySummary ? "云脉芯能公开信息摘要" : "候选人跟进摘要"}
+        markdown={`## ${isCompanySummary ? "云脉芯能公开信息摘要" : "候选人跟进摘要"}
 
 ${details.map((item) => `- ${item}`).join("\n")}
 
@@ -98,6 +99,12 @@ export function NewWork() {
     setSubmittedPrompt(forcedPrompts[forcedState]);
     setStatus(forcedState);
   }, [forcedState]);
+
+  useEffect(() => {
+    if (forcedState !== "direct") return;
+    sessionStorage.setItem("hunter-new-task-prompt", forcedPrompts.direct);
+    navigate("/tasks/task-interview-summary", { replace: true });
+  }, [forcedState, navigate]);
 
   useEffect(() => {
     if (status !== "classifying" || forcedState === "classifying")
@@ -189,46 +196,39 @@ export function NewWork() {
             ) : null}
             <OutcomeReply outcome={status} prompt={submittedPrompt} />
             {status === "clarify" ? (
-              <HunterReply
-                markdown={`这个目标还缺少一个会改变推进方式的信息：你希望只整理当前公开信息，还是持续跟踪这家公司的招聘需求并寻找联系人？
-
-也可以直接在输入框中说明其他目标。`}
-              >
-                <div className="s2-new-work-choices">
-                  <button type="button" onClick={() => chooseOutcome("direct")}>
-                    <b>只整理当前信息</b>
-                    <small>完成本次分析后结束，任务记录仍会保留。</small>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => chooseOutcome("mainline")}
-                  >
-                    <b>持续跟踪并寻找联系人</b>
-                    <small>保留任务上下文，后续继续接收变化和回复。</small>
-                  </button>
-                </div>
-              </HunterReply>
-            ) : null}
-            {status === "error" ? (
-              <div className="s2-local-error" role="alert">
-                <Icon name="warning" />
-                <span>
-                  <b>暂时无法判断任务推进方式</b>
-                  <small>
-                    你的输入和附件已经保留，可以重新判断或继续补充目标。
-                  </small>
-                </span>
-                <Button
-                  size="sm"
-                  icon="refresh"
-                  onClick={() => {
-                    if (forcedState) setParams({}, { replace: true });
-                    setStatus("classifying");
+              <HunterReply>
+                <DecisionRequest
+                  title="需要补充任务目标"
+                  description="不同目标会影响信息范围、后续跟踪和结束条件。"
+                  options={[
+                    {
+                      value: "direct",
+                      label: "只整理当前公开信息",
+                      description:
+                        "完成本次公开信息分析后保留结果，仍可继续对话。",
+                    },
+                    {
+                      value: "mainline",
+                      label: "持续跟踪招聘需求并寻找联系人",
+                      description:
+                        "保留任务上下文，后续接收公开变化和邮件回复。",
+                    },
+                    {
+                      value: "custom",
+                      label: "我来补充其他目标",
+                      description:
+                        "在下方输入具体范围、判断标准或希望交付的结果。",
+                    },
+                  ]}
+                  onSelect={(option) => {
+                    if (option.value === "custom") {
+                      setValue("我的具体目标是：");
+                      return;
+                    }
+                    chooseOutcome(option.value);
                   }}
-                >
-                  重新判断
-                </Button>
-              </div>
+                />
+              </HunterReply>
             ) : null}
           </div>
         ) : null}

@@ -133,10 +133,10 @@ export function ComponentsPage() {
             <Icon name="warning" />
           </i>
           <div>
-            <b>本机协作暂不可用</b>
-            <p>云端任务继续运行，已有结果和检查点均保留。</p>
+            <b>部分公开来源暂不可用</b>
+            <p>已有任务、结果和检查点均保留，失败来源可以单独重试。</p>
           </div>
-          <Button size="sm">查看处理方式</Button>
+          <Button size="sm">查看异常</Button>
         </article>
       </section>
       <Modal

@@ -1513,6 +1513,10 @@ input:focus-visible {
   margin-bottom: 18px;
 }
 
+.s1-support-grid.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .s1-support-panel {
   min-width: 0;
   padding: 20px;

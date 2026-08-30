@@ -575,9 +575,8 @@ export function ProfileSettingsPage() {
 const notificationRows = [
   ["decision", "需要我处理", "待确认、待授权和需要补充信息", true, true, true],
   ["reply", "外部回复", "邮件回复、新简历和附件到达", true, true, true],
-  ["task", "任务状态", "完成、失败、暂停和等待外部", true, true, false],
+  ["task", "任务状态", "需要处理、暂停、等待用户和等待外部", true, true, false],
   ["signal", "高优先级信号", "即将失效的机会和强信号", true, true, false],
-  ["app", "寻访 App", "结果提交、设备授权和版本异常", true, true, false],
   ["billing", "额度与订阅", "额度不足、预算上限和订阅到期", true, true, true],
 ];
 
@@ -829,7 +828,6 @@ export function ConnectionSettingsPage() {
   const notify = useToast();
   const empty = state === "empty";
   const [mailConnected, setMailConnected] = useState(!empty);
-  const [deviceConnected, setDeviceConnected] = useState(!empty);
   const [mailModal, setMailModal] = useState(false);
   const [mailStage, setMailStage] = useState("credentials");
   const [mailAddress, setMailAddress] = useState(empty ? "" : "shenlan@qq.com");
@@ -844,8 +842,6 @@ export function ConnectionSettingsPage() {
     incomingPort: "993",
     encryption: "SSL/TLS",
   });
-  const [deviceModal, setDeviceModal] = useState(false);
-  const [deviceWaiting, setDeviceWaiting] = useState(false);
   const [disconnect, setDisconnect] = useState(null);
 
   const resetMail = () => {
@@ -929,7 +925,7 @@ export function ConnectionSettingsPage() {
     >
       <SettingsPageHeader
         title="连接"
-        description="管理发件邮箱和已连接的寻访 App 设备。"
+        description="管理 Hunter 用于发送邮件和读取回复的个人邮箱。"
       />
       {state === "error" ? (
         <InlineNotice tone="danger" icon="warning">
@@ -986,74 +982,6 @@ export function ConnectionSettingsPage() {
           </div>
         )}
       </SettingsSection>
-      <SettingsSection
-        title="寻访 App 设备"
-        description="云端只管理设备连接、版本和结果同步，不显示人才平台账号与登录状态。"
-        action={
-          <Button size="sm" icon="plus" onClick={() => setDeviceModal(true)}>
-            添加设备
-          </Button>
-        }
-      >
-        {deviceConnected ? (
-          <div className="s5-device-list">
-            <div className="s5-device-card">
-              <i>
-                <Icon name="monitor" />
-              </i>
-              <span>
-                <span>
-                  <b>沈岚的 MacBook Pro</b>
-                  <StatusBadge tone="success">在线</StatusBadge>
-                </span>
-                <small>macOS 15.6 · 寻访 App 1.0.3 · 2 分钟前同步</small>
-                <em>设备授权将于 2026 年 11 月 24 日复核</em>
-              </span>
-              <IconButton
-                icon="more"
-                label="MacBook 设备操作"
-                onClick={() => setDisconnect("device")}
-              />
-            </div>
-            <div className="s5-device-card is-warning">
-              <i>
-                <Icon name="monitor" />
-              </i>
-              <span>
-                <span>
-                  <b>办公室 Windows</b>
-                  <StatusBadge tone="warning">需要升级</StatusBadge>
-                </span>
-                <small>Windows 11 · 寻访 App 0.9.8 · 昨天 19:35 同步</small>
-                <em>版本过低，暂不能提交新的候选人批次。</em>
-              </span>
-              <Button
-                size="sm"
-                onClick={() => notify("升级说明已发送到该设备", "info")}
-              >
-                发送升级说明
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="s5-connection-empty">
-            <i>
-              <Icon name="monitor" />
-            </i>
-            <span>
-              <b>尚未连接设备</b>
-              <small>
-                安装寻访 App
-                后使用一次性连接码，将确认结果安全提交到当前工作空间。
-              </small>
-            </span>
-            <Button tone="primary" onClick={() => setDeviceModal(true)}>
-              添加设备
-            </Button>
-          </div>
-        )}
-      </SettingsSection>
-
       <Modal
         open={mailModal}
         close={resetMail}
@@ -1294,80 +1222,20 @@ export function ConnectionSettingsPage() {
       </Modal>
 
       <Modal
-        open={deviceModal}
-        close={() => {
-          setDeviceModal(false);
-          setDeviceWaiting(false);
-        }}
-        title="添加寻访 App 设备"
-        description="在设备上的寻访 App 中输入连接码，或扫描二维码。"
-        footer={
-          <>
-            <Button onClick={() => setDeviceModal(false)}>取消</Button>
-            <Button
-              tone="primary"
-              onClick={() => {
-                if (!deviceWaiting) {
-                  setDeviceWaiting(true);
-                  return;
-                }
-                setDeviceConnected(true);
-                setDeviceWaiting(false);
-                setDeviceModal(false);
-                notify("新设备已连接");
-              }}
-            >
-              {deviceWaiting ? "模拟设备已连接" : "开始等待"}
-            </Button>
-          </>
-        }
-      >
-        <div className="s5-device-code">
-          <div className="s5-qr-placeholder">
-            <Icon name="qrCode" />
-          </div>
-          <span>
-            <small>一次性连接码</small>
-            <b>H7K4-9Q2M</b>
-            <em>09:42 后失效</em>
-            <button
-              type="button"
-              onClick={() => notify("连接码已复制", "info")}
-            >
-              <Icon name="copy" />
-              复制连接码
-            </button>
-          </span>
-        </div>
-        {deviceWaiting ? (
-          <InlineNotice>
-            正在等待设备确认。关闭窗口不会取消连接码。
-          </InlineNotice>
-        ) : null}
-      </Modal>
-
-      <Modal
         open={Boolean(disconnect)}
         close={() => setDisconnect(null)}
         size="sm"
-        title={disconnect === "mail" ? "断开发件邮箱" : "撤销设备授权"}
-        description={
-          disconnect === "mail"
-            ? "已发送邮件和历史回复仍会保留。"
-            : "设备中的未提交结果不会自动上传。"
-        }
+        title="断开发件邮箱"
+        description="已发送邮件和历史回复仍会保留。"
         footer={
           <>
             <Button onClick={() => setDisconnect(null)}>取消</Button>
             <Button
               tone="danger"
               onClick={() => {
-                if (disconnect === "mail") setMailConnected(false);
-                else setDeviceConnected(false);
+                setMailConnected(false);
                 setDisconnect(null);
-                notify(
-                  disconnect === "mail" ? "发件邮箱已断开" : "设备授权已撤销",
-                );
+                notify("发件邮箱已断开");
               }}
             >
               确认
@@ -1376,9 +1244,7 @@ export function ConnectionSettingsPage() {
         }
       >
         <InlineNotice tone="warning" icon="warning">
-          {disconnect === "mail"
-            ? "尚未发送的邮件草稿会保留，但发送和读取后续回复前需要重新连接邮箱。"
-            : "正在运行的设备侧处理不会被远程停止，请同时在设备中结束处理。"}
+          尚未发送的邮件草稿会保留，但发送和读取后续回复前需要重新连接邮箱。
         </InlineNotice>
       </Modal>
     </PageState>

@@ -143,8 +143,7 @@ export function AutomationWorkspace() {
   const [phase, setPhase] = useState(() => {
     if (forcedState === "stream-error") return 1;
     if (forcedState === "limited") return 2;
-    if (forcedState === "local-waiting" || forcedState === "stale-task")
-      return 3;
+    if (forcedState === "resume-batch") return 3;
     if (forcedState === "merge-conflict") return 4;
     if (forcedState === "review") return 4;
     if (forcedState === "no-candidate") return 4;
@@ -205,19 +204,6 @@ export function AutomationWorkspace() {
     return sessionStorage.getItem("hunter-workstream-contact-stage") || "idle";
   });
   const [localError, setLocalError] = useState(forcedState === "error");
-  const [handoffOpen, setHandoffOpen] = useState(false);
-  const [handoffComplete, setHandoffComplete] = useState(
-    () =>
-      [
-        "local-waiting",
-        "stale-task",
-        "merge-conflict",
-        "review",
-        "waiting",
-        "candidate-reply",
-      ].includes(forcedState) ||
-      sessionStorage.getItem("hunter-workstream-handoff") === "1",
-  );
   const scrollRef = useRef(null);
   const prompt =
     sessionStorage.getItem("hunter-new-workstream-prompt") || defaultPrompt;
@@ -233,16 +219,10 @@ export function AutomationWorkspace() {
       setPaused(false);
       setStreamError(false);
       setStreamStopped(false);
-      setHandoffComplete(false);
-    } else if (
-      forcedState === "local-waiting" ||
-      forcedState === "stale-task"
-    ) {
+    } else if (forcedState === "resume-batch") {
       setPhase(3);
-      setHandoffComplete(true);
     } else if (forcedState === "merge-conflict") {
       setPhase(4);
-      setHandoffComplete(true);
     } else if (forcedState === "review") {
       setPhase(4);
     } else if (forcedState === "waiting") {
@@ -259,14 +239,7 @@ export function AutomationWorkspace() {
 
   useEffect(() => {
     if (forcedState && forcedState !== "stream-error") return undefined;
-    if (
-      paused ||
-      terminated ||
-      streamStopped ||
-      streamError ||
-      phase >= 4 ||
-      (phase === 2 && !handoffComplete)
-    )
+    if (paused || terminated || streamStopped || streamError || phase >= 4)
       return undefined;
     const delays = [700, 1200, 1450, 1750];
     const timer = window.setTimeout(
@@ -274,22 +247,7 @@ export function AutomationWorkspace() {
       delays[phase] || 1200,
     );
     return () => window.clearTimeout(timer);
-  }, [
-    forcedState,
-    handoffComplete,
-    paused,
-    phase,
-    streamError,
-    streamStopped,
-    terminated,
-  ]);
-
-  useEffect(() => {
-    sessionStorage.setItem(
-      "hunter-workstream-handoff",
-      handoffComplete ? "1" : "0",
-    );
-  }, [handoffComplete]);
+  }, [forcedState, paused, phase, streamError, streamStopped, terminated]);
 
   useEffect(() => {
     if (!forcedState)
@@ -359,8 +317,6 @@ export function AutomationWorkspace() {
     setStreamError(false);
     setContactStage("idle");
     setLocalError(false);
-    setHandoffOpen(false);
-    setHandoffComplete(false);
     sessionStorage.removeItem("hunter-workstream-phase");
     sessionStorage.removeItem("hunter-workstream-draft");
     sessionStorage.removeItem("hunter-workstream-inspection");
@@ -369,7 +325,6 @@ export function AutomationWorkspace() {
     sessionStorage.removeItem("hunter-workstream-plan-adjusted");
     sessionStorage.removeItem("hunter-workstream-plan-requirement");
     sessionStorage.removeItem("hunter-workstream-contact-stage");
-    sessionStorage.removeItem("hunter-workstream-handoff");
     notify("已从第一条输入重新演示", "info");
   };
 
@@ -521,7 +476,7 @@ export function AutomationWorkspace() {
               ? {
                   title: "岗位边界已确认",
                   detail:
-                    "云端候选人和公开资料检索已经开始；本机处理由用户选择设备后继续。",
+                    "系统候选人、人才版图和公开资料检索已经开始；用户上传的新简历会随时并入当前任务。",
                   time: "09:02",
                   tone: "info",
                 }
@@ -619,7 +574,7 @@ export function AutomationWorkspace() {
             {phase >= 1 ? (
               <HunterReply
                 streaming={phase === 1 && !streamStopped}
-                markdown={`我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行处理系统候选人、公开资料和需要在本机继续的渠道。${
+                markdown={`我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行处理系统候选人、人才版图、论文专利和公开网络资料。用户主动上传的新简历也可以随时并入本任务。${
                   phase >= 2
                     ? `
 
@@ -670,21 +625,14 @@ export function AutomationWorkspace() {
               </div>
             ) : null}
             {forcedState === "limited" ? (
-              <div className="s2-permission-state s2-permission-state--handoff">
+              <div className="s2-permission-state">
                 <Icon name="warning" />
                 <span>
-                  <b>本机协作暂不可用</b>
+                  <b>部分公开来源暂不可用</b>
                   <small>
-                    云端检索和已有结果继续保留。可以稍后在本机继续，或下载处理包。
+                    系统候选人、人才版图和已获得的公开结果继续保留。失败来源可以稍后单独重试，也可以直接上传补充简历。
                   </small>
                 </span>
-                <Button
-                  tone="secondary"
-                  size="sm"
-                  onClick={() => setHandoffOpen(true)}
-                >
-                  查看处理方式
-                </Button>
               </div>
             ) : null}
             {localError ? (
@@ -693,7 +641,7 @@ export function AutomationWorkspace() {
                 <span>
                   <b>论文与专利人物线索处理失败</b>
                   <small>
-                    系统候选人、公开资料和本机返回结果已经保留。可以只重试失败来源，不重新执行整轮任务。
+                    系统候选人、人才版图、公开资料和用户上传简历已经保留。可以只重试失败来源，不重新执行整轮任务。
                   </small>
                 </span>
                 <Button
@@ -710,60 +658,34 @@ export function AutomationWorkspace() {
               <HunterReply
                 markdown={`## 云端检索已开始
 
-Hunter 正在检查系统候选人、论文、专利和公开网络资料。需要在本机处理的渠道不会在云端运行，也不会阻塞云端结果。`}
-              >
-                <div className="s2-markdown-action-row">
-                  <Button
-                    tone={handoffComplete ? "secondary" : "primary"}
-                    icon={handoffComplete ? "check" : "download"}
-                    onClick={() => setHandoffOpen(true)}
-                  >
-                    {handoffComplete ? "本机处理已准备" : "在本机继续"}
-                  </Button>
-                  <small>
-                    {handoffComplete
-                      ? "本机结果返回后会自动进入身份检查、去重、合并和匹配。"
-                      : "可以选择已连接设备，也可以下载任务后在本机处理。"}
-                  </small>
-                </div>
-              </HunterReply>
+Hunter 正在检查系统候选人、人才版图、论文、专利和公开网络资料。Hunter 不会登录或自动操作需要认证的人才网站；你可以随时在下方上传整理好的简历文件，上传内容会进入同一套身份判断、查重和匹配流程。`}
+              />
             ) : null}
-            {forcedState === "local-waiting" ? (
-              <div className="s2-system-state">
-                <Icon name="clock" />
-                <span>
-                  <b>等待本机结果</b>
-                  <small>
-                    云端已经形成 9
-                    位候选人，尚未收到本机结果。本机处理可能仍在进行，也可能尚未启动；新结果返回后会随时合并，不需要等待全部来源结束。
-                  </small>
+            {forcedState === "resume-batch" ? (
+              <UserMessage time="今天 09:04">
+                <span>补充这批候选人简历，请和当前结果一起查重和匹配。</span>
+                <span className="s2-message-file">
+                  <Icon name="file" />
+                  <span>
+                    <b>VLA 候选人简历（12 份）.zip</b>
+                    <small>ZIP · 18.6 MB</small>
+                  </span>
                 </span>
-              </div>
-            ) : null}
-            {forcedState === "stale-task" ? (
-              <div className="s2-permission-state">
-                <Icon name="warning" />
-                <span>
-                  <b>岗位信息已更新，本机处理使用的是上一版本</b>
-                  <small>
-                    已返回候选人仍会接收，但会按照最新岗位重新匹配；后续本机处理将使用新版本。
-                  </small>
-                </span>
-              </div>
+              </UserMessage>
             ) : null}
             {phase >= 3 ? (
               <HunterReply
                 markdown={`## 候选人结果正在持续合并
 
-云端和本机结果不需要同时完成。每批结果到达后，Hunter 都会立即执行身份检查、去重、资料合并和最新岗位匹配，再把新增或变化的人选交给你审核。
+公开来源和用户上传资料不需要同时到齐。每批资料到达后，Hunter 都会执行身份检查、去重、资料合并和最新岗位匹配，再把新增或变化的人选交给你审核。
 
 | 来源 | 本批结果 | 合并后变化 |
 | --- | --- | --- |
 | 系统候选人 | 8 位 | 新增 5 位，更新 2 位，合并重复 1 位 |
 | 论文、专利与公开网络 | 14 位人物线索 | 转为候选人 4 位，保留线索 10 位 |
-| 本机结果 | 12 位 | 新增 9 位，更新 2 位，合并重复 1 位 |
+| 用户上传简历 | 12 位 | 新增 9 位，更新 2 位，合并重复 1 位 |
 
-> 原始简历附件不会随候选人批次自动上传。来源资料仅保留来源平台和本地批次，不在云端保存认证页面链接。`}
+> 上传的简历文件由用户主动提供。Hunter 不会从需要认证的人才网站自动获取资料，也不保存认证页面链接。`}
               >
                 <button
                   type="button"
@@ -818,11 +740,11 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
                       updatedAt: "2026-08-14 更新",
                     },
                     {
-                      label: "本机返回资料",
+                      label: "用户上传简历",
                       name: "林昊",
                       organization: "拓界机器人 · 具身智能中心",
                       role: "VLA 算法负责人",
-                      source: "猎聘简历",
+                      source: "用户上传 · 原来源标记为猎聘",
                       updatedAt: "2026-08-21 获取",
                     },
                   ]}
@@ -967,8 +889,23 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
               </section>
             ) : null}
             {contactStage === "reply" ? (
-              <HunterReply
-                markdown={`## 林昊的新简历已合并并完成局部重匹配
+              <>
+                {forcedState === "candidate-reply" ? (
+                  <UserMessage time="今天 16:42">
+                    <span>
+                      林昊愿意继续了解岗位，这是他刚发来的最新简历，请更新资料并重新匹配。
+                    </span>
+                    <span className="s2-message-file">
+                      <Icon name="file" />
+                      <span>
+                        <b>林昊_机器人学习负责人_2026.pdf</b>
+                        <small>PDF · 1.8 MB</small>
+                      </span>
+                    </span>
+                  </UserMessage>
+                ) : null}
+                <HunterReply
+                  markdown={`## 林昊的新简历已合并并完成局部重匹配
 
 新简历补充了最近 8 个月的团队扩张和真机数据闭环项目，没有创建重复候选人档案。原始简历版本继续保留。
 
@@ -979,7 +916,8 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
 | 明确只考虑北京或远程 | 地点风险已更新 |
 
 > 正式推荐、面试安排、薪资承诺、Offer 和推进阶段仍由猎头手动处理。`}
-              />
+                />
+              </>
             ) : null}
             {terminated ? (
               <div className="s2-system-state is-danger">
@@ -1028,70 +966,6 @@ Hunter 正在检查系统候选人、论文、专利和公开网络资料。需�
         </div>
       </section>
       <InspectionPanel item={inspection} onClose={() => setInspection(null)} />
-      <Modal
-        open={handoffOpen}
-        close={() => setHandoffOpen(false)}
-        title="在本机继续"
-        description="选择已连接设备继续本机处理；云端处理会继续运行。"
-        size="lg"
-      >
-        <div className="s2-handoff-options">
-          <section
-            className={forcedState === "limited" ? "is-unavailable" : ""}
-          >
-            <i>
-              <Icon name="database" />
-            </i>
-            <span>
-              <b>Eric 的 MacBook Pro</b>
-              <small>
-                {forcedState === "limited"
-                  ? "设备当前不可用 · 上次连接于 18 分钟前"
-                  : "设备在线 · 任务仅在这台电脑中处理"}
-              </small>
-            </span>
-            <Button
-              tone="primary"
-              size="sm"
-              disabled={forcedState === "limited"}
-              onClick={() => {
-                setHandoffComplete(true);
-                setPhase((current) => Math.max(current, 3));
-                setHandoffOpen(false);
-                notify("本机处理已准备，云端将继续接收返回结果", "success");
-              }}
-            >
-              在此设备继续
-            </Button>
-          </section>
-          <section>
-            <i>
-              <Icon name="download" />
-            </i>
-            <span>
-              <b>下载处理包</b>
-              <small>
-                适用于当前设备不可用时；处理完成后可将结果导回 Hunter。
-              </small>
-            </span>
-            <Button
-              tone="secondary"
-              size="sm"
-              onClick={() => {
-                setHandoffComplete(true);
-                setPhase((current) => Math.max(current, 3));
-                setHandoffOpen(false);
-                notify("处理包已下载，云端处理继续运行", "success");
-              }}
-            >
-              下载任务
-            </Button>
-          </section>
-          <p>
-            处理包包含岗位信息和已确认的筛选范围，不包含云端账号凭据。云端不会登录或控制需要认证的人才网站。
-          </p>
-        </div>
-      </Modal>
       <Modal
         open={terminateOpen}
         close={() => setTerminateOpen(false)}

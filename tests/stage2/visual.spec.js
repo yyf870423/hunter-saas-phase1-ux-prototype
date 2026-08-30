@@ -11,12 +11,13 @@ test.beforeAll(async () => {
   await mkdir(output, { recursive: true });
 });
 
-async function continueOnLocalDevice(page) {
+async function waitForCandidateReview(page) {
   await expect(page.getByText("云端检索已开始")).toBeVisible({
     timeout: 10_000,
   });
-  await page.getByRole("button", { name: "在本机继续" }).click();
-  await page.getByRole("button", { name: "在此设备继续" }).click();
+  await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
+    timeout: 10_000,
+  });
 }
 
 for (const viewport of [
@@ -28,7 +29,7 @@ for (const viewport of [
     const assertNoConsoleErrors = trackConsoleErrors(page);
     await page.setViewportSize(viewport);
     await page.goto("#/tasks/position-vla");
-    await continueOnLocalDevice(page);
+    await waitForCandidateReview(page);
     await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
       timeout: 10_000,
     });
@@ -44,7 +45,7 @@ for (const viewport of [
 test("截取候选人审核、任务运行和信号中心", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/tasks/position-vla");
-  await continueOnLocalDevice(page);
+  await waitForCandidateReview(page);
   await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -121,7 +122,6 @@ test("截取统一新建任务及关键状态", async ({ page }) => {
     ["", "desktop-new-work.png"],
     ["?state=clarify", "desktop-new-work-clarify.png"],
     ["?state=direct", "desktop-new-work-direct.png"],
-    ["?state=error", "desktop-new-work-error.png"],
     ["?state=limited", "desktop-new-work-limited.png"],
   ]) {
     await page.goto(`#/new${state}`);
@@ -163,31 +163,10 @@ test("截取阶段二异常状态和移动端详情", async ({ page }) => {
   });
 });
 
-test("截取云端交接和本机结果回流状态", async ({ page }) => {
+test("截取简历上传批次和身份合并状态", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("#/tasks/position-vla");
-  await expect(page.getByText("云端检索已开始")).toBeVisible({
-    timeout: 10_000,
-  });
-  await page.getByRole("button", { name: "在本机继续" }).click();
-  await expect(page.getByRole("heading", { name: "在本机继续" })).toBeVisible();
-  await expectNoHorizontalOverflow(page);
-  await page.screenshot({
-    path: `${output}/desktop-local-handoff.png`,
-    fullPage: true,
-    animations: "disabled",
-  });
-  await page.getByRole("button", { name: "关闭" }).click();
-  await page.reload();
-  await page.evaluate(() => sessionStorage.clear());
-
   for (const [state, marker, filename] of [
-    ["local-waiting", "等待本机结果", "desktop-local-waiting.png"],
-    [
-      "stale-task",
-      "岗位信息已更新，本机处理使用的是上一版本",
-      "desktop-stale-task.png",
-    ],
+    ["resume-batch", "VLA 候选人简历（12 份）.zip", "desktop-resume-batch.png"],
     [
       "merge-conflict",
       "林昊的资料存在冲突，确认后才能合并",

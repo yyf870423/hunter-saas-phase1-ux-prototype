@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
-import { actionItems, mainlines, runSummaries, signals } from "./data";
+import { actionItems, mainlines, signals } from "./data";
 import { Button, EmptyState, Skeleton, StatusBadge, useToast } from "./ui";
 
 function SectionHeading({ eyebrow, title, description, action }) {
@@ -100,21 +100,18 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
   );
 }
 
-function RunPanel({ state, onOpen, onRetry }) {
+function SignalPanel({ state, onOpen, onRetry }) {
   if (state === "error") {
     return (
-      <section
-        className="s1-support-panel s1-local-error"
-        aria-labelledby="task-title"
-      >
-        <SectionHeading eyebrow="运行动态" title="需要关注的执行" />
-        <div className="s1-local-state">
+      <section className="s1-support-panel" aria-labelledby="signal-title">
+        <SectionHeading eyebrow="信号与机会" title="值得判断的变化" />
+        <div className="s1-local-state s1-local-error">
           <i>
             <Icon name="warning" />
           </i>
           <div>
-            <b>运行摘要暂时无法加载</b>
-            <p>重点任务和信号仍可正常使用。</p>
+            <b>信号摘要暂时无法加载</b>
+            <p>重点任务和行动队列仍可正常使用。</p>
           </div>
           <Button size="sm" icon="refresh" onClick={onRetry}>
             重新加载
@@ -123,42 +120,6 @@ function RunPanel({ state, onOpen, onRetry }) {
       </section>
     );
   }
-  return (
-    <section className="s1-support-panel" aria-labelledby="task-title">
-      <SectionHeading
-        eyebrow="运行动态"
-        title="需要关注的执行"
-        action={
-          <Button tone="ghost" size="sm" onClick={() => onOpen("全部任务")}>
-            查看任务
-          </Button>
-        }
-      />
-      <div className="s1-task-list">
-        {runSummaries.map((task) => (
-          <button
-            type="button"
-            key={task.id}
-            onClick={() => onOpen(task.title)}
-          >
-            <span className="s1-task-status">
-              <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
-              <time>{task.time}</time>
-            </span>
-            <b>{task.title}</b>
-            <small>
-              {task.type} · {task.object}
-            </small>
-            <p>{task.detail}</p>
-            <Icon name="chevronRight" />
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function SignalPanel({ onOpen }) {
   return (
     <section className="s1-support-panel" aria-labelledby="signal-title">
       <SectionHeading
@@ -270,8 +231,8 @@ function LoadingDashboard() {
           </aside>
         </div>
       </section>
-      <div className="s1-support-grid">
-        {[1, 2].map((panel) => (
+      <div className="s1-support-grid is-single">
+        {[1].map((panel) => (
           <section className="s1-support-panel" key={panel}>
             <Skeleton className="s1-sk-title" />
             {[1, 2, 3].map((item) => (
@@ -306,18 +267,13 @@ export function Dashboard() {
       navigate(`/tasks/${work.id}`);
       return;
     }
-    const run = runSummaries.find((item) => item.title === title);
-    if (run) {
-      navigate(`/tasks/${run.parentTaskId}`);
-      return;
-    }
     notify(`已选择“${title}”，完整业务剧本将在原型阶段三提交`, "info");
   };
-  const recoverTasks = () => {
+  const recoverSignals = () => {
     const next = new URLSearchParams(params);
     next.delete("state");
     setParams(next, { replace: true });
-    notify("运行摘要已重新加载", "success");
+    notify("信号摘要已重新加载", "success");
   };
 
   if (state === "loading") return <LoadingDashboard />;
@@ -348,7 +304,7 @@ export function Dashboard() {
           }
         />
         <div className="s1-empty-support">
-          <span>任务执行产生的运行进度会回到对应任务</span>
+          <span>任务的计划、处理过程和结果都保留在任务对话中</span>
           <span>值得关注的外部变化会显示在信号中心</span>
         </div>
       </div>
@@ -361,7 +317,7 @@ export function Dashboard() {
         <div>
           <small>2026 年 8 月 19 日 · 星期三</small>
           <h1>上午好，沈岚</h1>
-          <p>你有 1 项任务等待继续，2 项运行需要关注。</p>
+          <p>你有 1 项任务等待继续，3 条信号值得判断。</p>
         </div>
       </header>
 
@@ -371,14 +327,11 @@ export function Dashboard() {
             <Icon name="warning" />
           </i>
           <div>
-            <b>本机协作暂不可用</b>
-            <p>云端检索和已有结果继续保留，可稍后在本机继续或下载处理包。</p>
+            <b>部分公开来源暂不可用</b>
+            <p>已有任务和结果不受影响，Hunter 会保留失败来源供稍后重试。</p>
           </div>
-          <Button
-            size="sm"
-            onClick={() => openPlaceholder("查看本机协作处理方式")}
-          >
-            查看处理方式
+          <Button size="sm" onClick={() => openPlaceholder("查看来源异常")}>
+            查看异常
           </Button>
         </section>
       ) : null}
@@ -388,13 +341,12 @@ export function Dashboard() {
         onSelect={setSelectedId}
         onOpen={openPlaceholder}
       />
-      <div className="s1-support-grid">
-        <RunPanel
+      <div className="s1-support-grid is-single">
+        <SignalPanel
           state={state}
           onOpen={openPlaceholder}
-          onRetry={recoverTasks}
+          onRetry={recoverSignals}
         />
-        <SignalPanel onOpen={openPlaceholder} />
       </div>
       <ActionQueue
         expanded={actionExpanded}

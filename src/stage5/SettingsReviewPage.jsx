@@ -24,15 +24,15 @@ const groups = [
   {
     number: "02",
     title: "自动化与连接",
-    description: "新任务的默认执行边界和云端可识别的外部连接。",
+    description: "新任务的默认执行边界和个人发件邮箱连接。",
     links: [
       [
         "自动化授权",
         "/settings/automation",
         "新任务统一默认授权和自动执行影响确认",
       ],
-      ["连接", "/settings/connections", "个人发件邮箱和寻访 App 设备"],
-      ["尚未连接", "/settings/connections?state=empty", "邮箱和设备空状态"],
+      ["连接", "/settings/connections", "个人发件邮箱连接与协议探测"],
+      ["尚未连接", "/settings/connections?state=empty", "邮箱空状态"],
       [
         "连接失败",
         "/settings/connections?state=error",
@@ -144,9 +144,9 @@ export function SettingsReviewPage() {
             <p>优先自动探测协议，失败后再手动设置。</p>
           </article>
           <article>
-            <Icon name="monitor" />
-            <b>只管理设备</b>
-            <p>人才平台登录与风控不进入云端设置。</p>
+            <Icon name="file" />
+            <b>不接外部工具</b>
+            <p>Hunter 只接收用户主动上传的资料。</p>
           </article>
           <article>
             <Icon name="shield" />

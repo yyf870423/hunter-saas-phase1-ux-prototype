@@ -28,7 +28,7 @@ export const settingSections = [
   {
     id: "connections",
     label: "连接",
-    description: "发件邮箱和寻访 App 设备",
+    description: "个人发件邮箱",
     icon: "link",
     route: "/settings/connections",
   },

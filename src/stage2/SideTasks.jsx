@@ -32,28 +32,46 @@ import {
 
 const tabs = [
   ["all", "全部"],
-  ["running", "运行中"],
-  ["waiting", "等待处理"],
-  ["finished", "已结束"],
+  ["client", "客户开发"],
+  ["position", "岗位招聘"],
+  ["mapping", "人才摸排"],
+  ["career", "候选人求职"],
+  ["other", "其他任务"],
 ];
 
-const businessScenarios = [
-  "全部业务场景",
-  "客户开发",
-  "岗位招聘",
-  "人才摸排",
-  "候选人求职",
+const scenarioByTab = {
+  client: "客户开发",
+  position: "岗位招聘",
+  mapping: "人才摸排",
+  career: "候选人求职",
+};
+
+const statusOptions = [
+  "全部状态",
+  "推进中",
+  "等待用户",
+  "等待外部",
+  "已暂停",
+  "需要处理",
+  "可继续",
 ];
 
-function workInTab(work, tab) {
-  if (tab === "running")
+function workInScenario(work, tab) {
+  if (tab === "all") return true;
+  if (tab === "other")
+    return !Object.values(scenarioByTab).includes(work.scenario);
+  return work.scenario === scenarioByTab[tab];
+}
+
+function workInStatus(work, status) {
+  if (!status) return true;
+  if (status === "推进中") {
     return ["推进中", "进行中", "运行中", "重试中", "排队中"].includes(
       work.status,
     );
-  if (tab === "waiting")
-    return ["等待用户", "等待外部", "已暂停", "失败"].includes(work.status);
-  if (tab === "finished") return ["完成", "已取消"].includes(work.status);
-  return true;
+  }
+  if (status === "需要处理") return ["失败", "异常"].includes(work.status);
+  return work.status === status;
 }
 
 export function WorksPage() {
@@ -61,7 +79,7 @@ export function WorksPage() {
   const notify = useToast();
   const [tab, setTab] = useState("all");
   const [query, setQuery] = useState("");
-  const [scenario, setScenario] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const [deleteWork, setDeleteWork] = useState(null);
   const [rows, setRows] = useState(workItems);
@@ -69,14 +87,14 @@ export function WorksPage() {
     const keyword = query.trim().toLowerCase();
     return rows.filter(
       (work) =>
-        workInTab(work, tab) &&
-        (!scenario || work.scenario === scenario) &&
+        workInScenario(work, tab) &&
+        workInStatus(work, statusFilter) &&
         (!keyword ||
           `${work.title} ${work.category} ${work.scenario} ${work.object}`
             .toLowerCase()
             .includes(keyword)),
     );
-  }, [query, rows, scenario, tab]);
+  }, [query, rows, statusFilter, tab]);
   return (
     <div className="s2-page s2-module-page">
       <header className="s2-page-heading">
@@ -94,7 +112,7 @@ export function WorksPage() {
           <div
             className="s2-module-tabs app-tabs"
             role="tablist"
-            aria-label="任务状态"
+            aria-label="业务场景"
           >
             {tabs.map(([value, label]) => (
               <button
@@ -109,7 +127,9 @@ export function WorksPage() {
                 }}
               >
                 {label}
-                <em>{rows.filter((work) => workInTab(work, value)).length}</em>
+                <em>
+                  {rows.filter((work) => workInScenario(work, value)).length}
+                </em>
               </button>
             ))}
           </div>
@@ -124,11 +144,11 @@ export function WorksPage() {
             />
             <SelectMenu
               className="s2-scenario-filter"
-              label="业务场景"
-              value={scenario}
-              options={businessScenarios}
+              label="状态"
+              value={statusFilter}
+              options={statusOptions}
               onChange={(next) => {
-                setScenario(next === "全部业务场景" ? "" : next);
+                setStatusFilter(next === "全部状态" ? "" : next);
                 setPage(1);
               }}
             />
@@ -189,13 +209,15 @@ export function WorksPage() {
           <div className="s2-empty">
             <Icon name="task" />
             <h2>没有符合条件的任务</h2>
-            <p>可以调整状态或搜索条件，也可以直接描述一项新的业务目标。</p>
+            <p>
+              可以调整业务场景、状态或搜索条件，也可以直接描述一项新的业务目标。
+            </p>
             <Button
               tone="secondary"
               onClick={() => {
                 setTab("all");
                 setQuery("");
-                setScenario("");
+                setStatusFilter("");
               }}
             >
               清空条件
@@ -381,12 +403,11 @@ function IdentityReviewTask({ taskId }) {
           <StatusBadge
             tone={resolved ? "success" : paused ? "neutral" : "warning"}
           >
-            {resolved ? "完成" : paused ? "已暂停" : "等待用户"}
+            {resolved ? "可继续" : paused ? "已暂停" : "等待用户"}
           </StatusBadge>
           <Button
             tone="secondary"
             icon={paused ? "play" : "pause"}
-            disabled={resolved}
             onClick={() => setPaused((value) => !value)}
           >
             {paused ? "继续" : "暂停"}
@@ -470,7 +491,7 @@ function IdentityReviewTask({ taskId }) {
               attachments={attachments}
               onAttachmentsChange={setAttachments}
               placeholder="输入你掌握的信息，或上传能够帮助核验的文件"
-              disabled={paused || resolved}
+              disabled={paused}
             />
           </div>
         </section>
@@ -527,7 +548,7 @@ function OneStepSummaryTask({ taskId }) {
           <p>关联：候选人林昊 · 具身智能 VLA 算法负责人</p>
         </div>
         <div>
-          <StatusBadge tone="success">完成</StatusBadge>
+          <StatusBadge tone="info">可继续</StatusBadge>
         </div>
       </header>
       <div className="s2-task-detail-layout">
@@ -538,7 +559,7 @@ function OneStepSummaryTask({ taskId }) {
                 "把这三条面试反馈整理为候选人跟进摘要。"}
             </UserMessage>
             <HunterReply
-              markdown={`已完成整理。这项任务只有一个处理步骤，因此没有生成执行计划。
+              markdown={`已整理当前三条面试反馈。
 
 ## 面试反馈摘要
 
@@ -660,7 +681,7 @@ export function RecommendationReportWorkspace({ onClose }) {
         </div>
         <div>
           <StatusBadge tone={revised ? "success" : "warning"}>
-            {revised ? "完成" : "等待用户"}
+            {revised ? "可继续修改" : "等待用户"}
           </StatusBadge>
         </div>
       </header>

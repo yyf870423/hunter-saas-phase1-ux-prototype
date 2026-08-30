@@ -51,6 +51,8 @@ const positionAiSupplement =
   "客户强调这是能直接参与技术路线决策的负责人岗位，需要同时判断候选人的技术深度、真机落地经验和团队管理跨度。";
 const positionMatchingTooltip =
   "使用 Hunter 中已有候选人计算与当前岗位的适配程度，不会从外部平台或公开网络寻找新候选人。";
+const positionSourcingTooltip =
+  "创建岗位招聘任务，从 Hunter 已有候选人、人才版图、公开网络、论文专利和用户上传简历中持续寻找新候选人。";
 
 function buildPositionAiRecord(state = "complete") {
   const planByState = {
@@ -2745,12 +2747,19 @@ export function PositionDetailPage() {
             人岗匹配
           </Button>
         </TooltipText>
-        <Button
-          icon="sparkles"
-          onClick={() => navigate(`/new?prompt=为${detail.name}寻找候选人`)}
+        <TooltipText
+          className="s4-action-tooltip"
+          tip={positionSourcingTooltip}
+          trigger="always"
         >
-          开始找人
-        </Button>
+          <Button
+            icon="sparkles"
+            aria-label={`开始找人：${positionSourcingTooltip}`}
+            onClick={() => navigate(`/new?prompt=为${detail.name}寻找候选人`)}
+          >
+            开始找人
+          </Button>
+        </TooltipText>
       </DetailHeader>
       <DetailTabs
         tabs={tabs}

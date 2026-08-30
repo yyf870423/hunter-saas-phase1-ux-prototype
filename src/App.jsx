@@ -104,17 +104,6 @@ export default function App() {
         <Route path="/new" element={<NewWork />} />
         <Route path="/tasks" element={<WorksPage />} />
         <Route path="/tasks/:workstreamId" element={<WorkstreamRoute />} />
-        <Route path="/works" element={<Navigate to="/tasks" replace />} />
-        <Route path="/works/:workstreamId" element={<WorkstreamRoute />} />
-        <Route
-          path="/workstreams/new"
-          element={<Navigate to="/new" replace />}
-        />
-        <Route
-          path="/workstreams/:workstreamId"
-          element={<WorkstreamRoute />}
-        />
-        <Route path="/tasks/new" element={<Navigate to="/new" replace />} />
         <Route path="/signals" element={<SignalsPage />} />
         <Route path="/candidates" element={<CandidatesListPage />} />
         <Route path="/candidates/new" element={<CandidateCreatePage />} />

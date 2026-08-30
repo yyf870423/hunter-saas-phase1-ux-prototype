@@ -337,6 +337,40 @@
   border-radius: 8px;
 }
 
+.s2-message-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: min(360px, 100%);
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--s1-surface) 82%, transparent);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.s2-message-file > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--s1-accent);
+}
+
+.s2-message-file > span,
+.s2-message-file b,
+.s2-message-file small {
+  display: block;
+}
+
+.s2-message-file b {
+  font-size: 13px;
+}
+
+.s2-message-file small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
 .s2-user-message time {
   min-height: 18px;
   margin-top: 5px;

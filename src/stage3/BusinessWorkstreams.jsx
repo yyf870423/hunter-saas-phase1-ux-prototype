@@ -325,18 +325,33 @@ ${createMarkdownTable(
         </HunterReply>
       ) : null}
       {phase === 5 ? (
-        <ExternalWaitState
-          title="等待陈雨回复招聘合作邮件"
-          description="邮件已于今天 09:26 发送。邮件回复会自动回到当前任务；猎头在系统外获得的新信息也可以作为普通跟进记录补充。"
-          meta="最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 · 7 天后标记长期未回复"
-          onAddResult={() =>
-            notify("可以在下方输入回复内容，或上传邮件截图和附件", "info")
-          }
-        />
+        <>
+          {forcedState === "waiting" ? (
+            <UserMessage time="今天 09:26">
+              邮件收件人、标题和正文都确认无误，发送给陈雨。
+            </UserMessage>
+          ) : null}
+          <ExternalWaitState
+            title="等待陈雨回复招聘合作邮件"
+            description="邮件已于今天 09:26 发送。邮件回复会自动回到当前任务；猎头在系统外获得的新信息也可以作为普通跟进记录补充。"
+            meta="最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 · 7 天后标记长期未回复"
+            onAddResult={() =>
+              notify("可以在下方输入回复内容，或上传邮件截图和附件", "info")
+            }
+          />
+        </>
       ) : null}
       {phase >= 6 ? (
-        <HunterReply
-          markdown={`## 回复已形成一条招聘机会
+        <>
+          {forcedState === "reply" ? (
+            <HunterReply
+              markdown={`## 已收到陈雨的邮件回复
+
+> 北京团队正在招聘 VLA 算法负责人和机器人学习工程师。可以继续讨论猎头合作，但合作预算需要与业务负责人确认。完整 JD 下周才能补充。`}
+            />
+          ) : null}
+          <HunterReply
+            markdown={`## 回复已形成一条招聘机会
 
 陈雨确认北京团队正在招聘 VLA 算法负责人和机器人学习工程师，猎头合作预算需与业务负责人进一步确认。现有信息足以建立招聘机会，但不足以直接创建正式岗位。
 
@@ -351,7 +366,8 @@ ${createMarkdownTable(
 | 仍缺信息 | 完整 JD、汇报关系、薪酬范围、合作预算 |
 
 > 如果后续收到完整 JD，Hunter 会先生成岗位草稿；用户确认后再创建正式岗位并启动对应任务。`}
-        />
+          />
+        </>
       ) : null}
     </>
   );
@@ -602,18 +618,40 @@ function CareerTimeline({
         />
       ) : null}
       {phase === 5 ? (
-        <ExternalWaitState
-          title="等待林昊补充反馈"
-          description="Hunter 没有代替你联系候选人。你已记录今天 10:14 完成首次联系，并询问是否愿意了解北京的团队负责人岗位。"
-          meta="最近记录：今天 10:14 · 建议提醒：2 个工作日后 · 等待期间不消耗 Agent 用量"
-          onAddResult={() =>
-            notify("请在下方输入回复内容，或上传新简历和补充文件", "info")
-          }
-        />
+        <>
+          {forcedState === "waiting" ? (
+            <UserMessage time="今天 10:14">
+              已经联系林昊，问了他是否愿意了解北京的团队负责人岗位，目前还没有回复。
+            </UserMessage>
+          ) : null}
+          <ExternalWaitState
+            title="等待林昊补充反馈"
+            description="Hunter 没有代替你联系候选人。你已记录今天 10:14 完成首次联系，并询问是否愿意了解北京的团队负责人岗位。"
+            meta="最近记录：今天 10:14 · 建议提醒：2 个工作日后 · 等待期间不消耗 Agent 用量"
+            onAddResult={() =>
+              notify("请在下方输入回复内容，或上传新简历和补充文件", "info")
+            }
+          />
+        </>
       ) : null}
       {phase >= 6 ? (
-        <HunterReply
-          markdown={`## 新简历已合并，2 个岗位需要重新判断
+        <>
+          {forcedState === "new-resume" ? (
+            <UserMessage time="今天 15:48">
+              <span>
+                林昊愿意了解北京的负责人岗位，这是他刚发来的新简历。请更新资料并重新匹配。
+              </span>
+              <span className="s2-message-file">
+                <Icon name="file" />
+                <span>
+                  <b>林昊_机器人学习负责人_2026.pdf</b>
+                  <small>PDF · 1.8 MB</small>
+                </span>
+              </span>
+            </UserMessage>
+          ) : null}
+          <HunterReply
+            markdown={`## 新简历已合并，2 个岗位需要重新判断
 
 新简历补充了最近 8 个月的团队扩张和真机数据闭环项目，没有创建重复候选人档案。原始简历版本继续保留。
 
@@ -624,7 +662,8 @@ function CareerTimeline({
 | 明确只考虑北京或远程 | 上海、深圳岗位降级，不再优先建议 |
 
 > 如果林昊确认有意愿，可以由你选择把他交给星澜或其他岗位招聘任务；正式推荐和后续推进仍由猎头处理。`}
-        />
+          />
+        </>
       ) : null}
     </>
   );

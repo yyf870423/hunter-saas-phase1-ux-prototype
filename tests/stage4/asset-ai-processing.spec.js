@@ -167,7 +167,7 @@ test("候选人信息补全在候选人详情内完成运行和字段审核", as
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#/candidates/candidate-linhao?tab=profile");
 
-  await page.getByRole("button", { name: "启动信息补全" }).click();
+  await page.getByRole("button", { name: "信息补全", exact: true }).click();
   const setup = page.getByRole("dialog", { name: "补全当前候选人资料" });
   await expect(setup).toContainText("不会新增任务");
   await expect(setup).toContainText("候选人资料 v6");

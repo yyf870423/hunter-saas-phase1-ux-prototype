@@ -9,7 +9,7 @@ export const workstreamHistory = [
     time: "刚刚",
     pinned: true,
     summary:
-      "系统候选人、公开资料和本机返回结果正在持续合并，18 位候选人等待审核。",
+      "系统候选人、人才版图、公开资料和用户上传简历正在持续合并，18 位候选人等待审核。",
   },
   {
     id: "client-xinglan",
@@ -276,8 +276,9 @@ export const planSteps = [
   },
   {
     id: "recall",
-    title: "云端检索并准备本机处理",
-    detail: "系统候选人、公开网络、论文专利与本机渠道并行处理。",
+    title: "并行检索并接收补充资料",
+    detail:
+      "检索系统候选人、人才版图、公开网络和论文专利，并接收用户上传的简历。",
     requirement: "多渠道找人；北京优先，异地人选保留地点意愿风险。",
   },
   {
@@ -310,12 +311,12 @@ export const internalTasks = [
     duration: "18 秒",
   },
   {
-    id: "internal-local-handoff",
-    title: "准备本机处理并接收结果",
+    id: "internal-resume-import",
+    title: "读取用户上传的候选人资料",
     status: "完成",
     tone: "success",
-    action: "本机返回 12 位候选人，已进入云端合并门禁",
-    duration: "8 分 42 秒",
+    action: "12 份简历已解析并进入身份判断、查重与匹配门禁",
+    duration: "2 分 18 秒",
   },
   {
     id: "internal-research",
@@ -555,7 +556,7 @@ export const candidates = candidateBase.map(
     risk,
     years: 8 + (index % 6),
     education: index % 4 === 0 ? "博士" : "硕士",
-    source: ["系统候选人", "本机批次 · 猎聘", "本机批次 · 脉脉", "论文线索"][
+    source: ["系统候选人", "用户上传简历", "公开职业资料", "论文线索"][
       index % 4
     ],
     skills: ["VLA", "机器人学习", "多模态模型"].slice(0, 2 + (index % 2)),
@@ -683,13 +684,13 @@ export const workItems = [
     title: "整理林昊的面试反馈",
     type: "信息整理",
     object: "候选人林昊",
-    status: "完成",
-    tone: "success",
+    status: "可继续",
+    tone: "info",
     time: "今天 09:31",
     owner: "沈岚",
     category: "信息整理",
     scenario: "岗位招聘",
-    summary: "一步完成三条面试反馈的归纳，没有生成执行计划。",
+    summary: "已整理三条面试反馈，可以继续补充信息或要求 Hunter 调整摘要。",
   },
 ];
 

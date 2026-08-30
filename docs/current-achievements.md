@@ -34,9 +34,9 @@
 
 ### 3.2 岗位招聘
 
-已覆盖岗位理解、云端公开来源和系统候选人检索、在本机继续、候选人批次持续合并、候选人补全与去重、人岗匹配、候选人审核、加入岗位储备、邮件草稿确认、等待回复和新简历回流。无候选人通过门禁时解释原因，不自动放宽硬门槛。
+已覆盖岗位理解、云端公开来源和系统候选人检索、用户主动上传简历批次、候选人批次持续合并、候选人补全与去重、人岗匹配、候选人审核、加入岗位储备、邮件草稿确认、等待回复和新简历回流。无候选人通过门禁时解释原因，不自动放宽硬门槛。
 
-认证人才平台自动化不在云端运行。当前云端原型只覆盖本机处理准备、选择设备或下载、等待本机结果、批次返回、身份合并和增量审核；Hunter 本地助手自身原型后续单独设计。
+认证人才平台自动化不属于 Hunter 云端产品。外部工具如用于摘取简历，只能由用户自行使用；Hunter 不与其通信或协作。用户主动把简历文件或批量压缩包上传到 Hunter 后，统一进入身份合并、增量审核和岗位匹配流程。
 
 ### 3.3 人才摸排
 
@@ -82,7 +82,7 @@ Agent 只能把变化归入既有标签，不能动态新增、改名或排序�
 
 1. 生产级数据 Schema、关系存储方案、Agent 工具协议、任务调度和并发恢复技术方案。
 2. 正式 PRD、技术方案和生产代码实现。
-3. Hunter 本地助手的页面、设置、平台运行、候选人选择和本地清理原型。
+3. 外部简历摘取工具不属于 Hunter 产品范围，不在本仓库设计或实现。
 
 后续阶段不能通过修改已审批公共交互来规避新问题。发现公共框架不足时，需要先记录原因、更新相应原型文档并重新审批。
 
@@ -127,10 +127,10 @@ Agent 只能把变化归入既有标签，不能动态新增、改名或排序�
 ### 8.2 四类业务任务
 
 1. 客户开发：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/client-xinglan>。专用状态包括 `waiting`、`no-contact` 和 `reply`。
-2. 岗位招聘：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/position-vla>。专用状态包括 `waiting`、`review`、`no-candidate`、`candidate-reply`、`local-waiting`、`stale-task` 和 `merge-conflict`。
+2. 岗位招聘：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/position-vla>。专用状态包括 `waiting`、`review`、`no-candidate`、`candidate-reply`、`resume-batch` 和 `merge-conflict`。
 3. 人才摸排：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/mapping-embodied>。专用状态包括 `waiting`、`conflict` 和 `gaps`。
 4. 候选人求职：<https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/tasks/career-linhao>。专用状态包括 `waiting`、`no-position` 和 `new-resume`。
 
 四类主线均可在对应 URL 后附加 `?state=loading`、`?state=stream-error`、`?state=limited` 或 `?state=error`，直接检查加载、流式中断、权限受限和失败状态。完整状态和操作步骤以 `docs/stage-3-interaction-coverage.md` 为准。
 
-本轮边界变更和后续本地助手范围以 `docs/cloud-companion-transition-plan.md` 为准。在线原型中没有 Hunter 本地助手页面。
+本轮合规边界变更以 `docs/cloud-companion-transition-plan.md` 为准。在线原型只表现用户主动上传简历和公开网络信息补充，不提供外部工具连接、任务下发或结果回传页面。

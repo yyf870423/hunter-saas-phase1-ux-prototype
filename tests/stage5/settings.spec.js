@@ -122,7 +122,7 @@ test("自动化授权支持三种统一模式且不展示内部门禁", async ({
   await assertNoConsoleErrors();
 });
 
-test("连接页覆盖邮箱自动探测、手动协议和设备连接", async ({ page }) => {
+test("连接页覆盖邮箱自动探测和手动协议", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/settings/connections?state=empty");
   await page.getByRole("button", { name: "连接邮箱" }).click();
@@ -147,12 +147,8 @@ test("连接页覆盖邮箱自动探测、手动协议和设备连接", async ({
   await expect(page.getByText(/已验证 SMTP 发件和 POP3 收件/)).toBeVisible();
   await page.getByRole("button", { name: "完成" }).click();
 
-  await page.getByRole("button", { name: "添加设备" }).first().click();
-  await expect(page.getByText("H7K4-9Q2M")).toBeVisible();
-  await page.getByRole("button", { name: "开始等待" }).click();
-  await expect(page.getByText(/正在等待设备确认/)).toBeVisible();
-  await page.getByRole("button", { name: "模拟设备已连接" }).click();
-  await expect(page.getByText("新设备已连接")).toBeVisible();
+  await expect(page.getByText("寻访 App 设备")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "添加设备" })).toHaveCount(0);
   await assertNoConsoleErrors();
 });
 

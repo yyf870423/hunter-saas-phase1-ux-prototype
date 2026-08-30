@@ -414,7 +414,6 @@ function ProfileTab({
   hasIdentityIssue = false,
   aiState,
   aiRecord,
-  onOpenAiSetup,
   onOpenAiDetails,
   onOpenAiReview,
   onStopAi,
@@ -478,18 +477,13 @@ function ProfileTab({
       <FieldGroup
         title="职业概览"
         action={
-          <div className="s4-field-actions">
-            <Button
-              size="sm"
-              icon="edit"
-              onClick={() => setEditSection("summary")}
-            >
-              编辑职业概览
-            </Button>
-            <Button size="sm" icon="sparkles" onClick={onOpenAiSetup}>
-              启动信息补全
-            </Button>
-          </div>
+          <Button
+            size="sm"
+            icon="edit"
+            onClick={() => setEditSection("summary")}
+          >
+            编辑职业概览
+          </Button>
         }
       >
         <p className="s4-long-copy">{candidate.summary}</p>
@@ -1761,7 +1755,11 @@ export function CandidateDetailPage() {
         ]}
         onBack={() => navigate("/candidates")}
         onDelete={() => setDeleteOpen(true)}
-      />
+      >
+        <Button icon="sparkles" onClick={() => setAiState("setup")}>
+          信息补全
+        </Button>
+      </DetailHeader>
       <nav
         className="s4-candidate-attention-index"
         aria-label="候选人待处理区域"
@@ -1824,7 +1822,6 @@ export function CandidateDetailPage() {
           hasIdentityIssue={state === "identity-conflict"}
           aiState={aiState}
           aiRecord={aiRecord}
-          onOpenAiSetup={() => setAiState("setup")}
           onOpenAiDetails={() =>
             updateQuery({ panel: "details", process: aiRecord.id })
           }
@@ -2246,7 +2243,7 @@ export function IdentityMergeReviewPage() {
           <b>
             {params.get("from") === "upload"
               ? "林昊_2026_更新简历.pdf"
-              : "本机返回资料"}
+              : "用户上传简历"}
           </b>
           <p>发现 3 项更新 · 1 项冲突</p>
         </article>

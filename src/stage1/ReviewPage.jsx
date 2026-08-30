@@ -6,8 +6,8 @@ const stateLinks = [
   ["正常状态", "/home", "工作台完整业务层级与主要交互"],
   ["加载状态", "/home?state=loading", "局部骨架与稳定布局"],
   ["空状态", "/home?state=empty", "首次使用与新建引导"],
-  ["局部错误", "/home?state=error", "部分运行失败但其他区域可用"],
-  ["本机协作异常", "/home?state=limited", "本机不可用时云端继续任务"],
+  ["局部错误", "/home?state=error", "部分来源失败但其他区域可用"],
+  ["来源受限", "/home?state=limited", "公开来源受限时保留已有结果"],
   ["组件状态", "/components", "本阶段公共组件与状态"],
 ];
 

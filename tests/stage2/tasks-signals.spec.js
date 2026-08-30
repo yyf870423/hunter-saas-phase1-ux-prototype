@@ -52,7 +52,7 @@ test("统一任务列表支持分类、搜索、详情和删除", async ({ page 
       exact: true,
     }),
   ).toHaveCount(1);
-  await page.getByRole("tab", { name: /等待处理/ }).click();
+  await page.getByRole("tab", { name: /人才摸排/ }).click();
   await expect(
     page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
   ).toBeVisible();
@@ -73,15 +73,15 @@ test("统一任务列表支持分类、搜索、详情和删除", async ({ page 
   await page.getByRole("button", { name: "取消" }).click();
   await page.getByRole("tab", { name: /全部/ }).click();
   await page.getByPlaceholder("搜索任务、业务场景或关联对象").fill("");
-  await page.getByRole("button", { name: "业务场景", exact: true }).click();
-  await page.getByRole("button", { name: "人才摸排", exact: true }).click();
+  await page.getByRole("button", { name: "状态", exact: true }).click();
+  await page.getByRole("button", { name: "等待用户", exact: true }).click();
   await expect(page.locator(".s2-task-row")).toHaveCount(2);
   await expect(
-    page.getByRole("link", { name: /^具身智能核心人才版图 / }),
+    page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
   ).toBeVisible();
   await expect(
     page.locator(".s2-task-row").filter({ hasText: "星澜机器人招聘合作" }),
-  ).toHaveCount(0);
+  ).toBeVisible();
   const search = page.getByPlaceholder("搜索任务、业务场景或关联对象");
   await search.focus();
   await expect(search).toHaveCSS("box-shadow", "none");
@@ -209,40 +209,35 @@ test("统一新建入口可进入有限范围任务或直接完成", async ({ pa
   await expect(
     page.getByRole("heading", { name: "整理林昊的面试反馈" }),
   ).toBeVisible();
-  await expect(page.getByText(/没有生成执行计划/)).toBeVisible();
+  await expect(page.getByText(/已整理当前三条面试反馈/)).toBeVisible();
 });
 
-test("统一新建入口覆盖歧义、失败、权限受限和旧路由", async ({ page }) => {
+test("统一新建入口覆盖歧义、自由补充和权限受限", async ({ page }) => {
   await page.goto("#/new?state=clarify");
-  await expect(page.getByText(/还缺少一个会改变推进方式的信息/)).toBeVisible();
-  await page.getByRole("button", { name: /只整理当前信息/ }).click();
-  await expect(
-    page.getByRole("heading", { name: "云脉芯能公开信息摘要" }),
-  ).toBeVisible();
-
-  await page.goto("#/new?state=error");
-  await expect(page.getByText("暂时无法判断任务推进方式")).toBeVisible();
-  await page.getByRole("button", { name: "重新判断" }).click();
-  await expect(page.getByText(/我正在判断这项任务/)).toBeVisible();
+  await expect(page.getByText("需要补充任务目标")).toBeVisible();
+  await expect(page.locator(".s2-decision-request > div > button")).toHaveCount(
+    3,
+  );
+  await page.getByRole("button", { name: /我来补充其他目标/ }).click();
+  await expect(page.locator(".s2-composer textarea")).toHaveValue(
+    "我的具体目标是：",
+  );
 
   await page.goto("#/new?state=limited");
   await expect(page.getByText("当前工作空间不能创建新任务")).toBeVisible();
   await expect(page.locator(".s2-composer textarea")).toBeDisabled();
 
-  await page.goto("#/workstreams/new");
-  await expect(page).toHaveURL(/#\/new$/);
-  await page.goto("#/tasks/new");
-  await expect(page).toHaveURL(/#\/new$/);
+  await page.goto("#/works");
+  await expect(page).toHaveURL(/#\/review$/);
 });
 
 test("新建任务和有限范围任务的普通回复统一由动态 Markdown 渲染", async ({
   page,
 }) => {
   const routes = [
-    ["#/new?state=direct", "候选人跟进摘要"],
+    ["#/new?state=direct", "面试反馈摘要"],
     ["#/new?state=mainline", "持续汇总系统候选人"],
     ["#/new?state=task", "范围有限、交付明确的核验任务"],
-    ["#/new?state=clarify", "还缺少一个会改变推进方式的信息"],
     ["#/tasks/task-hand-team", "当前判断"],
   ];
 

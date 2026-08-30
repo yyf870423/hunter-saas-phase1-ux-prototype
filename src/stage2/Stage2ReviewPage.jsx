@@ -25,15 +25,10 @@ const reviewLinks = [
   [
     "直接完成",
     "/new?state=direct",
-    "可立即完成的任务在当前对话返回 Markdown 结果",
+    "可立即完成的任务创建后进入统一任务对话并返回 Markdown 结果",
   ],
   ["持续推进任务", "/new?state=mainline", "说明持续推进原因，再进入任务详情"],
   ["有限范围任务", "/new?state=task", "说明有限范围和交付边界，再进入任务详情"],
-  [
-    "推进方式判断失败",
-    "/new?state=error",
-    "保留输入和附件，允许重新判断或补充目标",
-  ],
   [
     "创建权限受限",
     "/new?state=limited",
@@ -50,24 +45,19 @@ const reviewLinks = [
     "保留已生成内容并从当前检查点继续",
   ],
   [
-    "本机协作异常",
+    "公开来源受限",
     "/tasks/position-vla?state=limited",
-    "本机暂不可用时保留云端进展，并允许下载任务后继续",
+    "局部公开来源受限时保留系统候选人、人才版图和已有结果",
   ],
   [
-    "等待本机结果",
-    "/tasks/position-vla?state=local-waiting",
-    "云端结果先行可见，本机批次尚未返回时不阻塞当前任务",
-  ],
-  [
-    "旧版本结果回流",
-    "/tasks/position-vla?state=stale-task",
-    "岗位发生更新后，旧任务结果按最新版本重新匹配",
+    "用户上传简历批次",
+    "/tasks/position-vla?state=resume-batch",
+    "在对话中显示用户上传文件，并进入统一查重、合并和匹配流程",
   ],
   [
     "候选人合并冲突",
     "/tasks/position-vla?state=merge-conflict",
-    "本机批次与云端候选人疑似同人时等待用户决定",
+    "用户上传简历与系统候选人疑似同人时等待用户决定",
   ],
   ["阶段一工作台", "/home", "已审批并冻结的全局框架与工作台"],
 ];

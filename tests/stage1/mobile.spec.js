@@ -38,5 +38,5 @@ test("iPhone 空状态和权限状态可读", async ({ page }) => {
   await page.goto("#/home?state=empty");
   await expect(page.getByRole("heading", { name: "还没有任务" })).toBeVisible();
   await page.goto("#/home?state=limited");
-  await expect(page.getByText("本机协作暂不可用")).toBeVisible();
+  await expect(page.getByText("部分公开来源暂不可用")).toBeVisible();
 });

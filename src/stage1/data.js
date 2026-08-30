@@ -60,7 +60,8 @@ export const mainlines = [
     status: "推进中",
     tone: "info",
     changed: "4 分钟前",
-    summary: "云端与本机结果持续汇入，当前新增 18 位待审核候选人。",
+    summary:
+      "系统候选人、人才版图、公开资料和用户上传简历持续汇入，当前新增 18 位待审核候选人。",
     facts: [
       ["本批新增", "18 位"],
       ["资料更新", "4 位"],
@@ -101,42 +102,6 @@ export const mainlines = [
       ["当前等待", "猎头联系结果"],
     ],
     next: "联系候选人后补充意愿和最新资料，Hunter 将局部重算匹配结果。",
-  },
-];
-
-export const runSummaries = [
-  {
-    id: "task-hand-team",
-    parentTaskId: "mapping-embodied",
-    title: "核验灵巧手团队负责人",
-    type: "身份核验",
-    object: "星澜机器人人才版图",
-    status: "等待用户",
-    tone: "warning",
-    detail: "发现两位同名人物，需要确认公开履历对应关系。",
-    time: "16 分钟前",
-  },
-  {
-    id: "task-shlab",
-    parentTaskId: "mapping-embodied",
-    title: "补充上海人工智能实验室具身智能团队",
-    type: "公开资料调研",
-    object: "具身智能核心人才版图",
-    status: "运行中",
-    tone: "info",
-    detail: "已处理 8 / 13 个可信来源，当前正在核对组织关系。",
-    time: "已运行 24 分钟",
-  },
-  {
-    id: "task-zhaoxingyu",
-    parentTaskId: "position-vla",
-    title: "消歧赵星羽的论文与任职身份",
-    type: "人物消歧",
-    object: "VLA 候选人审核",
-    status: "失败",
-    tone: "danger",
-    detail: "一个来源暂时无法访问，已保留其余证据和检查点。",
-    time: "7 分钟前",
   },
 ];
 
@@ -196,10 +161,10 @@ export const actionItems = [
     tone: "neutral",
   },
   {
-    id: "action-local-handoff",
-    title: "处理本机协作异常",
+    id: "action-source-retry",
+    title: "处理公开来源异常",
     source: "岗位招聘 · VLA 候选人寻访",
-    meta: "云端任务继续，本地处理等待重新接收",
+    meta: "已有结果已保留，1 个失败来源可以单独重试",
     tone: "danger",
   },
 ];
@@ -231,8 +196,8 @@ export const notifications = [
   },
   {
     id: "notification-4",
-    type: "本机协作",
-    title: "本地结果已返回，18 位候选人待审核",
+    type: "资料导入",
+    title: "补充简历已合并，18 位候选人待审核",
     source: "具身智能 VLA 算法负责人",
     time: "昨天 22:14",
     unread: false,

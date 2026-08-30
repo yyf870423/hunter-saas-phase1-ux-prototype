@@ -11,8 +11,6 @@
 | 修改默认授权       | 自动化授权     | AuthorizationModal                 | 选择模式并确认             | 自动执行影响确认、保存失败                       |
 | 连接发件邮箱       | 连接           | ProtocolDetectModal                | 填写凭据、自动探测、验证   | 探测失败、手动选 IMAP/POP3、重试                 |
 | 断开发件邮箱       | 连接           | ConfirmModal                       | 确认后断开                 | 存在待发草稿、操作失败                           |
-| 添加寻访 App 设备  | 连接           | DeviceConnectModal                 | 连接码、等待、成功         | 连接码过期、版本不兼容                           |
-| 撤销设备授权       | 连接           | ConfirmModal                       | 撤销并刷新列表             | 未提交结果影响、操作失败                         |
 | 查看套餐与用量     | 订阅与用量     | UsageRing、UsageBreakdown          | 查看明细                   | 用量明细加载失败                                 |
 | 首次订阅           | 订阅与用量     | PlanModal、PaymentChoice           | 选套餐、支付宝/微信支付    | 支付失败、重复提交禁用                           |
 | 更换套餐与续订     | 订阅与用量     | PlanModal                          | 选择并确认                 | 支付失败、重复提交禁用                           |

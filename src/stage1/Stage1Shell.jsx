@@ -631,9 +631,7 @@ export function Stage1Shell() {
                     if (item.id === "home")
                       return location.pathname === "/home" ? "is-active" : "";
                     if (item.id === "tasks")
-                      return location.pathname.startsWith("/tasks") ||
-                        location.pathname.startsWith("/works") ||
-                        location.pathname.startsWith("/workstreams")
+                      return location.pathname.startsWith("/tasks")
                         ? "is-active"
                         : "";
                     if (item.id === "signals")
@@ -868,7 +866,7 @@ export function Stage1Shell() {
           </div>
         </header>
         <main
-          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/works/") || location.pathname.startsWith("/workstreams") || location.pathname.startsWith("/tasks/") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""}`}
+          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/tasks/") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""}`}
         >
           <Outlet />
         </main>
@@ -887,10 +885,7 @@ export function Stage1Shell() {
             key={id}
             className={
               (id === "home" && location.pathname === "/home") ||
-              (id === "tasks" &&
-                (location.pathname.startsWith("/works") ||
-                  location.pathname.startsWith("/workstreams") ||
-                  location.pathname.startsWith("/tasks"))) ||
+              (id === "tasks" && location.pathname.startsWith("/tasks")) ||
               (id === "signals" && location.pathname.startsWith("/signals"))
                 ? "is-active"
                 : ""
