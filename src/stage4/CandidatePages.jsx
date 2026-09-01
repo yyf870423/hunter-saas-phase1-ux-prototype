@@ -1068,6 +1068,7 @@ function ExperienceTab({ candidate }) {
               <time>{period}</time>
               <button
                 type="button"
+                aria-label={`编辑${school}教育经历`}
                 onClick={() =>
                   setRecordModal({
                     kind: "education",
@@ -1106,6 +1107,7 @@ function ExperienceTab({ candidate }) {
                 </span>
                 <button
                   type="button"
+                  aria-label={`编辑${name}项目经历`}
                   onClick={() =>
                     setRecordModal({ kind: "project", mode: "edit", name })
                   }

@@ -697,6 +697,7 @@ export function RecycleBinPage() {
           <article key={item.id}>
             <CustomCheckbox
               checked={selected.has(item.id)}
+              ariaLabel={`选择${item.name}`}
               onChange={(checked) => {
                 const next = new Set(selected);
                 if (checked) next.add(item.id);

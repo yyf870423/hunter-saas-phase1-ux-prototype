@@ -4,6 +4,14 @@ import { Icon } from "../components/Icon";
 import { actionItems, mainlines, signals } from "./data";
 import { Button, EmptyState, Skeleton, StatusBadge, useToast } from "./ui";
 
+function getTodayLabel() {
+  const now = new Date();
+  const weekday = new Intl.DateTimeFormat("zh-CN", {
+    weekday: "long",
+  }).format(now);
+  return `${now.getFullYear()} 年 ${now.getMonth() + 1} 月 ${now.getDate()} 日 · ${weekday}`;
+}
+
 function SectionHeading({ eyebrow, title, description, action }) {
   return (
     <header className="s1-section-heading">
@@ -275,6 +283,7 @@ export function Dashboard() {
     setParams(next, { replace: true });
     notify("信号摘要已重新加载", "success");
   };
+  const todayLabel = getTodayLabel();
 
   if (state === "loading") return <LoadingDashboard />;
   if (state === "empty") {
@@ -282,7 +291,7 @@ export function Dashboard() {
       <div className="s1-dashboard s1-dashboard-empty">
         <header className="s1-dashboard-head">
           <div>
-            <small>2026 年 8 月 19 日 · 星期三</small>
+            <small>{todayLabel}</small>
             <h1>上午好，沈岚</h1>
             <p>
               从一条真实业务目标开始，Hunter
@@ -315,7 +324,7 @@ export function Dashboard() {
     <div className="s1-dashboard">
       <header className="s1-dashboard-head">
         <div>
-          <small>2026 年 8 月 19 日 · 星期三</small>
+          <small>{todayLabel}</small>
           <h1>上午好，沈岚</h1>
           <p>你有 1 项任务等待继续，3 条信号值得判断。</p>
         </div>

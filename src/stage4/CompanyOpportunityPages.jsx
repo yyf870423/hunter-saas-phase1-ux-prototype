@@ -1484,6 +1484,7 @@ function ContactEditor({ open, close, company = "" }) {
             value="招聘负责人"
             onChange={() => {}}
             placeholder="职位或角色"
+            ariaLabel="公司关系中的职位或角色"
           />
           <SelectMenu
             label="关系状态"
@@ -2025,6 +2026,7 @@ export function ContactCreatePage() {
                 value={role}
                 onChange={setRole}
                 placeholder="职位或角色"
+                ariaLabel="公司关系中的职位或角色"
               />
               <SelectMenu
                 label="关系状态"

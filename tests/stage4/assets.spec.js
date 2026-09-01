@@ -46,6 +46,10 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
   await expect(page.getByLabel("最低工作年限")).toBeVisible();
   await expect(page.getByLabel("最低年龄")).toBeVisible();
   await expect(page.getByLabel("最高年龄")).toBeVisible();
+  await expect(
+    page.getByRole("checkbox", { name: "选择当前页全部数据" }),
+  ).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "选择林昊" })).toBeVisible();
 
   await page.getByRole("button", { name: "行业", exact: true }).click();
   await expect(
@@ -777,6 +781,12 @@ test("时间相关字段统一使用单触发框时间选择器", async ({ page 
   await basicEditor.getByRole("button", { name: "取消" }).click();
 
   await page.goto("#/candidates/candidate-linhao?tab=experience");
+  await expect(
+    page.getByRole("button", { name: /编辑.*教育经历/ }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /编辑.*项目经历/ }).first(),
+  ).toBeVisible();
   await page.getByRole("button", { name: "添加经历" }).click();
   const experienceEditor = page.getByRole("dialog", {
     name: "编辑工作经历",
@@ -1028,7 +1038,9 @@ test("岗位流程、匹配和暂停门禁可以完整操作", async ({ page }) 
     .click();
   await expect(
     page.getByRole("button", { name: "编辑", exact: true }),
-  ).toHaveCount(1);
+  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "编辑资料" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "编辑 JD" })).toBeVisible();
   await page.getByRole("button", { name: "编辑资料" }).click();
   const modal = page.getByRole("dialog", { name: "编辑岗位基本资料" });
   await modal.getByRole("button", { name: "招聘状态" }).click();

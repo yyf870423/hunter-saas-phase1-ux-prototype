@@ -183,6 +183,7 @@ export function Composer({
         ref={textareaRef}
         value={value}
         disabled={disabled}
+        aria-label="任务对话输入"
         rows={2}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}

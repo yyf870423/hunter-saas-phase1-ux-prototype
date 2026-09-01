@@ -1348,6 +1348,8 @@ function GraphCanvas({
                     <path
                       d={path}
                       className="tg-edge-hit"
+                      data-edge-id={relation.id}
+                      data-edge-label={relation.label || "未命名关系"}
                       onClick={(event) => {
                         event.stopPropagation();
                         setSelectedEdgeId(relation.id);

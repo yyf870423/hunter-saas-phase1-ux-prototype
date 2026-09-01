@@ -3510,11 +3510,9 @@
 }
 @keyframes s2-signal-detail-enter {
   from {
-    opacity: 0.58;
     transform: translateX(5px);
   }
   to {
-    opacity: 1;
     transform: translateX(0);
   }
 }

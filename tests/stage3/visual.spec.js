@@ -112,9 +112,7 @@ test("人才摸排关系影响区域宽于左侧变化列表", async ({ page }) 
   });
   await page.getByRole("button", { name: "打开本批次更新审核" }).click();
   await page.getByRole("tab", { name: /人物与关系/ }).click();
-  await page
-    .getByRole("button", { name: /王奕的身份与成果关系待确认/ })
-    .click();
+  await page.getByRole("button", { name: /王奕的身份与成果关系/ }).click();
   const list = await page.locator(".s3-context-change-list").boundingBox();
   const detail = await page.locator(".s3-context-graph").boundingBox();
   expect(list).not.toBeNull();
@@ -127,7 +125,12 @@ test("人才摸排关系影响区域宽于左侧变化列表", async ({ page }) 
   });
   await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
   await expect(
-    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
+    page.getByRole("button", { name: "重新选择王奕身份关系" }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("button", { name: /王奕的身份与成果关系/ })
+      .getByText("已确认写入", { exact: true }),
   ).toBeVisible();
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
   await page.getByRole("button", { name: /王奕身份关系冲突/ }).click();

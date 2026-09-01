@@ -302,6 +302,7 @@ test("移动端可以从信号列表进入详情并返回", async ({ page }) => 
     .locator(".s2-signal-feed > button")
     .filter({ hasText: "陈松的公开任职信息发生变化" })
     .click();
+  await expect(page.locator(".s2-signal-detail")).toHaveCSS("opacity", "1");
   await expect(
     page.getByRole("heading", { name: /陈松的公开任职信息发生变化/ }),
   ).toBeVisible();

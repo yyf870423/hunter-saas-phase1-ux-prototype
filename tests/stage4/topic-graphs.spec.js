@@ -308,9 +308,12 @@ test("空图谱、图谱内 AI、版本预览与关联入口有完整路径", as
       .nth(1),
   ).not.toHaveText(initialZoomLabel);
 
-  await page.locator(".tg-history-preview-canvas .tg-edge-hit").first().click({
-    force: true,
-  });
+  await page
+    .locator(
+      '.tg-history-preview-canvas .tg-edge-hit[data-edge-label="下属组织"]',
+    )
+    .first()
+    .dispatchEvent("click");
   await expect(
     page.locator(".tg-detail-panel").getByRole("heading", {
       name: "下属组织",

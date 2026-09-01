@@ -102,10 +102,7 @@ export function WorksPage() {
         <div>
           <small>一步完成与持续推进</small>
           <h1>任务</h1>
-          <p>
-            查看你主动创建的任务；资产 AI
-            处理和任务内部运行保留在对应资产或任务中。
-          </p>
+          <p>集中查看你发起的任务，并从最近进展继续推进。</p>
         </div>
       </header>
       <section className="s2-list-panel">

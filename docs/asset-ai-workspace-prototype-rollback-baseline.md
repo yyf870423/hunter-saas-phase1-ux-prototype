@@ -8,15 +8,15 @@
 
 ## 二、Git 基线
 
-| 项目 | 内容 |
-|---|---|
-| 记录时间 | 2026-08-31，Asia/Shanghai |
-| 仓库 | `https://github.com/yyf870423/hunter-saas-phase1-ux-prototype.git` |
-| 分支 | `main` |
-| 完整提交 | `26bee0039a58a0f291580e95a6cd07ddca08c6e7` |
-| 短哈希 | `26bee00` |
-| 提交说明 | `feat: unify task flows and remove local sourcing integration` |
-| 远端状态 | 记录时 `HEAD` 与 `origin/main` 一致 |
+| 项目     | 内容                                                               |
+| -------- | ------------------------------------------------------------------ |
+| 记录时间 | 2026-08-31，Asia/Shanghai                                          |
+| 仓库     | `https://github.com/yyf870423/hunter-saas-phase1-ux-prototype.git` |
+| 分支     | `main`                                                             |
+| 完整提交 | `26bee0039a58a0f291580e95a6cd07ddca08c6e7`                         |
+| 短哈希   | `26bee00`                                                          |
+| 提交说明 | `feat: unify task flows and remove local sourcing integration`     |
+| 远端状态 | 记录时 `HEAD` 与 `origin/main` 一致                                |
 
 ## 三、基线边界
 

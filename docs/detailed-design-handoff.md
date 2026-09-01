@@ -50,22 +50,22 @@
 
 详细设计继续保持 `00—13` 编号，不新增文档，也不调整资产、设置和运营端编号。
 
-| 编号 | 文档 | 在线地址 | 当前状态 |
-| --- | --- | --- | --- |
-| 00 | 目录与阅读顺序 | <https://my.feishu.cn/docx/PkRad4U4VoVDMJxmve8cQcWbnNb> | 已更新 |
-| 01 | 工作、执行与资产关系 | <https://my.feishu.cn/docx/RGHVdF6eDohvehxUUgbcrwaFn7d> | 已重构 |
-| 02 | 工作 | <https://my.feishu.cn/docx/Md81ds2a3o6l9oxuEdbcITgAnOh> | 已重构并同步列表筛选 |
-| 03 | 工作执行与恢复 | <https://my.feishu.cn/docx/Vm6AdOX3Iocpirx5FfBcpqOrnAb> | 已重构 |
-| 04 | 资产公共规则 | <https://my.feishu.cn/docx/HSobds7bZohhKGxPjn3cJOSOnAh> | 术语与引用已同步 |
-| 05 | 候选人资产 | <https://my.feishu.cn/docx/FoQ8d03Z5oJJ3bxZQUIcyj37nrd> | 术语与引用已同步 |
-| 06 | 岗位与招聘推进 | <https://my.feishu.cn/docx/V5jvdAXsBol5FwxkKWrcpqwRn1d> | 术语与引用已同步 |
-| 07 | 公司、联系人与招聘机会 | <https://my.feishu.cn/docx/ZbpZdVcDyoL4k9x8Jepc6rC0n8e> | 术语与引用已同步 |
-| 08 | 人才版图 | <https://my.feishu.cn/docx/ZQWIdsFmkoXf2lx6h29cTo6bnqd> | 术语与引用已同步 |
-| 09 | 论文、专利与人物身份 | <https://my.feishu.cn/docx/JDqhdUShKoo5J1xSifscOm1znSe> | 术语与引用已同步 |
-| 10 | 工作台、机会与信号、通知及统一数据操作 | <https://my.feishu.cn/docx/EbF7deNL9oH5PKxaSGicjXCvnDf> | 已更新 |
-| 11 | 公开首页与账号认证 | <https://my.feishu.cn/docx/Gl0odC23Mo5XmlxIsDkc5k3EnAh> | 已同步微信扫码注册 |
-| 12 | 设置中心 | <https://my.feishu.cn/docx/TmCFdArvho6BMext0KicyR4anyg> | 已更新 |
-| 13 | 运营端 | <https://my.feishu.cn/docx/WI2Jd5KcwoGvyPxvngwc6366ncc> | 已更新 |
+| 编号 | 文档                                   | 在线地址                                                | 当前状态             |
+| ---- | -------------------------------------- | ------------------------------------------------------- | -------------------- |
+| 00   | 目录与阅读顺序                         | <https://my.feishu.cn/docx/PkRad4U4VoVDMJxmve8cQcWbnNb> | 已更新               |
+| 01   | 工作、执行与资产关系                   | <https://my.feishu.cn/docx/RGHVdF6eDohvehxUUgbcrwaFn7d> | 已重构               |
+| 02   | 工作                                   | <https://my.feishu.cn/docx/Md81ds2a3o6l9oxuEdbcITgAnOh> | 已重构并同步列表筛选 |
+| 03   | 工作执行与恢复                         | <https://my.feishu.cn/docx/Vm6AdOX3Iocpirx5FfBcpqOrnAb> | 已重构               |
+| 04   | 资产公共规则                           | <https://my.feishu.cn/docx/HSobds7bZohhKGxPjn3cJOSOnAh> | 术语与引用已同步     |
+| 05   | 候选人资产                             | <https://my.feishu.cn/docx/FoQ8d03Z5oJJ3bxZQUIcyj37nrd> | 术语与引用已同步     |
+| 06   | 岗位与招聘推进                         | <https://my.feishu.cn/docx/V5jvdAXsBol5FwxkKWrcpqwRn1d> | 术语与引用已同步     |
+| 07   | 公司、联系人与招聘机会                 | <https://my.feishu.cn/docx/ZbpZdVcDyoL4k9x8Jepc6rC0n8e> | 术语与引用已同步     |
+| 08   | 人才版图                               | <https://my.feishu.cn/docx/ZQWIdsFmkoXf2lx6h29cTo6bnqd> | 术语与引用已同步     |
+| 09   | 论文、专利与人物身份                   | <https://my.feishu.cn/docx/JDqhdUShKoo5J1xSifscOm1znSe> | 术语与引用已同步     |
+| 10   | 工作台、机会与信号、通知及统一数据操作 | <https://my.feishu.cn/docx/EbF7deNL9oH5PKxaSGicjXCvnDf> | 已更新               |
+| 11   | 公开首页与账号认证                     | <https://my.feishu.cn/docx/Gl0odC23Mo5XmlxIsDkc5k3EnAh> | 已同步微信扫码注册   |
+| 12   | 设置中心                               | <https://my.feishu.cn/docx/TmCFdArvho6BMext0KicyR4anyg> | 已更新               |
+| 13   | 运营端                                 | <https://my.feishu.cn/docx/WI2Jd5KcwoGvyPxvngwc6366ncc> | 已更新               |
 
 ## 五、本轮实际更新
 

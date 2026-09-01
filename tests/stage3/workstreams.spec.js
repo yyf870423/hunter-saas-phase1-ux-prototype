@@ -102,15 +102,17 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
     page.getByRole("button", { name: /星澜机器人组织层级补充/ }),
   ).toHaveAttribute("aria-selected", "true");
   await page.getByRole("tab", { name: /人物与关系/ }).click();
-  await page
-    .getByRole("button", { name: /王奕的身份与成果关系待确认/ })
-    .click();
+  await page.getByRole("button", { name: /王奕的身份与成果关系/ }).click();
   await expect(page.getByText("身份待确认", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
   await expect(
     page.getByRole("button", { name: "重新选择王奕身份关系" }),
   ).toContainText("重新选择");
-  await expect(page.getByText("已确认写入", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .getByRole("button", { name: /王奕的身份与成果关系/ })
+      .getByText("已确认写入", { exact: true }),
+  ).toBeVisible();
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
   await expect(
     page.getByRole("button", { name: /王奕身份关系冲突/ }),
@@ -118,7 +120,7 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
   await expect(
     page.getByRole("button", { name: "重新选择王奕身份关系" }),
   ).toContainText("重新选择");
-  await page.getByRole("button", { name: /穹顶智能组织关系待确认/ }).click();
+  await page.getByRole("button", { name: /穹顶智能组织关系/ }).click();
   await page.getByRole("button", { name: "本批次不写入" }).click();
   await page.getByRole("button", { name: "完成审核并返回对话" }).click();
   await expect(page.getByText("本批次审核已经完成")).toBeVisible();
@@ -171,11 +173,9 @@ test("人才摸排每条变化显示对应关系影响并保持同一审核决�
   await expect(
     page.getByText("赵星羽 · 2 条可用路径 · 最短 2 段"),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: /王奕的身份与成果关系待确认/ })
-    .click();
+  await page.getByRole("button", { name: /王奕的身份与成果关系/ }).click();
   await expect(
-    page.getByRole("button", { name: /王奕的身份与成果关系待确认/ }),
+    page.getByRole("button", { name: /王奕的身份与成果关系/ }),
   ).toHaveAttribute("aria-selected", "true");
   await expect(
     page.getByText(/同名身份与论文单位时间线存在冲突/),

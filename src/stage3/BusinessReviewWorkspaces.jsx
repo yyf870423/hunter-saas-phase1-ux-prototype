@@ -31,7 +31,19 @@ function ContextReviewPanel({
   decisions,
   onDecision,
 }) {
-  const selected = items.find((item) => item.id === selectedId) || items[0];
+  const resolveDecisionState = (item) => {
+    const decision = item.decisionKey ? decisions[item.decisionKey] : null;
+    if (decision === "write") {
+      return { ...item, status: "已确认写入", tone: "success" };
+    }
+    if (decision === "skip") {
+      return { ...item, status: "本批次不写入", tone: "neutral" };
+    }
+    return item;
+  };
+  const resolvedItems = items.map(resolveDecisionState);
+  const selected =
+    resolvedItems.find((item) => item.id === selectedId) || resolvedItems[0];
   const sourceView = relationshipViews.find(
     (view) => view.id === selected.viewId,
   );
@@ -50,7 +62,7 @@ function ContextReviewPanel({
           <small>{items.length} 条重点变化</small>
         </div>
         <div className="s3-context-change-items">
-          {items.map((item) => (
+          {resolvedItems.map((item) => (
             <button
               type="button"
               className={item.id === selected.id ? "is-active" : ""}
@@ -407,13 +419,14 @@ export function LandscapeReviewWorkspace({
       },
       {
         id: "map-wangyi",
-        title: "王奕的身份与成果关系待确认",
+        title: "王奕的身份与成果关系",
         summary: "同名作者、专利发明人与公开职位的单位时间线存在冲突。",
         meta: "星澜机器人 · 身份待确认",
         impact:
           "变化可能把王奕与专利、论文和星澜机器人关联；确认前不会自动写入该身份关系。",
         status: "待确认",
         tone: "warning",
+        decisionKey: "wangyi",
         viewId: "academic",
         selection: { kind: "node", id: "academic-wang" },
       },
@@ -431,6 +444,7 @@ export function LandscapeReviewWorkspace({
           "冲突影响王奕与专利、论文及星澜机器人的身份关系。可以查看完整关系上下文后决定是否写入。",
         status: "待确认",
         tone: "warning",
+        decisionKey: "wangyi",
         viewId: "academic",
         selection: { kind: "node", id: "academic-wang" },
       },
@@ -448,13 +462,14 @@ export function LandscapeReviewWorkspace({
       },
       {
         id: "gap-qiongding",
-        title: "穹顶智能组织关系待确认",
+        title: "穹顶智能组织关系",
         summary: "已确认具身算法平台和技术方向，具体汇报及生态关系仍不明确。",
         meta: "1 条关系待确认",
         impact:
           "不确定项影响穹顶与星澜的技术路线关系，以及后续组织上下级判断。确认前保留原始证据和冲突说明。",
         status: "待确认",
         tone: "warning",
+        decisionKey: "qiongding",
         viewId: "ecosystem",
         selection: { kind: "edge", id: "eco-e3" },
       },

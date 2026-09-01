@@ -72,7 +72,7 @@ export function CustomCheckbox({
       type="button"
       role="checkbox"
       aria-checked={draftChecked}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel || label || "切换选择"}
       className={`s4-checkbox ${draftChecked ? "is-checked" : ""}`}
       disabled={disabled}
       onClick={toggle}
@@ -986,7 +986,11 @@ export function DataTable({
           <tr>
             {onSelect ? (
               <th className="s4-select-cell">
-                <CustomCheckbox checked={allChecked} onChange={toggleAll} />
+                <CustomCheckbox
+                  checked={allChecked}
+                  onChange={toggleAll}
+                  ariaLabel="选择当前页全部数据"
+                />
               </th>
             ) : null}
             {shown.map((column, columnIndex) => (
@@ -1010,6 +1014,7 @@ export function DataTable({
                 <td className="s4-select-cell">
                   <CustomCheckbox
                     checked={selected.has(row.id)}
+                    ariaLabel={`选择${row.name || row.title || row.label || row.id}`}
                     onChange={(checked) => {
                       const next = new Set(selected);
                       if (checked) next.add(row.id);
@@ -1287,7 +1292,13 @@ export function FormField({
   );
 }
 
-export function TextInput({ value, onChange, placeholder, disabled = false }) {
+export function TextInput({
+  value,
+  onChange,
+  placeholder,
+  disabled = false,
+  ariaLabel,
+}) {
   const [draftValue, setDraftValue] = useState(value || "");
   useEffect(() => setDraftValue(value || ""), [value]);
   return (
@@ -1295,6 +1306,7 @@ export function TextInput({ value, onChange, placeholder, disabled = false }) {
       className="s4-input"
       value={draftValue}
       disabled={disabled}
+      aria-label={ariaLabel}
       onChange={(event) => {
         setDraftValue(event.target.value);
         onChange?.(event.target.value);

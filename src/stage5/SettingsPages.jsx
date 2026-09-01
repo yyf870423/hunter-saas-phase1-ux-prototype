@@ -730,9 +730,6 @@ export function AutomationSettingsPage() {
         title="自动化授权"
         description="设置新任务的默认执行边界；运行中的任务可以单独调整。"
       />
-      <InlineNotice>
-        默认使用“执行前确认”。授权只影响尚未执行的动作，运行中的任务可以单独调整。
-      </InlineNotice>
       <SettingsSection
         title="新任务默认授权"
         description="所有新创建的任务继承同一默认值；进入任务后仍可单独调整。"
