@@ -74,6 +74,11 @@ const groups = [
         "多公司归属、身份关系和沟通记录",
       ],
       [
+        "联系路径执行中",
+        "/contacts/contact-chenyu?tab=contact-path&state=running",
+        "自然语言要求、逐步执行和结果生成",
+      ],
+      [
         "招聘机会详情",
         "/opportunities/opportunity-xinglan",
         "需求依据、方向拆分、创建或关联岗位",
@@ -90,6 +95,26 @@ const groups = [
         "图谱画布",
         "/mappings/mapping-embodied?tab=content",
         "多图页、拖动、缩放、搜索、节点与关系维护",
+      ],
+      [
+        "公司关系",
+        "/mappings/mapping-embodied?tab=content&page=ecosystem",
+        "公司竞争、合作、投资、上下游和人才流动",
+      ],
+      [
+        "候选人关系",
+        "/mappings/mapping-embodied?tab=content&page=people",
+        "前同事、共同作者、共同发明人与联系路径",
+      ],
+      [
+        "岗位上下游知识",
+        "/mappings/mapping-embodied?tab=content&page=position-context",
+        "岗位目标、关键协作、上下游交付和能力依赖",
+      ],
+      [
+        "行业上下游知识",
+        "/mappings/mapping-embodied?tab=content&page=industry-chain",
+        "产业链上游、中游平台与下游应用关系",
       ],
       [
         "层级表格",

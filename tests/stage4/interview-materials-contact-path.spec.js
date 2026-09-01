@@ -112,6 +112,17 @@ test("已有手机号的联系人仍可创建或更新联系路径", async ({ pa
   await expect(
     page.getByRole("button", { name: "更新联系路径" }),
   ).toBeVisible();
+
+  await page.getByRole("button", { name: "寻找联系路径" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "更新联系路径" }),
+  ).toBeVisible();
+  await page
+    .getByRole("dialog", { name: "更新联系路径" })
+    .getByRole("button", {
+      name: "取消",
+    })
+    .click();
   await expectNoHorizontalOverflow(page);
   await page.screenshot({
     path: `${output}/contact-path-ready-desktop.png`,
@@ -128,7 +139,25 @@ test("已有手机号的联系人仍可创建或更新联系路径", async ({ pa
   await expect(setup).toContainText("用自然语言说明优先关系");
   await setup.getByRole("button", { name: "开始寻找" }).click();
   await expect(page.getByText("正在寻找联系人路径")).toBeVisible();
+  await expect(page.getByText("读取联系人和招聘机会")).toBeVisible();
+  await expect(page.getByText("核实直接联系方式")).toBeVisible();
+  await expect(page.getByText("查找可执行引荐关系")).toBeVisible();
+  await expect(page.getByText("生成联系路径图")).toBeVisible();
   await expect(page.getByText("联系路径已生成")).toBeVisible({ timeout: 5000 });
+  await assertNoConsoleErrors();
+});
+
+test("联系人联系路径提供可直接验收的运行中和失败恢复状态", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/contacts/contact-chenyu?tab=contact-path&state=running");
+  await expect(page.getByText("正在寻找联系人路径")).toBeVisible();
+  await expect(page.getByText("运行中", { exact: true })).toBeVisible();
+  await expect(page.getByText("查找可执行引荐关系")).toBeVisible();
+
+  await page.goto("#/contacts/contact-chenyu?tab=contact-path&state=error");
+  await expect(page.getByText("联系路径寻找失败")).toBeVisible();
+  await page.getByRole("button", { name: "重新寻找" }).click();
+  await expect(page.getByText("正在寻找联系人路径")).toBeVisible();
   await assertNoConsoleErrors();
 });
 

@@ -207,6 +207,7 @@ const nodeKindLabel = {
   person: "人物",
   contact: "联系人",
   position: "岗位",
+  industry: "产业环节",
   group: "分组",
   note: "自由节点",
 };
@@ -3359,6 +3360,7 @@ function GraphContent({
   };
   const locate = (pageId, nodeId) => {
     setActivePageId(pageId);
+    updateParams(params, setParams, { page: pageId });
     setSelectedIds([nodeId]);
     setSelectedEdgeId(null);
     setFocusNodeId(nodeId);
@@ -3914,6 +3916,7 @@ export function MappingDetailPage() {
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") || "content";
   const panel = params.get("panel") || "";
+  const requestedPageId = params.get("page");
   const graph =
     topicGraphs.find((item) => item.id === mappingId) ||
     (mappingId === "graph-empty"
@@ -3950,6 +3953,9 @@ export function MappingDetailPage() {
     setNewPageOpen(false);
     setImportOpen(panel === "import");
   }, [mappingId]);
+  useEffect(() => {
+    if (requestedPageId) setActivePageId(requestedPageId);
+  }, [requestedPageId]);
   useEffect(() => setImportOpen(panel === "import"), [panel]);
   const analysisActive = ["running", "paused"].includes(analysisState);
   const startImport = () => {
@@ -3990,7 +3996,10 @@ export function MappingDetailPage() {
         }}
       />
     );
-  const locateFromReview = (pageId) => setActivePageId(pageId);
+  const locateFromReview = (pageId) => {
+    setActivePageId(pageId);
+    updateParams(params, setParams, { page: pageId });
+  };
 
   return (
     <div className="s4-detail-page tg-detail-page">

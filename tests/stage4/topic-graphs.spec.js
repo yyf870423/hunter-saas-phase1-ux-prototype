@@ -51,11 +51,9 @@ test("知识图谱支持真实拖动、跨图页搜索和画布表格切换", as
   await expectVisibleGraphNodesDoNotOverlap(page);
 
   await page.getByLabel("搜索知识图谱").fill("拓界机器人");
-  await page
-    .getByRole("button", { name: /具身智能公司生态 · 拓界机器人/ })
-    .click();
+  await page.getByRole("button", { name: /目标公司关系 · 拓界机器人/ }).click();
   await expect(page.locator(".tg-page-strip span.is-active")).toContainText(
-    "具身智能公司生态",
+    "目标公司关系",
   );
   await expect(
     page.locator(".tg-node.is-focused", { hasText: "拓界机器人" }),
@@ -132,6 +130,28 @@ test("知识图谱支持真实拖动、跨图页搜索和画布表格切换", as
   await expect(page.locator(".tg-canvas-frame")).toBeVisible();
   await expect(page.locator(".tg-detail-panel")).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
+  assertNoConsoleErrors();
+});
+
+test("知识图谱覆盖公司、候选人、岗位和行业关系图页", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  const scenarios = [
+    ["ecosystem", "目标公司关系", "人才流向"],
+    ["people", "候选人关系网络", "共同作者 · 2 篇"],
+    ["position-context", "VLA 岗位上下游知识", "输入产品目标"],
+    ["industry-chain", "具身智能行业上下游", "提供硬件能力"],
+  ];
+
+  for (const [pageId, tabName, relationship] of scenarios) {
+    await page.goto(`#/mappings/mapping-embodied?tab=content&page=${pageId}`);
+    await expect(page.getByRole("tab", { name: tabName })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(
+      page.getByText(relationship, { exact: true }).first(),
+    ).toBeVisible();
+  }
   assertNoConsoleErrors();
 });
 
@@ -435,6 +455,17 @@ test("图谱卡片支持拖动排序并持久化", async ({ page }) => {
   await expect(cards.nth(0).getByRole("heading")).toHaveText(secondTitle);
   await expect(cards.nth(1).getByRole("heading")).toHaveText(firstTitle);
   assertNoConsoleErrors();
+});
+
+test("知识图谱卡片和分页保持清晰间距", async ({ page }) => {
+  await page.goto("#/mappings");
+  const grid = page.locator(".tg-graph-grid");
+  const pagination = page.locator(".s4-pagination");
+  const gridBox = await grid.boundingBox();
+  const paginationBox = await pagination.boundingBox();
+  expect(paginationBox.y - (gridBox.y + gridBox.height)).toBeGreaterThanOrEqual(
+    20,
+  );
 });
 
 test("图谱空状态与节点资产关联可维护", async ({ page }) => {

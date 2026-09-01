@@ -923,6 +923,11 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin-top: 14px;
+  margin-bottom: 26px;
+}
+
+.tg-list-page > .s4-pagination {
+  margin-top: 0;
 }
 
 .tg-graph-card {
@@ -2075,6 +2080,10 @@
 .tg-node.is-position .tg-node-kind {
   color: #9a5c0d;
   background: color-mix(in srgb, #9a5c0d 10%, var(--s1-surface));
+}
+.tg-node.is-industry .tg-node-kind {
+  color: #235fa4;
+  background: color-mix(in srgb, #235fa4 10%, var(--s1-surface));
 }
 .tg-node-kind svg {
   width: 14px;

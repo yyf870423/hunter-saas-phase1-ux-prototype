@@ -1300,27 +1300,48 @@ const contactPathViews = [
   },
 ];
 
-function ContactPathTab({ initialEmpty = false, autoOpen = false }) {
+function ContactPathTab({ initialState = "ready", autoOpen = false }) {
   const notify = useToast();
-  const [status, setStatus] = useState(initialEmpty ? "idle" : "ready");
+  const [status, setStatus] = useState(initialState);
+  const [activeStep, setActiveStep] = useState(
+    initialState === "running" ? 2 : 0,
+  );
   const [dialogOpen, setDialogOpen] = useState(autoOpen);
   const [lastPrompt, setLastPrompt] = useState(
     "优先保留可以直接执行的关系，最多三层；同时核实公开手机号和邮箱，不要自动联系任何人。",
   );
-  const timerRef = useRef(null);
+  const timerRef = useRef([]);
   const generated = status === "ready";
   useEffect(() => {
-    setStatus(initialEmpty ? "idle" : "ready");
-  }, [initialEmpty]);
+    setStatus(initialState);
+    setActiveStep(initialState === "running" ? 2 : 0);
+  }, [initialState]);
   useEffect(() => {
     if (autoOpen) setDialogOpen(true);
   }, [autoOpen]);
-  useEffect(
-    () => () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
-    },
-    [],
-  );
+  const clearTimers = () => {
+    timerRef.current.forEach((timer) => window.clearTimeout(timer));
+    timerRef.current = [];
+  };
+  useEffect(() => () => clearTimers(), []);
+  const startFinding = (prompt, updating = false) => {
+    clearTimers();
+    setLastPrompt(prompt);
+    setStatus("running");
+    setActiveStep(0);
+    setDialogOpen(false);
+    [1, 2, 3].forEach((step, index) => {
+      timerRef.current.push(
+        window.setTimeout(() => setActiveStep(step), 650 * (index + 1)),
+      );
+    });
+    timerRef.current.push(
+      window.setTimeout(() => {
+        setStatus("ready");
+        notify(updating ? "联系路径已更新" : "联系路径已生成");
+      }, 2800),
+    );
+  };
   return (
     <div className="s4-detail-stack">
       <FieldGroup
@@ -1349,7 +1370,23 @@ function ContactPathTab({ initialEmpty = false, autoOpen = false }) {
               "查找可执行引荐关系",
               "生成联系路径图",
             ]}
-            activeStep={2}
+            activeStep={activeStep}
+          />
+        ) : status === "error" ? (
+          <StateBanner
+            tone="danger"
+            icon="warning"
+            title="联系路径寻找失败"
+            description="公开资料读取中断，本次没有生成或覆盖任何联系路径。可以保留原要求后重新执行。"
+            action={
+              <Button
+                size="sm"
+                icon="refresh"
+                onClick={() => startFinding(lastPrompt, generated)}
+              >
+                重新寻找
+              </Button>
+            }
           />
         ) : generated ? (
           <RelationshipCanvas
@@ -1377,15 +1414,7 @@ function ContactPathTab({ initialEmpty = false, autoOpen = false }) {
         initialPrompt={lastPrompt}
         submitLabel={generated ? "开始更新" : "开始寻找"}
         onSubmit={(prompt) => {
-          const updating = generated;
-          setLastPrompt(prompt);
-          setStatus("running");
-          setDialogOpen(false);
-          if (timerRef.current) window.clearTimeout(timerRef.current);
-          timerRef.current = window.setTimeout(() => {
-            setStatus("ready");
-            notify(updating ? "联系路径已更新" : "联系路径已生成");
-          }, 2400);
+          startFinding(prompt, generated);
         }}
       />
     </div>
@@ -1676,7 +1705,10 @@ export function ContactDetailPage() {
         onBack={() => navigate("/contacts")}
         onDelete={() => setDeleteOpen(true)}
       >
-        <Button icon="route" onClick={() => setParams({ tab: "contact-path" })}>
+        <Button
+          icon="route"
+          onClick={() => setParams({ tab: "contact-path", action: "find" })}
+        >
           寻找联系路径
         </Button>
       </DetailHeader>
@@ -1802,7 +1834,15 @@ export function ContactDetailPage() {
       ) : null}
       {tab === "contact-path" ? (
         <ContactPathTab
-          initialEmpty={params.get("state") === "empty"}
+          initialState={
+            params.get("state") === "empty"
+              ? "idle"
+              : params.get("state") === "running"
+                ? "running"
+                : params.get("state") === "error"
+                  ? "error"
+                  : "ready"
+          }
           autoOpen={params.get("action") === "find"}
         />
       ) : null}

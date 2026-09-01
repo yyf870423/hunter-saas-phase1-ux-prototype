@@ -7,11 +7,14 @@
 3. 当招聘机会发现潜在联系人时，可以从招聘机会发起“寻找联系路径”；运行结果归属于联系人资产，招聘机会只显示联系人、路径摘要和入口，不复制关系数据。
 4. Hunter 可以查找公开可验证的手机号或邮箱，也可以梳理同事、投资人、顾问和其他已有关系。新联系方式先作为待确认信息，用户确认后才写入联系人资料。
 5. 联系路径只提供可执行建议和证据，不自动代表猎头联系任何人。
+6. “寻找联系路径”从联系人页头和联系路径空状态进入同一自然语言要求界面；提交后必须显示逐步执行过程，再生成关系图。执行失败时保留输入并允许重新寻找，不能留下半成品关系图。
 
 ## 二、原型入口
 
 - 联系人联系路径：`#/contacts/contact-chenyu?tab=contact-path`
 - 尚未创建：`#/contacts/contact-chenyu?tab=contact-path&state=empty`
+- 正在执行：`#/contacts/contact-chenyu?tab=contact-path&state=running`
+- 执行失败：`#/contacts/contact-chenyu?tab=contact-path&state=error`
 - 招聘机会触发入口：`#/opportunities/opportunity-xinglan`
 
 ## 三、交互要求
