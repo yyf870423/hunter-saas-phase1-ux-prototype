@@ -64,7 +64,7 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   const review = page.getByRole("region", { name: "审核岗位解析结果" });
   await expect(review).toContainText("当前内容");
   await expect(review).toContainText("AI 建议");
-  await expect(review.getByRole("checkbox")).toHaveCount(4);
+  await expect(review.getByRole("checkbox")).toHaveCount(6);
   await expect(
     review.getByRole("navigation", { name: "待审核字段" }),
   ).toBeVisible();
@@ -76,19 +76,26 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   await expect(review).toContainText(
     "单纯写“跨团队协作”不足以支持后续匹配判断",
   );
+  await review.getByRole("button", { name: /招聘难度与找人建议/ }).click();
+  await expect(review).toContainText("高难度（8.4 / 10）");
+  await expect(review).toContainText("单一渠道很难覆盖");
+  await review.getByRole("button", { name: /建议挖猎的公司/ }).click();
+  await expect(review).toContainText("优先关注灵跃科技");
+  await expect(review).toContainText("组织调整、员工持股解禁");
+  await review.getByRole("button", { name: /软性与隐性要求/ }).click();
   await review
     .locator(".s4-ai-review-fields article.is-active")
     .getByRole("checkbox")
     .click();
   await expect(
-    review.getByRole("button", { name: /应用所选 2 项/ }),
+    review.getByRole("button", { name: /应用所选 4 项/ }),
   ).toBeVisible();
   await page.waitForTimeout(220);
   await page.screenshot({
     path: `${output}/review-desktop.png`,
     fullPage: true,
   });
-  await review.getByRole("button", { name: /应用所选 2 项/ }).click();
+  await review.getByRole("button", { name: /应用所选 4 项/ }).click();
   await expect(page).toHaveURL(/ai=complete/);
   await expect(page.getByText("岗位资料更新为 v4")).toBeVisible();
 

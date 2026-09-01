@@ -1160,6 +1160,238 @@ export function CompanyDetailPage() {
   );
 }
 
+const contactPathViews = [
+  {
+    id: "contact-path",
+    label: "联系路径",
+    description: "陈雨的直接联系方式与可执行引荐路径",
+    summary: "1 条直接联系方式 · 2 条关系路径 · 证据随底层资产自动更新",
+    layout: "network",
+    defaultSelection: { kind: "node", id: "contact-path-target" },
+    nodes: [
+      {
+        id: "contact-path-me",
+        label: "沈岚",
+        meta: "当前猎头",
+        summary: "当前 Hunter 用户，负责星澜机器人客户开发。",
+        status: "已确认",
+        tone: "success",
+        kind: "person",
+        x: 38,
+        y: 190,
+        evidence: ["用户账号", "客户开发任务"],
+      },
+      {
+        id: "contact-path-phone",
+        label: "已核实手机号",
+        meta: "直接联系方式",
+        summary: "手机号最近核实于 2026-08-20，可由猎头直接联系。",
+        status: "可直接联系",
+        tone: "success",
+        kind: "contact",
+        x: 300,
+        y: 42,
+        evidence: ["联系人档案", "最近沟通记录"],
+      },
+      {
+        id: "contact-path-investor",
+        label: "刘健",
+        meta: "启程资本 · 投资人",
+        summary: "与猎头已有联系，也是星澜机器人本轮融资的投资方联系人。",
+        status: "已确认",
+        tone: "success",
+        kind: "person",
+        x: 286,
+        y: 210,
+        detailPath: "/contacts/contact-liujian",
+        detailLabel: "打开联系人详情",
+        evidence: ["联系人档案", "公司融资关系", "沟通记录"],
+      },
+      {
+        id: "contact-path-founder",
+        label: "王凯",
+        meta: "星澜机器人 · 联合创始人",
+        summary: "负责技术与组织扩张，可由投资人刘健引荐。",
+        status: "关系已确认",
+        tone: "info",
+        kind: "person",
+        x: 520,
+        y: 332,
+        evidence: ["公司公开资料", "投资方公告"],
+      },
+      {
+        id: "contact-path-target",
+        label: "陈雨",
+        meta: "星澜机器人 · 招聘负责人",
+        summary:
+          "已存在直接联系方式，同时保留投资方和公司内部两条备用引荐路径。",
+        status: "目标联系人",
+        tone: "info",
+        kind: "person",
+        x: 790,
+        y: 190,
+        detailPath: "/contacts/contact-chenyu?tab=profile",
+        detailLabel: "打开联系人资料",
+        evidence: ["联系人档案", "招聘机会"],
+      },
+    ],
+    edges: [
+      {
+        id: "contact-edge-phone",
+        source: "contact-path-me",
+        target: "contact-path-phone",
+        label: "已有号码",
+        status: "已确认",
+        tone: "success",
+        observedAt: "2026-08-20",
+        evidence: ["联系人档案"],
+      },
+      {
+        id: "contact-edge-direct",
+        source: "contact-path-phone",
+        target: "contact-path-target",
+        label: "直接联系",
+        status: "可用",
+        tone: "success",
+        observedAt: "2026-08-20",
+        evidence: ["手机号核实记录"],
+      },
+      {
+        id: "contact-edge-investor",
+        source: "contact-path-me",
+        target: "contact-path-investor",
+        label: "已有联系",
+        status: "已确认",
+        tone: "success",
+        observedAt: "2026-08-12",
+        evidence: ["沟通记录"],
+      },
+      {
+        id: "contact-edge-investment",
+        source: "contact-path-investor",
+        target: "contact-path-target",
+        label: "投资方引荐",
+        status: "可执行",
+        tone: "info",
+        observedAt: "2026-08-24",
+        evidence: ["融资关系", "客户开发记录"],
+      },
+      {
+        id: "contact-edge-founder",
+        source: "contact-path-investor",
+        target: "contact-path-founder",
+        label: "董事会关系",
+        status: "已确认",
+        tone: "info",
+        observedAt: "2026-08-22",
+        evidence: ["投资方公告"],
+      },
+      {
+        id: "contact-edge-colleague",
+        source: "contact-path-founder",
+        target: "contact-path-target",
+        label: "公司内部协作",
+        status: "已确认",
+        tone: "info",
+        observedAt: "2026-08-24",
+        evidence: ["公司组织资料", "招聘机会"],
+      },
+    ],
+  },
+];
+
+function ContactPathTab({ initialEmpty = false, autoOpen = false }) {
+  const notify = useToast();
+  const [status, setStatus] = useState(initialEmpty ? "idle" : "ready");
+  const [dialogOpen, setDialogOpen] = useState(autoOpen);
+  const [lastPrompt, setLastPrompt] = useState(
+    "优先保留可以直接执行的关系，最多三层；同时核实公开手机号和邮箱，不要自动联系任何人。",
+  );
+  const timerRef = useRef(null);
+  const generated = status === "ready";
+  useEffect(() => {
+    setStatus(initialEmpty ? "idle" : "ready");
+  }, [initialEmpty]);
+  useEffect(() => {
+    if (autoOpen) setDialogOpen(true);
+  }, [autoOpen]);
+  useEffect(
+    () => () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    },
+    [],
+  );
+  return (
+    <div className="s4-detail-stack">
+      <FieldGroup
+        title="可执行联系路径"
+        description="无论是否已有手机号或邮箱，都可以继续整理直接联系方式和备用引荐关系。"
+        action={
+          generated ? (
+            <Button
+              size="sm"
+              icon="refresh"
+              onClick={() => setDialogOpen(true)}
+            >
+              更新联系路径
+            </Button>
+          ) : null
+        }
+      >
+        {status === "running" ? (
+          <RelationshipAiProcessingState
+            title="正在寻找联系人路径"
+            description="正在核对联系人、公司、投资关系和已有沟通记录。"
+            prompt={lastPrompt}
+            steps={[
+              "读取联系人和招聘机会",
+              "核实直接联系方式",
+              "查找可执行引荐关系",
+              "生成联系路径图",
+            ]}
+            activeStep={2}
+          />
+        ) : generated ? (
+          <RelationshipCanvas
+            views={contactPathViews}
+            decisions={{}}
+            onDecision={() => {}}
+            editable
+            draggable
+            storageKey="hunter-prototype-contact-chenyu-contact-path"
+          />
+        ) : (
+          <RelationshipAiEmptyState
+            title="尚未创建联系路径"
+            description="Hunter 会同时查找公开可验证的直接联系方式和可执行的关系路径；不会自动联系任何人。"
+            actionLabel="寻找联系路径"
+            onAction={() => setDialogOpen(true)}
+          />
+        )}
+      </FieldGroup>
+      <RelationshipAiDialog
+        open={dialogOpen}
+        close={() => setDialogOpen(false)}
+        title={generated ? "更新联系路径" : "寻找联系路径"}
+        description="用自然语言说明优先关系、最大层数和需要排除的路径。"
+        initialPrompt={lastPrompt}
+        submitLabel={generated ? "开始更新" : "开始寻找"}
+        onSubmit={(prompt) => {
+          const updating = generated;
+          setLastPrompt(prompt);
+          setStatus("running");
+          setDialogOpen(false);
+          if (timerRef.current) window.clearTimeout(timerRef.current);
+          timerRef.current = window.setTimeout(() => {
+            setStatus("ready");
+            notify(updating ? "联系路径已更新" : "联系路径已生成");
+          }, 2400);
+        }}
+      />
+    </div>
+  );
+}
+
 function ContactEditor({ open, close, company = "" }) {
   const notify = useToast();
   const [name, setName] = useState("");
@@ -1430,6 +1662,7 @@ export function ContactDetailPage() {
   const contactTabs = [
     { value: "profile", label: "联系人资料" },
     { value: "timeline", label: "跟进与沟通" },
+    { value: "contact-path", label: "联系路径" },
     { value: "business", label: "相关业务" },
   ];
   return (
@@ -1441,7 +1674,11 @@ export function ContactDetailPage() {
         badges={profile.categories.map((label) => ({ label, tone: "info" }))}
         onBack={() => navigate("/contacts")}
         onDelete={() => setDeleteOpen(true)}
-      />
+      >
+        <Button icon="route" onClick={() => setParams({ tab: "contact-path" })}>
+          寻找联系路径
+        </Button>
+      </DetailHeader>
       <DetailTabs
         tabs={contactTabs}
         value={tab}
@@ -1561,6 +1798,12 @@ export function ContactDetailPage() {
             />
           </FieldGroup>
         </div>
+      ) : null}
+      {tab === "contact-path" ? (
+        <ContactPathTab
+          initialEmpty={params.get("state") === "empty"}
+          autoOpen={params.get("action") === "find"}
+        />
       ) : null}
       {tab === "business" ? (
         <div className="s4-detail-stack">
@@ -2407,19 +2650,45 @@ export function OpportunityDetailPage() {
                 ["状态", <StatusFromText value={opportunity.status} />],
                 ["预计人数", "20 - 25 人"],
                 ["预计时间", "2026 年下半年"],
-                [
-                  "相关联系人",
-                  <button
-                    type="button"
-                    className="s4-inline-link"
-                    onClick={() => navigate("/contacts/contact-chenyu")}
-                  >
-                    陈雨 · 招聘负责人
-                  </button>,
-                ],
                 ["创建方式", "客户开发任务"],
               ]}
             />
+          </FieldGroup>
+          <FieldGroup
+            title="相关联系人"
+            description="招聘机会只引用联系人及路径摘要；完整结果保存在联系人资产中。"
+          >
+            <div className="s4-opportunity-contact-path">
+              <i>
+                <Icon name="user" />
+              </i>
+              <span>
+                <b>陈雨 · 招聘负责人</b>
+                <p>已核实手机号和邮箱 · 2 条备用引荐路径</p>
+                <small>最近核实于 2026-08-24</small>
+              </span>
+              <StatusBadge tone="success">可以联系</StatusBadge>
+              <div>
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/contacts/contact-chenyu")}
+                >
+                  查看联系人
+                </Button>
+                <Button
+                  size="sm"
+                  icon="route"
+                  tone="primary"
+                  onClick={() =>
+                    navigate(
+                      "/contacts/contact-chenyu?tab=contact-path&action=find",
+                    )
+                  }
+                >
+                  寻找联系路径
+                </Button>
+              </div>
+            </div>
           </FieldGroup>
           <FieldGroup
             title="招聘需求摘要"

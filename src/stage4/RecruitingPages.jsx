@@ -32,6 +32,7 @@ import {
   StateBanner,
   StatusBadge,
   StatusFromText,
+  Tabs,
   TagList,
   TextArea,
   TextInput,
@@ -43,6 +44,10 @@ import {
   AssetAiProcessDrawer,
   AssetAiProcessHistory,
 } from "./AssetAiProcessing";
+import {
+  buildInterviewGuideRecord,
+  PositionInterviewMaterials,
+} from "./PositionInterviewMaterials";
 import { matchResults, positionDetail, positions } from "./data";
 
 const tabs = [
@@ -50,6 +55,7 @@ const tabs = [
   { value: "pipeline", label: "候选人流程", count: 11 },
   { value: "matching", label: "匹配结果", count: 128 },
   { value: "talent-map", label: "人才梳理", count: 23 },
+  { value: "interview", label: "面试资料" },
   { value: "work", label: "关联任务" },
 ];
 
@@ -62,10 +68,10 @@ const positionSourcingTooltip =
 
 function buildPositionAiRecord(state = "complete") {
   const planByState = {
-    running: ["complete", "running", "pending", "pending"],
-    review: ["complete", "complete", "complete", "complete"],
-    failed: ["complete", "failed", "pending", "pending"],
-    complete: ["complete", "complete", "complete", "complete"],
+    running: ["complete", "running", "pending", "pending", "pending"],
+    review: ["complete", "complete", "complete", "complete", "complete"],
+    failed: ["complete", "failed", "pending", "pending", "pending"],
+    complete: ["complete", "complete", "complete", "complete", "complete"],
   };
   const planStates = planByState[state] || planByState.complete;
   const plan = [
@@ -76,7 +82,11 @@ function buildPositionAiRecord(state = "complete") {
         ? "模型响应中断，已保留读取结果和原始输入。"
         : "分析岗位层级、职责边界、上下游关系与可能风险。",
     ],
-    ["生成寻访建议", "生成软性与隐性要求、对标企业和寻访关键词。"],
+    ["判断招聘难度", "结合人才供给、角色复合度、地域和验证成本判断招聘难度。"],
+    [
+      "生成找人建议",
+      "生成软性与隐性要求、建议挖猎公司、寻访关键词和有顺序的找人步骤。",
+    ],
     ["形成审核结果", "把建议转换为字段级差异，等待用户确认后写入。"],
   ].map(([title, detail], index) => {
     const itemState = planStates[index];
@@ -106,7 +116,7 @@ function buildPositionAiRecord(state = "complete") {
         ? "读取岗位资料后，模型连接中断。原始输入和已完成步骤均已保留。"
         : state === "running"
           ? "正在分析岗位定位和角色边界。"
-          : "已生成 4 项字段建议，正式岗位资料尚未改变。",
+          : "已生成 6 项字段建议，正式岗位资料尚未改变。",
     status:
       state === "failed"
         ? "失败"
@@ -147,10 +157,10 @@ function buildPositionAiRecord(state = "complete") {
       state === "running"
         ? "正在分析岗位定位、角色边界与寻访关键词。"
         : state === "review"
-          ? "已生成 4 项建议，等待确认后更新当前岗位。"
+          ? "已生成 6 项建议，等待确认后更新当前岗位。"
           : state === "failed"
             ? "模型连接中断，已保留原输入和完成步骤，可直接重试。"
-            : "已确认岗位定位、软性与隐性要求及 5 组寻访关键词。",
+            : "已确认岗位定位、招聘难度、建议挖猎公司、找人步骤及 5 组寻访关键词。",
     plan,
     runs:
       state === "complete"
@@ -268,8 +278,107 @@ function buildRecommendationReportRecord() {
   };
 }
 
+function RecruitmentStrategySummary({ strategy, onAnalyze }) {
+  return (
+    <FieldGroup
+      title="招聘难度与找人建议"
+      description="由岗位 AI 解析生成；用于确定先从哪些渠道开始，不会自动启动任务。"
+      action={
+        <Button size="sm" icon="sparkles" onClick={onAnalyze}>
+          重新分析
+        </Button>
+      }
+    >
+      <div className="s4-recruitment-strategy-summary">
+        <section>
+          <span>
+            <small>综合招聘难度</small>
+            <b>{strategy.difficulty}</b>
+            <em>{strategy.score}</em>
+          </span>
+          <div aria-label={`招聘难度 ${strategy.score}`}>
+            {Array.from({ length: 10 }, (_, index) => (
+              <i key={index} className={index < 8 ? "is-active" : ""} />
+            ))}
+          </div>
+        </section>
+        <article>
+          <b>判断依据</b>
+          <p>{strategy.summary}</p>
+          <TagList items={strategy.signals} tone="warning" />
+        </article>
+      </div>
+      <ol className="s4-recruitment-strategy-steps">
+        {strategy.steps.map((step, index) => (
+          <li key={step.title}>
+            <em>{index + 1}</em>
+            <span>
+              <small>
+                {step.channel} · {step.timing}
+              </small>
+              <b>{step.title}</b>
+              <p>{step.description}</p>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </FieldGroup>
+  );
+}
+
+function TargetCompanySuggestions({ items, onAnalyze, onSelect }) {
+  return (
+    <FieldGroup
+      title="建议挖猎的公司"
+      description="结合岗位对标关系、组织变化、股权窗口和人才流动信号生成；建议仅用于确定优先研究范围。"
+      action={
+        <Button size="sm" icon="sparkles" onClick={onAnalyze}>
+          重新分析
+        </Button>
+      }
+    >
+      <div className="s4-target-company-list">
+        {items.map((item) => (
+          <button type="button" key={item.id} onClick={() => onSelect(item)}>
+            <span className="s4-target-company-name">
+              <b>{item.name}</b>
+              <small>{item.targetTeams}</small>
+            </span>
+            <span className="s4-target-company-signal">
+              <StatusBadge
+                tone={
+                  item.signalType === "股权解禁"
+                    ? "warning"
+                    : item.signalType === "组织调整" ||
+                        item.signalType === "业务收缩"
+                      ? "danger"
+                      : "info"
+                }
+              >
+                {item.signalType}
+              </StatusBadge>
+              <p>{item.signal}</p>
+            </span>
+            <span className="s4-target-company-priority">
+              <StatusBadge
+                tone={item.priority === "优先" ? "success" : "neutral"}
+              >
+                {item.priority}
+              </StatusBadge>
+              <small>{item.evidence.length} 项依据</small>
+            </span>
+            <Icon name="chevronRight" />
+          </button>
+        ))}
+      </div>
+    </FieldGroup>
+  );
+}
+
 function PositionProfile({
   detail,
+  view,
+  onViewChange,
   aiState,
   aiRecord,
   onOpenAiSetup,
@@ -285,6 +394,7 @@ function PositionProfile({
   const [versionOpen, setVersionOpen] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState("v3");
   const [editSection, setEditSection] = useState(null);
+  const [activeTargetCompany, setActiveTargetCompany] = useState(null);
   const jdVersions = useMemo(
     () => [
       {
@@ -331,150 +441,254 @@ function PositionProfile({
         onSecondary={onStopAi}
         secondaryLabel={aiState === "running" ? "停止" : undefined}
       />
-      <FieldGroup
-        title="岗位基本资料"
-        action={
-          <Button size="sm" icon="edit" onClick={() => setEditSection("base")}>
-            编辑资料
-          </Button>
-        }
-      >
-        <DefinitionGrid
-          items={[
-            [
-              "招聘公司",
-              <button
-                className="s4-inline-link"
-                type="button"
-                onClick={() => navigate("/companies/company-xinglan")}
+      <Tabs
+        label="岗位资料视图"
+        items={[
+          { value: "information", label: "岗位信息" },
+          { value: "analysis", label: "招聘分析" },
+        ]}
+        value={view}
+        onChange={onViewChange}
+      />
+      {view === "information" ? (
+        <>
+          <FieldGroup
+            title="岗位基本资料"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditSection("base")}
               >
-                星澜机器人
-              </button>,
-            ],
-            ["招聘状态", <StatusFromText value={detail.status} />],
-            ["工作地点", detail.location],
-            ["薪资范围", detail.salary],
-            ["最低工作年限", detail.experience],
-            ["学历要求", detail.education],
-            [
-              "来源机会",
-              <button
-                type="button"
-                className="s4-position-source-inline"
-                onClick={() => navigate("/opportunities/opportunity-xinglan")}
+                编辑资料
+              </Button>
+            }
+          >
+            <DefinitionGrid
+              items={[
+                [
+                  "招聘公司",
+                  <button
+                    className="s4-inline-link"
+                    type="button"
+                    onClick={() => navigate("/companies/company-xinglan")}
+                  >
+                    星澜机器人
+                  </button>,
+                ],
+                ["招聘状态", <StatusFromText value={detail.status} />],
+                ["工作地点", detail.location],
+                ["薪资范围", detail.salary],
+                ["最低工作年限", detail.experience],
+                ["学历要求", detail.education],
+                [
+                  "来源机会",
+                  <button
+                    type="button"
+                    className="s4-position-source-inline"
+                    onClick={() =>
+                      navigate("/opportunities/opportunity-xinglan")
+                    }
+                  >
+                    <span>
+                      <b>{detail.sourceOpportunity}</b>
+                      <small>已确认 · 已形成 2 个岗位</small>
+                    </span>
+                    <Icon name="chevronRight" />
+                  </button>,
+                ],
+              ]}
+            />
+            <div className="s4-labeled-row">
+              <b>关键技能</b>
+              <TagList items={detail.skills} tone="info" />
+            </div>
+          </FieldGroup>
+          <FieldGroup
+            title="当前岗位 JD"
+            description={`${detail.jdVersion} · 当前有效版本`}
+            action={
+              <div className="s4-group-actions">
+                <Button
+                  size="sm"
+                  icon="edit"
+                  onClick={() => setEditSection("jd")}
+                >
+                  编辑 JD
+                </Button>
+                <Button size="sm" onClick={() => setVersionOpen(true)}>
+                  版本历史
+                </Button>
+                <Button size="sm" icon="sparkles" onClick={onOpenAiSetup}>
+                  AI 解析
+                </Button>
+              </div>
+            }
+          >
+            <div className="s4-jd-content">
+              {detail.jd
+                .split("\n")
+                .map((line, index) =>
+                  line ? (
+                    /^(岗位职责|任职要求)$/.test(line) ? (
+                      <h3 key={index}>{line}</h3>
+                    ) : (
+                      <p key={index}>{line}</p>
+                    )
+                  ) : (
+                    <br key={index} />
+                  ),
+                )}
+            </div>
+          </FieldGroup>
+          <FieldGroup
+            title="已确认招聘要求"
+            description="只有这一层可以成为明确硬约束。"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditSection("requirements")}
               >
-                <span>
-                  <b>{detail.sourceOpportunity}</b>
-                  <small>已确认 · 已形成 2 个岗位</small>
-                </span>
-                <Icon name="chevronRight" />
-              </button>,
-            ],
-          ]}
-        />
-        <div className="s4-labeled-row">
-          <b>关键技能</b>
-          <TagList items={detail.skills} tone="info" />
-        </div>
-      </FieldGroup>
-      <FieldGroup
-        title="当前岗位 JD"
-        description={`${detail.jdVersion} · 当前有效版本`}
-        action={
-          <div className="s4-group-actions">
-            <Button size="sm" icon="edit" onClick={() => setEditSection("jd")}>
-              编辑 JD
-            </Button>
-            <Button size="sm" onClick={() => setVersionOpen(true)}>
-              版本历史
-            </Button>
-            <Button size="sm" icon="sparkles" onClick={onOpenAiSetup}>
-              AI 解析
-            </Button>
-          </div>
-        }
-      >
-        <div className="s4-jd-content">
-          {detail.jd
-            .split("\n")
-            .map((line, index) =>
-              line ? (
-                /^(岗位职责|任职要求)$/.test(line) ? (
-                  <h3 key={index}>{line}</h3>
-                ) : (
-                  <p key={index}>{line}</p>
-                )
-              ) : (
-                <br key={index} />
-              ),
-            )}
-        </div>
-      </FieldGroup>
-      <FieldGroup
-        title="已确认招聘要求"
-        description="只有这一层可以成为明确硬约束。"
-        action={
-          <Button
-            size="sm"
-            icon="edit"
-            onClick={() => setEditSection("requirements")}
+                编辑要求
+              </Button>
+            }
           >
-            编辑要求
-          </Button>
-        }
-      >
-        <ol className="s4-confirmed-requirements">
-          {detail.confirmedRequirements.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ol>
-      </FieldGroup>
-      <FieldGroup
-        title="岗位解析"
-        description="用于理解岗位和辅助寻访，不自动成为硬要求。"
-        action={
-          <Button
-            size="sm"
-            icon="edit"
-            onClick={() => setEditSection("analysis")}
-          >
-            编辑解析
-          </Button>
-        }
-      >
-        <div className="s4-analysis-list">
-          {detail.analysis.map(([label, value]) => (
-            <article key={label}>
-              <b>{label}</b>
-              <p>{value}</p>
-            </article>
-          ))}
-        </div>
-      </FieldGroup>
-      <FieldGroup
-        title="寻访关键词"
-        description="最多 5 组，每组最多 2 个词。"
-        action={
-          <Button
-            size="sm"
-            icon="edit"
-            onClick={() => setEditSection("keywords")}
-          >
-            编辑
-          </Button>
-        }
-      >
-        <div className="s4-keyword-groups">
-          {detail.keywordGroups.map((group, index) => (
-            <span key={group.join("-")}>
-              <em>组合 {index + 1}</em>
-              {group.map((item) => (
-                <b key={item}>{item}</b>
+            <ol className="s4-confirmed-requirements">
+              {detail.confirmedRequirements.map((item) => (
+                <li key={item}>{item}</li>
               ))}
-            </span>
-          ))}
-        </div>
-      </FieldGroup>
+            </ol>
+          </FieldGroup>
+        </>
+      ) : (
+        <>
+          <FieldGroup
+            title="岗位解析"
+            description="用于理解岗位和辅助寻访，不自动成为硬要求。"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditSection("analysis")}
+              >
+                编辑解析
+              </Button>
+            }
+          >
+            <div className="s4-analysis-list">
+              {detail.analysis.map(([label, value]) => (
+                <article key={label}>
+                  <b>{label}</b>
+                  <p>{value}</p>
+                </article>
+              ))}
+            </div>
+          </FieldGroup>
+          <RecruitmentStrategySummary
+            strategy={detail.recruitmentStrategy}
+            onAnalyze={onOpenAiSetup}
+          />
+          <TargetCompanySuggestions
+            items={detail.targetCompanySuggestions}
+            onAnalyze={onOpenAiSetup}
+            onSelect={setActiveTargetCompany}
+          />
+          <FieldGroup
+            title="寻访关键词"
+            description="最多 5 组，每组最多 2 个词。"
+            action={
+              <Button
+                size="sm"
+                icon="edit"
+                onClick={() => setEditSection("keywords")}
+              >
+                编辑
+              </Button>
+            }
+          >
+            <div className="s4-keyword-groups">
+              {detail.keywordGroups.map((group, index) => (
+                <span key={group.join("-")}>
+                  <em>组合 {index + 1}</em>
+                  {group.map((item) => (
+                    <b key={item}>{item}</b>
+                  ))}
+                </span>
+              ))}
+            </div>
+          </FieldGroup>
+        </>
+      )}
+      <Drawer
+        open={Boolean(activeTargetCompany)}
+        close={() => setActiveTargetCompany(null)}
+        title="建议挖猎依据"
+        className="s4-target-company-drawer"
+      >
+        {activeTargetCompany ? (
+          <div className="s4-target-company-detail">
+            <header>
+              <span>
+                <small>建议挖猎公司</small>
+                <h3>{activeTargetCompany.name}</h3>
+              </span>
+              <StatusBadge tone="success">
+                {activeTargetCompany.priority}
+              </StatusBadge>
+            </header>
+            <dl>
+              <div>
+                <dt>重点团队</dt>
+                <dd>{activeTargetCompany.targetTeams}</dd>
+              </div>
+              <div>
+                <dt>机会信号</dt>
+                <dd>
+                  <StatusBadge tone="warning">
+                    {activeTargetCompany.signalType}
+                  </StatusBadge>
+                </dd>
+              </div>
+            </dl>
+            <section>
+              <h4>信号摘要</h4>
+              <p>{activeTargetCompany.signal}</p>
+            </section>
+            <section>
+              <h4>与当前岗位的关系</h4>
+              <p>{activeTargetCompany.reason}</p>
+            </section>
+            <section>
+              <h4>分析依据</h4>
+              <div className="s4-target-company-evidence">
+                {activeTargetCompany.evidence.map((item) => (
+                  <button
+                    type="button"
+                    key={item}
+                    onClick={() => notify(`正在打开：${item}`, "info")}
+                  >
+                    <Icon name="file" />
+                    <span>{item}</span>
+                    <Icon name="external" />
+                  </button>
+                ))}
+              </div>
+            </section>
+            <footer>
+              <Button
+                onClick={() =>
+                  activeTargetCompany.companyId
+                    ? navigate(`/companies/${activeTargetCompany.companyId}`)
+                    : notify("该公司尚未建立正式公司资产", "info")
+                }
+              >
+                查看公司资料
+              </Button>
+            </footer>
+          </div>
+        ) : null}
+      </Drawer>
       <Modal
         open={versionOpen}
         close={() => setVersionOpen(false)}
@@ -616,7 +830,9 @@ function PositionAiStartModal({ open, close, onStart }) {
         <div className="s4-ai-scope-options">
           <span>
             <b>本次处理范围</b>
-            <small>岗位解析、软性与隐性要求、对标企业、寻访关键词</small>
+            <small>
+              岗位解析、软性与隐性要求、招聘难度、找人步骤、建议挖猎公司、寻访关键词
+            </small>
           </span>
           <CustomCheckbox
             checked={includeJd}
@@ -640,6 +856,8 @@ function PositionAiReviewWorkspace({ onBack, onApply }) {
   const [selected, setSelected] = useState([
     "岗位定位",
     "软性与隐性要求",
+    "招聘难度与找人建议",
+    "建议挖猎的公司",
     "寻访关键词",
   ]);
   const [activeField, setActiveField] = useState("岗位定位");
@@ -668,6 +886,24 @@ function PositionAiReviewWorkspace({ onBack, onApply }) {
         "VLA + 真机部署；机器人学习 + 技术负责人；多模态策略 + 数据闭环；强化学习 + 量产交付；具身智能 + 团队管理",
       reason:
         "现有关键词偏技术主题，缺少交付和管理信号。新增组合用于覆盖技术负责人、量产交付和数据闭环等候选人表达。",
+    },
+    {
+      label: "招聘难度与找人建议",
+      current:
+        "尚未形成系统化难度判断。当前主要依赖猎头根据岗位经验自行选择找人渠道。",
+      suggestion:
+        "高难度（8.4 / 10）。先匹配 Hunter 已有候选人，并由猎头在招聘网站定向筛选；同步从公开网络、论文和专利补充人物线索，再重点摸排对标公司的组织结构、关键人才和联系路径。",
+      reason:
+        "岗位同时要求 VLA 技术深度、真机数据闭环、8 人以上团队管理和量产交付，符合条件的人才少且公开资料分散，单一渠道很难覆盖。",
+    },
+    {
+      label: "建议挖猎的公司",
+      current:
+        "当前仅记录了常规对标企业，没有结合组织调整、股权窗口和人才流动判断优先顺序。",
+      suggestion:
+        "优先关注灵跃科技的机器人算法中台、矩阵动力的具身模型团队和拓界机器人的机器人学习团队；补充关注从自动驾驶策略向机器人迁移的云驰智能。每家公司均保留机会信号、目标团队和分析依据。",
+      reason:
+        "组织调整、员工持股解禁、业务收缩和方向转型会改变候选人愿意沟通的可能性；结合岗位能力要求后，可以缩小需要重点摸排的公司和团队范围。",
     },
     {
       label: "岗位 JD",
@@ -706,7 +942,9 @@ function PositionAiReviewWorkspace({ onBack, onApply }) {
           <p>逐项查看建议及原内容；未选择的内容继续保留在本次处理记录中。</p>
         </div>
         <span>
-          <StatusBadge tone="warning">4 项建议待审核</StatusBadge>
+          <StatusBadge tone="warning">
+            {suggestions.length} 项建议待审核
+          </StatusBadge>
           <small>当前岗位资料 v3</small>
         </span>
       </header>
@@ -3079,6 +3317,7 @@ export function PositionDetailPage() {
   const notify = useToast();
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") || "profile";
+  const profileView = params.get("profile") || "information";
   const aiState = params.get("ai") || "idle";
   const aiPanel = params.get("panel") || "";
   const aiTimerRef = useRef(null);
@@ -3107,7 +3346,7 @@ export function PositionDetailPage() {
     setAiState("running");
     aiTimerRef.current = window.setTimeout(() => {
       updateQuery({ tab: "profile", ai: "review", panel: null, process: null });
-      notify("岗位 AI 解析完成，4 项建议等待审核", "info");
+      notify("岗位 AI 解析完成，6 项建议等待审核", "info");
     }, 4200);
   };
   useEffect(
@@ -3148,6 +3387,7 @@ export function PositionDetailPage() {
       : [buildPositionAiRecord("complete")]),
     buildPositionMatchingRecord(),
     buildRecommendationReportRecord(),
+    buildInterviewGuideRecord(),
   ];
   const selectedProcessId = params.get("process");
   const selectedProcessingRecord =
@@ -3211,7 +3451,13 @@ export function PositionDetailPage() {
         tabs={tabs}
         value={tab}
         onChange={(value) =>
-          updateQuery({ tab: value, panel: null, process: null })
+          updateQuery({
+            tab: value,
+            profile: null,
+            section: null,
+            panel: null,
+            process: null,
+          })
         }
       />
       {tab === "profile" && aiState === "review" && aiPanel === "review" ? (
@@ -3226,6 +3472,14 @@ export function PositionDetailPage() {
       {tab === "profile" && !(aiState === "review" && aiPanel === "review") ? (
         <PositionProfile
           detail={detail}
+          view={profileView}
+          onViewChange={(value) =>
+            updateQuery({
+              profile: value === "information" ? null : value,
+              panel: null,
+              process: null,
+            })
+          }
           aiState={aiState}
           aiRecord={aiRecord}
           onOpenAiSetup={() => setAiState("setup")}
@@ -3249,6 +3503,7 @@ export function PositionDetailPage() {
       {tab === "pipeline" ? <CandidatePipeline /> : null}
       {tab === "matching" ? <MatchingResults /> : null}
       {tab === "talent-map" ? <PositionTalentMap /> : null}
+      {tab === "interview" ? <PositionInterviewMaterials /> : null}
       {tab === "work" ? (
         <RelatedWork
           processingRecords={processingRecords}

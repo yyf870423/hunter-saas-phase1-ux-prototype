@@ -6,6 +6,904 @@
   margin: 0 auto;
 }
 
+/* Position interview knowledge and candidate-facing guide. */
+.s4-interview-materials {
+  --s4-interview-warning: color-mix(
+    in srgb,
+    var(--s1-warning) 86%,
+    var(--s1-ink)
+  );
+}
+
+.s4-interview-summary {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px 18px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+
+.s4-interview-summary > span,
+.s4-interview-summary > span > span,
+.s4-interview-summary dl,
+.s4-interview-summary dl > div {
+  display: flex;
+  align-items: center;
+}
+
+.s4-interview-summary > span {
+  min-width: 0;
+  gap: 12px;
+}
+
+.s4-interview-summary > span > i {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 7px;
+}
+
+.s4-interview-summary > span > i svg {
+  width: 18px;
+}
+
+.s4-interview-summary > span > span {
+  min-width: 0;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.s4-interview-summary small,
+.s4-interview-summary dt {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.s4-interview-summary b {
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s4-interview-summary dl {
+  flex: 0 0 auto;
+  gap: 0;
+  margin: 0;
+}
+
+.s4-interview-summary dl > div {
+  min-width: 116px;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 18px;
+  border-left: 1px solid var(--s1-line);
+}
+
+.s4-interview-summary dd {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 720;
+  line-height: 22px;
+}
+
+.s4-interview-summary dd.is-warning {
+  color: var(--s4-interview-warning);
+}
+
+.s4-interview-materials > .app-tabs {
+  margin-top: 2px;
+}
+
+.s4-interview-suggestion-list,
+.s4-interview-record-list,
+.s4-interview-history-list,
+.s4-interview-attachment-list {
+  display: grid;
+}
+
+.s4-interview-suggestion-list > button,
+.s4-interview-record-list > button,
+.s4-interview-history-list > button {
+  display: grid;
+  min-width: 0;
+  width: 100%;
+  align-items: center;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--s1-line);
+  cursor: pointer;
+}
+
+.s4-interview-suggestion-list > button:last-child,
+.s4-interview-record-list > button:last-child,
+.s4-interview-history-list > button:last-child {
+  border-bottom: 0;
+}
+
+.s4-interview-suggestion-list > button {
+  grid-template-columns: 38px minmax(0, 1fr) auto 16px;
+  gap: 12px;
+  padding: 13px 2px;
+}
+
+.s4-interview-suggestion-list > button:hover,
+.s4-interview-suggestion-list > button:focus-visible,
+.s4-interview-record-list > button:hover,
+.s4-interview-record-list > button:focus-visible,
+.s4-interview-history-list > button:hover,
+.s4-interview-history-list > button:focus-visible {
+  background: var(--s1-control-hover);
+  outline: 0;
+}
+
+.s4-interview-suggestion-list > button > i,
+.s4-interview-history-list > button > i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 6px;
+}
+
+.s4-interview-suggestion-list > button > i svg,
+.s4-interview-history-list > button > i svg {
+  width: 15px;
+}
+
+.s4-interview-suggestion-list span,
+.s4-interview-record-list span,
+.s4-interview-history-list span {
+  min-width: 0;
+}
+
+.s4-interview-suggestion-list b,
+.s4-interview-record-list b,
+.s4-interview-history-list b {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 19px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s4-interview-suggestion-list p,
+.s4-interview-record-list p {
+  display: -webkit-box;
+  margin: 4px 0;
+  overflow: hidden;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.s4-interview-suggestion-list small,
+.s4-interview-record-list small,
+.s4-interview-history-list small {
+  display: block;
+  overflow: hidden;
+  color: var(--s1-subtle);
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s4-interview-suggestion-list > button > svg,
+.s4-interview-record-list > button > svg,
+.s4-interview-history-list > button > svg {
+  width: 14px;
+  color: var(--s1-subtle);
+}
+
+.s4-interview-record-toolbar {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.s4-interview-record-toolbar .s1-search-field,
+.s4-interview-record-toolbar .s4-select {
+  min-width: 0;
+}
+.s4-interview-record-filters {
+  display: grid;
+  grid-template-columns: 150px 140px;
+  gap: 6px;
+}
+
+.s4-interview-record-list > button {
+  grid-template-columns: 96px minmax(0, 1fr) auto 16px;
+  gap: 14px;
+  padding: 14px 2px;
+}
+
+.s4-interview-record-list time {
+  align-self: start;
+  padding-top: 2px;
+  color: var(--s1-subtle);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.s4-interview-record-status {
+  display: flex;
+  max-width: 220px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.s4-interview-empty {
+  display: grid;
+  min-height: 210px;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  color: var(--s1-muted);
+  text-align: center;
+}
+
+.s4-interview-empty > svg {
+  width: 24px;
+  margin-bottom: 4px;
+  color: var(--s1-subtle);
+}
+
+.s4-interview-empty b {
+  color: var(--s1-ink);
+  font-size: 13px;
+}
+
+.s4-interview-empty p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.s4-interview-guide-actions,
+.s4-interview-guide-file > div,
+.s4-interview-review-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.s4-interview-guide-file {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+
+.s4-interview-guide-file.is-draft {
+  background: color-mix(in srgb, var(--s1-warning-soft) 48%, var(--s1-surface));
+  border-color: color-mix(in srgb, var(--s1-warning) 34%, var(--s1-line));
+}
+
+.s4-interview-guide-file > i {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+
+.s4-interview-guide-file > i svg {
+  width: 18px;
+}
+
+.s4-interview-guide-file > span {
+  min-width: 0;
+}
+
+.s4-interview-guide-file b,
+.s4-interview-guide-file small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s4-interview-guide-file b {
+  font-size: 13px;
+}
+
+.s4-interview-guide-file small {
+  margin-top: 5px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.s4-interview-guide-outline,
+.s4-interview-review-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 16px;
+  border-top: 1px solid var(--s1-line);
+}
+
+.s4-interview-guide-outline > section,
+.s4-interview-review-summary > span {
+  min-width: 0;
+  padding: 16px 18px 4px 0;
+}
+
+.s4-interview-guide-outline > section + section,
+.s4-interview-review-summary > span + span {
+  padding-left: 18px;
+  border-left: 1px solid var(--s1-line);
+}
+
+.s4-interview-guide-outline small,
+.s4-interview-guide-outline b,
+.s4-interview-guide-outline p,
+.s4-interview-review-summary b,
+.s4-interview-review-summary p {
+  display: block;
+}
+
+.s4-interview-guide-outline small {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.s4-interview-guide-outline b,
+.s4-interview-review-summary b {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.s4-interview-guide-outline p,
+.s4-interview-review-summary p {
+  margin: 4px 0 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.s4-interview-review-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.s4-interview-review-summary > span {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 8px;
+}
+
+.s4-interview-review-summary > span > svg {
+  width: 17px;
+  grid-row: span 2;
+  margin-top: 2px;
+  color: var(--s1-accent);
+}
+
+.s4-interview-review-summary b,
+.s4-interview-review-summary p {
+  grid-column: 2;
+}
+
+.s4-interview-review-actions {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.s4-interview-guide-document {
+  width: min(820px, 100%);
+  margin: 0 auto;
+  padding: 46px 54px 64px;
+  color: var(--s1-ink);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--s1-ink) 9%, transparent);
+}
+
+.s4-interview-guide-document > header {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--s1-line);
+}
+
+.s4-interview-guide-document small,
+.s4-interview-guide-document > header span {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.s4-interview-guide-document h2 {
+  margin: 8px 0;
+  font-size: 24px;
+  line-height: 34px;
+}
+
+.s4-interview-guide-document blockquote {
+  margin: 24px 0 28px;
+  padding: 12px 14px;
+  color: var(--s1-muted);
+  font-size: 13px;
+  line-height: 22px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.s4-interview-guide-document section {
+  margin-top: 26px;
+}
+
+.s4-interview-guide-document h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.s4-interview-guide-document ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.s4-interview-guide-document li {
+  padding-left: 2px;
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.s4-interview-review-drawer .s1-drawer-body,
+.s4-interview-record-drawer .s1-drawer-body,
+.s4-interview-history-drawer .s1-drawer-body {
+  padding: 0;
+}
+
+.s4-interview-review-drawer-body,
+.s4-interview-record-detail {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+}
+
+.s4-interview-review-drawer-body > header,
+.s4-interview-record-detail > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.s4-interview-review-drawer-body h3,
+.s4-interview-record-detail h3 {
+  margin: 5px 0 0;
+  font-size: 17px;
+  line-height: 24px;
+}
+
+.s4-interview-review-drawer-body header small,
+.s4-interview-record-detail header small {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.s4-interview-review-drawer-body dl,
+.s4-interview-record-detail dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.s4-interview-review-drawer-body dl > div,
+.s4-interview-record-detail dl > div {
+  min-width: 0;
+  padding: 12px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+
+.s4-interview-review-drawer-body dt,
+.s4-interview-record-detail dt {
+  margin-bottom: 6px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.s4-interview-review-drawer-body dd,
+.s4-interview-record-detail dd {
+  margin: 0;
+  font-size: 13px;
+}
+
+.s4-interview-review-drawer-body dd button,
+.s4-interview-record-detail dd button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  color: var(--s1-accent);
+  font: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.s4-interview-review-drawer-body dd button svg,
+.s4-interview-record-detail dd button svg {
+  width: 13px;
+}
+
+.s4-interview-review-drawer-body > section,
+.s4-interview-record-detail > section {
+  padding: 14px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+
+.s4-interview-review-drawer-body > section.is-proposed {
+  background: color-mix(in srgb, var(--s1-accent-soft) 52%, var(--s1-surface));
+  border-color: color-mix(in srgb, var(--s1-accent) 24%, var(--s1-line));
+}
+
+.s4-interview-review-drawer-body > section.is-excluded {
+  background: color-mix(in srgb, var(--s1-warning-soft) 50%, var(--s1-surface));
+  border-color: color-mix(in srgb, var(--s1-warning) 26%, var(--s1-line));
+}
+
+.s4-interview-review-drawer-body h4,
+.s4-interview-record-detail h4 {
+  margin: 0 0 7px;
+  font-size: 13px;
+}
+
+.s4-interview-review-drawer-body section p,
+.s4-interview-record-detail section p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.s4-interview-review-drawer-body > footer,
+.s4-interview-record-detail > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--s1-line);
+}
+
+.s4-interview-attachment-list {
+  gap: 7px;
+}
+
+.s4-interview-attachment-list > button {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 14px;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.s4-interview-attachment-list > button:hover {
+  border-color: color-mix(in srgb, var(--s1-accent) 34%, var(--s1-line));
+}
+
+.s4-interview-attachment-list svg {
+  width: 14px;
+  color: var(--s1-muted);
+}
+
+.s4-interview-record-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.s4-interview-privacy-note {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+
+.s4-interview-privacy-note > svg {
+  width: 17px;
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--s1-accent);
+}
+
+.s4-interview-privacy-note b {
+  font-size: 12px;
+}
+
+.s4-interview-privacy-note p {
+  margin: 4px 0 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.s4-interview-history-list {
+  padding: 8px 14px;
+}
+
+.s4-interview-history-list > button {
+  grid-template-columns: 36px minmax(0, 1fr) auto 14px;
+  gap: 10px;
+  padding: 13px 6px;
+}
+
+/* Recruitment opportunity contact-path handoff. */
+.s4-opportunity-contact-path {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 42px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.s4-opportunity-contact-path > i {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 7px;
+}
+
+.s4-opportunity-contact-path > i svg {
+  width: 18px;
+}
+
+.s4-opportunity-contact-path > span {
+  min-width: 0;
+}
+
+.s4-opportunity-contact-path b,
+.s4-opportunity-contact-path p,
+.s4-opportunity-contact-path small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s4-opportunity-contact-path b {
+  font-size: 13px;
+}
+
+.s4-opportunity-contact-path p {
+  margin: 4px 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.s4-opportunity-contact-path small {
+  color: var(--s1-subtle);
+  font-size: 12px;
+}
+
+.s4-opportunity-contact-path > div {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .s4-interview-summary {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .s4-interview-summary dl {
+    width: 100%;
+  }
+
+  .s4-interview-summary dl > div {
+    min-width: 0;
+    flex: 1 1 0;
+    align-items: flex-start;
+    padding: 0 12px;
+  }
+
+  .s4-interview-summary dl > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .s4-interview-record-toolbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .s4-interview-record-toolbar > .s1-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .s4-opportunity-contact-path {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+  }
+
+  .s4-opportunity-contact-path > div {
+    grid-column: 2 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .s4-interview-summary {
+    padding: 13px 14px;
+  }
+
+  .s4-interview-summary dl > div {
+    padding-inline: 8px;
+  }
+
+  .s4-interview-summary dt {
+    line-height: 16px;
+  }
+
+  .s4-interview-record-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .s4-interview-record-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .s4-interview-record-toolbar > .s1-button {
+    grid-column: auto;
+  }
+
+  .s4-interview-suggestion-list > button {
+    grid-template-columns: 34px minmax(0, 1fr) 14px;
+  }
+
+  .s4-interview-suggestion-list .s1-status {
+    display: none;
+  }
+
+  .s4-interview-record-list > button {
+    grid-template-columns: minmax(0, 1fr) 14px;
+    gap: 8px;
+    padding-block: 13px;
+  }
+
+  .s4-interview-record-list time {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .s4-interview-record-list > button > span:first-of-type {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .s4-interview-record-list > button > svg {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+
+  .s4-interview-record-status {
+    grid-column: 1;
+    grid-row: 3;
+    justify-content: flex-start;
+  }
+
+  .s4-interview-guide-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .s4-interview-guide-file {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .s4-interview-guide-file > i {
+    width: 38px;
+    height: 38px;
+  }
+
+  .s4-interview-guide-file > div {
+    grid-column: 1 / -1;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .s4-interview-guide-outline,
+  .s4-interview-review-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .s4-interview-guide-outline > section + section,
+  .s4-interview-review-summary > span + span {
+    padding-left: 0;
+    border-top: 1px solid var(--s1-line);
+    border-left: 0;
+  }
+
+  .s4-interview-guide-document {
+    padding: 28px 22px 40px;
+  }
+
+  .s4-interview-guide-document h2 {
+    font-size: 20px;
+    line-height: 29px;
+  }
+
+  .s4-interview-review-drawer-body dl,
+  .s4-interview-record-detail dl,
+  .s4-interview-record-form {
+    grid-template-columns: 1fr;
+  }
+
+  .s4-interview-record-form .s4-form-span-2 {
+    grid-column: auto;
+  }
+
+  .s4-opportunity-contact-path {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .s4-opportunity-contact-path > i {
+    width: 38px;
+    height: 38px;
+  }
+
+  .s4-opportunity-contact-path > .s1-status,
+  .s4-opportunity-contact-path > div {
+    grid-column: 1 / -1;
+  }
+
+  .s4-opportunity-contact-path > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
 /* Topic graph: multi-page canvas, hierarchy table, review and asset AI workspace. */
 .tg-list-page,
 .tg-detail-page,
@@ -7480,6 +8378,308 @@
   font-size: 13px;
   line-height: 21px;
 }
+.s4-recruitment-strategy-summary {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s4-recruitment-strategy-summary > section {
+  padding: 14px 16px;
+  background: var(--s1-warning-soft);
+  border: 1px solid color-mix(in srgb, var(--s1-warning) 24%, var(--s1-line));
+  border-radius: 7px;
+}
+.s4-recruitment-strategy-summary > section > span {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 3px 10px;
+}
+.s4-recruitment-strategy-summary > section small {
+  grid-column: 1 / -1;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s4-recruitment-strategy-summary > section b {
+  color: var(--s1-ink);
+  font-size: 20px;
+}
+.s4-recruitment-strategy-summary > section em {
+  color: var(--s1-warning);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+.s4-recruitment-strategy-summary > section > div {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 3px;
+  margin-top: 13px;
+}
+.s4-recruitment-strategy-summary > section > div i {
+  height: 5px;
+  background: color-mix(in srgb, var(--s1-warning) 14%, var(--s1-surface));
+  border-radius: 2px;
+}
+.s4-recruitment-strategy-summary > section > div i.is-active {
+  background: var(--s1-warning);
+}
+.s4-recruitment-strategy-summary > article {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+}
+.s4-recruitment-strategy-summary > article > b {
+  font-size: 12px;
+}
+.s4-recruitment-strategy-summary > article > p {
+  margin: 5px 0 10px;
+  color: var(--s1-muted);
+  font-size: 13px;
+  line-height: 21px;
+}
+.s4-recruitment-strategy-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.s4-recruitment-strategy-steps li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  padding: 17px 18px 17px 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s4-recruitment-strategy-steps li:nth-child(odd) {
+  padding-right: 22px;
+  border-right: 1px solid var(--s1-line);
+}
+.s4-recruitment-strategy-steps li:nth-child(even) {
+  padding-left: 22px;
+}
+.s4-recruitment-strategy-steps li:nth-last-child(-n + 2) {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.s4-recruitment-strategy-steps li > em {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  color: var(--s1-accent);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 750;
+  background: var(--s1-accent-soft);
+  border-radius: 50%;
+}
+.s4-recruitment-strategy-steps li > span {
+  min-width: 0;
+}
+.s4-recruitment-strategy-steps small,
+.s4-recruitment-strategy-steps b {
+  display: block;
+}
+.s4-recruitment-strategy-steps small {
+  margin-bottom: 3px;
+  color: var(--s1-accent);
+  font-size: 11px;
+  font-weight: 650;
+}
+.s4-recruitment-strategy-steps b {
+  font-size: 13px;
+}
+.s4-recruitment-strategy-steps p {
+  margin: 4px 0 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.s4-target-company-list {
+  display: grid;
+}
+.s4-target-company-list > button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 200px minmax(0, 1fr) 96px 16px;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 2px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--s1-line);
+  cursor: pointer;
+}
+.s4-target-company-list > button:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.s4-target-company-list > button:last-child {
+  padding-bottom: 0;
+}
+.s4-target-company-list > button:hover .s4-target-company-name b,
+.s4-target-company-list > button:focus-visible .s4-target-company-name b {
+  color: var(--s1-accent);
+}
+.s4-target-company-name,
+.s4-target-company-priority {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+.s4-target-company-name b {
+  font-size: 13px;
+}
+.s4-target-company-name small,
+.s4-target-company-priority small {
+  overflow: hidden;
+  color: var(--s1-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s4-target-company-signal {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+}
+.s4-target-company-signal p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.s4-target-company-priority {
+  justify-items: start;
+}
+.s4-target-company-list > button > svg {
+  width: 14px;
+  color: var(--s1-subtle);
+}
+.s4-target-company-drawer .s1-drawer-body {
+  padding: 0;
+}
+.s4-target-company-detail {
+  display: grid;
+}
+.s4-target-company-detail > header,
+.s4-target-company-detail > section,
+.s4-target-company-detail > footer,
+.s4-target-company-detail > dl {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s4-target-company-detail > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.s4-target-company-detail > header small,
+.s4-target-company-detail > header h3 {
+  display: block;
+  margin: 0;
+}
+.s4-target-company-detail > header small,
+.s4-target-company-detail dt {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s4-target-company-detail > header h3 {
+  margin-top: 3px;
+  font-size: 18px;
+}
+.s4-target-company-detail > dl {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 18px;
+  margin: 0;
+}
+.s4-target-company-detail dt,
+.s4-target-company-detail dd {
+  margin: 0;
+}
+.s4-target-company-detail dd {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 19px;
+}
+.s4-target-company-detail h4 {
+  margin: 0 0 7px;
+  font-size: 12px;
+}
+.s4-target-company-detail section > p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 13px;
+  line-height: 21px;
+}
+.s4-target-company-evidence {
+  display: grid;
+  gap: 7px;
+}
+.s4-target-company-evidence > button {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 14px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 11px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.s4-target-company-evidence svg {
+  width: 14px;
+  color: var(--s1-muted);
+}
+.s4-target-company-detail > footer {
+  display: flex;
+  justify-content: flex-end;
+  border-bottom: 0;
+}
+@media (max-width: 900px) {
+  .s4-target-company-list > button {
+    grid-template-columns: 170px minmax(0, 1fr) 88px 14px;
+    gap: 12px;
+  }
+}
+@media (max-width: 720px) {
+  .s4-target-company-list > button {
+    grid-template-columns: minmax(0, 1fr) auto 14px;
+    gap: 8px;
+  }
+  .s4-target-company-signal {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+  .s4-target-company-priority {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .s4-target-company-list > button > svg {
+    grid-row: 1;
+    grid-column: 3;
+  }
+  .s4-target-company-detail > dl {
+    grid-template-columns: 1fr;
+  }
+}
 .s4-keyword-groups {
   display: flex;
   flex-wrap: wrap;
@@ -11332,6 +12532,21 @@
   .s4-analysis-list article {
     grid-template-columns: 1fr;
     gap: 5px;
+  }
+  .s4-recruitment-strategy-summary,
+  .s4-recruitment-strategy-steps {
+    grid-template-columns: 1fr;
+  }
+  .s4-recruitment-strategy-steps li,
+  .s4-recruitment-strategy-steps li:nth-child(odd),
+  .s4-recruitment-strategy-steps li:nth-child(even) {
+    padding: 14px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--s1-line);
+  }
+  .s4-recruitment-strategy-steps li:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
   }
   .s4-position-analysis-editor {
     grid-template-columns: 1fr;
