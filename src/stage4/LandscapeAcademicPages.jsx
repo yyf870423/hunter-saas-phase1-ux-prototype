@@ -43,10 +43,10 @@ export function MappingsListPage() {
   return (
     <div className="s4-page">
       <AssetPageHeader
-        title="人才版图"
+        title="知识图谱"
         description="围绕一个摸排目标组织公司、组织、方向、人物和关系。"
         count={controller.filtered.length}
-        primaryLabel="新建人才版图"
+        primaryLabel="新建知识图谱"
         onPrimary={() => navigate("/mappings/new")}
       />
       <FilterBar
@@ -64,7 +64,7 @@ export function MappingsListPage() {
                   <Icon name="route" />
                 </i>
                 <span>
-                  <small>人才版图</small>
+                  <small>知识图谱</small>
                   <h2>{item.name}</h2>
                 </span>
                 <button
@@ -146,14 +146,14 @@ export function MappingsListPage() {
       ) : (
         <div className="s4-custom-empty">
           <Icon name="route" />
-          <b>还没有人才版图</b>
+          <b>还没有知识图谱</b>
           <p>说明一个摸排目标，或导入已有的人才地图文件。</p>
           <Button
             tone="primary"
             icon="plus"
             onClick={() => navigate("/mappings/new")}
           >
-            新建人才版图
+            新建知识图谱
           </Button>
         </div>
       )}
@@ -776,7 +776,7 @@ function LandscapeBusiness() {
         close={() => setEditOpen(false)}
         size="lg"
         title="编辑相关业务"
-        description="这里只维护人才版图与现有业务资产的关联，不复制岗位或任务。"
+        description="这里只维护知识图谱与现有业务资产的关联，不复制岗位或任务。"
         footer={
           <>
             <Button onClick={() => setEditOpen(false)}>取消</Button>
@@ -845,7 +845,7 @@ function MappingEditModal({ open, profile, close, onSave }) {
       open={open}
       close={close}
       size="lg"
-      title="编辑人才版图"
+      title="编辑知识图谱"
       description="调整版图名称、摸排范围和完成标准；已有关系和审核记录不会被删除。"
       footer={
         <>
@@ -918,7 +918,7 @@ export function MappingDetailPage() {
   }));
   if (!item)
     return (
-      <NotFoundState label="人才版图" onBack={() => navigate("/mappings")} />
+      <NotFoundState label="知识图谱" onBack={() => navigate("/mappings")} />
     );
   return (
     <div className="s4-detail-page s4-mapping-detail">
@@ -961,18 +961,18 @@ export function MappingDetailPage() {
         onSave={(next) => {
           setProfile(next);
           setEditOpen(false);
-          notify("人才版图资料已更新");
+          notify("知识图谱资料已更新");
         }}
       />
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
-        assetLabel="人才版图"
+        assetLabel="知识图谱"
         assetName={item.name}
         impact="版图中引用的公司、候选人、联系人、论文和专利不会删除；共享资产保留。"
         onConfirm={() => {
           setDeleteOpen(false);
-          notify("人才版图已进入回收站");
+          notify("知识图谱已进入回收站");
           navigate("/mappings");
         }}
       />
@@ -991,8 +991,8 @@ export function MappingCreatePage() {
   return (
     <div className="s4-create-page">
       <AssetPageHeader
-        eyebrow="人才版图"
-        title="新建人才版图"
+        eyebrow="知识图谱"
+        title="新建知识图谱"
         description="说明摸排目标和已知范围，或导入现有人才地图文件。"
         actions={<Button onClick={() => navigate("/mappings")}>取消</Button>}
       />
@@ -1036,7 +1036,7 @@ export function MappingCreatePage() {
                     const fileNames = attachedFiles
                       .map((file) => file.name)
                       .join("、");
-                    const prompt = text || `根据附件 ${fileNames} 新建人才版图`;
+                    const prompt = text || `根据附件 ${fileNames} 新建知识图谱`;
                     navigate(`/new?prompt=${encodeURIComponent(prompt)}`);
                   }}
                   authMode={authMode}
@@ -1054,7 +1054,7 @@ export function MappingCreatePage() {
           ) : mode === "file" ? (
             <>
               <header>
-                <h2>导入人才版图</h2>
+                <h2>导入知识图谱</h2>
                 <p>文件先做格式校验和重名判断，不会创建新的地图容器。</p>
               </header>
               <FileDrop
@@ -1093,7 +1093,7 @@ export function MappingCreatePage() {
                 <Button
                   tone="primary"
                   onClick={() => {
-                    notify("人才版图已创建");
+                    notify("知识图谱已创建");
                     navigate("/mappings/mapping-embodied");
                   }}
                 >
@@ -1306,8 +1306,8 @@ function AcademicCardList({ kind }) {
           <span>
             已选 {selected.size} 篇{label}
           </span>
-          <Button size="sm" onClick={() => notify("已加入人才版图")}>
-            加入人才版图
+          <Button size="sm" onClick={() => notify("已加入知识图谱")}>
+            加入知识图谱
           </Button>
           <Button
             size="sm"

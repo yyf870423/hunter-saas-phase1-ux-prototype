@@ -31,7 +31,7 @@ test("右上角手动新建资产先选择类型再进入对应页面", async ({
     page.getByRole("button", { name: "候选人 录入候选人或上传简历" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "人才版图 建立人才摸排目标和范围" }),
+    page.getByRole("button", { name: "知识图谱 创建可持续维护的关系图谱" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "联系人 记录联系人身份与公司关系" })

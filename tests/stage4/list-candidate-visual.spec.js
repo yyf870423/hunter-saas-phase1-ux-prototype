@@ -19,7 +19,7 @@ const listPages = [
   ["companies", "公司"],
   ["contacts", "联系人"],
   ["opportunities", "招聘机会"],
-  ["mappings", "人才版图"],
+  ["mappings", "知识图谱"],
   ["papers", "论文"],
   ["patents", "专利"],
   ["data/imports", "数据导入"],

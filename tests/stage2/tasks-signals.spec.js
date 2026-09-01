@@ -192,7 +192,7 @@ test("推荐报告资产 AI 处理按对话过程保留每次生成的文件", a
 test("统一新建入口可进入有限范围任务或直接完成", async ({ page }) => {
   await page.goto("#/new");
   const input = page.getByPlaceholder(/例如：为星澜机器人/);
-  await input.fill("核验人才版图中的两位周明远是不是同一个人");
+  await input.fill("核验知识图谱中的两位周明远是不是同一个人");
   await input.press("Enter");
   await expect(page.getByText(/范围有限、交付明确的核验任务/)).toBeVisible();
   await expect(page).toHaveURL(/#\/tasks\/task-hand-team$/, {
@@ -227,8 +227,8 @@ test("统一新建入口覆盖歧义、自由补充和权限受限", async ({ pa
   await expect(page.getByText("当前工作空间不能创建新任务")).toBeVisible();
   await expect(page.locator(".s2-composer textarea")).toBeDisabled();
 
-  await page.goto("#/works");
-  await expect(page).toHaveURL(/#\/review$/);
+  await page.goto("#/tasks");
+  await expect(page).toHaveURL(/#\/tasks$/);
 });
 
 test("新建任务和有限范围任务的普通回复统一由动态 Markdown 渲染", async ({

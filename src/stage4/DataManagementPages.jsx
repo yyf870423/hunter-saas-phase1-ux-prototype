@@ -50,7 +50,7 @@ export function ImportsPage() {
   const [step, setStep] = useState("file");
   const [type, setType] = useState(
     params.get("type") === "mappings" || params.get("type") === "mapping"
-      ? "人才版图"
+      ? "知识图谱"
       : params.get("type") === "papers"
         ? "论文"
         : params.get("type") === "patents"
@@ -88,7 +88,7 @@ export function ImportsPage() {
       setStep(
         files[0]?.name?.includes("错误")
           ? "error"
-          : type === "人才版图"
+          : type === "知识图谱"
             ? "duplicate"
             : "confirm",
       );
@@ -180,7 +180,7 @@ export function ImportsPage() {
             : step === "confirm"
               ? "确认导入结果"
               : step === "duplicate"
-                ? "发现同名人才版图"
+                ? "发现同名知识图谱"
                 : step === "error"
                   ? "文件格式校验失败"
                   : "导入任务已创建"
@@ -191,7 +191,7 @@ export function ImportsPage() {
             : step === "confirm"
               ? "本次解析发现新建、补充、待确认和失败结果"
               : step === "duplicate"
-                ? "“具身智能 VLA 核心人才版图”已存在于当前工作空间"
+                ? "“具身智能 VLA 核心知识图谱”已存在于当前工作空间"
                 : step === "error"
                   ? "未通过格式校验的文件不能进入长时间解析"
                   : "可以关闭窗口，任务会继续在后台运行"
@@ -250,7 +250,7 @@ export function ImportsPage() {
                   "岗位",
                   "联系人",
                   "招聘机会",
-                  "人才版图",
+                  "知识图谱",
                   "论文",
                   "专利",
                 ]}
@@ -261,13 +261,13 @@ export function ImportsPage() {
               files={files}
               onFiles={setFiles}
               accept={
-                type === "人才版图"
+                type === "知识图谱"
                   ? "XLSX、MM、FreeMind"
                   : type === "候选人"
                     ? "PDF、DOCX、ZIP、XLSX"
                     : "PDF、DOCX、XLSX"
               }
-              multiple={type !== "人才版图"}
+              multiple={type !== "知识图谱"}
             />
             <a
               href="#sample"
@@ -336,13 +336,13 @@ export function ImportsPage() {
             <div>
               <article>
                 <small>待导入</small>
-                <b>具身智能 VLA 核心人才版图</b>
+                <b>具身智能 VLA 核心知识图谱</b>
                 <p>37 位人物 · 64 条关系</p>
               </article>
               <Icon name="refresh" />
               <article>
                 <small>当前版图</small>
-                <b>具身智能 VLA 核心人才版图</b>
+                <b>具身智能 VLA 核心知识图谱</b>
                 <p>35 位人物 · 58 条关系</p>
               </article>
             </div>
@@ -355,7 +355,7 @@ export function ImportsPage() {
             <CustomRadio
               checked={duplicateChoice === "keep"}
               label="保留两张版图"
-              description="导入版图命名为“具身智能 VLA 核心人才版图（2）”"
+              description="导入版图命名为“具身智能 VLA 核心知识图谱（2）”"
               onChange={() => setDuplicateChoice("keep")}
             />
           </div>
@@ -368,7 +368,7 @@ export function ImportsPage() {
               第 3
               行直接出现“三级节点”，但对应的“二级节点”为空。请补齐上级节点后重新导入。
             </p>
-            <code>工作表：人才版图 · 单元格 C3</code>
+            <code>工作表：知识图谱 · 单元格 C3</code>
           </div>
         ) : null}
         {step === "success" ? (
@@ -535,7 +535,7 @@ export function ExportsPage() {
                 "岗位",
                 "联系人",
                 "招聘机会",
-                "人才版图",
+                "知识图谱",
                 "论文",
                 "专利",
               ]}
@@ -611,7 +611,7 @@ export function RecycleBinPage() {
               "岗位",
               "联系人",
               "招聘机会",
-              "人才版图",
+              "知识图谱",
               "论文",
               "专利",
             ],

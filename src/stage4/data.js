@@ -818,8 +818,8 @@ export const opportunities = [
 export const landscapes = [
   {
     id: "mapping-embodied",
-    name: "具身智能 VLA 核心人才版图",
-    goal: "摸清国内具身智能 VLA、机器人学习与真机数据闭环团队的组织结构、技术方向和关键人才，补齐负责人、核心骨干、上下游协作关系及近期流动信号，为岗位寻访和后续持续跟踪提供可复用的人才版图。",
+    name: "具身智能 VLA 核心知识图谱",
+    goal: "摸清国内具身智能 VLA、机器人学习与真机数据闭环团队的组织结构、技术方向和关键人才，补齐负责人、核心骨干、上下游协作关系及近期流动信号，为岗位寻访和后续持续跟踪提供可复用的知识图谱。",
     companies: 8,
     organizations: 19,
     people: 37,
@@ -829,7 +829,7 @@ export const landscapes = [
   },
   {
     id: "mapping-hand",
-    name: "灵巧手结构与驱动人才版图",
+    name: "灵巧手结构与驱动知识图谱",
     goal: "覆盖灵巧手结构、传动、驱动和量产方向",
     companies: 11,
     organizations: 22,
@@ -840,7 +840,7 @@ export const landscapes = [
   },
   {
     id: "mapping-autodrive",
-    name: "自动驾驶决策算法人才版图",
+    name: "自动驾驶决策算法知识图谱",
     goal: "梳理决策规划团队和可迁移到具身智能的人才",
     companies: 14,
     organizations: 31,
@@ -1189,8 +1189,8 @@ export const importTasks = [
   },
   {
     id: "import-mapping",
-    name: "灵巧手人才版图导入",
-    type: "人才版图",
+    name: "灵巧手知识图谱导入",
+    type: "知识图谱",
     file: "灵巧手人才图谱.xlsx",
     progress: 0,
     result: "第 3 行组织层级不连续",
@@ -1211,7 +1211,7 @@ export const exportTasks = [
   },
   {
     id: "export-mapping",
-    name: "具身智能 VLA 核心人才版图",
+    name: "具身智能 VLA 核心知识图谱",
     scope: "当前版图 · 37 人 · 64 条关系",
     format: "Excel",
     status: "可下载",
@@ -1261,8 +1261,8 @@ export const assetMeta = {
     route: "/opportunities",
   },
   mappings: {
-    label: "人才版图",
-    singular: "人才版图",
+    label: "知识图谱",
+    singular: "知识图谱",
     icon: "route",
     route: "/mappings",
   },
