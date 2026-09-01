@@ -338,6 +338,86 @@ export function SelectMenu({
   );
 }
 
+export function PostWriteMatchingOptions({
+  entityType,
+  enabled,
+  onEnabledChange,
+  scope = "all",
+  onScopeChange,
+  selectedPositions = [],
+  onSelectedPositionsChange,
+  error = "",
+}) {
+  const isCandidate = entityType === "candidate";
+  const positionOptions = [
+    "具身智能 VLA 算法负责人 · 星澜机器人",
+    "机器人数据平台负责人 · 拓界机器人",
+    "强化学习算法专家 · 灵跃科技",
+    "具身算法平台总监 · 穹顶智能",
+  ];
+  return (
+    <section
+      className={`s4-post-write-matching ${enabled ? "is-enabled" : ""}`}
+    >
+      <div className="s4-post-write-matching-switch">
+        <CustomCheckbox
+          checked={enabled}
+          onChange={onEnabledChange}
+          label={isCandidate ? "写入后立即人岗匹配" : "创建后立即人岗匹配"}
+        />
+        <p>
+          {isCandidate
+            ? "完成身份判断、查重和正式写入后，再对成功写入的候选人运行匹配。"
+            : "岗位创建成功后，使用确认版本与系统内可用候选人运行一次匹配。"}
+        </p>
+      </div>
+      {enabled && isCandidate ? (
+        <div className="s4-post-write-matching-options">
+          <span>匹配范围</span>
+          <div role="radiogroup" aria-label="候选人匹配岗位范围">
+            <CustomRadio
+              checked={scope === "all"}
+              onChange={() => onScopeChange?.("all")}
+              label="全部招聘中岗位"
+              description="对当前工作空间中 8 个招聘中岗位运行匹配。"
+            />
+            <CustomRadio
+              checked={scope === "selected"}
+              onChange={() => onScopeChange?.("selected")}
+              label="指定岗位"
+              description="只匹配本次选择的一个或多个岗位。"
+            />
+          </div>
+          {scope === "selected" ? (
+            <div className="s4-post-write-position-select">
+              <SelectMenu
+                label="选择岗位"
+                value={selectedPositions}
+                options={positionOptions}
+                multiple
+                searchable
+                onChange={onSelectedPositionsChange}
+              />
+              {error ? <b role="alert">{error}</b> : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      {enabled && !isCandidate ? (
+        <div className="s4-post-write-matching-summary">
+          <Icon name="users" />
+          <span>
+            <b>匹配系统内可用候选人</b>
+            <small>
+              不匹配人物线索、已删除候选人或资料不足以完成判断的人选。
+            </small>
+          </span>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 const monthLabels = [
   "1 月",
   "2 月",

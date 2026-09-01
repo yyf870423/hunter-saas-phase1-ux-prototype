@@ -203,6 +203,7 @@ export function AutomationWorkspace() {
     if (forcedState === "candidate-reply") return "reply";
     return sessionStorage.getItem("hunter-workstream-contact-stage") || "idle";
   });
+  const [ingestionDecision, setIngestionDecision] = useState("");
   const [localError, setLocalError] = useState(forcedState === "error");
   const scrollRef = useRef(null);
   const prompt =
@@ -220,6 +221,8 @@ export function AutomationWorkspace() {
       setStreamError(false);
       setStreamStopped(false);
     } else if (forcedState === "resume-batch") {
+      setPhase(3);
+    } else if (forcedState === "candidate-ingestion") {
       setPhase(3);
     } else if (forcedState === "merge-conflict") {
       setPhase(4);
@@ -543,16 +546,20 @@ export function AutomationWorkspace() {
           status={
             contactStage === "waiting"
               ? "等待外部"
-              : phase < 4
-                ? "推进中"
-                : "等待用户"
+              : forcedState === "candidate-ingestion" && !ingestionDecision
+                ? "等待用户"
+                : phase < 4
+                  ? "推进中"
+                  : "等待用户"
           }
           statusTone={
             contactStage === "waiting"
               ? "neutral"
-              : phase < 4
-                ? "info"
-                : "warning"
+              : forcedState === "candidate-ingestion" && !ingestionDecision
+                ? "warning"
+                : phase < 4
+                  ? "info"
+                  : "warning"
           }
           paused={paused}
           terminated={terminated}
@@ -707,6 +714,68 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
                   </p>
                 ) : null}
               </HunterReply>
+            ) : null}
+            {forcedState === "candidate-ingestion" && !ingestionDecision ? (
+              <HunterReply
+                markdown={`## 12 份简历已经完成身份判断
+
+本批资料将新建 9 位候选人、补充 2 位已有候选人，另有 1 位需要先完成人工身份确认。匹配只会在正式写入成功后启动；待确认记录不会进入匹配。`}
+              >
+                <DecisionRequest
+                  title="候选人写入后是否立即进行人岗匹配？"
+                  description="请选择本批成功写入候选人的后续处理方式。"
+                  options={[
+                    {
+                      value: "all",
+                      label: "写入并匹配全部招聘中岗位",
+                      description:
+                        "对当前工作空间中的 8 个招聘中岗位运行匹配。",
+                    },
+                    {
+                      value: "selected",
+                      label: "写入并匹配指定岗位",
+                      description:
+                        "先匹配当前的具身智能 VLA 算法负责人岗位，可继续输入其他岗位。",
+                    },
+                    {
+                      value: "write-only",
+                      label: "仅写入候选人",
+                      description: "完成新建或资料合并，不启动岗位匹配。",
+                    },
+                    {
+                      value: "custom",
+                      label: "我来补充其他要求",
+                      description:
+                        "在下方输入岗位范围、例外人选或其他处理要求。",
+                    },
+                  ]}
+                  onSelect={(option) => {
+                    if (option.value === "custom") {
+                      setComposer("写入候选人后，请按以下范围匹配：");
+                      return;
+                    }
+                    setIngestionDecision(option.value);
+                  }}
+                />
+              </HunterReply>
+            ) : null}
+            {forcedState === "candidate-ingestion" && ingestionDecision ? (
+              <div className="s2-decision-thread">
+                <UserMessage time="刚刚">
+                  {ingestionDecision === "all"
+                    ? "写入后匹配全部招聘中岗位。"
+                    : ingestionDecision === "selected"
+                      ? "写入后先匹配具身智能 VLA 算法负责人岗位。"
+                      : "本批只写入候选人，暂不匹配岗位。"}
+                </UserMessage>
+                <HunterReply
+                  markdown={
+                    ingestionDecision === "write-only"
+                      ? "已确认。本批会先完成身份审核和正式写入，不启动人岗匹配；之后仍可从候选人详情发起。"
+                      : `已确认。我会先完成身份审核和正式写入，再对成功写入的 11 位候选人启动匹配。身份待确认的 1 位候选人不会提前进入匹配。\n\n> 匹配失败不会回滚已经写入的候选人资料，可以从候选人详情的 AI 处理记录单独重试。`
+                  }
+                />
+              </div>
             ) : null}
             {phase >= 4 && forcedState !== "no-candidate" ? (
               <HunterReply

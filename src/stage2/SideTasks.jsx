@@ -18,6 +18,7 @@ import {
 import { SelectMenu } from "../stage4/asset-ui";
 import {
   Composer,
+  DecisionRequest,
   HunterReply,
   PlanList,
   PlanUpdate,
@@ -303,10 +304,155 @@ const taskPlan = [
 export function SideTaskDetail({ taskId: taskIdOverride }) {
   const { taskId: routeTaskId, workstreamId } = useParams();
   const taskId = taskIdOverride || routeTaskId || workstreamId;
-  return taskId === "task-interview-summary" ? (
+  return taskId === "task-create-position" ? (
+    <PositionCreationTask taskId={taskId} />
+  ) : taskId === "task-interview-summary" ? (
     <OneStepSummaryTask taskId={taskId} />
   ) : (
     <IdentityReviewTask taskId={taskId || "task-hand-team"} />
+  );
+}
+
+function PositionCreationTask({ taskId }) {
+  const navigate = useNavigate();
+  const notify = useToast();
+  const [decision, setDecision] = useState("");
+  const [composer, setComposer] = useState("");
+  const [attachments, setAttachments] = useState([]);
+  const [authMode, setAuthMode] = useState("confirm");
+  const applyDecision = (next) => {
+    setDecision(next);
+    notify(
+      next === "match"
+        ? "岗位创建后将立即启动人岗匹配"
+        : "岗位将创建，暂不启动人岗匹配",
+      "success",
+    );
+  };
+  return (
+    <TaskWorkspaceShell currentId={taskId}>
+      <header className="s2-detail-header">
+        <button type="button" onClick={() => navigate("/tasks")}>
+          <Icon name="chevronLeft" />
+          返回全部任务
+        </button>
+        <div>
+          <small>岗位创建</small>
+          <h1>创建具身智能 VLA 算法负责人岗位</h1>
+          <p>来源：新建岗位 · AI 解析 JD</p>
+        </div>
+        <div>
+          <StatusBadge tone={decision ? "info" : "warning"}>
+            {decision ? "正在写入" : "等待用户"}
+          </StatusBadge>
+        </div>
+      </header>
+      <div className="s2-task-detail-layout">
+        <section className="s2-task-conversation">
+          <div className="s2-task-timeline">
+            <UserMessage time="今天 10:12">
+              {sessionStorage.getItem("hunter-new-task-prompt") ||
+                "我们想找一个做 VLA 的算法负责人，要做过真实机器人部署，最好带过 8 人以上团队，Base 北京。"}
+            </UserMessage>
+            <HunterReply
+              markdown={`我已经整理出可写入的岗位资料，并完成公司关系、岗位要求和招聘分析检查。
+
+## 岗位摘要
+
+- **岗位名称：** 具身智能 VLA 算法负责人
+- **招聘公司：** 星澜机器人
+- **工作地点：** 北京
+- **关键要求：** VLA、真机部署、8 人以上团队管理
+- **招聘判断：** 中高难度，建议先匹配系统候选人，再结合知识图谱和公开资料持续找人
+
+岗位资料写入后可以立即与系统候选人运行一次人岗匹配。匹配失败不会回滚岗位创建。`}
+            />
+            {!decision ? (
+              <HunterReply>
+                <DecisionRequest
+                  title="创建岗位后是否立即进行人岗匹配？"
+                  description="请选择岗位正式写入后的下一步。"
+                  options={[
+                    {
+                      value: "match",
+                      label: "创建岗位并立即人岗匹配",
+                      description: "使用确认后的岗位版本匹配系统内可用候选人。",
+                    },
+                    {
+                      value: "create-only",
+                      label: "仅创建岗位",
+                      description: "保存岗位资料，之后再从岗位详情发起匹配。",
+                    },
+                    {
+                      value: "custom",
+                      label: "我来补充其他要求",
+                      description:
+                        "在下方输入需要调整的岗位信息或后续处理方式。",
+                    },
+                  ]}
+                  onSelect={(option) => {
+                    if (option.value === "custom") {
+                      setComposer("创建岗位前，请再调整：");
+                      return;
+                    }
+                    applyDecision(option.value);
+                  }}
+                />
+              </HunterReply>
+            ) : null}
+            {decision ? (
+              <div className="s2-decision-thread">
+                <UserMessage time="刚刚">
+                  {decision === "match"
+                    ? "创建岗位并立即做人岗匹配。"
+                    : "仅创建岗位，暂不匹配。"}
+                </UserMessage>
+                <HunterReply
+                  markdown={
+                    decision === "match"
+                      ? "岗位已经创建，系统正在对 128 位可用候选人运行人岗匹配。你可以继续对话，也可以进入岗位匹配结果查看进度。"
+                      : "岗位已经创建，当前没有启动匹配。之后可以从岗位详情的“人岗匹配”入口运行。"
+                  }
+                >
+                  <div className="s2-markdown-action-row">
+                    <Button
+                      tone="primary"
+                      onClick={() =>
+                        navigate(
+                          decision === "match"
+                            ? "/positions/position-vla?tab=matching&state=running"
+                            : "/positions/position-vla",
+                        )
+                      }
+                    >
+                      打开岗位详情
+                    </Button>
+                  </div>
+                </HunterReply>
+              </div>
+            ) : null}
+          </div>
+          <div className="s2-task-composer-dock">
+            <Composer
+              value={composer}
+              onChange={setComposer}
+              onSend={(text) => {
+                if (!text.trim()) return;
+                setDecision("create-only");
+                setComposer("");
+                setAttachments([]);
+                notify("补充要求已记录，岗位资料将重新检查", "info");
+              }}
+              authMode={authMode}
+              onAuthChange={setAuthMode}
+              attachments={attachments}
+              onAttachmentsChange={setAttachments}
+              placeholder="补充岗位信息或说明创建后的处理方式"
+            />
+          </div>
+        </section>
+      </div>
+    </TaskWorkspaceShell>
   );
 }
 

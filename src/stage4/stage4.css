@@ -4271,6 +4271,58 @@
   border-bottom: 1px solid var(--s1-line);
 }
 
+.s4-employment-relations-filters {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+.s4-employment-relations-filters .s4-inline-search {
+  width: min(330px, 30vw);
+}
+.s4-employment-relation-filter,
+.s4-employment-company-filter {
+  width: 132px;
+  flex: 0 0 132px;
+}
+.s4-employment-relation-filter > button,
+.s4-employment-company-filter > button {
+  width: 100%;
+  max-width: none;
+}
+.s4-employment-relations table {
+  min-width: 1180px;
+}
+.s4-employment-relations th:nth-child(1) {
+  width: 120px;
+}
+.s4-employment-relations th:nth-child(2) {
+  width: 125px;
+}
+.s4-employment-relations th:nth-child(3) {
+  width: 245px;
+}
+.s4-employment-relations th:nth-child(4) {
+  width: 140px;
+}
+.s4-employment-relations th:nth-child(5) {
+  width: 210px;
+}
+.s4-employment-relations th:nth-child(6) {
+  width: 120px;
+}
+.s4-employment-relations th:nth-child(7) {
+  width: 110px;
+}
+.s4-employment-relations td:nth-child(3) b,
+.s4-employment-relations td:nth-child(3) small {
+  display: block;
+}
+.s4-employment-relations td:nth-child(3) small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+}
+
 .s4-table-count {
   flex: 0 0 auto;
   color: var(--s1-muted);
@@ -7536,6 +7588,113 @@
   color: var(--s1-success);
 }
 
+.s4-post-write-matching {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 14px 15px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+.s4-post-write-matching.is-enabled {
+  background: color-mix(in srgb, var(--s1-accent-soft) 46%, var(--s1-surface));
+  border-color: color-mix(in srgb, var(--s1-accent) 22%, var(--s1-line));
+}
+.s4-post-write-matching-switch {
+  display: grid;
+  gap: 6px;
+}
+.s4-post-write-matching-switch .s4-checkbox {
+  justify-self: start;
+}
+.s4-post-write-matching-switch p {
+  margin: 0 0 0 26px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+.s4-post-write-matching-options {
+  display: grid;
+  gap: 9px;
+  padding-top: 12px;
+  border-top: 1px solid var(--s1-line);
+}
+.s4-post-write-matching-options > span {
+  color: var(--s1-ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+.s4-post-write-matching-options > div[role="radiogroup"] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.s4-post-write-position-select {
+  display: grid;
+  width: min(520px, 100%);
+  gap: 6px;
+}
+.s4-post-write-position-select > b {
+  color: var(--s1-danger);
+  font-size: 12px;
+  font-weight: 500;
+}
+.s4-post-write-matching-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--s1-line);
+}
+.s4-post-write-matching-summary > svg {
+  width: 17px;
+  color: var(--s1-accent);
+}
+.s4-post-write-matching-summary b,
+.s4-post-write-matching-summary small {
+  display: block;
+}
+.s4-post-write-matching-summary b {
+  font-size: 12px;
+}
+.s4-post-write-matching-summary small {
+  margin-top: 3px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 17px;
+}
+
+.s4-review-post-action {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--s1-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 20%, var(--s1-line));
+  border-radius: 7px;
+}
+.s4-review-post-action > svg {
+  width: 17px;
+  color: var(--s1-accent);
+  justify-self: center;
+}
+.s4-review-post-action b,
+.s4-review-post-action small {
+  display: block;
+}
+.s4-review-post-action b {
+  font-size: 12px;
+}
+.s4-review-post-action small {
+  margin-top: 3px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 17px;
+}
+
 .s4-file-list article {
   grid-template-columns: 34px minmax(0, 1fr) auto auto;
 }
@@ -8114,6 +8273,35 @@
   font-style: normal;
   background: var(--s1-line);
   border-radius: 99px;
+}
+.s4-relation-switcher {
+  display: grid;
+  gap: 14px;
+}
+.s4-relation-view-tabs {
+  width: fit-content;
+  max-width: 100%;
+}
+.s4-relation-view-panel {
+  min-width: 0;
+}
+.s4-relation-view-panel > header {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.s4-relation-view-panel > header h3,
+.s4-relation-view-panel > header p {
+  margin: 0;
+}
+.s4-relation-view-panel > header h3 {
+  font-size: 14px;
+  line-height: 22px;
+}
+.s4-relation-view-panel > header p {
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 20px;
 }
 .s4-change-review-list {
   display: grid;
@@ -12755,6 +12943,32 @@
   }
   .s4-import-summary > dl {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .s4-post-write-matching-options > div[role="radiogroup"] {
+    grid-template-columns: 1fr;
+  }
+  .s4-review-post-action {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+  .s4-review-post-action > .s1-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .s4-large-relations-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .s4-employment-relations-filters {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .s4-employment-relations-filters .s4-inline-search {
+    width: 100%;
+  }
+  .s4-employment-relation-filter,
+  .s4-employment-company-filter {
+    width: calc(50% - 4px);
+    flex: 1 1 calc(50% - 4px);
   }
   .s4-duplicate-import > div {
     grid-template-columns: 1fr;

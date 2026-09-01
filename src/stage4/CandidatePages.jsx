@@ -25,6 +25,7 @@ import {
   Modal,
   NotFoundState,
   Pagination,
+  PostWriteMatchingOptions,
   ProgressBar,
   RelationshipAiDialog,
   RelationshipAiEmptyState,
@@ -144,6 +145,58 @@ const candidateAcademicCollaborators = Array.from(
     };
   },
 );
+
+const employmentRelationNames = [
+  "陈若凡",
+  "赵星羽",
+  "周明远",
+  "孙若凡",
+  "蒋文博",
+  "陆嘉成",
+  "唐心怡",
+  "魏清远",
+  "顾思源",
+  "沈岚",
+  "何静",
+  "王奕",
+];
+
+const candidateEmploymentRelations = Array.from({ length: 42 }, (_, index) => {
+  const company = index % 3 === 0 ? "拓界机器人" : "上海人工智能实验室";
+  const current = index % 4 < 2;
+  const sameDepartment = index % 3 !== 1;
+  return {
+    id: `employment-relation-${index}`,
+    person: employmentRelationNames[index % employmentRelationNames.length],
+    relation: `${current ? "当前" : "曾经"}${sameDepartment ? "同部门" : "同公司"}`,
+    company,
+    department: sameDepartment
+      ? index % 2
+        ? "机器人学习与数据平台"
+        : "具身智能中心"
+      : "部门信息未核实",
+    overlap: current
+      ? index % 2
+        ? "2024.06—至今"
+        : "2025.02—至今"
+      : index % 2
+        ? "2020.07—2023.11"
+        : "2018.04—2021.08",
+    title:
+      index % 4 === 0
+        ? "VLA 算法专家"
+        : index % 4 === 1
+          ? "机器人数据平台主管"
+          : index % 4 === 2
+            ? "强化学习算法负责人"
+            : "具身智能研究员",
+    status: sameDepartment ? "已核实" : "部门待确认",
+    path:
+      index % 5 === 0
+        ? "/candidates/candidate-zhaoxingyu"
+        : "/candidates/candidate-linhao",
+  };
+});
 
 const candidateContactPathViews = [
   {
@@ -1866,6 +1919,123 @@ function CandidateAcademicRelationsTable({ mode }) {
   );
 }
 
+function CandidateEmploymentRelationsTable() {
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [relationTypes, setRelationTypes] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 8;
+  const filtered = useMemo(() => {
+    const keyword = query.trim().toLowerCase();
+    return candidateEmploymentRelations.filter((item) => {
+      const matchesQuery =
+        !keyword ||
+        [item.person, item.relation, item.company, item.department, item.title]
+          .join(" ")
+          .toLowerCase()
+          .includes(keyword);
+      const matchesRelation =
+        !relationTypes.length || relationTypes.includes(item.relation);
+      const matchesCompany =
+        !companies.length || companies.includes(item.company);
+      return matchesQuery && matchesRelation && matchesCompany;
+    });
+  }, [companies, query, relationTypes]);
+  const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const rows = filtered.slice((page - 1) * pageSize, page * pageSize);
+  useEffect(() => setPage(1), [companies, query, relationTypes]);
+  return (
+    <div className="s4-large-relations s4-employment-relations">
+      <div className="s4-large-relations-toolbar">
+        <div className="s4-employment-relations-filters">
+          <div className="s4-inline-search">
+            <Icon name="search" />
+            <input
+              aria-label="搜索同公司或同部门候选人"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="搜索候选人、公司、部门或职位"
+            />
+          </div>
+          <SelectMenu
+            className="s4-employment-relation-filter"
+            label="关系类型"
+            value={relationTypes}
+            options={["当前同部门", "曾经同部门", "当前同公司", "曾经同公司"]}
+            multiple
+            onChange={setRelationTypes}
+          />
+          <SelectMenu
+            className="s4-employment-company-filter"
+            label="共同公司"
+            value={companies}
+            options={["拓界机器人", "上海人工智能实验室"]}
+            multiple
+            onChange={setCompanies}
+          />
+        </div>
+        <span className="s4-table-count">{filtered.length} 位候选人</span>
+      </div>
+      <div className="s4-large-relations-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>候选人</th>
+              <th>任职关系</th>
+              <th>共同公司与部门</th>
+              <th>任职重叠</th>
+              <th>对方当前职位</th>
+              <th>资料状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((item) => (
+              <tr key={item.id}>
+                <td>
+                  <b>{item.person}</b>
+                </td>
+                <td>
+                  <StatusBadge
+                    tone={item.relation.includes("同部门") ? "info" : "neutral"}
+                  >
+                    {item.relation}
+                  </StatusBadge>
+                </td>
+                <td>
+                  <b>{item.company}</b>
+                  <small>{item.department}</small>
+                </td>
+                <td>{item.overlap}</td>
+                <td>{item.title}</td>
+                <td>
+                  <StatusBadge
+                    tone={item.status === "已核实" ? "success" : "warning"}
+                  >
+                    {item.status}
+                  </StatusBadge>
+                </td>
+                <td>
+                  <Button size="xs" onClick={() => navigate(item.path)}>
+                    打开详情
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Pagination
+        page={page}
+        pages={pages}
+        pageSize={pageSize}
+        onChange={setPage}
+      />
+    </div>
+  );
+}
+
 function ContactPathTab() {
   const notify = useToast();
   const [status, setStatus] = useState("idle");
@@ -1947,9 +2117,33 @@ function ContactPathTab() {
 
 function RelationsTab({ processingRecords, onOpenProcessing }) {
   const navigate = useNavigate();
+  const [relationView, setRelationView] = useState("employment");
   const runningRecord = processingRecords.find(
     (record) => record.state === "running",
   );
+  const relationViews = {
+    employment: {
+      label: "任职关系",
+      count: 42,
+      title: "同公司与同部门候选人",
+      description:
+        "根据已确认工作经历和任职重叠时间自动整理；部门依据不足时只显示同公司关系。",
+    },
+    outcomes: {
+      label: "学术成果",
+      count: 48,
+      title: "学术成果",
+      description:
+        "共 48 项论文与专利，按成果名称、机构、作者身份和年份独立查看。",
+    },
+    collaborators: {
+      label: "合作人",
+      count: 28,
+      title: "合作人",
+      description: "共 28 位合作人，明确展示合作类型以及对应的论文或专利。",
+    },
+  };
+  const activeRelationView = relationViews[relationView];
   return (
     <div className="s4-detail-stack">
       {runningRecord ? (
@@ -1977,17 +2171,43 @@ function RelationsTab({ processingRecords, onOpenProcessing }) {
           />
         </div>
       </FieldGroup>
-      <FieldGroup
-        title="学术成果"
-        description="共 48 项论文与专利，按成果名称、机构、作者身份和年份独立查看。"
-      >
-        <CandidateAcademicRelationsTable mode="outcomes" />
-      </FieldGroup>
-      <FieldGroup
-        title="合作人"
-        description="共 28 位合作人，明确展示合作类型以及对应的论文或专利。"
-      >
-        <CandidateAcademicRelationsTable mode="collaborators" />
+      <FieldGroup title="人物与成果关系">
+        <div className="s4-relation-switcher">
+          <div
+            className="app-tabs s4-relation-view-tabs"
+            role="tablist"
+            aria-label="候选人关系类型"
+          >
+            {Object.entries(relationViews).map(([key, item]) => (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={relationView === key}
+                className={relationView === key ? "is-active" : ""}
+                onClick={() => setRelationView(key)}
+              >
+                {item.label}
+                <em>{item.count}</em>
+              </button>
+            ))}
+          </div>
+          <section
+            className="s4-relation-view-panel"
+            role="tabpanel"
+            aria-label={activeRelationView.title}
+          >
+            <header>
+              <h3>{activeRelationView.title}</h3>
+              <p>{activeRelationView.description}</p>
+            </header>
+            {relationView === "employment" ? (
+              <CandidateEmploymentRelationsTable />
+            ) : (
+              <CandidateAcademicRelationsTable mode={relationView} />
+            )}
+          </section>
+        </div>
       </FieldGroup>
       <FieldGroup title="知识图谱">
         <div className="s4-entity-grid">
@@ -2070,7 +2290,7 @@ export function CandidateDetailPage() {
       : candidates.find((item) => item.id === candidateId);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rematchOpen, setRematchOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(state === "matching-running");
   const updateQuery = (changes) => {
     const next = new URLSearchParams(params);
     Object.entries(changes).forEach(([key, value]) => {
@@ -2101,6 +2321,18 @@ export function CandidateDetailPage() {
     },
     [],
   );
+  useEffect(() => {
+    if (state !== "matching-running") return undefined;
+    setRefreshing(true);
+    const timer = window.setTimeout(() => {
+      setRefreshing(false);
+      notify("人岗匹配完成，8 个岗位中有 5 个结果值得查看");
+      const next = new URLSearchParams(params);
+      next.delete("state");
+      setParams(next);
+    }, 4200);
+    return () => window.clearTimeout(timer);
+  }, [state]);
   useEffect(() => {
     const active = ["running", "review", "failed"].includes(aiState);
     const payload = active
@@ -2570,18 +2802,45 @@ export function CandidateCreatePage() {
 function UploadCandidate({ files, setFiles }) {
   const navigate = useNavigate();
   const notify = useToast();
+  const [params] = useSearchParams();
   const [processing, setProcessing] = useState(false);
   const [failed, setFailed] = useState(false);
+  const initialMatchMode = params.get("match") || "none";
+  const [matchEnabled, setMatchEnabled] = useState(
+    initialMatchMode === "all" || initialMatchMode === "selected",
+  );
+  const [matchScope, setMatchScope] = useState(
+    initialMatchMode === "selected" ? "selected" : "all",
+  );
+  const [selectedPositions, setSelectedPositions] = useState(
+    initialMatchMode === "selected"
+      ? ["具身智能 VLA 算法负责人 · 星澜机器人"]
+      : [],
+  );
+  const [matchError, setMatchError] = useState("");
   const process = () => {
     if (!files.length) {
       setFailed(true);
       return;
     }
+    if (
+      matchEnabled &&
+      matchScope === "selected" &&
+      !selectedPositions.length
+    ) {
+      setMatchError("请至少选择一个岗位");
+      return;
+    }
+    setMatchError("");
     setProcessing(true);
     window.setTimeout(() => {
       setProcessing(false);
       notify("简历解析完成，发现已有候选人和 7 项变化", "info");
-      navigate("/reviews/identity/candidate-linhao?from=upload");
+      const next = new URLSearchParams({ from: "upload" });
+      if (matchEnabled) next.set("match", matchScope);
+      if (matchEnabled && matchScope === "selected")
+        next.set("positions", String(selectedPositions.length));
+      navigate(`/reviews/identity/candidate-linhao?${next.toString()}`);
     }, 900);
   };
   return (
@@ -2613,6 +2872,25 @@ function UploadCandidate({ files, setFiles }) {
           没有新内容时明确返回处理结果
         </span>
       </div>
+      <PostWriteMatchingOptions
+        entityType="candidate"
+        enabled={matchEnabled}
+        onEnabledChange={(next) => {
+          setMatchEnabled(next);
+          setMatchError("");
+        }}
+        scope={matchScope}
+        onScopeChange={(next) => {
+          setMatchScope(next);
+          setMatchError("");
+        }}
+        selectedPositions={selectedPositions}
+        onSelectedPositionsChange={(next) => {
+          setSelectedPositions(next);
+          setMatchError("");
+        }}
+        error={matchError}
+      />
       <footer>
         <Button tone="primary" loading={processing} onClick={process}>
           {processing ? "正在判断并解析" : "上传并解析"}
@@ -2634,6 +2912,8 @@ export function IdentityMergeReviewPage() {
     summary: "new",
   });
   const [busy, setBusy] = useState(false);
+  const matchMode = params.get("match") || "none";
+  const matchEnabled = matchMode === "all" || matchMode === "selected";
   const items = [
     {
       key: "company",
@@ -2847,6 +3127,20 @@ export function IdentityMergeReviewPage() {
           ]}
         />
       ) : null}
+      {matchEnabled ? (
+        <div className="s4-review-post-action">
+          <Icon name="sparkles" />
+          <span>
+            <b>完成合并后立即人岗匹配</b>
+            <small>
+              {matchMode === "selected"
+                ? `将使用资料版本 v7 匹配已选择的 ${params.get("positions") || "1"} 个岗位。`
+                : "将使用资料版本 v7 匹配全部 8 个招聘中岗位。"}
+            </small>
+          </span>
+          <StatusBadge tone="info">等待正式写入</StatusBadge>
+        </div>
+      ) : null}
       <footer className="s4-review-footer">
         <span>
           <b>合并后形成资料版本 7</b>
@@ -2862,8 +3156,16 @@ export function IdentityMergeReviewPage() {
             onClick={() => {
               setBusy(true);
               window.setTimeout(() => {
-                notify("资料已合并，可在变化记录中撤销");
-                navigate("/candidates/candidate-linhao");
+                notify(
+                  matchEnabled
+                    ? "资料已合并，人岗匹配已经开始"
+                    : "资料已合并，可在变化记录中撤销",
+                );
+                navigate(
+                  matchEnabled
+                    ? "/candidates/candidate-linhao?tab=matching&state=matching-running"
+                    : "/candidates/candidate-linhao",
+                );
               }, 700);
             }}
           >

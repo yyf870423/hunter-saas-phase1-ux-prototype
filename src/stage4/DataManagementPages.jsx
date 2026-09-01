@@ -12,6 +12,7 @@ import {
   FormField,
   Modal,
   Pagination,
+  PostWriteMatchingOptions,
   ProgressBar,
   SelectMenu,
   StateBanner,
@@ -55,7 +56,9 @@ export function ImportsPage() {
         ? "论文"
         : params.get("type") === "patents"
           ? "专利"
-          : "候选人",
+          : params.get("type") === "positions"
+            ? "岗位"
+            : "候选人",
   );
   const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -63,6 +66,19 @@ export function ImportsPage() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [duplicateChoice, setDuplicateChoice] = useState("replace");
+  const initialMatchMode = params.get("match") || "none";
+  const [matchEnabled, setMatchEnabled] = useState(
+    initialMatchMode === "all" || initialMatchMode === "selected",
+  );
+  const [matchScope, setMatchScope] = useState(
+    initialMatchMode === "selected" ? "selected" : "all",
+  );
+  const [selectedPositions, setSelectedPositions] = useState(
+    initialMatchMode === "selected"
+      ? ["具身智能 VLA 算法负责人 · 星澜机器人"]
+      : [],
+  );
+  const [matchError, setMatchError] = useState("");
   const visibleTasks = useMemo(
     () =>
       importTasks.filter((task) =>
@@ -82,6 +98,16 @@ export function ImportsPage() {
   }, [navigate, params]);
   const next = () => {
     if (!files.length) return;
+    if (
+      type === "候选人" &&
+      matchEnabled &&
+      matchScope === "selected" &&
+      !selectedPositions.length
+    ) {
+      setMatchError("请至少选择一个岗位");
+      return;
+    }
+    setMatchError("");
     setBusy(true);
     window.setTimeout(() => {
       setBusy(false);
@@ -254,7 +280,10 @@ export function ImportsPage() {
                   "论文",
                   "专利",
                 ]}
-                onChange={setType}
+                onChange={(nextType) => {
+                  setType(nextType);
+                  setMatchError("");
+                }}
               />
             </FormField>
             <FileDrop
@@ -269,6 +298,27 @@ export function ImportsPage() {
               }
               multiple={type !== "知识图谱"}
             />
+            {type === "候选人" || type === "岗位" ? (
+              <PostWriteMatchingOptions
+                entityType={type === "候选人" ? "candidate" : "position"}
+                enabled={matchEnabled}
+                onEnabledChange={(nextEnabled) => {
+                  setMatchEnabled(nextEnabled);
+                  setMatchError("");
+                }}
+                scope={matchScope}
+                onScopeChange={(nextScope) => {
+                  setMatchScope(nextScope);
+                  setMatchError("");
+                }}
+                selectedPositions={selectedPositions}
+                onSelectedPositionsChange={(nextPositions) => {
+                  setSelectedPositions(nextPositions);
+                  setMatchError("");
+                }}
+                error={matchError}
+              />
+            ) : null}
             <a
               href="#sample"
               onClick={(event) => {
@@ -306,6 +356,20 @@ export function ImportsPage() {
               title="2 条资料需要后续身份审核"
               description="只有姓名或身份依据不足的资料不会创建正式候选人，将保留为人物线索。"
             />
+            {matchEnabled && (type === "候选人" || type === "岗位") ? (
+              <StateBanner
+                tone="info"
+                icon="sparkles"
+                title="正式写入后将自动开始人岗匹配"
+                description={
+                  type === "候选人"
+                    ? matchScope === "selected"
+                      ? `只对成功写入的候选人匹配已选择的 ${selectedPositions.length} 个岗位；待身份确认和失败记录不会启动。`
+                      : "只对成功写入的候选人匹配全部招聘中岗位；待身份确认和失败记录不会启动。"
+                    : "只对成功写入的岗位匹配系统内可用候选人；失败岗位不会启动。"
+                }
+              />
+            ) : null}
             <div className="s4-import-result-list">
               <article>
                 <StatusBadge tone="success">新建</StatusBadge>

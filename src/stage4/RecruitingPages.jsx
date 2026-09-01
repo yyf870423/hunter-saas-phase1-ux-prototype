@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
 import { RecommendationReportWorkspace } from "../stage2/SideTasks";
+import { Composer } from "../stage2/automation-ui";
 import {
   buildRecommendationReportVersions,
   buildRevisedRecommendationReport,
@@ -25,6 +26,7 @@ import {
   Modal,
   NotFoundState,
   Pagination,
+  PostWriteMatchingOptions,
   ProgressBar,
   RelationshipAiDialog,
   RelationshipAiProcessingState,
@@ -2232,6 +2234,8 @@ const matchTabs = [
 function MatchingResults() {
   const navigate = useNavigate();
   const notify = useToast();
+  const [params, setParams] = useSearchParams();
+  const startedAfterCreate = params.get("state") === "running";
   const [selected, setSelected] = useState(
     () =>
       sessionStorage.getItem("hunter-matching-selected-candidate") ||
@@ -2278,8 +2282,10 @@ function MatchingResults() {
         : {}),
     };
   });
-  const [runOpen, setRunOpen] = useState(false);
-  const [runMode, setRunMode] = useState("complete");
+  const [runOpen, setRunOpen] = useState(startedAfterCreate);
+  const [runMode, setRunMode] = useState(
+    startedAfterCreate ? "running" : "complete",
+  );
   const [reportCandidate, setReportCandidate] = useState(null);
   const [reportPrompt, setReportPrompt] = useState("");
   const counts = useMemo(
@@ -2654,7 +2660,14 @@ function MatchingResults() {
       <MatchRunModal
         open={runOpen}
         mode={runMode}
-        close={() => setRunOpen(false)}
+        close={() => {
+          setRunOpen(false);
+          if (startedAfterCreate) {
+            const next = new URLSearchParams(params);
+            next.delete("state");
+            setParams(next);
+          }
+        }}
       />
       <Modal
         open={Boolean(reportCandidate)}
@@ -3549,16 +3562,27 @@ export function PositionDetailPage() {
 export function PositionCreatePage() {
   const navigate = useNavigate();
   const notify = useToast();
+  const [params] = useSearchParams();
   const [mode, setMode] = useState("manual");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [requirements, setRequirements] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [agentPrompt, setAgentPrompt] = useState("");
+  const [agentAuthMode, setAgentAuthMode] = useState("confirm");
+  const [agentAttachments, setAgentAttachments] = useState([]);
+  const [matchEnabled, setMatchEnabled] = useState(
+    params.get("match") === "all",
+  );
   const create = () => {
     setSubmitted(true);
     if (!name.trim() || !company.trim() || !requirements.trim()) return;
-    notify("岗位已创建");
-    navigate("/positions/position-vla");
+    notify(matchEnabled ? "岗位已创建，人岗匹配已经开始" : "岗位已创建");
+    navigate(
+      matchEnabled
+        ? "/positions/position-vla?tab=matching&state=running"
+        : "/positions/position-vla",
+    );
   };
   return (
     <div className="s4-create-page">
@@ -3663,6 +3687,11 @@ export function PositionCreatePage() {
                   />
                 </FormField>
               </div>
+              <PostWriteMatchingOptions
+                entityType="position"
+                enabled={matchEnabled}
+                onEnabledChange={setMatchEnabled}
+              />
               <footer>
                 <Button tone="primary" onClick={create}>
                   创建岗位
@@ -3674,30 +3703,37 @@ export function PositionCreatePage() {
               <i>
                 <Icon name="sparkles" />
               </i>
-              <h2>用自然语言创建岗位</h2>
+              <h2>解析 JD 并创建岗位</h2>
               <p>
-                Hunter
-                会先理解招聘目标、进行公开网络调研，并在写入前提供完整岗位资料供你确认。
+                粘贴完整 JD、输入口述式岗位需求，或添加文件。Hunter
+                会先理解招聘目标并形成完整岗位资料，确认前不会写入。
               </p>
-              <div>
-                <span>例如：</span>
-                <p>
-                  我们想找一个做 VLA
-                  的算法负责人，要做过真实机器人部署，最好带过 8
-                  人以上团队，Base 北京。
-                </p>
+              <div className="s4-agent-composer-shell">
+                <Composer
+                  value={agentPrompt}
+                  onChange={setAgentPrompt}
+                  onSend={(text, attachedFiles) => {
+                    const fileNames = attachedFiles
+                      .map((file) => file.name)
+                      .join("、");
+                    const prompt =
+                      text || `解析附件 ${fileNames}，形成完整岗位资料`;
+                    sessionStorage.setItem("hunter-new-task-prompt", prompt);
+                    navigate(
+                      "/tasks/task-create-position?state=position-ingestion",
+                    );
+                  }}
+                  authMode={agentAuthMode}
+                  onAuthChange={setAgentAuthMode}
+                  attachments={agentAttachments}
+                  onAttachmentsChange={setAgentAttachments}
+                  placeholder="粘贴完整 JD，或说明岗位方向、职责、核心技能、目标背景、地点、薪资和特别要求"
+                />
               </div>
-              <Button
-                tone="primary"
-                icon="message"
-                onClick={() =>
-                  navigate(
-                    "/new?prompt=我们想找一个做 VLA 的算法负责人，要做过真实机器人部署，最好带过 8 人以上团队，Base 北京",
-                  )
-                }
-              >
-                开始对话
-              </Button>
+              <small className="s4-agent-create-hint">
+                可直接粘贴链接，或添加
+                PDF、Word、表格与截图；进入任务后仍可继续补充信息。
+              </small>
             </div>
           )}
         </section>

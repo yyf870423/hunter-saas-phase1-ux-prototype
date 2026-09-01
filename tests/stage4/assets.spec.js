@@ -291,10 +291,12 @@ test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作",
   await expect(matching.getByText("岗位匹配完成")).toBeVisible();
 
   await page.goto("#/candidates/candidate-linhao?tab=relations");
+  await page.getByRole("tab", { name: /学术成果/ }).click();
   await expect(page.getByText("共 48 项论文与专利")).toBeVisible();
   await expect(
     page.getByRole("columnheader", { name: "论文或专利名称" }),
   ).toBeVisible();
+  await page.getByRole("tab", { name: /合作人/ }).click();
   await expect(page.getByRole("heading", { name: "合作人" })).toBeVisible();
   await expect(
     page.getByRole("columnheader", { name: "合作类型" }),
