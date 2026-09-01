@@ -26,11 +26,11 @@ async function expectVisibleGraphNodesDoNotOverlap(page) {
   expect(overlaps).toEqual([]);
 }
 
-test("知识图谱支持真实拖动、跨图页搜索和画布表格切换", async ({ page }) => {
+test("知识图谱支持真实拖动、图内搜索和画布表格切换", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content&page=organization");
   await expect(
-    page.getByRole("heading", { name: "具身智能 VLA 知识图谱" }),
+    page.getByRole("heading", { name: "星澜机器人组织知识图谱" }),
   ).toBeVisible();
 
   const node = page.locator(".tg-node", { hasText: "星澜机器人" }).first();
@@ -50,13 +50,13 @@ test("知识图谱支持真实拖动、跨图页搜索和画布表格切换", as
   expect(after.x).toBeGreaterThan(before.x + 50);
   await expectVisibleGraphNodesDoNotOverlap(page);
 
-  await page.getByLabel("搜索知识图谱").fill("拓界机器人");
-  await page.getByRole("button", { name: /目标公司关系 · 拓界机器人/ }).click();
+  await page.getByLabel("搜索知识图谱").fill("赵星羽");
+  await page.getByRole("button", { name: /星澜机器人组织 · 赵星羽/ }).click();
   await expect(page.locator(".tg-page-strip span.is-active")).toContainText(
-    "目标公司关系",
+    "星澜机器人组织",
   );
   await expect(
-    page.locator(".tg-node.is-focused", { hasText: "拓界机器人" }),
+    page.locator(".tg-node.is-focused", { hasText: "赵星羽" }),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "层级表格" }).click();
@@ -118,9 +118,9 @@ test("知识图谱支持真实拖动、跨图页搜索和画布表格切换", as
   await expect
     .poll(() => hierarchyScroll.evaluate((element) => element.scrollLeft))
     .toBe(shiftedLeft);
-  await expect(page.getByRole("button", { name: /拓界机器人/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /赵星羽/ })).toBeVisible();
   await page
-    .getByRole("button", { name: /拓界机器人/ })
+    .getByRole("button", { name: /赵星羽/ })
     .first()
     .click();
   await expect(page.locator(".tg-detail-panel")).toBeVisible();
@@ -133,17 +133,17 @@ test("知识图谱支持真实拖动、跨图页搜索和画布表格切换", as
   assertNoConsoleErrors();
 });
 
-test("知识图谱覆盖公司、候选人、岗位和行业关系图页", async ({ page }) => {
+test("公司、候选人、岗位和行业关系分别作为独立知识图谱", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   const scenarios = [
-    ["ecosystem", "目标公司关系", "人才流向"],
-    ["people", "候选人关系网络", "共同作者 · 2 篇"],
-    ["position-context", "VLA 岗位上下游知识", "输入产品目标"],
-    ["industry-chain", "具身智能行业上下游", "提供硬件能力"],
+    ["mapping-company-relations", "目标公司关系", "人才流向"],
+    ["mapping-candidate-relations", "候选人关系网络", "共同作者 · 2 篇"],
+    ["mapping-position-context", "VLA 岗位上下游知识", "输入产品目标"],
+    ["mapping-industry-chain", "具身智能行业上下游", "提供硬件能力"],
   ];
 
-  for (const [pageId, tabName, relationship] of scenarios) {
-    await page.goto(`#/mappings/mapping-embodied?tab=content&page=${pageId}`);
+  for (const [mappingId, tabName, relationship] of scenarios) {
+    await page.goto(`#/mappings/${mappingId}?tab=content`);
     await expect(page.getByRole("tab", { name: tabName })).toHaveAttribute(
       "aria-selected",
       "true",
@@ -252,7 +252,7 @@ test("图页导入、同名处理、智能分析和审核可操作", async ({ pa
     .getByRole("button", { name: "关闭", exact: true })
     .click();
   await page.getByRole("button", { name: "作为本图备注保留" }).click();
-  await expect(page.locator(".tg-review-list > button")).toHaveCount(2);
+  await expect(page.locator(".tg-review-list > button")).toHaveCount(1);
   assertNoConsoleErrors();
 });
 
@@ -468,6 +468,24 @@ test("知识图谱卡片和分页保持清晰间距", async ({ page }) => {
   );
 });
 
+test("不同关系主题在列表中作为独立知识图谱资产展示", async ({ page }) => {
+  await page.goto("#/mappings");
+  await expect(page.getByText("8 条", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "具身智能公司关系知识图谱" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "VLA 核心候选人关系知识图谱" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "VLA 岗位上下游知识图谱" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "具身智能行业上下游知识图谱" }),
+  ).toBeVisible();
+  await expect(page.getByText("每页 6 条", { exact: true })).toBeVisible();
+});
+
 test("图谱空状态与节点资产关联可维护", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings?state=empty");
@@ -484,10 +502,21 @@ test("图谱空状态与节点资产关联可维护", async ({ page }) => {
   await pageMenu.getByRole("button", { name: "编辑", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "编辑节点" });
   await expect(editor.getByText("已关联公司")).toBeVisible();
+  await expect(editor.getByText("节点图标", { exact: true })).toBeVisible();
+  await editor
+    .locator(".s4-form-field", { hasText: "节点图标" })
+    .getByRole("button")
+    .click();
+  await page.getByRole("button", { name: "人物", exact: true }).last().click();
   await editor.getByRole("button", { name: "解除关联" }).click();
   await expect(editor.getByText("将转为图谱本地节点")).toBeVisible();
   await editor.getByRole("button", { name: "保存修改" }).click();
   await expect(page.getByText("未关联正式资产")).toBeVisible();
+  await expect(
+    page
+      .locator(".tg-node", { hasText: "星澜机器人" })
+      .locator('svg[data-icon="user"]'),
+  ).toBeVisible();
   assertNoConsoleErrors();
 });
 

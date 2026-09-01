@@ -3195,9 +3195,7 @@ function PositionTalentMap() {
                       onClick={() =>
                         item.detailPath
                           ? navigate(item.detailPath)
-                          : navigate(
-                              "/mappings/mapping-embodied?page=position-pool",
-                            )
+                          : navigate("/mappings/mapping-position-pool")
                       }
                     >
                       {item.detailPath ? "候选人详情" : "查看线索"}

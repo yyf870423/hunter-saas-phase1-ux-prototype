@@ -212,6 +212,30 @@ const nodeKindLabel = {
   note: "自由节点",
 };
 
+const nodeKindIcon = {
+  company: "building",
+  organization: "users",
+  person: "user",
+  contact: "users",
+  position: "briefcase",
+  industry: "database",
+  group: "folder",
+  note: "route",
+};
+
+const nodeIconLabel = {
+  auto: "自动（按节点类型）",
+  route: "通用关系",
+  building: "公司",
+  user: "人物",
+  briefcase: "岗位",
+  users: "组织或团队",
+  database: "产业或知识",
+  folder: "分组",
+};
+
+const getNodeIcon = (node) => node?.icon || nodeKindIcon[node?.kind] || "route";
+
 const relationKindLabel = {
   shared: "共享关系",
   derived: "来源派生",
@@ -219,12 +243,17 @@ const relationKindLabel = {
   analysis: "分析建议",
 };
 
-const deepClonePages = () =>
-  initialGraphPages.map((page) => ({
-    ...page,
-    nodes: page.nodes.map((node) => ({ ...node })),
-    edges: page.edges.map((edge) => ({ ...edge })),
-  }));
+const deepClonePages = (mappingId) => {
+  const graph = topicGraphs.find((item) => item.id === mappingId);
+  const pageIds = graph?.pageIds || [];
+  return initialGraphPages
+    .filter((page) => pageIds.includes(page.id))
+    .map((page) => ({
+      ...page,
+      nodes: page.nodes.map((node) => ({ ...node })),
+      edges: page.edges.map((edge) => ({ ...edge })),
+    }));
+};
 
 function updateParams(params, setParams, changes) {
   const next = new URLSearchParams(params);
@@ -449,6 +478,7 @@ export function MappingsListPage() {
         page={controller.page}
         pages={controller.pages}
         onChange={controller.setPage}
+        pageSize={6}
       />
       <DeleteAssetModal
         open={Boolean(deleteItem)}
@@ -815,15 +845,7 @@ function GraphSearch({ pages, activePageId, onLocate }) {
                 setOpen(false);
               }}
             >
-              <Icon
-                name={
-                  node.kind === "person"
-                    ? "user"
-                    : node.kind === "company"
-                      ? "building"
-                      : "route"
-                }
-              />
+              <Icon name={getNodeIcon(node)} />
               <span>
                 <b>
                   {page.name} · {node.label}
@@ -1483,19 +1505,7 @@ function GraphCanvas({
                   }}
                 >
                   <span className="tg-node-kind">
-                    <Icon
-                      name={
-                        item.kind === "person"
-                          ? "user"
-                          : item.kind === "company"
-                            ? "building"
-                            : item.kind === "position"
-                              ? "briefcase"
-                              : item.kind === "contact"
-                                ? "users"
-                                : "route"
-                      }
-                    />
+                    <Icon name={getNodeIcon(item)} />
                   </span>
                   <span className="tg-node-copy">
                     <TooltipText
@@ -1671,15 +1681,7 @@ function GraphTable({ page, selectedIds, setSelectedIds, onOpenNode }) {
             onOpenNode(node);
           }}
         >
-          <Icon
-            name={
-              node.kind === "person"
-                ? "user"
-                : node.kind === "company"
-                  ? "building"
-                  : "route"
-            }
-          />
+          <Icon name={getNodeIcon(node)} />
           <span>
             <b>{node.label}</b>
             <small>{node.subtitle}</small>
@@ -1911,12 +1913,14 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
   const [subtitle, setSubtitle] = useState(node?.subtitle || "");
   const [summary, setSummary] = useState(node?.summary || "");
   const [kind, setKind] = useState(node?.kind || "note");
+  const [icon, setIcon] = useState(node?.icon || "auto");
   const [unlinkAsset, setUnlinkAsset] = useState(false);
   useEffect(() => {
     setLabel(node?.label || "");
     setSubtitle(node?.subtitle || "");
     setSummary(node?.summary || "");
     setKind(node?.kind || "note");
+    setIcon(node?.icon || "auto");
     setUnlinkAsset(false);
   }, [node, open]);
   return (
@@ -1939,6 +1943,7 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
                 subtitle: subtitle.trim(),
                 summary: summary.trim(),
                 kind,
+                icon: icon === "auto" ? undefined : icon,
                 ...(unlinkAsset
                   ? {
                       assetPath: undefined,
@@ -1955,14 +1960,23 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
       }
     >
       <div className="s4-form-grid">
-        <FormField label="节点名称" required>
+        <FormField label="节点名称" required span={2}>
           <TextInput value={label} onChange={setLabel} />
         </FormField>
         <FormField label="节点类型">
           <SelectMenu
             label="选择类型"
             value={nodeKindLabel[kind] || "自由节点"}
-            options={["自由节点", "公司", "组织", "人物", "岗位", "分组"]}
+            options={[
+              "自由节点",
+              "公司",
+              "组织",
+              "人物",
+              "联系人",
+              "岗位",
+              "产业环节",
+              "分组",
+            ]}
             onChange={(value) =>
               setKind(
                 Object.entries(nodeKindLabel).find(
@@ -1971,6 +1985,25 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
               )
             }
           />
+        </FormField>
+        <FormField label="节点图标">
+          <div className="tg-node-icon-control">
+            <span className="tg-node-icon-preview" aria-hidden="true">
+              <Icon name={icon === "auto" ? nodeKindIcon[kind] : icon} />
+            </span>
+            <SelectMenu
+              label="选择图标"
+              value={nodeIconLabel[icon] || nodeIconLabel.auto}
+              options={Object.values(nodeIconLabel)}
+              onChange={(value) =>
+                setIcon(
+                  Object.entries(nodeIconLabel).find(
+                    ([, label]) => label === value,
+                  )?.[0] || "auto",
+                )
+              }
+            />
+          </div>
         </FormField>
         <FormField label="副标题" span={2}>
           <TextInput
@@ -2696,13 +2729,17 @@ function GraphAiWorkspace({ page, close, onApply }) {
   );
 }
 
-function GraphReviewWorkspace({ pages, onLocate, onResolve }) {
-  const [items, setItems] = useState(graphReviewItems);
+function GraphReviewWorkspace({ pages, reviewItems, onLocate, onResolve }) {
+  const [items, setItems] = useState(reviewItems);
   const [selectedId, setSelectedId] = useState(items[0]?.id);
   const [evidencePreview, setEvidencePreview] = useState(null);
   const { isFullscreen, toggleFullscreen } = useCanvasFullscreen();
   const selected = items.find((item) => item.id === selectedId) || items[0];
   const page = pages.find((item) => item.id === selected?.pageId) || pages[0];
+  useEffect(() => {
+    setItems(reviewItems);
+    setSelectedId(reviewItems[0]?.id);
+  }, [reviewItems]);
   useEffect(() => {
     if (selected) onLocate(selected.pageId, selected.nodeId);
   }, [selectedId]);
@@ -2855,7 +2892,7 @@ function GraphReviewWorkspace({ pages, onLocate, onResolve }) {
   );
 }
 
-function GraphHistoryTab({ notify }) {
+function GraphHistoryTab({ notify, sourcePage }) {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(graphHistory[0]);
   const [zoom, setZoom] = useState(0.72);
@@ -2865,20 +2902,26 @@ function GraphHistoryTab({ notify }) {
   const [focusNodeId, setFocusNodeId] = useState(null);
   const [evidencePreview, setEvidencePreview] = useState(null);
   const { isFullscreen, toggleFullscreen } = useCanvasFullscreen();
-  const previewPage = useMemo(
-    () => ({
-      ...initialGraphPages[0],
-      name: `${initialGraphPages[0].name} · ${selected.version}`,
-      nodes: initialGraphPages[0].nodes
-        .filter((node, index) => {
-          if (selected.version === "v12") return true;
-          if (selected.version === "v11") return node.id !== "org-hejing";
-          return index < Math.max(4, initialGraphPages[0].nodes.length - 3);
-        })
-        .map((node) => ({ ...node, status: "normal", marker: undefined })),
-    }),
-    [selected],
-  );
+  const previewPage = useMemo(() => {
+    const basePage = sourcePage || initialGraphPages[0];
+    const nodes = basePage.nodes
+      .filter((node, index) => {
+        if (selected.version === "v12") return true;
+        if (selected.version === "v11")
+          return index < basePage.nodes.length - 1;
+        return index < Math.max(3, basePage.nodes.length - 2);
+      })
+      .map((node) => ({ ...node, status: "normal", marker: undefined }));
+    const nodeIds = new Set(nodes.map((node) => node.id));
+    return {
+      ...basePage,
+      name: `${basePage.name} · ${selected.version}`,
+      nodes,
+      edges: basePage.edges.filter(
+        (edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target),
+      ),
+    };
+  }, [selected, sourcePage]);
   const selectedNode = previewPage.nodes.find(
     (node) => selectedIds.length === 1 && node.id === selectedIds[0],
   );
@@ -3930,7 +3973,7 @@ export function MappingDetailPage() {
         }
       : null);
   const [pages, setPages] = useState(() =>
-    mappingId === "graph-empty" ? [] : deepClonePages(),
+    mappingId === "graph-empty" ? [] : deepClonePages(mappingId),
   );
   const [activePageId, setActivePageId] = useState(
     () => params.get("page") || pages[0]?.id,
@@ -3947,7 +3990,8 @@ export function MappingDetailPage() {
   const activePage = pages.find((page) => page.id === activePageId) || pages[0];
 
   useEffect(() => {
-    const nextPages = mappingId === "graph-empty" ? [] : deepClonePages();
+    const nextPages =
+      mappingId === "graph-empty" ? [] : deepClonePages(mappingId);
     setPages(nextPages);
     setActivePageId(params.get("page") || nextPages[0]?.id);
     setNewPageOpen(false);
@@ -3958,6 +4002,13 @@ export function MappingDetailPage() {
   }, [requestedPageId]);
   useEffect(() => setImportOpen(panel === "import"), [panel]);
   const analysisActive = ["running", "paused"].includes(analysisState);
+  const activeReviewItems = useMemo(
+    () =>
+      graphReviewItems.filter((item) =>
+        pages.some((page) => page.id === item.pageId),
+      ),
+    [pages],
+  );
   const startImport = () => {
     if (analysisActive) {
       setTaskBlockedOpen(true);
@@ -4032,7 +4083,7 @@ export function MappingDetailPage() {
         <DetailTabs
           tabs={detailTabs.map((item) =>
             item.value === "reviews"
-              ? { ...item, count: graphReviewItems.length }
+              ? { ...item, count: activeReviewItems.length }
               : item,
           )}
           value={tab}
@@ -4062,6 +4113,7 @@ export function MappingDetailPage() {
       {pages.length && tab === "reviews" ? (
         <GraphReviewWorkspace
           pages={pages}
+          reviewItems={activeReviewItems}
           onLocate={locateFromReview}
           onResolve={(action, item) =>
             notify(
@@ -4075,7 +4127,7 @@ export function MappingDetailPage() {
         />
       ) : null}
       {pages.length && tab === "history" ? (
-        <GraphHistoryTab notify={notify} />
+        <GraphHistoryTab notify={notify} sourcePage={activePage} />
       ) : null}
       {panel === "hidden" ? (
         <HiddenContentPanel
@@ -4121,7 +4173,9 @@ export function MappingDetailPage() {
         }}
         onImported={({ smart }) => {
           if (!pages.length) {
-            const imported = deepClonePages()[0];
+            const imported =
+              deepClonePages(mappingId)[0] ||
+              deepClonePages("mapping-embodied")[0];
             setPages([imported]);
             setActivePageId(imported.id);
           }
@@ -4135,7 +4189,9 @@ export function MappingDetailPage() {
         open={emptyAiOpen}
         close={() => setEmptyAiOpen(false)}
         onCreate={({ title, goal }) => {
-          const template = deepClonePages()[1] || deepClonePages()[0];
+          const template =
+            deepClonePages(mappingId)[0] ||
+            deepClonePages("mapping-embodied")[0];
           const createdPage = {
             ...template,
             id: `ai-page-${Date.now()}`,

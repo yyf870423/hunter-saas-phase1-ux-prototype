@@ -98,22 +98,22 @@ const groups = [
       ],
       [
         "公司关系",
-        "/mappings/mapping-embodied?tab=content&page=ecosystem",
+        "/mappings/mapping-company-relations?tab=content",
         "公司竞争、合作、投资、上下游和人才流动",
       ],
       [
         "候选人关系",
-        "/mappings/mapping-embodied?tab=content&page=people",
+        "/mappings/mapping-candidate-relations?tab=content",
         "前同事、共同作者、共同发明人与联系路径",
       ],
       [
         "岗位上下游知识",
-        "/mappings/mapping-embodied?tab=content&page=position-context",
+        "/mappings/mapping-position-context?tab=content",
         "岗位目标、关键协作、上下游交付和能力依赖",
       ],
       [
         "行业上下游知识",
-        "/mappings/mapping-embodied?tab=content&page=industry-chain",
+        "/mappings/mapping-industry-chain?tab=content",
         "产业链上游、中游平台与下游应用关系",
       ],
       [

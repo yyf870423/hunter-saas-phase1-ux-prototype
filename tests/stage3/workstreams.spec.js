@@ -127,7 +127,7 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
   await expect(
     page.getByText(/1 项待确认内容已按你的决定纳入本批次/),
   ).toBeVisible();
-  await page.getByRole("button", { name: /更新已有图谱/ }).click();
+  await page.getByRole("button", { name: /更新 3 个已有图谱/ }).click();
   await expect(page.getByText(/已有图谱已经更新/)).toBeVisible();
 });
 
@@ -226,7 +226,7 @@ test("相关处理详情使用人才摸排自己的结果去向和检查点", as
   await page.getByRole("button", { name: /相关处理/ }).click();
   await page.getByRole("button", { name: /人物关系与联系路径/ }).click();
   await expect(
-    page.getByText("具身智能 VLA 知识图谱 · 本批次增量更新"),
+    page.getByText("3 个独立知识图谱 · 本批次增量更新"),
   ).toBeVisible();
   await expect(page.getByText("人物身份与关系已去重")).toBeVisible();
   await expect(page.getByText("未生成重复候选人记录")).toHaveCount(0);

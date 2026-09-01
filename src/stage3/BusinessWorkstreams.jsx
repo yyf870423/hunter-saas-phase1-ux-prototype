@@ -94,7 +94,7 @@ const inspectionContexts = {
     ],
   },
   "mapping-embodied": {
-    resultDestination: "具身智能 VLA 知识图谱 · 本批次增量更新",
+    resultDestination: "3 个独立知识图谱 · 本批次增量更新",
     checkpoints: [
       {
         title: "公司与组织范围已检查",
@@ -469,7 +469,7 @@ ${createMarkdownTable(
                 tone: "warning",
                 action: "拓界技术负责人、穹顶汇报关系和王奕身份仍需处理",
                 duration: "本轮已运行 13 分 25 秒",
-                resultDestination: "具身智能 VLA 知识图谱 · 待补充信息",
+                resultDestination: "3 个独立知识图谱 · 待补充信息",
                 checkpoints: inspectionContexts["mapping-embodied"].checkpoints,
               })
             }
@@ -492,14 +492,14 @@ ${createMarkdownTable(
             options={[
               {
                 value: "new",
-                label: "保存为新图谱",
-                description:
-                  "创建“具身智能 VLA 人才摸排”图谱并写入本批次结果。",
+                label: "保存为 3 个新图谱",
+                description: "按组织、公司关系和候选人关系拆分保存本批次结果。",
               },
               {
                 value: "update",
-                label: "更新已有图谱",
-                description: "更新“具身智能 VLA 知识图谱”，并保留更新前版本。",
+                label: "更新 3 个已有图谱",
+                description:
+                  "分别更新组织、公司关系和候选人关系图谱，并保留各自的更新前版本。",
               },
               {
                 value: "report",
@@ -1000,14 +1000,14 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 onSaveDestination={(option) => {
                   const copy = {
                     new: {
-                      text: "将本批次结果保存为新图谱。",
+                      text: "将本批次结果按主题保存为 3 个新图谱。",
                       result:
-                        "## 新图谱已经创建\n\n“具身智能 VLA 人才摸排”已写入本批次审核结果，待确认项、原始证据和用户决定均已保留。",
+                        "## 3 个新图谱已经创建\n\n组织、公司关系和候选人关系已分别写入独立图谱，待确认项、原始证据和用户决定均已保留。",
                     },
                     update: {
-                      text: "更新已有的“具身智能 VLA 知识图谱”。",
+                      text: "更新已有的 3 个独立知识图谱。",
                       result:
-                        "## 已有图谱已经更新\n\n本批次审核结果已写入，更新前的图谱版本已保留；后续资产关系变化会继续自动刷新可信内容。",
+                        "## 3 个已有图谱已经更新\n\n本批次审核结果已按主题写入，三个图谱各自的更新前版本均已保留；后续资产关系变化会继续自动刷新可信内容。",
                     },
                     report: {
                       text: "本次只保留摸排报告。",

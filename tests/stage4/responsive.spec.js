@@ -14,7 +14,7 @@ const routes = [
   ["candidates", "候选人"],
   ["positions/position-vla?tab=matching", "匹配结果"],
   ["companies/company-xinglan", "星澜机器人"],
-  ["mappings/mapping-embodied?tab=content", "具身智能 VLA 知识图谱"],
+  ["mappings/mapping-embodied?tab=content", "星澜机器人组织知识图谱"],
   ["papers", "论文"],
   ["data/imports", "数据导入"],
 ];

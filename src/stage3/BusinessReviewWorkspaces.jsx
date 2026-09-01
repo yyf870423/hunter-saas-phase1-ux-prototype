@@ -480,7 +480,7 @@ export function LandscapeReviewWorkspace({
     <section className="s3-review-workspace" aria-label="知识图谱更新审核">
       <ReviewHeader
         eyebrow="人才摸排 · 变更批次审核"
-        title="具身智能 VLA 知识图谱"
+        title="3 个独立知识图谱的本批次变化"
         summary="本批次 4 家公司 · 30 位人物 · 10 条关系"
         onClose={onClose}
       />
@@ -570,7 +570,7 @@ export function LandscapeReviewWorkspace({
                 }`}
           </b>
           <small>
-            完成审核后返回任务对话，再决定保存为新图谱、更新已有图谱或只保留报告。
+            完成审核后返回任务对话，再决定按主题保存为多个新图谱、更新对应已有图谱或只保留报告。
           </small>
         </div>
         <Button

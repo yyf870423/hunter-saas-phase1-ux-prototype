@@ -2142,9 +2142,9 @@ export function PatentDetailPage() {
         >
           <EntityLink
             icon="route"
-            title="具身智能 VLA 知识图谱"
-            meta="人物关系图页 · 1 位已关联 · 自动同步"
-            onClick={() => navigate("/mappings/mapping-embodied?page=people")}
+            title="VLA 核心候选人关系知识图谱"
+            meta="候选人关系 · 1 位已关联 · 自动同步"
+            onClick={() => navigate("/mappings/mapping-candidate-relations")}
           />
         </FieldGroup>
       </div>

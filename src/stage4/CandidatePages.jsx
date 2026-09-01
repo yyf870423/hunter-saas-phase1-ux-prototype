@@ -2215,11 +2215,11 @@ function RelationsTab({ processingRecords, onOpenProcessing }) {
         <div className="s4-entity-grid">
           <EntityLink
             icon="route"
-            title="具身智能 VLA 知识图谱"
-            meta="人物关系图页 · 3 处引用 · 已自动同步"
+            title="VLA 核心候选人关系知识图谱"
+            meta="候选人关系 · 3 处引用 · 已自动同步"
             onClick={() =>
               navigate(
-                "/mappings/mapping-embodied?page=people&node=person-linhao",
+                "/mappings/mapping-candidate-relations?node=person-linhao",
               )
             }
           />

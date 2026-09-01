@@ -1129,7 +1129,7 @@ test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", as
   await expect(page.getByText("已有岗位已关联到招聘机会")).toBeVisible();
 });
 
-test("知识图谱多图页、关系详情与写入决定可用", async ({ page }) => {
+test("知识图谱内容、关系详情与写入决定可用", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/new");
   await expect(page.getByLabel("图谱名称")).toBeVisible();
@@ -1150,7 +1150,7 @@ test("知识图谱多图页、关系详情与写入决定可用", async ({ page 
   await page.goto("#/mappings/mapping-embodied?tab=reviews");
   await expect(page.getByRole("heading", { name: "待处理事项" })).toBeVisible();
   await page.getByRole("button", { name: "作为本图备注保留" }).click();
-  await expect(page.locator(".tg-review-list > button")).toHaveCount(2);
+  await expect(page.locator(".tg-review-list > button")).toHaveCount(1);
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
