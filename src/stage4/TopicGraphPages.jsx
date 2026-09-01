@@ -223,18 +223,7 @@ const nodeKindIcon = {
   note: "route",
 };
 
-const nodeIconLabel = {
-  auto: "自动（按节点类型）",
-  route: "通用关系",
-  building: "公司",
-  user: "人物",
-  briefcase: "岗位",
-  users: "组织或团队",
-  database: "产业或知识",
-  folder: "分组",
-};
-
-const getNodeIcon = (node) => node?.icon || nodeKindIcon[node?.kind] || "route";
+const getNodeIcon = (node) => nodeKindIcon[node?.kind] || "route";
 
 const relationKindLabel = {
   shared: "共享关系",
@@ -1913,14 +1902,12 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
   const [subtitle, setSubtitle] = useState(node?.subtitle || "");
   const [summary, setSummary] = useState(node?.summary || "");
   const [kind, setKind] = useState(node?.kind || "note");
-  const [icon, setIcon] = useState(node?.icon || "auto");
   const [unlinkAsset, setUnlinkAsset] = useState(false);
   useEffect(() => {
     setLabel(node?.label || "");
     setSubtitle(node?.subtitle || "");
     setSummary(node?.summary || "");
     setKind(node?.kind || "note");
-    setIcon(node?.icon || "auto");
     setUnlinkAsset(false);
   }, [node, open]);
   return (
@@ -1943,7 +1930,6 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
                 subtitle: subtitle.trim(),
                 summary: summary.trim(),
                 kind,
-                icon: icon === "auto" ? undefined : icon,
                 ...(unlinkAsset
                   ? {
                       assetPath: undefined,
@@ -1960,7 +1946,7 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
       }
     >
       <div className="s4-form-grid">
-        <FormField label="节点名称" required span={2}>
+        <FormField label="节点名称" required>
           <TextInput value={label} onChange={setLabel} />
         </FormField>
         <FormField label="节点类型">
@@ -1985,25 +1971,6 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
               )
             }
           />
-        </FormField>
-        <FormField label="节点图标">
-          <div className="tg-node-icon-control">
-            <span className="tg-node-icon-preview" aria-hidden="true">
-              <Icon name={icon === "auto" ? nodeKindIcon[kind] : icon} />
-            </span>
-            <SelectMenu
-              label="选择图标"
-              value={nodeIconLabel[icon] || nodeIconLabel.auto}
-              options={Object.values(nodeIconLabel)}
-              onChange={(value) =>
-                setIcon(
-                  Object.entries(nodeIconLabel).find(
-                    ([, label]) => label === value,
-                  )?.[0] || "auto",
-                )
-              }
-            />
-          </div>
         </FormField>
         <FormField label="副标题" span={2}>
           <TextInput

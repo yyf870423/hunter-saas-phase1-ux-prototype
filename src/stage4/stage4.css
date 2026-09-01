@@ -6782,28 +6782,6 @@
   line-height: 17px;
 }
 
-.tg-node-icon-control {
-  display: grid;
-  min-width: 0;
-  grid-template-columns: 38px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-}
-
-.tg-node-icon-preview {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  color: var(--s1-accent);
-  background: var(--s1-accent-soft);
-  border: 1px solid color-mix(in srgb, var(--s1-accent) 22%, var(--s1-line));
-  border-radius: 7px;
-}
-
-.tg-node-icon-control .s4-select {
-  min-width: 0;
-}
 .s4-form-field > b {
   color: var(--s1-danger);
   font-size: 12px;

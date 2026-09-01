@@ -502,9 +502,9 @@ test("图谱空状态与节点资产关联可维护", async ({ page }) => {
   await pageMenu.getByRole("button", { name: "编辑", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "编辑节点" });
   await expect(editor.getByText("已关联公司")).toBeVisible();
-  await expect(editor.getByText("节点图标", { exact: true })).toBeVisible();
+  await expect(editor.getByText("节点图标", { exact: true })).toHaveCount(0);
   await editor
-    .locator(".s4-form-field", { hasText: "节点图标" })
+    .locator(".s4-form-field", { hasText: "节点类型" })
     .getByRole("button")
     .click();
   await page.getByRole("button", { name: "人物", exact: true }).last().click();
