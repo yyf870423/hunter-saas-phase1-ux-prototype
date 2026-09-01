@@ -40,14 +40,16 @@ import {
   RecycleBinPage,
 } from "./stage4/DataManagementPages";
 import {
-  MappingCreatePage,
-  MappingDetailPage,
-  MappingsListPage,
   PaperDetailPage,
   PapersListPage,
   PatentDetailPage,
   PatentsListPage,
 } from "./stage4/LandscapeAcademicPages";
+import {
+  MappingCreatePage,
+  MappingDetailPage,
+  MappingsListPage,
+} from "./stage4/TopicGraphPages";
 import {
   PositionCreatePage,
   PositionDetailPage,

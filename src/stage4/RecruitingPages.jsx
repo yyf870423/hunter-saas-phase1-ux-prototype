@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
 import { RecommendationReportWorkspace } from "../stage2/SideTasks";
 import {
   buildRecommendationReportVersions,
@@ -17,12 +18,16 @@ import {
   DetailHeader,
   DetailTabs,
   Drawer,
+  EntityLink,
   FieldGroup,
   FormField,
+  HierarchyTable,
   Modal,
   NotFoundState,
   Pagination,
   ProgressBar,
+  RelationshipAiDialog,
+  RelationshipAiProcessingState,
   SelectMenu,
   StateBanner,
   StatusBadge,
@@ -44,6 +49,7 @@ const tabs = [
   { value: "profile", label: "岗位资料" },
   { value: "pipeline", label: "候选人流程", count: 11 },
   { value: "matching", label: "匹配结果", count: 128 },
+  { value: "talent-map", label: "人才梳理", count: 23 },
   { value: "work", label: "关联任务" },
 ];
 
@@ -52,7 +58,7 @@ const positionAiSupplement =
 const positionMatchingTooltip =
   "使用 Hunter 中已有候选人计算与当前岗位的适配程度，不会从外部平台或公开网络寻找新候选人。";
 const positionSourcingTooltip =
-  "创建岗位招聘任务，从 Hunter 已有候选人、人才版图、公开网络、论文专利和用户上传简历中持续寻找新候选人。";
+  "创建岗位招聘任务，从 Hunter 已有候选人、专题图谱、公开网络、论文专利和用户上传简历中持续寻找新候选人。";
 
 function buildPositionAiRecord(state = "complete") {
   const planByState = {
@@ -2568,6 +2574,446 @@ function MatchRunModal({ open, mode, close }) {
   );
 }
 
+const positionTalentRows = [
+  [
+    "林昊",
+    "拓界机器人",
+    "机器人学习负责人",
+    91,
+    "正式候选人",
+    "储备",
+    "/candidates/candidate-linhao",
+  ],
+  [
+    "赵星羽",
+    "星澜机器人",
+    "VLA 算法负责人",
+    87,
+    "正式候选人",
+    "未加入流程",
+    "/candidates/candidate-zhaoxingyu",
+  ],
+  ["周明远", "穹顶智能", "具身算法专家", 84, "人物线索", "待补资料", ""],
+  [
+    "陈楚宁",
+    "灵跃科技",
+    "灵巧操作负责人",
+    82,
+    "正式候选人",
+    "推进中",
+    "/candidates/candidate-chensong",
+  ],
+  ["王奕", "星澜机器人", "机器人学习研究员", 79, "身份待确认", "待确认", ""],
+  [
+    "何静",
+    "上海人工智能实验室",
+    "强化学习研究员",
+    77,
+    "人物线索",
+    "待补资料",
+    "",
+  ],
+  ["孙若凡", "清华大学", "VLA 博士后", 75, "人物线索", "保留观察", ""],
+  [
+    "顾思源",
+    "拓界机器人",
+    "真机部署专家",
+    73,
+    "正式候选人",
+    "储备",
+    "/candidates/candidate-linhao",
+  ],
+].map(([name, company, title, score, type, stage, path], index) => {
+  const teamByCompany = {
+    星澜机器人: "具身智能中心",
+    拓界机器人: "机器人学习团队",
+    穹顶智能: "具身算法平台",
+    灵跃科技: "灵巧操作团队",
+    上海人工智能实验室: "强化学习中心",
+    清华大学: "机器人学习实验室",
+  };
+  return {
+    id: `talent-${index}`,
+    name,
+    company,
+    title,
+    score,
+    type,
+    stage,
+    detailPath: path,
+    source: path ? "系统候选人 · 人岗匹配" : "公开资料 · 人才梳理",
+    hierarchyPath: [
+      {
+        id: "direction-vla",
+        label: "具身智能 VLA",
+        subtitle: "岗位目标方向",
+        kind: "direction",
+      },
+      {
+        id: `company-${company}`,
+        label: company,
+        subtitle: "目标人才所在机构",
+        kind: "company",
+      },
+      {
+        id: `team-${company}`,
+        label: teamByCompany[company] || "相关团队",
+        subtitle: "团队或研究方向",
+        kind: "team",
+      },
+      {
+        id: `person-${name}`,
+        label: name,
+        subtitle: title,
+        kind: "person",
+      },
+    ],
+  };
+});
+
+const positionTalentViews = [
+  {
+    id: "position-talent",
+    label: "人才关系图",
+    description: "岗位要求与重点人才的关系",
+    summary: "正式候选人、人物线索与关键能力关系会随底层资产自动更新",
+    layout: "network",
+    defaultSelection: { kind: "node", id: "position-vla" },
+    nodes: [
+      {
+        id: "position-vla",
+        label: "VLA 算法负责人",
+        meta: "当前岗位",
+        summary: "重点判断 VLA 技术深度、真机部署和团队管理跨度。",
+        status: "招聘中",
+        tone: "info",
+        kind: "position",
+        x: 54,
+        y: 190,
+        detailPath: "/positions/position-vla?tab=profile",
+        evidence: ["岗位资料", "岗位 AI 解析"],
+      },
+      ...positionTalentRows.slice(0, 5).map((item, index) => ({
+        id: item.id,
+        label: item.name,
+        meta: `${item.company} · ${item.score} 分`,
+        summary: `${item.title}；${item.type}；当前状态：${item.stage}。`,
+        status: item.type === "身份待确认" ? "待确认" : item.type,
+        tone: item.type === "身份待确认" ? "warning" : "success",
+        kind: "person",
+        x: index < 3 ? 360 : 680,
+        y: index < 3 ? 42 + index * 150 : 115 + (index - 3) * 190,
+        detailPath: item.detailPath || undefined,
+        detailLabel: item.detailPath ? "打开候选人详情" : undefined,
+        evidence: ["人岗匹配结果", "专题图谱关系"],
+      })),
+    ],
+    edges: positionTalentRows.slice(0, 5).map((item, index) => ({
+      id: `talent-edge-${index}`,
+      source: "position-vla",
+      target: item.id,
+      label: `${item.score} 分`,
+      status: item.type === "身份待确认" ? "待确认" : "已核验",
+      tone: item.type === "身份待确认" ? "warning" : "success",
+      observedAt: "今天 11:20",
+      evidence: ["人岗匹配结果", "人才梳理任务"],
+    })),
+  },
+];
+
+function PositionTalentMap() {
+  const navigate = useNavigate();
+  const notify = useToast();
+  const [refreshing, setRefreshing] = useState(false);
+  const [view, setView] = useState("table");
+  const [graphProcessing, setGraphProcessing] = useState(false);
+  const [graphDialogOpen, setGraphDialogOpen] = useState(false);
+  const [graphPrompt, setGraphPrompt] = useState("");
+  const graphTimerRef = useRef(null);
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState("");
+  const [identity, setIdentity] = useState("全部身份");
+  const [stage, setStage] = useState("全部状态");
+  const filteredTalents = useMemo(() => {
+    const keyword = query.trim().toLowerCase();
+    return positionTalentRows
+      .filter((item) => {
+        const keywordMatched =
+          !keyword ||
+          [item.name, item.company, item.title]
+            .join(" ")
+            .toLowerCase()
+            .includes(keyword);
+        const identityMatched =
+          identity === "全部身份" || item.type === identity;
+        const stageMatched = stage === "全部状态" || item.stage === stage;
+        return keywordMatched && identityMatched && stageMatched;
+      })
+      .sort((left, right) =>
+        [left.company, left.title, left.name]
+          .join("|")
+          .localeCompare(
+            [right.company, right.title, right.name].join("|"),
+            "zh-CN",
+          ),
+      );
+  }, [identity, query, stage]);
+  const pageSize = 8;
+  const pageCount = Math.max(1, Math.ceil(filteredTalents.length / pageSize));
+
+  useEffect(() => setPage(1), [identity, query, stage]);
+
+  useEffect(
+    () => () => {
+      if (graphTimerRef.current) window.clearTimeout(graphTimerRef.current);
+    },
+    [],
+  );
+
+  return (
+    <div className="s4-detail-stack">
+      {refreshing ? (
+        <StateBanner
+          tone="info"
+          icon="refresh"
+          title="正在更新岗位人才梳理"
+          description="正在重新计算系统候选人、专题图谱和公开人物线索之间的关系，不会中断当前岗位流程。"
+        />
+      ) : null}
+      <FieldGroup
+        title="当前结果"
+        description="无论是否已经建立专题图谱都可以执行。专题图谱存在时，它会作为重要输入参与梳理。"
+        action={
+          <Button
+            size="sm"
+            icon="refresh"
+            disabled={refreshing}
+            onClick={() => setGraphDialogOpen(true)}
+          >
+            {refreshing ? "正在更新" : "更新人才梳理"}
+          </Button>
+        }
+      >
+        <div className="s4-landscape-summary-card">
+          <span>
+            <small>岗位人才池 · v7</small>
+            <h3>具身智能 VLA 算法负责人</h3>
+            <p>
+              已梳理 23 位合适人才：系统候选人 14 位、公开资料人物线索 9 位。
+            </p>
+          </span>
+          <dl>
+            <div>
+              <dt>优先联系</dt>
+              <dd>8</dd>
+            </div>
+            <div>
+              <dt>保留观察</dt>
+              <dd>11</dd>
+            </div>
+            <div>
+              <dt>待补资料</dt>
+              <dd>4</dd>
+            </div>
+          </dl>
+          <Button onClick={() => navigate("/tasks/position-vla")}>
+            查看梳理过程
+          </Button>
+        </div>
+      </FieldGroup>
+      <FieldGroup
+        title="重点人才"
+        description="正式候选人资料变化后，这里的摘要和排序会自动更新。"
+        action={
+          <div className="s4-relation-type-tabs" role="tablist">
+            {[
+              ["table", "表格"],
+              ["graph", "关系图"],
+            ].map(([value, label]) => (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view === value}
+                className={view === value ? "is-active" : ""}
+                key={value}
+                onClick={() => setView(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        }
+      >
+        {graphProcessing ? (
+          <RelationshipAiProcessingState
+            title="正在更新岗位人才梳理"
+            description="Hunter 正在读取岗位要求、候选人资料和已确认关系，完成后会同步更新表格与关系图。"
+            prompt={graphPrompt}
+            steps={[
+              "读取岗位画像与人才池",
+              "核验候选人身份与关系",
+              "更新表格与关系图",
+            ]}
+            activeStep={1}
+          />
+        ) : view === "table" ? (
+          <div className="s4-large-relations s4-talent-table">
+            <div className="s4-large-relations-toolbar s4-talent-table-toolbar">
+              <div className="s4-inline-search">
+                <Icon name="search" />
+                <input
+                  aria-label="搜索重点人才"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="搜索姓名、公司或职位"
+                />
+              </div>
+              <div className="s4-talent-filter-pair">
+                <SelectMenu
+                  label="筛选身份"
+                  value={identity}
+                  options={["全部身份", "正式候选人", "人物线索", "身份待确认"]}
+                  onChange={setIdentity}
+                />
+                <SelectMenu
+                  label="筛选状态"
+                  value={stage}
+                  options={[
+                    "全部状态",
+                    "未加入流程",
+                    "储备",
+                    "推进中",
+                    "待补资料",
+                    "待确认",
+                    "保留观察",
+                  ]}
+                  onChange={setStage}
+                />
+              </div>
+            </div>
+            <HierarchyTable
+              rows={filteredTalents
+                .slice((page - 1) * pageSize, page * pageSize)
+                .map((item) => ({ ...item, path: item.hierarchyPath }))}
+              columns={[
+                {
+                  key: "type",
+                  label: "类型",
+                  render: (item) => item.type,
+                },
+                {
+                  key: "status",
+                  label: "关联状态",
+                  render: (item) => (
+                    <StatusBadge
+                      tone={
+                        item.stage === "推进中" || item.stage === "储备"
+                          ? "success"
+                          : item.stage === "待确认"
+                            ? "warning"
+                            : "neutral"
+                      }
+                    >
+                      {item.stage}
+                    </StatusBadge>
+                  ),
+                },
+                {
+                  key: "summary",
+                  label: "内容摘要",
+                  render: (item) => (
+                    <TooltipText
+                      tip={`${item.title} · 人岗匹配 ${item.score} 分`}
+                      clampLines={2}
+                    >
+                      {item.title} · {item.score} 分
+                    </TooltipText>
+                  ),
+                },
+                {
+                  key: "source",
+                  label: "来源",
+                  render: (item) => item.source,
+                },
+                {
+                  key: "action",
+                  label: "操作",
+                  render: (item) => (
+                    <Button
+                      size="xs"
+                      onClick={() =>
+                        item.detailPath
+                          ? navigate(item.detailPath)
+                          : navigate(
+                              "/mappings/mapping-embodied?page=position-pool",
+                            )
+                      }
+                    >
+                      {item.detailPath ? "候选人详情" : "查看线索"}
+                    </Button>
+                  ),
+                },
+              ]}
+              page={page}
+              pages={pageCount}
+              pageSize={pageSize}
+              totalLabel={`共 ${filteredTalents.length} 位符合条件的人才 · 23 位人才池演示数据`}
+              onPageChange={setPage}
+              renderLevel={(node) => (
+                <span className="tg-table-node is-static">
+                  <Icon
+                    name={
+                      node.kind === "person"
+                        ? "user"
+                        : node.kind === "company"
+                          ? "building"
+                          : "route"
+                    }
+                  />
+                  <span>
+                    <b>{node.label}</b>
+                    <small>{node.subtitle}</small>
+                  </span>
+                </span>
+              )}
+              scrollLabel="横向滚动重点人才层级表格"
+              testId="position-talent-hierarchy-table"
+            />
+          </div>
+        ) : (
+          <RelationshipCanvas
+            views={positionTalentViews}
+            decisions={{}}
+            onDecision={() => {}}
+            editable
+            draggable
+            storageKey="hunter-prototype-position-vla-talent-map"
+          />
+        )}
+      </FieldGroup>
+      <RelationshipAiDialog
+        open={graphDialogOpen}
+        close={() => setGraphDialogOpen(false)}
+        title="更新岗位人才梳理"
+        description="用自然语言说明需要补充的人才范围、关系类型和筛选重点。更新会同时作用于表格和关系图。"
+        initialPrompt={graphPrompt}
+        submitLabel="开始更新"
+        onSubmit={(prompt) => {
+          setGraphPrompt(prompt);
+          setRefreshing(true);
+          setGraphProcessing(true);
+          setGraphDialogOpen(false);
+          graphTimerRef.current = window.setTimeout(() => {
+            setRefreshing(false);
+            setGraphProcessing(false);
+            notify("岗位人才梳理已更新，表格与关系图已同步");
+          }, 2400);
+        }}
+      />
+    </div>
+  );
+}
+
 function RelatedWork({ processingRecords, onOpenProcessing }) {
   const navigate = useNavigate();
   return (
@@ -2802,6 +3248,7 @@ export function PositionDetailPage() {
       ) : null}
       {tab === "pipeline" ? <CandidatePipeline /> : null}
       {tab === "matching" ? <MatchingResults /> : null}
+      {tab === "talent-map" ? <PositionTalentMap /> : null}
       {tab === "work" ? (
         <RelatedWork
           processingRecords={processingRecords}

@@ -65,7 +65,7 @@ const groups = [
       [
         "公司详情",
         "/companies/company-xinglan",
-        "资料、招聘业务、联系人、任职人才、版图与任务",
+        "资料、招聘业务、联系人、任职人才、专题图谱与任务",
       ],
       ["新建公司", "/companies/new", "手动、文件和 Agent 三种输入"],
       [
@@ -82,34 +82,34 @@ const groups = [
   },
   {
     number: "04",
-    title: "人才版图",
-    description: "目标清单和同一关系数据的多种投影视图。",
+    title: "专题图谱",
+    description: "可自由维护、持续同步并供 Agent 使用的关系图谱资产。",
     links: [
-      ["人才版图列表", "/mappings", "卡片列表、目标与缺口摘要"],
+      ["专题图谱列表", "/mappings", "搜索、卡片列表、新建与删除"],
       [
-        "摸排概况",
-        "/mappings/mapping-embodied",
-        "可理解、可行动、可预期的目标清单",
+        "图谱画布",
+        "/mappings/mapping-embodied?tab=content",
+        "多图页、拖动、缩放、搜索、节点与关系维护",
       ],
       [
-        "公司与生态",
-        "/mappings/mapping-embodied?tab=ecosystem",
-        "公司竞争、合作和人才来源关系",
+        "层级表格",
+        "/mappings/mapping-embodied?tab=content&view=table",
+        "同一份数据的层级表格视图与合并单元格",
       ],
       [
-        "组织与方向",
-        "/mappings/mapping-embodied?tab=organization",
-        "组织树、方向角色和人才流动",
-      ],
-      [
-        "人物与关系",
-        "/mappings/mapping-embodied?tab=people",
-        "人物关系、学术脉络和联系路径",
+        "导入图页",
+        "/mappings/mapping-embodied?panel=import",
+        "前置校验、同名处理、结构预览和智能分析",
       ],
       [
         "更新与审核",
-        "/mappings/mapping-embodied?tab=updates",
-        "增量批次、影响图和冲突审核",
+        "/mappings/mapping-embodied?tab=reviews",
+        "分析建议、证据、上下文和逐项处理",
+      ],
+      [
+        "图谱内 AI",
+        "/mappings/mapping-embodied?panel=ai",
+        "对话、计划、差异预览和审核写入",
       ],
     ],
   },
@@ -122,7 +122,7 @@ const groups = [
       [
         "论文详情",
         "/papers/paper-vla-survey",
-        "双语摘要、作者机构、身份和版图",
+        "双语摘要、作者机构、身份和关系同步",
       ],
       ["专利列表", "/patents", "专利类型、发明人和权利人搜索"],
       [
@@ -138,7 +138,11 @@ const groups = [
     description: "导入、导出、回收站和全局状态。",
     links: [
       ["数据导入", "/data/imports", "格式校验、解析、查重、结果确认和失败"],
-      ["人才版图重名导入", "/data/imports?type=mapping", "替换或保留两张版图"],
+      [
+        "专题图谱导入",
+        "/mappings/mapping-embodied?panel=import",
+        "只向已有图谱导入图页并处理同名",
+      ],
       ["数据导出", "/data/exports", "异步生成、限时下载和状态"],
       ["回收站", "/recycle-bin", "30 天恢复、永久删除和恢复冲突"],
       [
@@ -157,6 +161,10 @@ const stateLinks = [
   ["候选人权限受限", "/candidates?state=limited"],
   ["详情加载失败", "/candidates/candidate-linhao?state=error"],
   ["详情敏感信息受限", "/candidates/candidate-linhao?state=limited"],
+  ["专题图谱加载中", "/mappings?state=loading"],
+  ["专题图谱空状态", "/mappings?state=empty"],
+  ["专题图谱加载失败", "/mappings?state=error"],
+  ["专题图谱权限受限", "/mappings?state=limited"],
 ];
 
 export function Stage4ReviewPage() {

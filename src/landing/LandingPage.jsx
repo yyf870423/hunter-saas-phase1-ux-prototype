@@ -166,7 +166,7 @@ export function LandingPage() {
               </h1>
               <p className="lp-hero-description">
                 Hunter
-                先吃透岗位，再从已有候选人、人才版图、公开网络、论文、专利和开源项目并行找人；
+                先吃透岗位，再从已有候选人、专题图谱、公开网络、论文、专利和开源项目并行找人；
                 <br className="lp-desktop-break" />
                 统一身份、查重、补证和匹配，把有依据的候选池交给你判断。
               </p>

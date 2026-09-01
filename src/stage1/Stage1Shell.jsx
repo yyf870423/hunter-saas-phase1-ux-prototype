@@ -445,9 +445,9 @@ const manualAssetTypes = [
     route: "/candidates/new",
   },
   {
-    label: "人才版图",
+    label: "专题图谱",
     icon: "database",
-    description: "建立人才摸排目标和范围",
+    description: "创建可持续维护的关系图谱",
     route: "/mappings/new",
   },
 ];

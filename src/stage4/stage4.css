@@ -6,6 +6,3830 @@
   margin: 0 auto;
 }
 
+/* Topic graph: multi-page canvas, hierarchy table, review and asset AI workspace. */
+.tg-list-page,
+.tg-detail-page,
+.tg-create-page {
+  --tg-canvas: color-mix(in srgb, var(--s1-bg) 72%, var(--s1-surface));
+  --tg-grid: color-mix(in srgb, var(--s1-line) 64%, transparent);
+  --tg-node: var(--s1-surface);
+  --tg-node-shadow: 0 7px 22px color-mix(in srgb, var(--s1-ink) 9%, transparent);
+  --tg-review: #c47a12;
+  --tg-review-soft: color-mix(in srgb, var(--tg-review) 11%, var(--s1-surface));
+  --tg-update: #0a7a70;
+  --tg-update-soft: color-mix(in srgb, var(--tg-update) 11%, var(--s1-surface));
+}
+
+.tg-graph-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.tg-graph-card {
+  position: relative;
+  display: flex;
+  min-height: 290px;
+  flex-direction: column;
+  padding: 18px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tg-graph-card:hover {
+  border-color: color-mix(in srgb, var(--s1-accent) 34%, var(--s1-line));
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--s1-ink) 7%, transparent);
+  transform: translateY(-1px);
+}
+
+.tg-graph-card > header {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px 40px minmax(0, 1fr) 30px;
+  gap: 9px;
+  align-items: start;
+}
+
+.tg-card-drag-handle {
+  display: grid;
+  width: 18px;
+  height: 40px;
+  place-items: center;
+  color: var(--s1-subtle);
+  cursor: grab;
+}
+
+.tg-card-drag-handle svg {
+  width: 14px;
+  transform: rotate(90deg);
+}
+
+.tg-graph-card.is-dragging {
+  opacity: 0.58;
+  border-color: var(--s1-accent);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--s1-ink) 12%, transparent);
+  transform: scale(0.985) rotate(0.25deg);
+}
+
+.tg-graph-card-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 19%, var(--s1-line));
+  border-radius: 7px;
+}
+
+.tg-graph-card-icon svg,
+.tg-icon-button svg {
+  width: 17px;
+}
+
+.tg-graph-card h2 {
+  overflow: hidden;
+  margin: 2px 0 0;
+  color: var(--s1-ink);
+  font-size: 15px;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tg-graph-card small,
+.tg-graph-card p,
+.tg-graph-card dt {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.tg-icon-button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+}
+
+.tg-icon-button:hover {
+  color: var(--s1-ink);
+  background: var(--s1-surface-strong);
+}
+
+.tg-card-menu,
+.tg-page-menu,
+.tg-context-menu {
+  z-index: 80;
+  padding: 5px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 7px;
+  box-shadow: 0 16px 38px color-mix(in srgb, var(--s1-ink) 16%, transparent);
+}
+
+.tg-card-menu {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  width: 178px;
+}
+
+.tg-card-menu button,
+.tg-page-menu button,
+.tg-context-menu > button {
+  display: flex;
+  width: 100%;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 9px;
+  color: var(--s1-ink);
+  font-size: 12px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+}
+
+.tg-card-menu button:hover,
+.tg-page-menu button:hover,
+.tg-context-menu > button:hover {
+  background: var(--s1-surface-strong);
+}
+
+.tg-card-menu button svg,
+.tg-page-menu button svg,
+.tg-context-menu > button svg {
+  width: 14px;
+}
+
+.tg-card-menu button.is-danger,
+.tg-page-menu button.is-danger,
+.tg-context-menu > button.is-danger {
+  color: var(--s1-danger-action);
+}
+
+.tg-graph-description {
+  min-height: 60px;
+  margin: 16px 0;
+  color: var(--s1-muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.tg-graph-card > dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin: 0;
+  background: var(--s1-line);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tg-graph-card > dl > div {
+  padding: 9px 10px;
+  background: var(--s1-surface);
+}
+
+.tg-graph-card dd {
+  margin: 2px 0 0;
+  color: var(--s1-ink);
+  font-size: 16px;
+  font-weight: 720;
+}
+
+.tg-graph-card dd.is-warning {
+  color: var(--tg-review);
+}
+
+.tg-graph-card > footer {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.tg-graph-card > footer > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.tg-graph-card > footer b {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tg-create-panel {
+  width: min(780px, 100%);
+  margin: 28px auto 0;
+  padding: 26px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+
+.tg-create-panel > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-bottom: 24px;
+}
+
+.tg-create-panel > header > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 7px;
+}
+
+.tg-create-panel h2,
+.tg-empty-graph h2,
+.tg-ai-workspace h2,
+.tg-review-workspace h2,
+.tg-history-layout h2,
+.tg-related-layout h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 26px;
+}
+
+.tg-create-panel > header p,
+.tg-create-panel > header h2 {
+  margin-top: 0;
+  margin-bottom: 4px;
+}
+
+.tg-create-panel > header p,
+.tg-create-note p,
+.tg-empty-graph > p {
+  color: var(--s1-muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.tg-create-note {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-top: 18px;
+  padding: 12px;
+  color: var(--s1-muted);
+  background: var(--s1-surface-strong);
+  border-radius: 6px;
+}
+
+.tg-create-note svg {
+  width: 16px;
+  flex: 0 0 auto;
+  color: var(--s1-accent);
+}
+
+.tg-create-note p {
+  margin: 0;
+}
+
+.tg-create-panel > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--s1-line);
+}
+
+.tg-empty-graph {
+  display: grid;
+  min-height: 520px;
+  place-items: center;
+  align-content: center;
+  padding: 38px;
+  text-align: center;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+
+.tg-empty-visual {
+  position: relative;
+  width: 180px;
+  height: 95px;
+  margin-bottom: 23px;
+}
+
+.tg-empty-visual span {
+  position: absolute;
+  display: block;
+  width: 44px;
+  height: 28px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 5px;
+  box-shadow: var(--s1-control-shadow);
+}
+
+.tg-empty-visual span:first-child {
+  top: 32px;
+  left: 0;
+}
+.tg-empty-visual span:nth-child(2) {
+  top: 0;
+  right: 0;
+}
+.tg-empty-visual span:nth-child(3) {
+  right: 0;
+  bottom: 0;
+}
+.tg-empty-visual i {
+  position: absolute;
+  top: 31px;
+  left: 44px;
+  width: 93px;
+  height: 34px;
+  border-top: 1px solid var(--s1-accent);
+  border-bottom: 1px solid var(--s1-accent);
+  transform: skewY(-20deg);
+}
+
+.tg-empty-graph > p {
+  max-width: 520px;
+  margin: 6px 0 24px;
+}
+
+.tg-empty-graph > div:last-child {
+  display: grid;
+  width: min(760px, 100%);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.tg-empty-graph > div:last-child > button {
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  gap: 11px;
+  padding: 15px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+
+.tg-empty-graph > div:last-child > button:hover {
+  border-color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+}
+
+.tg-empty-graph > div:last-child svg {
+  width: 19px;
+  color: var(--s1-accent);
+}
+
+.tg-empty-graph > div:last-child span,
+.tg-empty-graph > div:last-child small {
+  display: block;
+}
+
+.tg-empty-ai-dialog {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tg-empty-ai-plan {
+  grid-column: 1 / -1;
+  padding: 16px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+
+.tg-empty-ai-plan > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tg-empty-ai-plan > header > svg {
+  width: 18px;
+  color: var(--s1-accent);
+}
+
+.tg-empty-ai-plan > header > span {
+  display: grid;
+  gap: 2px;
+}
+
+.tg-empty-ai-plan small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+
+.tg-empty-ai-plan ol {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0 20px;
+  padding: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.tg-empty-graph > div:last-child small {
+  margin-top: 3px;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+
+.tg-content-shell {
+  position: relative;
+  min-width: 0;
+}
+.tg-content-shell.is-fullscreen {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  min-height: 0;
+  flex-direction: column;
+  padding: 12px;
+  overflow: hidden;
+  background: var(--s1-canvas);
+}
+.tg-content-shell.is-fullscreen .tg-page-strip {
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+.tg-content-shell.is-fullscreen .tg-graph-toolbar,
+.tg-content-shell.is-fullscreen .tg-batch-toolbar {
+  flex: 0 0 auto;
+}
+.tg-content-shell.is-fullscreen .tg-graph-main {
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.tg-content-shell.is-fullscreen .tg-canvas-frame,
+.tg-content-shell.is-fullscreen .tg-canvas-scroll {
+  min-height: 0;
+}
+
+.tg-page-strip {
+  display: flex;
+  min-width: 0;
+  height: 46px;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 13px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.tg-page-strip > div {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tg-page-strip > div::-webkit-scrollbar {
+  display: none;
+}
+.tg-page-strip > div > span {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border-right: 1px solid var(--s1-line);
+}
+
+.tg-page-strip > div > span > button:first-child {
+  height: 100%;
+  padding: 0 9px 0 15px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  border: 0;
+  white-space: nowrap;
+}
+
+.tg-page-strip > div > span > button:nth-child(2) {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  margin-right: 5px;
+  color: var(--s1-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+}
+
+.tg-page-strip > div > span > button:nth-child(2):hover {
+  background: var(--s1-surface-strong);
+}
+.tg-page-strip > div > span > button:nth-child(2) svg {
+  width: 13px;
+}
+.tg-page-strip > div > span.is-active {
+  box-shadow: inset 0 -2px var(--s1-accent);
+}
+.tg-page-strip > div > span.is-active > button:first-child {
+  color: var(--s1-ink);
+  font-weight: 720;
+}
+
+.tg-page-menu {
+  width: 166px;
+  padding: 5px;
+  overflow: visible;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 7px;
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--s1-ink) 17%, transparent);
+}
+
+.tg-page-menu > button {
+  display: flex;
+  width: 100%;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  color: var(--s1-ink);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+}
+
+.tg-page-menu > button:hover {
+  background: var(--s1-surface-strong);
+}
+
+.tg-page-menu > button svg {
+  width: 14px;
+}
+
+.tg-page-menu > button.is-danger {
+  color: var(--s1-danger);
+}
+
+.tg-add-page-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 0 13px;
+  color: var(--s1-accent);
+  font-size: 12px;
+  font-weight: 650;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--s1-line);
+  white-space: nowrap;
+}
+
+.tg-add-page-button svg {
+  width: 14px;
+}
+.tg-graph-toolbar {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  gap: 7px;
+  padding: 7px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+}
+
+.tg-graph-search {
+  position: relative;
+  display: flex;
+  width: min(310px, 27vw);
+  height: 34px;
+  flex: 0 1 310px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 6px;
+}
+
+.tg-graph-search:focus-within {
+  border-color: var(--s1-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--s1-accent) 13%, transparent);
+}
+.tg-graph-search > svg {
+  width: 15px;
+  color: var(--s1-muted);
+}
+.tg-graph-search input {
+  min-width: 0;
+  flex: 1;
+  color: var(--s1-ink);
+  font: inherit;
+  font-size: 12px;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  box-shadow: none !important;
+}
+
+.tg-graph-search input:focus,
+.tg-graph-search input:focus-visible {
+  border: 0;
+  outline: 0;
+  box-shadow: none !important;
+}
+.tg-graph-search > button {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: transparent;
+  border: 0;
+}
+.tg-graph-search > button svg {
+  width: 12px;
+}
+
+.tg-search-results {
+  position: absolute;
+  top: 39px;
+  left: 0;
+  width: min(460px, 78vw);
+  max-height: 390px;
+  padding: 5px;
+  overflow-y: auto;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 7px;
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--s1-ink) 17%, transparent);
+}
+
+.tg-search-results header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 8px;
+  font-size: 11px;
+}
+
+.tg-search-results header button {
+  color: var(--s1-accent);
+  background: transparent;
+  border: 0;
+}
+.tg-search-results > button {
+  display: grid;
+  width: 100%;
+  min-height: 54px;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 8px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+}
+
+.tg-search-results > button:hover {
+  background: var(--s1-surface-strong);
+}
+.tg-search-results > button > svg {
+  width: 15px;
+  color: var(--s1-accent);
+}
+.tg-search-results span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.tg-search-results b {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tg-search-results small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-search-results em {
+  padding: 2px 5px;
+  color: var(--s1-accent);
+  font-size: 10px;
+  font-style: normal;
+  background: var(--s1-accent-soft);
+  border-radius: 4px;
+}
+.tg-search-results > p {
+  margin: 8px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.tg-view-switch,
+.tg-zoom-controls {
+  display: inline-flex;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 2px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.tg-view-switch button,
+.tg-zoom-controls button,
+.tg-toolbar-button {
+  display: inline-flex;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.tg-view-switch button.is-active {
+  color: var(--s1-ink);
+  background: var(--s1-surface);
+  box-shadow: var(--s1-control-shadow);
+}
+.tg-view-switch svg,
+.tg-toolbar-button svg {
+  width: 13px;
+}
+.tg-zoom-controls button {
+  min-width: 28px;
+  padding: 0 5px;
+}
+.tg-zoom-controls button:nth-child(2) {
+  min-width: 45px;
+  color: var(--s1-ink);
+  font-variant-numeric: tabular-nums;
+}
+.tg-zoom-controls svg {
+  width: 13px;
+}
+.tg-toolbar-button:hover {
+  color: var(--s1-ink);
+  background: var(--s1-surface-strong);
+}
+.tg-toolbar-button.is-active {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--s1-accent) 24%, transparent);
+}
+.tg-toolbar-divider {
+  width: 1px;
+  height: 22px;
+  flex: 0 0 auto;
+  background: var(--s1-line);
+}
+
+.tg-graph-main {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  height: clamp(520px, calc(100vh - 396px), 680px);
+  min-height: 520px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+.tg-graph-main.is-table {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+.tg-graph-main.is-detail-closed,
+.tg-graph-main.is-table.is-detail-closed {
+  grid-template-columns: minmax(0, 1fr);
+}
+.tg-graph-workarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--tg-canvas);
+}
+.tg-canvas-frame {
+  position: relative;
+  height: 100%;
+  min-height: 520px;
+}
+.tg-canvas-scroll {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  overflow: auto;
+  scrollbar-gutter: stable both-edges;
+  background-color: var(--tg-canvas);
+  background-image: radial-gradient(
+    circle,
+    var(--tg-grid) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+  overscroll-behavior: contain;
+}
+
+.tg-canvas-scroll,
+.tg-table-scroll {
+  scrollbar-color: var(--s1-line-strong) var(--s1-surface-soft);
+  scrollbar-width: thin;
+}
+
+.tg-canvas-scroll::-webkit-scrollbar,
+.tg-table-scroll::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+.tg-canvas-scroll::-webkit-scrollbar-track,
+.tg-table-scroll::-webkit-scrollbar-track {
+  background: var(--s1-surface-soft);
+}
+
+.tg-canvas-scroll::-webkit-scrollbar-thumb,
+.tg-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--s1-line-strong);
+  border: 2px solid var(--s1-surface-soft);
+  border-radius: 99px;
+}
+
+.tg-canvas-scroll.is-pan-mode {
+  cursor: grab;
+}
+.tg-canvas-frame.is-pan-enabled .tg-canvas-scroll {
+  cursor: grab;
+}
+.tg-canvas-frame.is-pan-enabled .tg-canvas-scroll:active {
+  cursor: grabbing;
+}
+.tg-canvas-scroll.is-pan-mode:active {
+  cursor: grabbing;
+}
+.tg-shortcut-panel {
+  position: absolute;
+  z-index: 6;
+  right: 12px;
+  bottom: 12px;
+  width: max-content;
+  max-width: 250px;
+  color: var(--s1-ink);
+  background: color-mix(in srgb, var(--s1-surface) 92%, transparent);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+  box-shadow: var(--s1-shadow);
+  backdrop-filter: blur(12px);
+}
+.tg-shortcut-panel > button {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  font-weight: 650;
+  background: transparent;
+  border: 0;
+}
+.tg-shortcut-panel > button svg {
+  width: 15px;
+}
+.tg-shortcut-panel dl {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 2px 9px 9px;
+}
+.tg-shortcut-panel dl > div {
+  display: grid;
+  grid-template-columns: minmax(112px, 1fr) max-content;
+  align-items: center;
+  gap: 10px;
+}
+.tg-shortcut-panel dt,
+.tg-shortcut-panel dd {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.tg-shortcut-panel dd {
+  display: flex;
+  gap: 3px;
+}
+.tg-shortcut-panel kbd {
+  min-width: 20px;
+  padding: 1px 4px;
+  color: var(--s1-ink);
+  font: inherit;
+  text-align: center;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 4px;
+}
+.tg-canvas-size {
+  position: relative;
+  min-width: 100%;
+  min-height: 100%;
+}
+.tg-canvas-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+.tg-edge-label-button {
+  cursor: pointer;
+}
+.tg-edge-label-button rect {
+  fill: var(--s1-surface);
+  stroke: var(--s1-line-strong);
+  transition:
+    fill 120ms ease,
+    stroke 120ms ease;
+}
+.tg-edge-label-button text {
+  fill: var(--s1-muted);
+  font-size: 10px;
+  font-weight: 650;
+  pointer-events: none;
+}
+.tg-edge-label-button:hover rect,
+.tg-edge-label-button:focus rect,
+.tg-edge.is-selected .tg-edge-label-button rect {
+  fill: var(--s1-accent-soft);
+  stroke: var(--s1-accent);
+}
+.tg-edge-label-button:focus {
+  outline: 0;
+}
+.tg-pan-toggle {
+  position: absolute;
+  z-index: 12;
+  right: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 5px;
+  box-shadow: var(--s1-control-shadow);
+}
+
+.tg-pan-toggle.is-active {
+  color: var(--s1-accent);
+  border-color: var(--s1-accent);
+}
+.tg-pan-toggle svg {
+  width: 13px;
+}
+.tg-edge-layer {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.tg-edge-line {
+  fill: none;
+  stroke: color-mix(in srgb, var(--s1-muted) 52%, transparent);
+  stroke-width: 1.4;
+}
+.tg-connection-draft {
+  fill: none;
+  stroke: var(--s1-accent);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+  pointer-events: none;
+}
+.tg-connection-mode-hint {
+  position: absolute;
+  z-index: 12;
+  top: 12px;
+  left: 50%;
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  color: var(--s1-accent);
+  font-size: 11px;
+  font-weight: 650;
+  background: color-mix(in srgb, var(--s1-surface) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 28%, var(--s1-line));
+  border-radius: 6px;
+  box-shadow: var(--s1-panel-shadow);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+.tg-connection-mode-hint svg {
+  width: 13px;
+}
+.tg-edge marker path {
+  fill: color-mix(in srgb, var(--s1-muted) 60%, transparent);
+}
+.tg-edge.is-shared .tg-edge-line {
+  stroke: var(--s1-accent);
+}
+.tg-edge.is-derived .tg-edge-line {
+  stroke: var(--tg-update);
+  stroke-dasharray: 5 4;
+}
+.tg-edge.is-analysis .tg-edge-line,
+.tg-edge.is-review .tg-edge-line {
+  stroke: var(--tg-review);
+  stroke-dasharray: 4 4;
+}
+.tg-edge.is-selected .tg-edge-line {
+  stroke-width: 2.6;
+  filter: drop-shadow(
+    0 1px 2px color-mix(in srgb, var(--s1-accent) 28%, transparent)
+  );
+}
+.tg-edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+  cursor: pointer;
+}
+.tg-edge text {
+  fill: var(--s1-muted);
+  font-size: 10px;
+  paint-order: stroke;
+  stroke: var(--tg-canvas);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+
+.tg-node {
+  position: absolute;
+  display: grid;
+  height: 86px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--tg-node);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 7px;
+  box-shadow: var(--tg-node-shadow);
+  user-select: none;
+  touch-action: none;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.tg-node:hover {
+  border-color: color-mix(in srgb, var(--s1-accent) 45%, var(--s1-line));
+}
+.tg-node.is-selected {
+  z-index: 4;
+  border-color: var(--s1-accent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--s1-accent) 17%, transparent),
+    var(--tg-node-shadow);
+}
+.tg-node.is-focused {
+  animation: tg-focus-pulse 1.4s ease-out 1;
+}
+.tg-node.is-review {
+  border-color: color-mix(in srgb, var(--tg-review) 72%, var(--s1-line));
+  background: var(--tg-review-soft);
+}
+.tg-node.is-updated {
+  border-color: color-mix(in srgb, var(--tg-update) 55%, var(--s1-line));
+}
+.tg-node-kind {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 5px;
+}
+.tg-node.is-person .tg-node-kind {
+  color: #6953c7;
+  background: color-mix(in srgb, #6953c7 10%, var(--s1-surface));
+}
+.tg-node.is-company .tg-node-kind {
+  color: #087b68;
+  background: color-mix(in srgb, #087b68 10%, var(--s1-surface));
+}
+.tg-node.is-position .tg-node-kind {
+  color: #9a5c0d;
+  background: color-mix(in srgb, #9a5c0d 10%, var(--s1-surface));
+}
+.tg-node-kind svg {
+  width: 14px;
+}
+.tg-node-copy {
+  min-width: 0;
+}
+.tg-node-copy > span {
+  display: block;
+}
+.tg-node-copy > .tg-node-title {
+  color: var(--s1-ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.tg-node-copy > .tg-node-subtitle {
+  color: var(--s1-muted);
+  font-size: 10px;
+  line-height: 15px;
+}
+.tg-node-copy > .tg-node-asset {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--s1-accent);
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tg-node-asset svg {
+  width: 10px;
+  flex: 0 0 auto;
+}
+.tg-node-marker {
+  position: absolute;
+  top: -9px;
+  right: 7px;
+  display: inline-flex;
+  height: 19px;
+  align-items: center;
+  gap: 3px;
+  padding: 0 5px;
+  font-size: 9px;
+  font-weight: 700;
+  background: var(--s1-surface);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.tg-node-marker svg {
+  width: 10px;
+}
+.tg-node-marker.is-review {
+  color: var(--tg-review);
+}
+.tg-node-marker.is-updated {
+  color: var(--tg-update);
+}
+.tg-node-connector {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  right: -9px;
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-accent);
+  border-radius: 50%;
+  cursor: crosshair;
+  opacity: 0.7;
+  transform: translateY(-50%);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.tg-node:hover .tg-node-connector,
+.tg-node.is-selected .tg-node-connector,
+.tg-canvas-frame.is-connection-mode .tg-node-connector,
+.tg-node-connector:focus-visible {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.08);
+}
+.tg-node.is-drop-target {
+  border-color: var(--s1-accent);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--s1-accent) 14%, transparent),
+    var(--tg-node-shadow);
+}
+.tg-node.is-drop-target::after {
+  position: absolute;
+  right: 8px;
+  bottom: -24px;
+  padding: 3px 6px;
+  color: var(--s1-surface);
+  font-size: 9px;
+  font-weight: 700;
+  content: "松开后移动到此节点下";
+  background: var(--s1-accent);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.tg-node-connector svg {
+  width: 9px;
+  pointer-events: none;
+}
+
+.tg-node-connector::after {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  width: max-content;
+  max-width: 180px;
+  padding: 6px 8px;
+  color: var(--s1-surface);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  content: attr(data-tooltip);
+  background: color-mix(in srgb, var(--s1-ink) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s1-surface) 12%, transparent);
+  border-radius: 5px;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--s1-ink) 18%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.tg-node-connector:hover::after,
+.tg-node-connector:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.tg-collapse-node {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 50%;
+}
+.tg-collapse-node svg {
+  width: 10px;
+}
+@keyframes tg-focus-pulse {
+  0% {
+    box-shadow:
+      0 0 0 0 color-mix(in srgb, var(--s1-accent) 42%, transparent),
+      var(--tg-node-shadow);
+  }
+  65% {
+    box-shadow:
+      0 0 0 12px color-mix(in srgb, var(--s1-accent) 0%, transparent),
+      var(--tg-node-shadow);
+  }
+  100% {
+    box-shadow: var(--tg-node-shadow);
+  }
+}
+
+.tg-detail-panel {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+  padding: 17px;
+  background: var(--s1-surface);
+  border-left: 1px solid var(--s1-line);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.tg-detail-close {
+  position: absolute;
+  z-index: 2;
+  top: 11px;
+  right: 11px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 5px;
+}
+.tg-detail-close:hover {
+  color: var(--s1-ink);
+  background: var(--s1-surface-strong);
+}
+.tg-detail-close svg {
+  width: 13px;
+}
+
+.tg-detail-panel.is-empty {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.tg-detail-panel.is-empty > svg {
+  width: 28px;
+  color: var(--s1-subtle);
+}
+.tg-detail-panel.is-empty h3 {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+.tg-detail-panel.is-empty p {
+  max-width: 230px;
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.tg-detail-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding-right: 34px;
+}
+
+.tg-detail-page .s1-status,
+.tg-review-workspace .s1-status,
+.tg-history-layout .s1-status {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.tg-detail-page .s1-status > i,
+.tg-review-workspace .s1-status > i,
+.tg-history-layout .s1-status > i {
+  flex: 0 0 auto;
+}
+.tg-detail-panel > header small {
+  color: var(--s1-accent);
+  font-size: 10px;
+  font-weight: 700;
+}
+.tg-detail-panel > header h3 {
+  margin: 3px 0 0;
+  font-size: 16px;
+  line-height: 22px;
+}
+.tg-detail-panel > header p {
+  margin: 2px 0 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-detail-panel > section {
+  padding-top: 14px;
+  border-top: 1px solid var(--s1-line);
+}
+.tg-detail-panel h4 {
+  margin: 0 0 7px;
+  font-size: 12px;
+}
+.tg-detail-panel p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.tg-detail-panel section > button {
+  display: flex;
+  width: 100%;
+  min-height: 34px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  color: var(--s1-ink);
+  font-size: 11px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-detail-panel section > button svg {
+  width: 12px;
+  flex: 0 0 auto;
+  color: var(--s1-muted);
+}
+.tg-detail-panel dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.tg-detail-panel dl div {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 11px;
+}
+.tg-detail-panel dt {
+  color: var(--s1-muted);
+}
+.tg-detail-panel dd {
+  margin: 0;
+  color: var(--s1-ink);
+}
+.tg-detail-panel > footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--s1-line);
+}
+.tg-asset-reference {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  background: var(--s1-accent-soft);
+  border-radius: 6px;
+}
+.tg-asset-reference > svg {
+  width: 14px;
+  color: var(--s1-accent);
+}
+.tg-asset-reference > span {
+  display: grid;
+  gap: 2px;
+}
+.tg-asset-reference b {
+  font-size: 11px;
+}
+.tg-asset-reference small {
+  color: var(--s1-muted);
+  font-size: 10px;
+  line-height: 14px;
+}
+.tg-asset-reference.is-unlinked {
+  grid-template-columns: 28px minmax(0, 1fr);
+  background: var(--s1-surface-strong);
+}
+
+.tg-relation-endpoints {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.tg-relation-endpoints > span {
+  display: grid;
+  min-height: 58px;
+  align-content: center;
+  gap: 3px;
+  padding: 9px 11px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.tg-relation-endpoints > svg {
+  width: 14px;
+  color: var(--s1-muted);
+}
+
+.tg-relation-endpoints small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+
+.tg-relation-endpoints b {
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tg-batch-toolbar {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  color: var(--s1-ink);
+  font-size: 11px;
+  background: var(--s1-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 24%, var(--s1-line));
+}
+.tg-batch-toolbar > span {
+  flex: 1;
+  color: var(--s1-muted);
+}
+.tg-batch-toolbar > button:last-child {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: transparent;
+  border: 0;
+}
+.tg-batch-toolbar > button:last-child svg {
+  width: 12px;
+}
+
+.tg-table-view {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: var(--s1-surface);
+}
+
+.s4-horizontal-scroll-control {
+  display: grid;
+  min-height: 28px;
+  grid-template-columns: 18px minmax(0, 1fr) 18px;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--s1-surface-strong);
+  border-top: 1px solid var(--s1-line);
+  border-bottom: 1px solid var(--s1-line);
+}
+
+.s4-horizontal-scroll-control > svg {
+  width: 12px;
+  color: var(--s1-muted);
+}
+
+.s4-horizontal-scroll-control input {
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  outline: 0;
+}
+
+.s4-horizontal-scroll-control input::-webkit-slider-runnable-track {
+  height: 5px;
+  background: var(--s1-line-strong);
+  border-radius: 999px;
+}
+
+.s4-horizontal-scroll-control input::-webkit-slider-thumb {
+  width: 54px;
+  height: 9px;
+  margin-top: -2px;
+  appearance: none;
+  background: var(--s1-muted);
+  border: 2px solid var(--s1-surface-strong);
+  border-radius: 999px;
+  cursor: grab;
+}
+
+.s4-horizontal-scroll-control input::-moz-range-track {
+  height: 5px;
+  background: var(--s1-line-strong);
+  border-radius: 999px;
+}
+
+.s4-horizontal-scroll-control input::-moz-range-thumb {
+  width: 54px;
+  height: 9px;
+  background: var(--s1-muted);
+  border: 2px solid var(--s1-surface-strong);
+  border-radius: 999px;
+  cursor: grab;
+}
+
+.s4-horizontal-scroll-control input:focus-visible::-webkit-slider-thumb {
+  background: var(--s1-accent);
+}
+
+.tg-table-scroll {
+  width: 100%;
+  height: min(390px, 52vh);
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-gutter: stable both-edges;
+  overscroll-behavior: contain;
+}
+.tg-table-view table {
+  width: 100%;
+  min-width: 1260px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.tg-table-view th {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 38px;
+  padding: 0 10px;
+  color: var(--s1-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+  background: var(--s1-surface-strong);
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-table-view th:nth-child(-n + 4) {
+  width: 170px;
+}
+.tg-table-view th:nth-child(5) {
+  width: 90px;
+}
+.tg-table-view th:nth-child(6) {
+  width: 116px;
+}
+.tg-table-view th:nth-child(7) {
+  width: 220px;
+}
+.tg-table-view th:nth-child(8) {
+  width: 140px;
+}
+.tg-table-view th:last-child {
+  width: 70px;
+}
+.tg-table-view td {
+  height: 58px;
+  padding: 7px 10px;
+  color: var(--s1-ink);
+  font-size: 11px;
+  border-bottom: 1px solid var(--s1-line);
+  vertical-align: middle;
+}
+
+.tg-table-pagination {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px 12px;
+  background: var(--s1-surface);
+  border-top: 1px solid var(--s1-line);
+}
+
+.tg-table-pagination > span {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+
+.tg-evidence-preview {
+  display: grid;
+  gap: 18px;
+}
+
+.tg-evidence-preview > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+
+.tg-evidence-preview h3,
+.tg-evidence-preview h4 {
+  margin: 0;
+}
+
+.tg-evidence-preview h3 {
+  margin-top: 3px;
+  font-size: 15px;
+}
+
+.tg-evidence-preview small,
+.tg-evidence-preview dt {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+
+.tg-evidence-preview dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.tg-evidence-preview dl div {
+  padding: 11px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.tg-evidence-preview dd {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.tg-evidence-preview section {
+  padding: 14px;
+  background: color-mix(in srgb, var(--s1-accent-soft) 54%, var(--s1-surface));
+  border-left: 2px solid var(--s1-accent);
+}
+
+.tg-evidence-preview section p {
+  margin: 7px 0 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 20px;
+}
+.tg-table-view tr.is-selected td {
+  background: var(--s1-accent-soft);
+}
+.tg-table-view td.tg-level-cell {
+  padding: 7px 8px;
+  background: color-mix(
+    in srgb,
+    var(--s1-surface-strong) 34%,
+    var(--s1-surface)
+  );
+  border-right: 1px solid var(--s1-line);
+  vertical-align: top;
+}
+.tg-table-view td.tg-level-cell.is-empty {
+  color: var(--s1-muted);
+  text-align: center;
+  background: var(--s1-surface);
+}
+.tg-table-node {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 42px;
+  grid-template-columns: 25px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+.tg-table-node.is-static {
+  cursor: default;
+}
+.tg-table-node > svg {
+  width: 13px;
+  color: var(--s1-accent);
+}
+.tg-table-node > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+.tg-table-node b,
+.tg-table-node small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tg-table-node small {
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.tg-asset-create-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+.tg-asset-create-links > span {
+  display: grid;
+  gap: 2px;
+}
+.tg-asset-create-links b {
+  color: var(--s1-ink);
+  font-size: 12px;
+}
+.tg-asset-create-links small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-asset-create-links > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.tg-asset-create-links a {
+  padding: 5px 8px;
+  color: var(--s1-accent);
+  font-size: 11px;
+  text-decoration: none;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 5px;
+}
+.tg-asset-create-links a:hover {
+  border-color: color-mix(in srgb, var(--s1-accent) 36%, var(--s1-line));
+}
+.tg-tree-elbow {
+  position: absolute;
+  left: 5px;
+  width: 14px;
+  height: 18px;
+  border-left: 1px solid var(--s1-line-strong);
+  border-bottom: 1px solid var(--s1-line-strong);
+}
+
+.tg-context-menu {
+  position: fixed;
+  width: 215px;
+}
+.tg-context-menu > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px 8px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-context-menu > header button {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: transparent;
+  border: 0;
+}
+.tg-context-menu > header svg {
+  width: 11px;
+}
+
+.tg-editor-asset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 12px;
+  background: var(--s1-surface-strong);
+  border-radius: 6px;
+}
+.tg-editor-asset > span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.tg-editor-asset > span > svg {
+  width: 15px;
+  color: var(--s1-accent);
+}
+.tg-editor-asset > span > span {
+  display: grid;
+  gap: 2px;
+}
+.tg-editor-asset b {
+  font-size: 12px;
+}
+.tg-editor-asset small,
+.tg-editor-hint {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-editor-hint {
+  margin: 10px 0 0;
+}
+.tg-asset-picker-search {
+  display: flex;
+  height: 38px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 6px;
+}
+.tg-asset-picker-search:focus-within {
+  border-color: var(--s1-accent);
+}
+.tg-asset-picker-search svg {
+  width: 15px;
+  color: var(--s1-muted);
+}
+.tg-asset-picker-search input {
+  min-width: 0;
+  flex: 1;
+  color: var(--s1-ink);
+  font: inherit;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+.tg-asset-picker-list {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+}
+.tg-asset-picker-list > button {
+  display: grid;
+  min-height: 54px;
+  grid-template-columns: 30px minmax(0, 1fr) 14px;
+  gap: 9px;
+  align-items: center;
+  padding: 7px 9px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+.tg-asset-picker-list > button:hover {
+  background: var(--s1-surface-strong);
+}
+.tg-asset-picker-list > button > svg {
+  width: 14px;
+  color: var(--s1-accent);
+}
+.tg-asset-picker-list span {
+  display: grid;
+  gap: 2px;
+}
+.tg-asset-picker-list small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+
+.tg-overlay-panel {
+  position: fixed;
+  z-index: 120;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(480px, 92vw);
+  padding: 22px;
+  overflow-y: auto;
+  background: var(--s1-surface);
+  border-left: 1px solid var(--s1-line);
+  box-shadow: -18px 0 46px color-mix(in srgb, var(--s1-ink) 14%, transparent);
+}
+.tg-overlay-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tg-overlay-panel > header small {
+  color: var(--s1-accent);
+  font-size: 11px;
+}
+.tg-overlay-panel > header h2 {
+  margin: 3px 0 0;
+  font-size: 20px;
+}
+.tg-overlay-panel > header > button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+}
+.tg-overlay-panel > header > button:hover {
+  background: var(--s1-surface-strong);
+}
+.tg-overlay-panel > header svg {
+  width: 14px;
+}
+.tg-overlay-panel > p {
+  margin: 12px 0 20px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.tg-hidden-panel > div > article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 0;
+  border-top: 1px solid var(--s1-line);
+}
+.tg-hidden-panel article > span {
+  display: grid;
+  gap: 2px;
+}
+.tg-hidden-panel article small {
+  color: var(--s1-accent);
+  font-size: 10px;
+}
+.tg-hidden-panel article b {
+  font-size: 13px;
+}
+.tg-hidden-panel article p {
+  margin: 2px 0 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-panel-empty {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: var(--s1-muted);
+}
+.tg-panel-empty svg {
+  width: 24px;
+  color: var(--s1-success);
+}
+
+.tg-import-step > p {
+  margin: 12px 0 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-demo-file {
+  display: grid;
+  width: 100%;
+  min-height: 60px;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  margin-top: 10px;
+  padding: 8px 11px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+.tg-demo-file:hover {
+  border-color: var(--s1-accent);
+}
+.tg-demo-file svg {
+  width: 16px;
+  color: var(--s1-accent);
+}
+.tg-demo-file span {
+  display: grid;
+  gap: 2px;
+}
+.tg-demo-file small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-import-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
+  gap: 18px;
+}
+.tg-import-preview > section,
+.tg-import-preview > aside {
+  min-width: 0;
+  padding: 16px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+.tg-import-preview section > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tg-import-preview h3 {
+  margin: 2px 0 0;
+  font-size: 15px;
+}
+.tg-import-preview small {
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+
+.tg-import-groups {
+  display: grid;
+  gap: 12px;
+}
+
+.tg-import-group-preview {
+  display: grid;
+  gap: 7px;
+}
+
+.tg-import-group-preview article {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 11px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.tg-import-group-preview article > i {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  color: var(--s1-accent);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  background: var(--s1-accent-soft);
+  border-radius: 5px;
+}
+
+.tg-import-group-preview article > span {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.tg-import-group-preview article b {
+  color: var(--s1-ink);
+  font-size: 12px;
+}
+
+.tg-import-group-preview article p,
+.tg-import-groups-result {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 10px;
+  line-height: 16px;
+}
+
+.tg-import-group-preview article em {
+  color: var(--s1-muted);
+  font-size: 10px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.tg-import-groups-result {
+  padding: 9px 10px;
+  background: var(--s1-surface-strong);
+  border-radius: 5px;
+}
+.tg-import-tree {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 14px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+.tg-import-tree > * {
+  position: relative;
+  padding-left: 18px;
+  font-size: 12px;
+}
+.tg-import-tree > *::before {
+  position: absolute;
+  top: 7px;
+  left: 3px;
+  width: 7px;
+  height: 7px;
+  content: "";
+  background: var(--s1-accent);
+  border-radius: 50%;
+}
+.tg-import-tree .is-child {
+  margin-left: 22px;
+  color: var(--s1-muted);
+}
+.tg-import-preview dl {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0;
+}
+.tg-import-preview dl div {
+  padding: 7px;
+  border-right: 1px solid var(--s1-line);
+}
+.tg-import-preview dl div:last-child {
+  border-right: 0;
+}
+.tg-import-preview dt {
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.tg-import-preview dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.tg-duplicate-box {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: var(--tg-review-soft);
+  border-radius: 6px;
+}
+.tg-duplicate-box > svg {
+  width: 15px;
+  flex: 0 0 auto;
+  color: var(--tg-review);
+}
+.tg-duplicate-box b {
+  font-size: 12px;
+}
+.tg-duplicate-box p {
+  margin: 3px 0 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-radio-stack {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.tg-radio-stack > button {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 10px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+.tg-radio-stack > button.is-active {
+  border-color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+}
+.tg-radio-stack > button > i {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 50%;
+}
+.tg-radio-stack > button.is-active > i {
+  border-color: var(--s1-accent);
+}
+.tg-radio-stack > button > i span {
+  width: 8px;
+  height: 8px;
+  background: var(--s1-accent);
+  border-radius: 50%;
+}
+.tg-radio-stack > button > span {
+  display: grid;
+  gap: 2px;
+}
+.tg-radio-stack b {
+  font-size: 11px;
+}
+.tg-radio-stack small {
+  color: var(--s1-muted);
+  font-size: 10px;
+  line-height: 15px;
+}
+.tg-import-complete {
+  display: grid;
+  min-height: 270px;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+.tg-import-complete > i {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  color: var(--s1-success);
+  background: color-mix(in srgb, var(--s1-success) 10%, var(--s1-surface));
+  border-radius: 50%;
+}
+.tg-import-complete > i svg {
+  width: 22px;
+}
+.tg-import-complete h3 {
+  margin: 14px 0 5px;
+  font-size: 17px;
+}
+.tg-import-complete p {
+  max-width: 540px;
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.tg-import-complete > div {
+  display: flex;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.tg-analysis-banner {
+  display: grid;
+  grid-template-columns: 36px minmax(250px, 1fr) minmax(120px, 240px) auto auto;
+  gap: 11px;
+  align-items: center;
+  margin: 12px 0;
+  padding: 11px 12px;
+  background: var(--s1-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 22%, var(--s1-line));
+  border-radius: 7px;
+}
+.tg-analysis-banner.is-failed {
+  grid-template-columns: 36px minmax(250px, 1fr) auto auto;
+  background: color-mix(in srgb, var(--s1-danger) 7%, var(--s1-surface));
+  border-color: color-mix(in srgb, var(--s1-danger) 24%, var(--s1-line));
+}
+.tg-analysis-banner.is-failed .tg-analysis-icon,
+.tg-analysis-banner.is-failed small {
+  color: var(--s1-danger);
+}
+.tg-analysis-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-surface);
+  border-radius: 6px;
+}
+.tg-analysis-icon svg {
+  width: 15px;
+}
+.tg-analysis-banner > span:nth-child(2) {
+  display: grid;
+  gap: 1px;
+}
+.tg-analysis-banner small {
+  color: var(--s1-accent);
+  font-size: 10px;
+}
+.tg-analysis-banner b {
+  font-size: 12px;
+}
+.tg-analysis-banner p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.tg-analysis-meter {
+  height: 5px;
+  overflow: hidden;
+  background: var(--s1-line);
+  border-radius: 999px;
+}
+.tg-analysis-meter i {
+  display: block;
+  height: 100%;
+  background: var(--s1-accent);
+  border-radius: inherit;
+  transform-origin: left center;
+  transition: transform 240ms ease;
+}
+
+.tg-ai-workspace {
+  position: fixed;
+  z-index: 140;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 64px minmax(0, 1fr);
+  background: var(--s1-bg);
+}
+.tg-ai-workspace > header {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 0 22px;
+  background: var(--s1-surface);
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-ai-workspace > header > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  background: transparent;
+  border: 0;
+}
+.tg-ai-workspace > header > button svg {
+  width: 14px;
+}
+.tg-ai-workspace > header > span {
+  display: grid;
+  gap: 1px;
+}
+.tg-ai-workspace > header small {
+  color: var(--s1-accent);
+  font-size: 10px;
+}
+.tg-ai-workspace > header h2 {
+  font-size: 16px;
+}
+.tg-ai-layout {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(440px, 0.9fr) minmax(520px, 1.1fr);
+}
+.tg-ai-conversation {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 19px;
+  padding: 28px max(30px, 5vw) 18px;
+  overflow-y: auto;
+  background: var(--s1-surface);
+  border-right: 1px solid var(--s1-line);
+}
+.tg-ai-message {
+  align-self: flex-end;
+  max-width: 82%;
+  padding: 10px 13px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.tg-ai-message p,
+.tg-ai-reply p {
+  margin: 0;
+  color: var(--s1-ink);
+  font-size: 13px;
+  line-height: 21px;
+}
+.tg-ai-reply h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.tg-ai-reply ul {
+  margin: 10px 0 0;
+  padding-left: 19px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 21px;
+}
+.tg-ai-plan {
+  display: grid;
+  gap: 6px;
+  margin-top: auto;
+  padding: 12px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+.tg-ai-plan header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+.tg-ai-plan header small {
+  color: var(--s1-muted);
+}
+.tg-ai-plan > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-ai-plan > div svg {
+  width: 12px;
+}
+.tg-ai-plan > div.is-done svg {
+  color: var(--s1-success);
+}
+.tg-ai-composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  gap: 8px;
+  padding: 9px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 8px;
+}
+.tg-ai-composer:focus-within {
+  border-color: var(--s1-accent);
+}
+.tg-ai-composer textarea {
+  min-height: 42px;
+  max-height: 150px;
+  resize: vertical;
+  color: var(--s1-ink);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+.tg-ai-composer button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  align-self: end;
+  place-items: center;
+  color: #fff;
+  background: var(--s1-accent);
+  border: 0;
+  border-radius: 6px;
+}
+.tg-ai-composer button:disabled {
+  opacity: 0.4;
+}
+.tg-ai-composer svg {
+  width: 14px;
+}
+.tg-ai-preview {
+  padding: 28px max(28px, 4vw);
+  overflow-y: auto;
+}
+.tg-ai-preview > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.tg-ai-preview > header small {
+  color: var(--s1-accent);
+  font-size: 10px;
+}
+.tg-ai-preview h3 {
+  margin: 3px 0 0;
+  font-size: 18px;
+}
+.tg-ai-diff-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-ai-diff-item span {
+  display: grid;
+  gap: 2px;
+}
+.tg-ai-diff-item b {
+  font-size: 12px;
+}
+.tg-ai-diff-item small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.tg-ai-diff-item em {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  color: var(--s1-accent);
+  font-size: 10px;
+  font-style: normal;
+  background: var(--s1-accent-soft);
+  border-radius: 4px;
+}
+.tg-ai-diff-item.is-review em {
+  color: var(--tg-review);
+  background: var(--tg-review-soft);
+}
+.tg-ai-preview > section {
+  margin-top: 18px;
+  padding: 13px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+.tg-ai-preview h4 {
+  margin: 0 0 5px;
+  font-size: 12px;
+}
+.tg-ai-preview section p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 18px;
+}
+.tg-ai-preview > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.tg-review-workspace {
+  display: grid;
+  min-height: 680px;
+  grid-template-columns: minmax(220px, 0.65fr) minmax(420px, 1.15fr) minmax(
+      360px,
+      0.9fr
+    );
+  margin-top: 13px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tg-review-workspace.is-fullscreen {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+.tg-review-list,
+.tg-review-detail {
+  min-width: 0;
+  overflow-y: auto;
+}
+.tg-review-list {
+  border-right: 1px solid var(--s1-line);
+}
+.tg-review-list > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-review-list small,
+.tg-review-detail > header small {
+  color: var(--s1-accent);
+  font-size: 10px;
+}
+.tg-review-list h2 {
+  margin-top: 2px;
+  font-size: 16px;
+}
+.tg-review-list > button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) 13px;
+  gap: 8px;
+  padding: 13px 15px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-review-list > button.is-active {
+  background: var(--tg-review-soft);
+  box-shadow: inset 3px 0 var(--tg-review);
+}
+.tg-review-list > button > span {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.tg-review-list > button b {
+  font-size: 12px;
+  line-height: 18px;
+}
+.tg-review-list > button p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 10px;
+  line-height: 16px;
+}
+.tg-review-list > button > svg {
+  width: 12px;
+  align-self: center;
+  color: var(--s1-muted);
+}
+.tg-review-canvas {
+  min-width: 0;
+  background: var(--tg-canvas);
+  border-right: 1px solid var(--s1-line);
+}
+.tg-review-canvas > header {
+  display: flex;
+  height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 13px;
+  background: var(--s1-surface);
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-review-canvas > header > span {
+  display: grid;
+  gap: 1px;
+}
+.tg-review-canvas > header small {
+  color: var(--s1-muted);
+  font-size: 9px;
+}
+.tg-review-canvas > header b {
+  font-size: 11px;
+}
+.tg-review-canvas > header > .tg-review-location-state {
+  display: inline-flex;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 5px;
+  color: var(--tg-review);
+  font-size: 10px;
+}
+.tg-review-fullscreen-button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--s1-muted);
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 5px;
+}
+.tg-review-fullscreen-button:hover {
+  color: var(--s1-ink);
+  border-color: var(--s1-line-strong);
+}
+.tg-review-fullscreen-button svg {
+  width: 13px;
+}
+.tg-review-canvas > header i {
+  width: 7px;
+  height: 7px;
+  background: var(--tg-review);
+  border-radius: 50%;
+}
+.tg-review-canvas .tg-canvas-frame,
+.tg-review-canvas .tg-canvas-scroll {
+  min-height: 632px;
+}
+.tg-review-workspace.is-fullscreen .tg-review-canvas,
+.tg-review-workspace.is-fullscreen .tg-canvas-frame,
+.tg-review-workspace.is-fullscreen .tg-canvas-scroll {
+  height: 100%;
+  min-height: 0;
+}
+.tg-review-detail {
+  padding: 18px;
+}
+.tg-review-detail > header h2 {
+  margin: 3px 0 7px;
+  font-size: 17px;
+  line-height: 24px;
+}
+.tg-review-detail > header p,
+.tg-review-detail section p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 18px;
+}
+.tg-review-detail > section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--s1-line);
+}
+.tg-review-detail h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+}
+.tg-review-detail dl {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+}
+.tg-review-detail dl div {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 11px;
+}
+.tg-review-detail dt {
+  color: var(--s1-muted);
+}
+.tg-review-detail dd {
+  margin: 0;
+}
+.tg-review-detail section > button {
+  display: flex;
+  width: 100%;
+  min-height: 34px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  color: var(--s1-ink);
+  font-size: 11px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-review-detail section > button svg {
+  width: 12px;
+  color: var(--s1-muted);
+}
+.tg-review-detail > footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--s1-line);
+}
+.tg-review-empty {
+  display: grid;
+  min-height: 520px;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+.tg-review-empty > svg {
+  width: 28px;
+  color: var(--s1-success);
+}
+.tg-review-empty h2 {
+  margin: 10px 0 3px;
+}
+.tg-review-empty p {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+.tg-history-layout,
+.tg-related-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+.tg-history-layout > section,
+.tg-history-layout > aside,
+.tg-related-layout > section,
+.tg-related-layout > aside {
+  padding: 18px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.tg-history-layout > section > header,
+.tg-related-layout > section > header {
+  margin-bottom: 14px;
+}
+.tg-history-layout header p,
+.tg-related-layout header p {
+  margin: 4px 0 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 18px;
+}
+.tg-history-layout > section > button {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 10px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--s1-line);
+}
+.tg-history-layout > section > button.is-active {
+  background: var(--s1-accent-soft);
+}
+.tg-history-layout > section > button > span {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 2px;
+}
+
+.tg-history-layout > section > button > .s1-status {
+  display: inline-grid !important;
+  width: max-content;
+  min-width: max-content;
+  grid-template-columns: 6px max-content;
+  flex: 0 0 auto;
+  align-self: flex-start;
+  flex-flow: row nowrap;
+  word-break: keep-all;
+  white-space: nowrap !important;
+}
+
+.tg-history-layout > section > button > .s1-status > span {
+  min-width: max-content;
+  word-break: keep-all;
+  white-space: nowrap !important;
+}
+.tg-history-layout small {
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.tg-history-layout b {
+  font-size: 12px;
+}
+.tg-history-layout p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 17px;
+}
+.tg-history-layout > aside > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tg-history-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.tg-history-preview-canvas {
+  min-width: 0;
+  height: min(610px, 64vh);
+  overflow: hidden;
+  background: var(--tg-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+
+.tg-history-viewer-toolbar {
+  position: relative;
+  z-index: 35;
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 6px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+}
+
+.tg-history-viewer-toolbar > span {
+  min-width: 0;
+  flex: 1 1 auto;
+  color: var(--s1-muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+.tg-history-viewer-toolbar .tg-graph-search {
+  width: min(300px, 36vw);
+  flex-basis: 300px;
+}
+
+.tg-history-preview-workspace {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tg-history-preview-workspace.is-detail-open {
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 0.42fr);
+}
+
+.tg-history-preview-workspace > .tg-history-preview-canvas {
+  border-radius: 0 0 7px 7px;
+}
+
+.tg-history-preview-workspace.is-detail-open > .tg-history-preview-canvas {
+  border-radius: 0 0 0 7px;
+}
+
+.tg-history-preview-workspace > .tg-detail-panel {
+  max-height: min(610px, 64vh);
+  border: 1px solid var(--s1-line);
+  border-top: 0;
+  border-left: 0;
+  border-radius: 0 0 7px;
+}
+
+.tg-history-layout.is-previewing {
+  grid-template-columns: minmax(340px, 0.46fr) minmax(0, 1.54fr);
+}
+
+.tg-history-layout > aside.is-history-preview {
+  min-width: 0;
+  padding: 14px;
+}
+.tg-history-layout > aside.is-history-preview.is-fullscreen {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  min-height: 0;
+  flex-direction: column;
+  padding: 12px;
+  overflow: hidden;
+  background: var(--s1-surface);
+  border: 0;
+  border-radius: 0;
+}
+.tg-history-layout
+  > aside.is-history-preview.is-fullscreen
+  .tg-history-preview-workspace {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.tg-history-layout
+  > aside.is-history-preview.is-fullscreen
+  .tg-history-preview-canvas,
+.tg-history-layout > aside.is-history-preview.is-fullscreen .tg-canvas-frame,
+.tg-history-layout > aside.is-history-preview.is-fullscreen .tg-canvas-scroll {
+  height: 100%;
+  min-height: 0;
+}
+.tg-history-layout > aside.is-history-preview.is-fullscreen .tg-detail-panel {
+  max-height: none;
+}
+.tg-history-layout
+  > aside.is-history-preview.is-fullscreen
+  .tg-history-summary {
+  display: none;
+}
+
+.tg-history-preview-canvas .tg-canvas-frame,
+.tg-history-preview-canvas .tg-canvas-scroll {
+  min-height: 100%;
+}
+.tg-history-summary {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--s1-line);
+}
+.tg-history-summary > summary {
+  color: var(--s1-muted);
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.s4-large-relations {
+  overflow: hidden;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+}
+.s4-large-relations > .s4-pagination {
+  margin: 0;
+  border-top: 1px solid var(--s1-line);
+  border-radius: 0;
+}
+
+.s4-relationship-empty {
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 30px;
+  text-align: center;
+  background: var(--s1-canvas);
+  border: 1px dashed var(--s1-line-strong);
+  border-radius: 7px;
+}
+.s4-relationship-empty > span {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 7px;
+  place-items: center;
+}
+.s4-relationship-empty > span svg {
+  width: 19px;
+}
+.s4-relationship-empty h3,
+.s4-relationship-empty p {
+  margin: 0;
+}
+.s4-relationship-empty h3 {
+  font-size: 15px;
+}
+.s4-relationship-empty p {
+  max-width: 560px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 20px;
+}
+.s4-relationship-empty .s1-button {
+  margin-top: 7px;
+}
+.s4-relationship-ai-hint {
+  margin: 10px 0 0;
+  padding: 10px 11px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 18px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.s4-relationship-processing {
+  display: grid;
+  min-height: 360px;
+  align-content: center;
+  gap: 18px;
+  padding: 28px clamp(22px, 5vw, 72px);
+  background: var(--s1-surface);
+  border: 1px dashed var(--s1-line-strong);
+  border-radius: 7px;
+}
+
+.s4-relationship-processing > header {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) max-content;
+  gap: 12px;
+  align-items: start;
+}
+
+.s4-relationship-processing-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 7px;
+}
+
+.s4-relationship-processing-icon svg {
+  width: 17px;
+  animation: s4-ai-processing-pulse 1.4s ease-in-out infinite;
+}
+
+.s4-relationship-processing header small,
+.s4-relationship-processing-prompt small,
+.s4-relationship-processing li small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+
+.s4-relationship-processing h3 {
+  margin: 2px 0 3px;
+  font-size: 15px;
+}
+
+.s4-relationship-processing p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.s4-relationship-processing-prompt {
+  padding: 11px 12px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.s4-relationship-processing-prompt p {
+  margin-top: 4px;
+  color: var(--s1-ink);
+}
+
+.s4-relationship-processing ol {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s4-relationship-processing li {
+  display: grid;
+  min-height: 46px;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid var(--s1-line);
+}
+
+.s4-relationship-processing li > i {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 50%;
+}
+
+.s4-relationship-processing li > i svg {
+  width: 11px;
+}
+
+.s4-relationship-processing li > i span {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.s4-relationship-processing li > span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.s4-relationship-processing li b {
+  font-size: 12px;
+}
+
+.s4-relationship-processing li.is-complete > i {
+  color: var(--s1-success);
+  background: var(--s1-success-soft);
+  border-color: transparent;
+}
+
+.s4-relationship-processing li.is-running > i {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: transparent;
+  animation: s4-ai-processing-pulse 1.2s ease-in-out infinite;
+}
+
+.s4-relationship-processing li.is-pending {
+  opacity: 0.62;
+}
+
+@keyframes s4-ai-processing-pulse {
+  50% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s4-relationship-processing-icon svg,
+  .s4-relationship-processing li.is-running > i {
+    animation: none;
+  }
+}
+
+.s4-relationship-update-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+
+.s4-large-relations-toolbar {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--s1-line);
+}
+
+.s4-table-count {
+  flex: 0 0 auto;
+  color: var(--s1-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.s4-talent-table-toolbar {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.s4-talent-table-toolbar .s4-inline-search {
+  width: min(380px, 36vw);
+}
+
+.s4-talent-table-toolbar .s4-select {
+  width: 136px;
+  flex: 0 0 136px;
+}
+.s4-talent-table-toolbar .s4-select > button {
+  width: 100%;
+  max-width: none;
+}
+
+.s4-talent-filter-pair {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.s4-talent-table .s4-large-relations-scroll {
+  height: 360px;
+  max-height: 360px;
+  overflow: scroll;
+  scrollbar-gutter: stable both-edges;
+}
+
+.s4-talent-table table {
+  min-width: 1160px;
+}
+
+.s4-inline-search {
+  display: flex;
+  width: min(360px, 44vw);
+  height: 34px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 6px;
+}
+
+.s4-inline-search:focus-within {
+  border-color: var(--s1-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--s1-accent) 13%, transparent);
+}
+
+.s4-inline-search > svg {
+  width: 15px;
+  flex: 0 0 auto;
+  color: var(--s1-muted);
+}
+
+.s4-inline-search input {
+  min-width: 0;
+  flex: 1;
+  color: var(--s1-ink);
+  font: inherit;
+  font-size: 12px;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  box-shadow: none !important;
+}
+
+.s4-relation-type-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+
+.s4-relation-type-tabs button {
+  height: 28px;
+  padding: 0 10px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+}
+
+.s4-relation-type-tabs button.is-active {
+  color: var(--s1-ink);
+  background: var(--s1-surface);
+  box-shadow: var(--s1-control-shadow);
+}
+.s4-company-relation-tabs {
+  margin-bottom: 14px;
+}
+
+.s4-large-relations-scroll {
+  max-height: 500px;
+  overflow: auto;
+  scrollbar-gutter: stable both-edges;
+}
+
+.s4-large-relations table {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.s4-large-relations th,
+.s4-large-relations td {
+  padding: 9px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--s1-line);
+  vertical-align: middle;
+}
+
+.s4-large-relations th {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  color: var(--s1-muted);
+  font-size: 10px;
+  background: var(--s1-surface-strong);
+}
+
+.s4-large-relations th:nth-child(1) {
+  width: 88px;
+}
+.s4-large-relations th:nth-child(2) {
+  width: 300px;
+}
+.s4-large-relations th:nth-child(3) {
+  width: 190px;
+}
+.s4-large-relations th:nth-child(4) {
+  width: 150px;
+}
+.s4-large-relations th:nth-child(5) {
+  width: 105px;
+}
+.s4-large-relations th:nth-child(6) {
+  width: 100px;
+}
+
+.s4-large-relations td {
+  color: var(--s1-ink);
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.s4-table-muted {
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+
+.s4-large-relations-footer {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px 12px;
+}
+
+.s4-large-relations-footer > span {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+
+.s4-detail-stack .s3-relationship-workspace {
+  margin: 0;
+}
+.tg-history-layout > aside > header h2 {
+  margin-top: 2px;
+  font-size: 16px;
+}
+.tg-version-diff {
+  display: grid;
+  gap: 4px;
+  margin: 18px 0;
+}
+.tg-version-diff article {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  padding: 10px;
+  background: var(--s1-surface-strong);
+  border-radius: 6px;
+}
+.tg-version-diff article > span:first-child {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-surface);
+  border-radius: 5px;
+}
+.tg-version-diff article > span:first-child svg {
+  width: 13px;
+}
+.tg-version-diff article > span:last-child {
+  display: grid;
+  gap: 2px;
+}
+.tg-version-diff article b {
+  font-size: 11px;
+}
+.tg-version-diff article p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.tg-related-layout > section > button {
+  display: grid;
+  width: 100%;
+  min-height: 62px;
+  grid-template-columns: 32px minmax(0, 1fr) 14px;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 6px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--s1-line);
+}
+.tg-related-layout > section > button:hover {
+  background: var(--s1-surface-strong);
+}
+.tg-related-layout > section > button > svg {
+  width: 15px;
+  color: var(--s1-accent);
+}
+.tg-related-layout > section > button > span {
+  display: grid;
+  gap: 2px;
+}
+.tg-related-layout > section b {
+  font-size: 12px;
+}
+.tg-related-layout > section small {
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.tg-related-layout > aside article {
+  display: grid;
+  gap: 2px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.tg-related-layout > aside small {
+  color: var(--s1-muted);
+  font-size: 10px;
+}
+.tg-related-layout > aside b {
+  font-size: 11px;
+}
+.tg-related-layout > aside p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 10px;
+  line-height: 16px;
+}
+
+@media (max-width: 1180px) {
+  .tg-graph-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tg-graph-toolbar {
+    flex-wrap: wrap;
+  }
+  .tg-graph-search {
+    width: min(420px, 50vw);
+    flex-basis: 360px;
+  }
+  .tg-graph-main {
+    grid-template-columns: minmax(0, 1fr) 270px;
+  }
+  .tg-review-workspace {
+    grid-template-columns: 230px minmax(380px, 1fr);
+  }
+  .tg-review-detail {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--s1-line);
+  }
+}
+
+@media (max-width: 820px) {
+  .tg-graph-grid {
+    grid-template-columns: 1fr;
+  }
+  .tg-empty-graph > div:last-child {
+    grid-template-columns: 1fr;
+  }
+  .tg-page-strip {
+    height: auto;
+    min-height: 46px;
+    align-items: stretch;
+  }
+  .tg-add-page-button {
+    padding-inline: 10px;
+    font-size: 0;
+  }
+  .tg-add-page-button svg {
+    width: 16px;
+  }
+  .tg-graph-search {
+    width: 100%;
+    flex-basis: 100%;
+    order: -1;
+  }
+  .tg-graph-main,
+  .tg-graph-main.is-table {
+    grid-template-columns: 1fr;
+  }
+  .tg-detail-panel {
+    min-height: 300px;
+    border-top: 1px solid var(--s1-line);
+    border-left: 0;
+  }
+  .tg-import-preview {
+    grid-template-columns: 1fr;
+  }
+  .tg-analysis-banner {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+  }
+  .tg-analysis-meter {
+    grid-column: 2 / -1;
+  }
+  .tg-analysis-banner > .s1-button {
+    grid-row: auto;
+  }
+  .tg-ai-layout {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .tg-ai-conversation,
+  .tg-ai-preview {
+    overflow: visible;
+  }
+  .tg-ai-workspace > header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .tg-ai-workspace > header > button {
+    font-size: 0;
+  }
+  .tg-review-workspace {
+    grid-template-columns: 1fr;
+  }
+  .tg-review-list {
+    max-height: 260px;
+    border-right: 0;
+  }
+  .tg-review-canvas {
+    border-top: 1px solid var(--s1-line);
+    border-right: 0;
+  }
+  .tg-review-detail {
+    grid-column: auto;
+  }
+  .tg-history-layout,
+  .tg-related-layout {
+    grid-template-columns: 1fr;
+  }
+  .tg-history-viewer-toolbar {
+    flex-wrap: wrap;
+  }
+  .tg-history-viewer-toolbar .tg-graph-search {
+    width: 100%;
+    flex-basis: 100%;
+  }
+  .tg-history-viewer-toolbar > span {
+    text-align: left;
+  }
+  .tg-history-preview-workspace.is-detail-open {
+    grid-template-columns: 1fr;
+  }
+  .tg-history-preview-workspace > .tg-detail-panel {
+    max-height: none;
+    border-top: 0;
+    border-left: 1px solid var(--s1-line);
+    border-radius: 0 0 7px 7px;
+  }
+}
+
+@media (max-width: 520px) {
+  .tg-create-panel {
+    padding: 18px;
+  }
+  .tg-graph-card {
+    min-height: 270px;
+  }
+  .tg-graph-toolbar {
+    gap: 5px;
+  }
+  .tg-toolbar-divider {
+    display: none;
+  }
+  .tg-toolbar-button {
+    font-size: 0;
+    padding-inline: 7px;
+  }
+  .tg-graph-main {
+    min-height: 520px;
+  }
+  .tg-canvas-frame,
+  .tg-canvas-scroll {
+    min-height: 520px;
+  }
+  .tg-analysis-banner {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+  .tg-analysis-banner > .s1-button {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .tg-ai-workspace > header {
+    padding-inline: 12px;
+  }
+  .tg-ai-workspace > header .s1-status {
+    display: none;
+  }
+  .tg-ai-conversation,
+  .tg-ai-preview {
+    padding: 20px 16px;
+  }
+  .tg-review-workspace {
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tg-node.is-focused {
+    animation: none;
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--s1-accent) 26%, transparent),
+      var(--tg-node-shadow);
+  }
+  .tg-graph-card,
+  .tg-analysis-meter i {
+    transition: none;
+  }
+}
+
 .s1-main
   :where(
     a[href],
@@ -2034,7 +5858,7 @@
 .s4-input:focus,
 .s4-textarea:focus {
   border-color: var(--s1-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s1-accent) 14%, transparent);
+  box-shadow: var(--s1-control-shadow);
 }
 .s4-input:disabled,
 .s4-textarea:disabled {

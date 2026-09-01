@@ -1753,4 +1753,282 @@ export function NotFoundState({ label, onBack }) {
   );
 }
 
+export function HorizontalScrollControl({ scrollRef, label = "横向滚动表格" }) {
+  const [metrics, setMetrics] = useState({ value: 0, max: 0 });
+
+  useLayoutEffect(() => {
+    const element = scrollRef.current;
+    if (!element) return undefined;
+    const update = () =>
+      setMetrics({
+        value: Math.round(element.scrollLeft),
+        max: Math.max(0, Math.round(element.scrollWidth - element.clientWidth)),
+      });
+    update();
+    element.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    if (element.firstElementChild) observer.observe(element.firstElementChild);
+    return () => {
+      element.removeEventListener("scroll", update);
+      observer.disconnect();
+    };
+  }, [scrollRef]);
+
+  if (!metrics.max) return null;
+  return (
+    <div className="s4-horizontal-scroll-control">
+      <Icon name="chevronLeft" />
+      <input
+        type="range"
+        min="0"
+        max={metrics.max}
+        value={metrics.value}
+        aria-label={label}
+        onChange={(event) => {
+          const value = Number(event.target.value);
+          scrollRef.current?.scrollTo({ left: value, behavior: "auto" });
+          setMetrics((current) => ({ ...current, value }));
+        }}
+      />
+      <Icon name="chevronRight" />
+    </div>
+  );
+}
+
+function hierarchyLevelCell(rows, rowIndex, level) {
+  const path = rows[rowIndex].path || [];
+  const node = path[level];
+  if (!node) return { node: null, rowSpan: 1 };
+  const key = path
+    .slice(0, level + 1)
+    .map((item) => item.id || item.label)
+    .join("/");
+  if (rowIndex > 0) {
+    const previousKey = (rows[rowIndex - 1].path || [])
+      .slice(0, level + 1)
+      .map((item) => item.id || item.label)
+      .join("/");
+    if (previousKey === key && rows[rowIndex - 1].path?.[level]) return null;
+  }
+  let rowSpan = 1;
+  for (let index = rowIndex + 1; index < rows.length; index += 1) {
+    const nextKey = (rows[index].path || [])
+      .slice(0, level + 1)
+      .map((item) => item.id || item.label)
+      .join("/");
+    if (nextKey !== key || !rows[index].path?.[level]) break;
+    rowSpan += 1;
+  }
+  return { node, rowSpan };
+}
+
+export function HierarchyTable({
+  rows,
+  columns,
+  page,
+  pages,
+  pageSize = 5,
+  totalLabel,
+  onPageChange,
+  renderLevel,
+  rowClassName,
+  scrollLabel = "横向滚动层级表格",
+  testId,
+}) {
+  const scrollRef = useRef(null);
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element) return undefined;
+    const handleWheel = (event) => {
+      if (!event.shiftKey || !event.deltaY) return;
+      event.preventDefault();
+      element.scrollLeft += event.deltaY;
+    };
+    element.addEventListener("wheel", handleWheel, { passive: false });
+    return () => element.removeEventListener("wheel", handleWheel);
+  }, []);
+  return (
+    <div className="tg-table-view s4-hierarchy-table">
+      <div
+        className="tg-table-scroll"
+        data-testid={testId}
+        ref={scrollRef}
+        role="region"
+        aria-label={scrollLabel}
+        tabIndex="0"
+      >
+        <table>
+          <thead>
+            <tr aria-label="层级表格列">
+              <th>一级节点</th>
+              <th>二级节点</th>
+              <th>三级节点</th>
+              <th>四级及更深</th>
+              {columns.map((column) => (
+                <th key={column.key}>{column.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, rowIndex) => (
+              <tr key={row.id} className={rowClassName?.(row) || ""}>
+                {[0, 1, 2, 3].map((level) => {
+                  const cell = hierarchyLevelCell(rows, rowIndex, level);
+                  if (!cell) return null;
+                  return (
+                    <td
+                      key={level}
+                      rowSpan={cell.rowSpan}
+                      className={`tg-level-cell ${cell.node ? "" : "is-empty"}`}
+                    >
+                      {cell.node ? renderLevel(cell.node, level, row) : "—"}
+                    </td>
+                  );
+                })}
+                {columns.map((column) => (
+                  <td key={column.key}>{column.render(row)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="tg-table-pagination">
+        <span>{totalLabel}</span>
+        <Pagination
+          page={page}
+          pages={pages}
+          pageSize={pageSize}
+          onChange={onPageChange}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function RelationshipAiEmptyState({
+  title,
+  description,
+  actionLabel,
+  onAction,
+}) {
+  return (
+    <div className="s4-relationship-empty">
+      <span>
+        <Icon name="route" />
+      </span>
+      <h3>{title}</h3>
+      <p>{description}</p>
+      <Button tone="primary" icon="sparkles" onClick={onAction}>
+        {actionLabel}
+      </Button>
+    </div>
+  );
+}
+
+export function RelationshipAiProcessingState({
+  title,
+  description,
+  prompt,
+  steps = ["读取已有关联资产", "整理可核验关系", "生成可查看结果"],
+  activeStep = 1,
+}) {
+  return (
+    <section className="s4-relationship-processing" aria-live="polite">
+      <header>
+        <span className="s4-relationship-processing-icon">
+          <Icon name="sparkles" />
+        </span>
+        <span>
+          <small>AI 正在处理</small>
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </span>
+        <StatusBadge tone="info">运行中</StatusBadge>
+      </header>
+      {prompt ? (
+        <div className="s4-relationship-processing-prompt">
+          <small>本次要求</small>
+          <p>{prompt}</p>
+        </div>
+      ) : null}
+      <ol>
+        {steps.map((step, index) => {
+          const state =
+            index < activeStep
+              ? "complete"
+              : index === activeStep
+                ? "running"
+                : "pending";
+          return (
+            <li className={`is-${state}`} key={step}>
+              <i>{state === "complete" ? <Icon name="check" /> : <span />}</i>
+              <span>
+                <b>{step}</b>
+                <small>
+                  {state === "complete"
+                    ? "已完成"
+                    : state === "running"
+                      ? "正在处理"
+                      : "等待处理"}
+                </small>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
+export function RelationshipAiDialog({
+  open,
+  close,
+  title,
+  description,
+  initialPrompt,
+  submitLabel,
+  onSubmit,
+}) {
+  const [prompt, setPrompt] = useState(initialPrompt || "");
+  useEffect(() => {
+    if (open) setPrompt(initialPrompt || "");
+  }, [initialPrompt, open]);
+  return (
+    <Modal
+      open={open}
+      close={close}
+      size="lg"
+      title={title}
+      description={description}
+      footer={
+        <>
+          <Button onClick={close}>取消</Button>
+          <Button
+            tone="primary"
+            disabled={!prompt.trim()}
+            onClick={() => onSubmit(prompt.trim())}
+          >
+            {submitLabel}
+          </Button>
+        </>
+      }
+    >
+      <FormField label="告诉 Hunter 需要如何整理" required>
+        <TextArea
+          value={prompt}
+          onChange={setPrompt}
+          rows={6}
+          placeholder="说明目标、关注范围、需要优先展示的关系，以及不应纳入的内容。"
+        />
+      </FormField>
+      <p className="s4-relationship-ai-hint">
+        Hunter
+        会结合当前资产、已核验证据和可用的公开资料生成或更新关系图；证据不足的关系会标记为待确认。
+      </p>
+    </Modal>
+  );
+}
+
 export { Button, Drawer, Modal, StatusBadge, Tabs, useToast };

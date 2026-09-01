@@ -161,9 +161,19 @@ export function TasksPage() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") || "runs";
+  const backgroundView = params.get("view") === "background";
   const state = params.get("state") || "normal";
   const [filters, setFilters] = useState({});
-  const rawSource = tab === "errors" ? errorGroups : tasks;
+  const rawSource =
+    tab === "errors"
+      ? errorGroups
+      : backgroundView
+        ? tasks.filter((item) =>
+            ["图谱关系同步", "关系派生重算", "岗位人才梳理更新"].includes(
+              item.type,
+            ),
+          )
+        : tasks;
   const source = useMemo(
     () =>
       rawSource.filter((item) => {
@@ -243,8 +253,12 @@ export function TasksPage() {
   return (
     <div className="ops-page">
       <OpsPageHeader
-        title="运行与故障"
-        description="统一查看任务运行、任务步骤运行、资产 AI 运行和系统运行的脱敏元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
+        title={backgroundView ? "图谱后台运行" : "运行与故障"}
+        description={
+          backgroundView
+            ? "查看图谱同步、关系派生重算和岗位人才梳理更新的脱敏状态；运营端不展示图谱正文和人物关系内容。"
+            : "统一查看任务运行、任务步骤运行、资产 AI 运行和系统运行的脱敏元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
+        }
       />
       <OpsTabs
         value={tab}
@@ -300,6 +314,9 @@ export function TasksPage() {
                       "学术搜索",
                       "公司调研",
                       "邮箱回复检查",
+                      "图谱关系同步",
+                      "关系派生重算",
+                      "岗位人才梳理更新",
                     ],
                     value: filters.type || [],
                     onChange: (value) =>

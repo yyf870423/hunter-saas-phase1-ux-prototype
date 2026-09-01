@@ -21,7 +21,10 @@ export function SignalsPage() {
   const [signals, setSignals] = useState(initialSignals);
   const [tab, setTab] = useState("全部");
   const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState(initialSignals[0].id);
+  const [selectedId, setSelectedId] = useState(
+    initialSignals.find((signal) => signal.id === "signal-cloudchip")?.id ||
+      initialSignals[0].id,
+  );
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [convertOpen, setConvertOpen] = useState(false);
   const [convertType, setConvertType] = useState("new");
@@ -167,9 +170,11 @@ export function SignalsPage() {
                         name={
                           signal.type === "候选人动向"
                             ? "user"
-                            : signal.type === "公司变化"
-                              ? "building"
-                              : "signal"
+                            : signal.type === "关系变化"
+                              ? "route"
+                              : signal.type === "公司变化"
+                                ? "building"
+                                : "signal"
                         }
                       />
                     </i>
@@ -276,13 +281,22 @@ export function SignalsPage() {
                 <section>
                   <h3>建议行动</h3>
                   <p>
-                    {selected.status === "已转化"
-                      ? "该信号已经转化并保留去向，可以查看关联任务。"
-                      : "建议先核验公司当前招聘需求和关键联系人，再决定是否启动客户开发任务。"}
+                    {selected.graphPath
+                      ? "可靠变化已经更新；请查看图谱中的待确认关系，确认后再成为可复用结果。"
+                      : selected.status === "已转化"
+                        ? "该信号已经转化并保留去向，可以查看关联任务。"
+                        : "建议先核验公司当前招聘需求和关键联系人，再决定是否启动客户开发任务。"}
                   </p>
                 </section>
                 <footer>
-                  {selected.status === "已转化" ? (
+                  {selected.graphPath ? (
+                    <Button
+                      tone="primary"
+                      onClick={() => navigate(selected.graphPath)}
+                    >
+                      查看图谱审核
+                    </Button>
+                  ) : selected.status === "已转化" ? (
                     <Button
                       tone="primary"
                       onClick={() => navigate("/tasks/position-vla")}

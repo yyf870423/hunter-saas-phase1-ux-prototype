@@ -291,6 +291,9 @@ export function LandscapeReviewWorkspace({
   const confirmedPendingCount = Object.values(pendingDecisions).filter(
     (value) => value === "write",
   ).length;
+  const unresolvedPendingCount = Object.values(pendingDecisions).filter(
+    (value) => value === "pending",
+  ).length;
   const decidePending = (key, value) =>
     setPendingDecisions((current) => ({ ...current, [key]: value }));
   const switchTab = (nextTab) => {
@@ -459,10 +462,10 @@ export function LandscapeReviewWorkspace({
     [],
   );
   return (
-    <section className="s3-review-workspace" aria-label="人才版图更新审核">
+    <section className="s3-review-workspace" aria-label="专题图谱更新审核">
       <ReviewHeader
         eyebrow="人才摸排 · 变更批次审核"
-        title="具身智能核心人才版图"
+        title="具身智能 VLA 专题图谱"
         summary="本批次 4 家公司 · 30 位人物 · 10 条关系"
         onClose={onClose}
       />
@@ -470,7 +473,7 @@ export function LandscapeReviewWorkspace({
         <div
           className="s3-review-tabs app-tabs"
           role="tablist"
-          aria-label="人才版图审核内容"
+          aria-label="专题图谱审核内容"
         >
           <button
             type="button"
@@ -540,20 +543,27 @@ export function LandscapeReviewWorkspace({
           />
         ) : null}
       </div>
-      <footer className="s3-review-footer">
-        <span>
+      <footer className="s3-review-footer s3-landscape-review-complete">
+        <div className="s3-landscape-destination-copy">
           <b>
-            写入本批次结果
-            {confirmedPendingCount
-              ? `，含 ${confirmedPendingCount} 项用户确认内容`
-              : ""}
+            {unresolvedPendingCount
+              ? `还有 ${unresolvedPendingCount} 项待确认内容必须处理`
+              : `本批次内容已处理完毕${
+                  confirmedPendingCount
+                    ? `，含 ${confirmedPendingCount} 项用户确认内容`
+                    : ""
+                }`}
           </b>
           <small>
-            自动流程不会写入待确认内容；用户明确确认写入的项目会记录确认人、时间和原始冲突。
+            完成审核后返回任务对话，再决定保存为新图谱、更新已有图谱或只保留报告。
           </small>
-        </span>
-        <Button tone="primary" onClick={() => onApply(pendingDecisions)}>
-          更新人才版图
+        </div>
+        <Button
+          tone="primary"
+          disabled={unresolvedPendingCount > 0}
+          onClick={() => onApply(pendingDecisions)}
+        >
+          完成审核并返回对话
         </Button>
       </footer>
     </section>

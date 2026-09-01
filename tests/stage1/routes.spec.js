@@ -11,9 +11,7 @@ test("审核入口暴露阶段四全部业务资产范围", async ({ page }) => 
   await expect(
     page.getByRole("link", { name: /从候选人列表开始验收/ }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: /人才版图重名导入/ }),
-  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /专题图谱导入/ })).toBeVisible();
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });

@@ -96,8 +96,7 @@ a {
 }
 
 button:focus-visible,
-a:focus-visible,
-input:focus-visible {
+a:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 2px var(--s1-surface),
@@ -165,8 +164,7 @@ input:focus-visible {
 }
 
 .s1-app[data-theme="dark"] button:focus-visible,
-.s1-app[data-theme="dark"] a:focus-visible,
-.s1-app[data-theme="dark"] input:focus-visible {
+.s1-app[data-theme="dark"] a:focus-visible {
   box-shadow:
     0 0 0 2px var(--s1-canvas),
     0 0 0 4px color-mix(in srgb, var(--s1-accent) 72%, transparent);
@@ -2052,6 +2050,9 @@ input:focus-visible {
 }
 .s1-modal-lg {
   width: min(880px, 100%);
+}
+.s1-modal-xl {
+  width: min(1080px, 100%);
 }
 
 .s1-modal > header,

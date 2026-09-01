@@ -14,7 +14,7 @@ const routes = [
   ["candidates", "候选人"],
   ["positions/position-vla?tab=matching", "匹配结果"],
   ["companies/company-xinglan", "星澜机器人"],
-  ["mappings/mapping-embodied?tab=people", "人物与关系"],
+  ["mappings/mapping-embodied?tab=content", "具身智能 VLA 专题图谱"],
   ["papers", "论文"],
   ["data/imports", "数据导入"],
 ];
@@ -45,7 +45,7 @@ test("阶段四关键页面生成桌面、平板和手机截图", async ({ page 
       path: `artifacts/stage4-matching-${viewport.name}.png`,
       fullPage: true,
     });
-    await page.goto("#/mappings/mapping-embodied?tab=people");
+    await page.goto("#/mappings/mapping-embodied?tab=content");
     await page.screenshot({
       path: `artifacts/stage4-mapping-${viewport.name}.png`,
       fullPage: true,

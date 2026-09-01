@@ -380,6 +380,95 @@
   color: var(--s1-muted);
   font-size: 12px;
 }
+.s3-landscape-destination-footer {
+  align-items: stretch;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(520px, 1.8fr);
+  padding-block: 16px;
+}
+.s3-landscape-destination-copy,
+.s3-landscape-destination-copy b,
+.s3-landscape-destination-copy small {
+  display: block;
+}
+.s3-landscape-destination-copy small {
+  margin-top: 6px;
+}
+.s3-landscape-destination-options {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.s3-landscape-destination-options > button {
+  align-items: center;
+  background: var(--s1-surface-raised);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+  color: var(--s1-text);
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 28px minmax(0, 1fr) 18px;
+  min-height: 72px;
+  padding: 10px 12px;
+  text-align: left;
+}
+.s3-landscape-destination-options > button:hover {
+  background: var(--s1-surface-soft);
+  border-color: var(--s1-line-strong);
+}
+.s3-landscape-destination-options > button.is-selected {
+  background: color-mix(
+    in srgb,
+    var(--s1-accent-soft) 74%,
+    var(--s1-surface-raised)
+  );
+  border-color: var(--s1-accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--s1-accent) 24%, transparent);
+}
+.s3-landscape-destination-options > button > i {
+  align-items: center;
+  background: var(--s1-surface-soft);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+.s3-landscape-destination-options > button > i svg,
+.s3-landscape-destination-options > button > svg {
+  height: 16px;
+  width: 16px;
+}
+.s3-landscape-destination-options > button > span,
+.s3-landscape-destination-options b,
+.s3-landscape-destination-options small {
+  display: block;
+  min-width: 0;
+}
+.s3-landscape-destination-options b {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.s3-landscape-destination-options small {
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 1.45;
+  margin-top: 3px;
+}
+.s3-landscape-destination-submit {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+.s3-landscape-destination-submit > small {
+  color: var(--s1-muted);
+  max-width: 680px;
+}
 .s3-review-empty {
   display: grid;
   min-height: 240px;
@@ -702,6 +791,12 @@
 .s3-pending-decision .s3-pending-control {
   justify-content: flex-start;
 }
+.s3-pending-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
 
 .s3-relationship-workspace {
   display: grid;
@@ -712,6 +807,23 @@
   background: var(--s1-surface);
   border: 1px solid var(--s1-line);
   border-radius: 8px;
+}
+.s3-relationship-workspace.is-fullscreen {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 0;
+  background: var(--s1-surface);
+  border: 0;
+  border-radius: 0;
+}
+.s3-relationship-workspace.is-fullscreen .s3-relationship-body,
+.s3-relationship-workspace.is-fullscreen .s3-relationship-canvas-shell,
+.s3-relationship-workspace.is-fullscreen .s3-relationship-viewport {
+  height: 100%;
+  min-height: 0;
 }
 .s3-relationship-header {
   display: grid;
@@ -799,6 +911,12 @@
   min-height: 520px;
   grid-template-columns: minmax(0, 1fr) 330px;
 }
+.s3-relationship-body.is-detail-hidden {
+  grid-template-columns: minmax(0, 1fr);
+}
+.s3-relationship-body.is-detail-hidden .s3-relationship-canvas-shell {
+  border-right: 0;
+}
 .s3-relationship-canvas-shell {
   position: relative;
   min-width: 0;
@@ -834,16 +952,38 @@
   font-size: 10px;
   text-align: center;
 }
+.s3-relationship-actionbar {
+  position: absolute;
+  z-index: 7;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  max-width: calc(100% - 190px);
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--s1-surface) 94%, transparent);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+  box-shadow: var(--s1-control-shadow);
+}
+.s3-relationship-actionbar .s1-button {
+  min-height: 28px;
+}
 .s3-relationship-viewport {
   width: 100%;
   height: 100%;
   min-height: 520px;
-  overflow: auto;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+.s3-relationship-viewport:active {
+  cursor: grabbing;
 }
 .s3-relationship-stage {
   position: relative;
   transform-origin: 0 0;
-  transition: transform 160ms ease;
 }
 .s3-relationship-edges {
   position: absolute;
@@ -873,6 +1013,13 @@
   fill: none;
   stroke: color-mix(in srgb, currentColor 52%, var(--s1-line));
   stroke-width: var(--s3-edge-width, 1.5px);
+}
+.s3-relationship-connection-draft {
+  fill: none;
+  stroke: var(--s1-accent);
+  stroke-dasharray: 5 4;
+  stroke-width: 1.5px;
+  pointer-events: none;
 }
 .s3-relationship-edge.is-active .s3-edge-line,
 .s3-relationship-edge:focus-visible .s3-edge-line {
@@ -911,8 +1058,8 @@
   position: absolute;
   z-index: 3;
   display: flex;
-  width: 148px;
-  height: 62px;
+  width: 168px;
+  height: 78px;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
@@ -933,6 +1080,14 @@
   border-color: color-mix(in srgb, var(--s1-accent) 38%, var(--s1-line));
   transform: translateY(-1px);
 }
+.s3-relationship-node.is-draggable {
+  cursor: grab;
+  touch-action: none;
+}
+.s3-relationship-node.is-draggable:active {
+  z-index: 5;
+  cursor: grabbing;
+}
 .s3-relationship-node.is-active {
   border-color: var(--s1-accent);
   box-shadow:
@@ -946,28 +1101,109 @@
   border-color: var(--s1-warning);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--s1-warning) 16%, transparent);
 }
-.s3-relationship-node span {
+.s3-relationship-node-copy {
+  display: grid;
   min-width: 0;
+  flex: 1 1 auto;
+  gap: 1px;
 }
-.s3-relationship-node b,
-.s3-relationship-node small {
+.s3-relationship-node-title,
+.s3-relationship-node-subtitle {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.s3-relationship-node b {
+.s3-relationship-node-title {
+  color: var(--s1-ink);
   font-size: 12px;
+  font-weight: 700;
+  line-height: 17px;
 }
-.s3-relationship-node small {
-  margin-top: 4px;
+.s3-relationship-node-subtitle {
   color: var(--s1-muted);
   font-size: 10px;
+  line-height: 15px;
+}
+.s3-relationship-node-asset {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+  color: var(--s1-accent);
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s3-relationship-node-asset svg {
+  width: 10px;
+  flex: 0 0 auto;
 }
 .s3-relationship-node > svg {
   flex: 0 0 auto;
   width: 15px;
   color: var(--s1-warning);
+}
+.s3-relationship-node-connector {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  right: -9px;
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-accent);
+  border-radius: 50%;
+  cursor: crosshair;
+  opacity: 0.72;
+  transform: translateY(-50%);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+.s3-relationship-node:hover .s3-relationship-node-connector,
+.s3-relationship-node.is-active .s3-relationship-node-connector,
+.s3-relationship-node-connector:focus-visible {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.08);
+}
+.s3-relationship-node-connector svg {
+  width: 9px;
+  pointer-events: none;
+}
+.s3-relationship-node-connector::after {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  width: max-content;
+  padding: 6px 8px;
+  color: var(--s1-surface);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  content: attr(data-tooltip);
+  background: color-mix(in srgb, var(--s1-ink) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s1-surface) 12%, transparent);
+  border-radius: 5px;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--s1-ink) 18%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+.s3-relationship-node-connector:hover::after,
+.s3-relationship-node-connector:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 .s3-relationship-node.is-company {
   border-left: 3px solid var(--s1-accent);
@@ -988,6 +1224,87 @@
   overflow-y: auto;
   background: var(--s1-surface-raised);
 }
+.s3-relation-editor-endpoints {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  background: var(--s1-surface-strong);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+}
+.s3-relation-editor-endpoints > span {
+  display: grid;
+  gap: 3px;
+}
+.s3-relation-editor-endpoints small,
+.s3-relationship-delete-copy {
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 18px;
+}
+.s3-relation-editor-endpoints > svg {
+  width: 14px;
+  color: var(--s1-muted);
+}
+.s3-relationship-delete-copy {
+  margin: 0;
+}
+.s3-relationship-context-menu {
+  position: fixed;
+  z-index: 240;
+  display: grid;
+  width: 180px;
+  overflow: hidden;
+  background: var(--s1-surface-raised);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 7px;
+  box-shadow: var(--s1-popover-shadow);
+}
+.s3-relationship-context-menu > header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 7px 7px 7px 10px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s3-relationship-context-menu > header b {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s3-relationship-context-menu > header .s1-icon-button {
+  width: 25px;
+  height: 25px;
+}
+.s3-relationship-context-menu > button {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  color: var(--s1-ink);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.s3-relationship-context-menu > button:hover {
+  background: var(--s1-surface-strong);
+}
+.s3-relationship-context-menu > button svg {
+  width: 14px;
+}
+.s3-relationship-context-menu > button.is-danger {
+  color: var(--s1-danger);
+}
 .s3-relationship-detail > header {
   display: flex;
   align-items: flex-start;
@@ -995,6 +1312,16 @@
   gap: 10px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--s1-line);
+}
+.s3-relationship-detail-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+}
+.s3-relationship-detail-actions .s1-icon-button {
+  width: 28px;
+  height: 28px;
 }
 .s3-relationship-detail h2 {
   margin: 3px 0 0;
@@ -1348,6 +1675,20 @@
   .s3-review-footer small {
     display: none;
   }
+  .s3-landscape-destination-footer {
+    grid-template-columns: 1fr;
+  }
+  .s3-landscape-destination-options {
+    grid-template-columns: 1fr;
+  }
+  .s3-landscape-destination-options small,
+  .s3-landscape-destination-submit > small {
+    display: block;
+  }
+  .s3-landscape-destination-submit {
+    align-items: stretch;
+    flex-direction: column;
+  }
   .s3-landscape-review-body {
     padding: 10px 12px;
   }
@@ -1366,6 +1707,10 @@
     height: 420px;
     border-right: 0;
     border-bottom: 1px solid var(--s1-line);
+  }
+  .s3-relationship-actionbar {
+    top: 48px;
+    max-width: calc(100% - 20px);
   }
   .s3-relationship-viewport {
     min-height: 420px;

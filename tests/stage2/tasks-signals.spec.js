@@ -126,7 +126,7 @@ test("有限范围任务详情支持补充资料、恢复和结果回流", async
   await input.fill("这是同一个人，2025 年 12 月加入穹顶智能。");
   await input.press("Enter");
   await expect(
-    page.getByText(/已回流“星澜机器人人才版图”的更新与审核区/),
+    page.getByText(/已回流“星澜机器人专题图谱”的更新与审核区/),
   ).toBeVisible();
   await expect(page.getByText("完成", { exact: true }).first()).toBeVisible();
   await expect(

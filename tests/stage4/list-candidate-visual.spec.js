@@ -198,68 +198,45 @@ test("公共时间选择器展开态符合统一设计语言", async ({ page }) 
   await assertNoConsoleErrors();
 });
 
-test("人才版图创建、目标、关系证据、冲突和相关业务交互完整", async ({
-  page,
-}) => {
+test("专题图谱创建、画布、审核和相关业务视觉完整", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 900 });
 
   await page.goto("#/mappings/new");
   await page.screenshot({
-    path: `${output}/mapping-create-composer.png`,
+    path: `${output}/topic-graph-create.png`,
     fullPage: true,
   });
 
-  await page.goto("#/mappings/mapping-embodied?tab=overview");
-  await page.getByRole("button", { name: "添加目标" }).click();
-  await page.waitForTimeout(220);
+  await page.goto("#/mappings/mapping-embodied?tab=content");
+  await page.locator(".tg-node", { hasText: "王奕" }).click();
   await page.screenshot({
-    path: `${output}/mapping-target-create.png`,
+    path: `${output}/topic-graph-canvas-node.png`,
     fullPage: true,
   });
-  await page.getByRole("button", { name: "取消" }).click();
-  await page
-    .getByRole("button", {
-      name: "查看目标：核实王奕的当前单位与身份",
-    })
-    .click();
-  await page.waitForTimeout(220);
+  await page.getByRole("button", { name: "层级表格" }).click();
   await page.screenshot({
-    path: `${output}/mapping-target-detail.png`,
+    path: `${output}/topic-graph-hierarchy-table.png`,
     fullPage: true,
   });
 
-  await page.goto("#/mappings/mapping-embodied?tab=organization");
-  await page.getByRole("button", { name: /查看证据：岗位页面/ }).click();
-  await page.waitForTimeout(220);
+  await page.goto("#/mappings/mapping-embodied?tab=reviews");
   await page.screenshot({
-    path: `${output}/mapping-evidence-preview.png`,
+    path: `${output}/topic-graph-review.png`,
     fullPage: true,
   });
 
-  await page.goto("#/mappings/mapping-embodied?tab=people");
-  await page.getByRole("tab", { name: "人物关系" }).click();
-  await page
-    .locator(".s3-relationship-node")
-    .filter({ hasText: "王奕" })
-    .click();
+  await page.goto("#/mappings/mapping-embodied?panel=import");
+  await page.getByRole("button", { name: /使用演示文件验收/ }).click();
+  await page.getByRole("button", { name: "校验并预览" }).click();
   await page.screenshot({
-    path: `${output}/mapping-candidate-node.png`,
+    path: `${output}/topic-graph-import-preview.png`,
     fullPage: true,
   });
 
-  await page.goto("#/mappings/mapping-embodied?tab=updates");
-  await page.getByRole("button", { name: /王奕身份冲突/ }).click();
+  await page.goto("#/mappings/mapping-embodied?panel=ai");
   await page.screenshot({
-    path: `${output}/mapping-conflict-review.png`,
-    fullPage: true,
-  });
-
-  await page.goto("#/mappings/mapping-embodied?tab=business");
-  await page.getByRole("button", { name: "编辑关联" }).click();
-  await page.waitForTimeout(220);
-  await page.screenshot({
-    path: `${output}/mapping-business-editor.png`,
+    path: `${output}/topic-graph-ai-workspace.png`,
     fullPage: true,
   });
 

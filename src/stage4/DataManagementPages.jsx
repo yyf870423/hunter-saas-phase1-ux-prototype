@@ -43,6 +43,7 @@ function DataManagementNav({ value }) {
 }
 
 export function ImportsPage() {
+  const navigate = useNavigate();
   const notify = useToast();
   const [params] = useSearchParams();
   const [wizardOpen, setWizardOpen] = useState(Boolean(params.get("type")));
@@ -74,6 +75,11 @@ export function ImportsPage() {
   const taskPages = Math.max(1, Math.ceil(visibleTasks.length / 2));
   const taskRows = visibleTasks.slice((page - 1) * 2, page * 2);
   useEffect(() => setPage(1), [query]);
+  useEffect(() => {
+    if (params.get("type") === "mappings" || params.get("type") === "mapping") {
+      navigate("/mappings/mapping-embodied?panel=import", { replace: true });
+    }
+  }, [navigate, params]);
   const next = () => {
     if (!files.length) return;
     setBusy(true);
@@ -120,7 +126,7 @@ export function ImportsPage() {
           {
             label: "资产类型",
             value: [],
-            options: ["候选人", "公司", "岗位", "人才版图", "论文", "专利"],
+            options: ["候选人", "公司", "岗位", "论文", "专利"],
             multiple: true,
           },
           {

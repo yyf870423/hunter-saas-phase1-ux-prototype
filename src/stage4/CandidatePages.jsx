@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
 import {
   ActivityTimeline,
   AssetPageHeader,
@@ -23,7 +24,11 @@ import {
   FormField,
   Modal,
   NotFoundState,
+  Pagination,
   ProgressBar,
+  RelationshipAiDialog,
+  RelationshipAiEmptyState,
+  RelationshipAiProcessingState,
   SelectMenu,
   SourceList,
   StateBanner,
@@ -32,6 +37,7 @@ import {
   TagList,
   TextArea,
   TextInput,
+  TooltipText,
   useToast,
 } from "./asset-ui";
 import {
@@ -54,6 +60,219 @@ const candidateTabs = [
   { value: "timeline", label: "跟进与沟通" },
   { value: "matching", label: "匹配与推进" },
   { value: "relations", label: "关联信息" },
+  { value: "contact-path", label: "联系路径" },
+];
+
+const academicRelationNames = [
+  "陈松",
+  "赵星羽",
+  "周明远",
+  "沈岚",
+  "何静",
+  "王奕",
+  "孙若凡",
+  "蒋文博",
+  "陆嘉成",
+  "唐心怡",
+  "魏清远",
+  "顾思源",
+];
+
+const academicOutcomeTitles = [
+  "Vision-Language-Action Learning for Generalizable Robotic Manipulation",
+  "Open-World Robot Learning with Multimodal Foundation Models",
+  "面向真机策略学习的数据闭环方法与系统",
+  "Cross-Embodiment Policy Transfer for Dexterous Manipulation",
+  "Learning Long-Horizon Mobile Manipulation from Human Videos",
+  "多模态机器人任务规划与执行方法",
+  "Scalable Data Curation for Vision-Language-Action Models",
+  "Tactile-Guided Policy Adaptation in Unstructured Environments",
+];
+
+const candidateAcademicOutcomes = Array.from({ length: 48 }, (_, index) => ({
+  id: `academic-outcome-${index}`,
+  type: index % 5 === 2 ? "专利" : "论文",
+  title: academicOutcomeTitles[index % academicOutcomeTitles.length],
+  institution:
+    index % 3 === 0
+      ? "上海人工智能实验室"
+      : index % 3 === 1
+        ? "清华大学智能产业研究院"
+        : "拓界机器人",
+  relation:
+    index % 7 === 0 ? "第一作者" : index % 4 === 0 ? "通讯作者" : "共同作者",
+  updatedAt: `${2021 + (index % 6)} 年`,
+  path: index % 5 === 2 ? "/patents/patent-data" : "/papers/paper-vla-survey",
+}));
+
+const collaborationWorks = [
+  "Vision-Language-Action Learning for Generalizable Robotic Manipulation",
+  "面向真机策略学习的数据闭环方法与系统",
+  "Open-World Robot Learning with Multimodal Foundation Models",
+  "多模态机器人任务规划与执行方法",
+  "Cross-Embodiment Policy Transfer for Dexterous Manipulation",
+  "Scalable Data Curation for Vision-Language-Action Models",
+];
+
+const candidateAcademicCollaborators = Array.from(
+  { length: 28 },
+  (_, index) => {
+    const name = academicRelationNames[index % academicRelationNames.length];
+    return {
+      id: `academic-collaborator-${index}`,
+      person: name,
+      collaborationType:
+        index % 5 === 1
+          ? "共同发明人"
+          : index % 4 === 0
+            ? "项目合作"
+            : "论文共同作者",
+      workName: collaborationWorks[index % collaborationWorks.length],
+      institution:
+        index % 3 === 0
+          ? "上海人工智能实验室"
+          : index % 3 === 1
+            ? "清华大学智能产业研究院"
+            : "拓界机器人",
+      updatedAt: `${2021 + (index % 5)}—${2023 + (index % 4)} 年`,
+      path:
+        name === "赵星羽"
+          ? "/candidates/candidate-zhaoxingyu"
+          : name === "陈松"
+            ? "/candidates/candidate-chensong"
+            : "",
+    };
+  },
+);
+
+const candidateContactPathViews = [
+  {
+    id: "contact-path",
+    label: "联系路径",
+    description: "林昊的可执行联系路径",
+    summary: "1 条直接联系方式 · 2 条关系路径 · 证据随底层资产自动更新",
+    layout: "network",
+    defaultSelection: { kind: "node", id: "path-linhao" },
+    nodes: [
+      {
+        id: "path-me",
+        label: "于一凡",
+        meta: "当前猎头",
+        summary: "当前 Hunter 用户。",
+        status: "已确认",
+        tone: "success",
+        kind: "person",
+        x: 38,
+        y: 190,
+        evidence: ["用户账号"],
+      },
+      {
+        id: "path-phone",
+        label: "已核实手机号",
+        meta: "直接联系",
+        summary: "手机号最近核实于 2026-08-20，可直接由猎头联系。",
+        status: "可直接联系",
+        tone: "success",
+        kind: "contact",
+        x: 310,
+        y: 42,
+        evidence: ["候选人档案"],
+      },
+      {
+        id: "path-shen",
+        label: "沈岚",
+        meta: "前同事 · 已有微信",
+        summary: "与猎头有稳定联系，曾与林昊在上海人工智能实验室共事。",
+        status: "已确认",
+        tone: "success",
+        kind: "person",
+        x: 292,
+        y: 190,
+        evidence: ["沟通记录", "工作经历"],
+      },
+      {
+        id: "path-chen",
+        label: "陈松",
+        meta: "共同作者 · 系统候选人",
+        summary: "与林昊共同发表 3 篇论文，可作为备用关系路径。",
+        status: "已确认",
+        tone: "info",
+        kind: "person",
+        x: 520,
+        y: 322,
+        detailPath: "/candidates/candidate-chensong",
+        detailLabel: "打开候选人详情",
+        evidence: ["论文作者关系", "候选人档案"],
+      },
+      {
+        id: "path-linhao",
+        label: "林昊",
+        meta: "目标候选人",
+        summary:
+          "无论是否已有直接联系方式，Hunter 都保留可解释的备用联系路径。",
+        status: "目标人物",
+        tone: "info",
+        kind: "person",
+        x: 770,
+        y: 190,
+        detailPath: "/candidates/candidate-linhao?tab=profile",
+        detailLabel: "打开候选人资料",
+        evidence: ["候选人档案"],
+      },
+    ],
+    edges: [
+      {
+        id: "path-e-phone",
+        source: "path-me",
+        target: "path-phone",
+        label: "已有号码",
+        status: "已确认",
+        tone: "success",
+        observedAt: "2026-08-20",
+        evidence: ["候选人档案"],
+      },
+      {
+        id: "path-e-phone-target",
+        source: "path-phone",
+        target: "path-linhao",
+        label: "直接联系",
+        status: "可用",
+        tone: "success",
+        observedAt: "2026-08-20",
+        evidence: ["手机号核实记录"],
+      },
+      {
+        id: "path-e-shen",
+        source: "path-me",
+        target: "path-shen",
+        label: "已有关系",
+        status: "已确认",
+        tone: "success",
+        observedAt: "2026-08-12",
+        evidence: ["沟通记录"],
+      },
+      {
+        id: "path-e-chen",
+        source: "path-shen",
+        target: "path-chen",
+        label: "前同事",
+        status: "已确认",
+        tone: "info",
+        observedAt: "2026-08-22",
+        evidence: ["工作经历"],
+      },
+      {
+        id: "path-e-target",
+        source: "path-chen",
+        target: "path-linhao",
+        label: "共同作者",
+        status: "已确认",
+        tone: "info",
+        observedAt: "2026-08-24",
+        evidence: ["论文作者关系"],
+      },
+    ],
+  },
 ];
 
 const candidateAiSuggestions = [
@@ -1502,10 +1721,246 @@ function MatchingTab({ onRematch, refreshing }) {
   );
 }
 
-function RelationsTab({ processingRecords, onOpenProcessing }) {
+function CandidateAcademicRelationsTable({ mode }) {
   const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 8;
+  const source =
+    mode === "collaborators"
+      ? candidateAcademicCollaborators
+      : candidateAcademicOutcomes;
+  const filtered = useMemo(
+    () =>
+      source.filter((item) => {
+        const keyword = query.trim().toLowerCase();
+        return (
+          !keyword ||
+          (mode === "collaborators"
+            ? [
+                item.person,
+                item.collaborationType,
+                item.workName,
+                item.institution,
+              ]
+            : [item.title, item.type, item.institution, item.relation]
+          )
+            .join(" ")
+            .toLowerCase()
+            .includes(keyword)
+        );
+      }),
+    [mode, query, source],
+  );
+  const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const rows = filtered.slice((page - 1) * pageSize, page * pageSize);
+  useEffect(() => setPage(1), [mode, query]);
+  return (
+    <div className="s4-large-relations">
+      <div className="s4-large-relations-toolbar">
+        <div className="s4-inline-search">
+          <Icon name="search" />
+          <input
+            aria-label={
+              mode === "collaborators" ? "搜索合作人" : "搜索学术成果"
+            }
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={
+              mode === "collaborators"
+                ? "搜索合作人、合作类型、成果或机构"
+                : "搜索论文、专利、机构或作者身份"
+            }
+          />
+        </div>
+        <span className="s4-table-count">
+          {mode === "collaborators" ? "28 位合作人" : "48 项学术成果"}
+        </span>
+      </div>
+      <div className="s4-large-relations-scroll">
+        <table>
+          <thead>
+            <tr>
+              {mode === "collaborators" ? (
+                <>
+                  <th>合作人</th>
+                  <th>合作类型</th>
+                  <th>合作论文或专利</th>
+                  <th>合作人机构</th>
+                  <th>合作时间</th>
+                  <th>操作</th>
+                </>
+              ) : (
+                <>
+                  <th>类型</th>
+                  <th>论文或专利名称</th>
+                  <th>所属机构</th>
+                  <th>作者身份</th>
+                  <th>年份</th>
+                  <th>操作</th>
+                </>
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((item) => (
+              <tr key={item.id}>
+                {mode === "collaborators" ? (
+                  <>
+                    <td>
+                      <b>{item.person}</b>
+                    </td>
+                    <td>
+                      <StatusBadge tone="info">
+                        {item.collaborationType}
+                      </StatusBadge>
+                    </td>
+                    <td>
+                      <TooltipText tip={item.workName} clampLines={2}>
+                        {item.workName}
+                      </TooltipText>
+                    </td>
+                    <td>{item.institution}</td>
+                    <td>{item.updatedAt}</td>
+                  </>
+                ) : (
+                  <>
+                    <td>
+                      <StatusBadge
+                        tone={item.type === "专利" ? "info" : "neutral"}
+                      >
+                        {item.type}
+                      </StatusBadge>
+                    </td>
+                    <td>
+                      <TooltipText tip={item.title} clampLines={2}>
+                        {item.title}
+                      </TooltipText>
+                    </td>
+                    <td>{item.institution}</td>
+                    <td>{item.relation}</td>
+                    <td>{item.updatedAt}</td>
+                  </>
+                )}
+                <td>
+                  {item.path ? (
+                    <Button size="xs" onClick={() => navigate(item.path)}>
+                      打开详情
+                    </Button>
+                  ) : (
+                    <span className="s4-table-muted">仅关系记录</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Pagination
+        page={page}
+        pages={pages}
+        pageSize={pageSize}
+        onChange={setPage}
+      />
+    </div>
+  );
+}
+
+function ContactPathTab() {
+  const notify = useToast();
+  const [status, setStatus] = useState("idle");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [lastPrompt, setLastPrompt] = useState("");
+  const timerRef = useRef(null);
+  const generated = status === "ready";
+  useEffect(
+    () => () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    },
+    [],
+  );
   return (
     <div className="s4-detail-stack">
+      <FieldGroup
+        title="可执行联系路径"
+        description="联系路径不会自动生成。用户可以说明希望优先使用的人脉、关系层数和需要排除的路径。"
+        action={
+          generated ? (
+            <Button
+              size="sm"
+              icon="refresh"
+              onClick={() => setDialogOpen(true)}
+            >
+              更新联系路径
+            </Button>
+          ) : null
+        }
+      >
+        {status === "running" ? (
+          <RelationshipAiProcessingState
+            title="正在创建联系路径"
+            description="正在核对候选人的任职、合作、学术与已有沟通关系。"
+            prompt={lastPrompt}
+            steps={["读取候选人关系", "查找可用联系链路", "生成联系路径图"]}
+            activeStep={1}
+          />
+        ) : generated ? (
+          <RelationshipCanvas
+            views={candidateContactPathViews}
+            decisions={{}}
+            onDecision={() => {}}
+            editable
+            draggable
+            storageKey="hunter-prototype-candidate-linhao-contact-path"
+          />
+        ) : (
+          <RelationshipAiEmptyState
+            title="尚未创建联系路径"
+            description="Hunter 会基于系统中的人物、任职、合作和沟通关系，整理一条或多条可解释路径；不会自动联系任何人。"
+            actionLabel="创建联系路径"
+            onAction={() => setDialogOpen(true)}
+          />
+        )}
+      </FieldGroup>
+      <RelationshipAiDialog
+        open={dialogOpen}
+        close={() => setDialogOpen(false)}
+        title={generated ? "更新联系路径" : "创建联系路径"}
+        description="用自然语言说明目标和限制，Hunter 会据此生成可审核的关系图。"
+        initialPrompt={lastPrompt}
+        submitLabel={generated ? "开始更新" : "开始创建"}
+        onSubmit={(prompt) => {
+          const updating = generated;
+          setLastPrompt(prompt);
+          setStatus("running");
+          setDialogOpen(false);
+          if (timerRef.current) window.clearTimeout(timerRef.current);
+          timerRef.current = window.setTimeout(() => {
+            setStatus("ready");
+            notify(updating ? "联系路径已按新要求更新" : "联系路径已创建");
+          }, 2400);
+        }}
+      />
+    </div>
+  );
+}
+
+function RelationsTab({ processingRecords, onOpenProcessing }) {
+  const navigate = useNavigate();
+  const runningRecord = processingRecords.find(
+    (record) => record.state === "running",
+  );
+  return (
+    <div className="s4-detail-stack">
+      {runningRecord ? (
+        <AssetAiProcessBanner
+          state="running"
+          title="正在更新候选人关联信息"
+          description="正在结合候选人资料、论文、专利和已确认关系，更新学术成果与合作人。"
+          target={runningRecord.target}
+          onDetails={() => onOpenProcessing(runningRecord)}
+        />
+      ) : null}
       <FieldGroup title="关联公司">
         <div className="s4-entity-grid">
           <EntityLink
@@ -1522,29 +1977,29 @@ function RelationsTab({ processingRecords, onOpenProcessing }) {
           />
         </div>
       </FieldGroup>
-      <FieldGroup title="学术成果">
-        <div className="s4-entity-grid">
-          <EntityLink
-            icon="paper"
-            title="Vision-Language-Action Models for Robotics: A Survey"
-            meta="第一作者 · 稳定作者身份已确认"
-            onClick={() => navigate("/papers/paper-vla-survey")}
-          />
-          <EntityLink
-            icon="patent"
-            title="机器人训练数据的自动筛选与回流系统"
-            meta="第一发明人 · 申请号已确认"
-            onClick={() => navigate("/patents/patent-data")}
-          />
-        </div>
+      <FieldGroup
+        title="学术成果"
+        description="共 48 项论文与专利，按成果名称、机构、作者身份和年份独立查看。"
+      >
+        <CandidateAcademicRelationsTable mode="outcomes" />
       </FieldGroup>
-      <FieldGroup title="人才版图">
+      <FieldGroup
+        title="合作人"
+        description="共 28 位合作人，明确展示合作类型以及对应的论文或专利。"
+      >
+        <CandidateAcademicRelationsTable mode="collaborators" />
+      </FieldGroup>
+      <FieldGroup title="专题图谱">
         <div className="s4-entity-grid">
           <EntityLink
             icon="route"
-            title="具身智能 VLA 核心人才版图"
-            meta="目标人才 · 优先级高"
-            onClick={() => navigate("/mappings/mapping-embodied")}
+            title="具身智能 VLA 专题图谱"
+            meta="人物关系图页 · 3 处引用 · 已自动同步"
+            onClick={() =>
+              navigate(
+                "/mappings/mapping-embodied?page=people&node=person-linhao",
+              )
+            }
           />
         </div>
       </FieldGroup>
@@ -1853,6 +2308,7 @@ export function CandidateDetailPage() {
           }
         />
       ) : null}
+      {tab === "contact-path" ? <ContactPathTab /> : null}
       <CandidateAiStartModal
         open={aiState === "setup"}
         close={() => setAiState("idle")}
@@ -2341,7 +2797,7 @@ export function IdentityMergeReviewPage() {
         <div className="s4-preserved-relations">
           <StateBanner
             title="正式关系不会因资料合并而丢失"
-            description="岗位推进、匹配历史、公司经历、论文、专利、人才版图和关联任务继续关联到保留档案。"
+            description="岗位推进、匹配历史、公司经历、论文、专利、专题图谱和关联任务继续关联到保留档案。"
           />
           <div className="s4-entity-grid">
             <EntityLink

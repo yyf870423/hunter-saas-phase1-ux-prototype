@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
 import { Composer } from "../stage2/automation-ui";
 import {
   ActivityTimeline,
@@ -18,6 +19,9 @@ import {
   FormField,
   Modal,
   NotFoundState,
+  RelationshipAiDialog,
+  RelationshipAiEmptyState,
+  RelationshipAiProcessingState,
   SelectMenu,
   SourceList,
   StateBanner,
@@ -458,38 +462,230 @@ function CompanyTalents() {
 }
 
 function CompanyMappings() {
-  const navigate = useNavigate();
+  const notify = useToast();
+  const [viewId, setViewId] = useState("company-ecosystem");
+  const [generated, setGenerated] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const processingTimerRef = useRef(null);
+  const baseViews = [
+    {
+      id: "company-ecosystem",
+      label: "公司关系",
+      description: "星澜机器人的竞争、合作、供应与研究关系",
+      summary: "5 家关联公司 · 7 条已确认关系 · 1 条待确认",
+      layout: "network",
+      defaultSelection: { kind: "node", id: "company-xinglan" },
+      nodes: [
+        ["company-xinglan", "星澜机器人", "目标公司", 405, 180, "success"],
+        ["company-tuojie", "拓界机器人", "竞争公司", 80, 55, "info"],
+        ["company-ailab", "上海人工智能实验室", "联合研究", 690, 45, "success"],
+        ["company-lingyue", "灵跃科技", "竞争公司", 720, 300, "info"],
+        ["company-datacloud", "数云科技", "数据供应商", 82, 320, "success"],
+      ].map(([id, label, meta, x, y, tone]) => ({
+        id,
+        label,
+        meta,
+        summary: `${label}与星澜机器人在具身智能产业链中的已核验关系。`,
+        status: tone === "success" ? "已确认" : "系统归纳",
+        tone,
+        kind: "company",
+        x,
+        y,
+        detailPath:
+          id === "company-xinglan"
+            ? "/companies/company-xinglan?tab=profile"
+            : id === "company-tuojie"
+              ? "/companies/company-tuojie"
+              : undefined,
+        detailLabel: "打开公司详情",
+        evidence: ["公司资料", "公开合作公告"],
+      })),
+      edges: [],
+    },
+    {
+      id: "company-talent-flow",
+      label: "人才流动",
+      description: "近 12 个月与星澜机器人相关的人才流动",
+      summary: "流入 6 人 · 流出 3 人 · 2 条疑似变化待确认",
+      layout: "network",
+      defaultSelection: { kind: "node", id: "flow-xinglan" },
+      nodes: [
+        ["flow-xinglan", "星澜机器人", "流入 6 · 流出 3", 410, 185, "success"],
+        ["flow-tuojie", "拓界机器人", "流入星澜 3 人", 85, 65, "info"],
+        ["flow-ailab", "上海人工智能实验室", "流入星澜 2 人", 70, 310, "info"],
+        ["flow-lingyue", "灵跃科技", "星澜流出 2 人", 710, 75, "warning"],
+        ["flow-qiongding", "穹顶智能", "星澜流出 1 人", 720, 315, "info"],
+      ].map(([id, label, meta, x, y, tone]) => ({
+        id,
+        label,
+        meta,
+        summary: `${label}与星澜机器人的人才流动汇总，点击连接可查看方向与证据。`,
+        status: tone === "warning" ? "待确认" : "已核验",
+        tone,
+        kind: "company",
+        x,
+        y,
+        evidence: ["候选人工作经历", "任职变化记录"],
+      })),
+      edges: [],
+    },
+  ];
+  const relationshipViews = baseViews.map((view) => {
+    const labels =
+      view.id === "company-ecosystem"
+        ? [
+            "竞争",
+            "联合研究",
+            "竞争",
+            "数据供应",
+            "人才竞争",
+            "联合项目",
+            "客户关系",
+            "技术合作",
+            "数据合作",
+            "生态协作",
+          ]
+        : [
+            "3 人流入",
+            "2 人流入",
+            "2 人流出",
+            "1 人流出",
+            "交叉任职",
+            "1 人流动",
+            "2 人流动",
+            "联合培养",
+            "1 人流动",
+            "交叉流动",
+          ];
+    let edgeIndex = 0;
+    const edges = view.nodes.flatMap((source, sourceIndex) =>
+      view.nodes.slice(sourceIndex + 1).map((target) => {
+        const index = edgeIndex;
+        edgeIndex += 1;
+        const warning = index === 8;
+        return {
+          id: `${view.id}-edge-${index}`,
+          source: source.id,
+          target: target.id,
+          label: labels[index],
+          status: warning ? "待确认" : "已核验",
+          tone: warning ? "warning" : index % 3 === 0 ? "success" : "info",
+          observedAt:
+            view.id === "company-ecosystem" ? "2026-08-30" : "近 12 个月",
+          evidence:
+            view.id === "company-ecosystem"
+              ? ["公司资料", "公开合作公告"]
+              : ["候选人工作经历", "任职变化记录"],
+        };
+      }),
+    );
+    return { ...view, edges };
+  });
+  const activeView =
+    relationshipViews.find((view) => view.id === viewId) ||
+    relationshipViews[0];
+
+  useEffect(
+    () => () => {
+      if (processingTimerRef.current) {
+        window.clearTimeout(processingTimerRef.current);
+      }
+    },
+    [],
+  );
+
   return (
     <div className="s4-detail-stack">
-      <FieldGroup title="关联人才版图">
-        <div className="s4-landscape-summary-card">
-          <span>
-            <small>重点版图</small>
-            <h3>具身智能 VLA 核心人才版图</h3>
-            <p>
-              星澜机器人被标记为核心目标公司，当前包含 3 个组织单元、7 位人物和
-              12 条关系。
-            </p>
-          </span>
-          <dl>
-            <div>
-              <dt>组织</dt>
-              <dd>3</dd>
+      <FieldGroup
+        title="公司关系与人才流动"
+        description="两类关系图默认不创建。需要时用自然语言说明公司范围、关系类型和时间窗口；创建后，可靠变化随底层资产自动更新。"
+        action={
+          generated && !processing ? (
+            <Button
+              size="sm"
+              icon="refresh"
+              onClick={() => setDialogOpen(true)}
+            >
+              更新关系图
+            </Button>
+          ) : null
+        }
+      >
+        {processing ? (
+          <RelationshipAiProcessingState
+            title="正在创建公司关系与人才流动"
+            description="Hunter 正在同时整理公司之间的业务关系和人才流动，完成后会提供两个可切换的关系图。"
+            prompt={prompt}
+            steps={[
+              "读取公司与候选人资产",
+              "整理公司关系与人才流动",
+              "生成两张关系图",
+            ]}
+            activeStep={1}
+          />
+        ) : generated ? (
+          <>
+            <div
+              className="s4-relation-type-tabs s4-company-relation-tabs"
+              role="tablist"
+              aria-label="公司关系类型"
+            >
+              {relationshipViews.map((view) => (
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={viewId === view.id}
+                  className={viewId === view.id ? "is-active" : ""}
+                  key={view.id}
+                  onClick={() => setViewId(view.id)}
+                >
+                  {view.label}
+                </button>
+              ))}
             </div>
-            <div>
-              <dt>人物</dt>
-              <dd>7</dd>
-            </div>
-            <div>
-              <dt>关系</dt>
-              <dd>12</dd>
-            </div>
-          </dl>
-          <Button onClick={() => navigate("/mappings/mapping-embodied")}>
-            打开版图
-          </Button>
-        </div>
+            <RelationshipCanvas
+              views={[activeView]}
+              decisions={{}}
+              onDecision={() => {}}
+              editable
+              draggable
+              storageKey="hunter-prototype-company-xinglan-relations"
+            />
+          </>
+        ) : (
+          <RelationshipAiEmptyState
+            title="尚未创建公司关系与人才流动"
+            description="说明需要关注的公司范围、业务关系、人才流动和时间窗口，Hunter 会同时生成两张关系图。"
+            actionLabel="创建公司关系与人才流动"
+            onAction={() => setDialogOpen(true)}
+          />
+        )}
       </FieldGroup>
+      <RelationshipAiDialog
+        open={dialogOpen}
+        close={() => setDialogOpen(false)}
+        title={generated ? "更新公司关系与人才流动" : "创建公司关系与人才流动"}
+        description="用自然语言说明公司范围、业务关系、人才流动和需要优先核验的内容。"
+        initialPrompt={prompt}
+        submitLabel={generated ? "开始更新" : "开始创建"}
+        onSubmit={(nextPrompt) => {
+          const updating = generated;
+          setPrompt(nextPrompt);
+          setProcessing(true);
+          setDialogOpen(false);
+          processingTimerRef.current = window.setTimeout(() => {
+            setGenerated(true);
+            setProcessing(false);
+            notify(
+              updating
+                ? "公司关系与人才流动已更新"
+                : "公司关系与人才流动已创建",
+            );
+          }, 2400);
+        }}
+      />
     </div>
   );
 }
@@ -781,7 +977,7 @@ export function CompanyDetailPage() {
     { value: "recruiting", label: "招聘业务" },
     { value: "contacts", label: "联系人", count: detail.contacts },
     { value: "talents", label: "任职人才", count: detail.talents },
-    { value: "mappings", label: "人才版图" },
+    { value: "mappings", label: "公司关系" },
     { value: "work", label: "关联任务" },
   ];
   const aiRecord = buildCompanyAiRecord(
@@ -953,7 +1149,7 @@ export function CompanyDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="公司"
         assetName={profileData.name}
-        impact="联系人、招聘机会、岗位、候选人和人才版图不会删除；原始公司文本继续保留。"
+        impact="联系人、招聘机会、岗位、候选人和专题图谱不会删除；原始公司文本继续保留。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("公司已进入回收站");

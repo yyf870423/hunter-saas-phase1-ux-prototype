@@ -94,7 +94,7 @@ const inspectionContexts = {
     ],
   },
   "mapping-embodied": {
-    resultDestination: "具身智能核心人才版图 · 本批次增量更新",
+    resultDestination: "具身智能 VLA 专题图谱 · 本批次增量更新",
     checkpoints: [
       {
         title: "公司与组织范围已检查",
@@ -378,7 +378,8 @@ function MappingTimeline({
   forcedState,
   setInspection,
   openReview,
-  notify,
+  saveReview,
+  onSaveDestination,
 }) {
   return (
     <>
@@ -468,7 +469,7 @@ ${createMarkdownTable(
                 tone: "warning",
                 action: "拓界技术负责人、穹顶汇报关系和王奕身份仍需处理",
                 duration: "本轮已运行 13 分 25 秒",
-                resultDestination: "具身智能核心人才版图 · 待补充信息",
+                resultDestination: "具身智能 VLA 专题图谱 · 待补充信息",
                 checkpoints: inspectionContexts["mapping-embodied"].checkpoints,
               })
             }
@@ -477,39 +478,36 @@ ${createMarkdownTable(
           </button>
         </HunterReply>
       ) : null}
-      {phase >= 5 ? (
+      {saveReview ? (
         <HunterReply
-          markdown={`## 人才版图已完成本批次更新
+          markdown={`## 本批次审核已经完成
 
-- 新增 4 家公司范围、7 个组织方向、18 位已确认人物和 9 条人物关系。
-- 11 位人物线索继续保留，王奕身份冲突没有合并。
-- 下一步可以探索拓界技术负责人，预计补充 1 至 3 条线索；也可以接受当前缺口并结束本轮。
-
-> 本轮结束不会把人才版图标记为“初版完成”或“维护中”。未来出现新变化时，通过新的任务或信号增量更新。`}
+- 已处理公司、组织、人物、关系及冲突项。
+- ${saveReview.confirmedCount} 项待确认内容已按你的决定纳入本批次。
+- 当前还没有创建或更新图谱资产，请选择这批结果的保存方式。`}
         >
           <DecisionRequest
-            title="本轮接下来怎么处理？"
-            description="两个选项都不会删除已经写入的人才版图结果。"
+            title="这批审核结果如何保存？"
+            description="选择后才会写入对应资产；审核决定和原始证据都会保留。"
             options={[
               {
-                value: "explore",
-                label: "继续探索缺失负责人",
-                description: "创建一项范围有限的人物探索处理。",
+                value: "new",
+                label: "保存为新图谱",
+                description:
+                  "创建“具身智能 VLA 人才摸排”图谱并写入本批次结果。",
               },
               {
-                value: "finish",
-                label: "接受当前缺口并结束本轮",
-                description: "保留待补充信息，后续出现新证据时再提醒。",
+                value: "update",
+                label: "更新已有图谱",
+                description: "更新“具身智能 VLA 专题图谱”，并保留更新前版本。",
+              },
+              {
+                value: "report",
+                label: "仅保留摸排报告",
+                description: "保存报告和审核决定，不创建或更新图谱资产。",
               },
             ]}
-            onSelect={(option) =>
-              notify(
-                option.value === "explore"
-                  ? "已准备人物探索处理，确认范围后开始"
-                  : "本轮摸排已结束，待补充信息继续保留在人才版图",
-                "success",
-              )
-            }
+            onSelect={onSaveDestination}
           />
         </HunterReply>
       ) : null}
@@ -692,6 +690,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [mappingSaveReview, setMappingSaveReview] = useState(null);
   const [planAdjusted, setPlanAdjusted] = useState(false);
   const [latestRequirement, setLatestRequirement] = useState("");
   const [streamStopped, setStreamStopped] = useState(false);
@@ -791,6 +790,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
     setComposer("");
     setAttachments([]);
     setMessages([]);
+    setMappingSaveReview(null);
     setPlanAdjusted(false);
     setLatestRequirement("");
     setStreamStopped(false);
@@ -916,18 +916,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
               (value) => value === "write",
             ).length;
             setReviewOpen(false);
-            setPhase(5);
-            setMessages((items) => [
-              ...items,
-              {
-                text: confirmedCount
-                  ? `将已确认结果更新到人才版图，并按我的决定写入 ${confirmedCount} 项待确认内容。`
-                  : "将本批次已确认结果更新到人才版图，其他内容继续待确认。",
-                result: confirmedCount
-                  ? `本批次已经写入；${confirmedCount} 项待确认内容按用户明确决定写入，并保留确认记录和原始冲突。`
-                  : "本批次已经写入；其他待确认内容和待补充信息继续保留。",
-              },
-            ]);
+            setMappingSaveReview({ confirmedCount });
           }}
         />
       </div>
@@ -999,7 +988,6 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 setInspection={setInspection}
                 openReview={() => setReviewOpen(true)}
                 setPhase={setPhase}
-                notify={notify}
               />
             ) : null}
             {scenarioId === "mapping-embodied" ? (
@@ -1008,6 +996,29 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 forcedState={forcedState}
                 setInspection={setInspection}
                 openReview={() => setReviewOpen(true)}
+                saveReview={mappingSaveReview}
+                onSaveDestination={(option) => {
+                  const copy = {
+                    new: {
+                      text: "将本批次结果保存为新图谱。",
+                      result:
+                        "## 新图谱已经创建\n\n“具身智能 VLA 人才摸排”已写入本批次审核结果，待确认项、原始证据和用户决定均已保留。",
+                    },
+                    update: {
+                      text: "更新已有的“具身智能 VLA 专题图谱”。",
+                      result:
+                        "## 已有图谱已经更新\n\n本批次审核结果已写入，更新前的图谱版本已保留；后续资产关系变化会继续自动刷新可信内容。",
+                    },
+                    report: {
+                      text: "本次只保留摸排报告。",
+                      result:
+                        "## 摸排报告已经保存\n\n本次没有创建或更新图谱资产；审核决定、冲突说明和原始证据仍可从当前任务查看。",
+                    },
+                  }[option.value];
+                  setMessages((items) => [...items, copy]);
+                  setMappingSaveReview(null);
+                  setPhase(5);
+                }}
                 notify={notify}
               />
             ) : null}
@@ -1203,7 +1214,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         <div className="s2-confirm-copy">
           <p>当前任务会先安全停止；任务专属的对话、计划和文件进入回收站。</p>
           <p>
-            公司、联系人、招聘机会、岗位、候选人和人才版图等正式资产不会被删除。
+            公司、联系人、招聘机会、岗位、候选人和专题图谱等正式资产不会被删除。
           </p>
         </div>
       </Modal>

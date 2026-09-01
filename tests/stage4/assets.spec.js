@@ -291,8 +291,198 @@ test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作",
   await expect(matching.getByText("岗位匹配完成")).toBeVisible();
 
   await page.goto("#/candidates/candidate-linhao?tab=relations");
+  await expect(page.getByText("共 48 项论文与专利")).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "论文或专利名称" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "合作人" })).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "合作类型" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "合作论文或专利" }),
+  ).toBeVisible();
+  await expect(page.getByText(/论文共同作者/).first()).toBeVisible();
   await expect(
     page.getByRole("button", { name: "查看全部证据" }),
+  ).toBeVisible();
+
+  await page.goto("#/candidates/candidate-linhao?tab=relations&ai=running");
+  await expect(page.getByText("正在更新候选人关联信息")).toBeVisible();
+  await expect(page.getByText("运行中", { exact: true }).first()).toBeVisible();
+
+  await page.goto("#/candidates/candidate-linhao?tab=contact-path");
+  await expect(
+    page.getByRole("heading", { name: "可执行联系路径" }),
+  ).toBeVisible();
+  await expect(page.getByText("尚未创建联系路径")).toBeVisible();
+  await page.getByRole("button", { name: "创建联系路径" }).click();
+  const contactPathDialog = page.getByRole("dialog", {
+    name: "创建联系路径",
+  });
+  await contactPathDialog
+    .getByPlaceholder(/说明目标、关注范围/)
+    .fill("优先使用已有同事关系，最多三段，不使用仅有邮箱的直接路径。");
+  await contactPathDialog.getByRole("button", { name: "开始创建" }).click();
+  await expect(page.getByText("正在创建联系路径")).toBeVisible();
+  await expect(
+    page.locator(".s3-relationship-node", { hasText: "林昊" }),
+  ).toBeVisible({ timeout: 5000 });
+  await expect(page.getByText(/1 条直接联系方式/).first()).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "更新联系路径" }),
+  ).toBeVisible();
+  const contactPathViewport = page.locator(".s3-relationship-viewport");
+  await contactPathViewport.hover();
+  await page.mouse.wheel(0, 120);
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
+    "90%",
+  );
+  await page.mouse.wheel(0, -120);
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
+    "100%",
+  );
+  const contactStage = page.locator(".s3-relationship-stage");
+  const contactTransformBefore = await contactStage.evaluate(
+    (element) => element.style.transform,
+  );
+  const contactViewportBox = await contactPathViewport.boundingBox();
+  expect(contactViewportBox).not.toBeNull();
+  await page.mouse.move(contactViewportBox.x + 24, contactViewportBox.y + 120);
+  await page.mouse.down();
+  await page.mouse.move(
+    contactViewportBox.x + 104,
+    contactViewportBox.y + 170,
+    { steps: 8 },
+  );
+  await page.mouse.up();
+  const contactTransformAfter = await contactStage.evaluate(
+    (element) => element.style.transform,
+  );
+  expect(contactTransformAfter).not.toBe(contactTransformBefore);
+  await expect(page.getByRole("button", { name: "手动编辑" })).toHaveCount(0);
+  await page.getByRole("button", { name: "关闭详情" }).click();
+  await expect(page.locator(".s3-relationship-detail")).toHaveCount(0);
+  const contactTargetNode = page.locator(
+    '.s3-relationship-node[data-node-id="path-linhao"]',
+  );
+  await contactTargetNode.click();
+  await expect(page.locator(".s3-relationship-detail")).toBeVisible();
+  const childEdgeCountBefore = await page
+    .locator(".s3-relationship-edge")
+    .count();
+  await page.keyboard.press("Tab");
+  const addChildNode = page.getByRole("dialog", { name: "添加关系节点" });
+  await expect(addChildNode).toBeVisible();
+  await addChildNode.getByLabel("节点名称").fill("林昊的前同事");
+  await addChildNode.getByRole("button", { name: "确认添加" }).click();
+  await expect(
+    page.locator(".s3-relationship-node", { hasText: "林昊的前同事" }),
+  ).toBeVisible();
+  await expect(page.locator(".s3-relationship-edge")).toHaveCount(
+    childEdgeCountBefore + 1,
+  );
+  await expect(page.getByText(/子节点已添加到“林昊”下/)).toBeVisible();
+  await page.getByRole("button", { name: "进入关系画布全屏" }).click();
+  await expect(page.locator(".s3-relationship-workspace")).toHaveClass(
+    /is-fullscreen/,
+  );
+  await expect
+    .poll(() => page.evaluate(() => document.body.style.overflow))
+    .toBe("hidden");
+  await page.getByRole("button", { name: "添加节点" }).click();
+  const fullscreenAddNode = page.getByRole("dialog", {
+    name: "添加关系节点",
+  });
+  await expect(fullscreenAddNode).toBeVisible();
+  expect(
+    await fullscreenAddNode.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return Boolean(
+        document
+          .elementFromPoint(rect.left + rect.width / 2, rect.top + 32)
+          ?.closest(".s1-modal"),
+      );
+    }),
+  ).toBe(true);
+  await fullscreenAddNode.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("button", { name: "关闭详情" }).click();
+  const childNode = page.locator(".s3-relationship-node.is-active");
+  const childNodeBox = await childNode.boundingBox();
+  const expandedViewportBox = await contactPathViewport.boundingBox();
+  expect(childNodeBox).not.toBeNull();
+  expect(expandedViewportBox).not.toBeNull();
+  await page.mouse.move(
+    childNodeBox.x + childNodeBox.width / 2,
+    childNodeBox.y + childNodeBox.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    expandedViewportBox.x + expandedViewportBox.width - 96,
+    childNodeBox.y + childNodeBox.height / 2 + 80,
+    { steps: 12 },
+  );
+  await page.mouse.up();
+  const expandedNodeLeft = await childNode.evaluate((element) =>
+    Number.parseFloat(element.style.left),
+  );
+  expect(expandedNodeLeft).toBeGreaterThan(960);
+  const expandedStageWidth = await contactStage.evaluate((element) =>
+    Number.parseFloat(element.style.width),
+  );
+  expect(expandedStageWidth).toBeGreaterThan(expandedNodeLeft + 168);
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".s3-relationship-workspace")).not.toHaveClass(
+    /is-fullscreen/,
+  );
+  await contactTargetNode.click();
+  await contactTargetNode.dblclick();
+  await expect(
+    page.getByRole("dialog", { name: "编辑关系节点" }),
+  ).toBeVisible();
+  await page
+    .getByRole("dialog", { name: "编辑关系节点" })
+    .getByRole("button", { name: "取消" })
+    .click();
+  await page.getByRole("button", { name: "添加节点" }).click();
+  const addContactNode = page.getByRole("dialog", { name: "添加关系节点" });
+  await addContactNode.getByLabel("节点名称").fill("前同事陈凯");
+  await addContactNode.getByRole("button", { name: "确认添加" }).click();
+  await expect(
+    page.locator(".s3-relationship-node", { hasText: "前同事陈凯" }),
+  ).toBeVisible();
+  const edgeCountBefore = await page.locator(".s3-relationship-edge").count();
+  const sourceConnector = page
+    .locator(".s3-relationship-node", { hasText: "前同事陈凯" })
+    .locator(".s3-relationship-node-connector");
+  const connectorBox = await sourceConnector.boundingBox();
+  const targetBox = await contactTargetNode.boundingBox();
+  expect(connectorBox).not.toBeNull();
+  expect(targetBox).not.toBeNull();
+  await page.mouse.move(
+    connectorBox.x + connectorBox.width / 2,
+    connectorBox.y + connectorBox.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    targetBox.x + targetBox.width / 2,
+    targetBox.y + targetBox.height / 2,
+    { steps: 10 },
+  );
+  await page.mouse.up();
+  await expect(page.locator(".s3-relationship-edge")).toHaveCount(
+    edgeCountBefore + 1,
+  );
+  const createdEdge = page.locator(".s3-relationship-edge").last();
+  await createdEdge.dblclick({ force: true });
+  const edgeDialog = page.getByRole("dialog", { name: "编辑节点关系" });
+  await expect(edgeDialog).toBeVisible();
+  await edgeDialog.locator("input").fill("前同事引荐");
+  await edgeDialog.getByRole("button", { name: "保存修改" }).click();
+  await expect(
+    page.locator(".s3-relationship-edge-label text", {
+      hasText: "前同事引荐",
+    }),
   ).toBeVisible();
 });
 
@@ -313,6 +503,262 @@ test("候选人来源证据逐项可打开且详情加载状态完整", async ({
   await page.goto("#/candidates/candidate-linhao?state=loading");
   await expect(page.getByLabel("候选人详情正在加载")).toBeVisible();
   await expect(page.locator(".s4-detail-loading > section")).toHaveCount(2);
+});
+
+test("岗位和公司详情按关系规模提供表格与关系图", async ({ page }) => {
+  await page.goto("#/positions/position-vla?tab=talent-map");
+  await page.evaluate(() =>
+    window.localStorage.removeItem("hunter-prototype-position-vla-talent-map"),
+  );
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "重点人才" })).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "一级节点" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "四级及更深" }),
+  ).toBeVisible();
+  await expect(page.getByText("专题图谱补充", { exact: false })).toHaveCount(0);
+  await expect(page.getByText(/共 8 位符合条件的人才/)).toBeVisible();
+  await expect(page.getByLabel("搜索重点人才")).toBeVisible();
+  await page.getByLabel("搜索重点人才").fill("周明远");
+  await expect(page.getByText(/共 1 位符合条件的人才/)).toBeVisible();
+  await expect(page.getByText("周明远", { exact: true })).toBeVisible();
+  await page.getByLabel("搜索重点人才").fill("");
+  const talentFilters = page.locator(
+    ".s4-talent-filter-pair > .s4-select > button",
+  );
+  await expect(talentFilters).toHaveCount(2);
+  const identityFilterBox = await talentFilters.nth(0).boundingBox();
+  const stageFilterBox = await talentFilters.nth(1).boundingBox();
+  expect(identityFilterBox).not.toBeNull();
+  expect(stageFilterBox).not.toBeNull();
+  expect(
+    stageFilterBox.x - (identityFilterBox.x + identityFilterBox.width),
+  ).toBeLessThanOrEqual(5);
+  await expect(
+    page.getByRole("button", { name: "候选人详情" }).first(),
+  ).toBeVisible();
+  const talentViewTabs = page.locator(".s4-relation-type-tabs");
+  await expect(talentViewTabs.getByRole("tab")).toHaveCount(2);
+  await expect(talentViewTabs.getByRole("tab", { name: "表格" })).toBeVisible();
+  await talentViewTabs.getByRole("tab", { name: "关系图" }).click();
+  await expect(
+    page.locator(".s3-relationship-node", { hasText: "VLA 算法负责人" }),
+  ).toBeVisible();
+  const linkedPositionNode = page.locator(".s3-relationship-node", {
+    hasText: "VLA 算法负责人",
+  });
+  await expect(
+    linkedPositionNode.locator(".s3-relationship-node-subtitle"),
+  ).toHaveText("当前岗位");
+  await expect(
+    linkedPositionNode.locator(".s3-relationship-node-asset"),
+  ).toHaveText("已关联 · 岗位");
+  await expect(
+    page
+      .locator(".s3-relationship-node", { hasText: "林昊" })
+      .locator(".s3-relationship-node-asset"),
+  ).toHaveText("已关联 · 候选人");
+  const relationViewport = page.locator(".s3-relationship-viewport");
+  await relationViewport.hover();
+  await page.mouse.wheel(0, 120);
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
+    "90%",
+  );
+  await page.mouse.wheel(0, -120);
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
+    "100%",
+  );
+  const positionStage = page.locator(".s3-relationship-stage");
+  const positionPanBefore = await positionStage.evaluate(
+    (element) => element.style.transform,
+  );
+  const positionViewportBox = await relationViewport.boundingBox();
+  expect(positionViewportBox).not.toBeNull();
+  await page.mouse.move(
+    positionViewportBox.x + 24,
+    positionViewportBox.y + 120,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    positionViewportBox.x + 104,
+    positionViewportBox.y + 168,
+    { steps: 8 },
+  );
+  await page.mouse.up();
+  const positionPanAfter = await positionStage.evaluate(
+    (element) => element.style.transform,
+  );
+  expect(positionPanAfter).not.toBe(positionPanBefore);
+  await expect(page.getByRole("button", { name: "手动编辑" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "添加节点" })).toBeVisible();
+  await page.getByRole("button", { name: "进入关系画布全屏" }).click();
+  await page.getByRole("button", { name: "关闭详情" }).click();
+  const positionNode = page.locator(".s3-relationship-node").first();
+  const positionBefore = await positionNode.boundingBox();
+  const positionExpandedViewport = await relationViewport.boundingBox();
+  expect(positionBefore).not.toBeNull();
+  expect(positionExpandedViewport).not.toBeNull();
+  await page.mouse.move(
+    positionBefore.x + positionBefore.width / 2,
+    positionBefore.y + positionBefore.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    positionExpandedViewport.x + positionExpandedViewport.width - 96,
+    positionBefore.y + positionBefore.height / 2 + 100,
+    { steps: 12 },
+  );
+  await page.mouse.up();
+  const positionLogicalAfter = await positionNode.evaluate((element) =>
+    Number.parseFloat(element.style.left),
+  );
+  expect(positionLogicalAfter).toBeGreaterThan(960);
+  expect(
+    await positionStage.evaluate((element) =>
+      Number.parseFloat(element.style.width),
+    ),
+  ).toBeGreaterThan(positionLogicalAfter + 168);
+  await page.keyboard.press("Escape");
+  await talentViewTabs.getByRole("tab", { name: "表格" }).click();
+  await talentViewTabs.getByRole("tab", { name: "关系图" }).click();
+  const positionLogicalRestored = await positionNode.evaluate((element) =>
+    Number.parseFloat(element.style.left),
+  );
+  expect(positionLogicalRestored).toBe(positionLogicalAfter);
+
+  await page.getByRole("button", { name: "更新人才梳理" }).click();
+  const talentGraphDialog = page.getByRole("dialog", {
+    name: "更新岗位人才梳理",
+  });
+  await talentGraphDialog
+    .getByPlaceholder(/说明目标、关注范围/)
+    .fill("按公司与团队整理重点人才，优先展示匹配分高于 80 分的人选。");
+  await talentGraphDialog.getByRole("button", { name: "开始更新" }).click();
+  await expect(page.getByText("正在更新岗位人才梳理").first()).toBeVisible();
+  await expect(
+    page.locator(".s3-relationship-node", { hasText: "VLA 算法负责人" }),
+  ).toBeVisible({ timeout: 5000 });
+  await expect(
+    talentViewTabs.getByRole("tab", { name: "关系图" }),
+  ).toBeVisible();
+  await expect(page.getByText("输入与更新来源", { exact: true })).toHaveCount(
+    0,
+  );
+
+  await page.goto("#/companies/company-xinglan?tab=mappings");
+  await page.evaluate(() =>
+    window.localStorage.removeItem(
+      "hunter-prototype-company-xinglan-relations",
+    ),
+  );
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "公司关系与人才流动", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("尚未创建公司关系与人才流动")).toBeVisible();
+  const relationshipTabs = page.locator(".s4-relation-type-tabs");
+  await expect(relationshipTabs.getByRole("tab")).toHaveCount(0);
+  await page.getByRole("button", { name: "创建公司关系与人才流动" }).click();
+  const companyGraphDialog = page.getByRole("dialog", {
+    name: "创建公司关系与人才流动",
+  });
+  await companyGraphDialog
+    .getByPlaceholder(/说明目标、关注范围/)
+    .fill("整理竞争、合作、供应、客户与研究关系，覆盖当前显示的全部公司。");
+  await companyGraphDialog.getByRole("button", { name: "开始创建" }).click();
+  await expect(page.getByText("正在创建公司关系与人才流动")).toBeVisible();
+  await expect(page.locator(".s3-relationship-workspace")).toBeVisible({
+    timeout: 5000,
+  });
+  await expect(
+    relationshipTabs.getByRole("tab", { name: "公司关系" }),
+  ).toBeVisible();
+  await expect(
+    relationshipTabs.getByRole("tab", { name: "人才流动" }),
+  ).toBeVisible();
+  const companyTabsBox = await relationshipTabs.boundingBox();
+  const companyWorkspaceBox = await page
+    .locator(".s3-relationship-workspace")
+    .boundingBox();
+  expect(
+    companyWorkspaceBox.y - (companyTabsBox.y + companyTabsBox.height),
+  ).toBeGreaterThanOrEqual(12);
+  await expect(page.locator(".s3-relationship-node")).toHaveCount(5);
+  await expect(page.locator(".s3-relationship-edge")).toHaveCount(10);
+  const companyRelationViewport = page.locator(".s3-relationship-viewport");
+  await companyRelationViewport.hover();
+  await page.mouse.wheel(0, 120);
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
+    "90%",
+  );
+  await page.mouse.wheel(0, -120);
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
+    "100%",
+  );
+  const companyStage = page.locator(".s3-relationship-stage");
+  const companyPanBefore = await companyStage.evaluate(
+    (element) => element.style.transform,
+  );
+  const companyViewportBox = await companyRelationViewport.boundingBox();
+  expect(companyViewportBox).not.toBeNull();
+  await page.mouse.move(companyViewportBox.x + 24, companyViewportBox.y + 120);
+  await page.mouse.down();
+  await page.mouse.move(
+    companyViewportBox.x + 104,
+    companyViewportBox.y + 168,
+    { steps: 8 },
+  );
+  await page.mouse.up();
+  const companyPanAfter = await companyStage.evaluate(
+    (element) => element.style.transform,
+  );
+  expect(companyPanAfter).not.toBe(companyPanBefore);
+  await expect(page.getByRole("button", { name: "更新关系图" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "手动编辑" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "添加节点" })).toBeVisible();
+  await page.getByRole("button", { name: "进入关系画布全屏" }).click();
+  await page.getByRole("button", { name: "关闭详情" }).click();
+  const companyNode = page.locator(".s3-relationship-node").first();
+  const companyNodeId = await companyNode.getAttribute("data-node-id");
+  const companyBefore = await companyNode.boundingBox();
+  const companyExpandedViewport = await companyRelationViewport.boundingBox();
+  expect(companyBefore).not.toBeNull();
+  expect(companyExpandedViewport).not.toBeNull();
+  await page.mouse.move(
+    companyBefore.x + companyBefore.width / 2,
+    companyBefore.y + companyBefore.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    companyExpandedViewport.x + companyExpandedViewport.width - 96,
+    companyBefore.y + companyBefore.height / 2 + 96,
+    { steps: 12 },
+  );
+  await page.mouse.up();
+  const companyLogicalAfter = await companyNode.evaluate((element) =>
+    Number.parseFloat(element.style.left),
+  );
+  expect(companyLogicalAfter).toBeGreaterThan(960);
+  expect(
+    await companyStage.evaluate((element) =>
+      Number.parseFloat(element.style.width),
+    ),
+  ).toBeGreaterThan(companyLogicalAfter + 168);
+  await page.keyboard.press("Escape");
+  await relationshipTabs.getByRole("tab", { name: "人才流动" }).click();
+  await expect(page.getByText(/流入 6 人/).first()).toBeVisible();
+  await expect(page.locator(".s3-relationship-node")).toHaveCount(5);
+  await expect(page.locator(".s3-relationship-edge")).toHaveCount(10);
+  await relationshipTabs.getByRole("tab", { name: "公司关系" }).click();
+  const restoredCompanyNode = page.locator(
+    `.s3-relationship-node[data-node-id="${companyNodeId}"]`,
+  );
+  const companyRestored = await restoredCompanyNode.evaluate((element) =>
+    Number.parseFloat(element.style.left),
+  );
+  expect(companyRestored).toBe(companyLogicalAfter);
 });
 
 test("时间相关字段统一使用单触发框时间选择器", async ({ page }) => {
@@ -669,99 +1115,28 @@ test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", as
   await expect(page.getByText("已有岗位已关联到招聘机会")).toBeVisible();
 });
 
-test("人才版图多视图、关系详情与写入决定可用", async ({ page }) => {
+test("专题图谱多图页、关系详情与写入决定可用", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/new");
-  const mappingComposer = page.locator(".s4-agent-create-entry .s2-composer");
-  await expect(mappingComposer).toBeVisible();
+  await expect(page.getByLabel("图谱名称")).toBeVisible();
   await expect(
-    mappingComposer.getByRole("button", { name: "发送" }),
+    page.getByRole("button", { name: "创建专题图谱" }),
   ).toBeDisabled();
 
-  await page.goto("#/mappings/mapping-embodied?tab=overview");
-  await page.getByRole("button", { name: "添加目标" }).click();
-  const targetEditor = page.getByRole("dialog", { name: "增加摸排目标" });
-  await expect(targetEditor).toBeVisible();
-  await targetEditor
-    .getByLabel("目标事项")
-    .fill("确认穹顶智能操作策略方向技术负责人");
-  await targetEditor
-    .getByLabel("完成标准")
-    .fill("确认负责人身份并形成稳定人物线索。");
-  await targetEditor.getByRole("button", { name: "添加目标" }).click();
+  await page.goto("#/mappings/mapping-embodied?tab=content");
+  await expect(page.getByRole("tablist", { name: "图页" })).toBeVisible();
+  await page.getByRole("button", { name: "层级表格" }).click();
   await expect(
-    page.getByRole("dialog", { name: "摸排目标详情" }),
+    page.getByRole("columnheader", { name: "一级节点" }),
   ).toBeVisible();
-  await page
-    .getByRole("dialog", { name: "摸排目标详情" })
-    .getByRole("button", { name: "关闭", exact: true })
-    .last()
-    .click();
-  await page
-    .getByRole("button", {
-      name: "查看目标：核实王奕的当前单位与身份",
-    })
-    .click();
-  await expect(
-    page
-      .getByRole("dialog", { name: "摸排目标详情" })
-      .getByText("两个公开来源冲突"),
-  ).toBeVisible();
-  await page
-    .getByRole("dialog", { name: "摸排目标详情" })
-    .getByRole("button", { name: "关闭", exact: true })
-    .last()
-    .click();
+  await page.getByRole("button", { name: "画布" }).click();
+  await page.locator(".tg-node", { hasText: "王奕" }).click();
+  await expect(page.getByText("身份待确认", { exact: true })).toBeVisible();
 
-  await page.goto("#/mappings/mapping-embodied?tab=organization");
-  await page.getByRole("button", { name: /查看证据：岗位页面/ }).click();
-  const evidence = page.getByRole("dialog", { name: "查看证据内容" });
-  await expect(evidence).toContainText("本轮读取到的关键内容");
-  await evidence
-    .getByRole("button", { name: "关闭", exact: true })
-    .last()
-    .click();
-
-  await page.goto("#/mappings/mapping-embodied?tab=people");
-  await expect(page.getByRole("heading", { name: "人物与关系" })).toBeVisible();
-  await page.getByRole("tab", { name: "人物关系" }).click();
-  await page
-    .locator(".s3-relationship-node")
-    .filter({ hasText: "林昊" })
-    .click();
-  await expect(page.locator(".s3-relationship-detail")).toBeVisible();
-  await page.getByRole("button", { name: "打开候选人详情" }).click();
-  await expect(page).toHaveURL(/candidates\/candidate-linhao/);
-
-  await page.goto("#/mappings/mapping-embodied?tab=updates");
-  await page.getByRole("button", { name: /王奕身份冲突/ }).click();
-  await expect(
-    page.getByRole("heading", { name: "王奕身份冲突" }),
-  ).toBeVisible();
-  await expect(page.locator(".s3-relationship-detail")).toBeVisible();
-
-  await page.goto("#/mappings/mapping-embodied?tab=people");
-  await page.getByRole("tab", { name: "人物关系" }).click();
-  await page
-    .locator(".s3-relationship-node")
-    .filter({ hasText: "王奕" })
-    .click();
-  const decision = page.getByRole("button", { name: /确认写入/ });
-  if (await decision.count()) {
-    await decision.first().click();
-    await expect(page.getByText("已确认写入")).toBeVisible();
-  }
-
-  await page.goto("#/mappings/mapping-embodied?tab=business");
-  await page.getByRole("button", { name: "编辑关联" }).click();
-  await expect(
-    page.getByRole("dialog", { name: "编辑相关业务" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "取消" }).click();
-  await page.getByRole("button", { name: "编辑", exact: true }).click();
-  await expect(
-    page.getByRole("dialog", { name: "编辑人才版图" }),
-  ).toBeVisible();
+  await page.goto("#/mappings/mapping-embodied?tab=reviews");
+  await expect(page.getByRole("heading", { name: "待处理事项" })).toBeVisible();
+  await page.getByRole("button", { name: "作为本图备注保留" }).click();
+  await expect(page.locator(".tg-review-list > button")).toHaveCount(2);
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
@@ -782,9 +1157,14 @@ test("导出范围控件保持紧凑且文件名保留完整编辑宽度", async
 
 test("阶段四次级控件不是装饰按钮", async ({ page }) => {
   await page.goto("/#/mappings");
-  await page.getByRole("button", { name: "更多操作" }).first().click();
+  await page
+    .getByRole("button", { name: /更多操作：/ })
+    .first()
+    .click();
   await expect(page.getByRole("menu")).toBeVisible();
-  await expect(page.getByRole("button", { name: "编辑版图" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "编辑图谱资料" }),
+  ).toBeVisible();
 
   await page.goto("/#/sources/candidate-linhao");
   await page.getByRole("button", { name: /团队规模/ }).click();
@@ -896,7 +1276,7 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
   await expect(page.getByRole("tooltip")).toBeVisible();
   await page.mouse.move(10, 10);
   await page.goto("#/mappings");
-  const untruncatedSummary = page.locator(".s4-landscape-goal").nth(1);
+  const untruncatedSummary = page.locator(".tg-graph-description").last();
   const shortSummaryMetrics = await untruncatedSummary.evaluate((element) => ({
     clientHeight: element.clientHeight,
     scrollHeight: element.scrollHeight,
@@ -1168,30 +1548,18 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
 
 test("导入、导出和回收站覆盖异步、重名和恢复冲突", async ({ page }) => {
   await page.goto("#/data/imports?type=mapping");
-  await expect(page.getByRole("tab", { name: "数据导入" })).toHaveAttribute(
-    "aria-selected",
-    "true",
-  );
+  await expect(page).toHaveURL(/mappings\/mapping-embodied\?panel=import/);
+  const modal = page.getByRole("dialog", { name: "导入图页" });
+  await modal.getByRole("button", { name: /使用演示文件验收/ }).click();
+  await modal.getByRole("button", { name: "校验并预览" }).click();
+  const previewModal = page.getByRole("dialog", { name: "确认图页结构" });
+  await expect(previewModal.getByText("发现同名图页")).toBeVisible();
+  await previewModal.getByRole("button", { name: /保留两个图页/ }).click();
+  await previewModal.getByRole("button", { name: "确认导入" }).click();
   await expect(
     page
-      .getByRole("button", { name: "新建导入" })
-      .locator('[data-icon="download"]'),
-  ).toBeVisible();
-  const modal = page.getByRole("dialog", { name: "导入业务数据" });
-  await modal.locator('input[type="file"]').setInputFiles({
-    name: "具身智能 VLA 核心人才版图.xlsx",
-    mimeType:
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    buffer: Buffer.from("prototype"),
-  });
-  await modal.getByRole("button", { name: "校验并解析" }).click();
-  await expect(
-    page.getByRole("dialog", { name: "发现同名人才版图" }),
-  ).toBeVisible();
-  await page.getByRole("radio", { name: /保留两张版图/ }).click();
-  await page.getByRole("button", { name: "确认导入" }).click();
-  await expect(
-    page.getByText("导入任务已创建", { exact: true }).first(),
+      .getByRole("dialog", { name: "图页已导入" })
+      .getByText("图页已经可以查看"),
   ).toBeVisible();
 
   await page.goto("#/data/exports");

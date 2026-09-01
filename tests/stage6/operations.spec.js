@@ -148,7 +148,7 @@ test("运营筛选会真实改变列表且可以单独清空", async ({ page }) 
 test("运行详情区分可安全恢复和不可恢复", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/ops/tasks/TASK-260824-019");
-  await expect(page.getByText("具身智能核心人才版图")).toBeVisible();
+  await expect(page.getByText("具身智能 VLA 人才摸排")).toBeVisible();
   await expect(page.getByText("WORK-260824-006")).toBeVisible();
   await expect(page.getByText("任务步骤运行", { exact: true })).toBeVisible();
   await expect(page.getByText("所属主线", { exact: true })).toHaveCount(0);

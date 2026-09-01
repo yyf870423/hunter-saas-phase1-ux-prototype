@@ -12,12 +12,12 @@ test("四类持续任务可以从同一任务历史区切换且内容不同", as
   ).toBeVisible();
   await page
     .locator(".s2-history-list > button")
-    .filter({ hasText: "具身智能核心人才版图" })
+    .filter({ hasText: "具身智能 VLA 人才摸排" })
     .first()
     .click();
   await expect(page).toHaveURL(/tasks\/mapping-embodied/);
   await expect(
-    page.getByRole("heading", { name: "具身智能核心人才版图" }),
+    page.getByRole("heading", { name: "具身智能 VLA 人才摸排" }),
   ).toBeVisible();
   await page.getByRole("button", { name: /林昊职业机会/ }).click();
   await expect(page).toHaveURL(/tasks\/career-linhao/);
@@ -108,20 +108,25 @@ test("人才摸排分批审核公司、人物、冲突和待补充信息", async
   await expect(page.getByText("身份待确认", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
   await expect(
-    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
-  ).toContainText("撤销确认");
+    page.getByRole("button", { name: "重新选择王奕身份关系" }),
+  ).toContainText("重新选择");
   await expect(page.getByText("已确认写入", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
   await expect(
     page.getByRole("button", { name: /王奕身份关系冲突/ }),
   ).toHaveAttribute("aria-selected", "true");
   await expect(
-    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
-  ).toContainText("撤销确认");
-  await page.getByRole("button", { name: "更新人才版图" }).click();
-  await expect(page.getByText(/按我的决定写入 1 项待确认内容/)).toBeVisible();
-  await expect(page.getByText("人才版图已完成本批次更新")).toBeVisible();
-  await expect(page.getByText(/不会把人才版图标记为“初版完成”/)).toBeVisible();
+    page.getByRole("button", { name: "重新选择王奕身份关系" }),
+  ).toContainText("重新选择");
+  await page.getByRole("button", { name: /穹顶智能组织关系待确认/ }).click();
+  await page.getByRole("button", { name: "本批次不写入" }).click();
+  await page.getByRole("button", { name: "完成审核并返回对话" }).click();
+  await expect(page.getByText("本批次审核已经完成")).toBeVisible();
+  await expect(
+    page.getByText(/1 项待确认内容已按你的决定纳入本批次/),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /更新已有图谱/ }).click();
+  await expect(page.getByText(/已有图谱已经更新/)).toBeVisible();
 });
 
 test("人才摸排每条变化显示对应关系影响并保持同一审核决定", async ({ page }) => {
@@ -177,13 +182,13 @@ test("人才摸排每条变化显示对应关系影响并保持同一审核决�
   ).toBeVisible();
   await page.getByRole("button", { name: "确认写入王奕身份关系" }).click();
   await expect(
-    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
+    page.getByRole("button", { name: "重新选择王奕身份关系" }),
   ).toBeVisible();
 
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
   await page.getByRole("button", { name: /王奕身份关系冲突/ }).click();
   await expect(
-    page.getByRole("button", { name: "撤销确认王奕身份关系" }),
+    page.getByRole("button", { name: "重新选择王奕身份关系" }),
   ).toBeVisible();
 });
 
@@ -221,7 +226,7 @@ test("相关处理详情使用人才摸排自己的结果去向和检查点", as
   await page.getByRole("button", { name: /相关处理/ }).click();
   await page.getByRole("button", { name: /人物关系与联系路径/ }).click();
   await expect(
-    page.getByText("具身智能核心人才版图 · 本批次增量更新"),
+    page.getByText("具身智能 VLA 专题图谱 · 本批次增量更新"),
   ).toBeVisible();
   await expect(page.getByText("人物身份与关系已去重")).toBeVisible();
   await expect(page.getByText("未生成重复候选人记录")).toHaveCount(0);

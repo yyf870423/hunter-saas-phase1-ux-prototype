@@ -2008,14 +2008,6 @@ export function PaperDetailPage() {
           </div>
           <SourceList items={item.sourceRecords} />
         </FieldGroup>
-        <FieldGroup title="人才版图">
-          <EntityLink
-            icon="route"
-            title="具身智能 VLA 核心人才版图"
-            meta="学术脉络 · 2 位作者已关联"
-            onClick={() => navigate("/mappings/mapping-embodied?tab=people")}
-          />
-        </FieldGroup>
       </div>
       {identityPerson ? (
         <PersonIdentityReview
@@ -2050,7 +2042,7 @@ export function PaperDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="论文"
         assetName={item.title}
-        impact="候选人、人物线索和人才版图不会删除；人物关系显示论文已删除引用。"
+        impact="候选人、人物线索和专题图谱不会删除；人物关系显示论文已删除引用。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("论文已进入回收站");
@@ -2144,12 +2136,15 @@ export function PatentDetailPage() {
             ]}
           />
         </FieldGroup>
-        <FieldGroup title="人才版图">
+        <FieldGroup
+          title="关系同步"
+          description="发明人身份确认后，共同发明关系会更新到候选人和引用该关系的专题图谱。"
+        >
           <EntityLink
             icon="route"
-            title="具身智能 VLA 核心人才版图"
-            meta="共同发明人关系 · 1 位已关联"
-            onClick={() => navigate("/mappings/mapping-embodied?tab=people")}
+            title="具身智能 VLA 专题图谱"
+            meta="人物关系图页 · 1 位已关联 · 自动同步"
+            onClick={() => navigate("/mappings/mapping-embodied?page=people")}
           />
         </FieldGroup>
       </div>
@@ -2186,7 +2181,7 @@ export function PatentDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="专利"
         assetName={item.title}
-        impact="候选人、人物线索和人才版图不会删除；共同发明人关系保留已删除引用。"
+        impact="候选人、人物线索和专题图谱不会删除；共同发明人关系保留已删除引用。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("专利已进入回收站");
