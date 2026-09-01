@@ -1149,7 +1149,7 @@ export function CompanyDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="公司"
         assetName={profileData.name}
-        impact="联系人、招聘机会、岗位、候选人和专题图谱不会删除；原始公司文本继续保留。"
+        impact="联系人、招聘机会、岗位、候选人和知识图谱不会删除；原始公司文本继续保留。"
         onConfirm={() => {
           setDeleteOpen(false);
           notify("公司已进入回收站");

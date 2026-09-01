@@ -955,7 +955,7 @@ export function RelationshipCanvas({
             <div
               className="s3-relationship-view-tabs app-tabs"
               role="tablist"
-              aria-label="专题图谱关系视图"
+              aria-label="知识图谱关系视图"
             >
               {views.map((view) => (
                 <button

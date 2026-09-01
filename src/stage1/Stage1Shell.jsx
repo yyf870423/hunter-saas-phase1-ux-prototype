@@ -445,7 +445,7 @@ const manualAssetTypes = [
     route: "/candidates/new",
   },
   {
-    label: "专题图谱",
+    label: "知识图谱",
     icon: "database",
     description: "创建可持续维护的关系图谱",
     route: "/mappings/new",

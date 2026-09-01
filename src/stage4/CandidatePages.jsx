@@ -1989,11 +1989,11 @@ function RelationsTab({ processingRecords, onOpenProcessing }) {
       >
         <CandidateAcademicRelationsTable mode="collaborators" />
       </FieldGroup>
-      <FieldGroup title="专题图谱">
+      <FieldGroup title="知识图谱">
         <div className="s4-entity-grid">
           <EntityLink
             icon="route"
-            title="具身智能 VLA 专题图谱"
+            title="具身智能 VLA 知识图谱"
             meta="人物关系图页 · 3 处引用 · 已自动同步"
             onClick={() =>
               navigate(
@@ -2797,7 +2797,7 @@ export function IdentityMergeReviewPage() {
         <div className="s4-preserved-relations">
           <StateBanner
             title="正式关系不会因资料合并而丢失"
-            description="岗位推进、匹配历史、公司经历、论文、专利、专题图谱和关联任务继续关联到保留档案。"
+            description="岗位推进、匹配历史、公司经历、论文、专利、知识图谱和关联任务继续关联到保留档案。"
           />
           <div className="s4-entity-grid">
             <EntityLink

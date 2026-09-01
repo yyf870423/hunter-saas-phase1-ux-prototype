@@ -94,7 +94,7 @@ const inspectionContexts = {
     ],
   },
   "mapping-embodied": {
-    resultDestination: "具身智能 VLA 专题图谱 · 本批次增量更新",
+    resultDestination: "具身智能 VLA 知识图谱 · 本批次增量更新",
     checkpoints: [
       {
         title: "公司与组织范围已检查",
@@ -469,7 +469,7 @@ ${createMarkdownTable(
                 tone: "warning",
                 action: "拓界技术负责人、穹顶汇报关系和王奕身份仍需处理",
                 duration: "本轮已运行 13 分 25 秒",
-                resultDestination: "具身智能 VLA 专题图谱 · 待补充信息",
+                resultDestination: "具身智能 VLA 知识图谱 · 待补充信息",
                 checkpoints: inspectionContexts["mapping-embodied"].checkpoints,
               })
             }
@@ -499,7 +499,7 @@ ${createMarkdownTable(
               {
                 value: "update",
                 label: "更新已有图谱",
-                description: "更新“具身智能 VLA 专题图谱”，并保留更新前版本。",
+                description: "更新“具身智能 VLA 知识图谱”，并保留更新前版本。",
               },
               {
                 value: "report",
@@ -1005,7 +1005,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                         "## 新图谱已经创建\n\n“具身智能 VLA 人才摸排”已写入本批次审核结果，待确认项、原始证据和用户决定均已保留。",
                     },
                     update: {
-                      text: "更新已有的“具身智能 VLA 专题图谱”。",
+                      text: "更新已有的“具身智能 VLA 知识图谱”。",
                       result:
                         "## 已有图谱已经更新\n\n本批次审核结果已写入，更新前的图谱版本已保留；后续资产关系变化会继续自动刷新可信内容。",
                     },
@@ -1214,7 +1214,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         <div className="s2-confirm-copy">
           <p>当前任务会先安全停止；任务专属的对话、计划和文件进入回收站。</p>
           <p>
-            公司、联系人、招聘机会、岗位、候选人和专题图谱等正式资产不会被删除。
+            公司、联系人、招聘机会、岗位、候选人和知识图谱等正式资产不会被删除。
           </p>
         </div>
       </Modal>

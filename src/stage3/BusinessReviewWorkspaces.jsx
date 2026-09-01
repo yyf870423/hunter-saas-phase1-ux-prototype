@@ -462,10 +462,10 @@ export function LandscapeReviewWorkspace({
     [],
   );
   return (
-    <section className="s3-review-workspace" aria-label="专题图谱更新审核">
+    <section className="s3-review-workspace" aria-label="知识图谱更新审核">
       <ReviewHeader
         eyebrow="人才摸排 · 变更批次审核"
-        title="具身智能 VLA 专题图谱"
+        title="具身智能 VLA 知识图谱"
         summary="本批次 4 家公司 · 30 位人物 · 10 条关系"
         onClose={onClose}
       />
@@ -473,7 +473,7 @@ export function LandscapeReviewWorkspace({
         <div
           className="s3-review-tabs app-tabs"
           role="tablist"
-          aria-label="专题图谱审核内容"
+          aria-label="知识图谱审核内容"
         >
           <button
             type="button"

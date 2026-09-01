@@ -58,7 +58,7 @@ const positionAiSupplement =
 const positionMatchingTooltip =
   "使用 Hunter 中已有候选人计算与当前岗位的适配程度，不会从外部平台或公开网络寻找新候选人。";
 const positionSourcingTooltip =
-  "创建岗位招聘任务，从 Hunter 已有候选人、专题图谱、公开网络、论文专利和用户上传简历中持续寻找新候选人。";
+  "创建岗位招聘任务，从 Hunter 已有候选人、知识图谱、公开网络、论文专利和用户上传简历中持续寻找新候选人。";
 
 function buildPositionAiRecord(state = "complete") {
   const planByState = {
@@ -2705,7 +2705,7 @@ const positionTalentViews = [
         y: index < 3 ? 42 + index * 150 : 115 + (index - 3) * 190,
         detailPath: item.detailPath || undefined,
         detailLabel: item.detailPath ? "打开候选人详情" : undefined,
-        evidence: ["人岗匹配结果", "专题图谱关系"],
+        evidence: ["人岗匹配结果", "知识图谱关系"],
       })),
     ],
     edges: positionTalentRows.slice(0, 5).map((item, index) => ({
@@ -2777,12 +2777,12 @@ function PositionTalentMap() {
           tone="info"
           icon="refresh"
           title="正在更新岗位人才梳理"
-          description="正在重新计算系统候选人、专题图谱和公开人物线索之间的关系，不会中断当前岗位流程。"
+          description="正在重新计算系统候选人、知识图谱和公开人物线索之间的关系，不会中断当前岗位流程。"
         />
       ) : null}
       <FieldGroup
         title="当前结果"
-        description="无论是否已经建立专题图谱都可以执行。专题图谱存在时，它会作为重要输入参与梳理。"
+        description="无论是否已经建立知识图谱都可以执行。知识图谱存在时，它会作为重要输入参与梳理。"
         action={
           <Button
             size="sm"

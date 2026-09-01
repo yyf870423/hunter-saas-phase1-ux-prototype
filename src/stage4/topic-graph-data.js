@@ -1,7 +1,7 @@
 export const topicGraphs = [
   {
     id: "mapping-embodied",
-    name: "具身智能 VLA 专题图谱",
+    name: "具身智能 VLA 知识图谱",
     description:
       "持续整理具身智能公司生态、组织结构、关键人物、岗位人才和可执行联系路径。",
     pageCount: 4,
@@ -13,7 +13,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-hand",
-    name: "灵巧手技术与人才专题图谱",
+    name: "灵巧手技术与人才知识图谱",
     description:
       "整理灵巧手结构、驱动、触觉、控制和量产链条，以及各方向的核心团队与人才。",
     pageCount: 5,
@@ -25,7 +25,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-autodrive",
-    name: "自动驾驶决策人才迁移专题图谱",
+    name: "自动驾驶决策人才迁移知识图谱",
     description: "分析决策规划团队、技术路线和向具身智能迁移的人才流动关系。",
     pageCount: 3,
     nodeCount: 97,
@@ -250,7 +250,7 @@ export const initialGraphPages = [
         assetPath: "/companies/company-xinglan",
         x: 490,
         y: 230,
-        summary: "专题图谱核心公司。",
+        summary: "知识图谱核心公司。",
         evidence: ["公司资料"],
       }),
       node({
@@ -521,7 +521,7 @@ export const initialGraphPages = [
         kind: "group",
         x: 380,
         y: 105,
-        summary: "当前 6 位，来自系统候选人与专题图谱。",
+        summary: "当前 6 位，来自系统候选人与知识图谱。",
       }),
       node({
         id: "pool-watch",
@@ -585,7 +585,7 @@ export const initialGraphPages = [
         sourceType: "derived",
         x: 720,
         y: 466,
-        summary: "由专题图谱关系新增，尚未建立正式候选人。",
+        summary: "由知识图谱关系新增，尚未建立正式候选人。",
         marker: "本次已更新",
         evidence: ["星澜机器人组织图页", "论文作者记录"],
       }),
@@ -633,7 +633,7 @@ export const initialGraphPages = [
         target: "pool-he",
         label: "图谱召回",
         kind: "derived",
-        evidence: ["专题图谱关系"],
+        evidence: ["知识图谱关系"],
       }),
     ],
   },

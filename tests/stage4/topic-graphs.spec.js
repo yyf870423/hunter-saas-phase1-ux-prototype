@@ -26,11 +26,11 @@ async function expectVisibleGraphNodesDoNotOverlap(page) {
   expect(overlaps).toEqual([]);
 }
 
-test("专题图谱支持真实拖动、跨图页搜索和画布表格切换", async ({ page }) => {
+test("知识图谱支持真实拖动、跨图页搜索和画布表格切换", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content&page=organization");
   await expect(
-    page.getByRole("heading", { name: "具身智能 VLA 专题图谱" }),
+    page.getByRole("heading", { name: "具身智能 VLA 知识图谱" }),
   ).toBeVisible();
 
   const node = page.locator(".tg-node", { hasText: "星澜机器人" }).first();
@@ -50,7 +50,7 @@ test("专题图谱支持真实拖动、跨图页搜索和画布表格切换", as
   expect(after.x).toBeGreaterThan(before.x + 50);
   await expectVisibleGraphNodesDoNotOverlap(page);
 
-  await page.getByLabel("搜索专题图谱").fill("拓界机器人");
+  await page.getByLabel("搜索知识图谱").fill("拓界机器人");
   await page
     .getByRole("button", { name: /具身智能公司生态 · 拓界机器人/ })
     .click();
@@ -135,7 +135,7 @@ test("专题图谱支持真实拖动、跨图页搜索和画布表格切换", as
   assertNoConsoleErrors();
 });
 
-test("专题图谱缩小后可继续扩展画布且节点信息保持完整", async ({ page }) => {
+test("知识图谱缩小后可继续扩展画布且节点信息保持完整", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content&page=organization");
   await page.getByRole("button", { name: "关闭详情" }).click();
@@ -287,8 +287,8 @@ test("空图谱、图谱内 AI、版本预览与关联入口有完整路径", as
   ).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator(".tg-history-preview-canvas")).toBeVisible();
-  await expect(page.getByLabel("搜索专题图谱")).toBeVisible();
-  await page.getByLabel("搜索专题图谱").fill("赵星羽");
+  await expect(page.getByLabel("搜索知识图谱")).toBeVisible();
+  await page.getByLabel("搜索知识图谱").fill("赵星羽");
   await page
     .locator(".tg-search-results > button", { hasText: "赵星羽" })
     .click();
@@ -427,7 +427,7 @@ test("图谱卡片支持拖动排序并持久化", async ({ page }) => {
   await expect(cards.nth(0).getByRole("heading")).toHaveText(secondTitle);
   await secondCard.dispatchEvent("drop", { dataTransfer });
   await firstCard.dispatchEvent("dragend", { dataTransfer });
-  await expect(page.getByText("专题图谱顺序已保存")).toBeVisible();
+  await expect(page.getByText("知识图谱顺序已保存")).toBeVisible();
   await page.reload();
   await expect(cards.nth(0).getByRole("heading")).toHaveText(secondTitle);
   await expect(cards.nth(1).getByRole("heading")).toHaveText(firstTitle);
@@ -437,7 +437,7 @@ test("图谱卡片支持拖动排序并持久化", async ({ page }) => {
 test("图谱空状态与节点资产关联可维护", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings?state=empty");
-  await expect(page.getByText("还没有专题图谱")).toBeVisible();
+  await expect(page.getByText("还没有知识图谱")).toBeVisible();
 
   await page.goto("#/mappings/mapping-embodied?tab=content");
   await page.locator(".tg-node", { hasText: "星澜机器人" }).click();
@@ -587,7 +587,7 @@ test("图谱快捷键与删除操作沿用本地人才地图语义", async ({ pa
   assertNoConsoleErrors();
 });
 
-test("专题图谱、历史视图和审核视图均可进入并退出全屏", async ({ page }) => {
+test("知识图谱、历史视图和审核视图均可进入并退出全屏", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content");
   await page.getByRole("button", { name: "进入图谱全屏" }).click();
@@ -622,7 +622,7 @@ test("专题图谱、历史视图和审核视图均可进入并退出全屏", as
   assertNoConsoleErrors();
 });
 
-test("相关资产和运营页体现专题图谱决策", async ({ page }) => {
+test("相关资产和运营页体现知识图谱决策", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   const cases = [
     ["#/candidates/candidate-linhao?tab=relations", "学术成果"],

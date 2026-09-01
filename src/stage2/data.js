@@ -9,7 +9,7 @@ export const workstreamHistory = [
     time: "刚刚",
     pinned: true,
     summary:
-      "系统候选人、专题图谱、公开资料和用户上传简历正在持续合并，18 位候选人等待审核。",
+      "系统候选人、知识图谱、公开资料和用户上传简历正在持续合并，18 位候选人等待审核。",
   },
   {
     id: "client-xinglan",
@@ -278,7 +278,7 @@ export const planSteps = [
     id: "recall",
     title: "并行检索并接收补充资料",
     detail:
-      "检索系统候选人、专题图谱、公开网络和论文专利，并接收用户上传的简历。",
+      "检索系统候选人、知识图谱、公开网络和论文专利，并接收用户上传的简历。",
     requirement: "多渠道找人；北京优先，异地人选保留地点意愿风险。",
   },
   {
@@ -577,7 +577,7 @@ export const sideTaskRows = [
     "task-hand-team",
     "核验灵巧手团队负责人",
     "人物身份核验",
-    "星澜机器人专题图谱",
+    "星澜机器人知识图谱",
     "等待用户",
     "warning",
     "16 分钟前",
@@ -586,7 +586,7 @@ export const sideTaskRows = [
     "task-shlab",
     "补充上海人工智能实验室具身智能团队",
     "公开资料调研",
-    "具身智能 VLA 专题图谱",
+    "具身智能 VLA 知识图谱",
     "运行中",
     "info",
     "已运行 24 分钟",
@@ -613,7 +613,7 @@ export const sideTaskRows = [
     "task-patent",
     "整理灵巧手结构专利共同发明人",
     "专利关系探索",
-    "灵巧手专题图谱",
+    "灵巧手知识图谱",
     "完成",
     "success",
     "昨天 19:40",
@@ -699,7 +699,7 @@ export const signals = [
     id: "signal-graph-sync",
     type: "关系变化",
     title: "星澜机器人组织与人才流动关系发生变化",
-    object: "具身智能 VLA 专题图谱",
+    object: "具身智能 VLA 知识图谱",
     priority: "需要确认",
     status: "待处理",
     tone: "warning",

@@ -20,7 +20,7 @@ export const navSections = [
     label: "人才资产",
     items: [
       { id: "candidates", label: "候选人", icon: "user" },
-      { id: "mappings", label: "专题图谱", icon: "database" },
+      { id: "mappings", label: "知识图谱", icon: "database" },
     ],
   },
   {
@@ -61,7 +61,7 @@ export const mainlines = [
     tone: "info",
     changed: "4 分钟前",
     summary:
-      "系统候选人、专题图谱、公开资料和用户上传简历持续汇入，当前新增 18 位待审核候选人。",
+      "系统候选人、知识图谱、公开资料和用户上传简历持续汇入，当前新增 18 位待审核候选人。",
     facts: [
       ["本批新增", "18 位"],
       ["资料更新", "4 位"],

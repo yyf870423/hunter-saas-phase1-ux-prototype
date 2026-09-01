@@ -65,7 +65,7 @@ const groups = [
       [
         "公司详情",
         "/companies/company-xinglan",
-        "资料、招聘业务、联系人、任职人才、专题图谱与任务",
+        "资料、招聘业务、联系人、任职人才、知识图谱与任务",
       ],
       ["新建公司", "/companies/new", "手动、文件和 Agent 三种输入"],
       [
@@ -82,10 +82,10 @@ const groups = [
   },
   {
     number: "04",
-    title: "专题图谱",
+    title: "知识图谱",
     description: "可自由维护、持续同步并供 Agent 使用的关系图谱资产。",
     links: [
-      ["专题图谱列表", "/mappings", "搜索、卡片列表、新建与删除"],
+      ["知识图谱列表", "/mappings", "搜索、卡片列表、新建与删除"],
       [
         "图谱画布",
         "/mappings/mapping-embodied?tab=content",
@@ -139,7 +139,7 @@ const groups = [
     links: [
       ["数据导入", "/data/imports", "格式校验、解析、查重、结果确认和失败"],
       [
-        "专题图谱导入",
+        "知识图谱导入",
         "/mappings/mapping-embodied?panel=import",
         "只向已有图谱导入图页并处理同名",
       ],
@@ -161,10 +161,10 @@ const stateLinks = [
   ["候选人权限受限", "/candidates?state=limited"],
   ["详情加载失败", "/candidates/candidate-linhao?state=error"],
   ["详情敏感信息受限", "/candidates/candidate-linhao?state=limited"],
-  ["专题图谱加载中", "/mappings?state=loading"],
-  ["专题图谱空状态", "/mappings?state=empty"],
-  ["专题图谱加载失败", "/mappings?state=error"],
-  ["专题图谱权限受限", "/mappings?state=limited"],
+  ["知识图谱加载中", "/mappings?state=loading"],
+  ["知识图谱空状态", "/mappings?state=empty"],
+  ["知识图谱加载失败", "/mappings?state=error"],
+  ["知识图谱权限受限", "/mappings?state=limited"],
 ];
 
 export function Stage4ReviewPage() {

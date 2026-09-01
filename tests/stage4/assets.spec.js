@@ -518,7 +518,7 @@ test("岗位和公司详情按关系规模提供表格与关系图", async ({ pa
   await expect(
     page.getByRole("columnheader", { name: "四级及更深" }),
   ).toBeVisible();
-  await expect(page.getByText("专题图谱补充", { exact: false })).toHaveCount(0);
+  await expect(page.getByText("知识图谱补充", { exact: false })).toHaveCount(0);
   await expect(page.getByText(/共 8 位符合条件的人才/)).toBeVisible();
   await expect(page.getByLabel("搜索重点人才")).toBeVisible();
   await page.getByLabel("搜索重点人才").fill("周明远");
@@ -1115,12 +1115,12 @@ test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", as
   await expect(page.getByText("已有岗位已关联到招聘机会")).toBeVisible();
 });
 
-test("专题图谱多图页、关系详情与写入决定可用", async ({ page }) => {
+test("知识图谱多图页、关系详情与写入决定可用", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/new");
   await expect(page.getByLabel("图谱名称")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "创建专题图谱" }),
+    page.getByRole("button", { name: "创建知识图谱" }),
   ).toBeDisabled();
 
   await page.goto("#/mappings/mapping-embodied?tab=content");

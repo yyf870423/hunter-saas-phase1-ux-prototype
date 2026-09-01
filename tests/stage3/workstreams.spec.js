@@ -226,7 +226,7 @@ test("相关处理详情使用人才摸排自己的结果去向和检查点", as
   await page.getByRole("button", { name: /相关处理/ }).click();
   await page.getByRole("button", { name: /人物关系与联系路径/ }).click();
   await expect(
-    page.getByText("具身智能 VLA 专题图谱 · 本批次增量更新"),
+    page.getByText("具身智能 VLA 知识图谱 · 本批次增量更新"),
   ).toBeVisible();
   await expect(page.getByText("人物身份与关系已去重")).toBeVisible();
   await expect(page.getByText("未生成重复候选人记录")).toHaveCount(0);

@@ -283,7 +283,7 @@ const taskPlan = [
   {
     id: "collect",
     title: "汇总现有人物与来源",
-    detail: "读取专题图谱和公开来源中已经存在的两组人物记录。",
+    detail: "读取知识图谱和公开来源中已经存在的两组人物记录。",
     requirement: "核验两位“周明远”是否为同一个人。",
   },
   {
@@ -370,7 +370,7 @@ function IdentityReviewTask({ taskId }) {
   const planUpdate = resolved
     ? {
         title: "计划已完成",
-        detail: "用户补充最新任职信息后，身份建议已回流专题图谱审核区。",
+        detail: "用户补充最新任职信息后，身份建议已回流知识图谱审核区。",
         time: "刚刚",
         tone: "info",
       }
@@ -397,7 +397,7 @@ function IdentityReviewTask({ taskId }) {
         <div>
           <small>人物身份核验</small>
           <h1>核验灵巧手团队负责人</h1>
-          <p>关联：星澜机器人专题图谱 · 创建人：沈岚</p>
+          <p>关联：星澜机器人知识图谱 · 创建人：沈岚</p>
         </div>
         <div>
           <StatusBadge
@@ -424,7 +424,7 @@ function IdentityReviewTask({ taskId }) {
           <div className="s2-task-timeline">
             <UserMessage time="今天 08:54">
               {sessionStorage.getItem("hunter-new-task-prompt") ||
-                "核验专题图谱中两位“周明远”是不是同一个人，只给身份建议，不要自动合并。"}
+                "核验知识图谱中两位“周明远”是不是同一个人，只给身份建议，不要自动合并。"}
             </UserMessage>
             <HunterReply
               markdown={`我已经比较公开履历、任职时间、教育经历和团队关系。两组记录有较强重合，但目前仍存在一项无法自动消除的冲突。
@@ -451,7 +451,7 @@ function IdentityReviewTask({ taskId }) {
                 <UserMessage time="刚刚">
                   补充：这是同一个人，2025 年 12 月加入穹顶智能。
                 </UserMessage>
-                <HunterReply markdown="已记录你补充的任职事实，并将两组记录标记为同一人物的合并建议。该建议已回流“星澜机器人专题图谱”的更新与审核区，仍需按当前写入规则完成审核。" />
+                <HunterReply markdown="已记录你补充的任职事实，并将两组记录标记为同一人物的合并建议。该建议已回流“星澜机器人知识图谱”的更新与审核区，仍需按当前写入规则完成审核。" />
               </>
             ) : null}
           </div>
@@ -521,7 +521,7 @@ function IdentityReviewTask({ taskId }) {
       >
         <div className="s2-confirm-copy">
           <p>任务对话、计划和尚未写入正式资产的专属文件会一起进入回收站。</p>
-          <p>专题图谱中已经确认的正式人物记录不会删除。</p>
+          <p>知识图谱中已经确认的正式人物记录不会删除。</p>
         </div>
       </Modal>
     </TaskWorkspaceShell>

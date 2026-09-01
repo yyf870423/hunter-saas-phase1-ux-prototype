@@ -293,7 +293,7 @@ export const tasks = [
     type: "图谱关系同步",
     scope: "系统运行",
     workId: "mapping-embodied",
-    workTitle: "专题图谱关系同步",
+    workTitle: "知识图谱关系同步",
     trigger: "资产变化事件",
     status: "已完成",
     phase: "同步后校验",

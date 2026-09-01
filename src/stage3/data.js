@@ -365,7 +365,7 @@ export const mappingRelationshipViews = [
           ["关键人物", "11 位"],
           ["方向", "VLA、机器人学习"],
         ],
-        evidence: ["专题图谱范围"],
+        evidence: ["知识图谱范围"],
       },
       {
         id: "eco-tuojie",
@@ -529,7 +529,7 @@ export const mappingRelationshipViews = [
           ["已知组织", "具身智能中心"],
           ["当前缺口", "数据闭环负责人"],
         ],
-        evidence: ["公司组织资料", "专题图谱人物"],
+        evidence: ["公司组织资料", "知识图谱人物"],
       },
       {
         id: "matrix-tuojie",
@@ -1205,7 +1205,7 @@ export const mappingRelationshipViews = [
           ["直接联系方式", "尚未掌握"],
           ["路径建议", "优先通过刘健引荐"],
         ],
-        evidence: ["专题图谱人物关系"],
+        evidence: ["知识图谱人物关系"],
       },
       {
         id: "path-founder",
@@ -1673,7 +1673,7 @@ export const businessScenarios = {
       },
       {
         id: "update",
-        title: "审核并增量更新专题图谱",
+        title: "审核并增量更新知识图谱",
         detail: "按批次写入通过门禁的结果，冲突内容等待用户判断。",
         requirement: "每批更新说明新增、冲突、缺口和下一步动作。",
         doneAt: 5,

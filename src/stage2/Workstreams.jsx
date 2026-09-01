@@ -476,7 +476,7 @@ export function AutomationWorkspace() {
               ? {
                   title: "岗位边界已确认",
                   detail:
-                    "系统候选人、专题图谱和公开资料检索已经开始；用户上传的新简历会随时并入当前任务。",
+                    "系统候选人、知识图谱和公开资料检索已经开始；用户上传的新简历会随时并入当前任务。",
                   time: "09:02",
                   tone: "info",
                 }
@@ -574,7 +574,7 @@ export function AutomationWorkspace() {
             {phase >= 1 ? (
               <HunterReply
                 streaming={phase === 1 && !streamStopped}
-                markdown={`我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行处理系统候选人、专题图谱、论文专利和公开网络资料。用户主动上传的新简历也可以随时并入本任务。${
+                markdown={`我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行处理系统候选人、知识图谱、论文专利和公开网络资料。用户主动上传的新简历也可以随时并入本任务。${
                   phase >= 2
                     ? `
 
@@ -630,7 +630,7 @@ export function AutomationWorkspace() {
                 <span>
                   <b>部分公开来源暂不可用</b>
                   <small>
-                    系统候选人、专题图谱和已获得的公开结果继续保留。失败来源可以稍后单独重试，也可以直接上传补充简历。
+                    系统候选人、知识图谱和已获得的公开结果继续保留。失败来源可以稍后单独重试，也可以直接上传补充简历。
                   </small>
                 </span>
               </div>
@@ -641,7 +641,7 @@ export function AutomationWorkspace() {
                 <span>
                   <b>论文与专利人物线索处理失败</b>
                   <small>
-                    系统候选人、专题图谱、公开资料和用户上传简历已经保留。可以只重试失败来源，不重新执行整轮任务。
+                    系统候选人、知识图谱、公开资料和用户上传简历已经保留。可以只重试失败来源，不重新执行整轮任务。
                   </small>
                 </span>
                 <Button
@@ -658,7 +658,7 @@ export function AutomationWorkspace() {
               <HunterReply
                 markdown={`## 云端检索已开始
 
-Hunter 正在检查系统候选人、专题图谱、论文、专利和公开网络资料。Hunter 不会登录或自动操作需要认证的人才网站；你可以随时在下方上传整理好的简历文件，上传内容会进入同一套身份判断、查重和匹配流程。`}
+Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网络资料。Hunter 不会登录或自动操作需要认证的人才网站；你可以随时在下方上传整理好的简历文件，上传内容会进入同一套身份判断、查重和匹配流程。`}
               />
             ) : null}
             {forcedState === "resume-batch" ? (

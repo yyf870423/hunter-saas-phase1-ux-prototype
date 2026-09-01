@@ -284,16 +284,16 @@ export function MappingsListPage() {
       graphOrderStorageKey,
       JSON.stringify(next.map((item) => item.id)),
     );
-    notify("专题图谱顺序已保存");
+    notify("知识图谱顺序已保存");
   };
 
   return (
     <div className="s4-page tg-list-page">
       <AssetPageHeader
-        title="专题图谱"
+        title="知识图谱"
         description="用图页整理组织、人物、公司生态、岗位人才和其他需要持续维护的关系内容。"
         count={controller.filtered.length}
-        primaryLabel="新建专题图谱"
+        primaryLabel="新建知识图谱"
         onPrimary={() => navigate("/mappings/new")}
       />
       <FilterBar
@@ -304,7 +304,7 @@ export function MappingsListPage() {
       />
       <AssetListState
         state={state}
-        label="专题图谱"
+        label="知识图谱"
         onRetry={() => navigate("/mappings")}
       >
         {state === "normal" && controller.rows.length ? (
@@ -350,7 +350,7 @@ export function MappingsListPage() {
                     <Icon name="route" />
                   </span>
                   <span>
-                    <small>专题图谱 · {item.pageCount} 个图页</small>
+                    <small>知识图谱 · {item.pageCount} 个图页</small>
                     <h2>{item.name}</h2>
                   </span>
                   <button
@@ -384,7 +384,7 @@ export function MappingsListPage() {
                         }}
                       >
                         <Icon name="trash" />
-                        删除专题图谱
+                        删除知识图谱
                       </button>
                     </div>
                   ) : null}
@@ -430,7 +430,7 @@ export function MappingsListPage() {
         ) : state === "normal" || state === "empty" ? (
           <div className="s4-custom-empty">
             <Icon name="route" />
-            <b>还没有专题图谱</b>
+            <b>还没有知识图谱</b>
             <p>
               先创建一个图谱，再在其中增加空白图页、导入文件或使用 AI 整理内容。
             </p>
@@ -439,7 +439,7 @@ export function MappingsListPage() {
               icon="plus"
               onClick={() => navigate("/mappings/new")}
             >
-              新建专题图谱
+              新建知识图谱
             </Button>
           </div>
         ) : null}
@@ -452,7 +452,7 @@ export function MappingsListPage() {
       <DeleteAssetModal
         open={Boolean(deleteItem)}
         close={() => setDeleteItem(null)}
-        assetLabel="专题图谱"
+        assetLabel="知识图谱"
         assetName={deleteItem?.name || ""}
         impact="图谱进入回收站；候选人、岗位、公司、论文、专利和共享关系均不会删除。"
         onConfirm={() => {
@@ -473,15 +473,15 @@ export function MappingCreatePage() {
   const create = () => {
     setSubmitted(true);
     if (!name.trim()) return;
-    notify("专题图谱已创建");
+    notify("知识图谱已创建");
     navigate("/mappings/graph-empty");
   };
 
   return (
     <div className="s4-create-page tg-create-page">
       <AssetPageHeader
-        eyebrow="专题图谱"
-        title="新建专题图谱"
+        eyebrow="知识图谱"
+        title="新建知识图谱"
         description="先建立图谱容器。创建后再增加图页、导入文件或让 AI 整理内容。"
         actions={<Button onClick={() => navigate("/mappings")}>取消</Button>}
       />
@@ -493,7 +493,7 @@ export function MappingCreatePage() {
           <div>
             <h2>图谱基本资料</h2>
             <p>
-              专题图谱可以承载组织、人物、公司生态、岗位人才或其他关系内容。
+              知识图谱可以承载组织、人物、公司生态、岗位人才或其他关系内容。
             </p>
           </div>
         </header>
@@ -507,7 +507,7 @@ export function MappingCreatePage() {
             <TextInput
               value={name}
               onChange={setName}
-              placeholder="例如：具身智能 VLA 专题图谱"
+              placeholder="例如：具身智能 VLA 知识图谱"
             />
           </FormField>
           <FormField label="图谱说明" span={2}>
@@ -523,13 +523,13 @@ export function MappingCreatePage() {
           <Icon name="info" />
           <p>
             创建后不会自动生成图页，也不会启动任务。文件导入和 AI
-            整理只能在已有专题图谱中执行。
+            整理只能在已有知识图谱中执行。
           </p>
         </div>
         <footer>
           <Button onClick={() => navigate("/mappings")}>取消</Button>
           <Button tone="primary" disabled={!name.trim()} onClick={create}>
-            创建专题图谱
+            创建知识图谱
           </Button>
         </footer>
       </section>
@@ -546,7 +546,7 @@ function GraphEmptyState({ onCreatePage, onImport, onAi }) {
         <span />
         <i />
       </div>
-      <h2>这份专题图谱还没有图页</h2>
+      <h2>这份知识图谱还没有图页</h2>
       <p>选择一种方式开始。后续可以在同一份图谱中继续增加更多图页。</p>
       <div>
         <button type="button" onClick={onCreatePage}>
@@ -777,7 +777,7 @@ function GraphSearch({ pages, activePageId, onLocate }) {
     <div className="tg-graph-search">
       <Icon name="search" />
       <input
-        aria-label="搜索专题图谱"
+        aria-label="搜索知识图谱"
         value={query}
         onFocus={() => setOpen(true)}
         onChange={(event) => {
@@ -2218,7 +2218,7 @@ function HiddenContentPanel({ pages, close, onRestore }) {
     <aside className="tg-overlay-panel tg-hidden-panel">
       <header>
         <span>
-          <small>当前专题图谱</small>
+          <small>当前知识图谱</small>
           <h2>隐藏内容</h2>
         </span>
         <button type="button" aria-label="关闭隐藏内容" onClick={close}>
@@ -2283,7 +2283,7 @@ function ImportGraphPage({ open, close, onImported, scenario = "" }) {
         ? {
             title: "文件无法读取",
             description:
-              "文件可能已损坏或内容不完整。当前专题图谱没有产生任何半成品图页。",
+              "文件可能已损坏或内容不完整。当前知识图谱没有产生任何半成品图页。",
           }
         : null;
   return (
@@ -2296,7 +2296,7 @@ function ImportGraphPage({ open, close, onImported, scenario = "" }) {
       }
       description={
         step === 1
-          ? "文件只会在当前专题图谱中创建图页。"
+          ? "文件只会在当前知识图谱中创建图页。"
           : step === 2
             ? "结构先落地；智能分析在导入后继续运行。"
             : "可以立即查看图页，智能分析不会阻塞使用。"
@@ -2375,7 +2375,7 @@ function ImportGraphPage({ open, close, onImported, scenario = "" }) {
                   tone="warning"
                   icon="warning"
                   title="文件中没有共同的第一层结构"
-                  description="系统识别出 3 组互不隶属的内容。本次会在当前专题图谱中分别创建 3 个图页，不会强行给它们增加同一个父节点。"
+                  description="系统识别出 3 组互不隶属的内容。本次会在当前知识图谱中分别创建 3 个图页，不会强行给它们增加同一个父节点。"
                 />
                 <div className="tg-import-group-preview">
                   {[
@@ -2560,7 +2560,7 @@ function GraphAiWorkspace({ page, close, onApply }) {
       <header>
         <button type="button" onClick={close}>
           <Icon name="chevronLeft" />
-          返回专题图谱
+          返回知识图谱
         </button>
         <span>
           <small>资产内 AI 协作 · 不进入任务列表</small>
@@ -2572,7 +2572,7 @@ function GraphAiWorkspace({ page, close, onApply }) {
         <section className="tg-ai-conversation">
           <div className="tg-ai-message is-user">
             <p>
-              结合专题图谱中已经确认的公司、候选人和论文关系，补齐 VLA
+              结合知识图谱中已经确认的公司、候选人和论文关系，补齐 VLA
               算法组最近加入的核心成员，并整理与岗位人才池的关系。
             </p>
           </div>
@@ -3080,7 +3080,7 @@ function GraphRelatedTab({ navigate }) {
       <section>
         <header>
           <h2>关联业务</h2>
-          <p>专题图谱可以被任务和资产复用，但不会因为被引用而复制正式数据。</p>
+          <p>知识图谱可以被任务和资产复用，但不会因为被引用而复制正式数据。</p>
         </header>
         {[
           [
@@ -3799,7 +3799,7 @@ function GraphContent({
         title={pageEditor?.id ? "编辑图页" : "新建图页"}
         description={
           pageEditor?.id
-            ? "只修改当前专题图谱中的图页名称。"
+            ? "只修改当前知识图谱中的图页名称。"
             : "创建空白图页；也可以改用导入或 AI 整理。"
         }
         footer={
@@ -3898,7 +3898,7 @@ function GraphContent({
           setPages(remaining);
           setActivePageId(remaining[0]?.id);
           setPageDelete(null);
-          notify("图页已进入当前专题图谱的版本历史");
+          notify("图页已进入当前知识图谱的版本历史");
         }}
       />
     </div>
@@ -3971,7 +3971,7 @@ export function MappingDetailPage() {
   };
   if (!graph)
     return (
-      <NotFoundState label="专题图谱" onBack={() => navigate("/mappings")} />
+      <NotFoundState label="知识图谱" onBack={() => navigate("/mappings")} />
     );
   if (panel === "ai" && activePage)
     return (
@@ -4156,7 +4156,7 @@ export function MappingDetailPage() {
         open={taskBlockedOpen}
         close={() => setTaskBlockedOpen(false)}
         title="当前图谱已有整理任务"
-        description="为了避免两个任务同时修改同一份图谱，单个专题图谱同一时间只能运行一个导入分析或 AI 整理任务。"
+        description="为了避免两个任务同时修改同一份图谱，单个知识图谱同一时间只能运行一个导入分析或 AI 整理任务。"
         footer={
           <Button tone="primary" onClick={() => setTaskBlockedOpen(false)}>
             查看当前进度
@@ -4210,12 +4210,12 @@ export function MappingDetailPage() {
       <DeleteAssetModal
         open={deleteOpen}
         close={() => setDeleteOpen(false)}
-        assetLabel="专题图谱"
+        assetLabel="知识图谱"
         assetName={graph.name}
         impact="整份图谱进入回收站；正式资产、来源记录和共享关系均不会删除。"
         onConfirm={() => {
           setDeleteOpen(false);
-          notify("专题图谱已进入回收站");
+          notify("知识图谱已进入回收站");
           navigate("/mappings");
         }}
       />

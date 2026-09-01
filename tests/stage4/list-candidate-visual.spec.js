@@ -198,7 +198,7 @@ test("公共时间选择器展开态符合统一设计语言", async ({ page }) 
   await assertNoConsoleErrors();
 });
 
-test("专题图谱创建、画布、审核和相关业务视觉完整", async ({ page }) => {
+test("知识图谱创建、画布、审核和相关业务视觉完整", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 900 });
 
