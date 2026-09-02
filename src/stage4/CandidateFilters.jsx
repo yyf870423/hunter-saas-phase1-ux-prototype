@@ -5,9 +5,11 @@ import { SearchField } from "../stage1/ui";
 import {
   Button,
   CustomCheckbox,
+  Drawer,
   FloatingPanel,
   Modal,
   SelectMenu,
+  useToast,
 } from "./asset-ui";
 import { candidateFavoriteTree, candidateIndustryTree } from "./data";
 
@@ -150,18 +152,23 @@ function flattenFolders(nodes, parentPath = "", depth = 0) {
   });
 }
 
-const folderRows = flattenFolders(candidateFavoriteTree);
-
-function FolderTree({ value, onChange, multiple = false, query = "" }) {
+function FolderTree({
+  tree = candidateFavoriteTree,
+  value,
+  onChange,
+  multiple = false,
+  query = "",
+}) {
   const [expanded, setExpanded] = useState(
-    () => new Set(candidateFavoriteTree.map((item) => item.id)),
+    () => new Set(tree.map((item) => item.id)),
   );
+  const folderRows = useMemo(() => flattenFolders(tree), [tree]);
   const normalized = query.trim().toLowerCase();
   const visible = normalized
     ? folderRows.filter((item) => item.path.toLowerCase().includes(normalized))
     : folderRows.filter((item) => {
         const parentPaths = item.path.split("/").slice(0, -1);
-        let nodes = candidateFavoriteTree;
+        let nodes = tree;
         for (const parentName of parentPaths) {
           const parent = nodes.find((node) => node.name === parentName);
           if (!parent || !expanded.has(parent.id)) return false;
@@ -230,7 +237,12 @@ function FolderTree({ value, onChange, multiple = false, query = "" }) {
   );
 }
 
-export function FavoriteFilter({ value = [], onChange }) {
+export function FavoriteFilter({
+  tree = candidateFavoriteTree,
+  value = [],
+  onChange,
+  onManage,
+}) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef(null);
@@ -243,7 +255,9 @@ export function FavoriteFilter({ value = [], onChange }) {
       ref={ref}
     >
       <button type="button" aria-expanded={open} onClick={() => setOpen(!open)}>
-        <span>{label}</span>
+        <span className="s4-select-value">
+          <span>{label}</span>
+        </span>
         <Icon name={open ? "chevronUp" : "chevronDown"} />
       </button>
       <FloatingPanel
@@ -261,25 +275,48 @@ export function FavoriteFilter({ value = [], onChange }) {
             placeholder="搜索收藏夹"
           />
         </label>
-        <FolderTree value={value} onChange={onChange} multiple query={query} />
+        <FolderTree
+          tree={tree}
+          value={value}
+          onChange={onChange}
+          multiple
+          query={query}
+        />
         <footer>
           <span>
             已选 <b>{value.length}</b> 个收藏夹
           </span>
-          <button
-            type="button"
-            disabled={!value.length}
-            onClick={() => onChange([])}
-          >
-            清空
-          </button>
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onManage?.();
+              }}
+            >
+              管理收藏夹
+            </button>
+            <button
+              type="button"
+              disabled={!value.length}
+              onClick={() => onChange([])}
+            >
+              清空
+            </button>
+          </div>
         </footer>
       </FloatingPanel>
     </div>
   );
 }
 
-export function FavoritePickerModal({ open, count, close, onConfirm }) {
+export function FavoritePickerModal({
+  open,
+  count,
+  close,
+  onConfirm,
+  tree = candidateFavoriteTree,
+}) {
   const [selected, setSelected] = useState([]);
   const [query, setQuery] = useState("");
   useEffect(() => {
@@ -320,6 +357,7 @@ export function FavoritePickerModal({ open, count, close, onConfirm }) {
           />
         </label>
         <FolderTree
+          tree={tree}
           value={selected}
           onChange={setSelected}
           multiple
@@ -336,6 +374,247 @@ export function FavoritePickerModal({ open, count, close, onConfirm }) {
       </div>
     </Modal>,
     document.body,
+  );
+}
+
+function findFolder(nodes, id) {
+  for (const node of nodes) {
+    if (node.id === id) return node;
+    const child = findFolder(node.children || [], id);
+    if (child) return child;
+  }
+  return null;
+}
+
+export function FavoriteManagerDrawer({
+  open,
+  close,
+  tree = candidateFavoriteTree,
+  onCreate,
+  onRename,
+  onDelete,
+}) {
+  const notify = useToast();
+  const [pathIds, setPathIds] = useState([]);
+  const [editor, setEditor] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  useEffect(() => {
+    if (!open) return;
+    setPathIds([]);
+    setEditor(null);
+    setDeleteTarget(null);
+    setName("");
+    setError("");
+  }, [open]);
+  const pathNodes = pathIds.map((id) => findFolder(tree, id)).filter(Boolean);
+  const parent = pathNodes.at(-1) || null;
+  const currentNodes = parent?.children || tree;
+  const currentPath = pathNodes.map((item) => item.name).join(" / ");
+  const openEditor = (mode, target = null) => {
+    setEditor({ mode, target });
+    setName(target?.name || "");
+    setError("");
+  };
+  const saveEditor = () => {
+    const normalized = name.trim();
+    if (!normalized) {
+      setError("请输入收藏夹名称");
+      return;
+    }
+    if (normalized.length > 30) {
+      setError("收藏夹名称不能超过 30 个字符");
+      return;
+    }
+    if (
+      currentNodes.some(
+        (item) =>
+          item.id !== editor?.target?.id && item.name.trim() === normalized,
+      )
+    ) {
+      setError("当前层级已存在同名收藏夹");
+      return;
+    }
+    if (editor?.mode === "create") {
+      onCreate?.({ parentId: parent?.id || null, name: normalized });
+      notify(`已在${currentPath || "根目录"}新建收藏夹“${normalized}”`);
+    } else {
+      onRename?.({ id: editor?.target?.id, name: normalized });
+      notify(`收藏夹已重命名为“${normalized}”`);
+    }
+    setEditor(null);
+  };
+  return (
+    <>
+      <Drawer
+        open={open}
+        close={close}
+        title="管理收藏夹"
+        className="s4-favorite-manager-drawer"
+      >
+        <div className="s4-favorite-manager">
+          <header>
+            <div>
+              <p>在当前层级新建和管理收藏夹。</p>
+              <nav aria-label="收藏夹层级">
+                <button type="button" onClick={() => setPathIds([])}>
+                  全部收藏夹
+                </button>
+                {pathNodes.map((item, index) => (
+                  <span key={item.id}>
+                    <Icon name="chevronRight" />
+                    <button
+                      type="button"
+                      onClick={() => setPathIds(pathIds.slice(0, index + 1))}
+                    >
+                      {item.name}
+                    </button>
+                  </span>
+                ))}
+              </nav>
+            </div>
+            <Button
+              size="sm"
+              tone="primary"
+              icon="plus"
+              onClick={() => openEditor("create")}
+            >
+              新建收藏夹
+            </Button>
+          </header>
+          <div className="s4-favorite-manager-list">
+            {currentNodes.length ? (
+              currentNodes.map((item) => (
+                <article key={item.id}>
+                  <button
+                    type="button"
+                    className="s4-favorite-manager-main"
+                    onClick={() => setPathIds([...pathIds, item.id])}
+                  >
+                    <span className="s4-favorite-manager-icon">
+                      <Icon name="folder" />
+                    </span>
+                    <span>
+                      <b>{item.name}</b>
+                      <small>
+                        {item.count} 人
+                        {item.children?.length
+                          ? ` · ${item.children.length} 个子收藏夹`
+                          : " · 暂无子收藏夹"}
+                      </small>
+                    </span>
+                    <Icon name="chevronRight" />
+                  </button>
+                  <div className="s4-favorite-manager-actions">
+                    <button
+                      type="button"
+                      aria-label={`重命名${item.name}`}
+                      onClick={() => openEditor("rename", item)}
+                    >
+                      <Icon name="edit" />
+                    </button>
+                    <button
+                      type="button"
+                      className="is-danger"
+                      aria-label={`删除${item.name}`}
+                      onClick={() => setDeleteTarget(item)}
+                    >
+                      <Icon name="trash" />
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="s4-favorite-manager-empty">
+                <Icon name="folder" />
+                <b>当前层级还没有收藏夹</b>
+                <p>新建收藏夹后，可以继续进入下一级整理候选人。</p>
+                <Button icon="plus" onClick={() => openEditor("create")}>
+                  新建收藏夹
+                </Button>
+              </div>
+            )}
+          </div>
+          <footer>
+            <Icon name="info" />
+            <span>删除收藏夹只会解除收藏关系，不会删除候选人资料。</span>
+          </footer>
+        </div>
+      </Drawer>
+      <Modal
+        open={Boolean(editor)}
+        close={() => setEditor(null)}
+        size="sm"
+        title={editor?.mode === "create" ? "新建收藏夹" : "重命名收藏夹"}
+        description={
+          editor?.mode === "create"
+            ? `创建位置：${currentPath || "全部收藏夹"}`
+            : `当前位置：${currentPath || "全部收藏夹"}`
+        }
+        footer={
+          <>
+            <Button onClick={() => setEditor(null)}>取消</Button>
+            <Button tone="primary" onClick={saveEditor}>
+              保存
+            </Button>
+          </>
+        }
+      >
+        <label
+          className={`s4-favorite-editor-field ${error ? "has-error" : ""}`}
+        >
+          <span>收藏夹名称</span>
+          <input
+            value={name}
+            maxLength={30}
+            autoFocus
+            onChange={(event) => {
+              setName(event.target.value);
+              setError("");
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") saveEditor();
+            }}
+            placeholder="例如：重点岗位人才"
+          />
+          {error ? <small>{error}</small> : null}
+        </label>
+      </Modal>
+      <Modal
+        open={Boolean(deleteTarget)}
+        close={() => setDeleteTarget(null)}
+        size="sm"
+        title="删除收藏夹"
+        description="此操作不会删除候选人资料。"
+        footer={
+          <>
+            <Button onClick={() => setDeleteTarget(null)}>取消</Button>
+            <Button
+              tone="danger"
+              onClick={() => {
+                onDelete?.(deleteTarget?.id);
+                notify(`已删除收藏夹“${deleteTarget?.name}”`);
+                setDeleteTarget(null);
+              }}
+            >
+              确认删除
+            </Button>
+          </>
+        }
+      >
+        <div className="s4-favorite-delete-copy">
+          <p>
+            删除“{deleteTarget?.name}”后，其下的
+            {deleteTarget?.children?.length || 0} 个子收藏夹也会一并删除。
+          </p>
+          <p>
+            约 {deleteTarget?.count || 0}
+            位候选人将解除这些收藏关系，候选人资料仍会保留。
+          </p>
+        </div>
+      </Modal>
+    </>
   );
 }
 
@@ -401,6 +680,8 @@ export function CandidateFilterBar({
   values,
   setValues,
   columnMenu,
+  favoriteTree,
+  onManageFavorites,
 }) {
   const [expanded, setExpanded] = useState(true);
   const update = (key, value) =>
@@ -572,8 +853,10 @@ export function CandidateFilterBar({
               />
             </label>
             <FavoriteFilter
+              tree={favoriteTree}
               value={values.favorite}
               onChange={(value) => update("favorite", value)}
+              onManage={onManageFavorites}
             />
             <NumericFilters values={values} update={update} />
           </div>

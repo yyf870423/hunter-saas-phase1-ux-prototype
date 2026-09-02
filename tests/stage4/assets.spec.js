@@ -62,6 +62,9 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
 
   await page.getByRole("button", { name: "收藏夹", exact: true }).click();
   await expect(
+    page.locator(".s4-favorite-filter > button .s4-select-value > span"),
+  ).toHaveCSS("font-size", "12px");
+  await expect(
     page.getByRole("checkbox", { name: /重点岗位人才/ }),
   ).toBeVisible();
   await expect(
@@ -150,7 +153,7 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
     .getByRole("checkbox")
     .first()
     .click();
-  await page.getByRole("button", { name: "加入收藏夹" }).click();
+  await page.getByRole("button", { name: "加入收藏夹", exact: true }).click();
   const favoriteModal = page.getByRole("dialog", { name: "加入收藏夹" });
   await expect(favoriteModal).toBeVisible();
   await favoriteModal
@@ -167,6 +170,52 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
   await page.getByRole("tab", { name: /简历与文件/ }).click();
   await expect(page.getByText("林昊_机器人学习负责人_2026.pdf")).toBeVisible();
   await expectNoHorizontalOverflow(page);
+  await assertNoConsoleErrors();
+});
+
+test("候选人收藏夹支持单人加入和多层目录管理", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/candidates");
+
+  await page.getByRole("button", { name: "收藏夹", exact: true }).click();
+  await expect(page.getByRole("button", { name: "管理收藏夹" })).toBeVisible();
+  await page.getByRole("button", { name: "管理收藏夹" }).click();
+  const manager = page.getByRole("dialog", { name: "管理收藏夹" });
+  await expect(manager).toBeVisible();
+  await expect(
+    manager.getByText("重点岗位人才", { exact: true }),
+  ).toBeVisible();
+
+  await manager.getByRole("button", { name: "新建收藏夹" }).click();
+  const createModal = page.getByRole("dialog", { name: "新建收藏夹" });
+  await createModal.getByPlaceholder("例如：重点岗位人才").fill("本周联系");
+  await createModal.getByRole("button", { name: "保存" }).click();
+  await expect(manager.getByText("本周联系", { exact: true })).toBeVisible();
+
+  await manager.getByRole("button", { name: "重命名本周联系" }).click();
+  const renameModal = page.getByRole("dialog", { name: "重命名收藏夹" });
+  await renameModal.getByPlaceholder("例如：重点岗位人才").fill("本周优先联系");
+  await renameModal.getByRole("button", { name: "保存" }).click();
+  await expect(
+    manager.getByText("本周优先联系", { exact: true }),
+  ).toBeVisible();
+
+  await manager.getByRole("button", { name: "删除本周优先联系" }).click();
+  const deleteModal = page.getByRole("dialog", { name: "删除收藏夹" });
+  await expect(deleteModal.getByText(/不会删除候选人资料/)).toBeVisible();
+  await deleteModal.getByRole("button", { name: "确认删除" }).click();
+  await expect(manager.getByText("本周优先联系", { exact: true })).toHaveCount(
+    0,
+  );
+  await manager.getByRole("button", { name: "关闭" }).click();
+
+  await page.getByRole("button", { name: "将林昊加入收藏夹" }).click();
+  const picker = page.getByRole("dialog", { name: "加入收藏夹" });
+  await expect(picker).toContainText("已选择 1 位候选人");
+  await picker.getByRole("checkbox", { name: /客户项目/ }).click();
+  await picker.getByRole("button", { name: "确认加入" }).click();
+  await expect(page.getByText(/已将 1 位候选人加入 1 个收藏夹/)).toBeVisible();
+
   await assertNoConsoleErrors();
 });
 

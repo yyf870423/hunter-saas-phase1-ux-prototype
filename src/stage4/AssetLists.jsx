@@ -20,6 +20,7 @@ import {
 } from "./asset-ui";
 import {
   CandidateFilterBar,
+  FavoriteManagerDrawer,
   FavoritePickerModal,
   IndustryCascade,
   candidateFilterDefaults,
@@ -28,6 +29,7 @@ import {
   candidates,
   companies,
   contacts,
+  candidateFavoriteTree,
   opportunities,
   positions,
 } from "./data";
@@ -270,10 +272,19 @@ const configs = {
   },
 };
 
-function RowActions({ row, type, onDelete }) {
+function RowActions({ row, type, onDelete, onFavorite }) {
   const navigate = useNavigate();
   return (
     <div className="s4-row-actions">
+      {type === "candidates" ? (
+        <button
+          type="button"
+          aria-label={`将${row.name}加入收藏夹`}
+          onClick={() => onFavorite?.(row)}
+        >
+          <Icon name="folder" />
+        </button>
+      ) : null}
       <button
         type="button"
         aria-label={`打开${row.name || row.title}`}
@@ -320,7 +331,11 @@ export function AssetListPage({ type }) {
       .map((column) => column.key),
   );
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [favoritePickerOpen, setFavoritePickerOpen] = useState(false);
+  const [favoriteTargetIds, setFavoriteTargetIds] = useState([]);
+  const [favoriteManagerOpen, setFavoriteManagerOpen] = useState(false);
+  const [favoriteTree, setFavoriteTree] = useState(() =>
+    structuredClone(candidateFavoriteTree),
+  );
   const candidateRows = useMemo(
     () =>
       controller.filtered.map((row) => ({
@@ -471,6 +486,8 @@ export function AssetListPage({ type }) {
           setQuery={controller.setQuery}
           values={candidateFilters}
           setValues={setCandidateFilters}
+          favoriteTree={favoriteTree}
+          onManageFavorites={() => setFavoriteManagerOpen(true)}
           columnMenu={
             <ColumnMenu
               columns={config.columns}
@@ -516,7 +533,7 @@ export function AssetListPage({ type }) {
           <Button
             size="sm"
             icon="folder"
-            onClick={() => setFavoritePickerOpen(true)}
+            onClick={() => setFavoriteTargetIds([...controller.selected])}
           >
             加入收藏夹
           </Button>
@@ -550,6 +567,7 @@ export function AssetListPage({ type }) {
               row={row}
               type={entityRoute}
               onDelete={setDeleteTarget}
+              onFavorite={(candidate) => setFavoriteTargetIds([candidate.id])}
             />
           )}
           stickyEdges={config.stickyEdges}
@@ -595,13 +613,14 @@ export function AssetListPage({ type }) {
         }}
       />
       <FavoritePickerModal
-        open={favoritePickerOpen}
-        count={controller.selected.size}
-        close={() => setFavoritePickerOpen(false)}
+        open={Boolean(favoriteTargetIds.length)}
+        count={favoriteTargetIds.length}
+        tree={favoriteTree}
+        close={() => setFavoriteTargetIds([])}
         onConfirm={(folders) => {
           setCandidateFolders((current) => {
             const next = { ...current };
-            controller.selected.forEach((candidateId) => {
+            favoriteTargetIds.forEach((candidateId) => {
               next[candidateId] = [
                 ...new Set([...(next[candidateId] || []), ...folders]),
               ];
@@ -609,10 +628,114 @@ export function AssetListPage({ type }) {
             return next;
           });
           notify(
-            `已将 ${controller.selected.size} 位候选人加入 ${folders.length} 个收藏夹`,
+            `已将 ${favoriteTargetIds.length} 位候选人加入 ${folders.length} 个收藏夹`,
           );
           controller.setSelected(new Set());
-          setFavoritePickerOpen(false);
+          setFavoriteTargetIds([]);
+        }}
+      />
+      <FavoriteManagerDrawer
+        open={favoriteManagerOpen}
+        close={() => setFavoriteManagerOpen(false)}
+        tree={favoriteTree}
+        onCreate={({ parentId, name }) => {
+          const node = {
+            id: `favorite-${crypto.randomUUID()}`,
+            name,
+            count: 0,
+            children: [],
+          };
+          setFavoriteTree((current) => {
+            if (!parentId) return [...current, node];
+            const append = (items) =>
+              items.map((item) =>
+                item.id === parentId
+                  ? { ...item, children: [...(item.children || []), node] }
+                  : { ...item, children: append(item.children || []) },
+              );
+            return append(current);
+          });
+        }}
+        onRename={({ id, name }) => {
+          const findPath = (items, targetId, prefix = "") => {
+            for (const item of items) {
+              const path = prefix ? `${prefix}/${item.name}` : item.name;
+              if (item.id === targetId) return path;
+              const childPath = findPath(item.children || [], targetId, path);
+              if (childPath) return childPath;
+            }
+            return "";
+          };
+          const previousPath = findPath(favoriteTree, id);
+          const parentPath = previousPath.split("/").slice(0, -1).join("/");
+          const nextPath = parentPath ? `${parentPath}/${name}` : name;
+          const rename = (items) =>
+            items.map((item) => ({
+              ...item,
+              name: item.id === id ? name : item.name,
+              children: rename(item.children || []),
+            }));
+          setFavoriteTree((current) => rename(current));
+          setCandidateFolders((current) =>
+            Object.fromEntries(
+              Object.entries(current).map(([candidateId, folders]) => [
+                candidateId,
+                folders.map((folder) =>
+                  folder === previousPath ||
+                  folder.startsWith(`${previousPath}/`)
+                    ? `${nextPath}${folder.slice(previousPath.length)}`
+                    : folder,
+                ),
+              ]),
+            ),
+          );
+          setCandidateFilters((current) => ({
+            ...current,
+            favorite: current.favorite.map((folder) =>
+              folder === previousPath || folder.startsWith(`${previousPath}/`)
+                ? `${nextPath}${folder.slice(previousPath.length)}`
+                : folder,
+            ),
+          }));
+        }}
+        onDelete={(id) => {
+          const findPath = (items, targetId, prefix = "") => {
+            for (const item of items) {
+              const path = prefix ? `${prefix}/${item.name}` : item.name;
+              if (item.id === targetId) return path;
+              const childPath = findPath(item.children || [], targetId, path);
+              if (childPath) return childPath;
+            }
+            return "";
+          };
+          const deletedPath = findPath(favoriteTree, id);
+          const remove = (items) =>
+            items
+              .filter((item) => item.id !== id)
+              .map((item) => ({
+                ...item,
+                children: remove(item.children || []),
+              }));
+          setFavoriteTree((current) => remove(current));
+          setCandidateFolders((current) =>
+            Object.fromEntries(
+              Object.entries(current).map(([candidateId, folders]) => [
+                candidateId,
+                folders.filter(
+                  (folder) =>
+                    folder !== deletedPath &&
+                    !folder.startsWith(`${deletedPath}/`),
+                ),
+              ]),
+            ),
+          );
+          setCandidateFilters((current) => ({
+            ...current,
+            favorite: current.favorite.filter(
+              (folder) =>
+                folder !== deletedPath && !folder.startsWith(`${deletedPath}/`),
+            ),
+          }));
         }}
       />
     </div>
