@@ -223,6 +223,13 @@ const nodeKindIcon = {
   note: "route",
 };
 
+const nodeTypeIcon = Object.fromEntries(
+  Object.entries(nodeKindLabel).map(([kind, label]) => [
+    label,
+    nodeKindIcon[kind],
+  ]),
+);
+
 const getNodeIcon = (node) => nodeKindIcon[node?.kind] || "route";
 
 const relationKindLabel = {
@@ -1953,6 +1960,8 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
           <SelectMenu
             label="选择类型"
             value={nodeKindLabel[kind] || "自由节点"}
+            optionIcons={nodeTypeIcon}
+            panelClassName="tg-node-type-select-panel"
             options={[
               "自由节点",
               "公司",

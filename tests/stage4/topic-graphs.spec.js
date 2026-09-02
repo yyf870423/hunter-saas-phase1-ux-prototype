@@ -507,7 +507,27 @@ test("图谱空状态与节点资产关联可维护", async ({ page }) => {
     .locator(".s4-form-field", { hasText: "节点类型" })
     .getByRole("button")
     .click();
+  const typeOptions = page.locator(".s4-select-panel .s4-select-options");
+  await expect(typeOptions.getByRole("button")).toHaveCount(8);
+  await expect(
+    typeOptions.getByRole("button", { name: "分组", exact: true }),
+  ).toBeInViewport();
+  await expect(
+    typeOptions
+      .getByRole("button", { name: "公司", exact: true })
+      .locator(".s4-select-option-icon"),
+  ).toHaveAttribute("data-icon", "building");
+  await expect(
+    typeOptions
+      .getByRole("button", { name: "人物", exact: true })
+      .locator(".s4-select-option-icon"),
+  ).toHaveAttribute("data-icon", "user");
   await page.getByRole("button", { name: "人物", exact: true }).last().click();
+  await expect(
+    editor
+      .locator(".s4-form-field", { hasText: "节点类型" })
+      .locator('.s4-select-value svg[data-icon="user"]'),
+  ).toBeVisible();
   await editor.getByRole("button", { name: "解除关联" }).click();
   await expect(editor.getByText("将转为图谱本地节点")).toBeVisible();
   await editor.getByRole("button", { name: "保存修改" }).click();

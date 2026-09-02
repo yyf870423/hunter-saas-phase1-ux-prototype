@@ -190,11 +190,13 @@ export function SelectMenu({
   value,
   options,
   onChange,
+  optionIcons = {},
   multiple = false,
   searchable = false,
   creatable = false,
   disabled = false,
   className = "",
+  panelClassName = "",
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -234,6 +236,8 @@ export function SelectMenu({
       ? `${label} · ${values.length}`
       : values[0]
     : label;
+  const displayIcon =
+    !multiple && values.length ? optionIcons[values[0]] : undefined;
   const choose = (option) => {
     if (multiple) {
       const next = values.includes(option)
@@ -258,14 +262,19 @@ export function SelectMenu({
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
       >
-        <span>{display}</span>
+        <span className="s4-select-value">
+          {displayIcon ? (
+            <Icon className="s4-select-value-icon" name={displayIcon} />
+          ) : null}
+          <span>{display}</span>
+        </span>
         <Icon name={open ? "chevronUp" : "chevronDown"} />
       </button>
       <FloatingPanel
         open={open}
         anchorRef={ref}
         panelRef={panelRef}
-        className="s4-select-panel"
+        className={`s4-select-panel ${panelClassName}`}
         width={260}
       >
         {searchable ? (
@@ -311,7 +320,13 @@ export function SelectMenu({
                   {values.includes(option) ? <Icon name="check" /> : null}
                 </span>
               ) : null}
-              <span>{option}</span>
+              {optionIcons[option] ? (
+                <Icon
+                  className="s4-select-option-icon"
+                  name={optionIcons[option]}
+                />
+              ) : null}
+              <span className="s4-select-option-label">{option}</span>
               {!multiple && values.includes(option) ? (
                 <Icon name="check" />
               ) : null}

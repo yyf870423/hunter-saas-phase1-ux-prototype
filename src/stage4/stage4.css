@@ -5381,7 +5381,14 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--s1-accent) 14%, transparent);
 }
 
-.s4-select > button span {
+.s4-select-value {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.s4-select-value > span {
   overflow: hidden;
   font-size: 12px;
   font-weight: 600;
@@ -5393,6 +5400,13 @@
   width: 14px;
   flex: 0 0 14px;
   color: var(--s1-muted);
+}
+
+.s4-select > button .s4-select-value-icon {
+  width: 16px;
+  height: 16px;
+  flex-basis: 16px;
+  color: var(--s1-ink-soft);
 }
 
 .s4-select-panel,
@@ -5446,6 +5460,10 @@
   padding: 5px;
 }
 
+.tg-node-type-select-panel .s4-select-options {
+  max-height: 288px;
+}
+
 .s4-select-options > button {
   display: flex;
   width: 100%;
@@ -5467,14 +5485,25 @@
   background: var(--s1-accent-soft);
 }
 
-.s4-select-options > button > span:nth-child(2),
-.s4-select-options > button > span:first-child:last-child {
+.s4-select-option-label {
   min-width: 0;
   flex: 1;
 }
 
 .s4-select-options > button > svg {
   width: 14px;
+}
+
+.s4-select-options > button > .s4-select-option-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  color: var(--s1-muted);
+}
+
+.s4-select-options > button:hover > .s4-select-option-icon,
+.s4-select-options > button.is-selected > .s4-select-option-icon {
+  color: var(--s1-accent);
 }
 
 .s4-option-check {
