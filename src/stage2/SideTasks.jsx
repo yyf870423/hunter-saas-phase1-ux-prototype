@@ -30,6 +30,7 @@ import {
   buildRecommendationTaskArtifacts,
   TaskArtifactPreview,
 } from "./TaskArtifactPreview";
+import { TaskAreaNav } from "./TaskAreaNav";
 
 const tabs = [
   ["all", "全部"],
@@ -467,6 +468,7 @@ function TaskWorkspaceShell({ currentId, children }) {
         onSelect={(item) => navigate(`/tasks/${item.id}`)}
       />
       <section className="s2-workstream-main s2-task-detail-page">
+        <TaskAreaNav value="tasks" />
         {children}
       </section>
     </div>
@@ -543,18 +545,9 @@ function IdentityReviewTask({ taskId }) {
           <p>关联：星澜机器人知识图谱 · 创建人：沈岚</p>
         </div>
         <div>
-          <StatusBadge
-            tone={resolved ? "success" : paused ? "neutral" : "warning"}
-          >
-            {resolved ? "可继续" : paused ? "已暂停" : "等待用户"}
-          </StatusBadge>
-          <Button
-            tone="secondary"
-            icon={paused ? "play" : "pause"}
-            onClick={() => setPaused((value) => !value)}
-          >
-            {paused ? "继续" : "暂停"}
-          </Button>
+          {!resolved ? (
+            <StatusBadge tone="warning">等待用户</StatusBadge>
+          ) : null}
           <IconButton
             icon="trash"
             label="删除任务"

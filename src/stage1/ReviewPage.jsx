@@ -67,7 +67,7 @@ export function ReviewPage() {
             <Icon name="clock" />
             <b>后续阶段</b>
             <p>
-              对话式任务、运行追踪、信号中心、业务资产、设置与运营端完整交互。
+              对话式任务、运行追踪、洞察中心、业务资产、设置与运营端完整交互。
             </p>
           </article>
         </div>

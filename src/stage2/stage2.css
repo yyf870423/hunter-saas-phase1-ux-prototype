@@ -221,7 +221,7 @@
   display: grid;
   min-width: 0;
   min-height: 0;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   background: var(--s1-surface);
 }
 
@@ -2473,6 +2473,601 @@
   line-height: 18px;
 }
 
+/* Unified task area */
+.s2-task-create-workspace {
+  grid-template-columns: 252px minmax(0, 1fr);
+}
+.s2-task-create-main {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: 47px minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--s1-surface);
+}
+.s2-task-area-nav.app-tabs {
+  display: flex;
+  min-width: 0;
+  min-height: 47px;
+  align-items: end;
+  gap: 26px;
+  padding: 0 24px;
+  background: var(--s1-surface);
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-task-area-nav.app-tabs > button {
+  min-height: 47px;
+  padding: 0 1px;
+  font-size: 13px;
+  font-weight: 620;
+}
+.s2-task-create-main > .s2-new-work {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 28px;
+}
+.s2-history-scenes {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+.s2-history-scenes > em {
+  display: inline-block;
+  overflow: hidden;
+  color: inherit;
+  font: inherit;
+  font-style: normal;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s2-history-scenes > em + em::before {
+  margin-right: 4px;
+  content: "·";
+}
+.s2-history > header .s1-icon-button.is-active {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+}
+
+/* Periodic tasks */
+.s2-periodic-page {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: 47px auto 43px minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--s1-canvas);
+}
+.s2-periodic-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 24px 14px;
+}
+.s2-periodic-heading > div {
+  min-width: 0;
+}
+.s2-periodic-heading small {
+  color: var(--s1-accent);
+  font-size: 12px;
+  font-weight: 650;
+}
+.s2-periodic-heading h1 {
+  margin: 3px 0;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+.s2-periodic-heading p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.s2-periodic-view-tabs.app-tabs {
+  display: flex;
+  align-items: end;
+  gap: 24px;
+  padding: 0 24px;
+  background: var(--s1-surface);
+  border-top: 1px solid var(--s1-line);
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-periodic-view-tabs.app-tabs > button {
+  min-height: 42px;
+}
+.s2-periodic-view-tabs em {
+  min-width: 18px;
+  margin-left: 5px;
+  padding: 1px 5px;
+  color: var(--s1-muted);
+  font-size: 11px;
+  font-style: normal;
+  background: var(--s1-control-hover);
+  border-radius: 9px;
+}
+.s2-periodic-shell {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(300px, 0.74fr) minmax(560px, 1.55fr);
+  overflow: hidden;
+  background: var(--s1-surface);
+}
+.s2-periodic-list-pane {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  padding-top: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--s1-canvas) 84%, var(--s1-surface));
+  border-right: 1px solid var(--s1-line);
+}
+.s2-periodic-list-tools {
+  display: grid;
+  gap: 8px;
+  padding: 0 12px 10px;
+}
+.s2-periodic-list-tools > .s1-search-field {
+  width: 100%;
+}
+.s2-periodic-run-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.s2-periodic-custom-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.s2-periodic-custom-range .s4-date-picker {
+  width: 100%;
+  min-width: 0;
+}
+.s2-periodic-custom-range .s4-date-picker > button {
+  width: 100%;
+}
+.s2-periodic-run-filters .s4-select {
+  width: 128px;
+  min-width: 0;
+  flex: 0 1 128px;
+}
+.s2-periodic-run-filters .s4-select > button {
+  width: 100%;
+}
+.s2-periodic-status-filter .s4-select-value > span,
+.s2-periodic-time-filter .s4-select-value > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s2-periodic-list-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  border-top: 1px solid var(--s1-line);
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-periodic-list-label b {
+  color: var(--s1-ink);
+  font-size: 12px;
+}
+.s2-periodic-list {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px;
+}
+.s2-periodic-filter-empty {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  padding: 24px 16px;
+  color: var(--s1-muted);
+  text-align: center;
+}
+.s2-periodic-filter-empty > svg {
+  width: 22px;
+  color: var(--s1-subtle);
+}
+.s2-periodic-filter-empty b {
+  color: var(--s1-ink);
+  font-size: 13px;
+}
+.s2-periodic-filter-empty small {
+  font-size: 12px;
+}
+.s2-periodic-list > button {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 11px 9px;
+  color: var(--s1-ink);
+  font: inherit;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.s2-periodic-list > button:hover {
+  background: var(--s1-surface);
+  border-color: var(--s1-line);
+}
+.s2-periodic-list > button.is-active {
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 32%, var(--s1-line));
+  box-shadow: inset 3px 0 var(--s1-accent);
+}
+.s2-periodic-list > button > i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 8px;
+}
+.s2-periodic-list > button > i.tone-warning {
+  color: var(--s1-warning);
+  background: var(--s1-warning-soft);
+}
+.s2-periodic-list > button > i.tone-neutral {
+  color: var(--s1-muted);
+  background: var(--s1-control-hover);
+}
+.s2-periodic-list > button > span {
+  display: block;
+  min-width: 0;
+}
+.s2-periodic-list small,
+.s2-periodic-list b,
+.s2-periodic-list p,
+.s2-periodic-list em {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s2-periodic-list small,
+.s2-periodic-list em {
+  color: var(--s1-subtle);
+  font-size: 11px;
+  font-style: normal;
+}
+.s2-periodic-list b {
+  margin-top: 3px;
+  font-size: 13px;
+}
+.s2-periodic-list p {
+  margin: 4px 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-periodic-list .s1-status {
+  margin-top: 1px;
+}
+.s2-periodic-detail {
+  min-width: 0;
+  min-height: 0;
+  padding: 18px 22px 0;
+  overflow-y: auto;
+  background: var(--s1-surface);
+}
+.s2-periodic-mobile-back {
+  display: none;
+}
+.s2-periodic-detail > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 14px;
+}
+.s2-periodic-detail > header > div {
+  min-width: 0;
+}
+.s2-periodic-detail > header small,
+.s2-periodic-detail > header p {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-periodic-detail > header h2 {
+  margin: 4px 0;
+  font-size: 17px;
+  letter-spacing: 0;
+}
+.s2-periodic-detail > header p {
+  margin: 0;
+}
+.s2-periodic-scenarios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.s2-periodic-scenarios span {
+  padding: 3px 7px;
+  color: var(--s1-accent);
+  font-size: 11px;
+  background: var(--s1-accent-soft);
+  border-radius: 4px;
+}
+.s2-periodic-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--s1-line);
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-periodic-metrics > div {
+  min-width: 0;
+  padding: 12px 14px;
+  border-right: 1px solid var(--s1-line);
+}
+.s2-periodic-metrics > div:first-child {
+  padding-left: 0;
+}
+.s2-periodic-metrics > div:last-child {
+  border-right: 0;
+}
+.s2-periodic-metrics small,
+.s2-periodic-metrics b {
+  display: block;
+}
+.s2-periodic-metrics small {
+  color: var(--s1-subtle);
+  font-size: 11px;
+}
+.s2-periodic-metrics b {
+  margin-top: 4px;
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s2-periodic-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-periodic-actions .s1-button:last-child {
+  margin-left: auto;
+}
+.s2-periodic-body > section {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-periodic-body h3 {
+  margin: 0 0 7px;
+  font-size: 13px;
+}
+.s2-periodic-body p {
+  margin: 0 0 7px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 20px;
+}
+.s2-periodic-body > section > small {
+  color: var(--s1-subtle);
+  font-size: 11px;
+}
+.s2-periodic-recent-runs {
+  display: grid;
+}
+.s2-periodic-recent-runs > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  color: var(--s1-ink);
+  font: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--s1-line);
+  cursor: pointer;
+}
+.s2-periodic-recent-runs > button span,
+.s2-periodic-recent-runs > button b,
+.s2-periodic-recent-runs > button small {
+  display: block;
+}
+.s2-periodic-recent-runs > button b {
+  font-size: 12px;
+}
+.s2-periodic-recent-runs > button small {
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s2-run-detail {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  padding: 18px 0 0;
+  overflow: hidden;
+}
+.s2-run-detail > .s2-periodic-mobile-back,
+.s2-run-detail > header {
+  margin-inline: 22px;
+}
+.s2-run-detail > header {
+  border-bottom: 1px solid var(--s1-line);
+}
+.s2-run-conversation {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.s2-run-timeline {
+  width: min(780px, calc(100% - 40px));
+  margin: 0 auto;
+  overflow-y: auto;
+  padding: 22px 0 26px;
+}
+.s2-run-timeline .s2-hunter-reply:first-child {
+  margin-top: 0;
+}
+.s2-run-composer-dock {
+  width: min(780px, calc(100% - 40px));
+  margin: 8px auto 12px;
+}
+.s2-run-composer-dock > .s2-composer {
+  width: 100%;
+}
+.s2-periodic-state {
+  align-self: start;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 24px;
+  padding: 18px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s2-periodic-state > svg {
+  color: var(--s1-warning);
+}
+.s2-periodic-state > div {
+  flex: 1;
+}
+.s2-periodic-state h2,
+.s2-periodic-state p {
+  margin: 0;
+}
+.s2-periodic-state h2 {
+  font-size: 14px;
+}
+.s2-periodic-state p {
+  margin-top: 4px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-periodic-state.is-loading {
+  display: grid;
+}
+
+@media (max-width: 900px) {
+  .s2-task-create-workspace {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+  .s2-periodic-shell {
+    grid-template-columns: minmax(280px, 0.9fr) minmax(430px, 1.2fr);
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .s2-task-create-workspace {
+    display: block;
+    overflow-y: auto;
+  }
+  .s2-task-create-workspace > .s2-history {
+    display: none;
+  }
+  .s2-task-create-main {
+    min-height: 100%;
+    overflow: visible;
+  }
+  .s2-task-area-nav.app-tabs,
+  .s2-periodic-view-tabs.app-tabs {
+    padding-inline: 16px;
+  }
+  .s2-task-create-main > .s2-new-work {
+    overflow: visible;
+    padding: 0 16px;
+  }
+  .s2-periodic-page {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .s2-periodic-heading {
+    padding: 16px;
+  }
+  .s2-periodic-heading .s1-button {
+    flex: 0 0 auto;
+  }
+  .s2-periodic-heading .s1-button span {
+    display: none;
+  }
+  .s2-periodic-shell {
+    display: block;
+    overflow: visible;
+  }
+  .s2-periodic-shell .s2-periodic-detail {
+    display: none;
+  }
+  .s2-periodic-shell.is-mobile-detail .s2-periodic-list-pane {
+    display: none;
+  }
+  .s2-periodic-shell.is-mobile-detail .s2-periodic-detail {
+    display: block;
+  }
+  .s2-periodic-list-pane {
+    border-right: 0;
+  }
+  .s2-periodic-detail {
+    border-top: 1px solid var(--s1-line);
+  }
+  .s2-periodic-mobile-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0 0 12px;
+    padding: 0;
+    color: var(--s1-accent);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .s2-periodic-metrics {
+    grid-template-columns: 1fr;
+  }
+  .s2-periodic-metrics > div,
+  .s2-periodic-metrics > div:first-child {
+    padding: 10px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--s1-line);
+  }
+  .s2-periodic-metrics > div:last-child {
+    border-bottom: 0;
+  }
+  .s2-run-detail {
+    padding-top: 14px;
+  }
+  .s2-run-detail > .s2-periodic-mobile-back,
+  .s2-run-detail > header {
+    margin-inline: 16px;
+  }
+  .s2-run-conversation {
+    min-height: 620px;
+  }
+  .s2-run-timeline,
+  .s2-run-composer-dock {
+    width: calc(100% - 32px);
+  }
+}
+
 /* Module pages and task tables */
 .s2-module-page,
 .s2-signals-page {
@@ -2694,7 +3289,7 @@
 .s2-task-detail-page {
   display: grid;
   height: 100%;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   overflow: hidden;
 }
 .s2-recommendation-asset-workspace {

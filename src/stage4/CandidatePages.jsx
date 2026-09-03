@@ -2262,7 +2262,7 @@ function RelationsTab({ processingRecords, onOpenProcessing }) {
       </FieldGroup>
       <FieldGroup
         title="AI 处理记录"
-        description="当前候选人的信息补全和匹配计算记录，不进入任务列表。"
+        description="当前候选人的信息补全和匹配计算记录，不创建独立任务。"
       >
         <AssetAiProcessHistory
           records={processingRecords}

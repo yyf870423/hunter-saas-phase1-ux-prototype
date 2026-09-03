@@ -4,7 +4,7 @@ import {
   trackConsoleErrors,
 } from "../stage1/helpers";
 
-test("导航、列表和详情只使用统一任务概念", async ({ page }) => {
+test("导航和任务工作区只使用统一任务概念", async ({ page }) => {
   await page.goto("#/home");
   await expect(
     page.getByRole("button", { name: "任务", exact: true }),
@@ -15,85 +15,141 @@ test("导航、列表和详情只使用统一任务概念", async ({ page }) => 
   await expect(
     page.getByRole("button", { name: "支线任务", exact: true }),
   ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "处理进度", exact: true }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: "任务", exact: true }).click();
   await expect(page).toHaveURL(/#\/tasks$/);
   await expect(
-    page.getByRole("heading", { name: "任务", exact: true }),
+    page.getByRole("heading", { name: "新建任务", exact: true }),
   ).toBeVisible();
   await expect(
-    page
-      .locator(".s2-task-row")
-      .filter({ hasText: "具身智能 VLA 算法负责人" })
-      .first(),
+    page.locator(".s2-history-list").getByText("具身智能 VLA 算法负责人"),
   ).toBeVisible();
-  await page
-    .getByPlaceholder("搜索任务、业务场景或关联对象")
-    .fill("核验灵巧手");
+  await page.getByPlaceholder("搜索任务").fill("核验灵巧手");
   await expect(
-    page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
+    page.locator(".s2-history-list").getByText("核验灵巧手团队负责人"),
   ).toBeVisible();
 
   await page.goto("#/tasks");
   await expect(page).toHaveURL(/#\/tasks$/);
 });
 
-test("统一任务列表支持分类、搜索、详情和删除", async ({ page }) => {
+test("统一任务工作区支持任务与周期性任务切换", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/tasks");
   await expect(
-    page.locator(".s2-page-heading").getByRole("button", {
-      name: "新建任务",
-      exact: true,
-    }),
-  ).toHaveCount(0);
-  await expect(
-    page.locator(".s1-topbar").getByRole("button", {
-      name: "新建任务",
-      exact: true,
-    }),
-  ).toHaveCount(1);
-  await page.getByRole("tab", { name: /人才摸排/ }).click();
-  await expect(
-    page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
-  ).toBeVisible();
-  await page
-    .getByPlaceholder("搜索任务、业务场景或关联对象")
-    .fill("核验灵巧手");
-  await expect(
-    page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
-  ).toBeVisible();
-  const deleteButton = page.getByLabel("删除 核验灵巧手团队负责人");
-  await expect(deleteButton).toHaveClass(/s1-table-delete-button/);
-  await expect(deleteButton).toHaveCSS("color", "rgb(196, 43, 51)");
-  await page.getByRole("button", { name: "切换深色模式" }).click();
-  await expect(deleteButton).toHaveCSS("color", "rgb(185, 87, 95)");
-  await page.getByRole("button", { name: "切换亮色模式" }).click();
-  await deleteButton.click();
-  await expect(page.getByRole("heading", { name: "删除任务" })).toBeVisible();
-  await page.getByRole("button", { name: "取消" }).click();
-  await page.getByRole("tab", { name: /全部/ }).click();
-  await page.getByPlaceholder("搜索任务、业务场景或关联对象").fill("");
-  await page.getByRole("button", { name: "状态", exact: true }).click();
-  await page.getByRole("button", { name: "等待用户", exact: true }).click();
-  await expect(page.locator(".s2-task-row")).toHaveCount(2);
-  await expect(
-    page.locator(".s2-task-row").filter({ hasText: "核验灵巧手团队负责人" }),
-  ).toBeVisible();
-  await expect(
-    page.locator(".s2-task-row").filter({ hasText: "星澜机器人招聘合作" }),
-  ).toBeVisible();
-  const search = page.getByPlaceholder("搜索任务、业务场景或关联对象");
-  await search.focus();
-  await expect(search).toHaveCSS("box-shadow", "none");
-  await expect(page.locator(".s1-search-field").last()).not.toHaveCSS(
-    "box-shadow",
-    "none",
-  );
+    page.getByRole("tab", { name: "任务", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("tab", { name: "周期性任务" }).click();
+  await expect(page).toHaveURL(/#\/tasks\/periodic$/);
+  await expect(page.getByRole("heading", { name: "周期性任务" })).toBeVisible();
+  await page.getByRole("tab", { name: "任务", exact: true }).click();
+  await expect(page).toHaveURL(/#\/tasks$/);
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
 
-test("有限范围任务详情支持补充资料、恢复和结果回流", async ({ page }) => {
+test("周期性任务覆盖配置、运行记录和等待用户状态", async ({ page }) => {
+  await page.goto("#/tasks/periodic");
+  await expect(
+    page.getByRole("heading", {
+      name: "每周发现具身智能创业公司与招聘机会",
+    }),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: /运行记录/ }).click();
+  await expect(
+    page.locator(".s2-periodic-list-label").getByText("全部状态 · 近一周"),
+  ).toBeVisible();
+  await page.locator(".s2-periodic-status-filter > button").click();
+  await page.getByRole("button", { name: "等待用户", exact: true }).click();
+  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(1);
+  await expect(
+    page.getByRole("complementary").getByText("两位候选人的身份合并结论冲突"),
+  ).toBeVisible();
+  await expect(page.locator(".s2-run-conversation")).toBeVisible();
+  await expect(page.getByLabel("任务对话输入")).toBeVisible();
+  await expect(page.getByText("2 项身份冲突需要一起确认")).toBeVisible();
+  await page.getByRole("button", { name: /跳过本轮冲突项/ }).click();
+  await expect(page.getByText("运行已继续")).toBeVisible();
+  await page.getByRole("button", { name: "停止", exact: true }).click();
+  await page.getByLabel("任务对话输入").fill("只重新处理受影响的两个岗位。");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.getByText("只重新处理受影响的两个岗位。")).toBeVisible();
+  await expect(page.getByText(/已收到补充要求/)).toBeVisible();
+});
+
+test("周期性任务提供关键页面状态和运行时间筛选", async ({ page }) => {
+  for (const route of [
+    "#/tasks/periodic?state=loading",
+    "#/tasks/periodic?state=empty",
+    "#/tasks/periodic?state=error",
+    "#/tasks/periodic?state=disabled",
+  ]) {
+    await page.goto(route);
+    await expectNoHorizontalOverflow(page);
+  }
+
+  await page.goto("#/tasks/periodic?view=runs&status=正在运行");
+  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(1);
+  await expect(page.getByText("当前执行进度", { exact: true })).toBeVisible();
+  await expect(page.locator(".s2-run-timeline .s2-hunter-reply")).toHaveCount(
+    2,
+  );
+  await expect(
+    page.locator(".s2-run-composer-dock .s2-composer"),
+  ).toBeVisible();
+  const statusFilterBox = await page
+    .locator(".s2-periodic-status-filter")
+    .boundingBox();
+  const timeFilterBox = await page
+    .locator(".s2-periodic-time-filter")
+    .boundingBox();
+  expect(statusFilterBox).not.toBeNull();
+  expect(timeFilterBox).not.toBeNull();
+  expect(
+    timeFilterBox.x - (statusFilterBox.x + statusFilterBox.width),
+  ).toBeLessThanOrEqual(8);
+  await page.locator(".s2-periodic-time-filter > button").click();
+  await page.getByRole("button", { name: "自定义", exact: true }).click();
+  await expect(page.getByRole("button", { name: /开始日期/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /结束日期/ })).toBeVisible();
+
+  await page.goto("#/processing");
+  await expect(page).toHaveURL(/#\/tasks\/periodic\?view=runs&status=/);
+});
+
+test("所有周期运行状态都使用可继续对话的完整详情", async ({ page }) => {
+  await page.goto("#/tasks/periodic?view=runs");
+  await page.locator(".s2-periodic-time-filter > button").click();
+  await page.getByRole("button", { name: "近一个月", exact: true }).click();
+  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(7);
+
+  for (const index of [0, 2, 3, 4, 5, 6]) {
+    await page.locator(".s2-periodic-list > button").nth(index).click();
+    await expect(page.locator(".s2-run-conversation")).toBeVisible();
+    await expect(page.getByLabel("任务对话输入")).toBeVisible();
+    await expect(page.getByText("执行计划", { exact: true })).toBeVisible();
+  }
+});
+
+test("统一任务相关页面在 320 像素宽度下无页面级溢出", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 760 });
+  for (const route of [
+    "#/tasks",
+    "#/tasks/periodic",
+    "#/tasks/periodic?view=runs&run=run-position-waiting",
+    "#/signals",
+  ]) {
+    await page.goto(route);
+    await expectNoHorizontalOverflow(page);
+  }
+  await page.goto("#/tasks/periodic?view=runs&run=run-position-waiting");
+  await page.locator(".s2-run-composer-dock").scrollIntoViewIfNeeded();
+  await expect(page.getByLabel("任务对话输入")).toBeVisible();
+});
+
+test("直接核验任务详情支持补充资料、恢复和结果回流", async ({ page }) => {
   await page.goto("#/tasks/task-hand-team");
   await expect(page.getByText("工作上下文", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "当前判断" })).toBeVisible();
@@ -189,12 +245,12 @@ test("推荐报告资产 AI 处理按对话过程保留每次生成的文件", a
   await expect(page.getByText("林昊 · 客户推荐报告")).toHaveCount(0);
 });
 
-test("统一新建入口可进入有限范围任务或直接完成", async ({ page }) => {
+test("统一新建入口可进入直接核验任务或直接完成", async ({ page }) => {
   await page.goto("#/new");
   const input = page.getByPlaceholder(/例如：为星澜机器人/);
   await input.fill("核验知识图谱中的两位周明远是不是同一个人");
   await input.press("Enter");
-  await expect(page.getByText(/范围有限、交付明确的核验任务/)).toBeVisible();
+  await expect(page.getByText(/直接核验这两条人物记录/)).toBeVisible();
   await expect(page).toHaveURL(/#\/tasks\/task-hand-team$/, {
     timeout: 5_000,
   });
@@ -231,13 +287,31 @@ test("统一新建入口覆盖歧义、自由补充和权限受限", async ({ pa
   await expect(page).toHaveURL(/#\/tasks$/);
 });
 
-test("新建任务和有限范围任务的普通回复统一由动态 Markdown 渲染", async ({
+test("统一自然语言入口可以创建周期性任务", async ({ page }) => {
+  await page.goto("#/new?mode=periodic");
+  const input = page.locator(".s2-composer textarea");
+  await input.fill("每周一检查具身智能创业公司和招聘变化，有重要发现时提醒我");
+  await input.press("Enter");
+  await expect(
+    page.getByRole("heading", { name: "周期性任务草案" }),
+  ).toBeVisible();
+  await expect(page.getByText("确认周期性任务", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /按此计划创建/ }).click();
+  await expect(page).toHaveURL(
+    /#\/tasks\/periodic\?selected=periodic-startups$/,
+  );
+  await expect(
+    page.getByText("周期性任务已创建，将按确认的计划运行"),
+  ).toBeVisible();
+});
+
+test("新建任务和直接核验任务的普通回复统一由动态 Markdown 渲染", async ({
   page,
 }) => {
   const routes = [
     ["#/new?state=direct", "面试反馈摘要"],
     ["#/new?state=mainline", "持续汇总系统候选人"],
-    ["#/new?state=task", "范围有限、交付明确的核验任务"],
+    ["#/new?state=task", "直接核验这两条人物记录"],
     ["#/tasks/task-hand-team", "当前判断"],
   ];
 
@@ -258,7 +332,7 @@ test("新建任务和有限范围任务的普通回复统一由动态 Markdown �
   }
 });
 
-test("信号中心支持合并来源、观察和转化", async ({ page }) => {
+test("洞察中心支持合并来源、观察和转化", async ({ page }) => {
   await page.goto("#/signals");
   await expect(
     page.getByRole("heading", { name: /云脉芯能正在组建机器人芯片团队/ }),
@@ -286,7 +360,7 @@ test("信号中心支持合并来源、观察和转化", async ({ page }) => {
   await page.getByRole("button", { name: "加入观察" }).click();
   await expect(page.getByText(/信号已加入观察/)).toBeVisible();
   await page.getByRole("button", { name: "转化或启动任务" }).click();
-  await expect(page.getByRole("heading", { name: "转化信号" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "处理洞察" })).toBeVisible();
   await page.getByRole("radio", { name: /启动新任务/ }).click();
   await page.getByRole("button", { name: "继续" }).click();
   await expect(page).toHaveURL(/#\/new$/);
@@ -306,6 +380,8 @@ test("移动端可以从信号列表进入详情并返回", async ({ page }) => 
   await expect(
     page.getByRole("heading", { name: /陈松的公开任职信息发生变化/ }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "返回信号列表" }).click();
-  await expect(page.getByPlaceholder("搜索公司、人物或信号内容")).toBeVisible();
+  await page.getByRole("button", { name: "返回洞察列表" }).click();
+  await expect(
+    page.getByPlaceholder("搜索公司、人物、信号或洞察"),
+  ).toBeVisible();
 });

@@ -32,7 +32,7 @@ test("岗位 AI 解析依附岗位运行，不创建任务", async ({ page }) =>
   await expect(page.getByLabel("岗位 AI 解析，运行中")).toBeVisible();
   await expect(
     page.getByRole("button", { name: /岗位 AI 解析.*运行中/ }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await page.waitForTimeout(220);
   await page.screenshot({
     path: `${output}/running-desktop.png`,
@@ -114,7 +114,7 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   await expect(
     page.getByRole("heading", { name: "AI 处理记录" }),
   ).toBeVisible();
-  await expect(page.getByText("不进入任务列表")).toBeVisible();
+  await expect(page.getByText("不创建独立任务")).toBeVisible();
   await expect(page.getByText("重新解析具身智能 VLA 算法负责人")).toBeVisible();
   await page.waitForTimeout(220);
   await page.screenshot({

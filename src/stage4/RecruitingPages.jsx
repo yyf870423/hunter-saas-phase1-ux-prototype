@@ -3287,7 +3287,7 @@ function RelatedWork({ processingRecords, onOpenProcessing }) {
       </FieldGroup>
       <FieldGroup
         title="AI 处理记录"
-        description="当前岗位上的解析、匹配与内容生成记录，不进入任务列表。"
+        description="当前岗位上的解析、匹配与内容生成记录，不创建独立任务。"
       >
         <AssetAiProcessHistory
           records={processingRecords}

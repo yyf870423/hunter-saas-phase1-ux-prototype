@@ -673,11 +673,20 @@ export const workItems = [
     ...item,
     category: item.type,
     scenario: item.type,
+    scenarios:
+      item.id === "position-vla"
+        ? ["岗位招聘", "人才摸排"]
+        : item.id === "client-xinglan"
+          ? ["客户开发", "招聘机会"]
+          : item.id === "mapping-embodied"
+            ? ["人才摸排", "知识图谱"]
+            : ["候选人求职", "人岗匹配"],
   })),
   {
     ...sideTasks.find((item) => item.id === "task-hand-team"),
     category: "身份核验",
     scenario: sideTaskBusinessScenarios["task-hand-team"],
+    scenarios: ["候选人", "身份核验"],
   },
   {
     id: "task-interview-summary",
@@ -690,6 +699,7 @@ export const workItems = [
     owner: "沈岚",
     category: "信息整理",
     scenario: "岗位招聘",
+    scenarios: ["岗位招聘", "信息整理"],
     summary: "已整理三条面试反馈，可以继续补充信息或要求 Hunter 调整摘要。",
   },
 ];
@@ -697,6 +707,7 @@ export const workItems = [
 export const signals = [
   {
     id: "signal-graph-sync",
+    kind: "洞察",
     type: "关系变化",
     title: "星澜机器人组织与人才流动关系发生变化",
     object: "星澜机器人组织知识图谱",
@@ -723,6 +734,7 @@ export const signals = [
   },
   {
     id: "signal-cloudchip",
+    kind: "信号",
     type: "公司变化",
     title: "云脉芯能正在组建机器人芯片团队",
     object: "云脉芯能",
@@ -741,6 +753,7 @@ export const signals = [
   },
   {
     id: "signal-tuoji",
+    kind: "信号",
     type: "招聘动态",
     title: "拓界智驾新增感知与规划团队招聘页面",
     object: "拓界智驾",
@@ -755,6 +768,7 @@ export const signals = [
   },
   {
     id: "signal-chensong",
+    kind: "洞察",
     type: "候选人动向",
     title: "陈松的公开任职信息发生变化",
     object: "陈松 · 自动驾驶技术经理",
@@ -769,6 +783,7 @@ export const signals = [
   },
   {
     id: "signal-xinglan",
+    kind: "信号",
     type: "招聘动态",
     title: "星澜机器人 VLA 团队扩招信息已转化",
     object: "星澜机器人",
@@ -783,6 +798,7 @@ export const signals = [
   },
   {
     id: "signal-expired",
+    kind: "信号",
     type: "公司变化",
     title: "旧招聘页面中的机器人岗位已下线",
     object: "远航智能",

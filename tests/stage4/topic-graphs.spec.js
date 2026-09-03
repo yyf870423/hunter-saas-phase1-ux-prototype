@@ -295,7 +295,7 @@ test("空图谱、图谱内 AI、版本预览与关联入口有完整路径", as
   await expect(page.getByRole("button", { name: /产业链关系/ })).toBeVisible();
 
   await page.goto("#/mappings/mapping-embodied?panel=ai");
-  await expect(page.getByText("资产内 AI 协作 · 不进入任务列表")).toBeVisible();
+  await expect(page.getByText("资产内 AI 协作 · 不创建独立任务")).toBeVisible();
   await page.getByRole("button", { name: "应用可信变化" }).click();
   await expect(
     page.getByText("3 项可信变化已写入当前图页，1 项待确认"),

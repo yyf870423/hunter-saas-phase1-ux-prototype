@@ -9,7 +9,7 @@ test("右上角手动新建资产先选择类型再进入对应页面", async ({
   await page.goto("#/home");
   await page
     .locator(".s1-topbar")
-    .getByRole("button", { name: "新建任务" })
+    .getByRole("button", { name: "新建", exact: true })
     .click();
   await page.getByRole("button", { name: /手动新建资产/ }).click();
   await expect(
@@ -64,7 +64,7 @@ test("招聘机会新建页面展示完整字段和必填校验", async ({ page 
   await assertNoConsoleErrors();
 });
 
-test("信号中心分类完整且主从区域没有横向溢出", async ({ page }) => {
+test("洞察中心分类完整且主从区域没有横向溢出", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#/signals");
@@ -85,69 +85,67 @@ test("信号中心分类完整且主从区域没有横向溢出", async ({ page 
     .evaluateAll((nodes) =>
       nodes.map((node) => node.getBoundingClientRect().width),
     );
-  const signalTop = (await page.locator(".s2-signal-shell").boundingBox()).y;
   expect(panes[1]).toBeGreaterThan(panes[0]);
-  await page.goto("#/signals?view=periodic");
-  const periodicPanes = await page
-    .locator(".s2-signal-shell > *")
-    .evaluateAll((nodes) =>
-      nodes.map((node) => node.getBoundingClientRect().width),
-    );
-  const periodicTop = (await page.locator(".s2-signal-shell").boundingBox()).y;
-  expect(periodicPanes[0]).toBeCloseTo(panes[0], 0);
-  expect(periodicPanes[1]).toBeCloseTo(panes[1], 0);
-  expect(periodicTop).toBeCloseTo(signalTop, 0);
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
 
-test("周期扫描支持查看、运行、暂停和编辑配置", async ({ page }) => {
+test("周期性任务支持查看、运行、暂停和自然语言调整", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("#/signals?view=periodic");
-  await expect(page.getByRole("heading", { name: "信号中心" })).toBeVisible();
+  await page.goto("#/tasks/periodic");
+  await expect(page.getByRole("heading", { name: "周期性任务" })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "具身智能新公司与融资动态" }),
+    page.getByRole("heading", { name: "每周发现具身智能创业公司与招聘机会" }),
   ).toBeVisible();
-  await expect(page.getByRole("tab", { name: "扫描配置" })).toBeVisible();
-  await page.getByRole("tab", { name: /执行记录/ }).click();
-  await expect(page.getByText("核验 73 家公司")).toBeVisible();
-  await page.getByRole("tab", { name: /产生的信号/ }).click();
-  await expect(page.getByText("维拓智能完成数千万元天使轮融资")).toBeVisible();
+  await expect(page.getByText("任务要求")).toBeVisible();
   await page.getByRole("button", { name: "立即运行" }).click();
-  await expect(page.getByRole("button", { name: "正在运行" })).toBeDisabled();
+  await expect(page).toHaveURL(/#\/tasks\/periodic\?view=runs&run=/);
+  await expect(page.getByText("当前执行进度", { exact: true })).toBeVisible();
   await expect(
-    page.getByText("本轮扫描完成，产生 2 条待处理信号"),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "暂停", exact: true }).click();
+    page
+      .locator(".s2-periodic-list > button")
+      .filter({ hasText: "运行不到 1 分钟" }),
+  ).toHaveCount(1);
+  await page.goto("#/tasks/periodic");
+  await page.getByRole("button", { name: "调整任务" }).click();
   await expect(
-    page.getByRole("button", { name: "继续", exact: true }),
+    page.getByRole("heading", { name: "调整周期性任务" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "编辑" }).click();
-  await expect(
-    page.getByRole("heading", { name: "编辑周期扫描" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "关闭", exact: true }).click();
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
 
-test("周期扫描在移动端可以进入详情并返回", async ({ page }) => {
+test("周期性任务在移动端可以查看配置与运行记录", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#/signals");
-  const signalTop = (await page.locator(".s2-signal-shell").boundingBox()).y;
-  await page.goto("#/signals?view=periodic");
-  const periodicTop = (await page.locator(".s2-signal-shell").boundingBox()).y;
-  expect(periodicTop).toBeCloseTo(signalTop, 0);
+  await page.goto("#/tasks/periodic");
   await page
-    .locator(".s2-scan-list > button")
-    .filter({ hasText: "AI 创业公司核心岗位招聘" })
+    .locator(".s2-periodic-list > button")
+    .filter({ hasText: "每 3 天更新招聘中岗位的人岗匹配" })
     .click();
   await expect(
-    page.getByRole("heading", { name: "AI 创业公司核心岗位招聘" }),
+    page.getByRole("heading", { name: "每 3 天更新招聘中岗位的人岗匹配" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "返回周期扫描列表" }).click();
-  await expect(page.getByPlaceholder("搜索周期扫描名称或范围")).toBeVisible();
+  await page.getByRole("button", { name: "返回周期任务" }).click();
+  await page.getByRole("tab", { name: /运行记录/ }).click();
+  await page
+    .locator(".s2-periodic-list > button")
+    .filter({ hasText: "等待用户" })
+    .click();
+  await expect(
+    page.getByRole("complementary").getByText("两位候选人的身份合并结论冲突"),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "返回运行记录" }).click();
+  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(5);
+
+  await page.goto("#/home");
+  await page.getByRole("button", { name: "打开通知" }).click();
+  await page
+    .getByRole("button", { name: /两位候选人的身份合并结论冲突/ })
+    .click();
+  await expect(
+    page.getByText("2 项身份冲突需要一起确认", { exact: true }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });
 

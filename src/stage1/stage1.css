@@ -1683,6 +1683,7 @@ a:focus-visible {
 }
 
 .s1-action-queue {
+  margin-top: 16px;
   overflow: hidden;
   background: var(--s1-surface);
   border: 1px solid var(--s1-line);
@@ -3424,5 +3425,155 @@ a:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dashboard task entry and recent asset changes */
+.s1-task-starter {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(420px, 1.28fr);
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 26px;
+  padding: 18px 20px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+  box-shadow: var(--s1-card-shadow);
+}
+.s1-task-starter > div:first-child small {
+  color: var(--s1-accent);
+  font-size: 12px;
+  font-weight: 650;
+}
+.s1-task-starter h2 {
+  margin: 4px 0;
+  font-size: 17px;
+  letter-spacing: 0;
+}
+.s1-task-starter p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.s1-task-starter-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 9px;
+  padding: 8px 8px 8px 12px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 8px;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.s1-task-starter-input:focus-within {
+  border-color: var(--s1-accent);
+  box-shadow: 0 0 0 3px var(--s1-accent-soft);
+}
+.s1-task-starter-input textarea {
+  width: 100%;
+  min-height: 42px;
+  max-height: 92px;
+  padding: 3px 0;
+  overflow-y: auto;
+  color: var(--s1-ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  resize: none;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+.s1-asset-changes {
+  margin-top: 22px;
+  padding: 18px 20px 8px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s1-asset-changes > div {
+  display: grid;
+}
+.s1-asset-changes > div > button {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto 16px;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 0;
+  color: var(--s1-ink);
+  font: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--s1-line);
+  cursor: pointer;
+}
+.s1-asset-changes > div > button:hover b {
+  color: var(--s1-accent);
+}
+.s1-asset-changes > div > button > i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-radius: 7px;
+}
+.s1-asset-changes > div > button span,
+.s1-asset-changes > div > button b,
+.s1-asset-changes > div > button small {
+  display: block;
+  min-width: 0;
+}
+.s1-asset-changes > div > button b {
+  font-size: 13px;
+  transition: color 150ms ease;
+}
+.s1-asset-changes > div > button small,
+.s1-asset-changes > div > button time {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s1-asset-changes > div > button small {
+  margin-top: 3px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s1-asset-changes > div > button > svg {
+  color: var(--s1-subtle);
+}
+
+@media (max-width: 900px) {
+  .s1-task-starter {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .s1-task-starter {
+    padding: 15px;
+  }
+  .s1-task-starter-input {
+    grid-template-columns: 1fr;
+  }
+  .s1-task-starter-input .s1-button {
+    justify-self: end;
+  }
+  .s1-asset-changes {
+    padding-inline: 15px;
+  }
+  .s1-asset-changes > div > button {
+    grid-template-columns: 34px minmax(0, 1fr) 16px;
+  }
+  .s1-asset-changes > div > button time {
+    display: none;
   }
 }

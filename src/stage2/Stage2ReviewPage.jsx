@@ -4,18 +4,32 @@ import { StatusBadge } from "../stage1/ui";
 
 const reviewLinks = [
   [
-    "持续任务渐进演示",
+    "任务渐进演示",
     "/tasks/position-vla",
     "从第一条用户输入开始，逐步出现回复、计划、运行、结果和审核",
   ],
-  ["新建任务", "/new", "一个自然语言入口，由 Hunter 决定一步完成或持续推进"],
-  ["任务列表", "/tasks", "用户主动创建的任务统一搜索、分类、分页和删除"],
   [
-    "有限范围任务",
+    "任务工作区",
+    "/tasks",
+    "同一入口创建任务并查看历史对话，不要求用户选择任务类型",
+  ],
+  ["周期性任务", "/tasks/periodic", "统一创建周期、查看配置和逐轮运行记录"],
+  [
+    "等待用户的周期运行",
+    "/tasks/periodic?view=runs&run=run-position-waiting",
+    "同一批问题集中确认后继续本轮运行",
+  ],
+  [
+    "正在运行的周期记录",
+    "/tasks/periodic?view=runs&status=正在运行",
+    "在运行记录中筛选当前正在执行的周期运行",
+  ],
+  [
+    "直接核验任务",
     "/tasks/task-hand-team",
     "等待用户、补充信息、恢复和结果回流",
   ],
-  ["信号中心", "/signals", "合并来源、观察、忽略、失效和转化"],
+  ["洞察中心", "/signals", "统一处理 Hunter 主动发现的信号与洞察"],
   [
     "推进方式判断中",
     "/new?state=classifying",
@@ -27,8 +41,6 @@ const reviewLinks = [
     "/new?state=direct",
     "可立即完成的任务创建后进入统一任务对话并返回 Markdown 结果",
   ],
-  ["持续推进任务", "/new?state=mainline", "说明持续推进原因，再进入任务详情"],
-  ["有限范围任务", "/new?state=task", "说明有限范围和交付边界，再进入任务详情"],
   [
     "创建权限受限",
     "/new?state=limited",
@@ -72,10 +84,10 @@ export function Stage2ReviewPage() {
           </i>
           Hunter SaaS
         </span>
-        <StatusBadge tone="info">阶段二待审批</StatusBadge>
-        <h1>自动化通用交互框架</h1>
+        <StatusBadge tone="info">统一任务模型待审批</StatusBadge>
+        <h1>垂类 Agent 任务模型</h1>
         <p>
-          本轮审批统一任务详情、运行追踪和信号中心的通用交互。四类业务流程、正式业务资产和运营端仍属于后续阶段。
+          本轮审批统一任务、周期性任务、运行记录和洞察中心的产品模型。用户不需要理解任何内部任务分类。
         </p>
         <Link className="s1-review-primary" to="/tasks/position-vla">
           进入渐进式任务演示
@@ -86,7 +98,7 @@ export function Stage2ReviewPage() {
         <div>
           <small>01</small>
           <h2>页面入口</h2>
-          <p>建议先观察渐进式任务，再检查大型审核、一步完成任务和信号转化。</p>
+          <p>建议先检查统一任务工作区，再查看周期运行记录和洞察处理。</p>
         </div>
         <div className="s1-review-links">
           {reviewLinks.map(([title, route, description]) => (
@@ -104,13 +116,15 @@ export function Stage2ReviewPage() {
         <div>
           <small>02</small>
           <h2>本轮审批重点</h2>
-          <p>验证统一机制是否足以承载后续不同 Agent 场景。</p>
+          <p>
+            验证用户是否能用同一套交互创建、继续和管理不同复杂度的猎头任务。
+          </p>
         </div>
         <div className="s1-review-boundary">
           <article>
             <Icon name="check" />
             <b>对象边界</b>
-            <p>任务、运行和信号在页面位置、状态与去向上是否容易区分。</p>
+            <p>任务历史、周期配置、当前运行和洞察处理是否各有明确入口。</p>
           </article>
           <article>
             <Icon name="task" />
@@ -129,25 +143,30 @@ export function Stage2ReviewPage() {
           <article>
             <Icon name="warning" />
             <b>异常边界</b>
-            <p>等待、暂停、失败、终止、删除和信号失效是否不会混为同一状态。</p>
+            <p>
+              运行中、等待用户、等待外部、错误、停止和删除是否不会混为同一状态。
+            </p>
           </article>
         </div>
       </section>
       <section className="s1-review-section">
         <div>
           <small>03</small>
-          <h2>阶段边界</h2>
-          <p>本轮不使用有限示例替代完整业务设计。</p>
+          <h2>模型边界</h2>
+          <p>
+            资产内 AI 继续从资产详情发起；只有用户对话创建的工作进入任务历史。
+          </p>
         </div>
         <div className="s1-review-viewports">
           <span>
-            <b>本轮包含</b>任务详情、计划、运行、结果、审核、授权和信号处理
+            <b>本轮包含</b>统一任务、周期运行记录、洞察处理和关键状态
           </span>
           <span>
-            <b>阶段三</b>客户开发、岗位招聘、人才摸排、候选人求职完整剧本
+            <b>业务场景</b>
+            客户开发、岗位招聘、人才摸排、候选人求职使用同一任务交互
           </span>
           <span>
-            <b>后续阶段</b>八类正式业务资产、设置、运营端与全量串联
+            <b>资产边界</b>资产 AI 不创建独立任务，运行状态保留在对应资产中
           </span>
         </div>
       </section>

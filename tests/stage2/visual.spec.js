@@ -42,7 +42,7 @@ for (const viewport of [
   });
 }
 
-test("截取候选人审核、任务运行和信号中心", async ({ page }) => {
+test("截取候选人审核、任务运行和洞察中心", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/tasks/position-vla");
   await waitForCandidateReview(page);
@@ -62,7 +62,7 @@ test("截取候选人审核、任务运行和信号中心", async ({ page }) => 
   });
   await page.goto("#/tasks");
   await page.screenshot({
-    path: `${output}/desktop-side-tasks.png`,
+    path: `${output}/desktop-task-workspace.png`,
     fullPage: true,
   });
   await page.goto("#/tasks/task-hand-team");
@@ -111,9 +111,55 @@ test("截取候选人审核、任务运行和信号中心", async ({ page }) => 
   });
   await page.goto("#/signals");
   await page.screenshot({
-    path: `${output}/desktop-signals.png`,
+    path: `${output}/desktop-insights.png`,
     fullPage: true,
   });
+});
+
+test("截取周期性任务、等待确认和正在运行记录", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  for (const [route, filename] of [
+    ["#/tasks/periodic", "desktop-periodic-tasks.png"],
+    [
+      "#/tasks/periodic?view=runs&run=run-position-waiting",
+      "desktop-periodic-run-waiting.png",
+    ],
+    [
+      "#/tasks/periodic?view=runs&status=正在运行",
+      "desktop-periodic-runs-running.png",
+    ],
+  ]) {
+    await page.goto(route);
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `${output}/${filename}`,
+      fullPage: true,
+      animations: "disabled",
+    });
+  }
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [route, filename] of [
+    ["#/tasks", "iphone-task-workspace.png"],
+    [
+      "#/tasks/periodic?view=runs&run=run-position-waiting",
+      "iphone-periodic-run-waiting.png",
+    ],
+    [
+      "#/tasks/periodic?view=runs&status=正在运行",
+      "iphone-periodic-runs-running.png",
+    ],
+  ]) {
+    await page.goto(route);
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `${output}/${filename}`,
+      fullPage: true,
+      animations: "disabled",
+    });
+  }
+  await assertNoConsoleErrors();
 });
 
 test("截取统一新建任务及关键状态", async ({ page }) => {

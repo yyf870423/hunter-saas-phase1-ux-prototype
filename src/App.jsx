@@ -7,7 +7,7 @@ import { Dashboard } from "./stage1/Dashboard";
 import { ReviewPage } from "./stage1/ReviewPage";
 import { Stage1Shell } from "./stage1/Stage1Shell";
 import { NewWork } from "./stage2/NewWork";
-import { SideTaskDetail, WorksPage } from "./stage2/SideTasks";
+import { PeriodicTasksPage } from "./stage2/PeriodicTasks";
 import { SignalsPage } from "./stage2/Signals";
 import { Stage2ReviewPage } from "./stage2/Stage2ReviewPage";
 import { WorkstreamRoute } from "./stage3/WorkstreamRoute";
@@ -104,8 +104,15 @@ export default function App() {
         <Route path="/home" element={<Dashboard />} />
         <Route path="/components" element={<ComponentsPage />} />
         <Route path="/new" element={<NewWork />} />
-        <Route path="/tasks" element={<WorksPage />} />
+        <Route path="/tasks" element={<NewWork />} />
+        <Route path="/tasks/periodic" element={<PeriodicTasksPage />} />
         <Route path="/tasks/:workstreamId" element={<WorkstreamRoute />} />
+        <Route
+          path="/processing"
+          element={
+            <Navigate to="/tasks/periodic?view=runs&status=正在运行" replace />
+          }
+        />
         <Route path="/signals" element={<SignalsPage />} />
         <Route path="/candidates" element={<CandidatesListPage />} />
         <Route path="/candidates/new" element={<CandidateCreatePage />} />

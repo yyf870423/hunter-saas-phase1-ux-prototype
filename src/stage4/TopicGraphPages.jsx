@@ -2529,7 +2529,7 @@ function AnalysisProgress({ state, onPause, onResume, onReview }) {
         <Icon name={failed ? "warning" : paused ? "pause" : "sparkles"} />
       </span>
       <span>
-        <small>导入处理记录 · 不进入任务列表</small>
+        <small>导入处理记录 · 不创建独立任务</small>
         <b>
           {failed
             ? "智能分析未完成"
@@ -2575,7 +2575,7 @@ function GraphAiWorkspace({ page, close, onApply }) {
           返回知识图谱
         </button>
         <span>
-          <small>资产内 AI 协作 · 不进入任务列表</small>
+          <small>资产内 AI 协作 · 不创建独立任务</small>
           <h2>整理“{page.name}”</h2>
         </span>
         <StatusBadge tone="info">预览中</StatusBadge>

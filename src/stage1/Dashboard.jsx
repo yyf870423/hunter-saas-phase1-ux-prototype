@@ -25,6 +25,46 @@ function SectionHeading({ eyebrow, title, description, action }) {
   );
 }
 
+function TaskStarter({ onStart }) {
+  const [value, setValue] = useState("");
+  const submit = () => {
+    if (!value.trim()) return;
+    onStart(value.trim());
+  };
+  return (
+    <section className="s1-task-starter" aria-labelledby="task-starter-title">
+      <div>
+        <small>开始一项猎头任务</small>
+        <h2 id="task-starter-title">今天希望 Hunter 帮你完成什么？</h2>
+        <p>可以直接描述一次性工作，也可以要求它按指定周期自动执行。</p>
+      </div>
+      <div className="s1-task-starter-input">
+        <textarea
+          rows={2}
+          value={value}
+          aria-label="描述新任务"
+          placeholder="例如：每周一检查具身智能创业公司和招聘变化，有重要发现时提醒我"
+          onChange={(event) => setValue(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              submit();
+            }
+          }}
+        />
+        <Button
+          tone="primary"
+          icon="send"
+          disabled={!value.trim()}
+          onClick={submit}
+        >
+          开始
+        </Button>
+      </div>
+    </section>
+  );
+}
+
 function MainlineFocus({ selectedId, onSelect, onOpen }) {
   const selected =
     mainlines.find((item) => item.id === selectedId) || mainlines[0];
@@ -32,9 +72,9 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
   return (
     <section className="s1-mainline-section" aria-labelledby="mainline-title">
       <SectionHeading
-        eyebrow="重点任务"
-        title="继续最重要的任务"
-        description="Hunter 已按等待处理、业务影响和最近变化整理当前任务。"
+        eyebrow="等待你处理"
+        title="继续当前任务"
+        description="优先显示正在等待决定、补充信息或异常处理的任务。"
         action={
           <Button
             tone="ghost"
@@ -82,8 +122,8 @@ function MainlineFocus({ selectedId, onSelect, onOpen }) {
             继续任务
           </Button>
         </article>
-        <div className="s1-mainline-switcher" aria-label="其他进行中的任务">
-          <span>其他进行中的任务</span>
+        <div className="s1-mainline-switcher" aria-label="最近任务">
+          <span>最近任务</span>
           {alternatives.map((item) => (
             <button
               type="button"
@@ -112,7 +152,7 @@ function SignalPanel({ state, onOpen, onRetry }) {
   if (state === "error") {
     return (
       <section className="s1-support-panel" aria-labelledby="signal-title">
-        <SectionHeading eyebrow="信号与机会" title="值得判断的变化" />
+        <SectionHeading eyebrow="重点洞察" title="值得判断的变化" />
         <div className="s1-local-state s1-local-error">
           <i>
             <Icon name="warning" />
@@ -131,7 +171,7 @@ function SignalPanel({ state, onOpen, onRetry }) {
   return (
     <section className="s1-support-panel" aria-labelledby="signal-title">
       <SectionHeading
-        eyebrow="信号与机会"
+        eyebrow="重点洞察"
         title="值得判断的变化"
         action={
           <Button tone="ghost" size="sm" onClick={() => onOpen("全部信号")}>
@@ -160,6 +200,56 @@ function SignalPanel({ state, onOpen, onRetry }) {
                 <em>{signal.evidence} 个证据来源</em>
               </span>
             </span>
+            <Icon name="chevronRight" />
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AssetChanges({ onOpen }) {
+  const changes = [
+    {
+      icon: "user",
+      title: "林昊的候选人资料更新至 v6",
+      detail: "新增真机项目与团队规模，2 条岗位匹配已重算",
+      time: "18 分钟前",
+      route: "/candidates/candidate-linhao?tab=profile",
+    },
+    {
+      icon: "briefcase",
+      title: "VLA 算法负责人岗位补充找人建议",
+      detail: "新增 3 家建议挖猎公司和 1 条招聘难度判断",
+      time: "今天 08:52",
+      route: "/positions/position-vla?tab=profile",
+    },
+    {
+      icon: "database",
+      title: "机器人行业知识图谱更新 2 条关系",
+      detail: "1 条高可信关系已更新，1 条关系等待确认",
+      time: "昨天 19:06",
+      route: "/mappings/mapping-embodied?tab=reviews",
+    },
+  ];
+  return (
+    <section className="s1-asset-changes">
+      <SectionHeading eyebrow="业务资产" title="最近变化" />
+      <div>
+        {changes.map((change) => (
+          <button
+            type="button"
+            key={change.title}
+            onClick={() => onOpen(change.route)}
+          >
+            <i>
+              <Icon name={change.icon} />
+            </i>
+            <span>
+              <b>{change.title}</b>
+              <small>{change.detail}</small>
+            </span>
+            <time>{change.time}</time>
             <Icon name="chevronRight" />
           </button>
         ))}
@@ -262,6 +352,10 @@ export function Dashboard() {
   const notify = useToast();
   const state = params.get("state") || "normal";
   const openPlaceholder = (title) => {
+    if (title.startsWith("/")) {
+      navigate(title);
+      return;
+    }
     if (title === "新建任务") {
       navigate("/new");
       return;
@@ -270,12 +364,20 @@ export function Dashboard() {
       navigate("/tasks");
       return;
     }
+    if (title === "全部信号") {
+      navigate("/signals");
+      return;
+    }
     const work = mainlines.find((item) => item.title === title);
     if (work) {
       navigate(`/tasks/${work.id}`);
       return;
     }
     notify(`已选择“${title}”，完整业务剧本将在原型阶段三提交`, "info");
+  };
+  const startTask = (prompt) => {
+    sessionStorage.setItem("hunter-new-work-signal", prompt);
+    navigate("/tasks");
   };
   const recoverSignals = () => {
     const next = new URLSearchParams(params);
@@ -295,7 +397,7 @@ export function Dashboard() {
             <h1>上午好，沈岚</h1>
             <p>
               从一条真实业务目标开始，Hunter
-              会在过程中整理任务、信号和业务资产。
+              会在过程中整理任务、洞察和业务资产。
             </p>
           </div>
         </header>
@@ -314,7 +416,7 @@ export function Dashboard() {
         />
         <div className="s1-empty-support">
           <span>任务的计划、处理过程和结果都保留在任务对话中</span>
-          <span>值得关注的外部变化会显示在信号中心</span>
+          <span>值得关注的外部变化会显示在洞察中心</span>
         </div>
       </div>
     );
@@ -326,7 +428,7 @@ export function Dashboard() {
         <div>
           <small>{todayLabel}</small>
           <h1>上午好，沈岚</h1>
-          <p>你有 1 项任务等待继续，3 条信号值得判断。</p>
+          <p>你有 1 项任务等待继续，3 条洞察值得判断。</p>
         </div>
       </header>
 
@@ -345,6 +447,8 @@ export function Dashboard() {
         </section>
       ) : null}
 
+      <TaskStarter onStart={startTask} />
+
       <MainlineFocus
         selectedId={selectedId}
         onSelect={setSelectedId}
@@ -357,6 +461,7 @@ export function Dashboard() {
           onRetry={recoverSignals}
         />
       </div>
+      <AssetChanges onOpen={openPlaceholder} />
       <ActionQueue
         expanded={actionExpanded}
         onToggle={() => setActionExpanded((current) => !current)}

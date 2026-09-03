@@ -125,7 +125,7 @@ export function ImportsPage() {
     window.setTimeout(() => {
       setBusy(false);
       setStep("success");
-      notify("导入任务已创建，当前页面会持续更新状态", "info");
+      notify("导入处理已开始，当前页面会持续更新状态", "info");
     }, 750);
   };
   const closeWizard = () => {
@@ -147,7 +147,7 @@ export function ImportsPage() {
       <FilterBar
         query={query}
         setQuery={setQuery}
-        placeholder="搜索导入任务或文件名"
+        placeholder="搜索导入记录或文件名"
         filters={[
           {
             label: "资产类型",
@@ -156,7 +156,7 @@ export function ImportsPage() {
             multiple: true,
           },
           {
-            label: "任务状态",
+            label: "处理状态",
             value: [],
             options: ["处理中", "已完成", "需要处理", "失败"],
             multiple: true,
@@ -165,7 +165,7 @@ export function ImportsPage() {
       />
       <div className="s4-task-table">
         <header>
-          <span>导入任务</span>
+          <span>导入记录</span>
           <span>资产类型</span>
           <span>进度与结果</span>
           <span>状态</span>
@@ -209,7 +209,7 @@ export function ImportsPage() {
                 ? "发现同名知识图谱"
                 : step === "error"
                   ? "文件格式校验失败"
-                  : "导入任务已创建"
+                  : "导入处理已开始"
         }
         description={
           step === "file"
@@ -259,7 +259,7 @@ export function ImportsPage() {
             </>
           ) : (
             <Button tone="primary" onClick={closeWizard}>
-              查看任务列表
+              查看导入记录
             </Button>
           )
         }

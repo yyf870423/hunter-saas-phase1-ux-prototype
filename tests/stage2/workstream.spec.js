@@ -173,29 +173,30 @@ test("自然语言筛选与审核工作区使用同一入储备语义", async ({
   ).toBeVisible();
 });
 
-test("授权切换、暂停、终止与删除确认可用", async ({ page }) => {
+test("授权切换、归档与删除确认可用", async ({ page }) => {
   await page.getByRole("button", { name: /执行前确认/ }).click();
   await page.getByRole("option", { name: /仅分析/ }).click();
   await expect(page.getByText(/授权模式已切换为“仅分析”/)).toBeVisible();
-  await page.getByRole("button", { name: "暂停", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "继续", exact: true }),
-  ).toBeVisible();
   await page.getByRole("button", { name: "更多任务操作" }).click();
-  await page.getByRole("button", { name: "终止任务" }).click();
-  await expect(page.getByRole("heading", { name: "终止任务" })).toBeVisible();
-  await page.getByRole("button", { name: "取消" }).click();
+  await expect(
+    page.getByRole("button", { name: "归档任务", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "终止任务" })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "暂停", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "更多任务操作" }).click();
   await page.getByRole("button", { name: "更多任务操作" }).click();
   await page.getByRole("button", { name: "删除任务" }).click();
   await expect(page.getByRole("heading", { name: "删除任务" })).toBeVisible();
 });
 
-test("新建任务判断为持续任务后进入统一任务区", async ({ page }) => {
+test("新建任务自动规划后进入统一任务区", async ({ page }) => {
   await page.goto("#/new");
   const input = page.getByPlaceholder(/例如：为星澜机器人/);
   await input.fill("为星澜机器人 VLA 算法负责人岗位持续寻找合适候选人");
   await input.press("Enter");
-  await expect(page.getByText(/我会保留完整任务上下文/)).toBeVisible();
+  await expect(page.getByText(/我会先制定执行计划/)).toBeVisible();
   await expect(page).toHaveURL(/#\/tasks\/position-vla$/, {
     timeout: 5_000,
   });

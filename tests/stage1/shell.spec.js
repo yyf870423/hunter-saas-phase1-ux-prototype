@@ -84,7 +84,7 @@ test("全局搜索支持结果、详情和无结果", async ({ page }) => {
 test("通知支持未读筛选和全部已读", async ({ page }) => {
   await page.getByRole("button", { name: "打开通知" }).click();
   await page.getByRole("tab", { name: /未读/ }).click();
-  await expect(page.locator(".s1-notification-list > button")).toHaveCount(3);
+  await expect(page.locator(".s1-notification-list > button")).toHaveCount(4);
   await page.getByRole("button", { name: "全部已读" }).click();
   await expect(page.getByText("没有未读通知")).toBeVisible();
   await page.keyboard.press("Escape");
@@ -127,9 +127,12 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   await expect(page).toHaveURL(/#\/data\/imports$/);
   await expect(page.getByRole("heading", { name: "数据导入" })).toBeVisible();
   await page.goto("#/home");
-  await topbar.getByRole("button", { name: "新建任务", exact: true }).click();
+  await topbar.getByRole("button", { name: "新建", exact: true }).click();
   await expect(
     page.getByRole("button", { name: /手动新建资产/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /新建周期性任务/ }),
   ).toBeVisible();
   await page.getByLabel(/查看 Agent 用量/).click();
   await expect(

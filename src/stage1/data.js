@@ -4,7 +4,7 @@ export const navSections = [
     items: [
       { id: "home", label: "工作台", icon: "home", route: "/home" },
       { id: "tasks", label: "任务", icon: "route", count: 2 },
-      { id: "signals", label: "信号中心", icon: "signal", count: 3 },
+      { id: "signals", label: "洞察中心", icon: "signal", count: 3 },
     ],
   },
   {
@@ -108,6 +108,7 @@ export const mainlines = [
 export const signals = [
   {
     id: "signal-cloudchip",
+    kind: "信号",
     type: "公司变化",
     title: "云脉芯能正在组建机器人芯片团队",
     object: "云脉芯能",
@@ -118,6 +119,7 @@ export const signals = [
   },
   {
     id: "signal-tuoji",
+    kind: "信号",
     type: "招聘动态",
     title: "拓界智驾新增感知与规划团队招聘页面",
     object: "拓界智驾",
@@ -128,6 +130,7 @@ export const signals = [
   },
   {
     id: "signal-chensong",
+    kind: "洞察",
     type: "候选人动向",
     title: "陈松的公开任职信息发生变化",
     object: "陈松 · 自动驾驶技术经理",
@@ -171,10 +174,20 @@ export const actionItems = [
 
 export const notifications = [
   {
+    id: "notification-periodic-waiting",
+    type: "周期运行待确认",
+    title: "两位候选人的身份合并结论冲突",
+    source: "每 3 天更新招聘中岗位的人岗匹配",
+    route: "/tasks/periodic?view=runs&run=run-position-waiting",
+    time: "3 分钟前",
+    unread: true,
+  },
+  {
     id: "notification-1",
     type: "外部回复",
     title: "周雅雯补充了两个算法岗位方向",
     source: "星澜机器人招聘合作",
+    route: "/tasks/client-xinglan?state=reply",
     time: "8 分钟前",
     unread: true,
   },
@@ -183,6 +196,7 @@ export const notifications = [
     type: "任务更新",
     title: "赵星羽身份消歧需要处理",
     source: "VLA 候选人审核",
+    route: "/tasks/position-vla?state=merge-conflict",
     time: "18 分钟前",
     unread: true,
   },
@@ -190,7 +204,8 @@ export const notifications = [
     id: "notification-3",
     type: "信号",
     title: "云脉芯能团队变化已完成证据核验",
-    source: "信号中心",
+    source: "洞察中心",
+    route: "/signals",
     time: "今天 09:12",
     unread: true,
   },
@@ -199,6 +214,7 @@ export const notifications = [
     type: "资料导入",
     title: "补充简历已合并，18 位候选人待审核",
     source: "具身智能 VLA 算法负责人",
+    route: "/tasks/position-vla?state=review",
     time: "昨天 22:14",
     unread: false,
   },
@@ -215,7 +231,7 @@ export const searchItems = [
   })),
   ...signals.map((item) => ({
     id: item.id,
-    group: "信号",
+    group: "洞察",
     icon: "signal",
     title: item.title,
     meta: `${item.type} · ${item.priority}`,

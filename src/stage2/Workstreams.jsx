@@ -21,6 +21,7 @@ import {
   workItems,
 } from "./data";
 import { CandidateReviewWorkspace, InspectionPanel } from "./ReviewWorkspace";
+import { TaskAreaNav } from "./TaskAreaNav";
 
 const defaultPrompt =
   "为星澜机器人“具身智能 VLA 算法负责人”岗位做多渠道找人。优先北京，候选人要有机器人学习或多模态策略经验，也要真正做过产品落地和团队管理。本轮先给我 20 位以内值得判断的人选，不要直接联系。";
@@ -45,11 +46,8 @@ export function WorkstreamHeader({
   object = "星澜机器人 · 北京",
   status,
   statusTone,
-  paused,
-  terminated,
-  onPause,
   onReset,
-  onTerminate,
+  onArchive,
   onDelete,
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -63,74 +61,65 @@ export function WorkstreamHeader({
     return () => document.removeEventListener("pointerdown", close);
   }, [menuOpen]);
   return (
-    <header className="s2-workstream-header">
-      <div>
-        <span>{type}</span>
-        <h1>{title}</h1>
-        <small>{object}</small>
-      </div>
-      <div>
-        <StatusBadge
-          tone={
-            terminated ? "danger" : paused ? "neutral" : statusTone || "warning"
-          }
-        >
-          {terminated ? "已终止" : paused ? "已暂停" : status || "等待用户"}
-        </StatusBadge>
-        {!terminated ? (
-          <Button
-            tone="secondary"
-            icon={paused ? "play" : "pause"}
-            onClick={onPause}
-          >
-            {paused ? "继续" : "暂停"}
-          </Button>
-        ) : null}
-        <div className="s2-more-wrap" ref={menuRef}>
-          <IconButton
-            icon="more"
-            label="更多任务操作"
-            onClick={() => setMenuOpen((open) => !open)}
-          />
-          {menuOpen ? (
-            <div className="s2-more-menu">
-              <button
-                type="button"
-                onClick={() => {
-                  onReset();
-                  setMenuOpen(false);
-                }}
-              >
-                <Icon name="refresh" />
-                重新演示本轮流程
-              </button>
-              <button
-                type="button"
-                disabled={terminated}
-                onClick={() => {
-                  onTerminate();
-                  setMenuOpen(false);
-                }}
-              >
-                <Icon name="logout" />
-                终止任务
-              </button>
-              <button
-                type="button"
-                className="is-danger"
-                onClick={() => {
-                  onDelete();
-                  setMenuOpen(false);
-                }}
-              >
-                <Icon name="trash" />
-                删除任务
-              </button>
-            </div>
-          ) : null}
+    <>
+      <TaskAreaNav value="tasks" />
+      <header className="s2-workstream-header">
+        <div>
+          <span>{type}</span>
+          <h1>{title}</h1>
+          <small>{object}</small>
         </div>
-      </div>
-    </header>
+        <div>
+          {status ? (
+            <StatusBadge tone={statusTone || "warning"}>{status}</StatusBadge>
+          ) : null}
+          <div className="s2-more-wrap" ref={menuRef}>
+            <IconButton
+              icon="more"
+              label="更多任务操作"
+              onClick={() => setMenuOpen((open) => !open)}
+            />
+            {menuOpen ? (
+              <div className="s2-more-menu">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onReset();
+                    setMenuOpen(false);
+                  }}
+                >
+                  <Icon name="refresh" />
+                  重新演示本轮流程
+                </button>
+                {onArchive ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onArchive();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    <Icon name="folder" />
+                    归档任务
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="is-danger"
+                  onClick={() => {
+                    onDelete();
+                    setMenuOpen(false);
+                  }}
+                >
+                  <Icon name="trash" />
+                  删除任务
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </header>
+    </>
   );
 }
 
@@ -549,7 +538,7 @@ export function AutomationWorkspace() {
               : forcedState === "candidate-ingestion" && !ingestionDecision
                 ? "等待用户"
                 : phase < 4
-                  ? "推进中"
+                  ? "运行中"
                   : "等待用户"
           }
           statusTone={
@@ -561,18 +550,11 @@ export function AutomationWorkspace() {
                   ? "info"
                   : "warning"
           }
-          paused={paused}
-          terminated={terminated}
-          onPause={() => {
-            if (paused) {
-              setPlanAdjusted(false);
-              setLatestPlanRequirement("");
-            }
-            setPaused(!paused);
-            setStreamStopped(false);
-          }}
           onReset={resetDemo}
-          onTerminate={() => setTerminateOpen(true)}
+          onArchive={() => {
+            navigate("/tasks");
+            notify("任务已归档，可从任务历史中的归档入口恢复", "success");
+          }}
           onDelete={() => setDeleteOpen(true)}
         />
         <div className="s2-conversation" ref={scrollRef}>
@@ -617,18 +599,11 @@ export function AutomationWorkspace() {
               <div className="s2-system-state">
                 <Icon name="pause" />
                 <span>
-                  <b>已停止本次生成</b>
+                  <b>本轮执行已停止</b>
                   <small>
-                    已经生成的内容不会丢失，可以继续生成或补充新的要求。
+                    已经生成的内容和当前上下文不会丢失。请在下方输入新的要求后继续。
                   </small>
                 </span>
-                <Button
-                  tone="secondary"
-                  size="sm"
-                  onClick={() => setStreamStopped(false)}
-                >
-                  继续生成
-                </Button>
               </div>
             ) : null}
             {forcedState === "limited" ? (

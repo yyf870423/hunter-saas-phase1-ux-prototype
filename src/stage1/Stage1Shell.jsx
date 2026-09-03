@@ -94,7 +94,7 @@ function SearchDialog({ open, close }) {
       close={close}
       title={selected ? "搜索结果摘要" : "全局搜索"}
       description={
-        selected ? "查看命中原因和当前业务状态" : "搜索任务、信号和正式业务资产"
+        selected ? "查看命中原因和当前业务状态" : "搜索任务、洞察和正式业务资产"
       }
       size="lg"
     >
@@ -179,6 +179,7 @@ function SearchDialog({ open, close }) {
 function NotificationPanel({ open, close, items, setItems }) {
   const [tab, setTab] = useState("all");
   const notify = useToast();
+  const navigate = useNavigate();
   const unread = items.filter((item) => item.unread).length;
   const visible =
     tab === "unread" ? items.filter((item) => item.unread) : items;
@@ -219,8 +220,9 @@ function NotificationPanel({ open, close, items, setItems }) {
                     entry.id === item.id ? { ...entry, unread: false } : entry,
                   ),
                 );
-                notify(`已定位到“${item.source}”`, "info");
                 close();
+                if (item.route) navigate(item.route);
+                else notify(`已定位到“${item.source}”`, "info");
               }}
             >
               <i />
@@ -397,6 +399,7 @@ function NewMenu({ open, close, onSelect }) {
     <div className="s1-new-menu" role="menu" ref={ref}>
       {[
         ["route", "新建任务", "直接说明目标，Hunter 会选择合适的推进方式"],
+        ["refresh", "新建周期性任务", "用自然语言说明需要重复执行的任务和周期"],
         ["plus", "手动新建资产", "进入对应业务资产创建正式记录"],
       ].map(([icon, title, description]) => (
         <button type="button" key={title} onClick={() => onSelect(title)}>
@@ -505,15 +508,6 @@ export function Stage1Shell() {
   const [assetNavigationOpen, setAssetNavigationOpen] = useState(false);
   const [assetCreateOpen, setAssetCreateOpen] = useState(false);
   const [mobileMode, setMobileMode] = useState(null);
-  const [activeAiProcess, setActiveAiProcess] = useState(() => {
-    try {
-      return JSON.parse(
-        sessionStorage.getItem("hunter-active-ai-process") || "null",
-      );
-    } catch {
-      return null;
-    }
-  });
   const assetTriggerRef = useRef(null);
   const accountRef = useRef(null);
   const [notificationItems, setNotificationItems] =
@@ -526,29 +520,6 @@ export function Stage1Shell() {
   useEffect(() => {
     localStorage.setItem("hunter-nav-expanded", expanded ? "1" : "0");
   }, [expanded]);
-  useEffect(() => {
-    const syncActiveAiProcess = (event) => {
-      if (event.detail !== undefined) {
-        setActiveAiProcess(event.detail);
-        return;
-      }
-      try {
-        setActiveAiProcess(
-          JSON.parse(
-            sessionStorage.getItem("hunter-active-ai-process") || "null",
-          ),
-        );
-      } catch {
-        setActiveAiProcess(null);
-      }
-    };
-    window.addEventListener("hunter:ai-processing", syncActiveAiProcess);
-    window.addEventListener("storage", syncActiveAiProcess);
-    return () => {
-      window.removeEventListener("hunter:ai-processing", syncActiveAiProcess);
-      window.removeEventListener("storage", syncActiveAiProcess);
-    };
-  }, []);
   useEffect(() => {
     const onKeyDown = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -631,7 +602,8 @@ export function Stage1Shell() {
                     if (item.id === "home")
                       return location.pathname === "/home" ? "is-active" : "";
                     if (item.id === "tasks")
-                      return location.pathname.startsWith("/tasks")
+                      return location.pathname.startsWith("/tasks") ||
+                        location.pathname === "/new"
                         ? "is-active"
                         : "";
                     if (item.id === "signals")
@@ -797,48 +769,17 @@ export function Stage1Shell() {
             onClick={() => setSearchOpen(true)}
           >
             <Icon name="search" />
-            <span>搜索任务、信号和业务资产</span>
+            <span>搜索任务、洞察和业务资产</span>
             <kbd>Ctrl K</kbd>
           </button>
           <div className="s1-topbar-actions">
-            {activeAiProcess ? (
-              <button
-                type="button"
-                className={`s1-active-process-entry is-${activeAiProcess.state}`}
-                aria-label={`${activeAiProcess.title}，${activeAiProcess.target}，${
-                  activeAiProcess.state === "running"
-                    ? "运行中"
-                    : activeAiProcess.state === "review"
-                      ? "等待审核"
-                      : "处理失败"
-                }`}
-                onClick={() => navigate(activeAiProcess.route)}
-              >
-                <Icon
-                  name={
-                    activeAiProcess.state === "running"
-                      ? "refresh"
-                      : activeAiProcess.state === "review"
-                        ? "clock"
-                        : "warning"
-                  }
-                />
-                <span>
-                  {activeAiProcess.state === "running"
-                    ? "1 项处理中"
-                    : activeAiProcess.state === "review"
-                      ? "1 项待审核"
-                      : "1 项处理失败"}
-                </span>
-              </button>
-            ) : null}
             <div className="s1-new-menu-wrap">
               <Button
                 tone="primary"
                 icon="plus"
                 onClick={() => setNewOpen((current) => !current)}
               >
-                新建任务
+                新建
               </Button>
               <NewMenu
                 open={newOpen}
@@ -846,6 +787,8 @@ export function Stage1Shell() {
                 onSelect={(label) => {
                   setNewOpen(false);
                   if (label === "新建任务") navigate("/new");
+                  else if (label === "新建周期性任务")
+                    navigate("/new?mode=periodic");
                   else if (label === "手动新建资产") setAssetCreateOpen(true);
                 }}
               />
@@ -866,7 +809,7 @@ export function Stage1Shell() {
           </div>
         </header>
         <main
-          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/tasks/") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""}`}
+          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/tasks") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""}`}
         >
           <Outlet />
         </main>
@@ -876,7 +819,7 @@ export function Stage1Shell() {
         {[
           ["home", "工作台", "home"],
           ["route", "任务", "tasks"],
-          ["signal", "信号", "signals"],
+          ["signal", "洞察", "signals"],
           ["database", "业务资产", "assets"],
           ["menu", "更多", "more"],
         ].map(([icon, label, id]) => (
@@ -885,7 +828,9 @@ export function Stage1Shell() {
             key={id}
             className={
               (id === "home" && location.pathname === "/home") ||
-              (id === "tasks" && location.pathname.startsWith("/tasks")) ||
+              (id === "tasks" &&
+                (location.pathname.startsWith("/tasks") ||
+                  location.pathname === "/new")) ||
               (id === "signals" && location.pathname.startsWith("/signals"))
                 ? "is-active"
                 : ""

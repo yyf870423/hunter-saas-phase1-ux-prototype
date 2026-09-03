@@ -226,7 +226,7 @@ export function Composer({
         </div>
         {streaming ? (
           <Button tone="secondary" icon="pause" onClick={onStop}>
-            停止生成
+            停止
           </Button>
         ) : (
           <IconButton
@@ -625,25 +625,37 @@ export function WorkHistory({
   onCreate,
 }) {
   const [query, setQuery] = useState("");
+  const [showArchived, setShowArchived] = useState(false);
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase();
+    const scoped = items.filter(
+      (item) => Boolean(item.archived) === showArchived,
+    );
     return keyword
-      ? items.filter((item) =>
-          `${item.title} ${item.type} ${item.object}`
+      ? scoped.filter((item) =>
+          `${item.title} ${item.type} ${item.scenario || ""} ${(item.scenarios || []).join(" ")} ${item.object}`
             .toLowerCase()
             .includes(keyword),
         )
-      : items;
-  }, [items, query]);
+      : scoped;
+  }, [items, query, showArchived]);
   return (
     <aside className={`s2-history ${collapsed ? "is-collapsed" : ""}`}>
       <header>
         {collapsed ? null : <b>任务</b>}
         <div>
+          {!collapsed ? (
+            <IconButton
+              icon="folder"
+              label={showArchived ? "查看最近任务" : "查看已归档任务"}
+              className={showArchived ? "is-active" : ""}
+              onClick={() => setShowArchived((current) => !current)}
+            />
+          ) : null}
           <IconButton icon="plus" label="新建任务" onClick={onCreate} />
           <IconButton
             icon={collapsed ? "panelRight" : "panelLeft"}
-            label={collapsed ? "展开任务列表" : "收起任务列表"}
+            label={collapsed ? "展开任务历史" : "收起任务历史"}
             onClick={onToggle}
           />
         </div>
@@ -690,13 +702,23 @@ export function WorkHistory({
               >
                 <span>
                   <small>
-                    {item.type}
+                    <span className="s2-history-scenes">
+                      {(item.scenarios || [item.scenario || item.type])
+                        .slice(0, 2)
+                        .map((scene) => (
+                          <em key={scene}>{scene}</em>
+                        ))}
+                    </span>
                     {item.pinned ? <Icon name="pin" /> : null}
                   </small>
                   <b>{item.title}</b>
                   <em>{item.object}</em>
                 </span>
-                <StatusBadge tone={item.tone}>{item.status}</StatusBadge>
+                {["运行中", "等待用户", "等待外部", "错误"].includes(
+                  item.status,
+                ) ? (
+                  <StatusBadge tone={item.tone}>{item.status}</StatusBadge>
+                ) : null}
                 <time>{item.time}</time>
               </button>
             ))}
