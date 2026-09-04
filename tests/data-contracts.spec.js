@@ -11,7 +11,12 @@ import {
   positions,
 } from "../src/stage4/data";
 import { subscriptionPlans } from "../src/shared/productCatalog";
-import { orders, overviewMetrics, tasks } from "../src/stage6/operations-data";
+import {
+  orders,
+  overviewMetrics,
+  runQuality,
+  tasks,
+} from "../src/stage6/operations-data";
 
 test("任务历史与工作台使用同一当前状态", () => {
   const currentById = new Map(mainlines.map((item) => [item.id, item.status]));
@@ -80,13 +85,13 @@ test("用户端套餐和运营端订单使用同一产品目录", () => {
   expect(basicOrders.every((order) => order.amount === "¥ 199.00")).toBe(true);
 });
 
-test("运营指标有统计口径，周期检查任务不占用长任务资源", () => {
+test("运营指标有统计口径，四类运行使用统一阶段摘要", () => {
   expect(overviewMetrics.every((metric) => metric.definition)).toBe(true);
   expect(
     overviewMetrics.find((metric) => metric.id === "tasks").definition,
   ).toContain("系统运行");
   expect(new Set(tasks.map((task) => task.scope))).toEqual(
-    new Set(["任务运行", "任务步骤运行", "资产 AI 运行", "系统运行"]),
+    new Set(["普通任务运行", "周期任务运行", "资产 AI 运行", "系统运行"]),
   );
   expect(
     tasks
@@ -95,7 +100,7 @@ test("运营指标有统计口径，周期检查任务不占用长任务资源",
   ).toBe(true);
   expect(
     tasks
-      .filter((task) => ["任务运行", "任务步骤运行"].includes(task.scope))
+      .filter((task) => ["普通任务运行", "周期任务运行"].includes(task.scope))
       .every((task) => task.workId.startsWith("WORK-")),
   ).toBe(true);
   expect(
@@ -111,4 +116,14 @@ test("运营指标有统计口径，周期检查任务不占用长任务资源",
   const mailCheck = tasks.find((task) => task.type === "邮箱回复检查");
   expect(mailCheck.status).toBe("已完成");
   expect(mailCheck.resource).toBe("已释放");
+  expect(
+    tasks.every(
+      (task) =>
+        task.processPhase &&
+        task.plan.total >= task.plan.completed &&
+        task.writeSummary,
+    ),
+  ).toBe(true);
+  expect(runQuality).toHaveLength(4);
+  expect(runQuality.every((row) => row.waitingDuration)).toBe(true);
 });

@@ -83,7 +83,7 @@ const workspaceColumns = [
   },
   {
     key: "health",
-    label: "任务健康",
+    label: "运行健康",
     width: 125,
     render: (row) => <OpsStatus>{row.health}</OpsStatus>,
   },
@@ -158,14 +158,14 @@ function WorkspaceDrawer({ workspace, close }) {
               <OpsStatus>{workspace.subscription}</OpsStatus>
             </span>
             <span>
-              <small>任务用量</small>
+              <small>运行用量</small>
               <b>{workspace.quota}%</b>
               <em>
                 <i style={{ width: `${workspace.quota}%` }} />
               </em>
             </span>
             <span>
-              <small>任务健康</small>
+              <small>运行健康</small>
               <b>{workspace.taskCount} 个</b>
               <OpsStatus>{workspace.health}</OpsStatus>
             </span>
@@ -193,8 +193,8 @@ function WorkspaceDrawer({ workspace, close }) {
                 <i>
                   <Icon name="warning" />
                 </i>
-                <b>任务成功率低于近 7 日基线</b>
-                <small>建议先查看失败任务聚类，不直接接触业务内容。</small>
+                <b>运行成功率低于近 7 日基线</b>
+                <small>建议先查看失败运行聚类，不直接接触业务内容。</small>
               </span>
             ) : null}
             {workspace.storageRisk !== "正常" ? (
@@ -225,8 +225,8 @@ function WorkspaceDrawer({ workspace, close }) {
           </div>
         </OpsSection>
         <OpsSection
-          title="最近任务"
-          description="仅展示该工作空间的脱敏任务摘要。"
+          title="最近运行"
+          description="仅展示该工作空间的脱敏运行摘要。"
           action={
             <Button
               size="sm"
@@ -235,7 +235,7 @@ function WorkspaceDrawer({ workspace, close }) {
                 close();
               }}
             >
-              查看全部任务
+              查看全部运行
             </Button>
           }
         >
@@ -527,7 +527,7 @@ export function UsersWorkspacesPage() {
     <div className="ops-page">
       <OpsPageHeader
         title="用户与工作空间"
-        description="账号和工作空间分别管理；订阅、任务与支持状态引用对应模块的同一数据。"
+        description="账号和工作空间分别管理；订阅、运行与支持状态引用对应模块的同一数据。"
       />
       <OpsTabs
         label="用户与工作空间范围"
@@ -579,8 +579,8 @@ export function UsersWorkspacesPage() {
                       })),
                   },
                   {
-                    label: "任务健康",
-                    options: ["正常", "需关注", "无运行任务"],
+                    label: "运行健康",
+                    options: ["正常", "需关注", "无运行记录"],
                     value: filters.health || "",
                     onChange: (value) =>
                       setFilters((current) => ({ ...current, health: value })),
@@ -767,7 +767,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
               ["当前周期", subscription.period],
               ["续订方式", subscription.renewal],
               ["支付状态", subscription.payment],
-              ["任务用量", subscription.quota],
+              ["运行用量", subscription.quota],
               ["到期时间", subscription.expiresAt],
             ]}
           />

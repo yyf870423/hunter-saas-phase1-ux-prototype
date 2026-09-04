@@ -135,7 +135,7 @@ test("运营筛选会真实改变列表且可以单独清空", async ({ page }) 
   await expect(page.getByText("TASK-260824-011")).toHaveCount(0);
   await page.getByRole("button", { name: "清空运行状态" }).click();
   await expect(page.getByText("TASK-260824-011").first()).toBeVisible();
-  await page.getByRole("button", { name: "执行归属", exact: true }).click();
+  await page.getByRole("button", { name: "运行类型", exact: true }).click();
   await page
     .locator(".s4-select-panel")
     .getByRole("button", { name: "系统运行", exact: true })
@@ -145,18 +145,42 @@ test("运营筛选会真实改变列表且可以单独清空", async ({ page }) 
   await assertNoConsoleErrors();
 });
 
+test("运行质量按四类运行展示且排除等待耗时", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/ops/tasks?tab=quality");
+  await expect(page.getByText("运行耗时不包含等待时间")).toBeVisible();
+  for (const type of [
+    "普通任务运行",
+    "周期任务运行",
+    "资产 AI 运行",
+    "系统运行",
+  ]) {
+    await expect(page.getByText(type, { exact: true }).first()).toBeVisible();
+  }
+  await expect(page.getByText("中位等待耗时", { exact: true })).toBeVisible();
+  await assertNoConsoleErrors();
+});
+
 test("运行详情区分可安全恢复和不可恢复", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/ops/tasks/TASK-260824-019");
-  await expect(page.getByText("具身智能 VLA 人才摸排")).toBeVisible();
+  await expect(page.getByText("具身智能 VLA 人才摸排")).toHaveCount(0);
   await expect(page.getByText("WORK-260824-006")).toBeVisible();
-  await expect(page.getByText("任务步骤运行", { exact: true })).toBeVisible();
+  await expect(page.getByText("普通任务运行", { exact: true })).toBeVisible();
+  await expect(page.getByText("制定/调整计划", { exact: true })).toBeVisible();
+  await expect(page.getByText("计划调整", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .locator(".ops-section")
+      .filter({ hasText: "计划与写入摘要" })
+      .getByText("2 次", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("所属主线", { exact: true })).toHaveCount(0);
   await expect(page.getByText("可以执行受控恢复")).toBeVisible();
   await page.getByRole("button", { name: "执行安全恢复" }).click();
   const dialog = page.getByRole("dialog", { name: "执行安全恢复" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByText(/不会修改任务输入/)).toBeVisible();
+  await expect(dialog.getByText(/不会修改用户输入/)).toBeVisible();
   await expect(
     dialog.getByRole("button", { name: /重新分配执行资源/ }),
   ).toBeVisible();

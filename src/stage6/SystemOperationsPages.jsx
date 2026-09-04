@@ -9,6 +9,7 @@ import {
   capabilityConfigurations,
   diagnostics,
   errorGroups,
+  runQuality,
   securityEvents,
   supportRecords,
   tasks,
@@ -36,21 +37,21 @@ const taskColumns = [
   { key: "workspace", label: "工作空间", width: 210 },
   {
     key: "scope",
-    label: "执行归属",
-    width: 130,
+    label: "运行类型",
+    width: 140,
     render: (row) => <OpsStatus>{row.scope}</OpsStatus>,
   },
-  { key: "type", label: "执行类型", width: 140 },
+  { key: "type", label: "业务动作", width: 140 },
   {
-    key: "workTitle",
-    label: "所属对象",
-    width: 230,
+    key: "workId",
+    label: "来源对象",
+    width: 180,
     render: (row) =>
       row.workId === "—" ? (
-        "—"
+        <span className="ops-muted-copy">无业务对象</span>
       ) : (
         <span className="ops-primary-cell">
-          <b>{row.workTitle}</b>
+          <b>{row.scope === "资产 AI 运行" ? "业务资产" : "用户任务"}</b>
           <small>{row.workId}</small>
         </span>
       ),
@@ -61,7 +62,17 @@ const taskColumns = [
     width: 110,
     render: (row) => <OpsStatus>{row.status}</OpsStatus>,
   },
-  { key: "phase", label: "当前阶段", width: 140 },
+  {
+    key: "processPhase",
+    label: "运行阶段",
+    width: 170,
+    render: (row) => (
+      <span className="ops-primary-cell">
+        <b>{row.processPhase}</b>
+        <small>{row.phase}</small>
+      </span>
+    ),
+  },
   { key: "startedAt", label: "开始时间", width: 130 },
   { key: "duration", label: "耗时", width: 130 },
   {
@@ -78,6 +89,84 @@ const taskColumns = [
   },
   { key: "error", label: "错误分类", width: 190 },
 ];
+
+const runQualityColumns = [
+  {
+    key: "scope",
+    label: "运行类型",
+    width: 170,
+    render: (row) => <OpsStatus>{row.scope}</OpsStatus>,
+  },
+  { key: "runs", label: "运行量", width: 110 },
+  { key: "success", label: "成功率", width: 110 },
+  { key: "activeDuration", label: "中位运行耗时", width: 150 },
+  { key: "waitingDuration", label: "中位等待耗时", width: 150 },
+  { key: "retries", label: "平均重试", width: 120 },
+  { key: "revisions", label: "平均计划调整", width: 140 },
+  { key: "recovery", label: "恢复成功率", width: 130 },
+];
+
+const processPhases = [
+  "理解目标",
+  "制定/调整计划",
+  "执行步骤",
+  "等待用户/外部",
+  "校验并写入资产",
+  "整理交付",
+];
+
+function RunProcess({ task }) {
+  const currentIndex = processPhases.indexOf(task.processPhase);
+  const isFinished = task.status === "已完成";
+  return (
+    <ol className="ops-run-process" aria-label="运行阶段">
+      {processPhases.map((phase, index) => {
+        const skipped = task.skippedPhases?.includes(phase);
+        const failed =
+          index === currentIndex && ["失败", "需处理"].includes(task.status);
+        const stopped = index === currentIndex && task.status === "已取消";
+        const current = index === currentIndex && !isFinished && !failed;
+        const completed =
+          !skipped &&
+          (index < currentIndex || (isFinished && index === currentIndex));
+        const state = skipped
+          ? "skipped"
+          : failed
+            ? "failed"
+            : stopped
+              ? "stopped"
+              : current
+                ? "current"
+                : completed
+                  ? "completed"
+                  : "pending";
+        return (
+          <li key={phase} className={`is-${state}`}>
+            <i aria-hidden="true">
+              {completed ? <Icon name="check" /> : index + 1}
+            </i>
+            <span>
+              <b>{phase}</b>
+              <small>
+                {state === "completed"
+                  ? "已完成"
+                  : state === "current"
+                    ? "当前阶段"
+                    : state === "failed"
+                      ? "发生异常"
+                      : state === "stopped"
+                        ? "已停止"
+                        : state === "skipped"
+                          ? "本次未触发"
+                          : "尚未进入"}
+              </small>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
 
 function ErrorDrawer({ error, close }) {
   const navigate = useNavigate();
@@ -121,7 +210,7 @@ function ErrorDrawer({ error, close }) {
                 <span>
                   <b>{task.id}</b>
                   <small>
-                    {task.workspace} · {task.phase}
+                    {task.workspace} · {task.processPhase} · {task.phase}
                   </small>
                 </span>
                 <Icon name="chevronRight" />
@@ -167,13 +256,15 @@ export function TasksPage() {
   const rawSource =
     tab === "errors"
       ? errorGroups
-      : backgroundView
-        ? tasks.filter((item) =>
-            ["图谱关系同步", "关系派生重算", "岗位人才梳理更新"].includes(
-              item.type,
-            ),
-          )
-        : tasks;
+      : tab === "quality"
+        ? runQuality
+        : backgroundView
+          ? tasks.filter((item) =>
+              ["图谱关系同步", "关系派生重算", "岗位人才梳理更新"].includes(
+                item.type,
+              ),
+            )
+          : tasks;
   const source = useMemo(
     () =>
       rawSource.filter((item) => {
@@ -184,10 +275,12 @@ export function TasksPage() {
             (!filters.type?.length || filters.type.includes(item.type)) &&
             (!filters.resource || item.resource === filters.resource)
           );
-        return (
-          (!filters.errorStatus || item.status === filters.errorStatus) &&
-          (!filters.capability || item.capability === filters.capability)
-        );
+        if (tab === "errors")
+          return (
+            (!filters.errorStatus || item.status === filters.errorStatus) &&
+            (!filters.capability || item.capability === filters.capability)
+          );
+        return true;
       }),
     [filters, rawSource, tab],
   );
@@ -195,16 +288,9 @@ export function TasksPage() {
     source,
     tab === "errors"
       ? ["code", "title", "taskTypes"]
-      : [
-          "id",
-          "workspace",
-          "scope",
-          "type",
-          "workTitle",
-          "workId",
-          "status",
-          "error",
-        ],
+      : tab === "quality"
+        ? ["scope"]
+        : ["id", "workspace", "scope", "type", "workId", "status", "error"],
   );
   const [selectedError, setSelectedError] = useState(
     errorGroups.find((item) => item.id === params.get("error")) || null,
@@ -257,7 +343,7 @@ export function TasksPage() {
         description={
           backgroundView
             ? "查看图谱同步、关系派生重算和岗位人才梳理更新的脱敏状态；运营端不展示图谱正文和人物关系内容。"
-            : "统一查看任务运行、任务步骤运行、资产 AI 运行和系统运行的脱敏元数据、错误码与调用链；无法证明安全时不提供恢复操作。"
+            : "统一查看普通任务、周期任务、资产 AI 和系统运行的脱敏元数据、质量指标、错误码与调用链；无法证明安全时不提供恢复操作。"
         }
       />
       <OpsTabs
@@ -266,113 +352,144 @@ export function TasksPage() {
         label="运行与故障范围"
         items={[
           { value: "runs", label: "运行记录", count: tasks.length },
+          { value: "quality", label: "运行质量" },
           { value: "errors", label: "错误中心", count: errorGroups.length },
         ]}
       />
       <OpsState
         state={state}
-        label={tab === "runs" ? "运行记录" : "错误中心"}
+        label={
+          tab === "runs"
+            ? "运行记录"
+            : tab === "quality"
+              ? "运行质量"
+              : "错误中心"
+        }
         onRetry={() => switchTab(tab)}
       >
-        <OpsFilterBar
-          query={list.query}
-          onQuery={list.setQuery}
-          placeholder={
-            tab === "runs"
-              ? "搜索运行编号、工作空间、所属对象、执行归属、执行类型或错误码"
-              : "搜索错误码、分类或运行类型"
-          }
-          filters={
-            tab === "runs"
-              ? [
-                  {
-                    label: "运行状态",
-                    options: ["运行中", "需处理", "失败", "已完成", "已取消"],
-                    value: filters.status || [],
-                    onChange: (value) =>
-                      setFilters((current) => ({ ...current, status: value })),
-                    multiple: true,
-                  },
-                  {
-                    label: "执行归属",
-                    options: [
-                      "任务运行",
-                      "任务步骤运行",
-                      "资产 AI 运行",
-                      "系统运行",
-                    ],
-                    value: filters.scope || [],
-                    onChange: (value) =>
-                      setFilters((current) => ({ ...current, scope: value })),
-                    multiple: true,
-                  },
-                  {
-                    label: "执行类型",
-                    options: [
-                      "岗位解析",
-                      "候选人补全",
-                      "学术搜索",
-                      "公司调研",
-                      "邮箱回复检查",
-                      "图谱关系同步",
-                      "关系派生重算",
-                      "岗位人才梳理更新",
-                    ],
-                    value: filters.type || [],
-                    onChange: (value) =>
-                      setFilters((current) => ({ ...current, type: value })),
-                    multiple: true,
-                  },
-                  {
-                    label: "资源状态",
-                    options: ["运行中", "已释放", "资源未释放"],
-                    value: filters.resource || "",
-                    onChange: (value) =>
-                      setFilters((current) => ({
-                        ...current,
-                        resource: value,
-                      })),
-                  },
-                ]
-              : [
-                  {
-                    label: "处理状态",
-                    options: ["需处理", "处理中", "观察中", "用户处理"],
-                    value: filters.errorStatus || "",
-                    onChange: (value) =>
-                      setFilters((current) => ({
-                        ...current,
-                        errorStatus: value,
-                      })),
-                  },
-                  {
-                    label: "关联能力",
-                    options: ["大模型", "公开网络搜索", "邮件", "执行调度"],
-                    value: filters.capability || "",
-                    onChange: (value) =>
-                      setFilters((current) => ({
-                        ...current,
-                        capability: value,
-                      })),
-                  },
-                ]
-          }
-        />
+        {tab !== "quality" ? (
+          <OpsFilterBar
+            query={list.query}
+            onQuery={list.setQuery}
+            placeholder={
+              tab === "runs"
+                ? "搜索运行编号、工作空间、来源对象、运行类型、业务动作或错误码"
+                : "搜索错误码、分类或运行类型"
+            }
+            filters={
+              tab === "runs"
+                ? [
+                    {
+                      label: "运行状态",
+                      options: ["运行中", "需处理", "失败", "已完成", "已取消"],
+                      value: filters.status || [],
+                      onChange: (value) =>
+                        setFilters((current) => ({
+                          ...current,
+                          status: value,
+                        })),
+                      multiple: true,
+                    },
+                    {
+                      label: "运行类型",
+                      options: [
+                        "普通任务运行",
+                        "周期任务运行",
+                        "资产 AI 运行",
+                        "系统运行",
+                      ],
+                      value: filters.scope || [],
+                      onChange: (value) =>
+                        setFilters((current) => ({ ...current, scope: value })),
+                      multiple: true,
+                    },
+                    {
+                      label: "业务动作",
+                      options: [
+                        "岗位解析",
+                        "候选人补全",
+                        "学术搜索",
+                        "人才动态扫描",
+                        "公司调研",
+                        "邮箱回复检查",
+                        "图谱关系同步",
+                        "关系派生重算",
+                        "岗位人才梳理更新",
+                      ],
+                      value: filters.type || [],
+                      onChange: (value) =>
+                        setFilters((current) => ({ ...current, type: value })),
+                      multiple: true,
+                    },
+                    {
+                      label: "资源状态",
+                      options: ["运行中", "已释放", "资源未释放"],
+                      value: filters.resource || "",
+                      onChange: (value) =>
+                        setFilters((current) => ({
+                          ...current,
+                          resource: value,
+                        })),
+                    },
+                  ]
+                : [
+                    {
+                      label: "处理状态",
+                      options: ["需处理", "处理中", "观察中", "用户处理"],
+                      value: filters.errorStatus || "",
+                      onChange: (value) =>
+                        setFilters((current) => ({
+                          ...current,
+                          errorStatus: value,
+                        })),
+                    },
+                    {
+                      label: "关联能力",
+                      options: ["大模型", "公开网络搜索", "邮件", "执行调度"],
+                      value: filters.capability || "",
+                      onChange: (value) =>
+                        setFilters((current) => ({
+                          ...current,
+                          capability: value,
+                        })),
+                    },
+                  ]
+            }
+          />
+        ) : null}
+        {tab === "quality" ? (
+          <OpsInlineState
+            tone="info"
+            icon="activity"
+            title="运行耗时不包含等待时间"
+            description="中位运行耗时只统计实际执行、校验和交付时间；等待用户输入或外部回复的时间单独记录，不计入运行性能。"
+          />
+        ) : null}
         <OpsTable
-          columns={tab === "runs" ? taskColumns : errorColumns}
+          columns={
+            tab === "runs"
+              ? taskColumns
+              : tab === "quality"
+                ? runQualityColumns
+                : errorColumns
+          }
           rows={list.visible}
           onRow={
             tab === "runs"
               ? (row) => navigate(`/ops/tasks/${row.id}`)
-              : setSelectedError
+              : tab === "errors"
+                ? setSelectedError
+                : undefined
           }
         />
-        <OpsPagination
-          page={list.page}
-          pages={list.pages}
-          onChange={list.setPage}
-          total={list.filtered.length}
-        />
+        {tab !== "quality" ? (
+          <OpsPagination
+            page={list.page}
+            pages={list.pages}
+            onChange={list.setPage}
+            total={list.filtered.length}
+          />
+        ) : null}
       </OpsState>
       <ErrorDrawer error={selectedError} close={() => setSelectedError(null)} />
     </div>
@@ -470,7 +587,7 @@ function RecoveryModal({ task, close, initialAction }) {
           </FormField>
           <div className="ops-impact-preview">
             <b>执行边界</b>
-            <span>不会修改任务输入、业务结果或用户审核状态。</span>
+            <span>不会修改用户输入、业务结果或用户审核状态。</span>
             <span>操作结果和失败原因都会写入不可编辑的审计记录。</span>
           </div>
         </div>
@@ -490,22 +607,40 @@ export function TaskDetailPage() {
     {
       title: "运行创建并进入队列",
       meta: task.startedAt,
-      detail: `触发方式：${task.trigger} · 执行归属：${task.scope} · 执行类型：${task.type}`,
+      detail: `触发方式：${task.trigger} · 运行类型：${task.scope} · 业务动作：${task.type}`,
       tone: "success",
     },
     {
-      title: "完成前置检查",
+      title: "目标识别与前置检查完成",
       meta: "开始后 12 秒",
-      detail: "身份、额度、并发和运行环境检查通过。",
+      detail:
+        "目标识别、身份、额度、并发和运行环境检查通过；不记录用户输入正文。",
       tone: "success",
     },
     {
-      title: `进入${task.phase}`,
+      title: "执行计划已生成",
+      meta: "开始后 18 秒",
+      detail: `共 ${task.plan.total} 步，当前已完成 ${task.plan.completed} 步。运营端不展示计划正文。`,
+      tone: "success",
+    },
+    ...(task.plan.revisions
+      ? [
+          {
+            title: "执行计划已调整",
+            meta: `累计 ${task.plan.revisions} 次`,
+            detail:
+              "运行根据已完成步骤的结果调整后续计划，调整前后版本均已留痕。",
+            tone: "info",
+          },
+        ]
+      : []),
+    {
+      title: `进入“${task.processPhase}”阶段`,
       meta: task.duration,
       detail:
         task.error === "—"
-          ? "运行按照执行计划继续推进。"
-          : `检测到 ${task.error}，业务数据未写入。`,
+          ? `当前动作：${task.phase}。运行按照最新计划继续推进。`
+          : `当前动作：${task.phase}。检测到 ${task.error}，不合格结果未写入业务资产。`,
       tone: task.error === "—" ? "info" : "danger",
     },
   ];
@@ -563,17 +698,18 @@ export function TaskDetailPage() {
             <OpsDefinitionList
               items={[
                 ["工作空间", task.workspace],
-                ["执行归属", task.scope],
-                ["执行类型", task.type],
+                ["运行类型", task.scope],
+                ["业务动作", task.type],
                 [
-                  "所属对象",
+                  "来源对象",
                   task.workId === "—"
                     ? "系统运行，不关联用户业务对象"
-                    : `${task.workTitle} · ${task.workId}`,
+                    : `${task.scope === "资产 AI 运行" ? "业务资产" : "用户任务"} · ${task.workId}`,
                 ],
                 ["触发方式", task.trigger],
                 ["状态", task.status],
-                ["当前阶段", task.phase],
+                ["运行阶段", task.processPhase],
+                ["当前动作", task.phase],
                 ["开始时间", task.startedAt],
                 ["运行耗时", task.duration],
                 ["检查点", task.checkpoint],
@@ -585,8 +721,33 @@ export function TaskDetailPage() {
               ]}
             />
           </OpsSection>
-          <OpsSection title="状态时间线">
+          <OpsSection
+            title="执行阶段"
+            description="显示运行到达的位置，不展示用户输入、计划正文或业务结果。"
+          >
+            <RunProcess task={task} />
+          </OpsSection>
+        </div>
+        <div className="ops-task-detail-grid">
+          <OpsSection title="脱敏运行事件">
             <OpsTimeline items={timeline} />
+          </OpsSection>
+          <OpsSection title="计划与写入摘要">
+            <OpsDefinitionList
+              items={[
+                ["计划步骤", `${task.plan.total} 步`],
+                ["已完成步骤", `${task.plan.completed} 步`],
+                [
+                  "当前步骤",
+                  task.plan.completed >= task.plan.total
+                    ? "全部完成"
+                    : `第 ${Math.min(task.plan.completed + 1, task.plan.total)} 步`,
+                ],
+                ["计划调整", `${task.plan.revisions} 次`],
+                ["资产写入", task.writeSummary],
+                ["重复写入", "未检测到"],
+              ]}
+            />
           </OpsSection>
         </div>
         <OpsSection
@@ -596,7 +757,7 @@ export function TaskDetailPage() {
           <div className="ops-call-chain">
             {[
               {
-                service: "任务调度",
+                service: "运行调度",
                 action: "分配执行单元",
                 duration: "842 ms",
                 status: "200",
@@ -634,7 +795,7 @@ export function TaskDetailPage() {
           </div>
         </OpsSection>
         <div className="ops-task-detail-grid">
-          <OpsSection title="关联上下文">
+          <OpsSection title="关联支持信息">
             <div className="ops-link-list">
               <button
                 type="button"
@@ -1195,7 +1356,7 @@ function SupportDrawer({ record, close }) {
                 <Icon name="activity" />
                 <span>
                   <b>TASK-260824-019</b>
-                  <small>任务步骤运行 · 学术搜索 · 失败</small>
+                  <small>普通任务运行 · 学术搜索 · 失败</small>
                 </span>
                 <Icon name="chevronRight" />
               </button>

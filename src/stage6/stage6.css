@@ -1382,6 +1382,98 @@
 .ops-back svg {
   width: 15px;
 }
+.ops-run-process {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ops-run-process li {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+  color: #69727d;
+  background: #f7f8fa;
+  border: 1px solid #e5e8ec;
+  border-radius: 7px;
+}
+.ops-run-process li > i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: #69727d;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  background: #e8ebef;
+  border-radius: 6px;
+}
+.ops-run-process li > i svg {
+  width: 14px;
+}
+.ops-run-process li > span {
+  display: grid;
+  min-width: 0;
+}
+.ops-run-process li b {
+  overflow: hidden;
+  color: #323943;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ops-run-process li small {
+  margin-top: 1px;
+  color: #7e8791;
+  font-size: 10px;
+  line-height: 15px;
+}
+.ops-run-process li.is-completed {
+  background: #f2faf7;
+  border-color: #c9e7dc;
+}
+.ops-run-process li.is-completed > i {
+  color: #087252;
+  background: #dcf3ea;
+}
+.ops-run-process li.is-current {
+  background: #f2f8ff;
+  border-color: #a9d2f7;
+  box-shadow: 0 3px 12px rgba(20, 94, 160, 0.08);
+}
+.ops-run-process li.is-current > i {
+  color: #fff;
+  background: #0b72d1;
+}
+.ops-run-process li.is-failed {
+  background: #fff4f4;
+  border-color: #f0b8bb;
+}
+.ops-run-process li.is-failed > i {
+  color: #fff;
+  background: #be2c34;
+}
+.ops-run-process li.is-stopped {
+  background: #f6f7f8;
+  border-color: #d7dce1;
+}
+.ops-run-process li.is-stopped > i {
+  color: #fff;
+  background: #69727d;
+}
+.ops-run-process li.is-skipped {
+  color: #8b929b;
+  background: #fafafa;
+  border-style: dashed;
+}
 .ops-call-chain {
   display: grid;
   gap: 0;
@@ -2644,6 +2736,9 @@
     grid-column: 2/4;
     justify-self: start;
   }
+  .ops-run-process {
+    grid-template-columns: 1fr 1fr;
+  }
   .ops-capability-summary,
   .ops-capability-grid {
     grid-template-columns: 1fr 1fr;
@@ -2691,5 +2786,8 @@
   }
   .ops-inline-state .s1-button {
     margin-left: 44px;
+  }
+  .ops-run-process {
+    grid-template-columns: 1fr;
   }
 }

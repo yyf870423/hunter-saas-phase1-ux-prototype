@@ -39,7 +39,7 @@ export function OverviewPage() {
       <OpsPageHeader
         eyebrow="2026 年 8 月 24 日 · 数据更新于 16:46"
         title="运营概况"
-        description="先判断运营趋势是否符合预期，再处理系统风险、异常任务和用户事项。"
+        description="先判断运营趋势是否符合预期，再处理系统风险、异常运行和用户事项。"
         actions={
           <>
             <SelectMenu
@@ -68,7 +68,7 @@ export function OverviewPage() {
           tone="warning"
           icon="warning"
           title="成本趋势暂时不可用"
-          description="用户、任务和订阅指标已正常更新，成本数据将在下次刷新时重试。"
+          description="用户、运行和订阅指标已正常更新，成本数据将在下次刷新时重试。"
           action={
             <Button size="sm" onClick={retry}>
               重试成本数据
@@ -129,11 +129,11 @@ export function OverviewPage() {
             </div>
           </OpsSection>
           <OpsSection
-            title="任务处理"
-            description="只显示需要运营判断的脱敏任务。"
+            title="运行处理"
+            description="只显示需要运营判断的脱敏运行。"
             action={
               <Button size="sm" onClick={() => navigate("/ops/tasks")}>
-                进入任务中心
+                进入运行中心
               </Button>
             }
           >

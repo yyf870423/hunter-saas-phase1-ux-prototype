@@ -67,7 +67,7 @@ function OpsGlobalSearch({ open, close }) {
       open={open}
       close={close}
       title="运营搜索"
-      description="搜索工作空间编号、登录手机号、联系邮箱、任务编号或错误码"
+      description="搜索工作空间编号、登录手机号、联系邮箱、运行编号或错误码"
       size="lg"
     >
       <div className="ops-global-search">
@@ -77,7 +77,7 @@ function OpsGlobalSearch({ open, close }) {
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="输入工作空间、邮箱、任务编号或错误码"
+            placeholder="输入工作空间、邮箱、运行编号或错误码"
           />
           {query ? (
             <button
@@ -274,7 +274,7 @@ export function OperationsShell() {
             onClick={() => setSearchOpen(true)}
           >
             <Icon name="search" />
-            <span>搜索工作空间、任务或错误码</span>
+            <span>搜索工作空间、运行或错误码</span>
             <kbd>⌘ K</kbd>
           </button>
           <div className="ops-topbar-actions">

@@ -4,7 +4,7 @@ import { Icon } from "../components/Icon";
 const groups = [
   {
     title: "运营概况",
-    description: "趋势、风险、任务处理和用户商业事项。",
+    description: "趋势、风险、运行处理和用户商业事项。",
     links: [
       ["正常状态", "/ops/overview"],
       ["部分数据失败", "/ops/overview?state=partial-error"],

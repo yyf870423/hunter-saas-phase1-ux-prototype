@@ -9,6 +9,7 @@ const routes = [
   ["users-workspaces", "用户与工作空间"],
   ["subscriptions", "订阅与额度"],
   ["tasks", "运行与故障"],
+  ["tasks?tab=quality", "运行与故障"],
   ["tasks/TASK-260824-019", "TASK-260824-019"],
   ["capabilities", "系统能力"],
   ["support", "支持与审计"],
@@ -45,6 +46,7 @@ test("运营端关键页面生成桌面、平板和手机验收截图", async ({
       ["users-workspaces", "workspaces"],
       ["subscriptions", "subscriptions"],
       ["tasks", "tasks"],
+      ["tasks?tab=quality", "run-quality"],
       ["tasks/TASK-260824-019", "task-detail"],
       ["capabilities", "capabilities"],
     ]) {
