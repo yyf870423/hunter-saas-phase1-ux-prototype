@@ -152,13 +152,13 @@ function SignalPanel({ state, onOpen, onRetry }) {
   if (state === "error") {
     return (
       <section className="s1-support-panel" aria-labelledby="signal-title">
-        <SectionHeading eyebrow="重点洞察" title="值得判断的变化" />
+        <SectionHeading eyebrow="重点洞察" title="需要处理的洞察" />
         <div className="s1-local-state s1-local-error">
           <i>
             <Icon name="warning" />
           </i>
           <div>
-            <b>信号摘要暂时无法加载</b>
+            <b>洞察摘要暂时无法加载</b>
             <p>重点任务和行动队列仍可正常使用。</p>
           </div>
           <Button size="sm" icon="refresh" onClick={onRetry}>
@@ -172,7 +172,7 @@ function SignalPanel({ state, onOpen, onRetry }) {
     <section className="s1-support-panel" aria-labelledby="signal-title">
       <SectionHeading
         eyebrow="重点洞察"
-        title="值得判断的变化"
+        title="需要处理的洞察"
         action={
           <Button tone="ghost" size="sm" onClick={() => onOpen("全部信号")}>
             查看全部
@@ -184,7 +184,7 @@ function SignalPanel({ state, onOpen, onRetry }) {
           <button
             type="button"
             key={signal.id}
-            onClick={() => onOpen(signal.title)}
+            onClick={() => onOpen(`/signals?signal=${signal.id}`)}
           >
             <span className="s1-signal-line">
               <i />
@@ -196,9 +196,10 @@ function SignalPanel({ state, onOpen, onRetry }) {
               </small>
               <b>{signal.title}</b>
               <span>
-                <StatusBadge tone={signal.tone}>{signal.priority}</StatusBadge>
+                <StatusBadge tone={signal.tone}>{signal.status}</StatusBadge>
                 <em>{signal.evidence} 个证据来源</em>
               </span>
+              <em className="s1-signal-next">{signal.next}</em>
             </span>
             <Icon name="chevronRight" />
           </button>
@@ -428,7 +429,7 @@ export function Dashboard() {
         <div>
           <small>{todayLabel}</small>
           <h1>上午好，沈岚</h1>
-          <p>你有 1 项任务等待继续，3 条洞察值得判断。</p>
+          <p>你有 1 项任务等待继续，3 条洞察需要处理。</p>
         </div>
       </header>
 

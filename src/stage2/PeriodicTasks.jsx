@@ -499,6 +499,20 @@ ${run.summary}
 
 **当前结果：** ${run.result}`}
           />
+          {run.id === "run-startups-success" ? (
+            <div className="s2-run-result-link">
+              <Button
+                size="sm"
+                tone="secondary"
+                icon="signal"
+                onClick={() =>
+                  window.location.assign("#/signals?signal=signal-cloudchip")
+                }
+              >
+                查看本轮产生的洞察
+              </Button>
+            </div>
+          ) : null}
           {run.status === "等待用户" && !resolved ? (
             <HunterReply>
               <DecisionRequest

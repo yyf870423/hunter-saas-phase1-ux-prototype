@@ -4,6 +4,7 @@ import { Button } from "../stage1/ui";
 import { DatePicker, SelectMenu } from "../stage4/asset-ui";
 import {
   entitlementChanges,
+  insightLifecycleHealth,
   overviewMetrics,
   riskItems,
   tasks,
@@ -163,6 +164,37 @@ export function OverviewPage() {
             </div>
           </OpsSection>
         </div>
+        <OpsSection
+          title="洞察运行健康"
+          description="只展示积压、超期、失败与合并效率，不展示用户业务内容。"
+          action={
+            <Button
+              size="sm"
+              onClick={() => navigate("/ops/tasks?tab=runs&scope=系统运行")}
+            >
+              查看相关运行
+            </Button>
+          }
+        >
+          <div className="ops-insight-health">
+            {insightLifecycleHealth.map((item) => (
+              <button
+                type="button"
+                key={item.id}
+                onClick={() => navigate("/ops/tasks?tab=runs&scope=系统运行")}
+              >
+                <span>
+                  <b>{item.title}</b>
+                  <small>{item.detail}</small>
+                </span>
+                <span>
+                  <strong>{item.value}</strong>
+                  <OpsStatus tone={item.tone}>{item.status}</OpsStatus>
+                </span>
+              </button>
+            ))}
+          </div>
+        </OpsSection>
         <OpsSection
           title="用户与商业事项"
           description="试用、订阅、支付与额度中需要人工处理的事项。"

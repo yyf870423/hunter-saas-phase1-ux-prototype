@@ -48,3 +48,13 @@ test("工作台可直接用自然语言开始任务", async ({ page }) => {
   await expect(page).toHaveURL(/#\/tasks$/);
   await expect(page.locator(".s2-composer textarea")).toHaveValue(/每周一检查/);
 });
+
+test("工作台洞察说明下一步并进入对应详情", async ({ page }) => {
+  const signal = page.getByRole("button", {
+    name: /云脉芯能正在组建机器人芯片团队/,
+  });
+  await expect(signal.getByText("待你决定", { exact: true })).toBeVisible();
+  await expect(signal.getByText(/需要确认：是否开展客户开发/)).toBeVisible();
+  await signal.click();
+  await expect(page).toHaveURL(/#\/signals\?signal=signal-cloudchip/);
+});

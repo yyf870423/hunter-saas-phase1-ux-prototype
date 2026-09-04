@@ -62,6 +62,41 @@ export const overviewMetrics = [
   },
 ];
 
+export const insightLifecycleHealth = [
+  {
+    id: "insight-decision-backlog",
+    title: "待用户处理积压",
+    value: "37 条",
+    detail: "4 条超过 24 小时未处理",
+    status: "需关注",
+    tone: "warning",
+  },
+  {
+    id: "insight-observation-overdue",
+    title: "观察计划超期",
+    value: "6 条",
+    detail: "3 条正在补跑，3 条等待来源恢复",
+    status: "需关注",
+    tone: "warning",
+  },
+  {
+    id: "insight-verification-failed",
+    title: "自动复查失败",
+    value: "3 条",
+    detail: "公开搜索降级影响 2 个工作空间",
+    status: "需处理",
+    tone: "danger",
+  },
+  {
+    id: "insight-merge-rate",
+    title: "重复信号合并率",
+    value: "81.6%",
+    detail: "近 7 天合并 1,284 条重复来源",
+    status: "正常",
+    tone: "success",
+  },
+];
+
 export const workspaces = [
   {
     id: "ws-blue",

@@ -809,7 +809,7 @@ export function Stage1Shell() {
           </div>
         </header>
         <main
-          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/tasks") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""}`}
+          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/tasks") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""} ${location.pathname.startsWith("/signals") ? "s1-main-signals" : ""}`}
         >
           <Outlet />
         </main>

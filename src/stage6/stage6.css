@@ -637,6 +637,57 @@
   justify-items: end;
 }
 
+.ops-insight-health {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.ops-insight-health > button {
+  display: flex;
+  min-width: 0;
+  min-height: 86px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  color: var(--s1-ink);
+  text-align: left;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.ops-insight-health > button:hover {
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 24%, var(--s1-line));
+}
+.ops-insight-health > button > span {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+.ops-insight-health > button > span:last-child {
+  flex: 0 0 auto;
+  justify-items: end;
+}
+.ops-insight-health b,
+.ops-insight-health strong,
+.ops-insight-health small {
+  display: block;
+}
+.ops-insight-health b {
+  font-size: 13px;
+}
+.ops-insight-health strong {
+  font-size: 18px;
+  line-height: 22px;
+}
+.ops-insight-health small {
+  color: var(--s1-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+
 .ops-business-matters {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2470,6 +2521,9 @@
   .ops-business-matters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .ops-insight-health {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .ops-capability-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2631,6 +2685,9 @@
     border-top: 1px solid #e7eaee;
   }
   .ops-business-matters {
+    grid-template-columns: 1fr;
+  }
+  .ops-insight-health {
     grid-template-columns: 1fr;
   }
   .ops-filter-bar {

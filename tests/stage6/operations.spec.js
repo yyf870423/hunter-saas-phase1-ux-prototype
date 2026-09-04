@@ -30,6 +30,21 @@ test("运营端六个模块可通过独立导航访问", async ({ page }) => {
   await assertNoConsoleErrors();
 });
 
+test("运营概况展示脱敏的洞察生命周期健康指标", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/ops/overview");
+  await expect(
+    page.getByRole("heading", { name: "洞察运行健康" }),
+  ).toBeVisible();
+  await expect(page.getByText("待用户处理积压")).toBeVisible();
+  await expect(page.getByText("观察计划超期")).toBeVisible();
+  await expect(page.getByText("自动复查失败")).toBeVisible();
+  await expect(page.getByText("重复信号合并率")).toBeVisible();
+  await expect(page.getByText("星澜机器人")).toHaveCount(0);
+  await expectNoHorizontalOverflow(page);
+  await assertNoConsoleErrors();
+});
+
 test("工作空间详情、用户详情与试用审批保持数据联动", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/ops/users-workspaces");

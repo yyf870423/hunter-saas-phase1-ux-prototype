@@ -1682,6 +1682,16 @@ a:focus-visible {
   font-style: normal;
 }
 
+.s1-signal-content > .s1-signal-next {
+  display: block;
+  margin-top: 7px;
+  overflow: hidden;
+  color: var(--s1-accent);
+  font-weight: 620;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .s1-action-queue {
   margin-top: 16px;
   overflow: hidden;
