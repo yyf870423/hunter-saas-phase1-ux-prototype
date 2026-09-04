@@ -32,6 +32,52 @@ const defaultObservation = {
   lastResult: "已经建立观察计划，当前没有需要立即处理的新变化。",
 };
 
+function getSignalTaskContext(signal) {
+  if (signal.taskContext) return signal.taskContext;
+  if (signal.sourceRun?.route) {
+    return {
+      title: signal.sourceRun.label,
+      route: signal.sourceRun.route,
+      status: signal.sourceRun.status || "可继续",
+      tone: signal.sourceRun.tone || "info",
+    };
+  }
+  if (signal.outcome?.route) {
+    return {
+      title: signal.outcome.title,
+      route: signal.outcome.route,
+      status: signal.outcome.taskStatus || "可继续",
+      tone: signal.outcome.taskTone || "info",
+    };
+  }
+  return null;
+}
+
+function SignalTaskContext({ task, onOpen }) {
+  if (!task) return null;
+  return (
+    <section className="s2-signal-task-context">
+      <header>
+        <i>
+          <Icon name="message" />
+        </i>
+        <span>
+          <small>关联任务</small>
+          <h3>{task.title}</h3>
+        </span>
+        <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
+      </header>
+      <p>
+        任务开始后，用户输入、Hunter
+        回复、执行计划、确认记录和交付结果会保留在同一段完整对话中。
+      </p>
+      <Button tone="secondary" icon="message" onClick={onOpen}>
+        查看完整上下文对话
+      </Button>
+    </section>
+  );
+}
+
 function FollowUpPanel({ signal }) {
   if (signal.status === "待你决定") {
     return (
@@ -99,8 +145,24 @@ function FollowUpPanel({ signal }) {
   if (signal.status === "核验中") {
     const verification = signal.verification || {
       progress: 35,
-      completed: "已读取现有来源",
-      remaining: "正在补充交叉证据",
+      activity: [
+        {
+          state: "done",
+          label: "已完成",
+          text: "已读取当前洞察和历史核验记录",
+        },
+        { state: "done", label: "已完成", text: "已整理现有来源及其发布时间" },
+        {
+          state: "current",
+          label: "进行中",
+          text: "正在补充能够相互印证的公开信息",
+        },
+        {
+          state: "queued",
+          label: "待执行",
+          text: "随后检查关联资产和已有任务，避免重复处理",
+        },
+      ],
       outcome: "完成后自动更新状态。",
     };
     return (
@@ -125,20 +187,21 @@ function FollowUpPanel({ signal }) {
         >
           <span style={{ width: `${verification.progress}%` }} />
         </div>
-        <dl>
-          <div>
-            <dt>已经完成</dt>
-            <dd>{verification.completed}</dd>
-          </div>
-          <div>
-            <dt>当前处理</dt>
-            <dd>{verification.remaining}</dd>
-          </div>
-          <div>
-            <dt>完成以后</dt>
-            <dd>{verification.outcome}</dd>
-          </div>
-        </dl>
+        <div className="s2-signal-verification-activity" aria-live="polite">
+          <h4>实时进展</h4>
+          <ol>
+            {verification.activity.map((item, index) => (
+              <li key={`${item.state}-${index}`} data-state={item.state}>
+                <span>{item.label}</span>
+                <p>{item.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <p className="s2-signal-verification-outcome">
+          <b>完成以后</b>
+          {verification.outcome}
+        </p>
       </section>
     );
   }
@@ -239,6 +302,7 @@ export function SignalsPage() {
   const timers = useRef([]);
   const selected =
     signals.find((signal) => signal.id === selectedId) || signals[0];
+  const selectedTaskContext = getSignalTaskContext(selected);
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     return signals.filter(
@@ -377,9 +441,35 @@ export function SignalsPage() {
         nextLabel: "正在核验：1 / 4 个来源",
         verification: {
           progress: 25,
-          completed: "已读取当前信号和历史证据",
-          remaining: "正在检查公开来源和关联正式资产",
+          activity: [
+            {
+              state: "done",
+              label: "已完成",
+              text: "已读取当前洞察和历史证据",
+            },
+            {
+              state: "current",
+              label: "进行中",
+              text: "正在检查公开来源的更新时间和内容差异",
+            },
+            {
+              state: "queued",
+              label: "待执行",
+              text: "核验关联公司与联系人信息",
+            },
+            {
+              state: "queued",
+              label: "待执行",
+              text: "检查已有任务，避免重复创建后续行动",
+            },
+          ],
           outcome: "完成后自动更新状态，无需停留等待。",
+        },
+        taskContext: selected.taskContext || {
+          title: `核验${selected.object}的最新变化`,
+          route: "/tasks/periodic?view=runs&run=run-startups-active",
+          status: "正在运行",
+          tone: "info",
         },
       },
       {
@@ -476,6 +566,14 @@ export function SignalsPage() {
           title: selectedTask.title,
           detail: "洞察的来源、变化和建议动作已作为新的上下文加入该任务。",
           route: `/tasks/${selectedTask.id}`,
+          taskStatus: selectedTask.status,
+          taskTone: selectedTask.tone,
+        },
+        taskContext: {
+          title: selectedTask.title,
+          route: `/tasks/${selectedTask.id}`,
+          status: selectedTask.status,
+          tone: selectedTask.tone,
         },
       },
       {
@@ -682,22 +780,12 @@ export function SignalsPage() {
                   </button>
                 ))}
               </div>
-              {selected.sourceRun ? (
-                <button
-                  type="button"
-                  className="s2-signal-origin-run"
-                  onClick={() => navigate(selected.sourceRun.route)}
-                >
-                  <Icon name="refresh" />
-                  <span>
-                    <small>发现来源</small>
-                    <b>{selected.sourceRun.label}</b>
-                  </span>
-                  <Icon name="chevronRight" />
-                </button>
-              ) : null}
             </section>
             <FollowUpPanel signal={selected} />
+            <SignalTaskContext
+              task={selectedTaskContext}
+              onOpen={() => navigate(selectedTaskContext.route)}
+            />
             <footer>
               {selected.status === "待你决定" ? (
                 <>
@@ -734,14 +822,6 @@ export function SignalsPage() {
               {selected.status === "核验中" ? (
                 <Button tone="secondary" loading disabled>
                   正在核验
-                </Button>
-              ) : null}
-              {selected.status === "已处理" && selected.outcome?.route ? (
-                <Button
-                  tone="primary"
-                  onClick={() => navigate(selected.outcome.route)}
-                >
-                  查看处理去向
                 </Button>
               ) : null}
               {["已忽略", "已失效"].includes(selected.status) ? (

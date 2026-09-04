@@ -387,7 +387,9 @@ test("洞察加入已有任务前必须明确选择目标任务", async ({ page 
   await submit.click();
   await expect(page.getByRole("heading", { name: "已加入任务" })).toBeVisible();
   await expect(
-    page.getByText("星澜机器人招聘合作", { exact: true }),
+    page
+      .locator(".s2-signal-followup")
+      .getByText("星澜机器人招聘合作", { exact: true }),
   ).toBeVisible();
 });
 
@@ -475,11 +477,43 @@ test("洞察中心展示核验、处理、忽略和失效的真实后续", async
     await expect(page.getByRole("heading", { name: marker })).toBeVisible();
     await expectNoHorizontalOverflow(page);
   }
+
+  await page.goto("#/signals?signal=signal-verifying");
+  const activity = page.locator(".s2-signal-verification-activity");
+  await expect(activity.getByRole("listitem")).toHaveCount(5);
+  await expect(
+    activity.getByText("正在核验任职时间和近期团队公开动态"),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "查看完整上下文对话" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "查看完整上下文对话" }).click();
+  await expect(page).toHaveURL(/run=run-startups-active/);
+  await expect(page.locator(".s2-run-conversation")).toBeVisible();
+});
+
+test("洞察关联任务的完整对话入口不随洞察状态变化丢失", async ({ page }) => {
+  await page.goto("#/signals?signal=signal-tuoji");
+  const conversationButton = page.getByRole("button", {
+    name: "查看完整上下文对话",
+  });
+  await expect(conversationButton).toBeVisible();
+  await page.getByRole("button", { name: "立即复查" }).click();
+  await expect(conversationButton).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Hunter 正在重新核验" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "等待你的决定" })).toBeVisible(
+    {
+      timeout: 3000,
+    },
+  );
+  await expect(conversationButton).toBeVisible();
 });
 
 test("周期运行与洞察可以双向追溯", async ({ page }) => {
   await page.goto("#/signals?signal=signal-cloudchip");
-  await page.getByRole("button", { name: /每周发现具身智能创业公司/ }).click();
+  await page.getByRole("button", { name: "查看完整上下文对话" }).click();
   await expect(page).toHaveURL(/run=run-startups-success/);
   await page.getByRole("button", { name: "查看本轮产生的洞察" }).click();
   await expect(page).toHaveURL(/signal=signal-cloudchip/);

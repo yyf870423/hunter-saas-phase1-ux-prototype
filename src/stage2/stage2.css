@@ -4353,6 +4353,61 @@
   border-radius: inherit;
   transition: width 220ms ease;
 }
+.s2-signal-verification-activity {
+  padding: 2px 0 8px;
+}
+.s2-signal-verification-activity h4 {
+  margin: 0 0 5px;
+  color: var(--s1-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.s2-signal-detail .s2-signal-verification-activity ol {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.s2-signal-verification-activity li {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid color-mix(in srgb, var(--s1-line) 68%, transparent);
+}
+.s2-signal-verification-activity li > span {
+  color: var(--s1-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 19px;
+  white-space: nowrap;
+}
+.s2-signal-verification-activity li > p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+.s2-signal-verification-activity li[data-state="done"] > span {
+  color: var(--s1-success);
+}
+.s2-signal-verification-activity li[data-state="current"] > span {
+  color: var(--s1-accent);
+}
+.s2-signal-verification-outcome {
+  display: grid !important;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 0;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--s1-line) 68%, transparent);
+}
+.s2-signal-verification-outcome > b {
+  color: var(--s1-subtle);
+  font-size: 11px;
+  font-weight: 600;
+}
 .s2-signal-sources {
   display: grid;
 }
@@ -4454,48 +4509,48 @@
 .s2-signal-source-preview > .s1-button {
   width: fit-content;
 }
-.s2-signal-origin-run {
+.s2-signal-task-context > header {
   display: grid;
-  width: 100%;
-  grid-template-columns: 30px minmax(0, 1fr) 15px;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
   align-items: center;
   gap: 9px;
-  margin-top: 8px;
-  padding: 10px;
-  color: var(--s1-ink);
-  text-align: left;
-  background: var(--s1-canvas);
-  border: 1px solid var(--s1-line);
-  border-radius: 7px;
-  cursor: pointer;
+  margin-bottom: 8px;
 }
-.s2-signal-origin-run:hover {
+.s2-signal-task-context > header > i {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
   color: var(--s1-accent);
   background: var(--s1-accent-soft);
-  border-color: color-mix(in srgb, var(--s1-accent) 24%, var(--s1-line));
+  border-radius: 7px;
 }
-.s2-signal-origin-run > svg:first-child {
-  width: 17px;
-  color: var(--s1-accent);
+.s2-signal-task-context > header > i svg {
+  width: 16px;
 }
-.s2-signal-origin-run > svg:last-child {
-  width: 13px;
-  color: var(--s1-subtle);
+.s2-signal-task-context > header > span {
+  min-width: 0;
 }
-.s2-signal-origin-run small,
-.s2-signal-origin-run b {
+.s2-signal-task-context > header small,
+.s2-signal-task-context > header h3 {
   display: block;
 }
-.s2-signal-origin-run small {
+.s2-signal-task-context > header small {
   color: var(--s1-subtle);
   font-size: 11px;
 }
-.s2-signal-origin-run b {
+.s2-signal-task-context > header h3 {
   margin-top: 2px;
   overflow: hidden;
   font-size: 12px;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.s2-signal-detail > .s2-signal-task-context > p {
+  margin: 0 0 10px;
+}
+.s2-signal-task-context > .s1-button {
+  width: fit-content;
 }
 .s2-signal-history {
   display: grid;

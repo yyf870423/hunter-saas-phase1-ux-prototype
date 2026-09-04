@@ -739,6 +739,12 @@ export const signals = [
       "周明远的任职变化仍待确认",
     ],
     graphPath: "/mappings/mapping-embodied?tab=reviews",
+    taskContext: {
+      title: "每月更新机器人行业知识图谱",
+      route: "/tasks/mapping-embodied",
+      status: "等待用户",
+      tone: "warning",
+    },
     history: [
       {
         time: "今天 09:24",
@@ -789,6 +795,8 @@ export const signals = [
     sourceRun: {
       label: "每周发现具身智能创业公司与招聘机会 · 今天 09:00",
       route: "/tasks/periodic?view=runs&run=run-startups-success",
+      status: "可继续",
+      tone: "success",
     },
     history: [
       {
@@ -838,6 +846,8 @@ export const signals = [
     sourceRun: {
       label: "每周发现具身智能创业公司与招聘机会 · 今天 09:00",
       route: "/tasks/periodic?view=runs&run=run-startups-success",
+      status: "可继续",
+      tone: "success",
     },
     history: [
       {
@@ -906,10 +916,41 @@ export const signals = [
     summary:
       "公司官网与近期活动议程中的负责人姓名不一致，Hunter 正在补充时间信息。",
     nextLabel: "正在核验：3 / 5 个来源",
+    taskContext: {
+      title: "每周发现具身智能创业公司与招聘机会 · 本轮运行",
+      route: "/tasks/periodic?view=runs&run=run-startups-active",
+      status: "正在运行",
+      tone: "info",
+    },
     verification: {
       progress: 60,
-      completed: "已核验公司官网、活动议程和两条公开报道",
-      remaining: "正在核验任职时间和近期团队公开动态",
+      activity: [
+        {
+          state: "done",
+          label: "已完成",
+          text: "已读取当前洞察和历史核验记录",
+        },
+        {
+          state: "done",
+          label: "已完成",
+          text: "已核对公司官网、活动议程和两条公开报道",
+        },
+        {
+          state: "done",
+          label: "已完成",
+          text: "已确认不同来源中的负责人姓名确实存在冲突",
+        },
+        {
+          state: "current",
+          label: "进行中",
+          text: "正在核验任职时间和近期团队公开动态",
+        },
+        {
+          state: "queued",
+          label: "待执行",
+          text: "随后检查关联公司、联系人和已有任务，避免重复处理",
+        },
+      ],
       outcome: "核验完成后将自动进入待你决定、观察中或已失效，无需停留等待。",
     },
     sources: [
@@ -956,6 +997,8 @@ export const signals = [
       title: "具身智能 VLA 算法负责人",
       detail: "任务正在推进候选人召回、身份合并和人岗匹配。",
       route: "/tasks/position-vla",
+      taskStatus: "推进中",
+      taskTone: "info",
     },
     history: [
       {
