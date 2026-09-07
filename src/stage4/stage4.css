@@ -9816,6 +9816,27 @@
 .s4-contact-company-relations article {
   grid-template-columns: minmax(0, 1fr) auto auto;
 }
+.s4-contact-company-relations .s4-contact-file-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.s4-contact-file-row > span {
+  flex: 1 1 240px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.s4-contact-file-preview {
+  width: 100%;
+  height: min(65vh, 640px);
+  border: 0;
+}
+.s4-contact-file-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 65vh;
+  overflow: auto;
+}
 .s4-contact-company-relations b,
 .s4-contact-company-relations small {
   display: block;

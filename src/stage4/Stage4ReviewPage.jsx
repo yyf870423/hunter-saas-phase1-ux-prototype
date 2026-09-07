@@ -70,12 +70,12 @@ const groups = [
       ["新建公司", "/companies/new", "手动、文件和 Agent 三种输入"],
       [
         "联系人详情",
-        "/contacts/contact-chenyu",
-        "多公司归属、身份关系和沟通记录",
+        "/companies/company-xinglan/contacts/contact-chenyu",
+        "公司专属记录、候选人身份关系和沟通记录",
       ],
       [
         "联系路径执行中",
-        "/contacts/contact-chenyu?tab=contact-path&state=running",
+        "/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=running",
         "自然语言要求、逐步执行和结果生成",
       ],
       [

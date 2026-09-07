@@ -20,7 +20,7 @@ test("右上角手动新建资产先选择类型再进入对应页面", async ({
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "联系人 记录联系人身份与公司关系" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "招聘机会 沉淀已经确认的招聘需求" }),
   ).toBeVisible();
@@ -34,20 +34,21 @@ test("右上角手动新建资产先选择类型再进入对应页面", async ({
     page.getByRole("button", { name: "知识图谱 创建可持续维护的关系图谱" }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "联系人 记录联系人身份与公司关系" })
+    .getByRole("button", { name: "公司 建立公司资料与招聘关联" })
     .click();
-  await expect(page).toHaveURL(/#\/contacts\/new$/);
-  await expect(page.getByRole("heading", { name: "新建联系人" })).toBeVisible();
+  await expect(page).toHaveURL(/#\/companies\/new$/);
+  await expect(page.getByRole("heading", { name: "新建公司" })).toBeVisible();
   await assertNoConsoleErrors();
 });
 
-test("联系人新建页面使用独立表单并阻止信息不足的写入", async ({ page }) => {
+test("联系人新建页面固定所属公司并阻止姓名缺失", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
-  await page.goto("#/contacts/new");
-  await page.getByPlaceholder("例如：陈雨").fill("周明");
+  await page.goto("#/companies/company-xinglan/contacts/new");
   await page.getByRole("button", { name: "创建联系人" }).click();
-  await expect(page.getByText("身份信息不足")).toBeVisible();
-  await expect(page).toHaveURL(/#\/contacts\/new$/);
+  await expect(
+    page.getByText("请输入姓名或明确称呼", { exact: true }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/company-xinglan\/contacts\/new$/);
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
@@ -152,7 +153,7 @@ test("周期性任务在移动端可以查看配置与运行记录", async ({ pa
 
 test("移动端新建页面和资产类型选择没有横向溢出", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#/contacts/new");
+  await page.goto("#/companies/company-xinglan/contacts/new");
   await expectNoHorizontalOverflow(page);
   await page.goto("#/opportunities/new");
   await expectNoHorizontalOverflow(page);

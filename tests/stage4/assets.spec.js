@@ -39,7 +39,7 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
     "收藏夹",
   ]) {
     await expect(
-      page.getByRole("button", { name: filter, exact: true }),
+      page.getByRole("main").getByRole("button", { name: filter, exact: true }),
     ).toBeVisible();
   }
   await expect(page.getByLabel("职位筛选")).toBeVisible();
@@ -138,7 +138,10 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
   ).toBeVisible();
   await expect(page.getByText("赵星羽")).toHaveCount(0);
 
-  await page.getByRole("button", { name: "公司" }).click();
+  await page
+    .getByRole("main")
+    .getByRole("button", { name: "公司", exact: true })
+    .click();
   await page
     .locator(".s4-select-panel")
     .getByRole("button", { name: "拓界机器人" })
@@ -857,11 +860,13 @@ test("时间相关字段统一使用单触发框时间选择器", async ({ page 
   await page.keyboard.press("Escape");
   await experienceEditor.getByRole("button", { name: "取消" }).click();
 
-  await page.goto("#/contacts/contact-chenyu?tab=timeline");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=timeline",
+  );
   await page.getByRole("button", { name: "添加沟通记录" }).click();
   const contactEditor = page.getByRole("dialog", { name: "添加沟通记录" });
   await contactEditor
-    .getByRole("button", { name: /选择发生时间：2026-08-21 14:30/ })
+    .getByRole("button", { name: /选择发生时间：2026-09-07 14:30/ })
     .click();
   const dateTimePicker = page.getByRole("dialog", {
     name: "选择发生时间时间选择器",
@@ -870,7 +875,7 @@ test("时间相关字段统一使用单触发框时间选择器", async ({ page 
   await dateTimePicker.getByRole("button", { name: "16:00" }).click();
   await expect(
     contactEditor.getByRole("button", {
-      name: /选择发生时间：2026-08-21 16:00/,
+      name: /选择发生时间：2026-09-07 16:00/,
     }),
   ).toBeVisible();
 
@@ -1148,7 +1153,9 @@ test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", as
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "执行前确认" })).toBeVisible();
 
-  await page.goto("#/contacts/contact-chenyu?tab=timeline");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=timeline",
+  );
   await page.getByRole("button", { name: "添加沟通记录" }).click();
   await page.getByLabel("沟通内容").fill("客户确认下周安排候选人技术面。 ");
   await page.getByRole("button", { name: "保存" }).click();
@@ -1398,7 +1405,7 @@ test("所有业务资产的同组标签保持统一间距", async ({ page }) => 
     "#/candidates",
     "#/positions",
     "#/companies",
-    "#/contacts",
+    "#/companies/company-xinglan?tab=contacts",
     "#/papers",
     "#/patents",
   ]) {

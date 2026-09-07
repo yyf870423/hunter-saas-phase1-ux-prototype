@@ -11,7 +11,6 @@ export const navSections = [
     label: "招聘资产",
     items: [
       { id: "companies", label: "公司", icon: "building" },
-      { id: "contacts", label: "联系人", icon: "users" },
       { id: "opportunities", label: "招聘机会", icon: "sparkles" },
       { id: "positions", label: "岗位", icon: "briefcase" },
     ],

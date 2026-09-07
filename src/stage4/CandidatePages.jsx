@@ -54,6 +54,8 @@ import {
   positionDetail,
 } from "./data";
 
+import { AssetRelatedTasks } from "./AssetRelatedTasks";
+
 const candidateTabs = [
   { value: "profile", label: "候选人资料" },
   { value: "experience", label: "工作与教育" },
@@ -62,6 +64,7 @@ const candidateTabs = [
   { value: "matching", label: "匹配与推进" },
   { value: "relations", label: "关联信息" },
   { value: "contact-path", label: "联系路径" },
+  { value: "work", label: "关联任务" },
 ];
 
 const academicRelationNames = [
@@ -830,20 +833,28 @@ function ProfileTab({
               <Icon name="phone" />
             </i>
             <span>
-              <b>{candidate.phone}</b>
-              <small>主要手机 · 2026-08-18 核实</small>
+              <b>{candidate.phone || "未提供"}</b>
+              <small>
+                {candidate.phone ? "主要手机 · 2026-08-18 核实" : "主要手机"}
+              </small>
             </span>
-            <StatusBadge tone="success">可用</StatusBadge>
+            <StatusBadge tone={candidate.phone ? "success" : "neutral"}>
+              {candidate.phone ? "可用" : "待补充"}
+            </StatusBadge>
           </article>
           <article>
             <i>
               <Icon name="mail" />
             </i>
             <span>
-              <b>{candidate.email}</b>
-              <small>主要邮箱 · 简历提供</small>
+              <b>{candidate.email || "未提供"}</b>
+              <small>
+                {candidate.email ? "主要邮箱 · 简历提供" : "主要邮箱"}
+              </small>
             </span>
-            <StatusBadge tone="success">已回复</StatusBadge>
+            <StatusBadge tone={candidate.email ? "success" : "neutral"}>
+              {candidate.email ? "已回复" : "待补充"}
+            </StatusBadge>
           </article>
         </div>
       </FieldGroup>
@@ -1553,14 +1564,6 @@ function TimelineTab({ candidate }) {
               label="选择发生时间"
               mode="datetime"
               value="2026-08-21 14:30"
-              onChange={() => {}}
-            />
-          </FormField>
-          <FormField label="关联业务">
-            <SelectMenu
-              label="可选"
-              value="具身智能 VLA 算法负责人"
-              options={["具身智能 VLA 算法负责人", "星澜机器人客户开发"]}
               onChange={() => {}}
             />
           </FormField>
@@ -2543,6 +2546,9 @@ export function CandidateDetailPage() {
         />
       ) : null}
       {tab === "contact-path" ? <ContactPathTab /> : null}
+      {tab === "work" ? (
+        <AssetRelatedTasks assetType="candidate" assetId={candidateId} />
+      ) : null}
       <CandidateAiStartModal
         open={aiState === "setup"}
         close={() => setAiState("idle")}

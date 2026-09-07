@@ -44,7 +44,6 @@ export function AssetAiProcessBanner({
   title,
   description,
   target,
-  work,
   onDetails,
   onPrimary,
   primaryLabel,
@@ -67,10 +66,7 @@ export function AssetAiProcessBanner({
           <StatusBadge tone={meta.tone}>{meta.label}</StatusBadge>
         </header>
         <p>{description}</p>
-        <small>
-          处理对象：{target}
-          {work ? ` · 关联任务：${work}` : ""}
-        </small>
+        <small>处理对象：{target}</small>
       </div>
       <footer>
         <Button size="sm" onClick={onDetails}>
@@ -120,7 +116,6 @@ export function AssetAiProcessDrawer({
   open,
   close,
   record,
-  onOpenWork,
   onPrimary,
   primaryLabel,
 }) {
@@ -157,22 +152,6 @@ export function AssetAiProcessDrawer({
               ["最近更新", record.updatedAt],
             ]}
           />
-          {record.work ? (
-            <button
-              type="button"
-              className="s4-ai-process-work-link"
-              onClick={onOpenWork}
-            >
-              <i>
-                <Icon name="route" />
-              </i>
-              <span>
-                <small>关联任务</small>
-                <b>{record.work}</b>
-              </span>
-              <Icon name="chevronRight" />
-            </button>
-          ) : null}
         </section>
 
         <section>

@@ -252,7 +252,7 @@ test("全局状态标签的圆点与文字始终保持同一行", async ({ page 
     "#/positions/position-vla?tab=matching",
     "#/companies",
     "#/companies/company-xinglan",
-    "#/contacts/contact-chenyu",
+    "#/companies/company-xinglan/contacts/contact-chenyu",
     "#/opportunities/opportunity-xinglan",
     "#/mappings",
     "#/mappings/mapping-embodied?tab=overview",

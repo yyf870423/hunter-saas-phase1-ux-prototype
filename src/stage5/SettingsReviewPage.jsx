@@ -15,6 +15,11 @@ const groups = [
       ],
       ["通知", "/settings/notifications", "站内、邮件、强制通知和摘要频率"],
       [
+        "导航",
+        "/settings/navigation",
+        "平铺资产、其他入口、恢复默认和浏览器记忆",
+      ],
+      [
         "联系邮箱未验证",
         "/settings/notifications?state=limited",
         "邮件渠道禁用和恢复操作",
@@ -80,6 +85,11 @@ const groups = [
         "页面骨架和稳定布局",
       ],
       ["个人资料读取失败", "/settings/profile?state=error", "原因、影响和重试"],
+      [
+        "导航设置受限",
+        "/settings/navigation?state=permission-limited",
+        "保留当前偏好，禁止修改",
+      ],
       [
         "连接读取失败",
         "/settings/connections?state=error",

@@ -34,6 +34,7 @@ import {
   useToast,
 } from "./asset-ui";
 import { candidates, landscapes, papers, patents } from "./data";
+import { AssetRelatedTasks } from "./AssetRelatedTasks";
 
 export function MappingsListPage() {
   const navigate = useNavigate();
@@ -172,7 +173,6 @@ const mappingTabs = [
   { value: "organization", label: "组织与方向" },
   { value: "people", label: "人物与关系" },
   { value: "updates", label: "更新与审核", count: 3 },
-  { value: "business", label: "相关业务" },
 ];
 
 const initialMappingTargets = [
@@ -702,131 +702,6 @@ function LandscapeUpdates() {
   );
 }
 
-function LandscapeBusiness() {
-  const navigate = useNavigate();
-  const notify = useToast();
-  const [editOpen, setEditOpen] = useState(false);
-  const [positionLinks, setPositionLinks] = useState([
-    "具身智能 VLA 算法负责人",
-    "机器人数据平台负责人",
-  ]);
-  const [workstreamLinks, setWorkstreamLinks] = useState([
-    "具身智能 VLA 人才摸排",
-  ]);
-  return (
-    <div className="s4-detail-stack">
-      <FieldGroup
-        title="关联岗位"
-        action={
-          <Button size="sm" icon="edit" onClick={() => setEditOpen(true)}>
-            编辑关联
-          </Button>
-        }
-      >
-        <div className="s4-entity-grid">
-          {positionLinks.map((position) => (
-            <EntityLink
-              icon="briefcase"
-              title={position}
-              meta={
-                position === "具身智能 VLA 算法负责人"
-                  ? "用于候选人范围扩展和关系路径"
-                  : "用于数据闭环方向人才摸排"
-              }
-              key={position}
-              onClick={() =>
-                navigate(
-                  position === "具身智能 VLA 算法负责人"
-                    ? "/positions/position-vla"
-                    : "/positions/position-platform",
-                )
-              }
-            />
-          ))}
-        </div>
-      </FieldGroup>
-      <FieldGroup title="关联任务">
-        {workstreamLinks.map((workstream) => (
-          <EntityLink
-            icon="route"
-            title={workstream}
-            meta="运行中 · 3 项目标正在推进"
-            key={workstream}
-            onClick={() => navigate("/tasks/mapping-embodied")}
-          />
-        ))}
-      </FieldGroup>
-      <FieldGroup title="复用记录">
-        <div className="s4-task-records s4-mapping-reuse-records">
-          <article>
-            <i>
-              <Icon name="users" />
-            </i>
-            <span>
-              <b>岗位找人复用</b>
-              <small>今天 09:40 · 具身智能 VLA 算法负责人</small>
-              <p>从 37 位人才中筛出 11 位候选范围，并结合其他渠道完成匹配。</p>
-            </span>
-            <StatusBadge tone="success">已使用</StatusBadge>
-          </article>
-        </div>
-      </FieldGroup>
-      <Modal
-        open={editOpen}
-        close={() => setEditOpen(false)}
-        size="lg"
-        title="编辑相关业务"
-        description="这里只维护知识图谱与现有业务资产的关联，不复制岗位或任务。"
-        footer={
-          <>
-            <Button onClick={() => setEditOpen(false)}>取消</Button>
-            <Button
-              tone="primary"
-              onClick={() => {
-                setEditOpen(false);
-                notify("相关业务关联已更新");
-              }}
-            >
-              保存关联
-            </Button>
-          </>
-        }
-      >
-        <div className="s4-form-grid">
-          <FormField label="关联岗位" span={2}>
-            <SelectMenu
-              label="选择关联岗位"
-              value={positionLinks}
-              options={[
-                "具身智能 VLA 算法负责人",
-                "机器人数据平台负责人",
-                "运动控制算法专家",
-              ]}
-              onChange={setPositionLinks}
-              multiple
-              searchable
-            />
-          </FormField>
-          <FormField label="关联任务" span={2}>
-            <SelectMenu
-              label="选择任务"
-              value={workstreamLinks}
-              options={[
-                "具身智能 VLA 人才摸排",
-                "星澜机器人客户开发",
-                "具身智能 VLA 算法负责人招聘",
-              ]}
-              onChange={setWorkstreamLinks}
-              multiple
-              searchable
-            />
-          </FormField>
-        </div>
-      </Modal>
-    </div>
-  );
-}
-
 function MappingEditModal({ open, profile, close, onSave }) {
   const [name, setName] = useState(profile.name);
   const [goal, setGoal] = useState(profile.goal);
@@ -902,7 +777,9 @@ export function MappingDetailPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") || "overview";
+  const tab = mappingTabs.some((item) => item.value === params.get("tab"))
+    ? params.get("tab")
+    : "overview";
   const item = landscapes.find((mapping) => mapping.id === mappingId);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -953,7 +830,6 @@ export function MappingDetailPage() {
       ) : null}
       {tab === "people" ? <LandscapeGraphTab kind="people" /> : null}
       {tab === "updates" ? <LandscapeUpdates /> : null}
-      {tab === "business" ? <LandscapeBusiness /> : null}
       <MappingEditModal
         open={editOpen}
         profile={profile}
@@ -2008,6 +1884,7 @@ export function PaperDetailPage() {
           </div>
           <SourceList items={item.sourceRecords} />
         </FieldGroup>
+        <AssetRelatedTasks assetType="paper" assetId={paperId} />
       </div>
       {identityPerson ? (
         <PersonIdentityReview
@@ -2147,6 +2024,7 @@ export function PatentDetailPage() {
             onClick={() => navigate("/mappings/mapping-candidate-relations")}
           />
         </FieldGroup>
+        <AssetRelatedTasks assetType="patent" assetId={patentId} />
       </div>
       {identityPerson ? (
         <PersonIdentityReview

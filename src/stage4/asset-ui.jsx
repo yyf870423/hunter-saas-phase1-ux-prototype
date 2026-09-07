@@ -122,11 +122,16 @@ export function FloatingPanel({
   className,
   width = 240,
   align = "start",
+  placement = "bottom",
+  gap = 6,
   role,
   ariaLabel,
+  portalTarget,
   children,
 }) {
   const [style, setStyle] = useState(null);
+  const fallbackPanelRef = useRef(null);
+  const floatingRef = panelRef || fallbackPanelRef;
   useLayoutEffect(() => {
     if (!open || !anchorRef.current) {
       setStyle(null);
@@ -136,11 +141,40 @@ export function FloatingPanel({
       const rect = anchorRef.current?.getBoundingClientRect();
       if (!rect) return;
       const viewportPadding = 8;
-      const gap = 6;
       const resolvedWidth = Math.min(
         Math.max(width, rect.width),
         window.innerWidth - viewportPadding * 2,
       );
+      if (placement === "right") {
+        const maxHeight = window.innerHeight - viewportPadding * 2;
+        const panelHeight = Math.min(
+          floatingRef.current?.getBoundingClientRect().height || 0,
+          maxHeight,
+        );
+        const preferredLeft =
+          rect.right + gap + resolvedWidth <=
+          window.innerWidth - viewportPadding
+            ? rect.right + gap
+            : rect.left - resolvedWidth - gap;
+        setStyle({
+          position: "fixed",
+          left: Math.min(
+            Math.max(viewportPadding, preferredLeft),
+            window.innerWidth - resolvedWidth - viewportPadding,
+          ),
+          top: Math.max(
+            viewportPadding,
+            Math.min(
+              rect.top,
+              window.innerHeight - panelHeight - viewportPadding,
+            ),
+          ),
+          width: resolvedWidth,
+          maxHeight,
+          zIndex: 220,
+        });
+        return;
+      }
       const preferredLeft =
         align === "end" ? rect.right - resolvedWidth : rect.left;
       const left = Math.min(
@@ -163,25 +197,37 @@ export function FloatingPanel({
       });
     };
     update();
+    const observer = placement === "right" ? new ResizeObserver(update) : null;
+    if (floatingRef.current) observer?.observe(floatingRef.current);
+    observer?.observe(anchorRef.current);
     window.addEventListener("resize", update);
     window.addEventListener("scroll", update, true);
     return () => {
+      observer?.disconnect();
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update, true);
     };
-  }, [align, anchorRef, open, width]);
-  if (!open || !style) return null;
+  }, [align, anchorRef, floatingRef, gap, open, placement, width]);
+  if (!open || (!style && placement !== "right")) return null;
   return createPortal(
     <div
-      ref={panelRef}
+      ref={floatingRef}
       className={`${className} s4-floating-panel`}
-      style={style}
+      style={
+        style || {
+          position: "fixed",
+          visibility: "hidden",
+          width,
+          maxWidth: "calc(100vw - 16px)",
+          maxHeight: "calc(100dvh - 16px)",
+        }
+      }
       role={role}
       aria-label={ariaLabel}
     >
       {children}
     </div>,
-    document.body,
+    portalTarget || document.body,
   );
 }
 
@@ -350,6 +396,28 @@ export function SelectMenu({
         ) : null}
       </FloatingPanel>
     </div>
+  );
+}
+
+export function EntitySelect({ options, value, onChange, ...props }) {
+  const choices = options.map((option) => ({
+    ...option,
+    display:
+      options.filter((item) => item.label === option.label).length > 1
+        ? `${option.label} · ${option.value}`
+        : option.label,
+  }));
+  return (
+    <SelectMenu
+      {...props}
+      options={choices.map((option) => option.display)}
+      value={choices.find((option) => option.value === value)?.display || ""}
+      onChange={(display) =>
+        onChange(
+          choices.find((option) => option.display === display)?.value || "",
+        )
+      }
+    />
   );
 }
 
@@ -1164,6 +1232,7 @@ export function DetailHeader({
   subtitle,
   badges = [],
   onBack,
+  backLabel = "返回列表",
   onEdit,
   onDelete,
   children,
@@ -1172,7 +1241,7 @@ export function DetailHeader({
     <header className="s4-detail-header">
       <button type="button" className="s4-back-button" onClick={onBack}>
         <Icon name="chevronLeft" />
-        返回列表
+        {backLabel}
       </button>
       <div className="s4-detail-title-row">
         <i>
@@ -1369,6 +1438,12 @@ export function FileDrop({
         type="button"
         className={`s4-file-drop ${error ? "has-error" : ""}`}
         onClick={() => inputRef.current?.click()}
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => {
+          event.preventDefault();
+          const dropped = Array.from(event.dataTransfer.files || []);
+          onFiles(multiple ? dropped : dropped.slice(0, 1));
+        }}
       >
         <i>
           <Icon name="upload" />
@@ -1524,15 +1599,20 @@ export function SourceList({ items, onOpen }) {
           </>
         );
         return href ? (
-          <a href={href} key={item.title} target="_blank" rel="noreferrer">
+          <a
+            href={href}
+            key={item.id || item.title}
+            target="_blank"
+            rel="noreferrer"
+          >
             {content}
           </a>
         ) : open ? (
-          <button type="button" key={item.title} onClick={open}>
+          <button type="button" key={item.id || item.title} onClick={open}>
             {content}
           </button>
         ) : (
-          <article key={item.title}>{content}</article>
+          <article key={item.id || item.title}>{content}</article>
         );
       })}
     </div>

@@ -11,7 +11,7 @@ test.beforeAll(async () => {
   await mkdir(output, { recursive: true });
 });
 
-test("岗位资料、流程、匹配与关联任务桌面视觉门禁", async ({ page }) => {
+test("岗位资料、流程、匹配与处理记录桌面视觉门禁", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 900 });
 
@@ -19,11 +19,15 @@ test("岗位资料、流程、匹配与关联任务桌面视觉门禁", async ({
     ["profile", "profile"],
     ["pipeline", "pipeline"],
     ["matching", "matching"],
-    ["work", "related-work"],
+    ["history", "history"],
   ]) {
     await page.goto(`#/positions/position-vla?tab=${tab}`);
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: `${output}/${file}.png`, fullPage: true });
+    await page.screenshot({
+      path: `${output}/${file}.png`,
+      fullPage: true,
+      animations: "disabled",
+    });
   }
 
   await page.goto("#/positions/position-vla?tab=pipeline");
@@ -133,13 +137,17 @@ test("岗位核心工作区在平板和手机上保持可操作", async ({ page 
     for (const [tab, file] of [
       ["pipeline", "pipeline"],
       ["matching", "matching"],
-      ["work", "related-work"],
+      ["history", "history"],
     ]) {
       await page.goto(`#/positions/position-vla?tab=${tab}`);
+      await page
+        .locator('.s4-detail-tabs [aria-selected="true"]')
+        .scrollIntoViewIfNeeded();
       await expectNoHorizontalOverflow(page);
       await page.screenshot({
         path: `${output}/${file}-${viewport.name}.png`,
         fullPage: true,
+        animations: "disabled",
       });
     }
   }

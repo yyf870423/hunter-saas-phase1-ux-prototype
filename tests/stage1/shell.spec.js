@@ -36,22 +36,33 @@ test("常见桌面高度下导航无需滚动", async ({ page }) => {
     scrollHeight: element.scrollHeight,
   }));
   expect(dimensions.scrollHeight).toBeLessThanOrEqual(dimensions.clientHeight);
-  await page.getByRole("button", { name: "打开业务资产" }).click();
+  await page
+    .getByRole("navigation", { name: "资产导航" })
+    .getByRole("button", { name: "其他", exact: true })
+    .click();
   await expect(
-    page.getByRole("dialog", { name: "业务资产导航" }),
+    page.getByRole("dialog", { name: "其他资产导航" }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "专利" })).toBeInViewport();
   await expect(page.getByRole("button", { name: "收起导航" })).toBeInViewport();
 });
 
-test("业务资产使用侧向面板并可直接选择", async ({ page }) => {
-  await page.getByRole("button", { name: "打开业务资产" }).click();
-  const panel = page.getByRole("dialog", { name: "业务资产导航" });
-  await expect(panel).toBeVisible();
-  await panel.getByRole("button", { name: "候选人" }).click();
-  await expect(panel).toBeHidden();
+test("常用资产直接进入，其他仅显示未平铺资产", async ({ page }) => {
+  const assets = page.getByRole("navigation", { name: "资产导航" });
+  await assets.getByRole("button", { name: "候选人", exact: true }).click();
   await expect(page).toHaveURL(/#\/candidates$/);
-  await expect(page.getByRole("heading", { name: "候选人" })).toBeVisible();
+  await assets.getByRole("button", { name: "其他", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "其他资产导航" });
+  await expect(panel).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "候选人", exact: true }),
+  ).toHaveCount(0);
+  await panel.getByRole("button", { name: "论文", exact: true }).click();
+  await expect(panel).toBeHidden();
+  await expect(page).toHaveURL(/#\/papers$/);
+  await expect(
+    page.getByRole("heading", { name: "论文", exact: true }),
+  ).toBeVisible();
 });
 
 test("通知计数使用正圆标记", async ({ page }) => {

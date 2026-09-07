@@ -25,6 +25,7 @@ export const clientEvidence = [
 export const contactReviewRows = [
   {
     id: "contact-chenyu",
+    companyId: "company-xinglan",
     name: "陈雨",
     role: "招聘负责人",
     company: "星澜机器人",
@@ -38,6 +39,7 @@ export const contactReviewRows = [
   },
   {
     id: "contact-zhouqi",
+    companyId: "company-xinglan",
     name: "周琪",
     role: "机器人算法 HRBP",
     company: "星澜机器人",
@@ -50,6 +52,7 @@ export const contactReviewRows = [
   },
   {
     id: "lead-vp-hr",
+    companyId: "company-xinglan",
     name: "人力资源副总裁线索",
     role: "具体姓名尚未确认",
     company: "星澜机器人",
@@ -62,6 +65,7 @@ export const contactReviewRows = [
   },
   {
     id: "contact-liujian",
+    companyId: "company-qicheng",
     name: "刘健",
     role: "投资经理",
     company: "启程资本",
@@ -1176,7 +1180,7 @@ export const mappingRelationshipViews = [
         label: "陈雨",
         meta: "星澜招聘负责人",
         kind: "person",
-        detailPath: "/contacts/contact-chenyu",
+        detailPath: "/companies/company-xinglan/contacts/contact-chenyu",
         detailLabel: "打开联系人详情",
         x: 270,
         y: 314,

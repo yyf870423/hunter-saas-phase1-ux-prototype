@@ -103,7 +103,9 @@ test("岗位沟通记录直接整理为面试指南并保留历史版本", async
 test("已有手机号的联系人仍可创建或更新联系路径", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("#/contacts/contact-chenyu?tab=contact-path");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path",
+  );
 
   await expect(page.getByRole("tab", { name: "联系路径" })).toBeVisible();
   await expect(page.getByText("无论是否已有手机号或邮箱")).toBeVisible();
@@ -129,7 +131,9 @@ test("已有手机号的联系人仍可创建或更新联系路径", async ({ pa
     fullPage: true,
   });
 
-  await page.goto("#/contacts/contact-chenyu?tab=contact-path&state=empty");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=empty",
+  );
   await expect(page.getByText("尚未创建联系路径")).toBeVisible();
   await page
     .getByRole("button", { name: "寻找联系路径", exact: true })
@@ -149,12 +153,16 @@ test("已有手机号的联系人仍可创建或更新联系路径", async ({ pa
 
 test("联系人联系路径提供可直接验收的运行中和失败恢复状态", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
-  await page.goto("#/contacts/contact-chenyu?tab=contact-path&state=running");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=running",
+  );
   await expect(page.getByText("正在寻找联系人路径")).toBeVisible();
   await expect(page.getByText("运行中", { exact: true })).toBeVisible();
   await expect(page.getByText("查找可执行引荐关系")).toBeVisible();
 
-  await page.goto("#/contacts/contact-chenyu?tab=contact-path&state=error");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=error",
+  );
   await expect(page.getByText("联系路径寻找失败")).toBeVisible();
   await page.getByRole("button", { name: "重新寻找" }).click();
   await expect(page.getByText("正在寻找联系人路径")).toBeVisible();
@@ -166,7 +174,7 @@ test("招聘机会触发联系路径，但完整结果保存在联系人资产",
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#/opportunities/opportunity-xinglan");
 
-  await expect(page.getByText("招聘机会只引用联系人及路径摘要")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "相关联系人" })).toBeVisible();
   await expect(page.getByText("陈雨 · 招聘负责人")).toBeVisible();
   await page.getByRole("button", { name: "寻找联系路径" }).click();
   await expect(page).toHaveURL(
@@ -185,14 +193,16 @@ test("面试资料与联系路径在手机端可操作且无横向溢出", async
   for (const url of [
     "#/positions/position-vla?tab=interview",
     "#/positions/position-vla?tab=interview&section=guide",
-    "#/contacts/contact-chenyu?tab=contact-path",
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path",
     "#/opportunities/opportunity-xinglan",
   ]) {
     await page.goto(url);
     await expectNoHorizontalOverflow(page);
   }
 
-  await page.goto("#/contacts/contact-chenyu?tab=contact-path");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path",
+  );
   await page.screenshot({
     path: `${output}/contact-path-mobile.png`,
     fullPage: true,

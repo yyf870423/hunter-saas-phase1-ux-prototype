@@ -5,6 +5,7 @@ import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
 import { Composer } from "../stage2/automation-ui";
 import {
   ActivityTimeline,
+  AssetListState,
   AssetPageHeader,
   Button,
   CustomCheckbox,
@@ -14,8 +15,11 @@ import {
   DetailHeader,
   DetailTabs,
   EntityLink,
+  EntitySelect,
   FieldGroup,
   FileDrop,
+  FilterBar,
+  Pagination,
   FormField,
   Modal,
   NotFoundState,
@@ -39,11 +43,20 @@ import {
   AssetAiReviewWorkspace,
 } from "./AssetAiProcessing";
 import { IndustryCascade } from "./CandidateFilters";
+import { ContactFiles } from "./ContactFiles";
+import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import {
+  useCompanyContacts,
+  saveContact,
+  recycleContact,
+  recycleCompany,
+  contactRoute,
+  companyContactsRoute,
+} from "./company-contact-store";
 import {
   candidates,
   companies,
   companyDetail,
-  contacts,
   opportunities,
   positions,
 } from "./data";
@@ -413,31 +426,74 @@ function CompanyRecruiting() {
   );
 }
 
-function CompanyContacts() {
+function CompanyContacts({ company }) {
   const navigate = useNavigate();
-  const [contactModal, setContactModal] = useState(false);
+  const { contacts: records } = useCompanyContacts();
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [params, setParams] = useSearchParams();
+  const state = params.get("state") || "normal";
+  const rows = records.filter(
+    (item) =>
+      item.companyId === company.id &&
+      !item.deletedAt &&
+      `${item.name} ${item.role} ${item.phone} ${item.email}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
+  );
   return (
     <div className="s4-detail-stack">
       <FieldGroup
         title="联系人"
-        description="联系人可属于多家公司；公司关系在联系人档案中维护。"
         action={
-          <Button size="sm" icon="plus" onClick={() => setContactModal(true)}>
+          <Button
+            size="sm"
+            icon="plus"
+            disabled={["limited", "permission-limited", "loading"].includes(
+              state,
+            )}
+            onClick={() => navigate(`/companies/${company.id}/contacts/new`)}
+          >
             添加联系人
           </Button>
         }
       >
-        <CompactRelationTable
-          type="contacts"
-          rows={contacts.filter((item) => item.company === "星澜机器人")}
-          onOpen={(item) => navigate(`/contacts/${item.id}`)}
+        <FilterBar
+          query={query}
+          setQuery={(value) => {
+            setQuery(value);
+            setPage(1);
+          }}
+          placeholder="搜索姓名、角色、手机或邮箱"
+          filters={[]}
         />
+        <AssetListState
+          state={state === "permission-limited" ? "limited" : state}
+          label="联系人"
+          onRetry={() => setParams({ tab: "contacts" })}
+        >
+          {rows.length && state !== "empty" ? (
+            <CompactRelationTable
+              type="contacts"
+              rows={rows.slice((page - 1) * 10, page * 10)}
+              onOpen={(item) => navigate(contactRoute(item))}
+            />
+          ) : (
+            <StateBanner
+              title={query ? "没有匹配的联系人" : "该公司暂无联系人"}
+              description={query ? "请尝试其他姓名或联系方式。" : ""}
+            />
+          )}
+          {rows.length > 10 ? (
+            <Pagination
+              page={page}
+              pages={Math.ceil(rows.length / 10)}
+              pageSize={10}
+              onChange={setPage}
+            />
+          ) : null}
+        </AssetListState>
       </FieldGroup>
-      <ContactEditor
-        open={contactModal}
-        close={() => setContactModal(false)}
-        company="星澜机器人"
-      />
     </div>
   );
 }
@@ -690,26 +746,9 @@ function CompanyMappings() {
   );
 }
 
-function CompanyRelated({ processingRecords, onOpenProcessing }) {
-  const navigate = useNavigate();
+function CompanyHistory({ processingRecords, onOpenProcessing }) {
   return (
     <div className="s4-detail-stack">
-      <FieldGroup title="关联任务">
-        <div className="s4-entity-grid">
-          <EntityLink
-            icon="route"
-            title="星澜机器人客户开发"
-            meta="等待联系人确认"
-            onClick={() => navigate("/tasks/client-xinglan")}
-          />
-          <EntityLink
-            icon="route"
-            title="星澜机器人具身智能团队招聘"
-            meta="候选人审核中"
-            onClick={() => navigate("/tasks/position-vla")}
-          />
-        </div>
-      </FieldGroup>
       <FieldGroup title="来源与变化">
         <SourceList
           items={[
@@ -907,18 +946,27 @@ export function CompanyDetailPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") || "profile";
+  const requestedTab = params.get("tab");
+  const tab = requestedTab || "profile";
   const isDraft = params.get("state") === "draft";
   const aiState = params.get("ai") || "idle";
   const aiPanel = params.get("panel") || "";
   const aiTimerRef = useRef(null);
-  const item = companies.find((company) => company.id === companyId);
+  const { contacts: companyContactRecords, deletedCompanies } =
+    useCompanyContacts();
+  const item = companies.find(
+    (company) =>
+      company.id === companyId && !deletedCompanies.includes(company.id),
+  );
   const [editingSection, setEditingSection] = useState(null);
   const [profileData, setProfileData] = useState(() => ({
     ...companyDetail,
     ...item,
   }));
   const [deleteOpen, setDeleteOpen] = useState(false);
+  useEffect(() => {
+    setProfileData({ ...companyDetail, ...item });
+  }, [companyId]);
   const updateQuery = (changes) => {
     const next = new URLSearchParams(params);
     Object.entries(changes).forEach(([key, value]) => {
@@ -975,10 +1023,17 @@ export function CompanyDetailPage() {
   const detailTabs = [
     { value: "profile", label: "公司资料" },
     { value: "recruiting", label: "招聘业务" },
-    { value: "contacts", label: "联系人", count: detail.contacts },
+    {
+      value: "contacts",
+      label: "联系人",
+      count: companyContactRecords.filter(
+        (contact) => contact.companyId === companyId && !contact.deletedAt,
+      ).length,
+    },
     { value: "talents", label: "任职人才", count: detail.talents },
     { value: "mappings", label: "公司关系" },
     { value: "work", label: "关联任务" },
+    { value: "history", label: "处理与记录" },
   ];
   const aiRecord = buildCompanyAiRecord(
     ["running", "review", "failed"].includes(aiState) ? aiState : "complete",
@@ -1103,11 +1158,16 @@ export function CompanyDetailPage() {
         />
       ) : null}
       {tab === "recruiting" ? <CompanyRecruiting /> : null}
-      {tab === "contacts" ? <CompanyContacts /> : null}
+      {tab === "contacts" ? (
+        <CompanyContacts key={companyId} company={item} />
+      ) : null}
       {tab === "talents" ? <CompanyTalents /> : null}
       {tab === "mappings" ? <CompanyMappings /> : null}
       {tab === "work" ? (
-        <CompanyRelated
+        <AssetRelatedTasks assetType="company" assetId={companyId} />
+      ) : null}
+      {tab === "history" ? (
+        <CompanyHistory
           processingRecords={processingRecords}
           onOpenProcessing={(record) =>
             updateQuery({ panel: "details", process: record.id })
@@ -1149,8 +1209,9 @@ export function CompanyDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="公司"
         assetName={profileData.name}
-        impact="联系人、招聘机会、岗位、候选人和知识图谱不会删除；原始公司文本继续保留。"
+        impact="该公司的联系人将一并进入回收站；不会删除被引用的候选人、招聘机会、岗位和任务。"
         onConfirm={() => {
+          recycleCompany(companyId);
           setDeleteOpen(false);
           notify("公司已进入回收站");
           navigate("/companies");
@@ -1203,7 +1264,7 @@ const contactPathViews = [
         kind: "person",
         x: 286,
         y: 210,
-        detailPath: "/contacts/contact-liujian",
+        detailPath: "/companies/company-qicheng/contacts/contact-liujian",
         detailLabel: "打开联系人详情",
         evidence: ["联系人档案", "公司融资关系", "沟通记录"],
       },
@@ -1230,7 +1291,8 @@ const contactPathViews = [
         kind: "person",
         x: 790,
         y: 190,
-        detailPath: "/contacts/contact-chenyu?tab=profile",
+        detailPath:
+          "/companies/company-xinglan/contacts/contact-chenyu?tab=profile",
         detailLabel: "打开联系人资料",
         evidence: ["联系人档案", "招聘机会"],
       },
@@ -1300,7 +1362,7 @@ const contactPathViews = [
   },
 ];
 
-function ContactPathTab({ initialState = "ready", autoOpen = false }) {
+function ContactPathTab({ contact, initialState = "ready", autoOpen = false }) {
   const notify = useToast();
   const [status, setStatus] = useState(initialState);
   const [activeStep, setActiveStep] = useState(
@@ -1312,6 +1374,51 @@ function ContactPathTab({ initialState = "ready", autoOpen = false }) {
   );
   const timerRef = useRef([]);
   const generated = status === "ready";
+  const views =
+    contact.id === "contact-chenyu"
+      ? contactPathViews
+      : [
+          {
+            ...contactPathViews[0],
+            description: `${contact.name}的联系路径`,
+            summary: "根据当前公司联系人资料整理",
+            nodes: contactPathViews[0].nodes
+              .filter((node) =>
+                ["contact-path-me", "contact-path-target"].includes(node.id),
+              )
+              .map((node) =>
+                node.id === "contact-path-target"
+                  ? {
+                      ...node,
+                      label: contact.name,
+                      meta: `${contact.company} · ${contact.role}`,
+                      summary:
+                        contact.phone || contact.email || "尚无直接联系方式",
+                      detailPath: contactRoute(contact),
+                      evidence: ["公司联系人资料"],
+                    }
+                  : {
+                      ...node,
+                      summary: "当前 Hunter 用户",
+                      evidence: ["用户账号"],
+                    },
+              ),
+            edges:
+              contact.phone || contact.email
+                ? [
+                    {
+                      id: "direct-contact",
+                      source: "contact-path-me",
+                      target: "contact-path-target",
+                      label: "已有联系方式",
+                      status: "待核实",
+                      tone: "warning",
+                      evidence: ["公司联系人资料"],
+                    },
+                  ]
+                : [],
+          },
+        ];
   useEffect(() => {
     setStatus(initialState);
     setActiveStep(initialState === "running" ? 2 : 0);
@@ -1337,8 +1444,13 @@ function ContactPathTab({ initialState = "ready", autoOpen = false }) {
     });
     timerRef.current.push(
       window.setTimeout(() => {
-        setStatus("ready");
-        notify(updating ? "联系路径已更新" : "联系路径已生成");
+        try {
+          saveContact(contact.companyId, { pathReady: true }, contact.id);
+          setStatus("ready");
+          notify(updating ? "联系路径已更新" : "联系路径已生成");
+        } catch {
+          setStatus("error");
+        }
       }, 2800),
     );
   };
@@ -1390,12 +1502,24 @@ function ContactPathTab({ initialState = "ready", autoOpen = false }) {
           />
         ) : generated ? (
           <RelationshipCanvas
-            views={contactPathViews}
+            views={views.map((view) => ({
+              ...view,
+              nodes: view.nodes.map((node) =>
+                node.id === "contact-path-target"
+                  ? {
+                      ...node,
+                      label: contact.name,
+                      meta: `${contact.company} · ${contact.role}`,
+                      detailPath: contactRoute(contact),
+                    }
+                  : node,
+              ),
+            }))}
             decisions={{}}
             onDecision={() => {}}
             editable
             draggable
-            storageKey="hunter-prototype-contact-chenyu-contact-path"
+            storageKey={`hunter-prototype-${contact.companyId}-${contact.id}-contact-path`}
           />
         ) : (
           <RelationshipAiEmptyState
@@ -1421,121 +1545,6 @@ function ContactPathTab({ initialState = "ready", autoOpen = false }) {
   );
 }
 
-function ContactEditor({ open, close, company = "" }) {
-  const notify = useToast();
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [categories, setCategories] = useState(["客户 HR"]);
-  const [submitted, setSubmitted] = useState(false);
-  const save = () => {
-    setSubmitted(true);
-    if (!name.trim() || (!phone.trim() && !email.trim() && !company)) return;
-    close();
-    notify("联系人已保存");
-  };
-  return (
-    <Modal
-      open={open}
-      close={close}
-      size="xl"
-      title={name ? "编辑联系人" : "添加联系人"}
-      description="联系人可以属于多家公司；只有姓名不能形成正式联系人"
-      footer={
-        <>
-          <Button onClick={close}>取消</Button>
-          <Button tone="primary" onClick={save}>
-            保存联系人
-          </Button>
-        </>
-      }
-    >
-      <div className="s4-form-grid">
-        <FormField
-          label="姓名或明确称呼"
-          required
-          error={submitted && !name.trim() ? "请输入姓名或明确称呼" : ""}
-        >
-          <TextInput value={name} onChange={setName} placeholder="例如：陈雨" />
-        </FormField>
-        <FormField label="类别" required>
-          <SelectMenu
-            label="选择类别"
-            value={categories}
-            options={[
-              "客户 HR",
-              "招聘负责人",
-              "投资人",
-              "顾问",
-              "中间介绍人",
-              "行业关系人",
-            ]}
-            onChange={setCategories}
-            multiple
-          />
-        </FormField>
-        <FormField label="手机">
-          <TextInput value={phone} onChange={setPhone} />
-        </FormField>
-        <FormField label="邮箱">
-          <TextInput value={email} onChange={setEmail} />
-        </FormField>
-        <FormField label="所在地区">
-          <TextInput value="" onChange={() => {}} />
-        </FormField>
-        <FormField label="用户备注">
-          <TextInput value="" onChange={() => {}} />
-        </FormField>
-      </div>
-      <section className="s4-subform">
-        <header>
-          <span>
-            <h3>公司关系</h3>
-            <p>可添加多条当前或历史关系，并设置一个主要归属。</p>
-          </span>
-          <Button
-            size="sm"
-            icon="plus"
-            onClick={() => notify("已增加一条空公司关系")}
-          >
-            添加关系
-          </Button>
-        </header>
-        <div className="s4-company-relation-row">
-          <SelectMenu
-            label="选择公司"
-            value={company}
-            options={["星澜机器人", "拓界机器人", "启程资本"]}
-            onChange={() => {}}
-            searchable
-          />
-          <TextInput
-            value="招聘负责人"
-            onChange={() => {}}
-            placeholder="职位或角色"
-            ariaLabel="公司关系中的职位或角色"
-          />
-          <SelectMenu
-            label="关系状态"
-            value="当前"
-            options={["当前", "历史"]}
-            onChange={() => {}}
-          />
-          <CustomCheckbox checked onChange={() => {}} label="主要归属" />
-        </div>
-      </section>
-      {submitted && !phone.trim() && !email.trim() && !company ? (
-        <StateBanner
-          tone="danger"
-          icon="warning"
-          title="身份信息不足"
-          description="请补充手机、邮箱、已确认公司关系或其他足以区分身份的信息。"
-        />
-      ) : null}
-    </Modal>
-  );
-}
-
 function ContactSectionEditor({ section, contact, close, onSave }) {
   const notify = useToast();
   const [name, setName] = useState(contact.name);
@@ -1543,10 +1552,12 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
   const [categories, setCategories] = useState(contact.categories);
   const [phone, setPhone] = useState(contact.phone);
   const [email, setEmail] = useState(contact.email);
-  const [company, setCompany] = useState(contact.company);
+  const [note, setNote] = useState(contact.note || "");
   const [role, setRole] = useState(contact.role);
-  const [relationStatus, setRelationStatus] = useState("当前");
-  const [primary, setPrimary] = useState(true);
+  const [relationStatus, setRelationStatus] = useState(
+    contact.relationStatus || "当前",
+  );
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setName(contact.name);
@@ -1554,20 +1565,24 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
     setCategories(contact.categories);
     setPhone(contact.phone);
     setEmail(contact.email);
-    setCompany(contact.company);
+    setNote(contact.note || "");
     setRole(contact.role);
-    setRelationStatus("当前");
-    setPrimary(true);
+    setRelationStatus(contact.relationStatus || "当前");
+    setError("");
   }, [contact, section]);
 
   const save = () => {
-    onSave(
-      section === "basic"
-        ? { name, region, categories, phone, email }
-        : { company, role },
-    );
-    close();
-    notify(section === "basic" ? "联系人基本资料已保存" : "公司关系已保存");
+    try {
+      onSave(
+        section === "basic"
+          ? { name, region, categories, phone, email, note }
+          : { role, relationStatus },
+      );
+      close();
+      notify(section === "basic" ? "联系人基本资料已保存" : "任职信息已保存");
+    } catch (failure) {
+      setError(failure.message);
+    }
   };
 
   return (
@@ -1575,7 +1590,7 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
       open={Boolean(section)}
       close={close}
       size="lg"
-      title={section === "basic" ? "编辑联系人资料" : "编辑公司关系"}
+      title={section === "basic" ? "编辑联系人资料" : "编辑任职信息"}
       description="本次修改只影响当前资料分组"
       footer={
         <>
@@ -1590,6 +1605,7 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
         </>
       }
     >
+      {error ? <StateBanner tone="danger" title={error} /> : null}
       {section === "basic" ? (
         <div className="s4-form-grid s4-contact-profile-editor-grid">
           <FormField label="姓名或明确称呼" required>
@@ -1620,17 +1636,14 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
           <FormField label="邮箱">
             <TextInput value={email} onChange={setEmail} />
           </FormField>
+          <FormField label="用户备注" span={2}>
+            <TextArea value={note} onChange={setNote} />
+          </FormField>
         </div>
       ) : (
         <div className="s4-form-grid s4-contact-relation-editor-grid">
-          <FormField label="正式公司">
-            <SelectMenu
-              label="选择公司"
-              value={company}
-              options={companies.map((item) => item.name)}
-              onChange={setCompany}
-              searchable
-            />
+          <FormField label="所属公司">
+            <TextInput value={contact.company} disabled />
           </FormField>
           <FormField label="职位或角色">
             <TextInput value={role} onChange={setRole} />
@@ -1643,13 +1656,6 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
               onChange={setRelationStatus}
             />
           </FormField>
-          <FormField label="主要归属">
-            <CustomCheckbox
-              checked={primary}
-              onChange={setPrimary}
-              label="作为联系人默认展示的公司"
-            />
-          </FormField>
         </div>
       )}
     </Modal>
@@ -1657,52 +1663,63 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
 }
 
 export function ContactDetailPage() {
-  const { contactId } = useParams();
+  const { companyId, contactId } = useParams();
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") || "profile";
-  const item = contacts.find((contact) => contact.id === contactId);
+  const requestedTab = params.get("tab");
+  const tab = ["business", "related"].includes(requestedTab)
+    ? "profile"
+    : requestedTab || "profile";
+  const { contacts: records, deletedCompanies } = useCompanyContacts();
+  const item = records.find(
+    (contact) =>
+      contact.id === contactId &&
+      contact.companyId === companyId &&
+      !contact.deletedAt &&
+      !deletedCompanies.includes(companyId),
+  );
   const [editingSection, setEditingSection] = useState(null);
-  const [profile, setProfile] = useState(() => ({ ...item }));
+  const profile = item;
+  const [candidateOpen, setCandidateOpen] = useState(false);
+  const [candidateId, setCandidateId] = useState("");
   const [noteOpen, setNoteOpen] = useState(false);
   const [note, setNote] = useState("");
   const [editingNote, setEditingNote] = useState(null);
   const [deleteNote, setDeleteNote] = useState(null);
-  const [timeline, setTimeline] = useState([
-    [
-      "昨天 18:20",
-      "邮件回复",
-      "确认 VLA 负责人岗位仍在招聘，希望先看 3 位高匹配候选人。",
-      item?.email || item?.name,
-    ],
-    [
-      "08-19 10:30",
-      "电话沟通",
-      "客户更关注真机数据闭环，纯研究背景优先级较低。",
-      "沈岚",
-    ],
-    ["08-12 14:10", "人工备注", "由启程资本刘健引荐，已完成首次沟通。", "沈岚"],
-  ]);
+  const [noteTime, setNoteTime] = useState("2026-09-07 14:30");
+  const [noteError, setNoteError] = useState("");
+  const timeline = item?.timeline || [];
+  const setTimeline = (update) =>
+    saveContact(
+      companyId,
+      { timeline: update(timeline), lastContact: "刚刚" },
+      contactId,
+    );
   const [deleteOpen, setDeleteOpen] = useState(false);
   if (!item)
     return (
-      <NotFoundState label="联系人" onBack={() => navigate("/contacts")} />
+      <NotFoundState
+        label="该公司下的联系人"
+        onBack={() => navigate(companyContactsRoute(companyId))}
+      />
     );
   const contactTabs = [
     { value: "profile", label: "联系人资料" },
     { value: "timeline", label: "跟进与沟通" },
+    { value: "files", label: "文件", count: (profile.files || []).length },
     { value: "contact-path", label: "联系路径" },
-    { value: "business", label: "相关业务" },
+    { value: "work", label: "关联任务" },
   ];
   return (
     <div className="s4-detail-page">
       <DetailHeader
         icon="user"
         title={profile.name}
+        backLabel="返回公司联系人"
         subtitle={`${profile.company} · ${profile.role}`}
         badges={profile.categories.map((label) => ({ label, tone: "info" }))}
-        onBack={() => navigate("/contacts")}
+        onBack={() => navigate(companyContactsRoute(companyId))}
         onDelete={() => setDeleteOpen(true)}
       >
         <Button
@@ -1739,18 +1756,19 @@ export function ContactDetailPage() {
                 ["手机", profile.phone || "—"],
                 ["邮箱", profile.email || "—"],
                 ["最近沟通", profile.lastContact],
+                ["用户备注", profile.note || "—"],
               ]}
             />
           </FieldGroup>
           <FieldGroup
-            title="公司关系"
+            title="所属公司"
             action={
               <Button
                 size="sm"
                 icon="edit"
                 onClick={() => setEditingSection("company")}
               >
-                编辑公司关系
+                编辑任职信息
               </Button>
             }
           >
@@ -1758,44 +1776,51 @@ export function ContactDetailPage() {
               <article>
                 <span>
                   <b>{profile.company}</b>
-                  <small>{profile.role} · 当前</small>
+                  <small>
+                    {profile.role} · {profile.relationStatus}
+                  </small>
                 </span>
-                <StatusBadge tone="success">主要归属</StatusBadge>
+                <StatusBadge tone="success">公司联系人</StatusBadge>
                 <button
                   type="button"
-                  onClick={() => navigate("/companies/company-xinglan")}
+                  onClick={() => navigate(`/companies/${companyId}`)}
                 >
                   查看公司
                 </button>
               </article>
-              {profile.id === "contact-liujian" ? (
-                <article>
-                  <span>
-                    <b>远望创投</b>
-                    <small>投资经理 · 历史</small>
-                  </span>
-                  <StatusBadge tone="neutral">历史关系</StatusBadge>
-                  <button
-                    type="button"
-                    onClick={() => notify("远望创投公司资料尚未建立")}
-                  >
-                    查看公司
-                  </button>
-                </article>
-              ) : null}
             </div>
           </FieldGroup>
           <FieldGroup title="候选人身份关系">
             <StateBanner
-              title="当前未关联候选人档案"
-              description="联系人身份和候选人业务档案彼此独立；确认是同一自然人后只建立身份关系。"
+              title={
+                profile.candidateId
+                  ? candidates.find(
+                      (candidate) => candidate.id === profile.candidateId,
+                    )?.name
+                  : "当前未关联候选人档案"
+              }
               action={
-                <Button
-                  size="sm"
-                  onClick={() => notify("已打开候选人身份查找")}
-                >
-                  查找候选人
-                </Button>
+                <>
+                  {profile.candidateId ? (
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        navigate(`/candidates/${profile.candidateId}`)
+                      }
+                    >
+                      查看候选人
+                    </Button>
+                  ) : null}
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setCandidateId(profile.candidateId || "");
+                      setCandidateOpen(true);
+                    }}
+                  >
+                    {profile.candidateId ? "修改关联" : "关联候选人"}
+                  </Button>
+                </>
               }
             />
           </FieldGroup>
@@ -1805,7 +1830,6 @@ export function ContactDetailPage() {
         <div className="s4-detail-stack">
           <FieldGroup
             title="跟进与沟通"
-            description="真实沟通只保存一次；公司、机会和关联任务通过引用显示。"
             action={
               <Button
                 size="sm"
@@ -1813,6 +1837,7 @@ export function ContactDetailPage() {
                 onClick={() => {
                   setEditingNote(null);
                   setNote("");
+                  setNoteError("");
                   setNoteOpen(true);
                 }}
               >
@@ -1820,20 +1845,41 @@ export function ContactDetailPage() {
               </Button>
             }
           >
-            <ActivityTimeline
-              items={timeline}
-              onEdit={(entry, index) => {
-                setEditingNote(index);
-                setNote(entry[2]);
-                setNoteOpen(true);
-              }}
-              onDelete={(_, index) => setDeleteNote(index)}
-            />
+            {timeline.length ? (
+              <ActivityTimeline
+                items={timeline}
+                onEdit={(index) => {
+                  const entry = timeline[index];
+                  setEditingNote(index);
+                  setNote(entry[2]);
+                  setNoteTime(entry[0]);
+                  setNoteError("");
+                  setNoteOpen(true);
+                }}
+                onDelete={(index) => setDeleteNote(index)}
+              />
+            ) : (
+              <StateBanner title="暂无沟通记录" />
+            )}
           </FieldGroup>
         </div>
       ) : null}
+      {tab === "files" ? (
+        <div className="s4-detail-stack">
+          <ContactFiles key={contactId} contact={profile} />
+        </div>
+      ) : null}
+      {tab === "work" ? (
+        <AssetRelatedTasks
+          assetType="contact"
+          assetId={contactId}
+          companyId={companyId}
+        />
+      ) : null}
       {tab === "contact-path" ? (
         <ContactPathTab
+          key={contactId}
+          contact={profile}
           initialState={
             params.get("state") === "empty"
               ? "idle"
@@ -1841,37 +1887,55 @@ export function ContactDetailPage() {
                 ? "running"
                 : params.get("state") === "error"
                   ? "error"
-                  : "ready"
+                  : profile.pathReady || contactId === "contact-chenyu"
+                    ? "ready"
+                    : "idle"
           }
           autoOpen={params.get("action") === "find"}
         />
-      ) : null}
-      {tab === "business" ? (
-        <div className="s4-detail-stack">
-          <FieldGroup title="招聘机会">
-            <EntityLink
-              icon="signal"
-              title="星澜机器人具身智能团队扩张"
-              meta="跟进中 · 4 个方向"
-              onClick={() => navigate("/opportunities/opportunity-xinglan")}
-            />
-          </FieldGroup>
-          <FieldGroup title="关联任务">
-            <EntityLink
-              icon="route"
-              title="星澜机器人客户开发"
-              meta="等待联系人确认"
-              onClick={() => navigate("/tasks/client-xinglan")}
-            />
-          </FieldGroup>
-        </div>
       ) : null}
       <ContactSectionEditor
         section={editingSection}
         contact={profile}
         close={() => setEditingSection(null)}
-        onSave={(patch) => setProfile((current) => ({ ...current, ...patch }))}
+        onSave={(patch) => saveContact(companyId, patch, contactId)}
       />
+      <Modal
+        open={candidateOpen}
+        close={() => setCandidateOpen(false)}
+        title="关联候选人"
+        footer={
+          <>
+            <Button onClick={() => setCandidateOpen(false)}>取消</Button>
+            <Button
+              tone="primary"
+              onClick={() => {
+                saveContact(companyId, { candidateId }, contactId);
+                setCandidateOpen(false);
+                notify(candidateId ? "候选人身份已关联" : "候选人关联已解除");
+              }}
+            >
+              保存关联
+            </Button>
+          </>
+        }
+      >
+        <FormField label="候选人">
+          <EntitySelect
+            label="选择候选人"
+            value={candidateId}
+            options={[
+              { value: "", label: "不关联" },
+              ...candidates.map((candidate) => ({
+                value: candidate.id,
+                label: `${candidate.name} · ${candidate.company}`,
+              })),
+            ]}
+            onChange={setCandidateId}
+            searchable
+          />
+        </FormField>
+      </Modal>
       <Modal
         open={noteOpen}
         close={() => setNoteOpen(false)}
@@ -1883,13 +1947,16 @@ export function ContactDetailPage() {
             <Button
               tone="primary"
               onClick={() => {
-                if (!note.trim()) return;
+                if (!note.trim()) {
+                  setNoteError("请输入沟通内容");
+                  return;
+                }
                 setTimeline((current) =>
                   editingNote === null
-                    ? [["刚刚", "人工备注", note, "沈岚"], ...current]
+                    ? [[noteTime, "人工备注", note, "沈岚"], ...current]
                     : current.map((entry, index) =>
                         index === editingNote
-                          ? [entry[0], entry[1], note, entry[3]]
+                          ? [noteTime, entry[1], note, entry[3]]
                           : entry,
                       ),
                 );
@@ -1909,11 +1976,11 @@ export function ContactDetailPage() {
             <DatePicker
               label="选择发生时间"
               mode="datetime"
-              value="2026-08-21 14:30"
-              onChange={() => {}}
+              value={noteTime}
+              onChange={setNoteTime}
             />
           </FormField>
-          <FormField label="沟通内容" span={2}>
+          <FormField label="沟通内容" required error={noteError} span={2}>
             <TextArea value={note} onChange={setNote} rows={5} />
           </FormField>
         </div>
@@ -1953,11 +2020,12 @@ export function ContactDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="联系人"
         assetName={profile.name}
-        impact="公司、招聘机会和关联任务不会删除；真实沟通作为历史引用保留。"
+        impact="仅删除该公司下的联系人记录；其他公司的同名联系人和关联候选人不会删除。"
         onConfirm={() => {
+          recycleContact(contactId);
           setDeleteOpen(false);
           notify("联系人已进入回收站");
-          navigate("/contacts");
+          navigate(companyContactsRoute(companyId));
         }}
       />
     </div>
@@ -1965,6 +2033,11 @@ export function ContactDetailPage() {
 }
 
 export function ContactCreatePage() {
+  const { companyId } = useParams();
+  const { deletedCompanies } = useCompanyContacts();
+  const company = companies.find(
+    (item) => item.id === companyId && !deletedCompanies.includes(companyId),
+  );
   const navigate = useNavigate();
   const notify = useToast();
   const [name, setName] = useState("");
@@ -1973,42 +2046,93 @@ export function ContactCreatePage() {
   const [region, setRegion] = useState("");
   const [note, setNote] = useState("");
   const [categories, setCategories] = useState(["客户 HR"]);
-  const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
   const [relationStatus, setRelationStatus] = useState("当前");
-  const [primary, setPrimary] = useState(true);
+  const [candidateId, setCandidateId] = useState("");
+  const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const linkedCandidate = candidates.find(
+    (candidate) => candidate.id === candidateId,
+  );
+  const contactData = linkedCandidate
+    ? {
+        name: linkedCandidate.name,
+        phone: linkedCandidate.phone,
+        email: linkedCandidate.email,
+        region: linkedCandidate.location,
+        role: linkedCandidate.title,
+      }
+    : { name, phone, email, region, role };
   const create = () => {
     setSubmitted(true);
-    if (!name.trim() || (!phone.trim() && !email.trim() && !company)) return;
-    notify("联系人已创建");
-    navigate("/contacts/contact-chenyu");
+    try {
+      const contact = saveContact(companyId, {
+        ...contactData,
+        note,
+        categories,
+        relationStatus,
+        candidateId,
+      });
+      notify("联系人已添加到公司");
+      navigate(contactRoute(contact));
+    } catch (failure) {
+      setError(failure.message);
+    }
   };
+  if (!company)
+    return (
+      <NotFoundState label="所属公司" onBack={() => navigate("/companies")} />
+    );
   return (
     <div className="s4-create-page">
       <AssetPageHeader
         eyebrow="联系人"
         title="新建联系人"
-        description="联系人可以属于多家公司，也可以在确认后与候选人建立同一自然人关系。"
-        actions={<Button onClick={() => navigate("/contacts")}>取消</Button>}
+        description={company.name}
+        actions={
+          <Button onClick={() => navigate(companyContactsRoute(companyId))}>
+            取消
+          </Button>
+        }
       />
       <div className="s4-create-layout s4-create-layout-direct">
         <section className="s4-create-workspace">
           <header>
             <h2>联系人资料</h2>
-            <p>
-              只有姓名不能创建正式联系人，请同时补充联系方式或已确认的公司关系。
-            </p>
           </header>
           <div className="s4-form-grid">
+            <FormField label="关联候选人" span={2}>
+              <EntitySelect
+                label="选择已有候选人"
+                value={candidateId}
+                options={[
+                  { value: "", label: "手工填写" },
+                  ...candidates.map((candidate) => ({
+                    value: candidate.id,
+                    label: `${candidate.name} · ${candidate.company}`,
+                  })),
+                ]}
+                onChange={(value) => {
+                  setCandidateId(value);
+                  setError("");
+                  setSubmitted(false);
+                }}
+                searchable
+              />
+            </FormField>
             <FormField
               label="姓名或明确称呼"
               required
-              error={submitted && !name.trim() ? "请输入姓名或明确称呼" : ""}
+              error={
+                submitted && !contactData.name.trim()
+                  ? "请输入姓名或明确称呼"
+                  : ""
+              }
             >
               <TextInput
-                value={name}
+                value={contactData.name}
                 onChange={setName}
+                disabled={Boolean(linkedCandidate)}
                 placeholder="例如：陈雨"
               />
             </FormField>
@@ -2029,15 +2153,24 @@ export function ContactCreatePage() {
               />
             </FormField>
             <FormField label="手机">
-              <TextInput value={phone} onChange={setPhone} />
+              <TextInput
+                value={contactData.phone}
+                onChange={setPhone}
+                disabled={Boolean(linkedCandidate)}
+              />
             </FormField>
             <FormField label="邮箱">
-              <TextInput value={email} onChange={setEmail} />
+              <TextInput
+                value={contactData.email}
+                onChange={setEmail}
+                disabled={Boolean(linkedCandidate)}
+              />
             </FormField>
             <FormField label="所在地区">
               <TextInput
-                value={region}
+                value={contactData.region}
                 onChange={setRegion}
+                disabled={Boolean(linkedCandidate)}
                 placeholder="例如：北京"
               />
             </FormField>
@@ -2048,46 +2181,34 @@ export function ContactCreatePage() {
           <section className="s4-subform">
             <header>
               <span>
-                <h3>公司关系</h3>
-                <p>
-                  首条关系用于说明联系人的当前或历史归属，创建后可以继续添加。
-                </p>
+                <h3>任职信息</h3>
               </span>
             </header>
-            <div className="s4-company-relation-row">
-              <SelectMenu
-                label="选择公司"
-                value={company}
-                options={companies.map((item) => item.name)}
-                onChange={setCompany}
-                searchable
-              />
-              <TextInput
-                value={role}
-                onChange={setRole}
-                placeholder="职位或角色"
-                ariaLabel="公司关系中的职位或角色"
-              />
-              <SelectMenu
-                label="关系状态"
-                value={relationStatus}
-                options={["当前", "历史"]}
-                onChange={setRelationStatus}
-              />
-              <CustomCheckbox
-                checked={primary}
-                onChange={setPrimary}
-                label="主要归属"
-              />
+            <div className="s4-form-grid">
+              <FormField label="所属公司">
+                <TextInput value={company.name} disabled />
+              </FormField>
+              <FormField label="职位或角色">
+                <TextInput
+                  value={contactData.role}
+                  onChange={setRole}
+                  disabled={Boolean(linkedCandidate)}
+                  placeholder="职位或角色"
+                  ariaLabel="公司关系中的职位或角色"
+                />
+              </FormField>
+              <FormField label="关系状态">
+                <SelectMenu
+                  label="关系状态"
+                  value={relationStatus}
+                  options={["当前", "历史"]}
+                  onChange={setRelationStatus}
+                />
+              </FormField>
             </div>
           </section>
-          {submitted && !phone.trim() && !email.trim() && !company ? (
-            <StateBanner
-              tone="danger"
-              icon="warning"
-              title="身份信息不足"
-              description="请补充手机、邮箱或已确认公司关系中的至少一项。"
-            />
+          {error ? (
+            <StateBanner tone="danger" icon="warning" title={error} />
           ) : null}
           <footer>
             <Button tone="primary" onClick={create}>
@@ -2515,13 +2636,14 @@ function OpportunityDirections({ opportunity }) {
 }
 
 function OpportunitySectionEditor({ section, opportunity, close, onSave }) {
+  const { contacts } = useCompanyContacts();
   const notify = useToast();
   const [title, setTitle] = useState(opportunity.title);
   const [company, setCompany] = useState(opportunity.company);
   const [status, setStatus] = useState(opportunity.status);
   const [people, setPeople] = useState("20 - 25 人");
   const [period, setPeriod] = useState("2026.07 - 2026.12");
-  const [contact, setContact] = useState("陈雨");
+  const [contact, setContact] = useState(opportunity.contactId || "");
   const [copy, setCopy] = useState("");
   const titleMap = {
     basic: "机会资料",
@@ -2543,7 +2665,8 @@ function OpportunitySectionEditor({ section, opportunity, close, onSave }) {
   }, [opportunity, section]);
 
   const save = () => {
-    if (section === "basic") onSave({ title, company, status });
+    if (section === "basic")
+      onSave({ title, company, status, contactId: contact });
     if (section === "summary") onSave({ summary: copy });
     if (section === "evidence") onSave({ evidence: copy });
     close();
@@ -2576,7 +2699,10 @@ function OpportunitySectionEditor({ section, opportunity, close, onSave }) {
               label="选择公司"
               value={company}
               options={companies.map((item) => item.name)}
-              onChange={setCompany}
+              onChange={(value) => {
+                setCompany(value);
+                setContact("");
+              }}
               searchable
             />
           </FormField>
@@ -2600,10 +2726,15 @@ function OpportunitySectionEditor({ section, opportunity, close, onSave }) {
             />
           </FormField>
           <FormField label="相关联系人">
-            <SelectMenu
+            <EntitySelect
               label="选择联系人"
               value={contact}
-              options={contacts.map((item) => item.name)}
+              options={contacts
+                .filter((item) => item.company === company && !item.deletedAt)
+                .map((item) => ({
+                  value: item.id,
+                  label: `${item.name} · ${item.role}`,
+                }))}
               onChange={setContact}
               searchable
             />
@@ -2619,17 +2750,28 @@ function OpportunitySectionEditor({ section, opportunity, close, onSave }) {
 }
 
 export function OpportunityDetailPage() {
+  const { contacts } = useCompanyContacts();
   const { opportunityId } = useParams();
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") || "profile";
+  const requestedTab = params.get("tab");
+  const tab = requestedTab || "profile";
   const item = opportunities.find(
     (opportunity) => opportunity.id === opportunityId,
   );
   const [editingSection, setEditingSection] = useState(null);
   const [opportunity, setOpportunity] = useState(() => ({ ...item }));
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const relatedCompany = companies.find(
+    (company) => company.name === opportunity.company,
+  );
+  const relatedContact = contacts.find(
+    (contact) =>
+      contact.companyId === relatedCompany?.id &&
+      !contact.deletedAt &&
+      (!opportunity.contactId || opportunity.contactId === contact.id),
+  );
   if (!item)
     return (
       <NotFoundState
@@ -2641,6 +2783,7 @@ export function OpportunityDetailPage() {
     { value: "profile", label: "机会资料" },
     { value: "directions", label: "招聘方向", count: item.directions },
     { value: "work", label: "关联任务" },
+    { value: "history", label: "活动记录" },
   ];
   return (
     <div className="s4-detail-page">
@@ -2696,41 +2839,72 @@ export function OpportunityDetailPage() {
               ]}
             />
           </FieldGroup>
-          <FieldGroup
-            title="相关联系人"
-            description="招聘机会只引用联系人及路径摘要；完整结果保存在联系人资产中。"
-          >
-            <div className="s4-opportunity-contact-path">
-              <i>
-                <Icon name="user" />
-              </i>
-              <span>
-                <b>陈雨 · 招聘负责人</b>
-                <p>已核实手机号和邮箱 · 2 条备用引荐路径</p>
-                <small>最近核实于 2026-08-24</small>
-              </span>
-              <StatusBadge tone="success">可以联系</StatusBadge>
-              <div>
-                <Button
-                  size="sm"
-                  onClick={() => navigate("/contacts/contact-chenyu")}
-                >
-                  查看联系人
-                </Button>
-                <Button
-                  size="sm"
-                  icon="route"
-                  tone="primary"
-                  onClick={() =>
-                    navigate(
-                      "/contacts/contact-chenyu?tab=contact-path&action=find",
-                    )
+          <FieldGroup title="相关联系人">
+            {relatedContact ? (
+              <div className="s4-opportunity-contact-path">
+                <i>
+                  <Icon name="user" />
+                </i>
+                <span>
+                  <b>
+                    {relatedContact.name} · {relatedContact.role}
+                  </b>
+                  <p>{relatedContact.company}</p>
+                  <small>
+                    {relatedContact.phone ||
+                      relatedContact.email ||
+                      "尚无直接联系方式"}
+                  </small>
+                </span>
+                <StatusBadge
+                  tone={
+                    relatedContact.phone || relatedContact.email
+                      ? "success"
+                      : "warning"
                   }
                 >
-                  寻找联系路径
-                </Button>
+                  {relatedContact.phone || relatedContact.email
+                    ? "已有联系方式"
+                    : "待寻找路径"}
+                </StatusBadge>
+                <div>
+                  <Button
+                    size="sm"
+                    onClick={() => navigate(contactRoute(relatedContact))}
+                  >
+                    查看联系人
+                  </Button>
+                  <Button
+                    size="sm"
+                    icon="route"
+                    tone="primary"
+                    onClick={() =>
+                      navigate(
+                        `${contactRoute(relatedContact)}?tab=contact-path&action=find`,
+                      )
+                    }
+                  >
+                    寻找联系路径
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <StateBanner
+                title="暂无相关联系人"
+                action={
+                  relatedCompany ? (
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        navigate(companyContactsRoute(relatedCompany.id))
+                      }
+                    >
+                      前往公司联系人
+                    </Button>
+                  ) : null
+                }
+              />
+            )}
           </FieldGroup>
           <FieldGroup
             title="招聘需求摘要"
@@ -2785,15 +2959,10 @@ export function OpportunityDetailPage() {
         <OpportunityDirections opportunity={opportunity} />
       ) : null}
       {tab === "work" ? (
+        <AssetRelatedTasks assetType="opportunity" assetId={opportunityId} />
+      ) : null}
+      {tab === "history" ? (
         <div className="s4-detail-stack">
-          <FieldGroup title="关联任务">
-            <EntityLink
-              icon="route"
-              title="星澜机器人客户开发"
-              meta="已确认招聘需求"
-              onClick={() => navigate("/tasks/client-xinglan")}
-            />
-          </FieldGroup>
           <FieldGroup title="活动记录">
             <ActivityTimeline
               items={[
@@ -2839,101 +3008,8 @@ export function OpportunityDetailPage() {
   );
 }
 
-function OpportunityEditor({ open, close, item = null }) {
-  const notify = useToast();
-  const [title, setTitle] = useState(item?.title || "");
-  const [summary, setSummary] = useState(item?.summary || "");
-  const [evidence, setEvidence] = useState(item?.evidence || "");
-  const [submitted, setSubmitted] = useState(false);
-  const save = () => {
-    setSubmitted(true);
-    if (!title.trim() || !summary.trim() || !evidence.trim()) return;
-    close();
-    notify(item ? "招聘机会已保存" : "招聘机会已创建");
-  };
-  return (
-    <Modal
-      open={open}
-      close={close}
-      size="xl"
-      title={item ? "编辑招聘机会" : "新建招聘机会"}
-      description="只有已确认存在招聘需求时才形成正式招聘机会"
-      footer={
-        <>
-          <Button onClick={close}>取消</Button>
-          <Button tone="primary" onClick={save}>
-            {item ? "保存修改" : "创建机会"}
-          </Button>
-        </>
-      }
-    >
-      <div className="s4-form-grid">
-        <FormField
-          label="机会名称"
-          required
-          error={submitted && !title.trim() ? "请输入机会名称" : ""}
-        >
-          <TextInput value={title} onChange={setTitle} />
-        </FormField>
-        <FormField label="所属公司" required>
-          <SelectMenu
-            label="选择公司"
-            value={item?.company || "星澜机器人"}
-            options={companies.map((company) => company.name)}
-            onChange={() => {}}
-            searchable
-          />
-        </FormField>
-        <FormField
-          label="招聘需求摘要"
-          required
-          span={2}
-          error={submitted && !summary.trim() ? "请输入招聘需求摘要" : ""}
-        >
-          <TextArea value={summary} onChange={setSummary} rows={5} />
-        </FormField>
-        <FormField
-          label="已确认存在需求的依据"
-          required
-          span={2}
-          error={submitted && !evidence.trim() ? "请说明需求确认依据" : ""}
-        >
-          <TextArea value={evidence} onChange={setEvidence} rows={4} />
-        </FormField>
-        <FormField label="预计人数">
-          <TextInput value="20 - 25" onChange={() => {}} />
-        </FormField>
-        <FormField label="预计时间">
-          <DatePicker
-            label="选择预计时间"
-            mode="month-range"
-            value="2026.07 - 2026.12"
-            onChange={() => {}}
-          />
-        </FormField>
-        <FormField label="相关联系人">
-          <SelectMenu
-            label="选择联系人"
-            value="陈雨"
-            options={contacts.map((contact) => contact.name)}
-            onChange={() => {}}
-            searchable
-          />
-        </FormField>
-        <FormField label="状态">
-          <SelectMenu
-            label="状态"
-            value={item?.status || "跟进中"}
-            options={["跟进中", "已完成", "已关闭"]}
-            onChange={() => {}}
-          />
-        </FormField>
-      </div>
-    </Modal>
-  );
-}
-
 export function OpportunityCreatePage() {
+  const { contacts } = useCompanyContacts();
   const navigate = useNavigate();
   const notify = useToast();
   const [title, setTitle] = useState("");
@@ -2989,7 +3065,10 @@ export function OpportunityCreatePage() {
                 label="选择公司"
                 value={company}
                 options={companies.map((item) => item.name)}
-                onChange={setCompany}
+                onChange={(value) => {
+                  setCompany(value);
+                  setContact("");
+                }}
                 searchable
               />
             </FormField>
@@ -3035,10 +3114,15 @@ export function OpportunityCreatePage() {
               />
             </FormField>
             <FormField label="相关联系人">
-              <SelectMenu
+              <EntitySelect
                 label="选择联系人"
                 value={contact}
-                options={contacts.map((item) => item.name)}
+                options={contacts
+                  .filter((item) => item.company === company && !item.deletedAt)
+                  .map((item) => ({
+                    value: item.id,
+                    label: `${item.name} · ${item.role}`,
+                  }))}
                 onChange={setContact}
                 searchable
               />

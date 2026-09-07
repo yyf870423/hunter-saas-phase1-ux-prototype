@@ -110,7 +110,9 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
     () =>
       new Set(
         contacts
-          .filter((item) => item.name !== "人力资源副总裁线索")
+          .filter(
+            (item) => item.companyId && item.name !== "人力资源副总裁线索",
+          )
           .map((item) => item.id),
       ),
   );
@@ -179,6 +181,7 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
                   type="checkbox"
                   aria-label={`选择 ${contact.name}`}
                   checked={selected.has(contact.id)}
+                  disabled={!contact.companyId}
                   onChange={() => toggle(contact.id)}
                 />
               </span>
@@ -257,6 +260,11 @@ export function ContactReviewWorkspace({ contacts, onClose, onApply }) {
           </section>
           <section className="is-note">
             <h3>本次审核的影响</h3>
+            <p>
+              {focused.companyId
+                ? `保存位置：${focused.company} / 联系人`
+                : "所属公司尚未确认，仅保留在当前任务作为人物线索。"}
+            </p>
             <p>
               选中只表示确认保存公司、联系人或联系人线索，不会发送消息，也不会把线索自动变成正式联系人。
             </p>

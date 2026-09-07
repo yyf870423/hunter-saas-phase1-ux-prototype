@@ -1,6 +1,12 @@
 export const workstreamHistory = [
   {
     id: "position-vla",
+    assetRefs: [
+      { type: "position", id: "position-vla" },
+      { type: "company", id: "company-xinglan" },
+      { type: "candidate", id: "candidate-linhao" },
+      { type: "candidate", id: "candidate-zhaoxingyu" },
+    ],
     type: "岗位招聘",
     title: "具身智能 VLA 算法负责人",
     object: "星澜机器人",
@@ -13,6 +19,11 @@ export const workstreamHistory = [
   },
   {
     id: "client-xinglan",
+    assetRefs: [
+      { type: "company", id: "company-xinglan" },
+      { type: "contact", id: "contact-chenyu", companyId: "company-xinglan" },
+      { type: "opportunity", id: "opportunity-xinglan" },
+    ],
     type: "客户开发",
     title: "星澜机器人招聘合作",
     object: "星澜机器人",
@@ -24,6 +35,7 @@ export const workstreamHistory = [
   },
   {
     id: "mapping-embodied",
+    assetRefs: [{ type: "graph", id: "mapping-embodied" }],
     type: "人才摸排",
     title: "具身智能 VLA 人才摸排",
     object: "VLA、机器人学习与灵巧操作",
@@ -34,6 +46,7 @@ export const workstreamHistory = [
   },
   {
     id: "career-linhao",
+    assetRefs: [{ type: "candidate", id: "candidate-linhao" }],
     type: "候选人求职",
     title: "林昊职业机会",
     object: "林昊 · 机器人算法负责人",
@@ -684,12 +697,14 @@ export const workItems = [
   })),
   {
     ...sideTasks.find((item) => item.id === "task-hand-team"),
+    assetRefs: [{ type: "graph", id: "mapping-embodied" }],
     category: "身份核验",
     scenario: sideTaskBusinessScenarios["task-hand-team"],
     scenarios: ["候选人", "身份核验"],
   },
   {
     id: "task-interview-summary",
+    assetRefs: [{ type: "candidate", id: "candidate-linhao" }],
     title: "整理林昊的面试反馈",
     type: "信息整理",
     object: "候选人林昊",

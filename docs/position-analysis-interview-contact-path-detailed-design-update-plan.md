@@ -171,8 +171,8 @@
 
 #### D. 原型和截图
 
-1. [联系人联系路径](https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/contacts/contact-chenyu?tab=contact-path)
-2. [联系路径未创建](https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/contacts/contact-chenyu?tab=contact-path&state=empty)
+1. [联系人联系路径](https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path)
+2. [联系路径未创建](https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=empty)
 3. [招聘机会详情](https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/#/opportunities/opportunity-xinglan)
 
 ## 五、不修改文档的交叉检查结论

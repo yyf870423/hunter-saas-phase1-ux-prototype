@@ -12,6 +12,13 @@ export const settingSections = [
     route: "/settings/profile",
   },
   {
+    id: "navigation",
+    label: "导航",
+    description: "常用资产与其他入口",
+    icon: "menu",
+    route: "/settings/navigation",
+  },
+  {
     id: "notifications",
     label: "通知",
     description: "站内和邮件提醒",

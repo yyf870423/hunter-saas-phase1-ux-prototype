@@ -358,6 +358,10 @@ export const candidatePositionRelations = [
   },
 ];
 
+const candidateContactMethods = {
+  "candidate-linhao": { phone: "138 **** 6217", email: "hao.lin@example.com" },
+};
+
 export const candidates = candidateSeed.map((item, index) => ({
   id: item[0],
   name: item[1],
@@ -366,6 +370,8 @@ export const candidates = candidateSeed.map((item, index) => ({
   location: item[4],
   education: item[5],
   experience: item[6],
+  phone: candidateContactMethods[item[0]]?.phone || "",
+  email: candidateContactMethods[item[0]]?.email || "",
   age: candidateAges[index],
   pipeline:
     candidatePositionRelations.find(
@@ -403,8 +409,6 @@ export const candidateDetail = {
   englishName: "Hao Lin",
   birthYear: "1989",
   gender: "男",
-  phone: "138 **** 6217",
-  email: "hao.lin@example.com",
   preference: "愿意了解机会",
   summary:
     "12 年机器人学习与具身智能经验，长期负责从算法研究到真机部署的数据闭环。近三年带领 14 人团队完成模仿学习和强化学习平台建设，适合承担 VLA 算法负责人或机器人学习负责人岗位。",
@@ -783,10 +787,22 @@ export const companies = [
     progress: 0,
     updatedAt: "08-10",
   },
+  {
+    id: "company-qicheng",
+    name: "启程资本",
+    industries: ["投资"],
+    location: "北京",
+    contacts: 1,
+    opportunities: 0,
+    positions: 0,
+    talents: 0,
+    progress: 0,
+    updatedAt: "08-11",
+  },
 ];
 
 export const companyDetail = {
-  ...companies[0],
+  ...companies.find((company) => company.id === "company-xinglan"),
   aliases: ["Xinglan Robotics", "星澜智能机器人"],
   website: "www.xinglan-robotics.com",
   intro:
@@ -809,6 +825,7 @@ export const companyDetail = {
 export const contacts = [
   {
     id: "contact-chenyu",
+    companyId: "company-xinglan",
     name: "陈雨",
     categories: ["招聘负责人", "客户 HR"],
     company: "星澜机器人",
@@ -820,6 +837,7 @@ export const contacts = [
   },
   {
     id: "contact-zhouqi",
+    companyId: "company-xinglan",
     name: "周琪",
     categories: ["客户 HR"],
     company: "星澜机器人",
@@ -831,6 +849,7 @@ export const contacts = [
   },
   {
     id: "contact-liujian",
+    companyId: "company-qicheng",
     name: "刘健",
     categories: ["投资人", "中间介绍人"],
     company: "启程资本",
@@ -842,6 +861,7 @@ export const contacts = [
   },
   {
     id: "contact-zhangmin",
+    companyId: "company-tuojie",
     name: "张敏",
     categories: ["招聘负责人"],
     company: "拓界机器人",
@@ -853,6 +873,7 @@ export const contacts = [
   },
   {
     id: "contact-lijie",
+    companyId: "company-lingyue",
     name: "李洁",
     categories: ["顾问"],
     company: "灵跃科技",
@@ -1343,12 +1364,6 @@ export const assetMeta = {
     singular: "公司",
     icon: "building",
     route: "/companies",
-  },
-  contacts: {
-    label: "联系人",
-    singular: "联系人",
-    icon: "user",
-    route: "/contacts",
   },
   opportunities: {
     label: "招聘机会",

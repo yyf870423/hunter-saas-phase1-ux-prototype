@@ -2139,6 +2139,11 @@
   .s5-page-actions .s1-button {
     width: 100%;
   }
+  .s5-page-actions {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
   .s5-page-actions .s1-button span {
     display: inline;
   }

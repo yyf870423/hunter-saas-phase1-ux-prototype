@@ -11,10 +11,10 @@
 
 ## 二、原型入口
 
-- 联系人联系路径：`#/contacts/contact-chenyu?tab=contact-path`
-- 尚未创建：`#/contacts/contact-chenyu?tab=contact-path&state=empty`
-- 正在执行：`#/contacts/contact-chenyu?tab=contact-path&state=running`
-- 执行失败：`#/contacts/contact-chenyu?tab=contact-path&state=error`
+- 联系人联系路径：`#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path`
+- 尚未创建：`#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=empty`
+- 正在执行：`#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=running`
+- 执行失败：`#/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=error`
 - 招聘机会触发入口：`#/opportunities/opportunity-xinglan`
 
 ## 三、交互要求

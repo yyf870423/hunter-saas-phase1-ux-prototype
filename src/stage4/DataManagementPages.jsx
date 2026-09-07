@@ -22,7 +22,11 @@ import {
   TextInput,
   useToast,
 } from "./asset-ui";
-import { exportTasks, importTasks, recycleItems } from "./data";
+import { companies, exportTasks, importTasks, recycleItems } from "./data";
+import {
+  useCompanyContacts,
+  restoreCompanyContact,
+} from "./company-contact-store";
 
 function DataManagementNav({ value }) {
   const navigate = useNavigate();
@@ -274,7 +278,6 @@ export function ImportsPage() {
                   "候选人",
                   "公司",
                   "岗位",
-                  "联系人",
                   "招聘机会",
                   "知识图谱",
                   "论文",
@@ -597,7 +600,6 @@ export function ExportsPage() {
                 "候选人",
                 "公司",
                 "岗位",
-                "联系人",
                 "招聘机会",
                 "知识图谱",
                 "论文",
@@ -635,14 +637,50 @@ export function ExportsPage() {
 }
 
 export function RecycleBinPage() {
+  const contactState = useCompanyContacts();
+  const [removedDemoIds, setRemovedDemoIds] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [restoreError, setRestoreError] = useState("");
   const notify = useToast();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(new Set());
   const [restoreTarget, setRestoreTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [conflict, setConflict] = useState(false);
-  const rows = recycleItems.filter((item) =>
-    `${item.type}${item.name}`.includes(query),
+  const companyRows = companies
+    .filter(
+      (company) =>
+        contactState.deletedCompanies.includes(company.id) &&
+        !(contactState.purgedCompanies || []).includes(company.id),
+    )
+    .map((company) => ({
+      ...company,
+      type: "公司",
+      local: true,
+      reason: `包含 ${contactState.contacts.filter((contact) => contact.companyId === company.id && contact.deletedWithCompany).length} 条本次随公司删除的联系人记录`,
+      operator: "沈岚",
+      deletedAt: "刚刚",
+      remaining: "剩余 30 天",
+    }));
+  const contactRows = contactState.contacts
+    .filter((contact) => contact.deletedAt && !contact.deletedWithCompany)
+    .map((contact) => ({
+      ...contact,
+      type: "公司联系人",
+      local: true,
+      reason: `所属公司：${contact.company}`,
+      operator: "沈岚",
+      deletedAt: contact.deletedAt.slice(0, 10),
+      remaining: "剩余 30 天",
+    }));
+  const rows = [
+    ...companyRows,
+    ...contactRows,
+    ...recycleItems.filter((item) => !removedDemoIds.includes(item.id)),
+  ].filter(
+    (item) =>
+      `${item.type}${item.name}${item.company || ""}`.includes(query) &&
+      (!types.length || types.includes(item.type)),
   );
   return (
     <div className="s4-page">
@@ -658,7 +696,7 @@ export function RecycleBinPage() {
           tone="warning"
           icon="warning"
           title="回收站中的关系只用于恢复和影响说明"
-          description="删除不会级联其他独立资产；永久清理后，其他对象只保留必要历史名称或已删除引用。"
+          description="公司删除包含所属联系人；恢复公司仅恢复本次一起删除的联系人。其他独立资产不会级联删除。"
         />
       </div>
       <FilterBar
@@ -668,19 +706,19 @@ export function RecycleBinPage() {
         filters={[
           {
             label: "资产类型",
-            value: [],
+            value: types,
             options: [
               "候选人",
               "公司",
               "岗位",
-              "联系人",
+              "公司联系人",
               "招聘机会",
               "知识图谱",
               "论文",
               "专利",
             ],
             multiple: true,
-            onChange: () => {},
+            onChange: setTypes,
           },
         ]}
       />
@@ -719,7 +757,8 @@ export function RecycleBinPage() {
                 type="button"
                 onClick={() => {
                   setRestoreTarget(item);
-                  setConflict(item.type === "公司");
+                  setConflict(item.type === "公司" && !item.local);
+                  setRestoreError("");
                 }}
               >
                 恢复
@@ -735,7 +774,7 @@ export function RecycleBinPage() {
           </article>
         ))}
       </div>
-      <Pagination page={1} pages={2} onChange={() => {}} />
+      {!rows.length ? <StateBanner title="回收站中没有匹配记录" /> : null}
       <Modal
         open={Boolean(restoreTarget)}
         close={() => setRestoreTarget(null)}
@@ -754,7 +793,19 @@ export function RecycleBinPage() {
             <Button onClick={() => setRestoreTarget(null)}>取消</Button>
             <Button
               tone="primary"
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  if (restoreTarget.local)
+                    await restoreCompanyContact(restoreTarget);
+                  else
+                    setRemovedDemoIds((current) => [
+                      ...current,
+                      restoreTarget.id,
+                    ]);
+                } catch (failure) {
+                  setRestoreError(failure.message);
+                  return;
+                }
                 setRestoreTarget(null);
                 notify(conflict ? "已进入公司身份合并审核" : "资产已恢复");
               }}
@@ -764,6 +815,9 @@ export function RecycleBinPage() {
           </>
         }
       >
+        {restoreError ? (
+          <StateBanner tone="danger" title={restoreError} />
+        ) : null}
         {conflict ? (
           <div className="s4-duplicate-compare">
             <article>
@@ -800,7 +854,19 @@ export function RecycleBinPage() {
             <Button onClick={() => setDeleteTarget(null)}>取消</Button>
             <Button
               tone="danger"
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  if (deleteTarget.local)
+                    await restoreCompanyContact(deleteTarget, true);
+                  else
+                    setRemovedDemoIds((current) => [
+                      ...current,
+                      deleteTarget.id,
+                    ]);
+                } catch {
+                  notify("永久删除失败，请检查浏览器存储后重试。", "error");
+                  return;
+                }
                 setDeleteTarget(null);
                 notify("资产已永久删除");
               }}

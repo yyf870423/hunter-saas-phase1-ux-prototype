@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { useCanvasFullscreen } from "../components/useCanvasFullscreen";
+import { contactRoute, useCompanyContacts } from "./company-contact-store";
 import {
   AssetListState,
   AssetPageHeader,
@@ -34,10 +35,13 @@ import {
   topicGraphs,
 } from "./topic-graph-data";
 
+import { AssetRelatedTasks } from "./AssetRelatedTasks";
+
 const detailTabs = [
   { value: "content", label: "图谱内容" },
   { value: "reviews", label: "更新与审核", count: 3 },
   { value: "history", label: "版本记录" },
+  { value: "work", label: "关联任务" },
 ];
 
 const graphOrderStorageKey = "hunter-topic-graph-order";
@@ -284,7 +288,7 @@ export function MappingsListPage() {
   });
   const controller = useListController(
     orderedGraphs,
-    ["name", "description", "related"],
+    ["name", "description"],
     6,
   );
   const state = params.get("state") || "normal";
@@ -325,7 +329,7 @@ export function MappingsListPage() {
       <FilterBar
         query={controller.query}
         setQuery={controller.setQuery}
-        placeholder="搜索图谱名称、内容或关联业务"
+        placeholder="搜索图谱名称或内容"
         filters={[]}
       />
       <AssetListState
@@ -440,7 +444,6 @@ export function MappingsListPage() {
                 </dl>
                 <footer>
                   <span>
-                    <b>{item.related}</b>
                     <small>更新于 {item.updatedAt}</small>
                   </span>
                   <Button
@@ -2039,8 +2042,17 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
 }
 
 function AssetLinkDialog({ open, close, onSelect }) {
+  const { contacts } = useCompanyContacts();
   const [query, setQuery] = useState("");
   const options = [
+    ...contacts
+      .filter((contact) => !contact.deletedAt)
+      .map((contact) => [
+        contact.id,
+        contact.name,
+        `公司联系人 · ${contact.company} · ${contact.role}`,
+        contactRoute(contact),
+      ]),
     [
       "candidate-zhaoxingyu",
       "赵星羽",
@@ -2123,8 +2135,8 @@ function AssetLinkDialog({ open, close, onSelect }) {
           <a href="#/positions/new" target="_blank" rel="noreferrer">
             新建岗位
           </a>
-          <a href="#/contacts/new" target="_blank" rel="noreferrer">
-            新建联系人
+          <a href="#/companies" target="_blank" rel="noreferrer">
+            前往公司添加联系人
           </a>
         </div>
       </div>
@@ -3096,72 +3108,6 @@ function GraphHistoryTab({ notify, sourcePage }) {
   );
 }
 
-function GraphRelatedTab({ navigate }) {
-  return (
-    <div className="tg-related-layout">
-      <section>
-        <header>
-          <h2>关联业务</h2>
-          <p>知识图谱可以被任务和资产复用，但不会因为被引用而复制正式数据。</p>
-        </header>
-        {[
-          [
-            "briefcase",
-            "具身智能 VLA 算法负责人",
-            "岗位 · 人才梳理持续引用 18 个节点",
-            "/positions/position-vla?tab=talent-map",
-          ],
-          [
-            "task",
-            "星澜机器人具身智能团队招聘",
-            "任务 · 候选人审核中",
-            "/tasks/position-vla",
-          ],
-          [
-            "building",
-            "星澜机器人",
-            "公司 · 4 个图页引用",
-            "/companies/company-xinglan?tab=mappings",
-          ],
-          [
-            "user",
-            "林昊",
-            "候选人 · 3 个图页引用",
-            "/candidates/candidate-linhao?tab=relations",
-          ],
-        ].map(([icon, title, meta, path]) => (
-          <button type="button" key={title} onClick={() => navigate(path)}>
-            <Icon name={icon} />
-            <span>
-              <b>{title}</b>
-              <small>{meta}</small>
-            </span>
-            <Icon name="chevronRight" />
-          </button>
-        ))}
-      </section>
-      <aside>
-        <h2>最近复用记录</h2>
-        {[
-          [
-            "今天 11:06",
-            "岗位人才梳理读取图谱",
-            "生成 18 位当前候选人和 5 位人物线索",
-          ],
-          ["今天 09:52", "任务查询人物联系路径", "返回 3 条可解释路径"],
-          ["昨天 18:36", "公司关系变化同步", "更新 2 个图页中的 4 条关系"],
-        ].map(([time, title, detail]) => (
-          <article key={title}>
-            <small>{time}</small>
-            <b>{title}</b>
-            <p>{detail}</p>
-          </article>
-        ))}
-      </aside>
-    </div>
-  );
-}
-
 function GraphContent({
   pages,
   setPages,
@@ -3933,7 +3879,6 @@ export function MappingDetailPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") || "content";
   const panel = params.get("panel") || "";
   const requestedPageId = params.get("page");
   const graph =
@@ -3951,6 +3896,12 @@ export function MappingDetailPage() {
   const [pages, setPages] = useState(() =>
     mappingId === "graph-empty" ? [] : deepClonePages(mappingId),
   );
+  const availableTabs = detailTabs.filter(
+    (item) => pages.length || ["content", "work"].includes(item.value),
+  );
+  const tab = availableTabs.some((item) => item.value === params.get("tab"))
+    ? params.get("tab")
+    : "content";
   const [activePageId, setActivePageId] = useState(
     () => params.get("page") || pages[0]?.id,
   );
@@ -4055,20 +4006,18 @@ export function MappingDetailPage() {
           AI 整理
         </Button>
       </DetailHeader>
-      {pages.length ? (
-        <DetailTabs
-          tabs={detailTabs.map((item) =>
-            item.value === "reviews"
-              ? { ...item, count: activeReviewItems.length }
-              : item,
-          )}
-          value={tab}
-          onChange={(value) =>
-            updateParams(params, setParams, { tab: value, panel: null })
-          }
-        />
-      ) : null}
-      {!pages.length ? (
+      <DetailTabs
+        tabs={availableTabs.map((item) =>
+          item.value === "reviews"
+            ? { ...item, count: activeReviewItems.length }
+            : item,
+        )}
+        value={tab}
+        onChange={(value) =>
+          updateParams(params, setParams, { tab: value, panel: null })
+        }
+      />
+      {!pages.length && tab === "content" ? (
         <GraphEmptyState
           onCreatePage={() => setNewPageOpen(true)}
           onImport={startImport}
@@ -4104,6 +4053,9 @@ export function MappingDetailPage() {
       ) : null}
       {pages.length && tab === "history" ? (
         <GraphHistoryTab notify={notify} sourcePage={activePage} />
+      ) : null}
+      {tab === "work" ? (
+        <AssetRelatedTasks assetType="graph" assetId={mappingId} />
       ) : null}
       {panel === "hidden" ? (
         <HiddenContentPanel

@@ -51,6 +51,7 @@ import {
   PositionInterviewMaterials,
 } from "./PositionInterviewMaterials";
 import { matchResults, positionDetail, positions } from "./data";
+import { AssetRelatedTasks } from "./AssetRelatedTasks";
 
 const tabs = [
   { value: "profile", label: "岗位资料" },
@@ -59,6 +60,7 @@ const tabs = [
   { value: "talent-map", label: "人才梳理", count: 23 },
   { value: "interview", label: "面试资料" },
   { value: "work", label: "关联任务" },
+  { value: "history", label: "处理与记录" },
 ];
 
 const positionAiSupplement =
@@ -430,7 +432,6 @@ function PositionProfile({
         title="岗位 AI 解析"
         description={aiRecord.summary}
         target={aiRecord.target}
-        work={aiRecord.work}
         onDetails={onOpenAiDetails}
         onPrimary={aiState === "review" ? onOpenAiReview : onRetryAi}
         primaryLabel={
@@ -3263,28 +3264,9 @@ function PositionTalentMap() {
   );
 }
 
-function RelatedWork({ processingRecords, onOpenProcessing }) {
-  const navigate = useNavigate();
+function PositionHistory({ processingRecords, onOpenProcessing }) {
   return (
     <div className="s4-detail-stack">
-      <FieldGroup title="关联任务">
-        <button
-          type="button"
-          className="s4-related-mainline"
-          onClick={() => navigate("/tasks/position-vla")}
-        >
-          <i>
-            <Icon name="route" />
-          </i>
-          <span>
-            <small>岗位招聘</small>
-            <b>星澜机器人 · 具身智能团队招聘</b>
-            <p>持续汇总候选人召回、匹配、审核和岗位推进结果。</p>
-          </span>
-          <StatusBadge tone="warning">等待候选人审核</StatusBadge>
-          <Icon name="chevronRight" />
-        </button>
-      </FieldGroup>
       <FieldGroup
         title="AI 处理记录"
         description="当前岗位上的解析、匹配与内容生成记录，不创建独立任务。"
@@ -3327,7 +3309,8 @@ export function PositionDetailPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") || "profile";
+  const requestedTab = params.get("tab");
+  const tab = requestedTab || "profile";
   const profileView = params.get("profile") || "information";
   const aiState = params.get("ai") || "idle";
   const aiPanel = params.get("panel") || "";
@@ -3516,7 +3499,10 @@ export function PositionDetailPage() {
       {tab === "talent-map" ? <PositionTalentMap /> : null}
       {tab === "interview" ? <PositionInterviewMaterials /> : null}
       {tab === "work" ? (
-        <RelatedWork
+        <AssetRelatedTasks assetType="position" assetId={positionId} />
+      ) : null}
+      {tab === "history" ? (
+        <PositionHistory
           processingRecords={processingRecords}
           onOpenProcessing={(record) =>
             updateQuery({ panel: "details", process: record.id })
@@ -3527,7 +3513,6 @@ export function PositionDetailPage() {
         open={aiPanel === "details"}
         close={() => updateQuery({ panel: null, process: null })}
         record={selectedProcessingRecord}
-        onOpenWork={() => navigate("/tasks/position-vla")}
         primaryLabel={
           selectedProcessingRecord.state === "review"
             ? "审核解析结果"

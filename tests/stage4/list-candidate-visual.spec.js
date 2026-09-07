@@ -17,7 +17,6 @@ const listPages = [
   ["candidates", "候选人"],
   ["positions", "岗位"],
   ["companies", "公司"],
-  ["contacts", "联系人"],
   ["opportunities", "招聘机会"],
   ["mappings", "知识图谱"],
   ["papers", "论文"],
@@ -107,7 +106,7 @@ test("公司、联系人和招聘机会详情遵循分区编辑与完整岗位�
     fullPage: true,
   });
 
-  await page.goto("#/contacts/contact-chenyu");
+  await page.goto("#/companies/company-xinglan/contacts/contact-chenyu");
   await page.screenshot({
     path: `${output}/contact-detail-section-editing.png`,
     fullPage: true,
@@ -119,14 +118,16 @@ test("公司、联系人和招聘机会详情遵循分区编辑与完整岗位�
     fullPage: true,
   });
   await page.getByRole("button", { name: "取消" }).click();
-  await page.getByRole("button", { name: "编辑公司关系" }).click();
+  await page.getByRole("button", { name: "编辑任职信息" }).click();
   await page.waitForTimeout(220);
   await page.screenshot({
     path: `${output}/contact-relation-editor-compact.png`,
     fullPage: true,
   });
   await page.getByRole("button", { name: "取消" }).click();
-  await page.goto("#/contacts/contact-chenyu?tab=timeline");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=timeline",
+  );
   await page.screenshot({
     path: `${output}/contact-timeline-crud.png`,
     fullPage: true,
@@ -177,10 +178,12 @@ test("公共时间选择器展开态符合统一设计语言", async ({ page }) 
     fullPage: true,
   });
 
-  await page.goto("#/contacts/contact-chenyu?tab=timeline");
+  await page.goto(
+    "#/companies/company-xinglan/contacts/contact-chenyu?tab=timeline",
+  );
   await page.getByRole("button", { name: "添加沟通记录" }).click();
   await page
-    .getByRole("button", { name: /选择发生时间：2026-08-21 14:30/ })
+    .getByRole("button", { name: /选择发生时间：2026-09-07 14:30/ })
     .click();
   await page.waitForTimeout(180);
   await page.screenshot({
@@ -198,7 +201,7 @@ test("公共时间选择器展开态符合统一设计语言", async ({ page }) 
   await assertNoConsoleErrors();
 });
 
-test("知识图谱创建、画布、审核和相关业务视觉完整", async ({ page }) => {
+test("知识图谱创建、画布、审核与导入视觉完整", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 900 });
 

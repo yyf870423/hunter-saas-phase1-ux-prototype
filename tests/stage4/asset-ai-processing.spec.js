@@ -109,8 +109,8 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   await page.getByRole("button", { name: "重新运行" }).click();
   await expect(page).toHaveURL(/ai=running/);
 
-  await page.goto("#/positions/position-vla?tab=work&ai=review");
-  await expect(page.getByRole("heading", { name: "关联任务" })).toBeVisible();
+  await page.goto("#/positions/position-vla?tab=history&ai=review");
+  await expect(page.getByRole("heading", { name: "关联任务" })).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "AI 处理记录" }),
   ).toBeVisible();
@@ -232,7 +232,7 @@ test("已有公司调研留在公司详情并共享同一套审核交互", async
   await review.getByRole("button", { name: /确认所选 5 项/ }).click();
   await expect(page.getByText("公司资料更新为 v4")).toBeVisible();
 
-  await page.goto("#/companies/company-xinglan?tab=work&ai=review");
+  await page.goto("#/companies/company-xinglan?tab=history&ai=review");
   await expect(
     page.getByRole("heading", { name: "AI 处理记录" }),
   ).toBeVisible();

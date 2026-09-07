@@ -436,6 +436,13 @@ a:focus-visible {
   opacity: 1;
 }
 
+.s1-nav-section nav > button .s1-nav-icon-tooltip {
+  display: inline-flex;
+  flex: 0 0 18px;
+  overflow: visible;
+  opacity: 1;
+}
+
 .s1-nav-section nav > button em {
   min-width: 18px;
   margin-left: auto;
@@ -459,21 +466,12 @@ a:focus-visible {
 }
 
 .s1-asset-nav-panel {
-  position: absolute;
-  z-index: 60;
-  top: 294px;
-  left: calc(100% + 10px);
-  width: 380px;
   padding: 16px;
   color: var(--s1-ink);
   background: var(--s1-surface);
   border: 1px solid var(--s1-line);
   border-radius: 8px;
   box-shadow: var(--s1-popover-shadow);
-}
-
-.nav-collapsed .s1-asset-nav-panel {
-  top: 260px;
 }
 
 .s1-asset-nav-panel > header {
@@ -507,30 +505,18 @@ a:focus-visible {
   box-shadow: none;
 }
 
-.s1-asset-nav-groups {
-  display: grid;
-  gap: 13px;
-  padding-top: 13px;
-}
-
-.s1-asset-nav-groups h2 {
-  margin: 0 0 6px;
-  color: var(--s1-subtle);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.s1-asset-nav-groups section > div {
+.s1-asset-nav-items {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
+  padding-top: 13px;
 }
 
-.s1-asset-nav-groups section > div > button {
+.s1-asset-nav-items > button {
   display: grid;
   min-width: 0;
   height: 44px;
-  grid-template-columns: 28px minmax(0, 1fr) 16px;
+  grid-template-columns: 28px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
   padding: 0 10px;
@@ -542,13 +528,14 @@ a:focus-visible {
   cursor: pointer;
 }
 
-.s1-asset-nav-groups section > div > button:hover {
+.s1-asset-nav-items > button:hover,
+.s1-asset-nav-items > button[aria-current="page"] {
   color: var(--s1-accent);
   background: var(--s1-accent-soft);
   border-color: color-mix(in srgb, var(--s1-accent) 28%, var(--s1-line));
 }
 
-.s1-asset-nav-groups section > div > button > i {
+.s1-asset-nav-items > button > i {
   display: grid;
   width: 28px;
   height: 28px;
@@ -558,7 +545,7 @@ a:focus-visible {
   border-radius: 6px;
 }
 
-.s1-asset-nav-groups section > div > button span {
+.s1-asset-nav-items > button span {
   overflow: hidden;
   font-size: 13px;
   font-weight: 600;
@@ -566,10 +553,8 @@ a:focus-visible {
   text-overflow: ellipsis;
 }
 
-.s1-asset-nav-groups section > div > button > svg {
-  width: 14px;
-  height: 14px;
-  color: var(--s1-subtle);
+.s1-mobile-asset-back {
+  margin-bottom: 12px;
 }
 
 .nav-expanded .s1-nav-section nav > button em {

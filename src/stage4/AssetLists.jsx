@@ -28,11 +28,11 @@ import {
 import {
   candidates,
   companies,
-  contacts,
   candidateFavoriteTree,
   opportunities,
   positions,
 } from "./data";
+import { useCompanyContacts, recycleCompany } from "./company-contact-store";
 
 const educationTones = {
   博士: "violet",
@@ -187,49 +187,6 @@ const configs = {
       { key: "updatedAt", label: "更新时间" },
     ],
   },
-  contacts: {
-    title: "联系人",
-    description: "管理客户、投资人、顾问和行业关系人的身份与沟通记录。",
-    data: contacts,
-    searchKeys: ["name", "company", "role", "categories", "phone", "email"],
-    placeholder: "搜索姓名、公司、角色、手机或邮箱",
-    filters: [
-      ["类别", ["客户 HR", "招聘负责人", "投资人", "顾问", "中间介绍人"]],
-      ["公司", ["星澜机器人", "拓界机器人", "灵跃科技", "启程资本"]],
-    ],
-    columns: [
-      {
-        key: "name",
-        label: "联系人",
-        required: true,
-        render: (row) => (
-          <span className="s4-primary-cell">
-            <b>{row.name}</b>
-            <small>{row.role}</small>
-          </span>
-        ),
-      },
-      { key: "company", label: "主要归属", required: true },
-      {
-        key: "categories",
-        label: "类别",
-        render: (row) => <TagList items={row.categories} maxVisible={1} />,
-      },
-      { key: "phone", label: "手机" },
-      {
-        key: "email",
-        label: "邮箱",
-        render: (row) =>
-          row.email ? (
-            <TooltipText tip={row.email}>{row.email}</TooltipText>
-          ) : (
-            "—"
-          ),
-      },
-      { key: "region", label: "地区" },
-      { key: "lastContact", label: "最近沟通" },
-    ],
-  },
   opportunities: {
     title: "招聘机会",
     description: "记录已确认的招聘需求，并逐步拆分为正式岗位。",
@@ -306,7 +263,23 @@ export function AssetListPage({ type }) {
   const notify = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const state = searchParams.get("state") || "normal";
-  const controller = useListController(config.data, config.searchKeys, 6);
+  const { contacts: contactRecords, deletedCompanies } = useCompanyContacts();
+  const listData = useMemo(
+    () =>
+      type === "companies"
+        ? config.data
+            .filter((company) => !deletedCompanies.includes(company.id))
+            .map((company) => ({
+              ...company,
+              contacts: contactRecords.filter(
+                (contact) =>
+                  contact.companyId === company.id && !contact.deletedAt,
+              ).length,
+            }))
+        : config.data,
+    [type, config.data, contactRecords, deletedCompanies],
+  );
+  const controller = useListController(listData, config.searchKeys, 6);
   const [filterValues, setFilterValues] = useState(() =>
     Object.fromEntries(config.filters.map(([label]) => [label, []])),
   );
@@ -606,8 +579,19 @@ export function AssetListPage({ type }) {
         close={() => setDeleteTarget(null)}
         assetLabel={config.title}
         assetName={deleteTarget?.name || deleteTarget?.title || ""}
-        impact={`关联的其他正式资产不会删除；从反向列表进入时，也不会创建第二份关系。`}
+        impact={
+          type === "companies"
+            ? "所属联系人将一并进入回收站；关联候选人、招聘机会、岗位和任务不会删除。"
+            : "关联的其他正式资产不会删除；从反向列表进入时，也不会创建第二份关系。"
+        }
         onConfirm={() => {
+          if (type === "companies") {
+            (deleteTarget?.id
+              ? [deleteTarget.id]
+              : [...controller.selected]
+            ).forEach(recycleCompany);
+            controller.setSelected(new Set());
+          }
           notify(`“${deleteTarget?.name || deleteTarget?.title}”已进入回收站`);
           setDeleteTarget(null);
         }}
@@ -750,9 +734,6 @@ export function PositionsListPage() {
 }
 export function CompaniesListPage() {
   return <AssetListPage type="companies" />;
-}
-export function ContactsListPage() {
-  return <AssetListPage type="contacts" />;
 }
 export function OpportunitiesListPage() {
   return <AssetListPage type="opportunities" />;

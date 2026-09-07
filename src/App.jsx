@@ -14,7 +14,6 @@ import { WorkstreamRoute } from "./stage3/WorkstreamRoute";
 import {
   CandidatesListPage,
   CompaniesListPage,
-  ContactsListPage,
   OpportunitiesListPage,
   PositionsListPage,
 } from "./stage4/AssetLists";
@@ -56,6 +55,7 @@ import {
 } from "./stage4/RecruitingPages";
 import { Stage4ReviewPage } from "./stage4/Stage4ReviewPage";
 import { SettingsLayout } from "./stage5/SettingsLayout";
+import { NavigationSettingsPage } from "./stage5/NavigationSettingsPage";
 import {
   AutomationSettingsPage,
   ConnectionSettingsPage,
@@ -126,9 +126,14 @@ export default function App() {
         <Route path="/companies" element={<CompaniesListPage />} />
         <Route path="/companies/new" element={<CompanyCreatePage />} />
         <Route path="/companies/:companyId" element={<CompanyDetailPage />} />
-        <Route path="/contacts" element={<ContactsListPage />} />
-        <Route path="/contacts/new" element={<ContactCreatePage />} />
-        <Route path="/contacts/:contactId" element={<ContactDetailPage />} />
+        <Route
+          path="/companies/:companyId/contacts/new"
+          element={<ContactCreatePage />}
+        />
+        <Route
+          path="/companies/:companyId/contacts/:contactId"
+          element={<ContactDetailPage />}
+        />
         <Route path="/opportunities" element={<OpportunitiesListPage />} />
         <Route path="/opportunities/new" element={<OpportunityCreatePage />} />
         <Route
@@ -158,6 +163,7 @@ export default function App() {
         <Route path="/settings" element={<SettingsLayout />}>
           <Route index element={<Navigate to="/settings/profile" replace />} />
           <Route path="profile" element={<ProfileSettingsPage />} />
+          <Route path="navigation" element={<NavigationSettingsPage />} />
           <Route path="notifications" element={<NotificationSettingsPage />} />
           <Route path="automation" element={<AutomationSettingsPage />} />
           <Route path="connections" element={<ConnectionSettingsPage />} />
