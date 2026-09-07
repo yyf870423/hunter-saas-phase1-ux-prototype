@@ -29,6 +29,10 @@ import {
 } from "./company-contact-store";
 import { restoreGraph, useTopicGraphs } from "./topic-graph-store";
 import { graphTypeLabel } from "./graph-types";
+import { runOpportunityCommand, useOpportunityState } from "./opportunity-store";
+import { opportunityNow } from "./opportunity-domain";
+import { OpportunityImportDetail } from "./OpportunityImport";
+import { displayDateTime } from "./OpportunityComponents";
 
 function DataManagementNav({ value }) {
   const navigate = useNavigate();
@@ -53,7 +57,10 @@ export function ImportsPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params] = useSearchParams();
-  const [wizardOpen, setWizardOpen] = useState(Boolean(params.get("type")));
+  const [wizardOpen, setWizardOpen] = useState(Boolean(params.get("type")) && params.get("type") !== "opportunities");
+  useEffect(() => {
+    if (params.get("type") === "opportunities") navigate("/data/imports", { replace: true });
+  }, [params, navigate]);
   const [step, setStep] = useState("file");
   const [type, setType] = useState(
     params.get("type") === "mappings" || params.get("type") === "mapping"
@@ -85,14 +92,22 @@ export function ImportsPage() {
       : [],
   );
   const [matchError, setMatchError] = useState("");
+  const lifecycle = useOpportunityState();
   const visibleTasks = useMemo(
     () =>
-      importTasks.filter((task) =>
+      [...lifecycle.imports.map((batch) => {
+        const task = lifecycle.tasks.find((item) => item.id === batch.taskId);
+        const written = batch.rows.filter((row) => row.status === "written").length;
+        const failed = batch.rows.filter((row) => row.status === "error").length;
+        return { ...batch, lifecycle: true, type: "招聘机会", progress: batch.rows.length ? Math.round(written / batch.rows.length * 100) : 0,
+          status: task?.results.length ? "已完成" : batch.status, time: displayDateTime(batch.createdAt),
+          result: batch.taskId ? (task?.results.length ? "已写入 " + task.results.length + " 项结果" : "等待任务审核") : "已写入 " + written + " 行，需修正 " + failed + " 行" };
+      }), ...importTasks].filter((task) =>
         `${task.name}${task.file}${task.type}`
           .toLowerCase()
           .includes(query.trim().toLowerCase()),
       ),
-    [query],
+    [query, lifecycle],
   );
   const taskPages = Math.max(1, Math.ceil(visibleTasks.length / 2));
   const taskRows = visibleTasks.slice((page - 1) * 2, page * 2);
@@ -158,7 +173,7 @@ export function ImportsPage() {
           {
             label: "资产类型",
             value: [],
-            options: ["候选人", "公司", "岗位", "论文", "专利"],
+            options: ["候选人", "公司", "岗位", ...(lifecycle.imports.length ? ["招聘机会"] : []), "论文", "专利"],
             multiple: true,
           },
           {
@@ -280,7 +295,6 @@ export function ImportsPage() {
                   "候选人",
                   "公司",
                   "岗位",
-                  "招聘机会",
                   "知识图谱",
                   "论文",
                   "专利",
@@ -454,8 +468,9 @@ export function ImportsPage() {
           </div>
         ) : null}
       </Modal>
+      {detail?.lifecycle ? <OpportunityImportDetail batchId={detail.id} close={() => setDetail(null)} /> : null}
       <Modal
-        open={Boolean(detail)}
+        open={Boolean(detail) && !detail?.lifecycle}
         close={() => setDetail(null)}
         size="lg"
         title={detail?.name || "导入详情"}
@@ -641,6 +656,7 @@ export function ExportsPage() {
 export function RecycleBinPage() {
   const contactState = useCompanyContacts();
   const graphs = useTopicGraphs();
+  const lifecycle = useOpportunityState();
   const [removedDemoIds, setRemovedDemoIds] = useState([]);
   const [types, setTypes] = useState([]);
   const [restoreError, setRestoreError] = useState("");
@@ -651,7 +667,7 @@ export function RecycleBinPage() {
   const [restoreTarget, setRestoreTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [conflict, setConflict] = useState(false);
-  const companyRows = companies
+  const companyRows = contactState.companies
     .filter(
       (company) =>
         contactState.deletedCompanies.includes(company.id) &&
@@ -678,6 +694,12 @@ export function RecycleBinPage() {
       remaining: "剩余 30 天",
     }));
   const rows = [
+    ...[...lifecycle.opportunities.map((item) => ({ ...item, name: item.title, type: "招聘机会", lifecycleType: "opportunity" })),
+      ...lifecycle.positions.map((item) => ({ ...item, type: "岗位", lifecycleType: "position" })),
+      ...lifecycle.tasks.map((item) => ({ ...item, name: item.title, type: "任务", lifecycleType: "task" }))]
+      .filter((item) => item.deletedAt).map((item) => ({ ...item, reason: "用户删除；其他独立资产保留", operator: "用户",
+        remaining: "剩余 " + Math.max(0, 30 - Math.floor((new Date(opportunityNow(lifecycle)).getTime() - new Date(item.deletedAt).getTime()) / 86400000)) + " 天",
+        deletedAt: displayDateTime(item.deletedAt) })),
     ...companyRows,
     ...contactRows,
     ...graphs
@@ -731,6 +753,7 @@ export function RecycleBinPage() {
               "知识图谱",
               "论文",
               "专利",
+              "任务",
             ],
             multiple: true,
             onChange: setTypes,
@@ -811,7 +834,9 @@ export function RecycleBinPage() {
               tone="primary"
               onClick={async () => {
                 try {
-                  if (restoreTarget.localGraph)
+                  if (restoreTarget.lifecycleType)
+                    runOpportunityCommand(restoreTarget.lifecycleType + ".restore", { id: restoreTarget.id, title: restoreName });
+                  else if (restoreTarget.localGraph)
                     restoreGraph(restoreTarget.id, false, restoreName);
                   else if (restoreTarget.local)
                     await restoreCompanyContact(restoreTarget);
@@ -836,8 +861,8 @@ export function RecycleBinPage() {
         {restoreError ? (
           <StateBanner tone="danger" title={restoreError} />
         ) : null}
-        {restoreTarget?.localGraph ? (
-          <FormField label="恢复后的图谱名称" required>
+        {restoreTarget?.localGraph || restoreTarget?.lifecycleType === "opportunity" ? (
+          <FormField label={restoreTarget?.localGraph ? "恢复后的图谱名称" : "恢复后的机会名称"} required>
             <TextInput
               value={restoreName}
               onChange={(value) => {
@@ -885,7 +910,9 @@ export function RecycleBinPage() {
               tone="danger"
               onClick={async () => {
                 try {
-                  if (deleteTarget.localGraph)
+                  if (deleteTarget.lifecycleType)
+                    runOpportunityCommand(deleteTarget.lifecycleType + ".purge", { id: deleteTarget.id });
+                  else if (deleteTarget.localGraph)
                     restoreGraph(deleteTarget.id, true);
                   else if (deleteTarget.local)
                     await restoreCompanyContact(deleteTarget, true);

@@ -10,6 +10,9 @@ import {
 } from "../stage1/ui";
 import { mainlines } from "../stage1/data";
 import { signals as initialSignals } from "./data";
+import { mergeLifecycleTasks, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
+import { createOpportunityTask } from "../stage4/opportunity-task-adapter";
+import { StateBanner } from "../stage4/asset-ui";
 
 const signalDecisionAction = "处理洞察";
 
@@ -288,7 +291,17 @@ export function SignalsPage() {
     ? params.get("signal")
     : initialSignals.find((signal) => signal.id === "signal-cloudchip")?.id ||
       initialSignals[0].id;
-  const [signals, setSignals] = useState(initialSignals);
+  const [signalRecords, setSignals] = useState(initialSignals);
+  const lifecycle = useOpportunityState();
+  const signals = useMemo(() => signalRecords.map((signal) => {
+    const task = lifecycle.tasks.find((item) => !item.deletedAt &&
+      ((item.source?.kind === "signal" && item.source.id === signal.id) || item.sourceSignals?.includes(signal.id)));
+    return task ? { ...signal, status: "已处理", tone: "success", nextLabel: "去向：已加入任务",
+      taskContext: { title: task.title, route: "/tasks/" + task.id, status: task.status, tone: "info" },
+      outcome: { type: "已加入任务", title: task.title, route: "/tasks/" + task.id, detail: "来源与证据已保存在该任务。" } } : signal;
+  }), [signalRecords, lifecycle]);
+  const [decisionBusy, setDecisionBusy] = useState(false);
+  const [decisionError, setDecisionError] = useState("");
   const [tab, setTab] = useState("全部");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(initialSelectedId);
@@ -316,15 +329,16 @@ export function SignalsPage() {
   }, [query, signals, tab]);
   const availableTasks = useMemo(() => {
     const keyword = taskQuery.trim().toLowerCase();
-    return mainlines.filter(
+    const eligible = ["公司变化", "招聘动态"].includes(selected.type) ? mergeLifecycleTasks([], lifecycle).filter((task) => task.kind === "opportunity") : mainlines;
+    return eligible.filter(
       (task) =>
         !keyword ||
         `${task.title} ${task.type} ${task.object} ${task.status}`
           .toLowerCase()
           .includes(keyword),
     );
-  }, [taskQuery]);
-  const selectedTask = mainlines.find((task) => task.id === selectedTaskId);
+  }, [taskQuery, lifecycle, selected.type]);
+  const selectedTask = availableTasks.find((task) => task.id === selectedTaskId);
 
   useEffect(
     () => () => timers.current.forEach((timer) => window.clearTimeout(timer)),
@@ -515,8 +529,30 @@ export function SignalsPage() {
     );
   };
 
-  const completeDecision = () => {
+  const completeDecision = async () => {
     if (decisionType === "existing" && !selectedTask) return;
+    if (decisionBusy) return;
+    if (["公司变化", "招聘动态"].includes(selected.type) && decisionType !== "record") {
+      setDecisionBusy(true); setDecisionError("");
+      const material = "请核验这条洞察是否有真实招聘需求，证据不足时不要创建招聘机会。\n\n洞察：" + selected.title +
+        "\n对象：" + selected.object + "\n当前摘要：" + selected.summary + "\n来源与证据：\n" + JSON.stringify(selected.sources || selected.evidence, null, 2) +
+        "\n有效期：" + selected.validity;
+      try {
+        let taskId = selectedTask?.id;
+        if (decisionType === "new") {
+          const result = await createOpportunityTask({ prompt: material, kind: "opportunity", authMode: "confirm", source: { kind: "signal", id: selected.id, material } });
+          taskId = result.taskId;
+        } else {
+          const task = lifecycle.tasks.find((item) => item.id === taskId);
+          runOpportunityCommand("task.update", { id: taskId, patch: { phase: "input", status: "运行中", sourceSignals: [...new Set([...(task.sourceSignals || []), selected.id])] },
+            message: { role: "user", content: material } });
+        }
+        setDecisionOpen(false);
+        navigate("/tasks/" + taskId);
+      } catch (error) { setDecisionError(error.message); }
+      finally { setDecisionBusy(false); }
+      return;
+    }
     setDecisionOpen(false);
     if (decisionType === "record") {
       setTab("已处理");
@@ -587,6 +623,7 @@ export function SignalsPage() {
   };
 
   const openDecision = () => {
+    setDecisionError("");
     setDecisionType("new");
     setTaskQuery("");
     setSelectedTaskId("");
@@ -853,7 +890,7 @@ export function SignalsPage() {
             </Button>
             <Button
               tone="primary"
-              disabled={decisionType === "existing" && !selectedTask}
+              disabled={decisionBusy || (decisionType === "existing" && !selectedTask)}
               onClick={completeDecision}
             >
               {decisionType === "new"
@@ -865,6 +902,7 @@ export function SignalsPage() {
           </>
         }
       >
+        {decisionError ? <StateBanner tone="danger" title={decisionError} /> : null}
         <div
           className="s2-convert-options"
           role="radiogroup"

@@ -5,6 +5,7 @@ const prototypeUrl = `http://127.0.0.1:${previewPort}/hunter-saas-phase1-ux-prot
 
 export default defineConfig({
   testDir: "./tests",
+  testIgnore: "**/unit/**",
   timeout: 45_000,
   expect: { timeout: 8_000 },
   use: {

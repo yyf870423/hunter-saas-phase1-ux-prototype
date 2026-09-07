@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+export { OpportunityCreatePage, OpportunityDetailPage } from "./OpportunityPages";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
@@ -48,6 +49,7 @@ import { AssetRelatedTasks } from "./AssetRelatedTasks";
 import {
   useCompanyContacts,
   saveContact,
+  saveCompany,
   recycleContact,
   recycleCompany,
   contactRoute,
@@ -60,6 +62,15 @@ import {
   opportunities,
   positions,
 } from "./data";
+import { summarizePosition, useOpportunityState } from "./opportunity-store";
+import { summarizeOpportunity } from "./opportunity-domain";
+
+const companyProfileData = (item) => ({
+  ...(item?.id === "company-xinglan" ? companyDetail : {
+    website: "", aliases: [], industries: [], location: "", talents: 0,
+    intro: "", financing: "", advantages: "", benefits: "", interview: "", bases: "", requirements: "", note: "",
+  }), ...item,
+});
 
 function CompactRelationTable({ type, rows, onOpen }) {
   const columns =
@@ -358,15 +369,13 @@ function CompanyProfile({
   );
 }
 
-function CompanyRecruiting() {
+function CompanyRecruiting({ company }) {
   const navigate = useNavigate();
-  const companyName = "星澜机器人";
-  const companyOpportunities = opportunities.filter(
-    (item) => item.company === companyName,
-  );
-  const companyPositions = positions.filter(
-    (item) => item.company === companyName,
-  );
+  const state = useOpportunityState();
+  const context = useCompanyContacts();
+  const companyOpportunities = state.opportunities.filter((item) => !item.deletedAt && item.companyId === company.id)
+    .map((item) => summarizeOpportunity(item, state, context));
+  const companyPositions = state.positions.filter((item) => !item.deletedAt && item.companyId === company.id).map(summarizePosition);
   const progressingCandidates = companyPositions.reduce(
     (total, position) => total + position.progress,
     0,
@@ -399,7 +408,8 @@ function CompanyRecruiting() {
           </article>
         ))}
       </div>
-      <FieldGroup title="招聘机会">
+      <FieldGroup title="招聘机会" action={<Button icon="plus" size="sm" onClick={() => navigate("/opportunities/new?companyId=" + company.id)}>新建招聘机会</Button>}>
+        {!companyOpportunities.length ? <StateBanner title="暂无招聘机会" /> : null}
         <div className="s4-entity-grid">
           {companyOpportunities.map((item) => (
             <EntityLink
@@ -498,7 +508,7 @@ function CompanyContacts({ company }) {
   );
 }
 
-function CompanyTalents() {
+function CompanyTalents({ company }) {
   const navigate = useNavigate();
   return (
     <div className="s4-detail-stack">
@@ -509,7 +519,7 @@ function CompanyTalents() {
       <FieldGroup title="当前与历史任职人才">
         <CompactRelationTable
           type="candidates"
-          rows={candidates.filter((item) => item.company === "星澜机器人")}
+          rows={candidates.filter((item) => item.company === company.name)}
           onOpen={(item) => navigate(`/candidates/${item.id}`)}
         />
       </FieldGroup>
@@ -852,6 +862,7 @@ function CompanySectionEditor({ section, data, close, onSave }) {
   const [industries, setIndustries] = useState(data.industries);
   const [aliases, setAliases] = useState(data.aliases);
   const [copy, setCopy] = useState("");
+  const [error, setError] = useState("");
   const sectionTitle =
     section === "basic"
       ? "公司基本资料"
@@ -871,9 +882,11 @@ function CompanySectionEditor({ section, data, close, onSave }) {
       section === "basic"
         ? { name, website, location, industries, aliases }
         : { [section]: copy };
-    onSave(patch);
-    close();
-    notify(`${sectionTitle}已保存`);
+    try {
+      onSave(patch);
+      close();
+      notify(`${sectionTitle}已保存`);
+    } catch (failure) { setError(failure.message); }
   };
   return (
     <Modal
@@ -937,6 +950,7 @@ function CompanySectionEditor({ section, data, close, onSave }) {
           <TextArea value={copy} onChange={setCopy} rows={9} />
         </FormField>
       )}
+      {error ? <StateBanner tone="danger" title={error} /> : null}
     </Modal>
   );
 }
@@ -952,21 +966,19 @@ export function CompanyDetailPage() {
   const aiState = params.get("ai") || "idle";
   const aiPanel = params.get("panel") || "";
   const aiTimerRef = useRef(null);
-  const { contacts: companyContactRecords, deletedCompanies } =
+  const { companies: companyRecords, contacts: companyContactRecords, deletedCompanies } =
     useCompanyContacts();
-  const item = companies.find(
+  const lifecycle = useOpportunityState();
+  const item = companyRecords.find(
     (company) =>
       company.id === companyId && !deletedCompanies.includes(company.id),
   );
   const [editingSection, setEditingSection] = useState(null);
-  const [profileData, setProfileData] = useState(() => ({
-    ...companyDetail,
-    ...item,
-  }));
+  const [profileData, setProfileData] = useState(() => companyProfileData(item));
   const [deleteOpen, setDeleteOpen] = useState(false);
   useEffect(() => {
-    setProfileData({ ...companyDetail, ...item });
-  }, [companyId]);
+    setProfileData(companyProfileData(item));
+  }, [companyId, item]);
   const updateQuery = (changes) => {
     const next = new URLSearchParams(params);
     Object.entries(changes).forEach(([key, value]) => {
@@ -1019,7 +1031,7 @@ export function CompanyDetailPage() {
   }, [aiState]);
   if (!item)
     return <NotFoundState label="公司" onBack={() => navigate("/companies")} />;
-  const detail = { ...companyDetail, ...item };
+  const detail = companyProfileData(item);
   const detailTabs = [
     { value: "profile", label: "公司资料" },
     { value: "recruiting", label: "招聘业务" },
@@ -1059,7 +1071,7 @@ export function CompanyDetailPage() {
               ]
             : [
                 { label: "资料已确认", tone: "success" },
-                { label: "2 个招聘机会", tone: "info" },
+                { label: lifecycle.opportunities.filter((opportunity) => !opportunity.deletedAt && opportunity.companyId === companyId).length + " 个招聘机会", tone: "info" },
               ]
         }
         onBack={() => navigate("/companies")}
@@ -1076,7 +1088,7 @@ export function CompanyDetailPage() {
           >
             确认创建公司
           </Button>
-        ) : tab === "profile" ? (
+        ) : tab === "profile" && companyId === "company-xinglan" ? (
           <Button icon="sparkles" onClick={() => setAiState("setup")}>
             更新调研
           </Button>
@@ -1157,16 +1169,16 @@ export function CompanyDetailPage() {
           onRetryAi={startAiProcessing}
         />
       ) : null}
-      {tab === "recruiting" ? <CompanyRecruiting /> : null}
+      {tab === "recruiting" ? <CompanyRecruiting company={item} /> : null}
       {tab === "contacts" ? (
         <CompanyContacts key={companyId} company={item} />
       ) : null}
-      {tab === "talents" ? <CompanyTalents /> : null}
-      {tab === "mappings" ? <CompanyMappings /> : null}
+      {tab === "talents" ? <CompanyTalents company={item} /> : null}
+      {tab === "mappings" ? companyId === "company-xinglan" ? <CompanyMappings /> : <StateBanner title="暂无公司关系" /> : null}
       {tab === "work" ? (
         <AssetRelatedTasks assetType="company" assetId={companyId} />
       ) : null}
-      {tab === "history" ? (
+      {tab === "history" ? companyId !== "company-xinglan" ? <FieldGroup title="处理与记录"><StateBanner title="暂无 AI 处理记录" /><ActivityTimeline items={[[item.updatedAt, "公司资料", "用户创建或更新公司资料", "用户"]]} /></FieldGroup> : (
         <CompanyHistory
           processingRecords={processingRecords}
           onOpenProcessing={(record) =>
@@ -1200,9 +1212,10 @@ export function CompanyDetailPage() {
         section={editingSection}
         data={profileData}
         close={() => setEditingSection(null)}
-        onSave={(patch) =>
-          setProfileData((current) => ({ ...current, ...patch }))
-        }
+        onSave={(patch) => {
+          const next = saveCompany(patch, companyId);
+          setProfileData(companyProfileData(next));
+        }}
       />
       <DeleteAssetModal
         open={deleteOpen}
@@ -2034,8 +2047,8 @@ export function ContactDetailPage() {
 
 export function ContactCreatePage() {
   const { companyId } = useParams();
-  const { deletedCompanies } = useCompanyContacts();
-  const company = companies.find(
+  const { companies: companyRecords, deletedCompanies } = useCompanyContacts();
+  const company = companyRecords.find(
     (item) => item.id === companyId && !deletedCompanies.includes(companyId),
   );
   const navigate = useNavigate();
@@ -2221,940 +2234,17 @@ export function ContactCreatePage() {
   );
 }
 
-function OpportunityDirections({ opportunity }) {
-  const navigate = useNavigate();
-  const notify = useToast();
-  const [convert, setConvert] = useState(null);
-  const [manage, setManage] = useState(null);
-  const [unlinkTarget, setUnlinkTarget] = useState(null);
-  const [mode, setMode] = useState("create");
-  const [existingPositionId, setExistingPositionId] = useState("");
-  const [positionName, setPositionName] = useState("");
-  const [location, setLocation] = useState("北京 / 上海");
-  const [experience, setExperience] = useState("5 年及以上");
-  const [education, setEducation] = useState("硕士及以上，能力突出可放宽");
-  const [salary, setSalary] = useState("60 - 90 万 / 年");
-  const [skills, setSkills] = useState([]);
-  const [jd, setJd] = useState("");
-  const [note, setNote] = useState("");
-  const [directions, setDirections] = useState([
-    {
-      id: "direction-vla",
-      name: "VLA 算法负责人",
-      requirement: "VLA、真机部署、团队管理",
-      status: "已形成岗位",
-      position: "具身智能 VLA 算法负责人",
-      positionId: "position-vla",
-    },
-    {
-      id: "direction-learning",
-      name: "机器人学习工程师",
-      requirement: "模仿学习、强化学习、数据闭环",
-      status: "待处理",
-      location: "北京 / 上海",
-      experience: "5 年及以上",
-      education: "硕士及以上，能力突出可放宽",
-      salary: "60 - 90 万 / 年",
-      skills: ["模仿学习", "强化学习", "真机部署", "数据闭环"],
-      jd: `岗位职责
-1. 负责机器人模仿学习、强化学习和操作策略的训练、评测与真机部署。
-2. 建设从数据采集、清洗、训练到线上评测的数据闭环，并持续提升复杂操作任务成功率。
-3. 与 VLA、感知、控制和硬件团队协作，推动算法在双臂机器人产品中稳定落地。
-4. 参与关键技术方案评审，沉淀可复用的训练和部署工具。
-
-任职要求
-1. 计算机、自动化、机器人等相关专业硕士及以上学历，能力突出可放宽。
-2. 具备 5 年以上机器人学习、强化学习或模仿学习相关经验。
-3. 有真实机器人部署和数据闭环经验，能够独立定位训练与线上效果问题。
-4. 具备良好的跨团队沟通能力和工程交付意识。`,
-    },
-    {
-      id: "direction-data",
-      name: "数据平台负责人",
-      requirement: "机器人数据、MLOps、团队管理",
-      status: "已关联岗位",
-      position: "机器人数据平台负责人",
-      positionId: "position-platform",
-    },
-    {
-      id: "direction-simulation",
-      name: "仿真平台工程师",
-      requirement: "Isaac Sim、Sim2Real、Python",
-      status: "待处理",
-      location: "北京",
-      experience: "3 年及以上",
-      education: "本科及以上",
-      salary: "45 - 70 万 / 年",
-      skills: ["Isaac Sim", "Sim2Real", "Python"],
-      jd: `岗位职责
-1. 建设基于 Isaac Sim 的机器人仿真、数据生成和评测环境。
-2. 优化 Sim2Real 流程，支持操作策略快速验证和真机迁移。
-3. 与算法、数据和硬件团队协作，维护可复用的仿真资产与测试工具。
-
-任职要求
-1. 本科及以上学历，具备 3 年以上机器人仿真或相关平台经验。
-2. 熟悉 Isaac Sim、Python 和常用机器人仿真工具。
-3. 有仿真到真机迁移、合成数据或自动评测经验。`,
-    },
-  ]);
-  const selectedPosition = positions.find(
-    (position) => position.id === existingPositionId,
-  );
-
-  const openConvert = (direction) => {
-    setConvert(direction);
-    setMode("create");
-    setExistingPositionId("");
-    setPositionName(direction.name);
-    setLocation(direction.location || "北京 / 上海");
-    setExperience(direction.experience || "3 年及以上");
-    setEducation(direction.education || "本科及以上");
-    setSalary(direction.salary || "面议");
-    setSkills(direction.skills || []);
-    setJd(direction.jd || "");
-    setNote("");
-  };
-
-  const completeConversion = () => {
-    if (!convert) return;
-    const nextPosition =
-      mode === "create"
-        ? { id: "position-vla", name: positionName }
-        : selectedPosition;
-    if (!nextPosition || (mode === "create" && !jd.trim())) return;
-    setDirections((current) =>
-      current.map((direction) =>
-        direction.id === convert.id
-          ? {
-              ...direction,
-              status: mode === "create" ? "已形成岗位" : "已关联岗位",
-              position: nextPosition.name,
-              positionId: nextPosition.id,
-            }
-          : direction,
-      ),
-    );
-    notify(
-      mode === "create"
-        ? "新岗位已创建并关联到招聘机会"
-        : "已有岗位已关联到招聘机会",
-    );
-    setConvert(null);
-  };
-
-  return (
-    <div className="s4-detail-stack">
-      <StateBanner
-        title="拆分方向不会自动完成招聘机会"
-        description="一个招聘机会可以形成多个岗位；每个方向需要单独确认创建或关联已有岗位。"
-      />
-      <FieldGroup
-        title="招聘方向"
-        action={
-          <Button
-            size="sm"
-            icon="plus"
-            onClick={() => notify("已添加一个空招聘方向")}
-          >
-            添加方向
-          </Button>
-        }
-      >
-        <div className="s4-direction-list">
-          {directions.map((item) => (
-            <article key={item.id}>
-              <span>
-                <b>{item.name}</b>
-                <p>{item.requirement}</p>
-              </span>
-              <StatusBadge
-                tone={item.status === "待处理" ? "warning" : "success"}
-              >
-                {item.status}
-              </StatusBadge>
-              {item.position ? (
-                <div className="s4-direction-position-actions">
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/positions/${item.positionId}`)}
-                  >
-                    {item.position}
-                    <Icon name="chevronRight" />
-                  </button>
-                  <Button size="sm" onClick={() => setManage(item)}>
-                    管理关联
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  size="sm"
-                  tone="primary"
-                  onClick={() => openConvert(item)}
-                >
-                  形成岗位
-                </Button>
-              )}
-            </article>
-          ))}
-        </div>
-      </FieldGroup>
-      <Modal
-        open={Boolean(convert)}
-        close={() => setConvert(null)}
-        size="xl"
-        title={`将“${convert?.name || "招聘方向"}”形成岗位`}
-        description="先补齐并检查岗位资料，再创建新岗位或关联已有岗位"
-        footer={
-          <>
-            <Button onClick={() => setConvert(null)}>取消</Button>
-            <Button
-              tone="primary"
-              disabled={
-                mode === "create"
-                  ? !positionName.trim() || !jd.trim()
-                  : !existingPositionId
-              }
-              onClick={completeConversion}
-            >
-              {mode === "create" ? "确认创建并关联" : "确认关联岗位"}
-            </Button>
-          </>
-        }
-      >
-        <div className="s4-direction-convert-workspace">
-          <div
-            className="s4-convert-mode-tabs"
-            role="tablist"
-            aria-label="岗位形成方式"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === "create"}
-              className={mode === "create" ? "is-active" : ""}
-              onClick={() => setMode("create")}
-            >
-              <Icon name="plus" />
-              创建新岗位
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === "existing"}
-              className={mode === "existing" ? "is-active" : ""}
-              onClick={() => setMode("existing")}
-            >
-              <Icon name="link" />
-              关联已有岗位
-            </button>
-          </div>
-          {mode === "create" ? (
-            <div className="s4-direction-position-form">
-              <StateBanner
-                tone="info"
-                title="岗位资料来自招聘方向草稿"
-                description="请检查完整 JD 和招聘要求；确认后才会创建正式岗位。"
-              />
-              <div className="s4-form-grid">
-                <FormField label="岗位名称" required>
-                  <TextInput value={positionName} onChange={setPositionName} />
-                </FormField>
-                <FormField label="招聘公司">
-                  <TextInput value={opportunity.company} disabled />
-                </FormField>
-                <FormField label="工作地点">
-                  <TextInput value={location} onChange={setLocation} />
-                </FormField>
-                <FormField label="薪资范围">
-                  <TextInput value={salary} onChange={setSalary} />
-                </FormField>
-                <FormField label="最低工作年限">
-                  <TextInput value={experience} onChange={setExperience} />
-                </FormField>
-                <FormField label="学历要求及弹性">
-                  <TextInput value={education} onChange={setEducation} />
-                </FormField>
-                <FormField label="关键技能" span={2}>
-                  <SelectMenu
-                    label="关键技能"
-                    value={skills}
-                    options={skills}
-                    onChange={setSkills}
-                    multiple
-                    searchable
-                    creatable
-                  />
-                  <div className="s4-editor-tag-preview">
-                    <TagList items={skills} tone="info" />
-                  </div>
-                </FormField>
-                <FormField
-                  label="完整岗位 JD"
-                  required
-                  span={2}
-                  help="必须能够说明岗位职责和任职要求；可直接修改招聘方向生成的内容。"
-                >
-                  <TextArea value={jd} onChange={setJd} rows={16} />
-                </FormField>
-                <FormField label="用户备注" span={2}>
-                  <TextArea value={note} onChange={setNote} rows={4} />
-                </FormField>
-              </div>
-            </div>
-          ) : (
-            <div className="s4-existing-position-flow">
-              <FormField label="选择已有岗位" required>
-                <SelectMenu
-                  label="搜索岗位名称或公司"
-                  value={selectedPosition?.name || ""}
-                  options={positions.map((position) => position.name)}
-                  onChange={(name) =>
-                    setExistingPositionId(
-                      positions.find((position) => position.name === name)
-                        ?.id || "",
-                    )
-                  }
-                  searchable
-                />
-              </FormField>
-              {selectedPosition ? (
-                <section className="s4-existing-position-preview">
-                  <header>
-                    <span>
-                      <small>将要关联的岗位</small>
-                      <h3>{selectedPosition.name}</h3>
-                      <p>
-                        {selectedPosition.company} · {selectedPosition.location}
-                      </p>
-                    </span>
-                    <StatusFromText value={selectedPosition.status} />
-                  </header>
-                  <DefinitionGrid
-                    columns={2}
-                    items={[
-                      ["关键技能", <TagList items={selectedPosition.skills} />],
-                      ["匹配候选人", `${selectedPosition.matches} 位`],
-                      ["岗位资料", "资料已确认 · 可继续编辑"],
-                      ["当前来源机会", "尚未关联"],
-                    ]}
-                  />
-                  <div className="s4-existing-position-jd">
-                    <b>岗位要求摘要</b>
-                    <p>
-                      负责机器人数据、训练或仿真平台的规划与交付；具备相关平台建设、跨团队协作和工程落地经验。
-                    </p>
-                  </div>
-                </section>
-              ) : (
-                <StateBanner
-                  title="尚未选择岗位"
-                  description="选择后会显示公司、地点、状态、技能和岗位要求，确认无误再建立关联。"
-                />
-              )}
-            </div>
-          )}
-        </div>
-      </Modal>
-      <Modal
-        open={Boolean(manage)}
-        close={() => setManage(null)}
-        size="lg"
-        title="管理岗位关联"
-        description="招聘方向和正式岗位彼此独立，解除关联不会删除岗位。"
-        footer={
-          <>
-            <Button
-              tone="danger-outline"
-              onClick={() => {
-                setUnlinkTarget(manage);
-                setManage(null);
-              }}
-            >
-              解除关联
-            </Button>
-            <Button onClick={() => setManage(null)}>关闭</Button>
-            <Button
-              tone="primary"
-              onClick={() => navigate(`/positions/${manage?.positionId}`)}
-            >
-              查看岗位详情
-            </Button>
-          </>
-        }
-      >
-        <DefinitionGrid
-          columns={2}
-          items={[
-            ["招聘方向", manage?.name],
-            ["关联方式", manage?.status],
-            ["正式岗位", manage?.position],
-            ["来源机会", opportunity.title],
-          ]}
-        />
-      </Modal>
-      <Modal
-        open={Boolean(unlinkTarget)}
-        close={() => setUnlinkTarget(null)}
-        title="解除岗位关联"
-        description="岗位会继续保留，但不再显示为当前招聘方向形成的岗位。"
-        footer={
-          <>
-            <Button onClick={() => setUnlinkTarget(null)}>取消</Button>
-            <Button
-              tone="danger"
-              onClick={() => {
-                setDirections((current) =>
-                  current.map((direction) =>
-                    direction.id === unlinkTarget?.id
-                      ? {
-                          ...direction,
-                          status: "待处理",
-                          position: undefined,
-                          positionId: undefined,
-                        }
-                      : direction,
-                  ),
-                );
-                setUnlinkTarget(null);
-                notify("岗位关联已解除");
-              }}
-            >
-              确认解除
-            </Button>
-          </>
-        }
-      >
-        <StateBanner
-          tone="warning"
-          icon="warning"
-          title={`将解除“${unlinkTarget?.name || "招聘方向"}”与岗位的关联`}
-          description="招聘方向会恢复为待处理，可以之后重新创建或关联岗位。"
-        />
-      </Modal>
-    </div>
-  );
-}
-
-function OpportunitySectionEditor({ section, opportunity, close, onSave }) {
-  const { contacts } = useCompanyContacts();
-  const notify = useToast();
-  const [title, setTitle] = useState(opportunity.title);
-  const [company, setCompany] = useState(opportunity.company);
-  const [status, setStatus] = useState(opportunity.status);
-  const [people, setPeople] = useState("20 - 25 人");
-  const [period, setPeriod] = useState("2026.07 - 2026.12");
-  const [contact, setContact] = useState(opportunity.contactId || "");
-  const [copy, setCopy] = useState("");
-  const titleMap = {
-    basic: "机会资料",
-    summary: "招聘需求摘要",
-    evidence: "已确认依据",
-  };
-
-  useEffect(() => {
-    setTitle(opportunity.title);
-    setCompany(opportunity.company);
-    setStatus(opportunity.status);
-    setCopy(
-      section === "summary"
-        ? opportunity.summary
-        : section === "evidence"
-          ? opportunity.evidence
-          : "",
-    );
-  }, [opportunity, section]);
-
-  const save = () => {
-    if (section === "basic")
-      onSave({ title, company, status, contactId: contact });
-    if (section === "summary") onSave({ summary: copy });
-    if (section === "evidence") onSave({ evidence: copy });
-    close();
-    notify(`${titleMap[section] || "招聘机会资料"}已保存`);
-  };
-
-  return (
-    <Modal
-      open={Boolean(section)}
-      close={close}
-      size={section === "basic" ? "xl" : "lg"}
-      title={`编辑${titleMap[section] || "招聘机会资料"}`}
-      description="本次修改只影响当前资料分组"
-      footer={
-        <>
-          <Button onClick={close}>取消</Button>
-          <Button tone="primary" onClick={save}>
-            保存修改
-          </Button>
-        </>
-      }
-    >
-      {section === "basic" ? (
-        <div className="s4-form-grid">
-          <FormField label="机会名称" required>
-            <TextInput value={title} onChange={setTitle} />
-          </FormField>
-          <FormField label="所属公司" required>
-            <SelectMenu
-              label="选择公司"
-              value={company}
-              options={companies.map((item) => item.name)}
-              onChange={(value) => {
-                setCompany(value);
-                setContact("");
-              }}
-              searchable
-            />
-          </FormField>
-          <FormField label="状态">
-            <SelectMenu
-              label="机会状态"
-              value={status}
-              options={["跟进中", "已完成", "已关闭"]}
-              onChange={setStatus}
-            />
-          </FormField>
-          <FormField label="预计人数">
-            <TextInput value={people} onChange={setPeople} />
-          </FormField>
-          <FormField label="预计时间">
-            <DatePicker
-              label="选择预计时间"
-              mode="month-range"
-              value={period}
-              onChange={setPeriod}
-            />
-          </FormField>
-          <FormField label="相关联系人">
-            <EntitySelect
-              label="选择联系人"
-              value={contact}
-              options={contacts
-                .filter((item) => item.company === company && !item.deletedAt)
-                .map((item) => ({
-                  value: item.id,
-                  label: `${item.name} · ${item.role}`,
-                }))}
-              onChange={setContact}
-              searchable
-            />
-          </FormField>
-        </div>
-      ) : (
-        <FormField label={titleMap[section]} required>
-          <TextArea value={copy} onChange={setCopy} rows={9} />
-        </FormField>
-      )}
-    </Modal>
-  );
-}
-
-export function OpportunityDetailPage() {
-  const { contacts } = useCompanyContacts();
-  const { opportunityId } = useParams();
-  const navigate = useNavigate();
-  const notify = useToast();
-  const [params, setParams] = useSearchParams();
-  const requestedTab = params.get("tab");
-  const tab = requestedTab || "profile";
-  const item = opportunities.find(
-    (opportunity) => opportunity.id === opportunityId,
-  );
-  const [editingSection, setEditingSection] = useState(null);
-  const [opportunity, setOpportunity] = useState(() => ({ ...item }));
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const relatedCompany = companies.find(
-    (company) => company.name === opportunity.company,
-  );
-  const relatedContact = contacts.find(
-    (contact) =>
-      contact.companyId === relatedCompany?.id &&
-      !contact.deletedAt &&
-      (!opportunity.contactId || opportunity.contactId === contact.id),
-  );
-  if (!item)
-    return (
-      <NotFoundState
-        label="招聘机会"
-        onBack={() => navigate("/opportunities")}
-      />
-    );
-  const opportunityTabs = [
-    { value: "profile", label: "机会资料" },
-    { value: "directions", label: "招聘方向", count: item.directions },
-    { value: "work", label: "关联任务" },
-    { value: "history", label: "活动记录" },
-  ];
-  return (
-    <div className="s4-detail-page">
-      <DetailHeader
-        icon="signal"
-        title={opportunity.title}
-        subtitle={opportunity.company}
-        badges={[
-          {
-            label: opportunity.status,
-            tone: opportunity.status === "跟进中" ? "success" : "neutral",
-          },
-          { label: `${item.directions} 个招聘方向`, tone: "info" },
-        ]}
-        onBack={() => navigate("/opportunities")}
-        onDelete={() => setDeleteOpen(true)}
-      />
-      <DetailTabs
-        tabs={opportunityTabs}
-        value={tab}
-        onChange={(value) => setParams({ tab: value })}
-      />
-      {tab === "profile" ? (
-        <div className="s4-detail-stack">
-          <FieldGroup
-            title="机会资料"
-            action={
-              <Button
-                size="sm"
-                icon="edit"
-                onClick={() => setEditingSection("basic")}
-              >
-                编辑资料
-              </Button>
-            }
-          >
-            <DefinitionGrid
-              items={[
-                [
-                  "所属公司",
-                  <button
-                    type="button"
-                    className="s4-inline-link"
-                    onClick={() => navigate("/companies/company-xinglan")}
-                  >
-                    {opportunity.company}
-                  </button>,
-                ],
-                ["状态", <StatusFromText value={opportunity.status} />],
-                ["预计人数", "20 - 25 人"],
-                ["预计时间", "2026 年下半年"],
-                ["创建方式", "客户开发任务"],
-              ]}
-            />
-          </FieldGroup>
-          <FieldGroup title="相关联系人">
-            {relatedContact ? (
-              <div className="s4-opportunity-contact-path">
-                <i>
-                  <Icon name="user" />
-                </i>
-                <span>
-                  <b>
-                    {relatedContact.name} · {relatedContact.role}
-                  </b>
-                  <p>{relatedContact.company}</p>
-                  <small>
-                    {relatedContact.phone ||
-                      relatedContact.email ||
-                      "尚无直接联系方式"}
-                  </small>
-                </span>
-                <StatusBadge
-                  tone={
-                    relatedContact.phone || relatedContact.email
-                      ? "success"
-                      : "warning"
-                  }
-                >
-                  {relatedContact.phone || relatedContact.email
-                    ? "已有联系方式"
-                    : "待寻找路径"}
-                </StatusBadge>
-                <div>
-                  <Button
-                    size="sm"
-                    onClick={() => navigate(contactRoute(relatedContact))}
-                  >
-                    查看联系人
-                  </Button>
-                  <Button
-                    size="sm"
-                    icon="route"
-                    tone="primary"
-                    onClick={() =>
-                      navigate(
-                        `${contactRoute(relatedContact)}?tab=contact-path&action=find`,
-                      )
-                    }
-                  >
-                    寻找联系路径
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <StateBanner
-                title="暂无相关联系人"
-                action={
-                  relatedCompany ? (
-                    <Button
-                      size="sm"
-                      onClick={() =>
-                        navigate(companyContactsRoute(relatedCompany.id))
-                      }
-                    >
-                      前往公司联系人
-                    </Button>
-                  ) : null
-                }
-              />
-            )}
-          </FieldGroup>
-          <FieldGroup
-            title="招聘需求摘要"
-            action={
-              <Button
-                size="sm"
-                icon="edit"
-                onClick={() => setEditingSection("summary")}
-              >
-                编辑
-              </Button>
-            }
-          >
-            <p className="s4-long-copy">{opportunity.summary}</p>
-          </FieldGroup>
-          <FieldGroup
-            title="已确认依据"
-            action={
-              <Button
-                size="sm"
-                icon="edit"
-                onClick={() => setEditingSection("evidence")}
-              >
-                编辑
-              </Button>
-            }
-          >
-            <p className="s4-long-copy">
-              {opportunity.evidence}。客户明确表示 VLA
-              算法负责人和数据平台负责人优先，其他方向可以分批推进。
-            </p>
-            <SourceList
-              items={[
-                {
-                  title: "客户邮件确认",
-                  description: "陈雨确认招聘方向与优先级",
-                  meta: "2026-08-20 18:20",
-                  status: "已确认",
-                },
-                {
-                  title: "公开招聘页面",
-                  description: "新增 9 个机器人算法和平台研发岗位",
-                  meta: "2026-08-21 09:12",
-                  status: "已验证",
-                },
-              ]}
-            />
-          </FieldGroup>
-        </div>
-      ) : null}
-      {tab === "directions" ? (
-        <OpportunityDirections opportunity={opportunity} />
-      ) : null}
-      {tab === "work" ? (
-        <AssetRelatedTasks assetType="opportunity" assetId={opportunityId} />
-      ) : null}
-      {tab === "history" ? (
-        <div className="s4-detail-stack">
-          <FieldGroup title="活动记录">
-            <ActivityTimeline
-              items={[
-                ["今天 10:04", "方向更新", "新增仿真平台工程师方向。", "沈岚"],
-                [
-                  "昨天 18:20",
-                  "客户确认",
-                  "确认 VLA 与数据平台方向优先。",
-                  "陈雨",
-                ],
-                [
-                  "08-18 09:30",
-                  "创建机会",
-                  "从客户开发任务写入正式招聘机会。",
-                  "Hunter",
-                ],
-              ]}
-            />
-          </FieldGroup>
-        </div>
-      ) : null}
-      <OpportunitySectionEditor
-        section={editingSection}
-        opportunity={opportunity}
-        close={() => setEditingSection(null)}
-        onSave={(patch) =>
-          setOpportunity((current) => ({ ...current, ...patch }))
-        }
-      />
-      <DeleteAssetModal
-        open={deleteOpen}
-        close={() => setDeleteOpen(false)}
-        assetLabel="招聘机会"
-        assetName={opportunity.title}
-        impact="已经形成的岗位、公司、联系人和关联任务不会删除，岗位保留来源机会的历史名称。"
-        onConfirm={() => {
-          setDeleteOpen(false);
-          notify("招聘机会已进入回收站");
-          navigate("/opportunities");
-        }}
-      />
-    </div>
-  );
-}
-
-export function OpportunityCreatePage() {
-  const { contacts } = useCompanyContacts();
-  const navigate = useNavigate();
-  const notify = useToast();
-  const [title, setTitle] = useState("");
-  const [company, setCompany] = useState("");
-  const [summary, setSummary] = useState("");
-  const [evidence, setEvidence] = useState("");
-  const [headcount, setHeadcount] = useState("");
-  const [period, setPeriod] = useState("");
-  const [contact, setContact] = useState("");
-  const [status, setStatus] = useState("跟进中");
-  const [submitted, setSubmitted] = useState(false);
-  const create = () => {
-    setSubmitted(true);
-    if (!title.trim() || !company || !summary.trim() || !evidence.trim())
-      return;
-    notify("招聘机会已创建");
-    navigate("/opportunities/opportunity-xinglan");
-  };
-  return (
-    <div className="s4-create-page">
-      <AssetPageHeader
-        eyebrow="招聘机会"
-        title="新建招聘机会"
-        description="把已经确认存在的招聘需求沉淀为正式机会，再逐步拆分岗位。"
-        actions={
-          <Button onClick={() => navigate("/opportunities")}>取消</Button>
-        }
-      />
-      <div className="s4-create-layout s4-create-layout-direct">
-        <section className="s4-create-workspace">
-          <header>
-            <h2>招聘机会资料</h2>
-            <p>只有已经确认存在招聘需求时，才创建正式招聘机会。</p>
-          </header>
-          <div className="s4-form-grid">
-            <FormField
-              label="机会名称"
-              required
-              error={submitted && !title.trim() ? "请输入机会名称" : ""}
-            >
-              <TextInput
-                value={title}
-                onChange={setTitle}
-                placeholder="例如：星澜机器人具身智能团队扩张"
-              />
-            </FormField>
-            <FormField
-              label="所属公司"
-              required
-              error={submitted && !company ? "请选择所属公司" : ""}
-            >
-              <SelectMenu
-                label="选择公司"
-                value={company}
-                options={companies.map((item) => item.name)}
-                onChange={(value) => {
-                  setCompany(value);
-                  setContact("");
-                }}
-                searchable
-              />
-            </FormField>
-            <FormField
-              label="招聘需求摘要"
-              required
-              span={2}
-              error={submitted && !summary.trim() ? "请输入招聘需求摘要" : ""}
-            >
-              <TextArea
-                value={summary}
-                onChange={setSummary}
-                rows={5}
-                placeholder="说明已确认的招聘方向、优先级、团队阶段和岗位背景。"
-              />
-            </FormField>
-            <FormField
-              label="已确认存在需求的依据"
-              required
-              span={2}
-              error={submitted && !evidence.trim() ? "请说明需求确认依据" : ""}
-            >
-              <TextArea
-                value={evidence}
-                onChange={setEvidence}
-                rows={4}
-                placeholder="例如：客户 HR 已邮件确认团队扩张计划与优先招聘方向。"
-              />
-            </FormField>
-            <FormField label="预计人数">
-              <TextInput
-                value={headcount}
-                onChange={setHeadcount}
-                placeholder="例如：20 - 25"
-              />
-            </FormField>
-            <FormField label="预计时间">
-              <DatePicker
-                label="选择预计时间"
-                mode="month-range"
-                value={period}
-                onChange={setPeriod}
-              />
-            </FormField>
-            <FormField label="相关联系人">
-              <EntitySelect
-                label="选择联系人"
-                value={contact}
-                options={contacts
-                  .filter((item) => item.company === company && !item.deletedAt)
-                  .map((item) => ({
-                    value: item.id,
-                    label: `${item.name} · ${item.role}`,
-                  }))}
-                onChange={setContact}
-                searchable
-              />
-            </FormField>
-            <FormField label="状态">
-              <SelectMenu
-                label="状态"
-                value={status}
-                options={["跟进中", "已完成", "已关闭"]}
-                onChange={setStatus}
-              />
-            </FormField>
-          </div>
-          <footer>
-            <Button tone="primary" onClick={create}>
-              创建招聘机会
-            </Button>
-          </footer>
-        </section>
-      </div>
-    </div>
-  );
-}
-
 export function CompanyCreatePage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [mode, setMode] = useState("manual");
   const [files, setFiles] = useState([]);
-  const [name, setName] = useState("");
+  const [params] = useSearchParams();
+  const [name, setName] = useState(params.get("name") || "");
   const [intro, setIntro] = useState("");
   const [industries, setIndustries] = useState([]);
+  const [copyFields, setCopyFields] = useState({ financing: "", advantages: "", benefits: "", interview: "", bases: "", requirements: "", note: "" });
+  const [error, setError] = useState("");
   const [agentPrompt, setAgentPrompt] = useState("");
   const [agentAuthMode, setAgentAuthMode] = useState("confirm");
   const [agentAttachments, setAgentAttachments] = useState([]);
@@ -3163,8 +2253,11 @@ export function CompanyCreatePage() {
       notify("请输入公司名称", "error");
       return;
     }
-    notify("公司已创建");
-    navigate("/companies/company-xinglan");
+    try {
+      const company = saveCompany({ name, intro, industries, ...copyFields, location: "", website: "", aliases: [], talents: 0 });
+      notify("公司已创建");
+      navigate("/companies/" + company.id);
+    } catch (failure) { setError(failure.message); }
   };
   return (
     <div className="s4-create-page">
@@ -3220,27 +2313,28 @@ export function CompanyCreatePage() {
                   <TextArea value={intro} onChange={setIntro} rows={4} />
                 </FormField>
                 <FormField label="融资、上市与市值" span={2}>
-                  <TextArea value="" onChange={() => {}} rows={3} />
+                  <TextArea value={copyFields.financing} onChange={(financing) => setCopyFields({ ...copyFields, financing })} rows={3} />
                 </FormField>
                 <FormField label="公司优势与人才吸引点" span={2}>
-                  <TextArea value="" onChange={() => {}} rows={3} />
+                  <TextArea value={copyFields.advantages} onChange={(advantages) => setCopyFields({ ...copyFields, advantages })} rows={3} />
                 </FormField>
                 <FormField label="一般薪资与福利" span={2}>
-                  <TextArea value="" onChange={() => {}} rows={3} />
+                  <TextArea value={copyFields.benefits} onChange={(benefits) => setCopyFields({ ...copyFields, benefits })} rows={3} />
                 </FormField>
                 <FormField label="一般面试流程" span={2}>
-                  <TextArea value="" onChange={() => {}} rows={3} />
+                  <TextArea value={copyFields.interview} onChange={(interview) => setCopyFields({ ...copyFields, interview })} rows={3} />
                 </FormField>
                 <FormField label="Base 地点与业务" span={2}>
-                  <TextArea value="" onChange={() => {}} rows={4} />
+                  <TextArea value={copyFields.bases} onChange={(bases) => setCopyFields({ ...copyFields, bases })} rows={4} />
                 </FormField>
                 <FormField label="其他招聘要求" span={2}>
-                  <TextArea value="" onChange={() => {}} rows={3} />
+                  <TextArea value={copyFields.requirements} onChange={(requirements) => setCopyFields({ ...copyFields, requirements })} rows={3} />
                 </FormField>
                 <FormField label="用户备注" span={2}>
-                  <TextArea value="" onChange={() => {}} rows={3} />
+                  <TextArea value={copyFields.note} onChange={(note) => setCopyFields({ ...copyFields, note })} rows={3} />
                 </FormField>
               </div>
+              {error ? <StateBanner tone="danger" title={error} /> : null}
               <footer>
                 <Button tone="primary" onClick={create}>
                   创建公司

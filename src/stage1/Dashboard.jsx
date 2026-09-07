@@ -11,6 +11,7 @@ import {
   TaskSummaryTable,
 } from "./DashboardWidgets";
 import { Button, useToast } from "./ui";
+import { getOpportunityActions, mergeLifecycleTasks, useOpportunityState } from "../stage4/opportunity-store";
 
 function getTodayLabel() {
   const now = new Date();
@@ -27,7 +28,14 @@ export function Dashboard() {
   const notify = useToast();
   const state = params.get("state") || "normal";
   const loading = state === "loading";
-  const { tasks, insights, assets } = getDashboardData(params);
+  const { tasks: baseTasks, insights, assets } = getDashboardData(params);
+  const lifecycle = useOpportunityState();
+  const dynamicTasks = mergeLifecycleTasks([], lifecycle).map((task) => ({ ...task, route: "/tasks/" + task.id,
+    attention: task.phase === "result" ? "acceptance" : "action", progress: { icon: task.kind === "recruiting" ? "briefcase" : "building",
+      label: task.results.length ? "已写入 " + task.results.length + " 项结果" : task.phase === "input" ? "正在整理资料" : "等待审核",
+      detail: task.kind === "recruiting" ? "候选人审核与岗位流程" : "输入、草稿和正式结果保持关联" } }));
+  const tasks = [...dynamicTasks, ...baseTasks.filter((task) => !lifecycle.tasks.some((item) => item.id === task.id))];
+  const followupActions = getOpportunityActions(lifecycle);
   const startTask = (prompt) => {
     try {
       sessionStorage.setItem("hunter-new-work-signal", prompt);
@@ -163,8 +171,10 @@ export function Dashboard() {
           )}
         </DashboardSection>
       </div>
-      {!loading && tasks.length > 0 ? (
+      {!loading && (tasks.length > 0 || followupActions.length > 0) ? (
         <ActionQueue
+          additionalItems={followupActions}
+          includeExamples={baseTasks.length > 0}
           expanded={actionExpanded}
           onToggle={() => setActionExpanded((current) => !current)}
           onOpen={navigate}

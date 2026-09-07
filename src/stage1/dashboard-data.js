@@ -72,7 +72,7 @@ const taskPlanSnapshots = {
   "client-xinglan": {
     attention: "action",
     steps: businessScenarios["client-xinglan"].plan,
-    completedStepIds: ["verify", "contacts"],
+    completedStepIds: ["verify"],
     icon: "building",
   },
   "mapping-embodied": {

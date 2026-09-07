@@ -229,7 +229,8 @@ const actionRoutes = {
   "action-source-retry": "/tasks/position-vla?state=limited",
 };
 
-export function ActionQueue({ expanded, onToggle, onOpen }) {
+export function ActionQueue({ expanded, onToggle, onOpen, additionalItems = [], includeExamples = true }) {
+  const items = [...additionalItems, ...(includeExamples ? actionItems : [])];
   return (
     <section className={`s1-action-queue ${expanded ? "is-expanded" : ""}`}>
       <button
@@ -243,18 +244,18 @@ export function ActionQueue({ expanded, onToggle, onOpen }) {
         </i>
         <span>
           <b>行动队列</b>
-          <small>2 项待确认、1 项待补充、1 项异常</small>
+          <small>{additionalItems.length ? additionalItems.length + " 项招聘机会待跟进" : "2 项待确认、1 项待补充、1 项异常"}</small>
         </span>
-        <em>共 {actionItems.length} 项</em>
+        <em>共 {items.length} 项</em>
         <Icon name={expanded ? "chevronUp" : "chevronDown"} />
       </button>
       {expanded ? (
         <div className="s1-action-list">
-          {actionItems.map((item) => (
+          {items.map((item) => (
             <button
               type="button"
               key={item.id}
-              onClick={() => onOpen(actionRoutes[item.id])}
+              onClick={() => onOpen(item.route || actionRoutes[item.id])}
             >
               <StatusBadge tone={item.tone}>
                 {item.tone === "danger" ? "异常" : "待处理"}

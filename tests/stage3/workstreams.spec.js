@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { confirmClientOpportunity } from "./client-helpers";
+import { waitForOpportunityDraft, replyToAsset } from "../stage4/opportunity-helpers";
 import {
   expectNoHorizontalOverflow,
   trackConsoleErrors,
@@ -37,6 +39,7 @@ test("客户开发完成联系人审核、联系授权、外部等待和招聘�
   page,
 }) => {
   await page.goto("#/tasks/client-xinglan");
+  await confirmClientOpportunity(page);
   await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -71,17 +74,24 @@ test("客户开发完成联系人审核、联系授权、外部等待和招聘�
   await page.getByRole("button", { name: "确认并发送" }).click();
   await expect(page.getByText("等待陈雨回复招聘合作邮件")).toBeVisible();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
-  await input.fill("陈雨回复：两个岗位正在招聘，稍后补完整 JD。");
+  await input.fill("公司：星澜机器人\n机会名称：邮件确认的新一轮团队招聘\n招聘需求摘要：两个岗位正在招聘，稍后补完整 JD。\n需求依据：陈雨回复邮件，确认两个方向存在招聘需求。");
   await input.press("Enter");
-  await expect(page.getByText("回复已形成一条招聘机会")).toBeVisible();
-  await expect(page.getByText("星澜机器人 · 具身智能团队招聘")).toBeVisible();
-  await expect(page.getByText(/不足以直接创建正式岗位/)).toBeVisible();
+  await waitForOpportunityDraft(page);
+  await expect(page.getByRole("heading", { name: "待确认的招聘机会" })).toBeVisible();
+  await replyToAsset(page, "是");
+  await expect(page.getByRole("heading", { name: "待确认的招聘机会" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "查看招聘机会", exact: true })).toBeVisible();
+  const state = await page.evaluate(() => JSON.parse(localStorage.getItem("hunter-opportunity-lifecycle-v1")));
+  expect(state.opportunities.find((item) => item.title === "邮件确认的新一轮团队招聘").contactId).toBe("contact-chenyu");
+  expect(state.positions.filter((item) => item.managed)).toEqual([]);
 });
 
 test("客户开发没有联系人时展示可执行缺口而不生成虚假联系人", async ({
   page,
 }) => {
   await page.goto("#/tasks/client-xinglan?state=no-contact");
+  await expect(page.getByText("是否记录这条潜在招聘机会？", { exact: true })).toBeVisible();
+  await confirmClientOpportunity(page);
   await expect(
     page.getByText("暂未找到可以直接联系的招聘负责人"),
   ).toBeVisible();
@@ -329,6 +339,7 @@ for (const scenario of [
 test("移动端客户联系人和候选人岗位详情可查看并返回", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("#/tasks/client-xinglan");
+  await confirmClientOpportunity(page);
   await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
     timeout: 10_000,
   });
@@ -349,6 +360,7 @@ test("客户开发邮件草稿使用独立编辑组件且需要逐次确认", as
   ]) {
     await page.setViewportSize(viewport);
     await page.goto("#/tasks/client-xinglan");
+    await confirmClientOpportunity(page);
     await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
       timeout: 10_000,
     });
@@ -401,6 +413,7 @@ test("四类业务任务的 Markdown 标题列表引用和表格保持统一渲�
 
   for (const [route, marker] of scenarios) {
     await page.goto(`#/tasks/${route}`);
+    if (route.startsWith("client-")) await confirmClientOpportunity(page);
     await expect(page.getByText(marker)).toBeVisible({ timeout: 10_000 });
     const audit = await page
       .locator(".s2-hunter-reply")
@@ -439,7 +452,7 @@ test("四类业务任务的 Markdown 标题列表引用和表格保持统一渲�
 
 test("任务普通回复不再依赖场景专用对话卡片", async ({ page }) => {
   const scenarios = [
-    ["client-xinglan?state=reply", "回复已形成一条招聘机会"],
+    ["client-xinglan?state=reply", "待确认的招聘机会"],
     ["position-vla?state=review", "首批候选人已经可以审核"],
     ["mapping-embodied?state=conflict", "人物与关系批次可以审核"],
     ["career-linhao?state=new-resume", "新简历已合并"],

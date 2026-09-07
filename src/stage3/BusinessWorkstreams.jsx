@@ -29,6 +29,9 @@ import {
   mappingPeople,
   mappingRelationshipViews,
 } from "./data";
+import { getOpportunitySnapshot, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
+import { prepareLegacyOpportunityDiscovery, saveLegacyOpportunityReply } from "../stage4/opportunity-task-adapter";
+import { LegacyOpportunityResult } from "../stage4/OpportunityTaskWorkspace";
 
 function forcedPhase(scenarioId, state) {
   if (state === "stream-error") return 1;
@@ -201,13 +204,16 @@ function ClientTimeline({
   openReview,
   setPhase,
   notify,
+  opportunityResult,
+  opportunityDecided,
+  draftDeferred,
 }) {
   return (
     <>
       {phase >= 1 ? (
         <HunterReply
           streaming={phase === 1}
-          markdown={`我会先核验公司身份和招聘信号，再查找招聘负责人、可用联系方式和已有关系。融资或扩张新闻只作为线索，不会直接当成真实招聘需求。${
+          markdown={`我会先核验公司身份和招聘信号，整理潜在招聘机会并请你确认是否记录，再继续核实联系人与联系方式。融资或扩张新闻只作为线索，不会直接当成客户已确认的招聘需求。${
             phase >= 2
               ? `
 
@@ -248,15 +254,14 @@ ${createMarkdownTable(
           >
             查看来源与核验详情 <Icon name="chevronRight" />
           </button>
-          {phase === 2 ? (
-            <p className="s2-progress-line">
-              <span />
-              正在核验招聘负责人、联系方式和已有关系…
-            </p>
-          ) : null}
         </HunterReply>
       ) : null}
-      {phase >= 3 && forcedState === "no-contact" ? (
+      {phase >= 2 && (!opportunityDecided || draftDeferred || phase <= 3 || phase >= 6) ? <>
+        <HunterReply markdown={(phase >= 6 && opportunityDecided ? "## 补充本轮招聘机会" : opportunityDecided && !draftDeferred ? "## 招聘机会已记录" : "## 是否记录这条潜在招聘机会？\n\n公开招聘变化提供了跟进依据，实际 HC、预算、猎头合作意愿和完整 JD 仍待核实。记录入库不表示客户已确认合作。") + (forcedState === "no-contact" && !opportunityDecided ? "\n\n尚未找到可直接联系的负责人；可以先记录机会，联系人后续补充。" : "")} />
+        {opportunityResult}
+        {opportunityDecided && phase === 2 ? <Button onClick={() => setPhase(3)}>继续核实联系人</Button> : null}
+      </> : null}
+      {phase >= 3 && opportunityDecided && forcedState === "no-contact" ? (
         <HunterReply
           markdown={`## 暂未找到可以直接联系的招聘负责人
 
@@ -284,7 +289,7 @@ ${createMarkdownTable(
           />
         </HunterReply>
       ) : null}
-      {phase >= 3 && forcedState !== "no-contact" ? (
+      {phase >= 3 && opportunityDecided && forcedState !== "no-contact" ? (
         <HunterReply
           markdown={`## 公司与联系人结果可以审核
 
@@ -305,7 +310,7 @@ ${createMarkdownTable(
           />
         </HunterReply>
       ) : null}
-      {phase === 4 ? (
+      {phase === 4 && opportunityDecided ? (
         <HunterReply
           markdown={`## 公司与联系人已保存
 
@@ -324,7 +329,7 @@ ${createMarkdownTable(
           />
         </HunterReply>
       ) : null}
-      {phase === 5 ? (
+      {phase === 5 && opportunityDecided ? (
         <>
           {forcedState === "waiting" ? (
             <UserMessage time="今天 09:26">
@@ -338,34 +343,6 @@ ${createMarkdownTable(
             onAddResult={() =>
               notify("可以在下方输入回复内容，或上传邮件截图和附件", "info")
             }
-          />
-        </>
-      ) : null}
-      {phase >= 6 ? (
-        <>
-          {forcedState === "reply" ? (
-            <HunterReply
-              markdown={`## 已收到陈雨的邮件回复
-
-> 北京团队正在招聘 VLA 算法负责人和机器人学习工程师。可以继续讨论猎头合作，但合作预算需要与业务负责人确认。完整 JD 下周才能补充。`}
-            />
-          ) : null}
-          <HunterReply
-            markdown={`## 回复已形成一条招聘机会
-
-陈雨确认北京团队正在招聘 VLA 算法负责人和机器人学习工程师，猎头合作预算需与业务负责人进一步确认。现有信息足以建立招聘机会，但不足以直接创建正式岗位。
-
-### 星澜机器人 · 具身智能团队招聘
-
-| 项目 | 当前信息 |
-| --- | --- |
-| 状态 | 跟进中 |
-| 确认依据 | 招聘负责人邮件回复 · 今天 11:08 |
-| 招聘方向 | VLA 算法负责人、机器人学习工程师 |
-| 联系人 | 陈雨 · 招聘负责人 |
-| 仍缺信息 | 完整 JD、汇报关系、薪酬范围、合作预算 |
-
-> 如果后续收到完整 JD，Hunter 会先生成岗位草稿；用户确认后再创建正式岗位并启动对应任务。`}
           />
         </>
       ) : null}
@@ -674,19 +651,23 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   const [params] = useSearchParams();
   const forcedState = params.get("state");
   const storageKey = `hunter-stage3-${scenarioId}`;
-  const directPhase = forcedPhase(scenarioId, forcedState);
+  const requestedPhase = forcedPhase(scenarioId, forcedState);
+  const directPhase = scenarioId === "client-xinglan" && requestedPhase !== null ? Math.min(requestedPhase, 2) : requestedPhase;
   const [historyCollapsed, setHistoryCollapsed] = useState(false);
   const [phase, setPhase] = useState(() => {
     if (directPhase !== null) return directPhase;
     const stored = Number(sessionStorage.getItem(`${storageKey}-phase`));
-    return Number.isFinite(stored) ? stored : 0;
+    return Number.isFinite(stored) ? scenarioId === "client-xinglan" && !getOpportunitySnapshot().tasks.some((task) => task.id === scenarioId) ? Math.min(stored, 2) : stored : 0;
   });
   const [paused, setPaused] = useState(forcedState === "limited");
   const [terminated, setTerminated] = useState(false);
   const [runtimeOpen, setRuntimeOpen] = useState(false);
   const [inspection, setInspection] = useState(null);
   const [reviewOpen, setReviewOpen] = useState(false);
-  const [authMode, setAuthMode] = useState(scenario.defaultAuth);
+  const [authMode, setAuthMode] = useState(() => {
+    const mode = getOpportunitySnapshot().tasks.find((task) => task.id === scenarioId)?.authMode || scenario.defaultAuth;
+    return mode === "analyze" ? "analysis" : mode;
+  });
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -701,6 +682,19 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   const [terminateOpen, setTerminateOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const scrollRef = useRef(null);
+  const lifecycle = useOpportunityState();
+  const lifecycleTask = lifecycle.tasks.find((task) => task.id === scenarioId);
+  const opportunityDecided = Boolean(lifecycleTask?.opportunityId || lifecycleTask?.phase === "cancelled");
+  const [savingReply, setSavingReply] = useState(false);
+
+  useEffect(() => {
+    if (scenarioId === "client-xinglan" && lifecycleTask?.phase === "result" && phase >= 6) setPhase(7);
+  }, [scenarioId, lifecycleTask?.phase, phase]);
+  useEffect(() => {
+    if (scenarioId !== "client-xinglan" || phase < 2 || lifecycleTask) return;
+    try { prepareLegacyOpportunityDiscovery(scenario, clientEvidence, authMode); }
+    catch (error) { notify(error.message, "error"); }
+  }, [scenarioId, phase, lifecycleTask, authMode]);
 
   useEffect(() => {
     if (directPhase !== null) setPhase(directPhase);
@@ -744,11 +738,16 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         top: scrollRef.current.scrollHeight,
         behavior: forcedState ? "auto" : "smooth",
       });
-  }, [forcedState, messages.length, phase, storageKey]);
+  }, [forcedState, messages.length, phase, storageKey, params.get("panel"), lifecycleTask?.phase]);
 
   const plan = useMemo(
-    () => buildPlan(scenario, phase, paused, planAdjusted),
-    [paused, phase, planAdjusted, scenario],
+    () => buildPlan(scenario, phase, paused, planAdjusted).map((step) => {
+      if (scenarioId !== "client-xinglan") return step;
+      if (step.id === "record-opportunity" && opportunityDecided) return { ...step, status: "done" };
+      if (step.id === "contacts" && phase === 2 && opportunityDecided) return { ...step, status: "waiting-user", title: "继续核实联系人" };
+      return step;
+    }),
+    [paused, phase, planAdjusted, scenario, scenarioId, opportunityDecided],
   );
   const planUpdate = planAdjusted
     ? {
@@ -767,7 +766,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         }
       : null;
   const status =
-    phase === 5 && scenarioId !== "mapping-embodied"
+    scenarioId === "client-xinglan" && !opportunityDecided && phase >= 2 ? "等待用户" : scenarioId === "client-xinglan" && phase >= 7 ? "可继续" : phase === 5 && scenarioId !== "mapping-embodied"
       ? "等待外部"
       : phase >= scenario.autoStopPhase
         ? "等待用户"
@@ -799,7 +798,18 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
     notify("已从第一条输入重新演示", "info");
   };
 
-  const send = (text, files) => {
+  const send = async (text, files) => {
+    if (scenarioId === "client-xinglan" && phase >= 2) {
+      if (savingReply) return;
+      setSavingReply(true);
+      try {
+        const response = await saveLegacyOpportunityReply(scenario, text, files, authMode, phase >= 5 && opportunityDecided);
+        if (!response?.handled) setPhase(lifecycleTask?.opportunityId ? 6 : 2);
+        setComposer(""); setAttachments([]);
+      } catch (error) { notify(error.message, "error"); }
+      finally { setSavingReply(false); }
+      return;
+    }
     const attachmentText = files.length
       ? `；附带 ${files.map((file) => file.name).join("、")}`
       : "";
@@ -880,6 +890,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
       </div>
     );
   }
+
 
   if (reviewOpen && scenarioId === "client-xinglan") {
     return (
@@ -983,11 +994,15 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
             <UserMessage>{scenario.prompt}</UserMessage>
             {scenarioId === "client-xinglan" ? (
               <ClientTimeline
-                phase={phase}
+                phase={!opportunityDecided && phase > 2 ? 2 : phase}
                 forcedState={forcedState}
                 setInspection={setInspection}
                 openReview={() => setReviewOpen(true)}
                 setPhase={setPhase}
+                notify={notify}
+                opportunityResult={<LegacyOpportunityResult taskId={scenarioId} />}
+                opportunityDecided={opportunityDecided}
+                draftDeferred={lifecycleTask?.phase === "cancelled"}
               />
             ) : null}
             {scenarioId === "mapping-embodied" ? (
@@ -1124,6 +1139,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
               open={runtimeOpen}
               onToggle={() => setRuntimeOpen((value) => !value)}
               plan={plan}
+              waitingLabel={scenarioId === "client-xinglan" ? plan.find((step) => step.status === "waiting-user")?.title : undefined}
               planUpdate={planUpdate}
               tasks={scenario.tasks}
               paused={paused}
@@ -1143,6 +1159,10 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
             onSend={send}
             authMode={authMode}
             onAuthChange={(mode) => {
+              if (lifecycleTask) {
+                try { runOpportunityCommand("task.update", { id: lifecycleTask.id, patch: { authMode: mode === "analysis" ? "analyze" : mode } }); }
+                catch (error) { notify(error.message, "error"); return; }
+              }
               setAuthMode(mode);
               notify(
                 `授权模式已切换为“${mode === "analysis" ? "仅分析" : mode === "auto" ? "自动执行" : "执行前确认"}”，只影响尚未执行的动作`,
@@ -1153,7 +1173,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
             onAttachmentsChange={setAttachments}
             streaming={phase === 1 && !streamStopped && !streamError}
             onStop={() => setStreamStopped(true)}
-            disabled={terminated}
+            disabled={terminated || savingReply}
           />
         </div>
       </section>

@@ -15,6 +15,16 @@ test("桌面账户菜单中的设置与用量可以进入对应设置页", async
   await page.getByRole("menuitem", { name: /查看 Agent 用量/ }).click();
   await page.getByRole("button", { name: "查看订阅与用量" }).click();
   await expect(page).toHaveURL(/#\/settings\/subscription$/);
+  const usage = page.locator(".s5-usage-card");
+  await expect(usage.locator(".s5-usage-breakdown > span").filter({ hasText: "Agent 用量" }).locator("em")).toHaveText("64%");
+  await expect(usage.locator(".s5-metric-donut b")).toHaveText("64%");
+  await expect(usage).not.toContainText("次");
+  await expect(page.getByText("公开网络搜索", { exact: true })).toHaveCount(0);
+  await expect(usage).toContainText("8.2 / 20 GB");
+  await page.screenshot({ path: "artifacts/opportunity-lifecycle/spacing/quick-subscription-after.png", animations: "disabled" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expectNoHorizontalOverflow(page);
+  await usage.screenshot({ path: "artifacts/opportunity-lifecycle/spacing/quick-subscription-mobile.png", animations: "disabled" });
   await assertNoConsoleErrors();
 });
 

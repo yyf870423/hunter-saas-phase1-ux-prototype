@@ -1,5 +1,6 @@
 import { mkdir } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
+import { confirmClientOpportunity } from "./client-helpers";
 import {
   expectNoHorizontalOverflow,
   trackConsoleErrors,
@@ -26,7 +27,7 @@ test.beforeAll(async () => {
 });
 
 for (const scenario of [
-  ["client-xinglan", "公司与联系人结果可以审核", "client"],
+  ["client-xinglan", "待确认的招聘机会", "client"],
   ["mapping-embodied", "人物与关系批次可以审核", "mapping"],
   ["career-linhao", "系统内有 3 个岗位值得查看", "career"],
 ]) {
@@ -41,7 +42,8 @@ for (const scenario of [
       await expect(page.getByText(scenario[1])).toBeVisible({
         timeout: 10_000,
       });
-      await expectConversationAtLatest(page);
+      if (scenario[0] === "client-xinglan") await page.getByRole("heading", { name: "待确认的招聘机会", exact: true }).scrollIntoViewIfNeeded();
+      else await expectConversationAtLatest(page);
       await expectNoHorizontalOverflow(page);
       await page.screenshot({
         path: `${output}/${viewport.name}-${scenario[2]}.png`,
@@ -75,6 +77,7 @@ test("截取三类业务审核工作区", async ({ page }) => {
     ],
   ]) {
     await page.goto(`#/tasks/${scenario[0]}`);
+    if (scenario[0] === "client-xinglan") await confirmClientOpportunity(page);
     await expect(page.getByText(scenario[1])).toBeVisible({ timeout: 10_000 });
     await page.getByRole("button", { name: scenario[2] }).click();
     if (scenario[3] === "contact-review" || scenario[3] === "match-review") {
@@ -211,7 +214,7 @@ test("截取阶段三等待、冲突和资料回流状态", async ({ page }) => 
       "暂未找到可以直接联系的招聘负责人",
       "client-no-contact",
     ],
-    ["client-xinglan?state=reply", "回复已形成一条招聘机会", "client-reply"],
+    ["client-xinglan?state=reply", "待确认的招聘机会", "client-reply"],
     [
       "mapping-embodied?state=conflict",
       "人物与关系批次可以审核",
@@ -229,8 +232,20 @@ test("截取阶段三等待、冲突和资料回流状态", async ({ page }) => 
     ],
   ]) {
     await page.goto(`#/tasks/${route}`);
+    if (route.startsWith("client-xinglan")) {
+      await confirmClientOpportunity(page);
+      if (file === "client-waiting") {
+        await page.getByRole("button", { name: "打开公司与联系人审核" }).click();
+        await page.getByRole("button", { name: "保存审核结果" }).click();
+        await page.getByRole("button", { name: "确认并发送" }).click();
+      } else if (file === "client-reply") {
+        await page.getByPlaceholder("输入补充信息、决定或新的要求").fill("招聘需求摘要：客户回复确认算法方向有招聘计划，完整 JD 下周补充。\n发现依据：用户补充客户回复原文。");
+        await page.getByRole("button", { name: "发送", exact: true }).click();
+      }
+    }
     await expect(page.getByText(marker)).toBeVisible({ timeout: 10_000 });
-    await expectConversationAtLatest(page);
+    if (file === "client-reply") await page.getByRole("heading", { name: "待确认的招聘机会" }).scrollIntoViewIfNeeded();
+    else await expectConversationAtLatest(page);
     await expectNoHorizontalOverflow(page);
     await page.screenshot({
       path: `${output}/desktop-${file}.png`,
@@ -279,6 +294,7 @@ test("截取岗位招聘无候选人结果", async ({ page }) => {
 test("截取客户开发邮件逐次确认", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/tasks/client-xinglan");
+  await confirmClientOpportunity(page);
   await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({
     timeout: 10_000,
   });

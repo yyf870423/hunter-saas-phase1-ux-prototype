@@ -121,6 +121,7 @@ export function FloatingPanel({
   panelRef,
   className,
   width = 240,
+  matchAnchorWidth = true,
   align = "start",
   placement = "bottom",
   gap = 6,
@@ -142,7 +143,7 @@ export function FloatingPanel({
       if (!rect) return;
       const viewportPadding = 8;
       const resolvedWidth = Math.min(
-        Math.max(width, rect.width),
+        matchAnchorWidth ? Math.max(width, rect.width) : width,
         window.innerWidth - viewportPadding * 2,
       );
       if (placement === "right") {
@@ -207,7 +208,7 @@ export function FloatingPanel({
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update, true);
     };
-  }, [align, anchorRef, floatingRef, gap, open, placement, width]);
+  }, [align, anchorRef, floatingRef, gap, matchAnchorWidth, open, placement, width]);
   if (!open || (!style && placement !== "right")) return null;
   return createPortal(
     <div
@@ -429,6 +430,7 @@ export function EntitySelect({ options, value, onChange, ...props }) {
 export function PostWriteMatchingOptions({
   entityType,
   enabled,
+  disabled = false,
   onEnabledChange,
   scope = "all",
   onScopeChange,
@@ -450,6 +452,7 @@ export function PostWriteMatchingOptions({
       <div className="s4-post-write-matching-switch">
         <CustomCheckbox
           checked={enabled}
+          disabled={disabled}
           onChange={onEnabledChange}
           label={isCandidate ? "写入后立即人岗匹配" : "创建后立即人岗匹配"}
         />
@@ -543,12 +546,13 @@ export function DatePicker({
   yearOptions = [],
   allowOngoing = false,
   initialYear = 2026,
+  initialDate = "",
   className = "",
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const panelRef = useRef(null);
-  const initialRange = parseMonthParts(value);
+  const initialRange = parseMonthParts(value || initialDate);
   const [draftValue, setDraftValue] = useState(
     value || (mode === "years" ? [] : ""),
   );
@@ -556,18 +560,20 @@ export function DatePicker({
     Array.isArray(value) ? value : [],
   );
   const [viewYear, setViewYear] = useState(
-    initialRange.start?.year || parseYear(value, initialYear),
+    initialRange.start?.year || parseYear(value || initialDate, initialYear),
   );
   const [viewMonth, setViewMonth] = useState(
     Math.max(
       0,
-      Number(String(value || "").match(/\d{4}-(\d{2})/)?.[1] || 8) - 1,
+      Number(String(value || initialDate).match(/\d{4}-(\d{2})/)?.[1] || 8) - 1,
     ),
   );
   const [selectedDate, setSelectedDate] = useState(
-    String(value || "").match(/\d{4}-\d{2}-\d{2}/)?.[0] ||
+    String(value || initialDate).match(/\d{4}-\d{2}-\d{2}/)?.[0] ||
       `${initialYear}-08-21`,
   );
+  const [hour, setHour] = useState(String(value || "").match(/(?:T| )(\d{2}):/)?.[1] || "09");
+  const [minute, setMinute] = useState(String(value || "").match(/:(\d{2})/)?.[1] || "00");
   const [rangeStep, setRangeStep] = useState("start");
   const [rangeStart, setRangeStart] = useState(initialRange.start);
   const [rangeEnd, setRangeEnd] = useState(initialRange.end);
@@ -575,6 +581,16 @@ export function DatePicker({
   const valueKey = JSON.stringify(value || "");
   useEffect(() => {
     setDraftValue(value || (mode === "years" ? [] : ""));
+    if (mode === "datetime" || mode === "date") {
+      const parts = String(value || initialDate).match(/(\d{4})-(\d{2})-\d{2}/);
+      if (parts) {
+        setSelectedDate(parts[0]);
+        setViewYear(Number(parts[1]));
+        setViewMonth(Number(parts[2]) - 1);
+      }
+      setHour(String(value || "").match(/(?:T| )(\d{2}):/)?.[1] || "09");
+      setMinute(String(value || "").match(/:(\d{2})/)?.[1] || "00");
+    }
     if (mode === "years") setSelectedYears(Array.isArray(value) ? value : []);
     if (mode === "month-range") {
       const next = parseMonthParts(value);
@@ -584,7 +600,7 @@ export function DatePicker({
       setViewYear(next.start?.year || initialYear);
       setRangeStep("start");
     }
-  }, [initialYear, mode, valueKey]);
+  }, [initialYear, initialDate, mode, valueKey]);
   useEffect(() => {
     if (!open) return undefined;
     const close = (event) => {
@@ -681,6 +697,7 @@ export function DatePicker({
         className="s4-date-picker-panel"
         portalTarget={ref.current?.closest(".s1-app, .ops-app")}
         width={mode === "month-range" ? 344 : 320}
+        matchAnchorWidth={false}
         role="dialog"
         ariaLabel={`${label}时间选择器`}
       >
@@ -910,7 +927,7 @@ export function DatePicker({
             {mode === "datetime" ? (
               <div className="s4-time-grid">
                 <small>选择时间</small>
-                <div>
+                <div className="s4-time-presets">
                   {["09:00", "10:30", "14:30", "16:00", "18:30"].map((time) => (
                     <button
                       type="button"
@@ -926,6 +943,16 @@ export function DatePicker({
                       {time}
                     </button>
                   ))}
+                </div>
+                <div className="s4-date-time-inputs">
+                  <TextInput ariaLabel="小时" value={hour} onChange={setHour} inputMode="numeric" maxLength={2} />
+                  <span>:</span>
+                  <TextInput ariaLabel="分钟" value={minute} onChange={setMinute} inputMode="numeric" maxLength={2} />
+                  <Button size="sm" tone="primary"
+                    disabled={!/^\d{1,2}$/.test(hour) || Number(hour) > 23 || !/^\d{1,2}$/.test(minute) || Number(minute) > 59}
+                    onClick={() => { commit(`${selectedDate} ${padDatePart(Number(hour))}:${padDatePart(Number(minute))}`); setOpen(false); }}>
+                    确定
+                  </Button>
                 </div>
               </div>
             ) : null}
@@ -1282,9 +1309,9 @@ export function DetailHeader({
   );
 }
 
-export function DetailTabs({ tabs, value, onChange }) {
+export function DetailTabs({ tabs, value, onChange, variant = "page" }) {
   return (
-    <div className="s4-detail-tabs">
+    <div className={variant === "inset" ? "s4-inset-tabs" : "s4-detail-tabs"}>
       <Tabs label="详情内容" items={tabs} value={value} onChange={onChange} />
     </div>
   );
@@ -1388,6 +1415,8 @@ export function TextInput({
   placeholder,
   disabled = false,
   ariaLabel,
+  inputMode,
+  maxLength,
 }) {
   const [draftValue, setDraftValue] = useState(value || "");
   useEffect(() => setDraftValue(value || ""), [value]);
@@ -1397,6 +1426,8 @@ export function TextInput({
       value={draftValue}
       disabled={disabled}
       aria-label={ariaLabel}
+      inputMode={inputMode}
+      maxLength={maxLength}
       onChange={(event) => {
         setDraftValue(event.target.value);
         onChange?.(event.target.value);
@@ -1537,21 +1568,26 @@ export function DeleteAssetModal({
   );
 }
 
-export function ActivityTimeline({ items, onEdit, onDelete }) {
+export function ActivityTimeline({ items, onEdit, onDelete, renderAttachments }) {
   return (
     <ol className="s4-timeline">
-      {items.map(([time, type, content, source], index) => (
-        <li key={`${time}-${content}`}>
+      {items.map((item, index) => {
+        const [time, type, content, source] = Array.isArray(item)
+          ? item : [item.time, item.type, item.content, item.source];
+        const editable = Array.isArray(item) || item.editable !== false;
+        const identity = Array.isArray(item) ? index : item.id;
+        return (
+        <li key={item.id || `${time}-${content}`}>
           <time>{time}</time>
           <i />
           <div>
             <span>
               <b>{type}</b>
               <em>{source}</em>
-              {onEdit || onDelete ? (
+              {editable && (onEdit || onDelete) ? (
                 <span className="s4-timeline-actions">
                   {onEdit ? (
-                    <button type="button" onClick={() => onEdit(index)}>
+                    <button type="button" onClick={() => onEdit(identity)}>
                       <Icon name="edit" />
                       编辑
                     </button>
@@ -1560,7 +1596,7 @@ export function ActivityTimeline({ items, onEdit, onDelete }) {
                     <button
                       type="button"
                       className="is-danger"
-                      onClick={() => onDelete(index)}
+                      onClick={() => onDelete(identity)}
                     >
                       <Icon name="trash" />
                       删除
@@ -1570,9 +1606,10 @@ export function ActivityTimeline({ items, onEdit, onDelete }) {
               ) : null}
             </span>
             <p>{content}</p>
+            {renderAttachments?.(item)}
           </div>
         </li>
-      ))}
+      ); })}
     </ol>
   );
 }

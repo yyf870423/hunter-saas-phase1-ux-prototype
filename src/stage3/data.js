@@ -1566,13 +1566,14 @@ export const careerMatches = [
 export const businessScenarios = {
   "client-xinglan": {
     id: "client-xinglan",
+    replyContactId: "contact-chenyu",
     type: "客户开发",
     title: "星澜机器人招聘合作",
     object: "星澜机器人 · 具身智能与机器人研发",
     prompt:
-      "星澜机器人刚完成新一轮融资，最近也在扩机器人团队。帮我判断这家公司值不值得跟进，找到合适的招聘负责人和可用联系方式；如果确实有招聘需求，先整理成招聘机会，不要直接创建岗位。",
-    autoStopPhase: 3,
-    maxPhase: 6,
+      "星澜机器人刚完成新一轮融资，最近也在扩机器人团队。帮我核实招聘信号，先整理潜在招聘机会，和我确认是否记录入库，再继续查找招聘负责人和联系方式。不要直接创建岗位。",
+    autoStopPhase: 2,
+    maxPhase: 7,
     defaultAuth: "confirm",
     plan: [
       {
@@ -1581,6 +1582,14 @@ export const businessScenarios = {
         detail: "交叉检查融资、招聘变化、组织扩张和反向证据。",
         requirement: "先判断是否值得开发，不把融资新闻直接当成招聘需求。",
         doneAt: 2,
+      },
+      {
+        id: "record-opportunity",
+        title: "确认是否记录潜在招聘机会",
+        detail: "先审核发现依据和待确认事项，联系人与完整 JD 可以后续补充。",
+        requirement: "无论是否找到联系人，首次记录都由用户明确确认。",
+        doneAt: 3,
+        waitAt: 2,
       },
       {
         id: "contacts",
@@ -1610,10 +1619,11 @@ export const businessScenarios = {
       },
       {
         id: "opportunity",
-        title: "形成招聘机会与后续安排",
-        detail: "收到回复后整理需求；完整 JD 先形成岗位草稿。",
+        title: "补充本轮机会与后续安排",
+        detail: "收到回复后更新同一招聘机会；取得完整 JD 后再形成岗位草稿。",
         requirement: "信息不完整时不能伪造正式岗位。",
         doneAt: 7,
+        waitAt: 6,
       },
     ],
     tasks: [

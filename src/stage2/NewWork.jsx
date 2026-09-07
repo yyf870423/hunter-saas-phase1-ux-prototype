@@ -10,6 +10,8 @@ import {
 } from "./automation-ui";
 import { workItems } from "./data";
 import { TaskAreaNav } from "./TaskAreaNav";
+import { StateBanner } from "../stage4/asset-ui";
+import { createOpportunityTask } from "../stage4/opportunity-task-adapter";
 
 const starterPrompts = [
   "为星澜机器人的 VLA 算法负责人岗位持续寻找合适候选人",
@@ -108,6 +110,7 @@ export function NewWork() {
   const initialStatus = forcedPrompts[forcedState] ? forcedState : "idle";
   const [value, setValue] = useState(
     signalPrompt ||
+      params.get("prompt") ||
       (editingPeriodic
         ? "把这个任务改为每周三 10:00 运行，并继续保留原有去重规则。"
         : ""),
@@ -119,6 +122,8 @@ export function NewWork() {
   );
   const [status, setStatus] = useState(initialStatus);
   const [historyCollapsed, setHistoryCollapsed] = useState(false);
+  const [lifecycleBusy, setLifecycleBusy] = useState(false);
+  const [lifecycleError, setLifecycleError] = useState("");
 
   useEffect(() => {
     if (signalPrompt) sessionStorage.removeItem("hunter-new-work-signal");
@@ -169,10 +174,25 @@ export function NewWork() {
     return () => window.clearTimeout(timer);
   }, [forcedState, navigate, status, submittedPrompt]);
 
-  const begin = (text, files = []) => {
+  const begin = async (text, files = []) => {
     const fileNames = files.map((file) => file.name).join("、");
     const prompt = text.trim() || `请处理附件：${fileNames}`;
     if (!prompt) return;
+    const kind = params.get("kind") || (params.get("positionId") ? "recruiting" :
+      /招聘机会|招聘需求|客户开发|团队扩建|团队扩张/.test(prompt) ? "opportunity" :
+      /创建岗位|解析.*JD|整理.*岗位资料/.test(prompt) ? "position-create" : "");
+    if (["opportunity", "position-create", "recruiting"].includes(kind) && !periodicMode && !editingPeriodic) {
+      if (lifecycleBusy) return;
+      setLifecycleBusy(true); setLifecycleError("");
+      try {
+        const result = await createOpportunityTask({ kind, prompt, files, authMode,
+          opportunityId: params.get("opportunityId") || "", positionId: params.get("positionId") || "",
+          source: params.get("signalId") ? { kind: "signal", id: params.get("signalId"), material: prompt } : undefined });
+        navigate("/tasks/" + result.taskId);
+      } catch (error) { setLifecycleError(error.message); }
+      finally { setLifecycleBusy(false); }
+      return;
+    }
     if (forcedState) setParams({}, { replace: true });
     setSubmittedPrompt(prompt);
     setValue("");
@@ -232,6 +252,8 @@ export function NewWork() {
               </p>
             </header>
 
+            {lifecycleError ? <StateBanner tone="danger" title={lifecycleError} /> : null}
+            {lifecycleBusy ? <StateBanner icon="refresh" title="正在保存输入和附件" /> : null}
             {isLimited ? (
               <div className="s2-new-work-limited" role="alert">
                 <Icon name="warning" />
@@ -334,7 +356,7 @@ export function NewWork() {
               streaming={status === "classifying"}
               onStop={reset}
               disabled={
-                isLimited || ["mainline", "task", "direct"].includes(status)
+                isLimited || lifecycleBusy || ["mainline", "task", "direct"].includes(status)
               }
             />
 

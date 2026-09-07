@@ -169,17 +169,20 @@ test("联系人联系路径提供可直接验收的运行中和失败恢复状�
   await assertNoConsoleErrors();
 });
 
-test("招聘机会触发联系路径，但完整结果保存在联系人资产", async ({ page }) => {
+test("招聘机会先进入联系人详情，联系路径在联系人资产处理", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#/opportunities/opportunity-xinglan");
 
   await expect(page.getByRole("heading", { name: "相关联系人" })).toBeVisible();
   await expect(page.getByText("陈雨 · 招聘负责人")).toBeVisible();
-  await page.getByRole("button", { name: "寻找联系路径" }).click();
+  await expect(page.getByRole("button", { name: "寻找联系路径" })).toHaveCount(0);
+  await page.getByRole("button", { name: "查看联系人" }).click();
   await expect(page).toHaveURL(
-    /contacts\/contact-chenyu\?tab=contact-path&action=find/,
+    /companies\/company-xinglan\/contacts\/contact-chenyu/,
   );
+  await page.getByRole("tab", { name: "联系路径", exact: true }).click();
+  await page.getByRole("button", { name: "寻找联系路径", exact: true }).click();
   await expect(
     page.getByRole("dialog", { name: "更新联系路径" }),
   ).toBeVisible();

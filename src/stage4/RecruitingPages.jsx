@@ -52,6 +52,9 @@ import {
 } from "./PositionInterviewMaterials";
 import { matchResults, positionDetail, positions } from "./data";
 import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import { useOpportunityState } from "./opportunity-store";
+import { CreatedPositionWorkspace } from "./CreatedPositionWorkspace";
+export { PositionCreatePage } from "./PositionCreatePage";
 
 const tabs = [
   { value: "profile", label: "岗位资料" },
@@ -474,9 +477,9 @@ function PositionProfile({
                   <button
                     className="s4-inline-link"
                     type="button"
-                    onClick={() => navigate("/companies/company-xinglan")}
+                    onClick={() => navigate("/companies/" + detail.companyId)}
                   >
-                    星澜机器人
+                    {detail.company}
                   </button>,
                 ],
                 ["招聘状态", <StatusFromText value={detail.status} />],
@@ -490,12 +493,12 @@ function PositionProfile({
                     type="button"
                     className="s4-position-source-inline"
                     onClick={() =>
-                      navigate("/opportunities/opportunity-xinglan")
+                      navigate("/opportunities/" + detail.origin?.opportunityId)
                     }
                   >
                     <span>
                       <b>{detail.sourceOpportunity}</b>
-                      <small>已确认 · 已形成 2 个岗位</small>
+                      <small>岗位创建来源</small>
                     </span>
                     <Icon name="chevronRight" />
                   </button>,
@@ -3306,6 +3309,15 @@ function PositionHistory({ processingRecords, onOpenProcessing }) {
 
 export function PositionDetailPage() {
   const { positionId } = useParams();
+  const state = useOpportunityState();
+  const navigate = useNavigate();
+  const position = state.positions.find((item) => item.id === positionId && !item.deletedAt);
+  if (!position) return <NotFoundState label="岗位" onBack={() => navigate("/positions")} />;
+  return position.managed ? <CreatedPositionWorkspace key={position.id} position={position} /> : <LegacyPositionDetailPage />;
+}
+
+function LegacyPositionDetailPage() {
+  const { positionId } = useParams();
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
@@ -3315,9 +3327,8 @@ export function PositionDetailPage() {
   const aiState = params.get("ai") || "idle";
   const aiPanel = params.get("panel") || "";
   const aiTimerRef = useRef(null);
-  const item =
-    positions.find((position) => position.id === positionId) ||
-    (positionId === "position-vla" ? positionDetail : null);
+  const lifecycle = useOpportunityState();
+  const item = lifecycle.positions.find((position) => position.id === positionId && !position.deletedAt);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const updateQuery = (changes) => {
     const next = new URLSearchParams(params);
@@ -3371,7 +3382,7 @@ export function PositionDetailPage() {
   }, [aiState]);
   if (!item)
     return <NotFoundState label="岗位" onBack={() => navigate("/positions")} />;
-  const detail = { ...positionDetail, ...item };
+  const detail = { ...positionDetail, ...item, ...item.legacyCounts, sourceOpportunity: item.origin?.label || "用户创建" };
   const aiRecord = buildPositionAiRecord(
     ["running", "review", "failed"].includes(aiState) ? aiState : "complete",
   );
@@ -3435,7 +3446,7 @@ export function PositionDetailPage() {
           <Button
             icon="sparkles"
             aria-label={`开始找人：${positionSourcingTooltip}`}
-            onClick={() => navigate(`/new?prompt=为${detail.name}寻找候选人`)}
+            onClick={() => navigate(`/new?kind=recruiting&positionId=${detail.id}&prompt=${encodeURIComponent("为" + detail.name + "寻找候选人")}`)}
           >
             开始找人
           </Button>
@@ -3538,189 +3549,6 @@ export function PositionDetailPage() {
           navigate("/positions");
         }}
       />
-    </div>
-  );
-}
-
-export function PositionCreatePage() {
-  const navigate = useNavigate();
-  const notify = useToast();
-  const [params] = useSearchParams();
-  const [mode, setMode] = useState("manual");
-  const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
-  const [requirements, setRequirements] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [agentPrompt, setAgentPrompt] = useState("");
-  const [agentAuthMode, setAgentAuthMode] = useState("confirm");
-  const [agentAttachments, setAgentAttachments] = useState([]);
-  const [matchEnabled, setMatchEnabled] = useState(
-    params.get("match") === "all",
-  );
-  const create = () => {
-    setSubmitted(true);
-    if (!name.trim() || !company.trim() || !requirements.trim()) return;
-    notify(matchEnabled ? "岗位已创建，人岗匹配已经开始" : "岗位已创建");
-    navigate(
-      matchEnabled
-        ? "/positions/position-vla?tab=matching&state=running"
-        : "/positions/position-vla",
-    );
-  };
-  return (
-    <div className="s4-create-page">
-      <AssetPageHeader
-        eyebrow="岗位"
-        title="新建岗位"
-        description="手动创建正式岗位，或让 Hunter 根据自然语言和 JD 建立岗位资料。"
-        actions={<Button onClick={() => navigate("/positions")}>取消</Button>}
-      />
-      <div className="s4-create-layout">
-        <aside className="s4-create-modes">
-          <button
-            type="button"
-            className={mode === "manual" ? "is-active" : ""}
-            onClick={() => setMode("manual")}
-          >
-            <Icon name="edit" />
-            <span>
-              <b>手动新建</b>
-              <small>填写岗位资料</small>
-            </span>
-          </button>
-          <button
-            type="button"
-            className={mode === "agent" ? "is-active" : ""}
-            onClick={() => setMode("agent")}
-          >
-            <Icon name="sparkles" />
-            <span>
-              <b>AI 解析 JD</b>
-              <small>对话创建岗位</small>
-            </span>
-          </button>
-        </aside>
-        <section className="s4-create-workspace">
-          {mode === "manual" ? (
-            <>
-              <header>
-                <h2>岗位基础资料</h2>
-                <p>基本招聘要求可以是完整 JD，也可以是能说明目标的几句话。</p>
-              </header>
-              <div className="s4-form-grid">
-                <FormField
-                  label="岗位名称"
-                  required
-                  error={submitted && !name.trim() ? "请输入岗位名称" : ""}
-                >
-                  <TextInput
-                    value={name}
-                    onChange={setName}
-                    placeholder="例如：具身智能 VLA 算法负责人"
-                  />
-                </FormField>
-                <FormField
-                  label="招聘公司原文"
-                  required
-                  error={submitted && !company.trim() ? "请输入招聘公司" : ""}
-                >
-                  <TextInput value={company} onChange={setCompany} />
-                </FormField>
-                <FormField label="正式公司关联">
-                  <SelectMenu
-                    label="选择公司"
-                    value=""
-                    options={["星澜机器人", "拓界机器人", "灵跃科技"]}
-                    onChange={() => {}}
-                    searchable
-                  />
-                </FormField>
-                <FormField label="工作地点">
-                  <TextInput value="" onChange={() => {}} />
-                </FormField>
-                <FormField label="薪资下限">
-                  <TextInput
-                    value=""
-                    onChange={() => {}}
-                    placeholder="万元 / 年"
-                  />
-                </FormField>
-                <FormField label="薪资上限">
-                  <TextInput
-                    value=""
-                    onChange={() => {}}
-                    placeholder="万元 / 年"
-                  />
-                </FormField>
-                <FormField
-                  label="基本招聘要求"
-                  required
-                  span={2}
-                  error={
-                    submitted && !requirements.trim()
-                      ? "请输入完整 JD 或能够说明招聘目标的内容"
-                      : ""
-                  }
-                >
-                  <TextArea
-                    value={requirements}
-                    onChange={setRequirements}
-                    rows={12}
-                    placeholder="粘贴岗位 JD，或用几句话说明要找什么样的人、需要哪些经验与背景。"
-                  />
-                </FormField>
-              </div>
-              <PostWriteMatchingOptions
-                entityType="position"
-                enabled={matchEnabled}
-                onEnabledChange={setMatchEnabled}
-              />
-              <footer>
-                <Button tone="primary" onClick={create}>
-                  创建岗位
-                </Button>
-              </footer>
-            </>
-          ) : (
-            <div className="s4-agent-create-entry">
-              <i>
-                <Icon name="sparkles" />
-              </i>
-              <h2>解析 JD 并创建岗位</h2>
-              <p>
-                粘贴完整 JD、输入口述式岗位需求，或添加文件。Hunter
-                会先理解招聘目标并形成完整岗位资料，确认前不会写入。
-              </p>
-              <div className="s4-agent-composer-shell">
-                <Composer
-                  value={agentPrompt}
-                  onChange={setAgentPrompt}
-                  onSend={(text, attachedFiles) => {
-                    const fileNames = attachedFiles
-                      .map((file) => file.name)
-                      .join("、");
-                    const prompt =
-                      text || `解析附件 ${fileNames}，形成完整岗位资料`;
-                    sessionStorage.setItem("hunter-new-task-prompt", prompt);
-                    navigate(
-                      "/tasks/task-create-position?state=position-ingestion",
-                    );
-                  }}
-                  authMode={agentAuthMode}
-                  onAuthChange={setAgentAuthMode}
-                  attachments={agentAttachments}
-                  onAttachmentsChange={setAgentAttachments}
-                  placeholder="粘贴完整 JD，或说明岗位方向、职责、核心技能、目标背景、地点、薪资和特别要求"
-                />
-              </div>
-              <small className="s4-agent-create-hint">
-                可直接粘贴链接，或添加
-                PDF、Word、表格与截图；进入任务后仍可继续补充信息。
-              </small>
-            </div>
-          )}
-        </section>
-      </div>
     </div>
   );
 }

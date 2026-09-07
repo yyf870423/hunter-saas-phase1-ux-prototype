@@ -1169,20 +1169,33 @@ test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", as
   await page.getByRole("button", { name: "保存" }).click();
   await expect(page.getByText("沟通记录已更新")).toBeVisible();
 
+  await page.goto("#/positions/new");
+  await page.getByLabel("岗位名称", { exact: false }).fill("数据质量工程师");
+  await page.getByRole("button", { name: "招聘公司*", exact: true }).click();
+  await page.getByRole("button", { name: "星澜机器人科技有限公司", exact: true }).click();
+  await page.getByLabel("完整岗位 JD", { exact: false }).fill("岗位职责\n负责数据质量和自动化评测。\n任职要求\n具备数据工程与 Python 经验。");
+  await page.getByRole("button", { name: "创建岗位", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "数据质量工程师", exact: true })).toBeVisible();
   await page.goto("#/opportunities/opportunity-xinglan?tab=directions");
   await page.getByRole("button", { name: "形成岗位" }).first().click();
   await expect(page.getByRole("dialog", { name: /形成岗位/ })).toBeVisible();
-  await expect(page.getByLabel("完整岗位 JD")).toHaveValue(/岗位职责/);
+  await expect(page.getByLabel("完整岗位 JD")).toHaveValue("");
+  await page.getByLabel("完整岗位 JD").fill("岗位职责\n负责机器人学习研发和真机部署。\n任职要求\n有机器人学习工程经验。");
   await page.getByRole("button", { name: "确认创建并关联" }).click();
-  await expect(page.getByText("新岗位已创建并关联到招聘机会")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "岗位已形成", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "返回招聘方向", exact: true }).click();
 
   await page.getByRole("button", { name: "形成岗位" }).first().click();
   await page.getByRole("tab", { name: "关联已有岗位" }).click();
-  await page.locator(".s4-existing-position-flow .s4-select > button").click();
-  await page.getByRole("button", { name: "运动控制算法专家" }).click();
-  await expect(page.getByText("将要关联的岗位")).toBeVisible();
+  await page.getByRole("button", { name: "选择已有岗位*", exact: true }).click();
+  await expect(page.getByRole("button", { name: /运动控制算法专家/ })).toHaveCount(0);
+  await page.getByRole("button", { name: "数据质量工程师 · 招聘中", exact: true }).click();
+  await expect(page.getByText("尚未关联", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "确认关联岗位" }).click();
-  await expect(page.getByText("已有岗位已关联到招聘机会")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "岗位已形成", exact: true })).toBeVisible();
+  const state = await page.evaluate(() => JSON.parse(localStorage.getItem("hunter-opportunity-lifecycle-v1")));
+  const position = state.positions.find((item) => item.name === "数据质量工程师");
+  expect(state.opportunities.find((item) => item.id === "opportunity-xinglan").directions.some((item) => item.positionId === position.id)).toBe(true);
 });
 
 test("知识图谱内容、关系详情与写入决定可用", async ({ page }) => {

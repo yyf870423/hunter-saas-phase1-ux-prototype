@@ -8,6 +8,7 @@ import {
 } from "../shared/productCatalog";
 import { FormField, SelectMenu, TextInput } from "../stage4/asset-ui";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
+import { agentUsage } from "../stage1/data";
 import {
   ChoiceCard,
   InlineNotice,
@@ -1335,19 +1336,12 @@ export function SubscriptionSettingsPage() {
               </div>
             </div>
             <div className="s5-usage-card">
-              <MetricDonut value={64} label="64%" caption="本月已使用" />
+              <MetricDonut value={agentUsage.usedPercent} label={`${agentUsage.usedPercent}%`} caption="本月已使用" />
               <div className="s5-usage-breakdown">
                 <span>
-                  <i style={{ "--usage": "72%" }} />
+                  <i style={{ "--usage": `${agentUsage.usedPercent}%` }} />
                   <b>Agent 用量</b>
-                  <em>
-                    36 / {subscriptionPlans.professional.agentTaskQuota} 次
-                  </em>
-                </span>
-                <span>
-                  <i style={{ "--usage": "53%" }} />
-                  <b>公开网络搜索</b>
-                  <em>1,580 / 3,000 次</em>
+                  <em>{agentUsage.usedPercent}%</em>
                 </span>
                 <span>
                   <i style={{ "--usage": "41%" }} />

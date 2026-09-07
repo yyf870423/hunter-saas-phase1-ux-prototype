@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Icon } from "../components/Icon";
 import { HunterReply } from "../stage2/automation-ui";
 import { DashboardComponentsPreview } from "./DashboardComponentsPreview";
+import { OpportunityComponentsPreview } from "../stage4/OpportunityComponents";
 import {
   Button,
   EmptyState,
@@ -141,6 +142,7 @@ export function ComponentsPage() {
         </article>
       </section>
       <DashboardComponentsPreview />
+      <OpportunityComponentsPreview />
       <Modal
         open={modalOpen}
         close={() => setModalOpen(false)}

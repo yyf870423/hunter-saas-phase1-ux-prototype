@@ -58,9 +58,9 @@ test("招聘机会新建页面展示完整字段和必填校验", async ({ page 
   await page.goto("#/opportunities/new");
   await page.getByRole("button", { name: "创建招聘机会" }).click();
   await expect(page.getByText("请输入机会名称")).toBeVisible();
-  await expect(page.getByText("请选择所属公司")).toBeVisible();
+  await expect(page.getByText("请选择有效的所属公司")).toBeVisible();
   await expect(page.getByText("请输入招聘需求摘要")).toBeVisible();
-  await expect(page.getByText("请说明需求确认依据")).toBeVisible();
+  await expect(page.getByText("请说明发现依据")).toBeVisible();
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });

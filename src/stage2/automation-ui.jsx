@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Icon } from "../components/Icon";
 import { Button, IconButton, SearchField, StatusBadge } from "../stage1/ui";
+import { mergeLifecycleTasks, useOpportunityState } from "../stage4/opportunity-store";
 
 export const authorizationModes = [
   {
@@ -495,6 +496,7 @@ export function RuntimeBar({
   onInspectTask,
   paused = false,
   docked = false,
+  waitingLabel = "候选人审核",
 }) {
   const [tasksOpen, setTasksOpen] = useState(false);
   const done = plan.filter((step) => step.status === "done").length;
@@ -506,7 +508,7 @@ export function RuntimeBar({
     : paused
       ? `${done} 项已完成，当前步骤已暂停`
       : waiting
-        ? `${done} 项已完成，正在等待候选人审核`
+        ? `${done} 项已完成，等待${waitingLabel}`
         : running
           ? `已完成 ${done} / ${plan.length} 项`
           : `${done} / ${plan.length} 项已完成`;
@@ -624,6 +626,8 @@ export function WorkHistory({
   onSelect,
   onCreate,
 }) {
+  const lifecycle = useOpportunityState();
+  items = useMemo(() => mergeLifecycleTasks(items, lifecycle), [items, lifecycle]);
   const [query, setQuery] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const visible = useMemo(() => {

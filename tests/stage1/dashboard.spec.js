@@ -86,7 +86,7 @@ test("工作台进度按当前计划统计完成步数，未知和重复完成 I
     dashboardTasks.map(({ progress }) => [progress.completed, progress.total]),
   ).toEqual([
     [4, 5],
-    [2, 5],
+    [1, 6],
     [3, 5],
     [3, 5],
     [2, 3],
@@ -310,7 +310,7 @@ test("行动队列默认收起，展开后进入事项来源", async ({ page }) 
   await summary.click();
   await expect(page.locator(".s1-action-list")).toHaveCount(0);
   await summary.click();
-  await page.getByRole("button", { name: /确认星澜机器人优先联系人/ }).click();
+  await page.getByRole("button", { name: /确认是否记录星澜机器人潜在机会/ }).click();
   await expect(page).toHaveURL(/#\/tasks\/client-xinglan$/);
 });
 
@@ -416,7 +416,7 @@ test("组件库最大容量向每类传入 12 条但只呈现 10 条", async ({ 
       animations: "disabled",
     });
   }
-  await page.getByRole("tab", { name: "空状态", exact: true }).click();
+  await page.getByRole("tablist", { name: "工作台组件状态" }).getByRole("tab", { name: "空状态", exact: true }).click();
   await expect(
     page.locator(".s1-dashboard-component-preview .s1-empty-state"),
   ).toHaveCount(3);

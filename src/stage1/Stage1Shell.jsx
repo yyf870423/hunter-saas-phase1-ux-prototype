@@ -2,6 +2,9 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { TooltipText } from "../stage4/asset-ui";
+import { StateBanner } from "../stage4/asset-ui";
+import { getOpportunityNotificationError, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
+import { displayDateTime } from "../stage4/OpportunityComponents";
 import {
   AssetTypeNavigation,
   MobileNavigation,
@@ -170,6 +173,9 @@ function NotificationPanel({ open, close, items, setItems }) {
     tab === "unread" ? items.filter((item) => item.unread) : items;
   return (
     <Drawer open={open} close={close} title="通知">
+      {getOpportunityNotificationError() ? <StateBanner tone="danger" title={getOpportunityNotificationError()} action={<Button size="sm" icon="refresh" onClick={() => {
+        try { runOpportunityCommand("notifications.tick"); } catch (error) { notify(error.message, "error"); }
+      }}>重试提醒</Button>} /> : null}
       <div className="s1-notification-toolbar">
         <Tabs
           label="通知范围"
@@ -255,7 +261,6 @@ function NewMenu({ open, close, onSelect }) {
     <div className="s1-new-menu" role="menu" ref={ref}>
       {[
         ["route", "新建任务", "直接说明目标，Hunter 会选择合适的推进方式"],
-        ["refresh", "新建周期性任务", "用自然语言说明需要重复执行的任务和周期"],
         ["plus", "手动新建资产", "进入对应业务资产创建正式记录"],
       ].map(([icon, title, description]) => (
         <button type="button" key={title} onClick={() => onSelect(title)}>
@@ -383,8 +388,19 @@ export function Stage1Shell() {
     location.pathname.startsWith(`/${item.id}/`);
   const assetTriggerRef = useRef(null);
   const accountRef = useRef(null);
-  const [notificationItems, setNotificationItems] =
+  const [legacyNotifications, setLegacyNotifications] =
     useState(initialNotifications);
+  const lifecycle = useOpportunityState();
+  const notificationItems = [...lifecycle.notifications.map((notice) => ({ ...notice, lifecycle: true, unread: !notice.read,
+    type: notice.kind === "asset-write" ? "任务写入结果" : "招聘机会跟进", title: notice.resolved ? "跟进事项已处理或取消" : notice.title, source: notice.content, time: displayDateTime(notice.at),
+    route: notice.kind === "asset-write" ? "/tasks/" + notice.taskId : notice.taskId ? "/tasks/" + notice.taskId + "?followup=" + notice.followupId : "/opportunities/" + notice.opportunityId + "?tab=profile&followup=" + notice.followupId })), ...legacyNotifications];
+  const setNotificationItems = (update) => {
+    try {
+      const next = typeof update === "function" ? update(notificationItems) : update;
+      for (const item of next) if (item.lifecycle && !item.unread && lifecycle.notifications.find((notice) => notice.id === item.id && !notice.read)) runOpportunityCommand("notification.read", { id: item.id });
+      setLegacyNotifications(next.filter((item) => !item.lifecycle));
+    } catch (error) { notify(error.message, "error"); }
+  };
   const unread = notificationItems.filter((item) => item.unread).length;
 
   useEffect(() => {
@@ -742,8 +758,6 @@ export function Stage1Shell() {
                 onSelect={(label) => {
                   setNewOpen(false);
                   if (label === "新建任务") navigate("/new");
-                  else if (label === "新建周期性任务")
-                    navigate("/new?mode=periodic");
                   else if (label === "手动新建资产") setAssetCreateOpen(true);
                 }}
               />

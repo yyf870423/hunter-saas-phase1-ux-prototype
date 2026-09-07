@@ -6030,7 +6030,7 @@
 .s4-month-grid > button,
 .s4-year-grid > button,
 .s4-day-grid > button,
-.s4-time-grid button {
+.s4-time-presets > button {
   display: grid;
   height: 32px;
   place-items: center;
@@ -6048,10 +6048,22 @@
     border-color 100ms ease;
 }
 
+.s4-time-grid > .s4-date-time-inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.s4-date-time-inputs > input {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .s4-month-grid > button:hover,
 .s4-year-grid > button:hover,
 .s4-day-grid > button:hover,
-.s4-time-grid button:hover {
+.s4-time-presets > button:hover {
   background: var(--s1-canvas);
   border-color: var(--s1-line);
 }
@@ -6059,7 +6071,7 @@
 .s4-month-grid > button.is-selected,
 .s4-year-grid > button.is-selected,
 .s4-day-grid > button.is-selected,
-.s4-time-grid button.is-selected {
+.s4-time-presets > button.is-selected {
   color: #fff;
   background: var(--s1-accent);
   border-color: var(--s1-accent);
@@ -6096,24 +6108,26 @@
 }
 
 .s4-time-grid {
-  padding: 9px 10px 10px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
   border-top: 1px solid var(--s1-line);
 }
 
 .s4-time-grid > small {
   display: block;
-  margin-bottom: 6px;
   color: var(--s1-muted);
   font-size: 11px;
+  line-height: 16px;
 }
 
-.s4-time-grid > div {
+.s4-time-presets {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
 }
 
-.s4-time-grid button {
+.s4-time-presets > button {
   height: 30px;
   font-size: 10px;
 }
@@ -6815,15 +6829,21 @@
   margin-inline: calc(-1 * max(0px, (100vw - 1440px - 224px) / 2));
   padding-inline: max(0px, (100vw - 1440px - 224px) / 2);
 }
-.s4-detail-tabs .s1-tabs {
+.s4-detail-tabs .s1-tabs,
+.s4-inset-tabs .s1-tabs {
   width: 100%;
   padding: 0;
   overflow-x: auto;
   border-bottom: 0;
 }
-.s4-detail-tabs .s1-tabs button {
+.s4-detail-tabs .s1-tabs button,
+.s4-inset-tabs .s1-tabs button {
   min-height: 48px;
   white-space: nowrap;
+}
+.s4-inset-tabs {
+  min-width: 0;
+  border-bottom: 1px solid var(--s1-line);
 }
 .s4-detail-stack {
   display: grid;

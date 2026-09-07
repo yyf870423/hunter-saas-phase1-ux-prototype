@@ -146,8 +146,10 @@ test("公司、联系人和招聘机会详情遵循分区编辑与完整岗位�
     fullPage: true,
   });
   await page.getByRole("tab", { name: "关联已有岗位" }).click();
-  await page.locator(".s4-existing-position-flow .s4-select > button").click();
-  await page.getByRole("button", { name: "运动控制算法专家" }).click();
+  await page.getByRole("button", { name: "选择已有岗位*", exact: true }).click();
+  await expect(page.getByRole("button", { name: /运动控制算法专家/ })).toHaveCount(0);
+  await page.getByRole("button", { name: "具身智能 VLA 算法负责人 · 招聘中", exact: true }).click();
+  await expect(page.getByText("该岗位已有机会主归属", { exact: true })).toBeVisible();
   await page.screenshot({
     path: `${output}/opportunity-link-existing-position.png`,
     fullPage: true,

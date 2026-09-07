@@ -47,13 +47,13 @@ export const mainlines = [
     tone: "warning",
     changed: "12 分钟前",
     summary:
-      "已核验两条招聘信号，形成三位联系人草稿，其中两位具有可用联系方式。",
+      "已核验公开招聘与团队扩张线索，等待确认是否记录潜在招聘机会。",
     facts: [
-      ["招聘信号", "2 条已核验"],
-      ["联系人", "3 位 / 2 位可联系"],
-      ["当前等待", "确认优先联系人"],
+      ["招聘信号", "公开岗位与团队扩张"],
+      ["待确认", "招聘计划、联系人与完整 JD"],
+      ["当前等待", "是否记录潜在机会"],
     ],
-    next: "确认优先联系人后，Hunter 将准备联系内容并按当前授权继续。",
+    next: "先确认是否记录潜在机会，再继续核实联系人；对外联系单独授权。",
   },
   {
     id: "position-vla",
@@ -151,9 +151,9 @@ export const signals = [
 export const actionItems = [
   {
     id: "action-contact",
-    title: "确认星澜机器人优先联系人",
+    title: "确认是否记录星澜机器人潜在机会",
     source: "客户开发 · 星澜机器人招聘合作",
-    meta: "3 位联系人草稿，其中 2 位有可用联系方式",
+    meta: "发现依据已整理，招聘计划、联系人和 JD 待核实",
     tone: "warning",
   },
   {
@@ -191,10 +191,10 @@ export const notifications = [
   },
   {
     id: "notification-1",
-    type: "外部回复",
-    title: "周雅雯补充了两个算法岗位方向",
+    type: "任务待确认",
+    title: "星澜机器人潜在招聘机会待确认",
     source: "星澜机器人招聘合作",
-    route: "/tasks/client-xinglan?state=reply",
+    route: "/tasks/client-xinglan",
     time: "8 分钟前",
     unread: true,
   },

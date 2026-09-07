@@ -125,9 +125,9 @@ test("岗位新建与批量导入使用相同的写入后匹配规则", async ({
     "招聘具身智能 VLA 算法负责人，需要真机部署经验和团队管理能力。",
   );
   await page.getByRole("button", { name: "发送" }).click();
-  await expect(page).toHaveURL(/tasks\/task-create-position/);
+  await expect(page).toHaveURL(/tasks\/task-position-create-/);
   await expect(
-    page.getByText(/招聘具身智能 VLA 算法负责人，需要真机部署经验/),
+    page.getByText(/招聘具身智能 VLA 算法负责人，需要真机部署经验/).first(),
   ).toBeVisible();
 
   await page.goto("#/data/imports?type=positions&match=all");
@@ -156,10 +156,9 @@ test("Agent 入库对话在写入前询问是否立即匹配", async ({ page }) 
   });
 
   await page.goto("#/tasks/task-create-position?state=position-ingestion");
-  await expect(page.getByText(/创建岗位后是否立即进行人岗匹配/)).toBeVisible();
-  await expect(
-    page.getByText("创建岗位并立即人岗匹配", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "待确认的岗位", exact: true })).toBeVisible();
+  await expect(page.getByText("是否将这份岗位入库？", { exact: true })).toBeVisible();
+  await expect(page.getByText("创建岗位并立即人岗匹配", { exact: true })).toHaveCount(0);
   await assertNoConsoleErrors();
 });
 

@@ -26,6 +26,9 @@ test("导航和任务工作区只使用统一任务概念", async ({ page }) => 
   await expect(
     page.locator(".s2-history-list").getByText("具身智能 VLA 算法负责人"),
   ).toBeVisible();
+  await expect(page.locator(".s2-history-scenes em").first()).toHaveCSS("font-size", "13px");
+  await expect(page.locator(".s2-history-scenes em").first()).toHaveCSS("font-weight", "650");
+  await page.screenshot({ path: "artifacts/opportunity-lifecycle/spacing/quick-task-types-after.png", animations: "disabled" });
   await page.getByPlaceholder("搜索任务").fill("核验灵巧手");
   await expect(
     page.locator(".s2-history-list").getByText("核验灵巧手团队负责人"),
@@ -369,10 +372,12 @@ test("洞察中心持续跟进观察项并把处理结果带入任务", async ({
   await expect(page.getByRole("heading", { name: "处理洞察" })).toBeVisible();
   await page.getByRole("radio", { name: /创建新任务/ }).click();
   await page.getByRole("button", { name: "创建任务", exact: true }).click();
-  await expect(page).toHaveURL(/#\/new$/);
-  await expect(page.locator(".s2-composer textarea")).toHaveValue(
-    /拓界智驾新增感知与规划团队招聘页面/,
-  );
+  await expect(page).toHaveURL(/#\/tasks\/task-opportunity-/);
+  await expect(page.getByRole("heading", { name: "待确认的招聘机会" })).toBeVisible();
+  const state = await page.evaluate(() => JSON.parse(localStorage.getItem("hunter-opportunity-lifecycle-v1")));
+  expect(state.tasks[0].source.id).toBe("signal-tuoji");
+  expect(state.tasks[0].messages[0].content).toContain("拓界智驾新增感知与规划团队招聘页面");
+  expect(state.tasks[0].results).toEqual([]);
 });
 
 test("洞察加入已有任务前必须明确选择目标任务", async ({ page }) => {
@@ -382,15 +387,20 @@ test("洞察加入已有任务前必须明确选择目标任务", async ({ page 
   const submit = page.getByRole("button", { name: "加入所选任务" });
   await expect(submit).toBeDisabled();
   await expect(page.getByText("选择目标任务")).toBeVisible();
-  await page.getByRole("radio", { name: /星澜机器人招聘合作/ }).click();
+  await page.goto("#/new?kind=opportunity&prompt=" + encodeURIComponent("公司：星澜机器人\n机会名称：洞察核验任务\n招聘需求摘要：核验研发团队招聘\n需求依据：待核验"));
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "待确认的招聘机会" })).toBeVisible();
+  const taskUrl = page.url();
+  await page.goto("#/signals?signal=signal-cloudchip");
+  await page.getByRole("button", { name: "处理洞察" }).click();
+  await page.getByRole("radio", { name: /加入已有任务/ }).click();
+  await page.getByRole("radiogroup", { name: "已有任务" }).getByRole("radio").first().click();
   await expect(submit).toBeEnabled();
   await submit.click();
-  await expect(page.getByRole("heading", { name: "已加入任务" })).toBeVisible();
-  await expect(
-    page
-      .locator(".s2-signal-followup")
-      .getByText("星澜机器人招聘合作", { exact: true }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(taskUrl);
+  const state = await page.evaluate(() => JSON.parse(localStorage.getItem("hunter-opportunity-lifecycle-v1")));
+  expect(state.tasks).toHaveLength(1);
+  expect(state.tasks[0].sourceSignals).toContain("signal-cloudchip");
 });
 
 test("洞察可以记录系统外处理结果而不创建任务", async ({ page }) => {

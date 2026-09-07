@@ -2512,11 +2512,17 @@
   display: inline-flex;
   min-width: 0;
   align-items: center;
+  flex-wrap: wrap;
   gap: 4px;
   overflow: hidden;
+  color: var(--s1-accent-hover);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 20px;
 }
 .s2-history-scenes > em {
   display: inline-block;
+  margin-top: 0;
   overflow: hidden;
   color: inherit;
   font: inherit;

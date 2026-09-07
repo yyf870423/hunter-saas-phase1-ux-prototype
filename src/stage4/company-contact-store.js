@@ -5,6 +5,7 @@ import { removeContactFileData } from "./contact-file-storage";
 const key = "hunter-company-contacts-v1";
 const listeners = new Set();
 const initial = {
+  companies: companies.map((company) => ({ ...company })),
   contacts: contacts.map((contact) => ({
     ...contact,
     relationStatus: "当前",
@@ -44,7 +45,7 @@ try {
     Array.isArray(saved.contacts) &&
     Array.isArray(saved.deletedCompanies)
   )
-    state = saved;
+    state = { ...saved, companies: saved.companies || initial.companies };
 } catch {
   /* Invalid demo state falls back to seed data. */
 }
@@ -58,7 +59,7 @@ window.addEventListener("storage", (event) => {
       !Array.isArray(saved.deletedCompanies)
     )
       return;
-    state = saved;
+    state = { ...saved, companies: saved.companies || initial.companies };
     listeners.forEach((listener) => listener());
   } catch {
     /* Keep the last valid state when another tab has invalid demo data. */
@@ -85,13 +86,31 @@ export function useCompanyContacts() {
   );
 }
 
+export const getCompanyContactSnapshot = () => state;
+
+export function saveCompany(patch, id) {
+  const current = id ? state.companies.find((company) => company.id === id) : null;
+  if (id && (!current || state.deletedCompanies.includes(id)))
+    throw new Error("公司不存在或已删除。");
+  const name = (patch.name ?? current?.name)?.trim();
+  if (!name) throw new Error("请输入公司名称。");
+  if (state.companies.some((company) => company.id !== id &&
+    !state.deletedCompanies.includes(company.id) && company.name.trim() === name))
+    throw new Error("已有同名公司，请先核对现有公司资料。");
+  const next = { ...current, ...patch, name, id: id || "company-" + crypto.randomUUID(),
+    managed: true, updatedAt: new Date().toISOString() };
+  commit({ ...state, companies: current ? state.companies.map((company) =>
+    company.id === id ? next : company) : [...state.companies, next] });
+  return next;
+}
+
 export const contactRoute = (contact) =>
   `/companies/${contact.companyId}/contacts/${contact.id}`;
 export const companyContactsRoute = (companyId) =>
   `/companies/${companyId}?tab=contacts`;
 
 export function saveContact(companyId, patch, id) {
-  const company = companies.find((item) => item.id === companyId);
+  const company = state.companies.find((item) => item.id === companyId);
   if (!company || state.deletedCompanies.includes(companyId))
     throw new Error("所属公司不存在或已删除，请返回公司列表。");
   const current = id

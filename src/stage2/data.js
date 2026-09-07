@@ -31,7 +31,7 @@ export const workstreamHistory = [
     tone: "warning",
     time: "12 分钟前",
     pinned: true,
-    summary: "两条招聘信号已经核验，等待确认优先联系人和后续联系内容。",
+    summary: "公开招聘与团队扩张线索已核验，等待确认是否记录潜在招聘机会。",
   },
   {
     id: "mapping-embodied",

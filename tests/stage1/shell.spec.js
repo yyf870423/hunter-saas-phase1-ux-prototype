@@ -149,7 +149,9 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: /新建周期性任务/ }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(page.locator(".s1-new-menu").getByRole("button", { name: /^新建任务/ })).toBeVisible();
+  await page.screenshot({ path: "artifacts/opportunity-lifecycle/spacing/quick-new-menu.png", animations: "disabled" });
   await page.getByRole("button", { name: "打开用户菜单" }).click();
   await page.getByRole("menuitem", { name: /查看 Agent 用量/ }).click();
   await expect(page.getByRole("heading", { name: "Agent 用量" })).toBeVisible();

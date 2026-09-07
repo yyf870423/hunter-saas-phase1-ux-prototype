@@ -2886,6 +2886,7 @@ a:focus-visible {
   gap: 18px;
 }
 .s1-component-section {
+  min-width: 0;
   padding: 22px;
   background: var(--s1-surface);
   border: 1px solid var(--s1-line);

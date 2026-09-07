@@ -78,6 +78,7 @@ import {
   TasksPage,
 } from "./stage6/SystemOperationsPages";
 import { OperationsReviewPage } from "./stage6/OperationsReviewPage";
+import { OpportunityDemoPage, OpportunityDemoSourcePage } from "./stage4/OpportunityDemoPage";
 
 export default function App() {
   return (
@@ -101,6 +102,8 @@ export default function App() {
         <Route path="/ops/support" element={<SupportPage />} />
       </Route>
       <Route element={<Stage1Shell />}>
+        <Route path="/demo/opportunities" element={<OpportunityDemoPage />} />
+        <Route path="/demo/opportunity-source/:caseId" element={<OpportunityDemoSourcePage />} />
         <Route path="/home" element={<Dashboard />} />
         <Route path="/components" element={<ComponentsPage />} />
         <Route path="/new" element={<NewWork />} />

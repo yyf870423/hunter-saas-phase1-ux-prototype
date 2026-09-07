@@ -12,6 +12,7 @@ import {
   DeleteAssetModal,
   FilterBar,
   Pagination,
+  SelectMenu,
   StatusFromText,
   TagList,
   TooltipText,
@@ -33,6 +34,9 @@ import {
   positions,
 } from "./data";
 import { useCompanyContacts, recycleCompany } from "./company-contact-store";
+import { runOpportunityCommand, summarizePosition, useOpportunityState } from "./opportunity-store";
+import { summarizeOpportunity } from "./opportunity-domain";
+import { displayDateTime } from "./OpportunityComponents";
 
 const educationTones = {
   博士: "violet",
@@ -189,13 +193,14 @@ const configs = {
   },
   opportunities: {
     title: "招聘机会",
-    description: "记录已确认的招聘需求，并逐步拆分为正式岗位。",
+    description: "记录潜在招聘机会，核实需求后逐步形成正式岗位。",
     data: opportunities,
     searchKeys: ["title", "company", "summary", "evidence"],
     placeholder: "搜索机会名称、公司或招聘方向",
     filters: [
       ["公司", ["星澜机器人", "拓界机器人", "灵跃科技", "穹顶智能"]],
       ["状态", ["跟进中", "已完成", "已关闭"]],
+      ["跟进", ["待跟进", "已安排", "未安排"]],
     ],
     columns: [
       {
@@ -219,6 +224,8 @@ const configs = {
       },
       { key: "directions", label: "招聘方向" },
       { key: "positions", label: "已形成岗位" },
+      { key: "followupStatus", label: "跟进", render: (row) => <StatusFromText value={row.followupStatus} /> },
+      { key: "nextFollowup", label: "下次跟进", render: (row) => row.followup ? displayDateTime(row.followup.dueAt) : "未安排" },
       {
         key: "status",
         label: "状态",
@@ -258,16 +265,21 @@ function RowActions({ row, type, onDelete, onFavorite }) {
 }
 
 export function AssetListPage({ type }) {
-  const config = configs[type];
+  const baseConfig = configs[type];
   const navigate = useNavigate();
   const notify = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const state = searchParams.get("state") || "normal";
-  const { contacts: contactRecords, deletedCompanies } = useCompanyContacts();
+  const companyContext = useCompanyContacts();
+  const { companies: companyRecords, contacts: contactRecords, deletedCompanies } = companyContext;
+  const lifecycle = useOpportunityState();
+  const config = useMemo(() => ({ ...baseConfig, filters: baseConfig.filters.map(([label, options]) =>
+    [label, label === "公司" ? companyRecords.filter((company) => !deletedCompanies.includes(company.id)).map((company) => company.name) : options]) }), [baseConfig, companyRecords, deletedCompanies]);
+  const [sort, setSort] = useState("最近更新");
   const listData = useMemo(
     () =>
       type === "companies"
-        ? config.data
+        ? companyRecords
             .filter((company) => !deletedCompanies.includes(company.id))
             .map((company) => ({
               ...company,
@@ -275,9 +287,14 @@ export function AssetListPage({ type }) {
                 (contact) =>
                   contact.companyId === company.id && !contact.deletedAt,
               ).length,
+              opportunities: lifecycle.opportunities.filter((item) => !item.deletedAt && item.companyId === company.id).length,
+              positions: lifecycle.positions.filter((item) => !item.deletedAt && item.companyId === company.id).length,
+              talents: company.talents || 0,
+              progress: lifecycle.positions.filter((item) => !item.deletedAt && item.companyId === company.id).reduce((total, item) => total + summarizePosition(item).progress, 0),
             }))
-        : config.data,
-    [type, config.data, contactRecords, deletedCompanies],
+        : type === "opportunities" ? lifecycle.opportunities.filter((item) => !item.deletedAt).map((item) => summarizeOpportunity(item, lifecycle, companyContext))
+        : type === "positions" ? lifecycle.positions.filter((item) => !item.deletedAt).map(summarizePosition) : config.data,
+    [type, config.data, companyRecords, companyContext, lifecycle, contactRecords, deletedCompanies],
   );
   const controller = useListController(listData, config.searchKeys, 6);
   const [filterValues, setFilterValues] = useState(() =>
@@ -406,6 +423,7 @@ export function AssetListPage({ type }) {
           收藏夹: "folders",
           招聘状态: "status",
           状态: "status",
+          跟进: "followupStatus",
           类别: "categories",
         }[label];
         const cell = row[key];
@@ -426,10 +444,10 @@ export function AssetListPage({ type }) {
     type,
   ]);
   const pages = Math.max(1, Math.ceil(filtered.length / 6));
-  const filteredRows = filtered.slice(
-    (controller.page - 1) * 6,
-    controller.page * 6,
-  );
+  const sortedRows = type === "opportunities" ? [...filtered].sort((a, b) => sort === "名称" ? a.title.localeCompare(b.title, "zh-CN") :
+    sort === "下次跟进" ? (a.followup?.dueAt || "9999").localeCompare(b.followup?.dueAt || "9999") : b.updatedAt.localeCompare(a.updatedAt)) : filtered;
+  const currentPage = Math.min(controller.page, pages);
+  const filteredRows = sortedRows.slice((currentPage - 1) * 6, currentPage * 6);
   useEffect(
     () => controller.setPage(1),
     [candidateFilters, companyIndustries, filterValues],
@@ -490,11 +508,14 @@ export function AssetListPage({ type }) {
               : filterConfigs
           }
           trailing={
+            <div className="s4-command-actions">
+            {type === "opportunities" ? <SelectMenu label="排序" value={sort} options={["最近更新", "名称", "下次跟进"]} onChange={setSort} /> : null}
             <ColumnMenu
               columns={config.columns}
               visible={visibleColumns}
               onChange={setVisibleColumns}
             />
+            </div>
           }
         />
       )}
@@ -585,15 +606,23 @@ export function AssetListPage({ type }) {
             : "关联的其他正式资产不会删除；从反向列表进入时，也不会创建第二份关系。"
         }
         onConfirm={() => {
+          try {
           if (type === "companies") {
             (deleteTarget?.id
               ? [deleteTarget.id]
               : [...controller.selected]
             ).forEach(recycleCompany);
             controller.setSelected(new Set());
+          } else if (type === "opportunities") {
+            runOpportunityCommand("opportunity.recycle-many", { ids: deleteTarget?.id ? [deleteTarget.id] : [...controller.selected] });
+            controller.setSelected(new Set());
+          } else if (type === "positions") {
+            (deleteTarget?.id ? [deleteTarget.id] : [...controller.selected]).forEach((id) => runOpportunityCommand("position.recycle", { id }));
+            controller.setSelected(new Set());
           }
           notify(`“${deleteTarget?.name || deleteTarget?.title}”已进入回收站`);
           setDeleteTarget(null);
+          } catch (error) { notify(error.message, "error"); }
         }}
       />
       <FavoritePickerModal
