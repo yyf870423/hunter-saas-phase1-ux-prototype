@@ -789,7 +789,7 @@ export function PeriodicTasksPage() {
           className={`s2-periodic-shell ${mobileDetailOpen ? "is-mobile-detail" : ""}`}
         >
           <div className="s2-periodic-list-pane">
-            <div className="s2-periodic-list-tools">
+            <div className="s2-periodic-list-tools s4-filter-scope">
               <SearchField
                 value={query}
                 onChange={setQuery}

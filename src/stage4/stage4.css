@@ -1006,6 +1006,19 @@
   white-space: nowrap;
 }
 
+.tg-graph-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 6px;
+}
+
+.tg-graph-card-meta > * {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .tg-graph-card small,
 .tg-graph-card p,
 .tg-graph-card dt {
@@ -4377,7 +4390,7 @@
 .s4-inline-search {
   display: flex;
   width: min(360px, 44vw);
-  height: 34px;
+  height: var(--s1-field-height, 36px);
   align-items: center;
   gap: 7px;
   padding: 0 10px;
@@ -4402,7 +4415,9 @@
   flex: 1;
   color: var(--s1-ink);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--s1-control-font-size);
+  font-weight: var(--s1-control-font-weight);
+  line-height: var(--s1-control-line-height);
   background: transparent;
   border: 0;
   outline: 0;
@@ -4860,6 +4875,14 @@
   border-color: var(--s1-danger-action-hover);
 }
 
+.s4-filter-scope {
+  --s1-field-height: 40px;
+}
+
+.s4-filter-scope.is-compact {
+  --s1-field-height: 36px;
+}
+
 .s4-filter-bar {
   position: relative;
   z-index: 10;
@@ -4884,6 +4907,12 @@
   flex: 1;
   align-items: center;
   gap: 7px;
+  flex-wrap: wrap;
+}
+
+.s4-filter-controls > *,
+.s4-candidate-filter-area > div > * {
+  flex-shrink: 0;
 }
 
 .s4-filter-trailing {
@@ -4910,7 +4939,7 @@
 }
 .s4-candidate-filter-toggle {
   display: inline-flex;
-  height: 36px;
+  height: var(--s1-field-height, 40px);
   flex: 0 0 auto;
   align-items: center;
   gap: 7px;
@@ -4989,6 +5018,7 @@
   min-width: 0;
   align-items: center;
   gap: 7px;
+  flex-wrap: wrap;
 }
 .s4-candidate-filter-area .s4-select > button {
   min-width: 116px;
@@ -5000,10 +5030,10 @@
 }
 .s4-candidate-title-filter input,
 .s4-candidate-number-filters input {
-  height: 36px;
+  height: var(--s1-field-height, 40px);
   color: var(--s1-ink);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--s1-control-font-size);
   background: var(--s1-surface);
   border: 1px solid var(--s1-line-strong);
   border-radius: 6px;
@@ -5037,16 +5067,17 @@
 }
 .s4-candidate-number-filters label {
   display: inline-flex;
-  height: 36px;
+  height: var(--s1-field-height, 40px);
   flex: 0 0 auto;
   align-items: center;
   gap: 5px;
   padding: 0 8px;
   color: var(--s1-muted);
-  font-size: 12px;
-  background: var(--s1-tag-bg);
-  border: 1px solid var(--s1-tag-border);
+  font-size: var(--s1-control-font-size);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
   border-radius: 6px;
+  box-shadow: var(--s1-control-shadow);
 }
 .s4-candidate-number-filters input {
   width: 52px;
@@ -5094,7 +5125,7 @@
   min-width: 0;
   color: var(--s1-ink);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--s1-control-font-size);
   background: transparent;
   border: 0;
   outline: 0;
@@ -5125,7 +5156,7 @@
   gap: 8px;
   padding: 6px 8px;
   color: var(--s1-muted);
-  font-size: 12px;
+  font-size: var(--s1-control-font-size);
   text-align: left;
   background: transparent;
   border: 0;
@@ -5160,6 +5191,9 @@
   min-height: 34px;
   padding: 6px 8px;
   border-radius: 6px;
+  font-size: var(--s1-control-font-size);
+  font-weight: var(--s1-control-font-weight);
+  line-height: var(--s1-control-line-height);
 }
 .s4-cascade-secondary .s4-checkbox:hover,
 .s4-cascade-results .s4-checkbox:hover {
@@ -5607,7 +5641,7 @@
 
 .s4-select > button {
   display: flex;
-  height: 36px;
+  height: var(--s1-field-height, 36px);
   min-width: 104px;
   max-width: 190px;
   align-items: center;
@@ -5615,6 +5649,9 @@
   gap: 12px;
   padding: 0 11px;
   color: var(--s1-ink);
+  font-size: var(--s1-control-font-size);
+  font-weight: var(--s1-control-font-weight);
+  line-height: var(--s1-control-line-height);
   text-align: left;
   background: var(--s1-surface);
   border: 1px solid var(--s1-line-strong);
@@ -5637,8 +5674,8 @@
 
 .s4-select-value > span {
   overflow: hidden;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: inherit;
+  font-weight: inherit;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -5695,7 +5732,7 @@
   width: 100%;
   min-width: 0;
   color: var(--s1-ink);
-  font-size: 12px;
+  font-size: var(--s1-control-font-size);
   background: transparent;
   border: 0;
   outline: 0;
@@ -5718,7 +5755,10 @@
   align-items: center;
   gap: 8px;
   padding: 7px 8px;
-  font-size: 12px;
+  color: var(--s1-ink);
+  font-size: var(--s1-control-font-size);
+  font-weight: var(--s1-control-font-weight);
+  line-height: var(--s1-control-line-height);
   text-align: left;
   background: transparent;
   border: 0;
@@ -5798,8 +5838,8 @@
 }
 
 .s4-column-menu .s1-icon-button {
-  width: 36px;
-  height: 36px;
+  width: var(--s1-field-height, 36px);
+  height: var(--s1-field-height, 36px);
 }
 .s4-column-panel {
   padding: 8px;
@@ -5818,7 +5858,7 @@
   display: grid;
   width: 100%;
   min-width: 176px;
-  height: 36px;
+  height: var(--s1-field-height, 36px);
   grid-template-columns: 15px minmax(0, 1fr) 14px;
   align-items: center;
   gap: 8px;
@@ -5849,8 +5889,9 @@
 
 .s4-date-picker > button span {
   overflow: hidden;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--s1-control-font-size);
+  font-weight: var(--s1-control-font-weight);
+  line-height: var(--s1-control-line-height);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -12499,6 +12540,7 @@
     order: 3;
     width: 100%;
     flex-basis: 100%;
+    flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 2px;
   }
@@ -13312,6 +13354,7 @@
     display: table-cell;
   }
   .s4-candidate-filter-area > div {
+    flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 2px;
   }
@@ -13367,6 +13410,7 @@
     padding: 8px;
   }
   .s4-candidate-filter-area > div {
+    flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 2px;
   }

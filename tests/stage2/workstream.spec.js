@@ -283,5 +283,7 @@ test("移动端候选人审核可以查看详情并返回列表", async ({ page 
   await expect(page.getByRole("heading", { name: "推荐理由" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "风险提示" })).toBeVisible();
   await page.getByRole("button", { name: "返回候选人列表" }).click();
-  await expect(page.getByText("候选人", { exact: true }).first()).toBeVisible();
+  await expect(
+    page.locator(".s2-candidate-head").getByText("候选人", { exact: true }),
+  ).toBeVisible();
 });

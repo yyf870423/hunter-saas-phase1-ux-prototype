@@ -1,6 +1,7 @@
 export const topicGraphs = [
   {
     id: "mapping-embodied",
+    typeId: "talent-map",
     name: "星澜机器人组织知识图谱",
     description: "持续整理星澜机器人的组织结构、方向团队与核心成员。",
     pageIds: ["organization"],
@@ -13,6 +14,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-company-relations",
+    typeId: "company-relations",
     name: "具身智能公司关系知识图谱",
     description: "整理目标公司的竞争、合作、投资、上下游和人才流动关系。",
     pageIds: ["ecosystem"],
@@ -25,6 +27,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-candidate-relations",
+    typeId: "candidate-relations",
     name: "VLA 核心候选人关系知识图谱",
     description: "整理候选人的前同事、共同作者、共同发明人与可执行联系路径。",
     pageIds: ["people"],
@@ -37,6 +40,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-position-pool",
+    typeId: "position-pool",
     name: "VLA 算法负责人重点人才知识图谱",
     description: "围绕目标岗位整理重点人才、观察对象与候选人之间的关系。",
     pageIds: ["position-pool"],
@@ -49,6 +53,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-position-context",
+    typeId: "position-context",
     name: "VLA 岗位上下游知识图谱",
     description: "整理岗位的上游输入、关键协作角色、下游交付和能力依赖。",
     pageIds: ["position-context"],
@@ -61,6 +66,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-industry-chain",
+    typeId: "industry-chain",
     name: "具身智能行业上下游知识图谱",
     description: "整理核心部件、数据与模型、本体平台到行业应用的上下游关系。",
     pageIds: ["industry-chain"],
@@ -73,6 +79,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-hand",
+    typeId: "technology-talent",
     name: "灵巧手技术与人才知识图谱",
     description:
       "整理灵巧手结构、驱动、触觉、控制和量产链条，以及各方向的核心团队与人才。",
@@ -86,6 +93,7 @@ export const topicGraphs = [
   },
   {
     id: "mapping-autodrive",
+    typeId: "talent-flow",
     name: "自动驾驶决策人才迁移知识图谱",
     description: "分析决策规划团队、技术路线和向具身智能迁移的人才流动关系。",
     pageIds: ["autodrive-flow"],
@@ -119,7 +127,7 @@ export const initialGraphPages = [
   {
     id: "organization",
     name: "星澜机器人组织",
-    type: "组织架构",
+    type: "人才地图",
     description: "星澜机器人具身智能中心、方向团队与核心成员。",
     updatedAt: "今天 11:20",
     nodes: [

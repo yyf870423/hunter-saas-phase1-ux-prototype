@@ -43,7 +43,11 @@ test("常见桌面高度下导航无需滚动", async ({ page }) => {
   await expect(
     page.getByRole("dialog", { name: "其他资产导航" }),
   ).toBeVisible();
-  await expect(page.getByRole("button", { name: "专利" })).toBeInViewport();
+  await expect(
+    page
+      .getByRole("dialog", { name: "其他资产导航" })
+      .getByRole("button", { name: "专利", exact: true }),
+  ).toBeInViewport();
   await expect(page.getByRole("button", { name: "收起导航" })).toBeInViewport();
 });
 
@@ -76,10 +80,11 @@ test("全局搜索支持结果、详情和无结果", async ({ page }) => {
   await page.getByRole("button", { name: /搜索任务/ }).click();
   const input = page.getByPlaceholder("输入姓名、公司、岗位或任务名称");
   await input.fill("星澜机器人");
-  await expect(
-    page.getByRole("button", { name: /星澜机器人招聘合作/ }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: /星澜机器人招聘合作/ }).click();
+  const result = page
+    .getByRole("dialog", { name: "全局搜索", exact: true })
+    .getByRole("button", { name: /星澜机器人招聘合作/ });
+  await expect(result).toBeVisible();
+  await result.click();
   await expect(
     page
       .getByRole("dialog", { name: "搜索结果摘要" })
@@ -145,10 +150,9 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: /新建周期性任务/ }),
   ).toBeVisible();
-  await page.getByLabel(/查看 Agent 用量/).click();
-  await expect(
-    page.getByRole("heading", { name: "本月 Agent 用量" }),
-  ).toBeVisible();
+  await page.getByRole("button", { name: "打开用户菜单" }).click();
+  await page.getByRole("menuitem", { name: /查看 Agent 用量/ }).click();
+  await expect(page.getByRole("heading", { name: "Agent 用量" })).toBeVisible();
   await page
     .locator(".s1-modal > footer")
     .getByRole("button", { name: "关闭" })

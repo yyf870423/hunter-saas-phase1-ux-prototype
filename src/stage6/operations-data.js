@@ -575,6 +575,7 @@ export const tasks = [
 
 export const runQuality = [
   {
+    id: "task-runs",
     scope: "普通任务运行",
     runs: "2,146",
     success: "94.8%",
@@ -585,6 +586,7 @@ export const runQuality = [
     recovery: "91.2%",
   },
   {
+    id: "periodic-runs",
     scope: "周期任务运行",
     runs: "618",
     success: "97.1%",
@@ -595,6 +597,7 @@ export const runQuality = [
     recovery: "95.7%",
   },
   {
+    id: "asset-ai-runs",
     scope: "资产 AI 运行",
     runs: "734",
     success: "93.5%",
@@ -605,6 +608,7 @@ export const runQuality = [
     recovery: "89.6%",
   },
   {
+    id: "system-runs",
     scope: "系统运行",
     runs: "344",
     success: "99.2%",

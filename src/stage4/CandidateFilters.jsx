@@ -70,6 +70,7 @@ export function IndustryCascade({ value = [], onChange }) {
         anchorRef={ref}
         panelRef={panelRef}
         className="s4-cascade-panel"
+        portalTarget={ref.current?.closest(".s1-app")}
         width={620}
       >
         <label className="s4-cascade-search">
@@ -265,6 +266,7 @@ export function FavoriteFilter({
         anchorRef={ref}
         panelRef={panelRef}
         className="s4-favorite-panel"
+        portalTarget={ref.current?.closest(".s1-app")}
         width={440}
       >
         <label className="s4-cascade-search">
@@ -743,7 +745,7 @@ export function CandidateFilterBar({
     else update(key, "");
   };
   return (
-    <section className="s4-candidate-filter-shell">
+    <section className="s4-candidate-filter-shell s4-filter-scope">
       <div className="s4-candidate-search-row">
         <SearchField
           value={query}

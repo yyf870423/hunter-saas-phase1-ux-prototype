@@ -1,3 +1,8 @@
+export const agentUsage = {
+  usedPercent: 64,
+  expiresOn: "2026-08-31",
+};
+
 export const navSections = [
   {
     label: "核心业务",

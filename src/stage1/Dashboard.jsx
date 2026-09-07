@@ -1,438 +1,59 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
-import { actionItems, mainlines, signals } from "./data";
-import { Button, EmptyState, Skeleton, StatusBadge, useToast } from "./ui";
+import { getDashboardData } from "./dashboard-data";
+import {
+  ActionQueue,
+  DashboardFeed,
+  DashboardListSkeleton,
+  DashboardSection,
+  DashboardTaskStarter,
+  TaskSummaryTable,
+} from "./DashboardWidgets";
+import { Button, useToast } from "./ui";
 
 function getTodayLabel() {
   const now = new Date();
-  const weekday = new Intl.DateTimeFormat("zh-CN", {
-    weekday: "long",
-  }).format(now);
+  const weekday = new Intl.DateTimeFormat("zh-CN", { weekday: "long" }).format(
+    now,
+  );
   return `${now.getFullYear()} 年 ${now.getMonth() + 1} 月 ${now.getDate()} 日 · ${weekday}`;
-}
-
-function SectionHeading({ eyebrow, title, description, action }) {
-  return (
-    <header className="s1-section-heading">
-      <div>
-        {eyebrow ? <small>{eyebrow}</small> : null}
-        <h2>{title}</h2>
-        {description ? <p>{description}</p> : null}
-      </div>
-      {action}
-    </header>
-  );
-}
-
-function TaskStarter({ onStart }) {
-  const [value, setValue] = useState("");
-  const submit = () => {
-    if (!value.trim()) return;
-    onStart(value.trim());
-  };
-  return (
-    <section className="s1-task-starter" aria-labelledby="task-starter-title">
-      <div>
-        <small>开始一项猎头任务</small>
-        <h2 id="task-starter-title">今天希望 Hunter 帮你完成什么？</h2>
-        <p>可以直接描述一次性工作，也可以要求它按指定周期自动执行。</p>
-      </div>
-      <div className="s1-task-starter-input">
-        <textarea
-          rows={2}
-          value={value}
-          aria-label="描述新任务"
-          placeholder="例如：每周一检查具身智能创业公司和招聘变化，有重要发现时提醒我"
-          onChange={(event) => setValue(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              submit();
-            }
-          }}
-        />
-        <Button
-          tone="primary"
-          icon="send"
-          disabled={!value.trim()}
-          onClick={submit}
-        >
-          开始
-        </Button>
-      </div>
-    </section>
-  );
-}
-
-function MainlineFocus({ selectedId, onSelect, onOpen }) {
-  const selected =
-    mainlines.find((item) => item.id === selectedId) || mainlines[0];
-  const alternatives = mainlines.filter((item) => item.id !== selected.id);
-  return (
-    <section className="s1-mainline-section" aria-labelledby="mainline-title">
-      <SectionHeading
-        eyebrow="等待你处理"
-        title="继续当前任务"
-        description="优先显示正在等待决定、补充信息或异常处理的任务。"
-        action={
-          <Button
-            tone="ghost"
-            size="sm"
-            icon="chevronRight"
-            onClick={() => onOpen("全部任务")}
-          >
-            查看全部
-          </Button>
-        }
-      />
-      <div className="s1-mainline-focus">
-        <article className="s1-mainline-primary">
-          <div className="s1-mainline-meta">
-            <span className="s1-object-icon">
-              <Icon name={selected.icon} />
-            </span>
-            <span>{selected.type}</span>
-            <StatusBadge tone={selected.tone}>{selected.status}</StatusBadge>
-            <time>{selected.changed}</time>
-          </div>
-          <h3 id="mainline-title">{selected.title}</h3>
-          <p className="s1-mainline-object">{selected.object}</p>
-          <p className="s1-mainline-summary">{selected.summary}</p>
-          <dl className="s1-mainline-facts">
-            {selected.facts.map(([label, value]) => (
-              <div key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
-          <div className="s1-mainline-next">
-            <Icon name="sparkles" />
-            <span>
-              <b>下一步</b>
-              {selected.next}
-            </span>
-          </div>
-          <Button
-            tone="primary"
-            icon="chevronRight"
-            onClick={() => onOpen(selected.title)}
-          >
-            继续任务
-          </Button>
-        </article>
-        <div className="s1-mainline-switcher" aria-label="最近任务">
-          <span>最近任务</span>
-          {alternatives.map((item) => (
-            <button
-              type="button"
-              key={item.id}
-              onClick={() => onSelect(item.id)}
-            >
-              <i>
-                <Icon name={item.icon} />
-              </i>
-              <span>
-                <small>{item.type}</small>
-                <b>{item.title}</b>
-                <em>{item.object}</em>
-              </span>
-              <StatusBadge tone={item.tone}>{item.status}</StatusBadge>
-              <Icon name="chevronRight" />
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SignalPanel({ state, onOpen, onRetry }) {
-  if (state === "error") {
-    return (
-      <section className="s1-support-panel" aria-labelledby="signal-title">
-        <SectionHeading eyebrow="重点洞察" title="需要处理的洞察" />
-        <div className="s1-local-state s1-local-error">
-          <i>
-            <Icon name="warning" />
-          </i>
-          <div>
-            <b>洞察摘要暂时无法加载</b>
-            <p>重点任务和行动队列仍可正常使用。</p>
-          </div>
-          <Button size="sm" icon="refresh" onClick={onRetry}>
-            重新加载
-          </Button>
-        </div>
-      </section>
-    );
-  }
-  return (
-    <section className="s1-support-panel" aria-labelledby="signal-title">
-      <SectionHeading
-        eyebrow="重点洞察"
-        title="需要处理的洞察"
-        action={
-          <Button tone="ghost" size="sm" onClick={() => onOpen("全部信号")}>
-            查看全部
-          </Button>
-        }
-      />
-      <div className="s1-signal-list">
-        {signals.map((signal) => (
-          <button
-            type="button"
-            key={signal.id}
-            onClick={() => onOpen(`/signals?signal=${signal.id}`)}
-          >
-            <span className="s1-signal-line">
-              <i />
-              <time>{signal.time}</time>
-            </span>
-            <span className="s1-signal-content">
-              <small>
-                {signal.type} · {signal.object}
-              </small>
-              <b>{signal.title}</b>
-              <span>
-                <StatusBadge tone={signal.tone}>{signal.status}</StatusBadge>
-                <em>{signal.evidence} 个证据来源</em>
-              </span>
-              <em className="s1-signal-next">{signal.next}</em>
-            </span>
-            <Icon name="chevronRight" />
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function AssetChanges({ onOpen }) {
-  const changes = [
-    {
-      icon: "user",
-      title: "林昊的候选人资料更新至 v6",
-      detail: "新增真机项目与团队规模，2 条岗位匹配已重算",
-      time: "18 分钟前",
-      route: "/candidates/candidate-linhao?tab=profile",
-    },
-    {
-      icon: "briefcase",
-      title: "VLA 算法负责人岗位补充找人建议",
-      detail: "新增 3 家建议挖猎公司和 1 条招聘难度判断",
-      time: "今天 08:52",
-      route: "/positions/position-vla?tab=profile",
-    },
-    {
-      icon: "database",
-      title: "机器人行业知识图谱更新 2 条关系",
-      detail: "1 条高可信关系已更新，1 条关系等待确认",
-      time: "昨天 19:06",
-      route: "/mappings/mapping-embodied?tab=reviews",
-    },
-  ];
-  return (
-    <section className="s1-asset-changes">
-      <SectionHeading eyebrow="业务资产" title="最近变化" />
-      <div>
-        {changes.map((change) => (
-          <button
-            type="button"
-            key={change.title}
-            onClick={() => onOpen(change.route)}
-          >
-            <i>
-              <Icon name={change.icon} />
-            </i>
-            <span>
-              <b>{change.title}</b>
-              <small>{change.detail}</small>
-            </span>
-            <time>{change.time}</time>
-            <Icon name="chevronRight" />
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ActionQueue({ expanded, onToggle, onOpen }) {
-  return (
-    <section className={`s1-action-queue ${expanded ? "is-expanded" : ""}`}>
-      <button
-        type="button"
-        className="s1-action-summary"
-        aria-expanded={expanded}
-        onClick={onToggle}
-      >
-        <i>
-          <Icon name="check" />
-        </i>
-        <span>
-          <b>行动队列</b>
-          <small>2 项待确认、1 项待补充、1 项异常</small>
-        </span>
-        <em>共 {actionItems.length} 项</em>
-        <Icon name={expanded ? "chevronUp" : "chevronDown"} />
-      </button>
-      {expanded ? (
-        <div className="s1-action-list">
-          {actionItems.map((item) => (
-            <button
-              type="button"
-              key={item.id}
-              onClick={() => onOpen(item.title)}
-            >
-              <StatusBadge tone={item.tone}>
-                {item.tone === "danger" ? "异常" : "待处理"}
-              </StatusBadge>
-              <span>
-                <b>{item.title}</b>
-                <small>{item.source}</small>
-              </span>
-              <em>{item.meta}</em>
-              <Icon name="chevronRight" />
-            </button>
-          ))}
-        </div>
-      ) : null}
-    </section>
-  );
-}
-
-function LoadingDashboard() {
-  return (
-    <div className="s1-dashboard" aria-label="工作台正在加载">
-      <header className="s1-dashboard-head">
-        <div>
-          <Skeleton className="s1-sk-small" />
-          <Skeleton className="s1-sk-title" />
-          <Skeleton className="s1-sk-text" />
-        </div>
-        <Skeleton className="s1-sk-button" />
-      </header>
-      <section className="s1-loading-mainline">
-        <Skeleton className="s1-sk-small" />
-        <Skeleton className="s1-sk-title" />
-        <div>
-          <article>
-            <Skeleton className="s1-sk-wide" />
-            <Skeleton className="s1-sk-hero" />
-            <Skeleton className="s1-sk-wide" />
-          </article>
-          <aside>
-            {[1, 2, 3].map((item) => (
-              <Skeleton className="s1-sk-row" key={item} />
-            ))}
-          </aside>
-        </div>
-      </section>
-      <div className="s1-support-grid is-single">
-        {[1].map((panel) => (
-          <section className="s1-support-panel" key={panel}>
-            <Skeleton className="s1-sk-title" />
-            {[1, 2, 3].map((item) => (
-              <Skeleton className="s1-sk-row" key={item} />
-            ))}
-          </section>
-        ))}
-      </div>
-      <Skeleton className="s1-sk-action" />
-    </div>
-  );
 }
 
 export function Dashboard() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const [selectedId, setSelectedId] = useState(mainlines[0].id);
   const [actionExpanded, setActionExpanded] = useState(false);
   const notify = useToast();
   const state = params.get("state") || "normal";
-  const openPlaceholder = (title) => {
-    if (title.startsWith("/")) {
-      navigate(title);
-      return;
-    }
-    if (title === "新建任务") {
-      navigate("/new");
-      return;
-    }
-    if (title === "全部任务") {
-      navigate("/tasks");
-      return;
-    }
-    if (title === "全部信号") {
-      navigate("/signals");
-      return;
-    }
-    const work = mainlines.find((item) => item.title === title);
-    if (work) {
-      navigate(`/tasks/${work.id}`);
-      return;
-    }
-    notify(`已选择“${title}”，完整业务剧本将在原型阶段三提交`, "info");
-  };
+  const loading = state === "loading";
+  const { tasks, insights, assets } = getDashboardData(params);
   const startTask = (prompt) => {
-    sessionStorage.setItem("hunter-new-work-signal", prompt);
-    navigate("/tasks");
+    try {
+      sessionStorage.setItem("hunter-new-work-signal", prompt);
+      navigate("/tasks");
+    } catch {
+      notify("无法保存任务输入，请重试", "error");
+    }
   };
-  const recoverSignals = () => {
+  const recoverInsights = () => {
     const next = new URLSearchParams(params);
     next.delete("state");
     setParams(next, { replace: true });
-    notify("信号摘要已重新加载", "success");
+    notify("洞察摘要已重新加载", "success");
   };
-  const todayLabel = getTodayLabel();
-
-  if (state === "loading") return <LoadingDashboard />;
-  if (state === "empty") {
-    return (
-      <div className="s1-dashboard s1-dashboard-empty">
-        <header className="s1-dashboard-head">
-          <div>
-            <small>{todayLabel}</small>
-            <h1>上午好，沈岚</h1>
-            <p>
-              从一条真实业务目标开始，Hunter
-              会在过程中整理任务、洞察和业务资产。
-            </p>
-          </div>
-        </header>
-        <EmptyState
-          title="还没有任务"
-          description="可以从客户开发、岗位招聘、人才摸排或候选人求职开始，Hunter 会根据目标决定一步完成或持续推进。"
-          action={
-            <Button
-              tone="primary"
-              icon="plus"
-              onClick={() => openPlaceholder("新建任务")}
-            >
-              新建任务
-            </Button>
-          }
-        />
-        <div className="s1-empty-support">
-          <span>任务的计划、处理过程和结果都保留在任务对话中</span>
-          <span>值得关注的外部变化会显示在洞察中心</span>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="s1-dashboard">
+    <div
+      className="s1-dashboard"
+      aria-label={loading ? "工作台正在加载" : "工作台"}
+    >
       <header className="s1-dashboard-head">
         <div>
-          <small>{todayLabel}</small>
+          <small>{getTodayLabel()}</small>
           <h1>上午好，沈岚</h1>
-          <p>你有 1 项任务等待继续，3 条洞察需要处理。</p>
         </div>
       </header>
-
       {state === "limited" ? (
         <section className="s1-permission-strip">
           <i>
@@ -440,34 +61,115 @@ export function Dashboard() {
           </i>
           <div>
             <b>部分公开来源暂不可用</b>
-            <p>已有任务和结果不受影响，Hunter 会保留失败来源供稍后重试。</p>
+            <p>已有任务和结果不受影响，失败来源已保留。</p>
           </div>
-          <Button size="sm" onClick={() => openPlaceholder("查看来源异常")}>
-            查看异常
+          <Button size="sm" onClick={() => navigate("/settings/connections")}>
+            查看连接
           </Button>
         </section>
       ) : null}
+      <DashboardTaskStarter onStart={startTask} disabled={loading} />
 
-      <TaskStarter onStart={startTask} />
+      <DashboardSection
+        id="dashboard-tasks-title"
+        title="任务"
+        icon="task"
+        count={loading ? undefined : tasks.length}
+        loading={loading}
+        className="s1-dashboard-tasks"
+        action={
+          <Button
+            tone="ghost"
+            size="sm"
+            icon="chevronRight"
+            disabled={loading}
+            onClick={() => navigate("/tasks")}
+          >
+            全部任务
+          </Button>
+        }
+      >
+        {loading ? (
+          <DashboardListSkeleton rows={5} table />
+        ) : (
+          <TaskSummaryTable
+            items={tasks}
+            onOpen={navigate}
+            onCreate={() => navigate("/new")}
+          />
+        )}
+      </DashboardSection>
 
-      <MainlineFocus
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        onOpen={openPlaceholder}
-      />
-      <div className="s1-support-grid is-single">
-        <SignalPanel
-          state={state}
-          onOpen={openPlaceholder}
-          onRetry={recoverSignals}
-        />
+      <div className="s1-dashboard-updates">
+        <DashboardSection
+          id="dashboard-insights-title"
+          title="洞察"
+          icon="signal"
+          count={loading || state === "error" ? undefined : insights.length}
+          loading={loading}
+          className="s1-dashboard-insights"
+          action={
+            <Button
+              tone="ghost"
+              size="sm"
+              icon="chevronRight"
+              disabled={loading}
+              onClick={() => navigate("/signals")}
+            >
+              全部洞察
+            </Button>
+          }
+        >
+          {loading ? (
+            <DashboardListSkeleton rows={8} />
+          ) : state === "error" ? (
+            <div className="s1-local-state s1-local-error">
+              <i>
+                <Icon name="warning" />
+              </i>
+              <div>
+                <b>洞察摘要暂时无法加载</b>
+                <p>任务和资产变化仍可正常查看。</p>
+              </div>
+              <Button size="sm" icon="refresh" onClick={recoverInsights}>
+                重新加载
+              </Button>
+            </div>
+          ) : (
+            <DashboardFeed items={insights} onOpen={navigate} kind="insights" />
+          )}
+        </DashboardSection>
+        <DashboardSection
+          id="dashboard-assets-title"
+          title="资产变化"
+          icon="database"
+          count={loading ? undefined : assets.length}
+          loading={loading}
+          className="s1-dashboard-assets"
+        >
+          {loading ? (
+            <DashboardListSkeleton rows={10} />
+          ) : (
+            <DashboardFeed
+              items={assets}
+              onOpen={navigate}
+              kind="assets"
+              emptyAction={
+                <Button icon="upload" onClick={() => navigate("/data/imports")}>
+                  导入数据
+                </Button>
+              }
+            />
+          )}
+        </DashboardSection>
       </div>
-      <AssetChanges onOpen={openPlaceholder} />
-      <ActionQueue
-        expanded={actionExpanded}
-        onToggle={() => setActionExpanded((current) => !current)}
-        onOpen={openPlaceholder}
-      />
+      {!loading && tasks.length > 0 ? (
+        <ActionQueue
+          expanded={actionExpanded}
+          onToggle={() => setActionExpanded((current) => !current)}
+          onOpen={navigate}
+        />
+      ) : null}
     </div>
   );
 }

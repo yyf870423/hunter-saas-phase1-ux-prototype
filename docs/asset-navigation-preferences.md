@@ -22,6 +22,8 @@
 
 ## 公共组件与边界
 
+后续知识图谱增加可配置快捷类型，导航偏好仍使用同一个存储对象共同保存；侧栏密度和用户菜单用量摘要同步调整，见 `graph-types-navigation-prototype.md`。本页其余资产显隐规则不变。
+
 - `asset-navigation-store.js`：从现有资产清单派生固定顺序的选项；校验版本、允许 ID、重复值和损坏数据，合法空列表不回退默认。保存失败不覆盖当前导航；刷新和同源多页同步。
 - `AssetNavigation.jsx`：桌面“其他”浮层和移动资产选择共用资产项渲染；复用 `Icon`、`IconButton`、`Drawer`、`FloatingPanel` 及既有导航样式。
 - `NavigationSettingsPage`：组合 `SettingsPageHeader`、`SettingsSection`、`SettingRow`、`Toggle`、`Button`、`InlineNotice`。支持正常、未修改禁用、加载、读取失败、保存失败、权限受限、全部关闭及恢复默认。

@@ -63,7 +63,7 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
   await page.getByRole("button", { name: "收藏夹", exact: true }).click();
   await expect(
     page.locator(".s4-favorite-filter > button .s4-select-value > span"),
-  ).toHaveCSS("font-size", "12px");
+  ).toHaveCSS("font-size", "13px");
   await expect(
     page.getByRole("checkbox", { name: /重点岗位人才/ }),
   ).toBeVisible();
@@ -225,7 +225,7 @@ test("候选人收藏夹支持单人加入和多层目录管理", async ({ page 
 test("公共筛选浮层不被容器裁切且行业统一使用两级多选", async ({ page }) => {
   await page.goto("#/candidates");
   await page.getByRole("button", { name: "行业", exact: true }).click();
-  const cascade = page.locator("body > .s4-cascade-panel");
+  const cascade = page.locator(".s1-app > .s4-cascade-panel");
   await expect(cascade).toBeVisible();
   const search = cascade.getByPlaceholder("搜索行业（跨一级）");
   await search.focus();
@@ -251,7 +251,7 @@ test("公共筛选浮层不被容器裁切且行业统一使用两级多选", as
   await page.getByRole("button", { name: "编辑基本资料" }).click();
   const editor = page.getByRole("dialog", { name: "编辑公司基本资料" });
   await editor.locator(".s4-cascade > button").click();
-  await expect(page.locator("body > .s4-cascade-panel")).toBeVisible();
+  await expect(page.locator(".s1-app > .s4-cascade-panel")).toBeVisible();
 });
 
 test("候选人新建、身份合并和字段审核覆盖关键门禁", async ({ page }) => {
@@ -1189,9 +1189,9 @@ test("知识图谱内容、关系详情与写入决定可用", async ({ page }) 
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/new");
   await expect(page.getByLabel("图谱名称")).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "创建知识图谱" }),
-  ).toBeDisabled();
+  await page.getByRole("button", { name: "创建知识图谱", exact: true }).click();
+  await expect(page.getByText("请输入图谱名称", { exact: true })).toBeVisible();
+  await expect(page.getByText("请选择图谱类型", { exact: true })).toBeVisible();
 
   await page.goto("#/mappings/mapping-embodied?tab=content");
   await expect(page.getByRole("tablist", { name: "图页" })).toBeVisible();

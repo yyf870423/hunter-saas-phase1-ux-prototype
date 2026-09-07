@@ -14,7 +14,7 @@ export const settingSections = [
   {
     id: "navigation",
     label: "导航",
-    description: "常用资产与其他入口",
+    description: "常用资产与图谱类型",
     icon: "menu",
     route: "/settings/navigation",
   },

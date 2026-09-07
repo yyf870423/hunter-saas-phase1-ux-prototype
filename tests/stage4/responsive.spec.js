@@ -25,7 +25,9 @@ for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     for (const [route, text] of routes) {
       await page.goto(`#/${route}`);
-      await expect(page.getByText(text, { exact: true }).first()).toBeVisible();
+      await expect(
+        page.getByRole("main").getByText(text, { exact: true }).first(),
+      ).toBeVisible();
       await expectNoHorizontalOverflow(page);
     }
     await assertNoConsoleErrors();

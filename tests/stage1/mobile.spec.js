@@ -18,7 +18,7 @@ test("iPhone 使用底部导航并打开资产抽屉", async ({ page }) => {
   await assertNoConsoleErrors();
 });
 
-test("iPhone 搜索、通知和重点任务切换可用", async ({ page }) => {
+test("iPhone 搜索、通知和任务直达可用", async ({ page }) => {
   await page.goto("#/home");
   await page.locator(".s1-search-trigger").click();
   await expect(
@@ -28,10 +28,14 @@ test("iPhone 搜索、通知和重点任务切换可用", async ({ page }) => {
   await page.getByRole("button", { name: "打开通知" }).click();
   await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: /具身智能 VLA 算法负责人/ }).click();
-  await expect(page.locator(".s1-mainline-primary h3")).toHaveText(
-    "具身智能 VLA 算法负责人",
-  );
+  await page
+    .locator(".s1-task-summary-table")
+    .getByRole("button", { name: "具身智能 VLA 算法负责人", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#\/tasks\/position-vla$/);
+  await expect(
+    page.getByRole("heading", { name: "具身智能 VLA 算法负责人", exact: true }),
+  ).toBeVisible();
 });
 
 test("iPhone 空状态和权限状态可读", async ({ page }) => {

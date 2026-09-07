@@ -4,6 +4,7 @@ import {
   Button,
   EmptyState,
   IconButton,
+  SearchField,
   Skeleton,
   StatusBadge,
 } from "../stage1/ui";
@@ -109,24 +110,13 @@ export function OpsFilterBar({
   children,
 }) {
   return (
-    <div className="ops-filter-bar">
-      <label className="ops-search">
-        <Icon name="search" />
-        <input
-          value={query}
-          onChange={(event) => onQuery(event.target.value)}
-          placeholder={placeholder}
-        />
-        {query ? (
-          <button
-            type="button"
-            aria-label="清空搜索"
-            onClick={() => onQuery("")}
-          >
-            <Icon name="close" />
-          </button>
-        ) : null}
-      </label>
+    <div className="ops-filter-bar s4-filter-scope">
+      <SearchField
+        className="ops-search"
+        value={query}
+        onChange={onQuery}
+        placeholder={placeholder}
+      />
       <div className="ops-filter-controls">
         {filters.map((filter) => {
           const hasValue = filter.multiple

@@ -27,6 +27,8 @@ import {
   useCompanyContacts,
   restoreCompanyContact,
 } from "./company-contact-store";
+import { restoreGraph, useTopicGraphs } from "./topic-graph-store";
+import { graphTypeLabel } from "./graph-types";
 
 function DataManagementNav({ value }) {
   const navigate = useNavigate();
@@ -638,9 +640,11 @@ export function ExportsPage() {
 
 export function RecycleBinPage() {
   const contactState = useCompanyContacts();
+  const graphs = useTopicGraphs();
   const [removedDemoIds, setRemovedDemoIds] = useState([]);
   const [types, setTypes] = useState([]);
   const [restoreError, setRestoreError] = useState("");
+  const [restoreName, setRestoreName] = useState("");
   const notify = useToast();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(new Set());
@@ -676,6 +680,17 @@ export function RecycleBinPage() {
   const rows = [
     ...companyRows,
     ...contactRows,
+    ...graphs
+      .filter((graph) => graph.deletedAt && graph.deletedAt !== "purged")
+      .map((graph) => ({
+        ...graph,
+        type: "知识图谱",
+        localGraph: true,
+        reason: `图谱类型：${graphTypeLabel(graph.typeId)}`,
+        operator: "沈岚",
+        deletedAt: graph.deletedAt.slice(0, 10),
+        remaining: "剩余 30 天",
+      })),
     ...recycleItems.filter((item) => !removedDemoIds.includes(item.id)),
   ].filter(
     (item) =>
@@ -757,6 +772,7 @@ export function RecycleBinPage() {
                 type="button"
                 onClick={() => {
                   setRestoreTarget(item);
+                  setRestoreName(item.name);
                   setConflict(item.type === "公司" && !item.local);
                   setRestoreError("");
                 }}
@@ -795,7 +811,9 @@ export function RecycleBinPage() {
               tone="primary"
               onClick={async () => {
                 try {
-                  if (restoreTarget.local)
+                  if (restoreTarget.localGraph)
+                    restoreGraph(restoreTarget.id, false, restoreName);
+                  else if (restoreTarget.local)
                     await restoreCompanyContact(restoreTarget);
                   else
                     setRemovedDemoIds((current) => [
@@ -817,6 +835,17 @@ export function RecycleBinPage() {
       >
         {restoreError ? (
           <StateBanner tone="danger" title={restoreError} />
+        ) : null}
+        {restoreTarget?.localGraph ? (
+          <FormField label="恢复后的图谱名称" required>
+            <TextInput
+              value={restoreName}
+              onChange={(value) => {
+                setRestoreName(value);
+                setRestoreError("");
+              }}
+            />
+          </FormField>
         ) : null}
         {conflict ? (
           <div className="s4-duplicate-compare">
@@ -856,7 +885,9 @@ export function RecycleBinPage() {
               tone="danger"
               onClick={async () => {
                 try {
-                  if (deleteTarget.local)
+                  if (deleteTarget.localGraph)
+                    restoreGraph(deleteTarget.id, true);
+                  else if (deleteTarget.local)
                     await restoreCompanyContact(deleteTarget, true);
                   else
                     setRemovedDemoIds((current) => [

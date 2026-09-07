@@ -237,13 +237,14 @@ export function SearchField({
   onChange,
   placeholder,
   autoFocus = false,
+  className = "",
 }) {
   const ref = useRef(null);
   useEffect(() => {
     if (autoFocus) ref.current?.focus();
   }, [autoFocus]);
   return (
-    <label className="s1-search-field">
+    <label className={`s1-search-field ${className}`}>
       <Icon name="search" />
       <input
         ref={ref}
@@ -264,9 +265,15 @@ export function SearchField({
   );
 }
 
-export function EmptyState({ icon = "route", title, description, action }) {
+export function EmptyState({
+  icon = "route",
+  title,
+  description,
+  action,
+  compact = false,
+}) {
   return (
-    <section className="s1-empty-state">
+    <section className={`s1-empty-state ${compact ? "is-compact" : ""}`}>
       <i>
         <Icon name={icon} />
       </i>

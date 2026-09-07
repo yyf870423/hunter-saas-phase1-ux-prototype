@@ -1,13 +1,26 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { TooltipText } from "../stage4/asset-ui";
-import { MobileNavigation, OtherAssetNavigation } from "./AssetNavigation";
+import {
+  AssetTypeNavigation,
+  MobileNavigation,
+  OtherAssetNavigation,
+} from "./AssetNavigation";
+import {
+  graphListContext,
+  graphListRoute,
+  graphTypes,
+  isGraphType,
+} from "../stage4/graph-types";
+import { useTopicGraphs } from "../stage4/topic-graph-store";
 import {
   assetNavigationItems,
   useAssetNavigationPreferences,
+  useGraphTypeNavigationPreferences,
 } from "./asset-navigation-store";
 import {
+  agentUsage,
   navSections,
   notifications as initialNotifications,
   searchItems,
@@ -22,40 +35,6 @@ import {
   Tabs,
   useToast,
 } from "./ui";
-
-function UsageRing({ value = 64, expanded, onClick }) {
-  const radius = 16;
-  const circumference = 2 * Math.PI * radius;
-  return (
-    <button
-      type="button"
-      className={`s1-usage-entry ${expanded ? "is-expanded" : ""}`}
-      aria-label={`查看 Agent 用量，本月已使用 ${value}%`}
-      onClick={onClick}
-    >
-      <span className="s1-usage-ring">
-        <svg viewBox="0 0 40 40" aria-hidden="true">
-          <circle cx="20" cy="20" r={radius} />
-          <circle
-            className="s1-usage-ring-progress"
-            cx="20"
-            cy="20"
-            r={radius}
-            strokeDasharray={circumference}
-            strokeDashoffset={circumference * (1 - value / 100)}
-          />
-        </svg>
-        <b>{value}</b>
-      </span>
-      {expanded ? (
-        <span>
-          <b>Agent 用量</b>
-          <small>本月已使用 {value}%</small>
-        </span>
-      ) : null}
-    </button>
-  );
-}
 
 function Brand({ expanded }) {
   return (
@@ -380,6 +359,19 @@ export function Stage1Shell() {
   const [assetCreateOpen, setAssetCreateOpen] = useState(false);
   const [mobileMode, setMobileMode] = useState(null);
   const visibleAssetIds = useAssetNavigationPreferences();
+  const visibleGraphTypeIds = useGraphTypeNavigationPreferences();
+  const graphs = useTopicGraphs();
+  const currentGraph = graphs.find(
+    (graph) =>
+      !graph.deletedAt && location.pathname === `/mappings/${graph.id}`,
+  );
+  const requestedGraphType = graphListContext(
+    new URLSearchParams(location.search),
+  ).type;
+  const activeGraphType = location.pathname.startsWith("/mappings")
+    ? currentGraph?.typeId ||
+      (isGraphType(requestedGraphType) ? requestedGraphType : "")
+    : "";
   const visibleAssets = assetNavigationItems.filter((item) =>
     visibleAssetIds.includes(item.id),
   );
@@ -511,23 +503,46 @@ export function Stage1Shell() {
             <h2>业务资产</h2>
             <nav aria-label="资产导航">
               {visibleAssets.map((item) => (
-                <button
-                  type="button"
-                  key={item.id}
-                  className={isAssetActive(item) ? "is-active" : ""}
-                  aria-label={item.label}
-                  aria-current={isAssetActive(item) ? "page" : undefined}
-                  onClick={() => selectNavigation(item)}
-                >
-                  <TooltipText
-                    className="s1-nav-icon-tooltip"
-                    tip={!expanded ? item.label : undefined}
-                    trigger="always"
+                <Fragment key={item.id}>
+                  <button
+                    type="button"
+                    className={isAssetActive(item) ? "is-active" : ""}
+                    aria-label={item.label}
+                    aria-current={
+                      isAssetActive(item) &&
+                      !(
+                        item.id === "mappings" &&
+                        activeGraphType &&
+                        expanded &&
+                        visibleGraphTypeIds.includes(activeGraphType)
+                      )
+                        ? "page"
+                        : undefined
+                    }
+                    onClick={() => selectNavigation(item)}
                   >
-                    <Icon name={item.icon} />
-                  </TooltipText>
-                  <span>{item.label}</span>
-                </button>
+                    <TooltipText
+                      className="s1-nav-icon-tooltip"
+                      tip={!expanded ? item.label : undefined}
+                      trigger="always"
+                    >
+                      <Icon name={item.icon} />
+                    </TooltipText>
+                    <span>{item.label}</span>
+                  </button>
+                  {item.id === "mappings" && expanded ? (
+                    <AssetTypeNavigation
+                      label="知识图谱类型"
+                      items={graphTypes.filter((type) =>
+                        visibleGraphTypeIds.includes(type.id),
+                      )}
+                      activeId={activeGraphType}
+                      onSelect={(type) =>
+                        navigate(graphListRoute({ type: type.id }))
+                      }
+                    />
+                  ) : null}
+                </Fragment>
               ))}
               {otherAssets.length ? (
                 <button
@@ -589,7 +604,6 @@ export function Stage1Shell() {
           items={otherAssets}
         />
         <div className="s1-sidebar-foot">
-          <UsageRing expanded={expanded} onClick={() => setUsageOpen(true)} />
           <div className="s1-account-wrap" ref={accountRef}>
             <button
               type="button"
@@ -620,6 +634,21 @@ export function Stage1Shell() {
                   </span>
                 </header>
                 <div className="s1-account-menu-items">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    aria-label={`查看 Agent 用量，已用 ${agentUsage.usedPercent}%，${agentUsage.expiresOn} 到期`}
+                    onClick={() => {
+                      setAccountOpen(false);
+                      setUsageOpen(true);
+                    }}
+                  >
+                    <Icon name="activity" />
+                    <span>
+                      <b>Agent 用量 · 已用 {agentUsage.usedPercent}%</b>
+                      <small>{agentUsage.expiresOn} 到期</small>
+                    </span>
+                  </button>
                   <button
                     type="button"
                     role="menuitem"
@@ -801,8 +830,8 @@ export function Stage1Shell() {
       <Modal
         open={usageOpen}
         close={() => setUsageOpen(false)}
-        title="本月 Agent 用量"
-        description="仅实际运行的 Agent、公开网络搜索和数据处理任务消耗用量"
+        title="Agent 用量"
+        size="sm"
         footer={
           <>
             <Button onClick={() => setUsageOpen(false)}>关闭</Button>
@@ -819,25 +848,16 @@ export function Stage1Shell() {
         }
       >
         <div className="s1-usage-detail">
-          <UsageRing value={64} expanded />
           <dl>
             <div>
-              <dt>已使用</dt>
-              <dd>64%</dd>
+              <dt>已用量</dt>
+              <dd>{agentUsage.usedPercent}%</dd>
             </div>
             <div>
-              <dt>本月任务</dt>
-              <dd>38 次</dd>
-            </div>
-            <div>
-              <dt>预计可用</dt>
-              <dd>至 8 月 31 日</dd>
+              <dt>到期日期</dt>
+              <dd>{agentUsage.expiresOn}</dd>
             </div>
           </dl>
-          <p>
-            <Icon name="info" />
-            等待用户、等待外部、暂停和只查看历史不会持续消耗用量。
-          </p>
         </div>
       </Modal>
     </div>

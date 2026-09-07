@@ -818,49 +818,7 @@
   border-radius: 8px;
 }
 .ops-search {
-  display: flex;
   width: min(380px, 34vw);
-  height: 38px;
-  align-items: center;
-  gap: 8px;
-  padding: 0 10px;
-  border: 1px solid #d8dde3;
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.025);
-}
-.ops-search:focus-within {
-  border-color: #8fc3f5;
-  box-shadow: 0 0 0 3px rgba(7, 109, 215, 0.1);
-}
-.ops-search svg {
-  width: 17px;
-  color: #7f8791;
-}
-.ops-search input {
-  min-width: 0;
-  flex: 1;
-  border: 0;
-  outline: 0;
-  color: var(--s1-ink);
-  background: transparent;
-  font-size: 12px;
-}
-.ops-search input:focus-visible {
-  box-shadow: none;
-}
-.ops-search button {
-  display: grid;
-  width: 26px;
-  height: 26px;
-  place-items: center;
-  border: 0;
-  background: transparent;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.ops-search button:hover {
-  background: #edf1f5;
 }
 .ops-filter-controls {
   display: flex;
@@ -885,11 +843,6 @@
 }
 .ops-filter-select:has(> .s1-icon-button) .s4-select > button {
   padding-right: 54px;
-}
-.ops-filter-controls .s4-select > button,
-.ops-filter-controls .s4-date-picker > button {
-  height: 38px;
-  font-size: 12px;
 }
 
 .ops-table-wrap {

@@ -1,5 +1,7 @@
 # 原型阶段四：交互与状态覆盖
 
+> 2026-09-07 新增知识图谱单一类型、新建与资料编辑闭环、分类筛选、快捷导航配置、回收恢复及本地保存，逐项覆盖见 `graph-types-navigation-prototype.md`；全用户端与运营端筛选控件一致性见 `filter-controls-consistency.md`。
+
 > 2026-09-07 最新确认：移除资产独立关联业务与配置，恢复只读关联任务；任务引用精确匹配资产类型和 ID，公司联系人还须匹配公司 ID。各资产任务入口、状态、跳转及响应式由 `tests/stage4/asset-related-tasks.spec.js` 覆盖。事实关系、来源、AI 处理和活动历史保留，范围见 `asset-business-sections-removal.md`；资产 AI 不进入任务列表。
 
 > 状态：实现与自动化验证完成，等待人类审批。

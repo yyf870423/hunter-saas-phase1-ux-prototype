@@ -246,7 +246,7 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
             </button>
           ))}
         </div>
-        <div className="s2-review-filter-actions">
+        <div className="s2-review-filter-actions s4-filter-scope is-compact">
           <button
             type="button"
             className="s2-review-sort"

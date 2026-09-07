@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { mainlines } from "../src/stage1/data";
-import { workstreamHistory } from "../src/stage2/data";
+import {
+  dashboardInsights,
+  dashboardTasks,
+} from "../src/stage1/dashboard-data";
+import { signals, workItems, workstreamHistory } from "../src/stage2/data";
 import {
   candidates,
   candidatePositionRelations,
@@ -22,6 +26,16 @@ test("任务历史与工作台使用同一当前状态", () => {
   const currentById = new Map(mainlines.map((item) => [item.id, item.status]));
   for (const item of workstreamHistory) {
     expect(item.status, item.id).toBe(currentById.get(item.id));
+  }
+  for (const item of dashboardTasks) {
+    const source = workItems.find((work) => work.id === item.id);
+    for (const key of ["title", "type", "status", "tone"])
+      expect(item[key], `${item.id}.${key}`).toBe(source[key]);
+  }
+  for (const item of dashboardInsights) {
+    const source = signals.find((signal) => signal.id === item.id);
+    for (const key of ["title", "type", "status", "tone", "evidence"])
+      expect(item[key], `${item.id}.${key}`).toBe(source[key]);
   }
 });
 

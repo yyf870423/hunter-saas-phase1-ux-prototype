@@ -4,9 +4,12 @@ import { Button, useToast } from "../stage1/ui";
 import {
   assetNavigationItems,
   defaultVisibleAssetIds,
+  defaultVisibleGraphTypeIds,
   saveAssetNavigationPreferences,
   useAssetNavigationPreferences,
+  useGraphTypeNavigationPreferences,
 } from "../stage1/asset-navigation-store";
+import { graphTypes } from "../stage4/graph-types";
 import {
   InlineNotice,
   SettingRow,
@@ -19,7 +22,9 @@ import {
 
 export function NavigationSettingsPage() {
   const selected = useAssetNavigationPreferences();
+  const selectedGraphTypes = useGraphTypeNavigationPreferences();
   const [draft, setDraft] = useState(selected);
+  const [graphTypeDraft, setGraphTypeDraft] = useState(selectedGraphTypes);
   const [error, setError] = useState("");
   const [params, setParams] = useSearchParams();
   const state = params.get("state") || "normal";
@@ -27,11 +32,16 @@ export function NavigationSettingsPage() {
   const notify = useToast();
   useEffect(() => {
     setDraft(selected);
+    setGraphTypeDraft(selectedGraphTypes);
     setError("");
-  }, [selected]);
-  const changed = JSON.stringify(draft) !== JSON.stringify(selected);
+  }, [selected, selectedGraphTypes]);
+  const changed =
+    JSON.stringify(draft) !== JSON.stringify(selected) ||
+    JSON.stringify(graphTypeDraft) !== JSON.stringify(selectedGraphTypes);
   const isDefault =
-    JSON.stringify(draft) === JSON.stringify(defaultVisibleAssetIds);
+    JSON.stringify(draft) === JSON.stringify(defaultVisibleAssetIds) &&
+    JSON.stringify(graphTypeDraft) ===
+      JSON.stringify(defaultVisibleGraphTypeIds);
   if (state === "loading") return <SettingsLoading rows={7} />;
   if (state === "error")
     return (
@@ -54,6 +64,7 @@ export function NavigationSettingsPage() {
               icon="refresh"
               onClick={() => {
                 setDraft([...defaultVisibleAssetIds]);
+                setGraphTypeDraft([...defaultVisibleGraphTypeIds]);
                 setError("");
               }}
             >
@@ -64,7 +75,10 @@ export function NavigationSettingsPage() {
               icon="check"
               disabled={limited || !changed}
               onClick={() => {
-                const result = saveAssetNavigationPreferences(draft);
+                const result = saveAssetNavigationPreferences(
+                  draft,
+                  graphTypeDraft,
+                );
                 setError(result.error);
                 if (!result.error) notify("导航设置已保存");
               }}
@@ -106,6 +120,37 @@ export function NavigationSettingsPage() {
                             : draft.includes(asset.id),
                         )
                         .map((asset) => asset.id),
+                    );
+                    setError("");
+                  }}
+                />
+              }
+            />
+          ))}
+        </div>
+      </SettingsSection>
+      <SettingsSection title="知识图谱快捷类型">
+        <div className="s5-setting-list">
+          {graphTypes.map((type) => (
+            <SettingRow
+              key={type.id}
+              icon={type.icon}
+              title={type.label}
+              disabled={limited}
+              action={
+                <Toggle
+                  label={`快捷显示${type.label}`}
+                  checked={graphTypeDraft.includes(type.id)}
+                  disabled={limited}
+                  onChange={(checked) => {
+                    setGraphTypeDraft(
+                      graphTypes
+                        .filter((item) =>
+                          item.id === type.id
+                            ? checked
+                            : graphTypeDraft.includes(item.id),
+                        )
+                        .map((item) => item.id),
                     );
                     setError("");
                   }}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Icon } from "../components/Icon";
 import { HunterReply } from "../stage2/automation-ui";
+import { DashboardComponentsPreview } from "./DashboardComponentsPreview";
 import {
   Button,
   EmptyState,
@@ -139,6 +140,7 @@ export function ComponentsPage() {
           <Button size="sm">查看异常</Button>
         </article>
       </section>
+      <DashboardComponentsPreview />
       <Modal
         open={modalOpen}
         close={() => setModalOpen(false)}

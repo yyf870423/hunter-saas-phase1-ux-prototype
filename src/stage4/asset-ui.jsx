@@ -265,13 +265,17 @@ export function SelectMenu({
         setOpen(false);
     };
     const escape = (event) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        event.stopImmediatePropagation();
+        setOpen(false);
+        ref.current?.querySelector("button")?.focus();
+      }
     };
     document.addEventListener("pointerdown", close);
-    document.addEventListener("keydown", escape);
+    document.addEventListener("keydown", escape, true);
     return () => {
       document.removeEventListener("pointerdown", close);
-      document.removeEventListener("keydown", escape);
+      document.removeEventListener("keydown", escape, true);
     };
   }, [open]);
   const visible = options.filter((option) =>
@@ -321,6 +325,7 @@ export function SelectMenu({
         anchorRef={ref}
         panelRef={panelRef}
         className={`s4-select-panel ${panelClassName}`}
+        portalTarget={ref.current?.closest(".s1-app, .ops-app")}
         width={260}
       >
         {searchable ? (
@@ -674,6 +679,7 @@ export function DatePicker({
         anchorRef={ref}
         panelRef={panelRef}
         className="s4-date-picker-panel"
+        portalTarget={ref.current?.closest(".s1-app, .ops-app")}
         width={mode === "month-range" ? 344 : 320}
         role="dialog"
         ariaLabel={`${label}时间选择器`}
@@ -938,7 +944,7 @@ export function FilterBar({
   trailing,
 }) {
   return (
-    <section className="s4-filter-bar">
+    <section className="s4-filter-bar s4-filter-scope">
       <SearchField
         value={query}
         onChange={setQuery}
@@ -1640,9 +1646,17 @@ export function useAssetNavigation() {
   return { navigate, detail };
 }
 
-export function useListController(items, searchKeys, pageSize = 6) {
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+export function useListController(
+  items,
+  searchKeys,
+  pageSize = 6,
+  controls = {},
+) {
+  const [internalQuery, setInternalQuery] = useState("");
+  const [internalPage, setInternalPage] = useState(1);
+  const query = controls.query ?? internalQuery;
+  const setQuery = controls.onQueryChange || setInternalQuery;
+  const setPage = controls.onPageChange || setInternalPage;
   const [selected, setSelected] = useState(new Set());
   const normalized = query.trim().toLowerCase();
   const filtered = useMemo(
@@ -1659,9 +1673,10 @@ export function useListController(items, searchKeys, pageSize = 6) {
     [items, normalized, searchKeys],
   );
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const page = Math.max(1, Math.min(controls.page ?? internalPage, pages));
   const rows = filtered.slice((page - 1) * pageSize, page * pageSize);
   useEffect(() => {
-    setPage(1);
+    setInternalPage(1);
     setSelected(new Set());
   }, [query]);
   return {

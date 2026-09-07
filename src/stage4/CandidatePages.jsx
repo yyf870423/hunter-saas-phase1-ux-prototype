@@ -1953,7 +1953,7 @@ function CandidateEmploymentRelationsTable() {
   return (
     <div className="s4-large-relations s4-employment-relations">
       <div className="s4-large-relations-toolbar">
-        <div className="s4-employment-relations-filters">
+        <div className="s4-employment-relations-filters s4-filter-scope is-compact">
           <div className="s4-inline-search">
             <Icon name="search" />
             <input

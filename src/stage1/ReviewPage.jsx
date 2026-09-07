@@ -6,9 +6,17 @@ const stateLinks = [
   ["正常状态", "/home", "工作台完整业务层级与主要交互"],
   ["加载状态", "/home?state=loading", "局部骨架与稳定布局"],
   ["空状态", "/home?state=empty", "首次使用与新建引导"],
+  ["任务为空", "/home?empty=tasks", "保留洞察和资产变化"],
+  ["洞察为空", "/home?empty=insights", "保留任务和资产变化"],
+  ["资产变化为空", "/home?empty=assets", "保留任务和洞察"],
   ["局部错误", "/home?state=error", "部分来源失败但其他区域可用"],
   ["来源受限", "/home?state=limited", "公开来源受限时保留已有结果"],
   ["组件状态", "/components", "本阶段公共组件与状态"],
+  [
+    "最大容量",
+    "/components?dashboard=capacity",
+    "三个摘要列表均最多呈现 10 条",
+  ],
 ];
 
 export function ReviewPage() {
@@ -21,10 +29,12 @@ export function ReviewPage() {
           </i>
           Hunter SaaS
         </span>
-        <StatusBadge tone="info">阶段一待审批</StatusBadge>
+        <StatusBadge tone="info">工作台迭代待验收</StatusBadge>
         <h1>全局框架与工作台</h1>
         <p>
-          本轮只审批全局导航、工作台信息优先级、基础组件、状态设计和响应式结构。任务、信号、业务资产和运营端将在后续阶段分别提交。
+          【原型说明，正式实现不展示】2026-09-07
+          工作台迭代：任务按处理优先级排列，默认任务 5 条、洞察 8 条、资产变化
+          10 条，同时覆盖全局空和局部空状态。
         </p>
         <Link className="s1-review-primary" to="/home">
           进入工作台原型
@@ -60,14 +70,15 @@ export function ReviewPage() {
             <Icon name="check" />
             <b>本轮包含</b>
             <p>
-              桌面和移动导航、工作台四层优先级、搜索、通知、主题、用量、基础组件及必要状态。
+              任务四字段表格、洞察与资产变化双栏、三个区域最多 10
+              条、全局空与局部空，以及既有导航和主题。
             </p>
           </article>
           <article>
             <Icon name="clock" />
-            <b>后续阶段</b>
+            <b>保留既有实现</b>
             <p>
-              对话式任务、运行追踪、洞察中心、业务资产、设置与运营端完整交互。
+              任务、洞察和资产详情继续使用既有原型，不在工作台另建处理状态或重做业务流程。
             </p>
           </article>
         </div>

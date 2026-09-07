@@ -503,7 +503,7 @@ export function PositionInterviewMaterials() {
             </Button>
           }
         >
-          <div className="s4-interview-record-toolbar">
+          <div className="s4-interview-record-toolbar s4-filter-scope">
             <SearchField
               value={query}
               onChange={setQuery}

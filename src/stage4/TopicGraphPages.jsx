@@ -22,6 +22,7 @@ import {
   SelectMenu,
   StateBanner,
   StatusBadge,
+  TagList,
   TextArea,
   TextInput,
   TooltipText,
@@ -36,6 +37,29 @@ import {
 } from "./topic-graph-data";
 
 import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import {
+  GraphMetadataEditor,
+  GraphMetadataFields,
+  GraphTypeSelect,
+  graphMetadataDraft,
+} from "./GraphMetadata";
+import {
+  graphDestinationRoute,
+  graphListContext,
+  graphListRoute,
+  graphTypeLabel,
+  isGraphType,
+} from "./graph-types";
+import {
+  emptyGraphDemo,
+  graphOrderStorageKey,
+  orderTopicGraphs,
+  recycleGraph,
+  saveGraphMetadata,
+  saveGraphOrder,
+  useTopicGraphs,
+  validateGraphMetadata,
+} from "./topic-graph-store";
 
 const detailTabs = [
   { value: "content", label: "图谱内容" },
@@ -43,8 +67,6 @@ const detailTabs = [
   { value: "history", label: "版本记录" },
   { value: "work", label: "关联任务" },
 ];
-
-const graphOrderStorageKey = "hunter-topic-graph-order";
 
 const evidenceMeta = {
   公司官网: {
@@ -267,41 +289,96 @@ function updateParams(params, setParams, changes) {
 export function MappingsListPage() {
   const navigate = useNavigate();
   const notify = useToast();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
+  const graphs = useTopicGraphs();
+  const context = graphListContext(params);
+  const typeId = isGraphType(context.type) ? context.type : "";
+  const filterParamsRef = useRef(params);
+  useEffect(() => {
+    filterParamsRef.current = params;
+  }, [params]);
+  const changeFilter = (changes) => {
+    const current = filterParamsRef.current;
+    const next = new URLSearchParams(
+      graphListRoute({
+        ...graphListContext(current),
+        ...changes,
+        page: 1,
+      }).split("?")[1],
+    );
+    if (current.get("state")) next.set("state", current.get("state"));
+    filterParamsRef.current = next;
+    setParams(next, {
+      replace: Object.hasOwn(changes, "q") && !Object.hasOwn(changes, "type"),
+    });
+  };
   const [openMenu, setOpenMenu] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
+  const [editItem, setEditItem] = useState(null);
   const [draggedId, setDraggedId] = useState(null);
   const dragStartOrderRef = useRef(null);
   const dragPreviewOrderRef = useRef(null);
   const dragCommittedRef = useRef(false);
-  const [orderedGraphs, setOrderedGraphs] = useState(() => {
-    const stored = window.localStorage.getItem(graphOrderStorageKey);
-    if (!stored) return topicGraphs;
-    try {
-      const order = JSON.parse(stored);
-      return [...topicGraphs].sort(
-        (a, b) => order.indexOf(a.id) - order.indexOf(b.id),
+  const [orderedGraphs, setOrderedGraphs] = useState(() =>
+    orderTopicGraphs(graphs.filter((graph) => !graph.deletedAt)),
+  );
+  useEffect(() => {
+    const update = () =>
+      setOrderedGraphs(
+        orderTopicGraphs(graphs.filter((graph) => !graph.deletedAt)),
       );
-    } catch {
-      return topicGraphs;
-    }
-  });
+    const onStorage = (event) => {
+      if (event.key === graphOrderStorageKey || event.key === null) update();
+    };
+    update();
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [graphs]);
   const controller = useListController(
-    orderedGraphs,
+    orderedGraphs.filter((graph) => !typeId || graph.typeId === typeId),
     ["name", "description"],
     6,
+    {
+      query: context.q,
+      onQueryChange: (q) => changeFilter({ q }),
+      page: context.page,
+      onPageChange: (page) =>
+        updateParams(params, setParams, { page: page > 1 ? page : null }),
+    },
   );
   const state = params.get("state") || "normal";
+  const limited = ["limited", "permission-limited"].includes(state);
+  const createGraph = () =>
+    navigate(graphDestinationRoute("/mappings/new", context));
+  const openGraph = (id) =>
+    navigate(
+      graphDestinationRoute(`/mappings/${id}`, {
+        ...context,
+        page: controller.page,
+      }),
+    );
+
+  useEffect(() => {
+    if (context.page !== controller.page)
+      updateParams(params, setParams, {
+        page: controller.page > 1 ? controller.page : null,
+      });
+  }, [context.page, controller.page]);
 
   const previewGraphOrder = (targetId) => {
     if (!draggedId || draggedId === targetId) return;
     setOrderedGraphs((items) => {
-      const next = [...items];
-      const from = next.findIndex((item) => item.id === draggedId);
-      const to = next.findIndex((item) => item.id === targetId);
+      const visibleIds = new Set(controller.filtered.map((item) => item.id));
+      const visible = items.filter((item) => visibleIds.has(item.id));
+      const from = visible.findIndex((item) => item.id === draggedId);
+      const to = visible.findIndex((item) => item.id === targetId);
       if (from < 0 || to < 0) return items;
-      const [moved] = next.splice(from, 1);
-      next.splice(to, 0, moved);
+      const [moved] = visible.splice(from, 1);
+      visible.splice(to, 0, moved);
+      let index = 0;
+      const next = items.map((item) =>
+        visibleIds.has(item.id) ? visible[index++] : item,
+      );
       dragPreviewOrderRef.current = next;
       return next;
     });
@@ -309,12 +386,15 @@ export function MappingsListPage() {
 
   const commitGraphOrder = () => {
     const next = dragPreviewOrderRef.current || orderedGraphs;
-    dragCommittedRef.current = true;
-    window.localStorage.setItem(
-      graphOrderStorageKey,
-      JSON.stringify(next.map((item) => item.id)),
-    );
-    notify("知识图谱顺序已保存");
+    try {
+      saveGraphOrder(next.map((item) => item.id));
+      dragCommittedRef.current = true;
+      notify("知识图谱顺序已保存");
+    } catch (failure) {
+      if (dragStartOrderRef.current)
+        setOrderedGraphs(dragStartOrderRef.current);
+      notify(failure.message, "error");
+    }
   };
 
   return (
@@ -323,19 +403,41 @@ export function MappingsListPage() {
         title="知识图谱"
         description="用图页整理组织、人物、公司生态、岗位人才和其他需要持续维护的关系内容。"
         count={controller.filtered.length}
-        primaryLabel="新建知识图谱"
-        onPrimary={() => navigate("/mappings/new")}
+        primaryLabel={limited ? undefined : "新建知识图谱"}
+        onPrimary={createGraph}
       />
       <FilterBar
         query={controller.query}
         setQuery={controller.setQuery}
         placeholder="搜索图谱名称或内容"
-        filters={[]}
+        filters={[
+          {
+            key: "graph-type",
+            render: (
+              <GraphTypeSelect
+                all
+                value={typeId}
+                onChange={(type) => changeFilter({ type })}
+              />
+            ),
+          },
+        ]}
       />
+      {context.type && !typeId ? (
+        <StateBanner
+          tone="warning"
+          title="该图谱类型不存在，已显示全部类型"
+          action={
+            <Button onClick={() => changeFilter({ type: "" })}>
+              清除无效筛选
+            </Button>
+          }
+        />
+      ) : null}
       <AssetListState
-        state={state}
+        state={limited ? "limited" : state}
         label="知识图谱"
-        onRetry={() => navigate("/mappings")}
+        onRetry={() => updateParams(params, setParams, { state: null })}
       >
         {state === "normal" && controller.rows.length ? (
           <div className="tg-graph-grid">
@@ -379,10 +481,15 @@ export function MappingsListPage() {
                   <span className="tg-graph-card-icon">
                     <Icon name="route" />
                   </span>
-                  <span>
-                    <small>知识图谱 · {item.pageCount} 个图页</small>
+                  <div>
                     <h2>{item.name}</h2>
-                  </span>
+                    <div className="tg-graph-card-meta">
+                      <TagList
+                        items={[`类型：${graphTypeLabel(item.typeId)}`]}
+                      />
+                      <small>{item.pageCount} 个图页</small>
+                    </div>
+                  </div>
                   <button
                     type="button"
                     className="tg-icon-button"
@@ -400,7 +507,10 @@ export function MappingsListPage() {
                     <div className="tg-card-menu" role="menu">
                       <button
                         type="button"
-                        onClick={() => navigate(`/mappings/${item.id}`)}
+                        onClick={() => {
+                          setEditItem(item);
+                          setOpenMenu(null);
+                        }}
                       >
                         <Icon name="edit" />
                         编辑图谱资料
@@ -446,10 +556,7 @@ export function MappingsListPage() {
                   <span>
                     <small>更新于 {item.updatedAt}</small>
                   </span>
-                  <Button
-                    size="sm"
-                    onClick={() => navigate(`/mappings/${item.id}`)}
-                  >
+                  <Button size="sm" onClick={() => openGraph(item.id)}>
                     打开图谱
                   </Button>
                 </footer>
@@ -459,15 +566,24 @@ export function MappingsListPage() {
         ) : state === "normal" || state === "empty" ? (
           <div className="s4-custom-empty">
             <Icon name="route" />
-            <b>还没有知识图谱</b>
+            <b>
+              {context.q
+                ? "没有匹配的知识图谱"
+                : typeId
+                  ? `暂无${graphTypeLabel(typeId)}图谱`
+                  : "还没有知识图谱"}
+            </b>
             <p>
-              先创建一个图谱，再在其中增加空白图页、导入文件或使用 AI 整理内容。
+              {context.q
+                ? "请调整关键词或清除筛选条件。"
+                : "先创建一个图谱，再在其中增加空白图页、导入文件或使用 AI 整理内容。"}
             </p>
-            <Button
-              tone="primary"
-              icon="plus"
-              onClick={() => navigate("/mappings/new")}
-            >
+            {context.q || typeId ? (
+              <Button onClick={() => changeFilter({ type: "", q: "" })}>
+                清除筛选
+              </Button>
+            ) : null}
+            <Button tone="primary" icon="plus" onClick={createGraph}>
               新建知识图谱
             </Button>
           </div>
@@ -479,6 +595,7 @@ export function MappingsListPage() {
         onChange={controller.setPage}
         pageSize={6}
       />
+      <GraphMetadataEditor graph={editItem} close={() => setEditItem(null)} />
       <DeleteAssetModal
         open={Boolean(deleteItem)}
         close={() => setDeleteItem(null)}
@@ -486,8 +603,13 @@ export function MappingsListPage() {
         assetName={deleteItem?.name || ""}
         impact="图谱进入回收站；候选人、岗位、公司、论文、专利和共享关系均不会删除。"
         onConfirm={() => {
-          notify(`“${deleteItem?.name}”已进入回收站`);
-          setDeleteItem(null);
+          try {
+            recycleGraph(deleteItem.id);
+            notify(`“${deleteItem.name}”已进入回收站`);
+            setDeleteItem(null);
+          } catch (failure) {
+            notify(failure.message, "error");
+          }
         }}
       />
     </div>
@@ -496,15 +618,33 @@ export function MappingsListPage() {
 
 export function MappingCreatePage() {
   const navigate = useNavigate();
-  const { notify } = useToast();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const notify = useToast();
+  const [params] = useSearchParams();
+  const context = graphListContext(params);
+  const limited = ["limited", "permission-limited"].includes(
+    params.get("state"),
+  );
+  const graphs = useTopicGraphs();
+  const [draft, setDraft] = useState(() =>
+    graphMetadataDraft({
+      typeId: isGraphType(context.type) ? context.type : "",
+    }),
+  );
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const errors = submitted ? validateGraphMetadata(draft, graphs) : {};
+  const back = () => navigate(graphListRoute(context));
   const create = () => {
+    if (limited) return;
     setSubmitted(true);
-    if (!name.trim()) return;
-    notify("知识图谱已创建");
-    navigate("/mappings/graph-empty");
+    if (Object.keys(validateGraphMetadata(draft, graphs)).length) return;
+    try {
+      const graph = saveGraphMetadata(draft);
+      notify("知识图谱已创建");
+      navigate(graphDestinationRoute(`/mappings/${graph.id}`, context));
+    } catch (failure) {
+      setError(failure.message);
+    }
   };
 
   return (
@@ -513,7 +653,7 @@ export function MappingCreatePage() {
         eyebrow="知识图谱"
         title="新建知识图谱"
         description="先建立图谱容器。创建后再增加图页、导入文件或让 AI 整理内容。"
-        actions={<Button onClick={() => navigate("/mappings")}>取消</Button>}
+        actions={<Button onClick={back}>取消</Button>}
       />
       <section className="tg-create-panel">
         <header>
@@ -527,28 +667,23 @@ export function MappingCreatePage() {
             </p>
           </div>
         </header>
-        <div className="s4-form-grid">
-          <FormField
-            label="图谱名称"
-            required
-            span={2}
-            error={submitted && !name.trim() ? "请输入图谱名称" : ""}
-          >
-            <TextInput
-              value={name}
-              onChange={setName}
-              placeholder="例如：具身智能 VLA 知识图谱"
-            />
-          </FormField>
-          <FormField label="图谱说明" span={2}>
-            <TextArea
-              value={description}
-              onChange={setDescription}
-              rows={5}
-              placeholder="说明这份图谱主要整理什么内容，方便后续查找和复用。"
-            />
-          </FormField>
-        </div>
+        {limited ? (
+          <StateBanner
+            tone="warning"
+            icon="lock"
+            title="暂无权限新建知识图谱"
+          />
+        ) : null}
+        {error ? <StateBanner tone="danger" title={error} /> : null}
+        <GraphMetadataFields
+          draft={draft}
+          errors={errors}
+          disabled={limited}
+          onChange={(next) => {
+            setDraft(next);
+            setError("");
+          }}
+        />
         <div className="tg-create-note">
           <Icon name="info" />
           <p>
@@ -557,8 +692,8 @@ export function MappingCreatePage() {
           </p>
         </div>
         <footer>
-          <Button onClick={() => navigate("/mappings")}>取消</Button>
-          <Button tone="primary" disabled={!name.trim()} onClick={create}>
+          <Button onClick={back}>取消</Button>
+          <Button tone="primary" disabled={limited} onClick={create}>
             创建知识图谱
           </Button>
         </footer>
@@ -3879,20 +4014,17 @@ export function MappingDetailPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
+  const graphs = useTopicGraphs();
+  const context = graphListContext(params);
+  const limited = ["limited", "permission-limited"].includes(
+    params.get("state"),
+  );
+  const [metadataOpen, setMetadataOpen] = useState(false);
   const panel = params.get("panel") || "";
   const requestedPageId = params.get("page");
   const graph =
-    topicGraphs.find((item) => item.id === mappingId) ||
-    (mappingId === "graph-empty"
-      ? {
-          id: "graph-empty",
-          name: "新能源机器人产业图谱",
-          description: "整理产业链、目标公司与关键人才。",
-          pending: 0,
-          nodeCount: 0,
-          pageCount: 0,
-        }
-      : null);
+    graphs.find((item) => item.id === mappingId) ||
+    (mappingId === "graph-empty" ? emptyGraphDemo : null);
   const [pages, setPages] = useState(() =>
     mappingId === "graph-empty" ? [] : deepClonePages(mappingId),
   );
@@ -3955,9 +4087,12 @@ export function MappingDetailPage() {
     }
     updateParams(params, setParams, { panel: "ai" });
   };
-  if (!graph)
+  if (!graph || graph.deletedAt)
     return (
-      <NotFoundState label="知识图谱" onBack={() => navigate("/mappings")} />
+      <NotFoundState
+        label="知识图谱"
+        onBack={() => navigate(graphListRoute(context))}
+      />
     );
   if (panel === "ai" && activePage)
     return (
@@ -3985,27 +4120,43 @@ export function MappingDetailPage() {
         icon="route"
         title={graph.name}
         subtitle={graph.description}
-        badges={
-          pages.length
+        badges={[
+          { label: graphTypeLabel(graph.typeId), tone: "neutral" },
+          ...(pages.length
             ? [
                 { label: `${pages.length} 个图页`, tone: "info" },
                 {
-                  label: `${graph.pending || 3} 项待确认`,
+                  label: `${graph.pending ?? 0} 项待确认`,
                   tone: graph.pending ? "warning" : "neutral",
                 },
               ]
-            : [{ label: "空图谱", tone: "neutral" }]
-        }
-        onBack={() => navigate("/mappings")}
-        onDelete={() => setDeleteOpen(true)}
+            : [{ label: "空图谱", tone: "neutral" }]),
+        ]}
+        onBack={() => navigate(graphListRoute(context))}
+        onDelete={!limited ? () => setDeleteOpen(true) : undefined}
       >
-        <Button icon="download" onClick={startImport}>
+        <Button
+          icon="edit"
+          onClick={() => setMetadataOpen(true)}
+          disabled={limited}
+        >
+          编辑资料
+        </Button>
+        <Button icon="download" onClick={startImport} disabled={limited}>
           导入图页
         </Button>
-        <Button icon="sparkles" onClick={startAi}>
+        <Button icon="sparkles" onClick={startAi} disabled={limited}>
           AI 整理
         </Button>
       </DetailHeader>
+      {limited ? (
+        <StateBanner tone="warning" icon="lock" title="暂无权限修改图谱资料" />
+      ) : null}
+      <GraphMetadataEditor
+        graph={metadataOpen ? graph : null}
+        close={() => setMetadataOpen(false)}
+        disabled={limited}
+      />
       <DetailTabs
         tabs={availableTabs.map((item) =>
           item.value === "reviews"
@@ -4209,9 +4360,14 @@ export function MappingDetailPage() {
         assetName={graph.name}
         impact="整份图谱进入回收站；正式资产、来源记录和共享关系均不会删除。"
         onConfirm={() => {
-          setDeleteOpen(false);
-          notify("知识图谱已进入回收站");
-          navigate("/mappings");
+          try {
+            recycleGraph(graph.id);
+            setDeleteOpen(false);
+            notify("知识图谱已进入回收站");
+            navigate(graphListRoute(context));
+          } catch (failure) {
+            notify(failure.message, "error");
+          }
         }}
       />
     </div>

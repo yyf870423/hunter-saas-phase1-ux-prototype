@@ -4,6 +4,24 @@ import { Icon } from "../components/Icon";
 import { FloatingPanel } from "../stage4/asset-ui";
 import { Drawer, IconButton } from "./ui";
 
+export function AssetTypeNavigation({ label, items, activeId, onSelect }) {
+  if (!items.length) return null;
+  return (
+    <div className="s1-asset-type-nav" role="group" aria-label={label}>
+      {items.map((item) => (
+        <button
+          type="button"
+          key={item.id}
+          aria-current={activeId === item.id ? "page" : undefined}
+          onClick={() => onSelect(item)}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function AssetNavigationItems({
   items,
   onSelect,

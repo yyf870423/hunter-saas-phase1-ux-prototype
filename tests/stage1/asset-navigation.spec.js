@@ -218,7 +218,7 @@ test("设置覆盖加载、读取失败重试和受限状态", async ({ page }) 
   await page.goto("#/settings/navigation?state=error");
   await expect(page.getByText("设置读取失败", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "重新加载", exact: true }).click();
-  await expect(page.getByRole("switch")).toHaveCount(7);
+  await expect(page.getByRole("switch", { name: /^平铺显示/ })).toHaveCount(7);
   await page.goto("#/settings/navigation?state=permission-limited");
   await expect(page.getByText("暂无权限修改导航设置。")).toBeVisible();
   for (const control of await page.getByRole("switch").all())
@@ -413,7 +413,9 @@ test("导航设置桌面和手机沿用公共设置布局", async ({ page }) => 
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("#/settings/navigation");
-    await expect(page.getByRole("switch")).toHaveCount(7);
+    await expect(page.getByRole("switch", { name: /^平铺显示/ })).toHaveCount(
+      7,
+    );
     await expectNoHorizontalOverflow(page);
     await page.screenshot({
       path: `artifacts/asset-navigation/after/settings-${width}.png`,

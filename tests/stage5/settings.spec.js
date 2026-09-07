@@ -4,14 +4,15 @@ import {
   trackConsoleErrors,
 } from "../stage1/helpers";
 
-test("桌面账户菜单和用量环可以进入设置", async ({ page }) => {
+test("桌面账户菜单中的设置与用量可以进入对应设置页", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/home");
   await page.getByRole("button", { name: "打开用户菜单" }).click();
   await page.getByRole("menuitem", { name: /设置/ }).click();
   await expect(page).toHaveURL(/#\/settings\/profile$/);
 
-  await page.getByRole("button", { name: /查看 Agent 用量/ }).click();
+  await page.getByRole("button", { name: "打开用户菜单" }).click();
+  await page.getByRole("menuitem", { name: /查看 Agent 用量/ }).click();
   await page.getByRole("button", { name: "查看订阅与用量" }).click();
   await expect(page).toHaveURL(/#\/settings\/subscription$/);
   await assertNoConsoleErrors();

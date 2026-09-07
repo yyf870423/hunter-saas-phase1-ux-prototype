@@ -20,9 +20,9 @@ test("局部错误可独立恢复", async ({ page }) => {
   await page.goto("#/home?state=error");
   await page.getByRole("button", { name: "重新加载" }).click();
   await expect(page).toHaveURL(/#\/home$/);
-  await expect(page.getByText("信号摘要已重新加载")).toBeVisible();
+  await expect(page.getByText("洞察摘要已重新加载")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "需要处理的洞察" }),
+    page.locator(".s1-dashboard-insights .s1-dashboard-section-head h2"),
   ).toBeVisible();
 });
 

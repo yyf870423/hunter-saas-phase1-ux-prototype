@@ -2002,7 +2002,7 @@
 }
 .s2-review-toolbar .s1-search-field {
   width: min(340px, 34vw);
-  height: 34px;
+  height: var(--s1-field-height, 36px);
 }
 .s2-review-filter-actions {
   display: flex;
@@ -2011,16 +2011,18 @@
 }
 .s2-review-sort {
   display: flex;
-  height: 34px;
+  height: var(--s1-field-height, 36px);
   flex: 0 0 auto;
   align-items: center;
   gap: 6px;
   padding: 0 10px;
   color: var(--s1-muted);
-  font-size: 12px;
+  font-size: var(--s1-control-font-size);
+  font-weight: var(--s1-control-font-weight);
   background: var(--s1-surface);
-  border: 1px solid var(--s1-line);
-  border-radius: 7px;
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 6px;
+  box-shadow: var(--s1-control-shadow);
   cursor: pointer;
 }
 .s2-review-sort:hover {
@@ -3147,14 +3149,14 @@
 .s2-list-toolbar .s1-search-field {
   min-width: 220px;
   flex: 1 1 360px;
-  height: 34px;
+  height: var(--s1-field-height, 40px);
 }
 .s2-list-toolbar .s2-scenario-filter {
   flex: 0 0 auto;
 }
 .s2-list-toolbar .s2-scenario-filter > button {
   min-width: 132px;
-  height: 34px;
+  height: var(--s1-field-height, 40px);
 }
 .s2-task-table-head,
 .s2-task-row {

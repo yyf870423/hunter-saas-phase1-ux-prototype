@@ -25,7 +25,7 @@ import {
   UserMessage,
   WorkHistory,
 } from "./automation-ui";
-import { workItems } from "./data";
+import { identityReviewPlan, workItems } from "./data";
 import {
   buildRecommendationTaskArtifacts,
   TaskArtifactPreview,
@@ -132,7 +132,7 @@ export function WorksPage() {
               </button>
             ))}
           </div>
-          <div className="s2-list-filters">
+          <div className="s2-list-filters s4-filter-scope">
             <SearchField
               value={query}
               onChange={(next) => {
@@ -277,27 +277,6 @@ export function WorksPage() {
     </div>
   );
 }
-
-const taskPlan = [
-  {
-    id: "collect",
-    title: "汇总现有人物与来源",
-    detail: "读取知识图谱和公开来源中已经存在的两组人物记录。",
-    requirement: "核验两位“周明远”是否为同一个人。",
-  },
-  {
-    id: "compare",
-    title: "比较身份与任职证据",
-    detail: "对比姓名、教育、任职时间和团队关系。",
-    requirement: "只形成身份建议，不自动合并人物。",
-  },
-  {
-    id: "decide",
-    title: "交付消歧建议",
-    detail: "无法安全判断时等待用户补充或选择。",
-    requirement: "证据不足时必须停下来等待用户决定。",
-  },
-];
 
 export function SideTaskDetail({ taskId: taskIdOverride }) {
   const { taskId: routeTaskId, workstreamId } = useParams();
@@ -496,7 +475,7 @@ function IdentityReviewTask({ taskId }) {
       "success",
     );
   };
-  const visiblePlan = taskPlan.map((step, index) => ({
+  const visiblePlan = identityReviewPlan.map((step, index) => ({
     ...step,
     status: resolved
       ? "done"

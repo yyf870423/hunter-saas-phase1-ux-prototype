@@ -3110,7 +3110,7 @@ function PositionTalentMap() {
           />
         ) : view === "table" ? (
           <div className="s4-large-relations s4-talent-table">
-            <div className="s4-large-relations-toolbar s4-talent-table-toolbar">
+            <div className="s4-large-relations-toolbar s4-talent-table-toolbar s4-filter-scope is-compact">
               <div className="s4-inline-search">
                 <Icon name="search" />
                 <input
