@@ -336,12 +336,14 @@ function IdentityReviewTask({ taskId }) {
   const notify = useToast();
   const [paused, setPaused] = useState(false);
   const [resolved, setResolved] = useState(false);
+  const [replies, setReplies] = useState([]);
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [authMode, setAuthMode] = useState("confirm");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const send = (text, files) => {
+    setReplies((items) => [...items, { text, files: files.map((file) => file.name) }]);
     setResolved(true);
     setComposer("");
     setAttachments([]);
@@ -438,14 +440,10 @@ function IdentityReviewTask({ taskId }) {
 
 可以直接在下方输入你掌握的任职信息，或上传相关文件。`}
             />
-            {resolved ? (
-              <>
-                <UserMessage time="刚刚">
-                  补充：这是同一个人，2025 年 12 月加入穹顶智能。
-                </UserMessage>
-                <HunterReply markdown="已记录你补充的任职事实，并将两组记录标记为同一人物的合并建议。该建议已回流“星澜机器人知识图谱”的更新与审核区，仍需按当前写入规则完成审核。" />
-              </>
-            ) : null}
+            {replies.map((reply, index) => <div key={index}>
+              <UserMessage>{[reply.text, ...reply.files].filter(Boolean).join("\n")}</UserMessage>
+              <HunterReply markdown="补充资料已回流“星澜机器人知识图谱”的更新与审核区，供继续核对身份；当前没有合并人物，原有冲突和证据仍保留。" />
+            </div>)}
           </div>
           <div className="s2-task-composer-dock">
             <div className="s2-task-plan">
@@ -526,7 +524,7 @@ function OneStepSummaryTask({ taskId }) {
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [authMode, setAuthMode] = useState("confirm");
-  const [updated, setUpdated] = useState(false);
+  const [replies, setReplies] = useState([]);
   return (
     <TaskWorkspaceShell currentId={taskId}>
       <header className="s2-detail-header">
@@ -561,21 +559,17 @@ function OneStepSummaryTask({ taskId }) {
 
 摘要已保留在本次任务记录中，尚未写入候选人跟进记录。`}
             />
-            {updated ? (
-              <>
-                <UserMessage time="刚刚">
-                  把团队规模和奖金结构标记成下次必须确认的事项。
-                </UserMessage>
-                <HunterReply markdown="已调整摘要，并将团队规模和奖金结构列为下次沟通必须确认的事项。" />
-              </>
-            ) : null}
+            {replies.map((reply, index) => <div key={index}>
+              <UserMessage>{[reply.text, ...reply.files].filter(Boolean).join("\n")}</UserMessage>
+              <HunterReply markdown="补充要求已保留在当前摘要任务中，尚未写入候选人跟进记录，也未发起对外联系。" />
+            </div>)}
           </div>
           <div className="s2-task-composer-dock">
             <Composer
               value={composer}
               onChange={setComposer}
-              onSend={() => {
-                setUpdated(true);
+              onSend={(text, files) => {
+                setReplies((items) => [...items, { text, files: files.map((file) => file.name) }]);
                 setComposer("");
                 setAttachments([]);
                 notify("任务结果已更新", "success");
@@ -598,6 +592,7 @@ export function RecommendationReportWorkspace({ onClose }) {
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [authMode, setAuthMode] = useState("confirm");
+  const [replies, setReplies] = useState([]);
   const candidateId = sessionStorage.getItem(
     "hunter-recommendation-candidate-id",
   );
@@ -710,12 +705,13 @@ export function RecommendationReportWorkspace({ onClose }) {
                 setPreviewArtifactId(`report-${item.version}`)
               }
             />
+            {replies.map((reply, index) => <div key={index}>
+              <UserMessage>{[reply.text, ...reply.files].filter(Boolean).join("\n")}</UserMessage>
+              <HunterReply markdown="修改要求已保留。风险提示和待核实信息仍保留，报告没有对外发送。" />
+            </div>)}
             {revised ? (
               <>
-                <UserMessage time="刚刚">
-                  请进一步突出量产交付经验，并把薪资风险放到最后。
-                </UserMessage>
-                <HunterReply markdown="已完成新一轮修改：优先呈现量产和真实场景交付证据，薪资风险移动到报告末尾，未删除任何待核实信息。" />
+                <HunterReply markdown="【原型说明，正式实现不展示】以下为预置修订示例文件，尚未调用 Agent 按本次输入生成报告。" />
                 <RecommendationReportFile
                   candidateName={candidateName}
                   report={latestReport}
@@ -751,7 +747,8 @@ export function RecommendationReportWorkspace({ onClose }) {
             <Composer
               value={composer}
               onChange={setComposer}
-              onSend={() => {
+              onSend={(text, files) => {
+                setReplies((items) => [...items, { text, files: files.map((file) => file.name) }]);
                 setRevised(true);
                 const candidateId = sessionStorage.getItem(
                   "hunter-recommendation-candidate-id",

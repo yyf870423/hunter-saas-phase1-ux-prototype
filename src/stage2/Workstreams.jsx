@@ -577,14 +577,8 @@ export function AutomationWorkspace() {
               />
             ) : null}
             {streamError ? (
-              <div className="s2-local-error" role="alert">
-                <Icon name="warning" />
-                <span>
-                  <b>回复生成中断</b>
-                  <small>
-                    已经生成的内容和输入已保留，可以从当前检查点继续。
-                  </small>
-                </span>
+              <div role="alert">
+                <HunterReply markdown="### 回复生成中断\n\n已经生成的内容和输入已保留，可以从当前检查点继续。" />
                 <Button
                   tone="secondary"
                   size="sm"
@@ -596,36 +590,14 @@ export function AutomationWorkspace() {
               </div>
             ) : null}
             {streamStopped ? (
-              <div className="s2-system-state">
-                <Icon name="pause" />
-                <span>
-                  <b>本轮执行已停止</b>
-                  <small>
-                    已经生成的内容和当前上下文不会丢失。请在下方输入新的要求后继续。
-                  </small>
-                </span>
-              </div>
+              <HunterReply markdown="### 本轮执行已停止\n\n已经生成的内容和当前上下文不会丢失。请在下方输入新的要求后继续。" />
             ) : null}
             {forcedState === "limited" ? (
-              <div className="s2-permission-state">
-                <Icon name="warning" />
-                <span>
-                  <b>部分公开来源暂不可用</b>
-                  <small>
-                    系统候选人、知识图谱和已获得的公开结果继续保留。失败来源可以稍后单独重试，也可以直接上传补充简历。
-                  </small>
-                </span>
-              </div>
+              <HunterReply markdown="### 部分公开来源暂不可用\n\n系统候选人、知识图谱和已获得的公开结果继续保留。失败来源可以稍后单独重试，也可以直接上传补充简历。" />
             ) : null}
             {localError ? (
-              <div className="s2-local-error" role="alert">
-                <Icon name="warning" />
-                <span>
-                  <b>论文与专利人物线索处理失败</b>
-                  <small>
-                    系统候选人、知识图谱、公开资料和用户上传简历已经保留。可以只重试失败来源，不重新执行整轮任务。
-                  </small>
-                </span>
+              <div role="alert">
+                <HunterReply markdown="### 论文与专利人物线索处理失败\n\n系统候选人、知识图谱、公开资料和用户上传简历已经保留。可以只重试失败来源，不重新执行整轮任务。" />
                 <Button
                   tone="secondary"
                   size="sm"
@@ -906,31 +878,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
               </HunterReply>
             ) : null}
             {contactStage === "waiting" ? (
-              <section className="s3-external-wait">
-                <div className="s3-wait-icon">
-                  <Icon name="clock" />
-                </div>
-                <span>
-                  <small>等待外部</small>
-                  <b>等待 3 位候选人回复邮件</b>
-                  <p>
-                    邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到当前任务；猎头在系统外获得的新信息也可以作为普通跟进记录补充。
-                  </p>
-                  <em>
-                    最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 ·
-                    7 天后标记长期未回复
-                  </em>
-                </span>
-                <Button
-                  tone="secondary"
-                  size="sm"
-                  onClick={() =>
-                    notify("可以在下方输入回复内容或上传新简历", "info")
-                  }
-                >
-                  补充跟进结果
-                </Button>
-              </section>
+              <HunterReply markdown="## 等待 3 位候选人回复邮件\n\n邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到当前任务；猎头在系统外获得的新信息也可以作为普通跟进记录补充。\n\n最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 · 7 天后标记长期未回复" />
             ) : null}
             {contactStage === "reply" ? (
               <>
@@ -964,15 +912,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
               </>
             ) : null}
             {terminated ? (
-              <div className="s2-system-state is-danger">
-                <Icon name="warning" />
-                <span>
-                  <b>任务已终止</b>
-                  <small>
-                    对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建任务。
-                  </small>
-                </span>
-              </div>
+              <HunterReply markdown="### 任务已终止\n\n对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建任务。" />
             ) : null}
           </div>
         </div>

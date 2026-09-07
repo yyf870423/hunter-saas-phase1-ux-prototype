@@ -326,13 +326,12 @@ for (const scenario of [
     await page.getByRole("button", { name: "继续生成" }).click();
     await expect(page.getByText("回复生成中断")).toHaveCount(0);
     await page.goto(`#/tasks/${scenario}?state=limited`);
-    await expect(page.locator(".s2-permission-state")).toBeVisible();
-    await page.getByRole("button", { name: "处理权限" }).click();
-    await expect(page.getByText("已打开对应权限处理入口")).toBeVisible();
+    await expect(page.locator(".s2-hunter-reply").filter({ hasText: "只暂停受影响的内部处理" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "处理权限" })).toHaveCount(0);
     await page.goto(`#/tasks/${scenario}?state=error`);
-    await expect(page.locator(".s2-local-error")).toBeVisible();
+    await expect(page.getByRole("alert").filter({ has: page.getByRole("button", { name: "重试失败步骤" }) })).toBeVisible();
     await page.getByRole("button", { name: "重试失败步骤" }).click();
-    await expect(page.locator(".s2-local-error")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "重试失败步骤" })).toHaveCount(0);
   });
 }
 

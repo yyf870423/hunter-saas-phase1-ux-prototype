@@ -220,20 +220,6 @@ export function OpportunityFollowupSummary({ opportunity, ownerTaskId = "" }) {
   </FieldGroup>;
 }
 
-export function TaskOpportunityFollowup({ task }) {
-  const state = useOpportunityState();
-  const action = useOpportunityAction();
-  const opportunity = state.opportunities.find((item) => item.id === task.opportunityId);
-  if (opportunity) return <>{opportunity.deletedAt ? <StateBanner tone="warning" title="来源机会已进入回收站，任务跟进仍然保留" /> : null}
-    <OpportunityFollowupSummary opportunity={opportunity} ownerTaskId={task.id} /></>;
-  const plans = state.followups.filter((plan) => plan.ownerTaskId === task.id && ["pending", "due"].includes(plan.status));
-  if (!plans.length) return null;
-  return <FieldGroup title="持续跟进"><StateBanner tone="warning" title="来源机会已永久删除" description="任务安排仍保留，可取消；不能向已删除的机会追加记录。" />
-    {plans.map((plan) => <div key={plan.id}><p>{plan.subject}，{displayDateTime(plan.dueAt)}</p>
-      <Button size="sm" tone="danger-outline" disabled={action.busy || getOpportunityPermission()} onClick={() => action.run("followup.cancel", { id: plan.id, ownerTaskId: task.id })}>取消安排</Button></div>)}{action.errorView}
-  </FieldGroup>;
-}
-
 export function OpportunityComponentsPreview() {
   const [state, setState] = useState("normal");
   const [draft, setDraft] = useState({ ...emptyOpportunity("company-xinglan"), title: "团队扩建需求", summary: "客户确认新增机器人研发方向", evidence: "招聘负责人电话确认" });

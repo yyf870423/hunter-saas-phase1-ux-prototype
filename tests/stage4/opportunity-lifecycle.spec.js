@@ -389,10 +389,8 @@ test("客户开发回复保留原文、联系人、任务来源和唯一跟进�
   expect(opportunity.sources.at(-1).content).toContain(reply);
   expect(opportunity.sources.at(-1).taskId).toBe("client-xinglan");
   expect(opportunity.sources.at(-1).kind).toBe("reply");
-  await button(page, "安排下次跟进").click();
-  await field(page, "下次跟进事项").fill("确认邮件需求的完整职责");
-  await futureTime(page, "下次跟进时间");
-  await button(page, "保存安排").click();
+  await replyToAsset(page, "安排跟进\n跟进事项：确认邮件需求的完整职责\n跟进时间：2099-09-10 10:00");
+  await replyToAsset(page, "是");
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByRole("link", { name: "查看招聘机会", exact: true }).click();
   await expect(button(page, "返回原任务处理")).toBeVisible();
@@ -412,11 +410,9 @@ test("客户开发回复保留原文、联系人、任务来源和唯一跟进�
   await button(page, "移入回收站").click();
   await expect(page).toHaveURL(/#\/opportunities$/);
   await page.goto("#/tasks/client-xinglan");
-  await expect(page.getByText("来源机会已进入回收站，任务跟进仍然保留", { exact: true })).toBeVisible();
-  await button(page, "记录跟进").click();
-  await field(page, "跟进内容").fill("客户约定下轮再联系，原任务完成当前事项。");
-  await page.getByRole("checkbox", { name: /^完成当前事项/ }).click();
-  await button(page, "保存并完成本次跟进").click();
+  await expect(page.getByText("来源机会已进入回收站，原任务仍可维护已有跟进。", { exact: true })).toBeVisible();
+  await replyToAsset(page, "记录跟进\n跟进内容：客户约定下轮再联系，原任务完成当前事项。\n实际跟进时间：2026-09-01 10:00\n完成当前事项：是");
+  await replyToAsset(page, "是");
   await expect(page.getByRole("dialog")).toHaveCount(0);
   expect((await snapshot(page)).followups[0].status).toBe("done");
   await errors();

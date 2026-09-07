@@ -30,8 +30,9 @@ import {
   mappingRelationshipViews,
 } from "./data";
 import { getOpportunitySnapshot, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
-import { prepareLegacyOpportunityDiscovery, saveLegacyOpportunityReply } from "../stage4/opportunity-task-adapter";
+import { explicitInputFields, prepareLegacyOpportunityDiscovery, saveLegacyOpportunityReply } from "../stage4/opportunity-task-adapter";
 import { LegacyOpportunityResult } from "../stage4/OpportunityTaskWorkspace";
+import { singleAssetDecision } from "../stage4/single-asset-confirmation";
 
 function forcedPhase(scenarioId, state) {
   if (state === "stream-error") return 1;
@@ -149,23 +150,8 @@ function ReviewEntry({ icon, label, note, onOpen }) {
   );
 }
 
-function ExternalWaitState({ title, description, meta, onAddResult }) {
-  return (
-    <section className="s3-external-wait">
-      <div className="s3-wait-icon">
-        <Icon name="clock" />
-      </div>
-      <span>
-        <small>等待外部</small>
-        <b>{title}</b>
-        <p>{description}</p>
-        <em>{meta}</em>
-      </span>
-      <Button tone="secondary" size="sm" onClick={onAddResult}>
-        补充线下结果
-      </Button>
-    </section>
-  );
+function ExternalWaitState({ title, description, meta }) {
+  return <HunterReply markdown={"## " + title + "\n\n" + description + "\n\n" + meta} />;
 }
 
 function LocalBusinessError({ scenarioId, onRetry }) {
@@ -184,12 +170,8 @@ function LocalBusinessError({ scenarioId, onRetry }) {
     ],
   }[scenarioId];
   return (
-    <div className="s2-local-error" role="alert">
-      <Icon name="warning" />
-      <span>
-        <b>{copy[0]}</b>
-        <small>{copy[1]}</small>
-      </span>
+    <div role="alert">
+      <HunterReply markdown={"### " + copy[0] + "\n\n" + copy[1]} />
       <Button tone="secondary" size="sm" icon="refresh" onClick={onRetry}>
         重试失败步骤
       </Button>
@@ -256,10 +238,10 @@ ${createMarkdownTable(
           </button>
         </HunterReply>
       ) : null}
-      {phase >= 2 && (!opportunityDecided || draftDeferred || phase <= 3 || phase >= 6) ? <>
+      {phase >= 2 && phase < 6 && (!opportunityDecided || draftDeferred || phase <= 3) ? <>
         <HunterReply markdown={(phase >= 6 && opportunityDecided ? "## 补充本轮招聘机会" : opportunityDecided && !draftDeferred ? "## 招聘机会已记录" : "## 是否记录这条潜在招聘机会？\n\n公开招聘变化提供了跟进依据，实际 HC、预算、猎头合作意愿和完整 JD 仍待核实。记录入库不表示客户已确认合作。") + (forcedState === "no-contact" && !opportunityDecided ? "\n\n尚未找到可直接联系的负责人；可以先记录机会，联系人后续补充。" : "")} />
         {opportunityResult}
-        {opportunityDecided && phase === 2 ? <Button onClick={() => setPhase(3)}>继续核实联系人</Button> : null}
+        {opportunityDecided && phase === 2 ? <HunterReply markdown="是否继续核实联系人？请回复“是”“否”，或提出建议。联系人核实与对外发送分别确认。" /> : null}
       </> : null}
       {phase >= 3 && opportunityDecided && forcedState === "no-contact" ? (
         <HunterReply
@@ -738,7 +720,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         top: scrollRef.current.scrollHeight,
         behavior: forcedState ? "auto" : "smooth",
       });
-  }, [forcedState, messages.length, phase, storageKey, params.get("panel"), lifecycleTask?.phase]);
+  }, [forcedState, messages.length, phase, storageKey, params.get("panel"), lifecycleTask?.phase, lifecycleTask?.messages.length, lifecycleTask?.followupDraft]);
 
   const plan = useMemo(
     () => buildPlan(scenario, phase, paused, planAdjusted).map((step) => {
@@ -766,6 +748,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         }
       : null;
   const status =
+    scenarioId === "client-xinglan" && phase >= 6 && ["collect", "review"].includes(lifecycleTask?.followupDraft?.stage) ? "等待用户" :
     scenarioId === "client-xinglan" && !opportunityDecided && phase >= 2 ? "等待用户" : scenarioId === "client-xinglan" && phase >= 7 ? "可继续" : phase === 5 && scenarioId !== "mapping-embodied"
       ? "等待外部"
       : phase >= scenario.autoStopPhase
@@ -799,11 +782,18 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   };
 
   const send = async (text, files) => {
+    if (scenarioId === "client-xinglan" && phase === 2 && opportunityDecided && !files.length && !Object.keys(explicitInputFields(text)).length && text.trim() !== "重新核对") {
+      const confirmed = singleAssetDecision(text) === "confirm";
+      setMessages((items) => [...items, { text, result: confirmed ? "继续核实联系人，尚未对外联系。" : singleAssetDecision(text) === "decline" ? "暂不继续核实联系人，招聘机会或草稿已保留。" : "建议已保留，尚未开始核实，也未改写招聘机会。当前原型无法可靠解析新的核实范围；是否继续按已有公开来源核实联系人？" }]);
+      if (confirmed) setPhase(3);
+      setComposer("");
+      return;
+    }
     if (scenarioId === "client-xinglan" && phase >= 2) {
       if (savingReply) return;
       setSavingReply(true);
       try {
-        const response = await saveLegacyOpportunityReply(scenario, text, files, authMode, phase >= 5 && opportunityDecided);
+        const response = await saveLegacyOpportunityReply(scenario, text, files, authMode, phase >= 5 && opportunityDecided, phase >= 6);
         if (!response?.handled) setPhase(lifecycleTask?.opportunityId ? 6 : 2);
         setComposer(""); setAttachments([]);
       } catch (error) { notify(error.message, "error"); }
@@ -1000,7 +990,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 openReview={() => setReviewOpen(true)}
                 setPhase={setPhase}
                 notify={notify}
-                opportunityResult={<LegacyOpportunityResult taskId={scenarioId} />}
+                opportunityResult={<LegacyOpportunityResult taskId={scenarioId} showFollowup={phase >= 6} awaitingContinuation={phase === 2} />}
                 opportunityDecided={opportunityDecided}
                 draftDeferred={lifecycleTask?.phase === "cancelled"}
               />
@@ -1047,14 +1037,8 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
               />
             ) : null}
             {streamError ? (
-              <div className="s2-local-error" role="alert">
-                <Icon name="warning" />
-                <span>
-                  <b>回复生成中断</b>
-                  <small>
-                    已经生成的内容和输入已保留，可以从当前检查点继续。
-                  </small>
-                </span>
+              <div role="alert">
+                <HunterReply markdown="### 回复生成中断\n\n已经生成的内容和输入已保留，可以从当前检查点继续。" />
                 <Button
                   tone="secondary"
                   size="sm"
@@ -1066,14 +1050,8 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
               </div>
             ) : null}
             {streamStopped ? (
-              <div className="s2-system-state">
-                <Icon name="pause" />
-                <span>
-                  <b>已停止本次生成</b>
-                  <small>
-                    已经生成的内容不会丢失，可以继续生成或补充新的要求。
-                  </small>
-                </span>
+              <div>
+                <HunterReply markdown="### 已停止本次生成\n\n已经生成的内容不会丢失，可以继续生成或补充新的要求。" />
                 <Button
                   tone="secondary"
                   size="sm"
@@ -1084,27 +1062,12 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
               </div>
             ) : null}
             {forcedState === "limited" ? (
-              <div className="s2-permission-state">
-                <Icon name="warning" />
-                <span>
-                  <b>
-                    {scenarioId === "client-xinglan"
+              <div>
+                <HunterReply markdown={"### " + (scenarioId === "client-xinglan"
                       ? "公开职业资料来源暂不可用"
                       : scenarioId === "mapping-embodied"
                         ? "论文来源授权已失效"
-                        : "候选人附件读取权限不足"}
-                  </b>
-                  <small>
-                    只暂停受影响的内部处理，其他来源和已经形成的结果继续保留。
-                  </small>
-                </span>
-                <Button
-                  tone="secondary"
-                  size="sm"
-                  onClick={() => notify("已打开对应权限处理入口", "info")}
-                >
-                  处理权限
-                </Button>
+                        : "候选人附件读取权限不足") + "\n\n只暂停受影响的内部处理，其他来源和已经形成的结果继续保留。"} />
               </div>
             ) : null}
             {localError ? (
@@ -1122,14 +1085,9 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 <HunterReply markdown={message.result} />
               </div>
             ))}
+            {scenarioId === "client-xinglan" && phase >= 6 ? <LegacyOpportunityResult taskId={scenarioId} /> : null}
             {terminated ? (
-              <div className="s2-system-state is-danger">
-                <Icon name="warning" />
-                <span>
-                  <b>任务已终止</b>
-                  <small>对话、任务、审核结果和正式资产引用已保留。</small>
-                </span>
-              </div>
+              <HunterReply markdown="### 任务已终止\n\n对话、任务、审核结果和正式资产引用已保留。" />
             ) : null}
           </div>
         </div>

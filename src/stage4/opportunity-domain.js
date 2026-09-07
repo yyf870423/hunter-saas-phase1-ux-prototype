@@ -457,6 +457,7 @@ export function applyOpportunityCommand(current, command, context = {}) {
   } else if (command.type === "followup.cancel") {
     const plan = state.followups.find((item) => item.id === data.id);
     if (!plan || !activePlan(plan)) fail("跟进安排已失效。", "CONFLICT");
+    assertVersion(plan, data.expectedVersion);
     if (plan.ownerTaskId && plan.ownerTaskId !== data.ownerTaskId)
       fail("请回到原任务取消该安排。", "TASK_OWNED", { taskId: plan.ownerTaskId });
     plan.status = "cancelled";
@@ -763,19 +764,59 @@ export function applyOpportunityCommand(current, command, context = {}) {
     task.updatedAt = now;
     task.version += 1;
     result.taskId = task.id;
+  } else if (command.type === "task.followup.confirm") {
+    const task = state.tasks.find((item) => item.id === data.id && !item.deletedAt);
+    if (!task || task.phase !== "result") fail("当前任务没有可确认的跟进操作。", "STATE");
+    checkWriteAuthorization(state, { ...command, taskId: task.id });
+    const draft = task.followupDraft;
+    if (!draft || draft.stage !== "review" || draft.id !== data.draftId || !["schedule", "record", "cancel"].includes(draft.action))
+      fail("跟进草稿已变化，请重新核对。", "CONFLICT");
+    validateFollowupOwner(state, task.opportunityId, task.id);
+    const plan = currentFollowup(state, task.opportunityId);
+    if ((plan?.id || "") !== draft.planId) fail("跟进安排已变化，请重新核对。", "CONFLICT");
+    if (plan) {
+      assertVersion(plan, draft.planVersion);
+      if (plan.ownerTaskId && plan.ownerTaskId !== task.id) fail("该事项由原任务维护，请返回原任务处理。", "TASK_OWNED");
+    }
+    const opportunity = state.opportunities.find((item) => item.id === task.opportunityId);
+    if (opportunity) assertVersion(opportunity, draft.opportunityVersion);
+    const values = { opportunityId: task.opportunityId, ownerTaskId: task.id };
+    if (draft.action === "schedule") Object.assign(values, { id: draft.planId, subject: draft.subject, dueAt: draft.dueAt, expectedVersion: draft.planVersion });
+    else if (draft.action === "record") Object.assign(values, { content: draft.content, occurredAt: draft.occurredAt, fileIds: draft.fileIds || [], expectedVersion: draft.opportunityVersion, completeId: draft.complete ? draft.planId : "" });
+    else Object.assign(values, { id: draft.planId, expectedVersion: draft.planVersion });
+    const applied = applyOpportunityCommand(state, { type: "followup." + draft.action, data: values }, context);
+    Object.assign(state, applied.state);
+    const updatedTask = state.tasks.find((item) => item.id === task.id);
+    updatedTask.followupDraft = { ...draft, stage: "applied", feedback: "" };
+    updatedTask.status = "可继续";
+    updatedTask.messages.push({ id: crypto.randomUUID(), role: "assistant", sourceKind: "followup", at: now,
+      content: draft.action === "schedule" ? "已保存下次跟进安排。" : draft.action === "cancel" ? "已取消本次跟进安排，历史记录保留。" : draft.complete ? "已保存跟进记录，并完成当前事项。" : "已保存跟进记录，当前安排未改变。" });
+    updatedTask.version += 1;
+    updatedTask.updatedAt = now;
+    result = { ...applied.result, taskId: task.id };
   } else if (command.type === "task.update") {
     const task = state.tasks.find((item) => item.id === data.id);
     if (!task) fail("任务不存在。", "NOT_FOUND");
-    const allowed = ["draft", "phase", "status", "authMode", "title", "selectedCandidateIds", "sourceSignals"];
+    const allowed = ["draft", "followupDraft", "phase", "status", "authMode", "title", "selectedCandidateIds", "sourceSignals"];
     if (!data.patch || Object.keys(data.patch).some((key) => !allowed.includes(key)))
       fail("任务变更结构不合法。", "SCHEMA");
     if (data.patch.authMode && !["confirm", "auto", "analyze"].includes(data.patch.authMode))
       fail("任务授权方式不合法。", "SCHEMA");
+    if (data.patch.followupDraft != null) {
+      const draft = data.patch.followupDraft;
+      const keys = ["id", "stage", "action", "opportunityVersion", "planId", "planVersion", "subject", "dueAt", "content", "occurredAt", "complete", "feedback", "fileIds"];
+      if (typeof draft !== "object" || Array.isArray(draft) || Object.keys(draft).some((key) => !keys.includes(key)) ||
+        !["collect", "review", "declined", "applied"].includes(draft.stage) || !["schedule", "record", "cancel"].includes(draft.action) ||
+        ["id", "planId", "subject", "dueAt", "content", "occurredAt"].some((key) => typeof draft[key] !== "string") || typeof draft.complete !== "boolean" ||
+        ["opportunityVersion", "planVersion"].some((key) => draft[key] != null && (!Number.isInteger(draft[key]) || draft[key] < 1)) ||
+        (draft.fileIds != null && (!Array.isArray(draft.fileIds) || draft.fileIds.some((id) => typeof id !== "string" || !state.files.some((file) => file.id === id)))))
+        fail("跟进草稿结构不合法。", "SCHEMA");
+    }
     Object.assign(task, data.patch);
     if (data.message) task.messages.push({
       id: crypto.randomUUID(), role: data.message.role === "assistant" ? "assistant" : "user",
       content: String(data.message.content || ""), fileIds: data.message.fileIds || [], at: now,
-      sourceKind: ["reply", "decision"].includes(data.message.sourceKind) ? data.message.sourceKind : "task",
+      sourceKind: ["reply", "decision", "followup"].includes(data.message.sourceKind) ? data.message.sourceKind : "task",
       contactId: typeof data.message.contactId === "string" ? data.message.contactId : "",
     });
     task.version += 1;

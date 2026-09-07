@@ -4,6 +4,7 @@ import { getOpportunitySnapshot, runOpportunityCommand } from "./opportunity-sto
 import { checkFields, DIRECTION_FIELDS } from "./opportunity-domain";
 import { storeOpportunityAttachment } from "./OpportunityFiles";
 import { draftFailureText, singleAssetDecision } from "./single-asset-confirmation";
+import { nextFollowupDraft } from "./task-followup";
 
 const fieldLabels = {
   机会名称: "title", 招聘机会: "title", 招聘需求摘要: "summary", 需求摘要: "summary",
@@ -39,7 +40,7 @@ export function explicitInputFields(text) {
 export function prepareOpportunityDraft(task) {
   const state = getOpportunitySnapshot();
   const context = getCompanyContactSnapshot();
-  const materialMessages = task.messages.filter((item) => item.role === "user" && item.sourceKind !== "decision");
+  const materialMessages = task.messages.filter((item) => item.role === "user" && !["decision", "followup"].includes(item.sourceKind));
   const sourceText = [task.source?.material || "", ...materialMessages.map((item) => item.content)].filter(Boolean).join("\n\n");
   const currentId = task.draft?.opportunityId || task.opportunityId;
   const current = currentId ? state.opportunities.find((item) => item.id === currentId && !item.deletedAt) : null;
@@ -89,8 +90,9 @@ export function prepareLegacyOpportunityDiscovery(scenario, evidence, authMode) 
       "\n待确认事项：实际 HC、优先方向、预算、猎头合作意愿、完整 JD 和可联系的负责人均待确认。", warnings: [] } });
 }
 
-export async function saveLegacyOpportunityReply(scenario, text, files, authMode, isReply = true) {
-  const handled = !files.length && respondToSingleAssetDraft(scenario.id, text);
+export async function saveLegacyOpportunityReply(scenario, text, files, authMode, isReply = true, followupEnabled = true) {
+  if (followupEnabled && files.length && await respondToTaskFollowupFiles(scenario.id, text, files)) return { handled: true };
+  const handled = !files.length && ((followupEnabled && respondToTaskFollowup(scenario.id, text)) || respondToSingleAssetDraft(scenario.id, text));
   if (handled) return handled;
   const collected = await collectTaskAttachments(files);
   let task = getOpportunitySnapshot().tasks.find((item) => item.id === scenario.id);
@@ -98,7 +100,7 @@ export async function saveLegacyOpportunityReply(scenario, text, files, authMode
     runOpportunityCommand("task.create", { id: scenario.id, legacyWorkspace: true, kind: "opportunity", title: scenario.title,
       prompt: scenario.prompt, authMode: taskAuthorization(authMode), source: { kind: "reply", contactId: scenario.replyContactId || "", material: "", warnings: [] }, allowedResults: ["opportunity"] });
   }
-  runOpportunityCommand("task.update", { id: scenario.id, patch: { phase: "input", status: "运行中", authMode: taskAuthorization(authMode), ...(task?.phase === "result" ? { draft: null } : {}) },
+  runOpportunityCommand("task.update", { id: scenario.id, patch: { phase: "input", followupDraft: null, status: "运行中", authMode: taskAuthorization(authMode), ...(task?.phase === "result" ? { draft: null } : {}) },
     message: { role: "user", content: [text, collected.material, ...collected.warnings].filter(Boolean).join("\n\n"), fileIds: collected.fileIds,
       sourceKind: isReply ? "reply" : "task", contactId: isReply ? scenario.replyContactId || "" : "" } });
 }
@@ -106,7 +108,7 @@ export async function saveLegacyOpportunityReply(scenario, text, files, authMode
 export function preparePositionDraft(task) {
   const state = getOpportunitySnapshot();
   const current = state.positions.find((item) => item.id === task.positionId && !item.deletedAt);
-  const materialMessages = task.messages.filter((item) => item.role === "user" && item.sourceKind !== "decision");
+  const materialMessages = task.messages.filter((item) => item.role === "user" && !["decision", "followup"].includes(item.sourceKind));
   const sourceText = [task.source?.material || "", ...materialMessages.map((item) => item.content)].filter(Boolean).join("\n\n");
   const fields = current ? explicitInputFields(materialMessages.at(-1)?.content) :
     Object.assign({}, explicitInputFields(task.source?.material), ...materialMessages.map((item) => explicitInputFields(item.content)));
@@ -166,6 +168,36 @@ export function advanceLifecycleTask(taskId) {
   runOpportunityCommand("task.update", { id: taskId, patch: { draft, phase: "review", status: "等待用户" },
     message: { role: "assistant", content: latest.kind === "opportunity" ? "招聘需求已整理为草稿。请核对公司、需求依据和待确认项；正式结果将在写入后出现。" : "岗位草稿已整理。请检查职责、任职要求和未知字段，确认后创建岗位。" } });
   return "";
+}
+
+export async function respondToTaskFollowupFiles(taskId, text, files) {
+  const task = getOpportunitySnapshot().tasks.find((item) => item.id === taskId && !item.deletedAt);
+  const pending = task?.followupDraft && ["collect", "review", "declined"].includes(task.followupDraft.stage);
+  if (!task || task.phase !== "result" || task.kind !== "opportunity" || Object.keys(explicitInputFields(text)).length ||
+    !(pending || /^(记录(?:本次)?跟进|完成(?:本次|当前)跟进)/.test(text.trim()))) return null;
+  return respondToTaskFollowup(taskId, text, await collectTaskAttachments(files));
+}
+
+export function respondToTaskFollowup(taskId, text, collected) {
+  const state = getOpportunitySnapshot();
+  const task = state.tasks.find((item) => item.id === taskId && !item.deletedAt);
+  if (!task || task.kind !== "opportunity" || task.phase !== "result" || !task.opportunityId || Object.keys(explicitInputFields(text)).length) return null;
+  const draft = nextFollowupDraft(task, state, text);
+  if (!draft) return null;
+  if (collected) {
+    if (draft.action === "record") draft.fileIds = [...new Set([...(draft.fileIds || []), ...collected.fileIds])];
+    else { draft.feedback = "附件已保留在对话中；当前安排或取消操作不引用附件。请先核对操作摘要。"; draft.stage = "collect"; }
+  }
+  runOpportunityCommand("task.update", { id: taskId, patch: {}, message: { role: "user", content: [text, collected?.material, ...(collected?.warnings || [])].filter(Boolean).join("\n\n"), fileIds: collected?.fileIds || [], sourceKind: "followup" } });
+  if (!collected && task.followupDraft?.stage === "review" && singleAssetDecision(text) === "confirm") {
+    try {
+      runOpportunityCommand("task.followup.confirm", { id: taskId, draftId: task.followupDraft.id }, { commandId: "confirm-" + task.followupDraft.id });
+    } catch (error) {
+      runOpportunityCommand("task.update", { id: taskId, patch: { followupDraft: { ...task.followupDraft,
+        feedback: "尚未执行：" + error.message + (error.code === "CONFLICT" ? " 请回复“重新核对”，检查更新后的摘要再确认。" : "") } } });
+    }
+  } else runOpportunityCommand("task.update", { id: taskId, patch: { followupDraft: draft, status: draft.stage === "declined" ? "可继续" : "等待用户" } });
+  return { handled: true };
 }
 
 export function respondToSingleAssetDraft(taskId, text) {

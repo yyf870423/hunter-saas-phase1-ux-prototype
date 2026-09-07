@@ -35,7 +35,7 @@ for (const [device, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 
     await replyToAsset(page, "否");
     expect((await state(page)).opportunities).toHaveLength(4);
     await expect(page.getByRole("heading", { name: "草稿已保留，未写入正式资料", exact: true })).toBeVisible();
-    await button(page, "继续核实联系人").click();
+    await replyToAsset(page, "是");
     await expect(page.getByText("暂未找到可以直接联系的招聘负责人", { exact: true })).toBeVisible();
     await replyToAsset(page, "招聘需求摘要：新部门成立，可能需要补充外部算法人才；尚未确认招聘计划。");
     await replyToAsset(page, "是");

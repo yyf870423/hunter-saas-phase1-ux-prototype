@@ -298,10 +298,11 @@ test("统一自然语言入口可以创建周期性任务", async ({ page }) => 
   await expect(
     page.getByRole("heading", { name: "周期性任务草案" }),
   ).toBeVisible();
-  await expect(page.getByText("确认周期性任务", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: /按此计划创建/ }).click();
+  await expect(page.getByRole("heading", { name: "是否按此计划创建周期性任务？", exact: true })).toBeVisible();
+  await input.fill("是");
+  await input.press("Enter");
   await expect(page).toHaveURL(
-    /#\/tasks\/periodic\?selected=periodic-startups$/,
+    /#\/tasks\/periodic\?selected=periodic-[\w-]+$/,
   );
   await expect(
     page.getByText("周期性任务已创建，将按确认的计划运行"),

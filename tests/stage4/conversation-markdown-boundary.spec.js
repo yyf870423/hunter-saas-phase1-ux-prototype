@@ -199,15 +199,17 @@ test("并发修改必须在对话重新核对，非法方向结构不能入库",
   await other.close();
 });
 
-test("检查证据：纯状态说明仍有专用块，记录问题但不自动迁移业务操作", async ({ page }) => {
+test("纯状态说明使用 Markdown，保留独立业务操作边界", async ({ page }) => {
   const errors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#/tasks/position-vla?state=limited");
-  await expect(page.locator(".s2-permission-state")).toContainText("部分公开来源暂不可用");
+  await expect(page.getByRole("heading", { name: "部分公开来源暂不可用" })).toBeVisible();
+  await expect(page.locator(".s2-permission-state")).toHaveCount(0);
   await capture(page, "audit-04-readonly-permission-state");
   await page.goto("#/tasks/career-linhao?state=waiting");
-  await expect(page.locator(".s3-external-wait")).toBeVisible();
-  await page.locator(".s3-external-wait").scrollIntoViewIfNeeded();
+  await expect(page.getByRole("heading", { name: "等待林昊补充反馈" })).toBeVisible();
+  await page.getByRole("heading", { name: "等待林昊补充反馈" }).scrollIntoViewIfNeeded();
+  await expect(page.locator(".s3-external-wait")).toHaveCount(0);
   await capture(page, "audit-05-waiting-summary-and-action");
   await errors();
 });

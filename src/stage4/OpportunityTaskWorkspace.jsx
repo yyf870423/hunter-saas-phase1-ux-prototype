@@ -6,11 +6,36 @@ import { TaskAreaNav } from "../stage2/TaskAreaNav";
 import { workItems } from "../stage2/data";
 import { Button, DataTable, DefinitionGrid, FieldGroup, Modal, StateBanner, StatusBadge, TagList } from "./asset-ui";
 import { candidates } from "./data";
-import { displayDateTime, TaskOpportunityFollowup, useOpportunityAction } from "./OpportunityComponents";
+import { displayDateTime, useOpportunityAction } from "./OpportunityComponents";
 import { OpportunityFiles } from "./OpportunityFiles";
 import { getOpportunityContext, getOpportunityPermission, getOpportunitySnapshot, runOpportunityCommand, useOpportunityState } from "./opportunity-store";
-import { advanceLifecycleTask, collectTaskAttachments, respondToSingleAssetDraft, taskAuthorization } from "./opportunity-task-adapter";
+import { advanceLifecycleTask, collectTaskAttachments, respondToSingleAssetDraft, respondToTaskFollowup, respondToTaskFollowupFiles, taskAuthorization } from "./opportunity-task-adapter";
 import { draftSummaryMarkdown, markdownText, writeResultMarkdown } from "./opportunity-task-markdown";
+import { activeTaskPlan, missingFollowupField } from "./task-followup";
+
+export function TaskOpportunityFollowup({ task }) {
+  const state = useOpportunityState();
+  const opportunity = state.opportunities.find((item) => item.id === task.opportunityId);
+  const plan = activeTaskPlan(state, task);
+  const draft = task.followupDraft;
+  const lastRecord = opportunity?.records.filter((record) => !record.deletedAt).sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))[0];
+  const lines = ["## 持续跟进", plan ? "- 当前事项：" + markdownText(plan.subject) + "\n- 下次跟进：" + displayDateTime(plan.dueAt) + "\n- 提醒状态：" + (new Date(plan.dueAt) <= new Date(state.clock || Date.now()) ? "待跟进" : "已安排") : "目前没有待执行的跟进安排。",
+    lastRecord ? "最近跟进：" + displayDateTime(lastRecord.occurredAt) + "\n\n" + markdownText(lastRecord.content) : "尚无跟进记录。"];
+  if (!opportunity) lines.push("> 来源机会已永久删除。已有安排仍保留，可取消；不能追加跟进记录或新安排。");
+  else if (opportunity.deletedAt) lines.push("> 来源机会已进入回收站，原任务仍可维护已有跟进。");
+  if (plan?.ownerTaskId && plan.ownerTaskId !== task.id) lines.push("该事项由其他任务维护。[返回原任务处理](#/tasks/" + encodeURIComponent(plan.ownerTaskId) + ")");
+  else if (draft && ["collect", "review", "declined"].includes(draft.stage)) {
+    lines.push("### " + ({ schedule: "待确认的跟进安排", record: "待确认的跟进记录", cancel: "待确认的取消安排" }[draft.action]));
+    if (draft.action === "schedule") lines.push("- 跟进事项：" + markdownText(draft.subject || "待补充") + "\n- 跟进时间：" + (draft.dueAt ? displayDateTime(draft.dueAt) : "待补充"));
+    else if (draft.action === "record") lines.push("- 跟进内容：" + markdownText(draft.content || "待补充") + "\n- 实际跟进时间：" + (draft.occurredAt ? displayDateTime(draft.occurredAt) : "待补充") + "\n- 完成当前事项：" + (draft.complete ? "是" : "否"));
+    else lines.push("取消“" + markdownText(plan?.subject || "已失效的安排") + "”；历史跟进记录仍保留。");
+    if (draft.feedback) lines.push("> " + markdownText(draft.feedback));
+    if (draft.fileIds?.length) lines.push("附件：" + draft.fileIds.map((id) => markdownText(state.files.find((file) => file.id === id)?.name || "已保留附件")).join("、"));
+    const question = { subject: "下次需要跟进什么事项？", dueAt: "安排在什么时间？", content: "这次实际跟进了什么内容？", occurredAt: "这次实际跟进发生在什么时间？" }[missingFollowupField(draft)];
+    lines.push(question || "是否执行以上操作？请回复“是”“否”，或提出修改建议。");
+  } else lines.push(draft?.stage === "applied" ? "可以继续补充新的跟进记录，或提出改期、取消安排。" : plan ? "可以提出修改下次跟进、记录本次跟进或取消安排；确认前不会改变已有记录。" : opportunity ? "是否安排一次后续跟进？请回复“是”“否”，或提出建议。" : "需要取消保留的安排时，请说明取消安排。");
+  return <HunterReply markdown={lines.join("\n\n")} />;
+}
 
 export function OpportunityWriteResult({ result, taskId }) {
   const state = useOpportunityState();
@@ -48,10 +73,10 @@ export function RecruitingCandidateReview({ task }) {
   </div></FieldGroup>;
 }
 
-export function SingleAssetTaskSummary({ task }) {
+export function SingleAssetTaskSummary({ task, askConfirmation = true }) {
   const state = useOpportunityState();
   return <>
-    {["review", "cancelled"].includes(task.phase) ? <HunterReply markdown={draftSummaryMarkdown(task, { ...state, ...getOpportunityContext() })} /> : null}
+    {["review", "cancelled"].includes(task.phase) ? <HunterReply markdown={draftSummaryMarkdown(task, { ...state, ...getOpportunityContext() }, askConfirmation)} /> : null}
   </>;
 }
 
@@ -94,11 +119,14 @@ export function OpportunityTaskWorkspace({ taskId }) {
     if (busy || (!text.trim() && !files.length)) return;
     setBusy(true); setError("");
     try {
-      if (!files.length && respondToSingleAssetDraft(taskId, text)) {
+      if (files.length && await respondToTaskFollowupFiles(taskId, text, files)) {
+        setValue(""); setAttachments([]); return;
+      }
+      if (!files.length && (respondToTaskFollowup(taskId, text) || respondToSingleAssetDraft(taskId, text))) {
         setValue(""); setAttachments([]); return;
       }
       const collected = await collectTaskAttachments(files);
-      runOpportunityCommand("task.update", { id: task.id, patch: { phase: "input", status: "运行中", ...(task.phase === "result" ? { draft: null } : {}) },
+      runOpportunityCommand("task.update", { id: task.id, patch: { phase: "input", followupDraft: null, status: "运行中", ...(task.phase === "result" ? { draft: null } : {}) },
         message: { role: "user", content: [text, collected.material, ...collected.warnings].filter(Boolean).join("\n\n"), fileIds: collected.fileIds } });
       setValue(""); setAttachments([]);
     } catch (failure) { setError(failure.message); }
@@ -138,7 +166,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
   </div>;
 }
 
-export function LegacyOpportunityResult({ taskId }) {
+export function LegacyOpportunityResult({ taskId, showFollowup = true, awaitingContinuation = false }) {
   const state = useOpportunityState();
   const task = state.tasks.find((item) => item.id === taskId);
   const [error, setError] = useState("");
@@ -156,8 +184,8 @@ export function LegacyOpportunityResult({ taskId }) {
       {message.fileIds?.length ? <OpportunityFiles ids={message.fileIds} readOnly /> : null}</div> : <HunterReply key={message.id} markdown={message.content} />)}
     {task.phase === "input" ? <HunterReply streaming markdown="正在整理招聘需求与来源资料。" /> : null}
     {task.results.filter((result, index, items) => result.type === "opportunity" && items.findLastIndex((item) => item.type === "opportunity" && item.id === result.id) === index).map((result) => <OpportunityWriteResult key={result.id + "-" + result.version} result={result} />)}
-    <SingleAssetTaskSummary task={task} />
-    {task.opportunityId && task.phase === "result" ? <TaskOpportunityFollowup task={task} /> : null}
+    <SingleAssetTaskSummary task={task} askConfirmation={!(awaitingContinuation && task.phase === "cancelled")} />
+    {showFollowup && task.opportunityId && task.phase === "result" ? <TaskOpportunityFollowup task={task} /> : null}
     {error ? <HunterReply markdown={"> " + markdownText(error)} /> : null}
   </>;
 }

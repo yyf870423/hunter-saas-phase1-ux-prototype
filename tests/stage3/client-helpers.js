@@ -11,6 +11,6 @@ export async function confirmClientOpportunity(page) {
     await replyToAsset(page, "是");
     await expect(result).toBeVisible();
   }
-  const next = page.getByRole("button", { name: "继续核实联系人", exact: true });
-  if (await next.isVisible()) await next.click();
+  const next = page.getByText("是否继续核实联系人？请回复“是”“否”，或提出建议。联系人核实与对外发送分别确认。", { exact: true });
+  if (await next.isVisible()) await replyToAsset(page, "是");
 }

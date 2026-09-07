@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { readPeriodicDrafts } from "./periodic-draft";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
@@ -317,7 +318,7 @@ function PeriodicTaskDetail({ task, runs, onRun, onToggle, onDelete, onBack }) {
         <Button
           tone="secondary"
           icon="edit"
-          onClick={() => navigate(`/new?mode=periodic&edit=${task.id}`)}
+          onClick={() => navigate(`/new?mode=periodic&edit=${task.id}&originalPrompt=${encodeURIComponent(task.prompt)}&schedule=${encodeURIComponent(task.schedule)}`)}
         >
           调整任务
         </Button>
@@ -588,15 +589,7 @@ ${run.summary}
             </div>
           ))}
           {stopped ? (
-            <div className="s2-system-state">
-              <Icon name="pause" />
-              <span>
-                <b>本轮运行已停止</b>
-                <small>
-                  对话、证据和当前处理水位已保留，可以继续补充要求。
-                </small>
-              </span>
-            </div>
+            <HunterReply markdown="### 本轮运行已停止\n\n对话、证据和当前处理水位已保留，可以继续补充要求。" />
           ) : null}
         </div>
         <div className="s2-run-composer-dock">
@@ -656,7 +649,13 @@ export function PeriodicTasksPage() {
   const requestedTaskId = params.get("selected");
   const requestedRunId = params.get("run");
   const requestedRunStatus = params.get("status") || "";
-  const [tasks, setTasks] = useState(periodicTasks);
+  const [tasks, setTasks] = useState(() => {
+    const drafts = readPeriodicDrafts();
+    const merged = periodicTasks.map((task) => ({ ...task, ...drafts.find((item) => item.id === task.id) }));
+    return [...drafts.filter((item) => !periodicTasks.some((task) => task.id === item.id)).map((item) => ({ ...item, title: item.prompt,
+      scenarios: ["周期任务"], status: "已启用", tone: "success", nextRun: "待下次执行周期", lastRun: "尚未运行",
+      destination: "高价值变化进入洞察中心；资产草稿等待确认", memory: "尚无成功运行记录" })), ...merged];
+  });
   const [runs, setRuns] = useState(periodicRuns);
   const [query, setQuery] = useState("");
   const [runStatus, setRunStatus] = useState(requestedRunStatus);

@@ -12,6 +12,9 @@ import { workItems } from "./data";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { StateBanner } from "../stage4/asset-ui";
 import { createOpportunityTask } from "../stage4/opportunity-task-adapter";
+import { singleAssetDecision } from "../stage4/single-asset-confirmation";
+import { markdownText } from "../stage4/opportunity-task-markdown";
+import { periodicDraftKey, periodicSchedule, readPeriodicDrafts } from "./periodic-draft";
 
 const starterPrompts = [
   "为星澜机器人的 VLA 算法负责人岗位持续寻找合适候选人",
@@ -40,7 +43,7 @@ function classifyWork(prompt) {
   return "mainline";
 }
 
-function OutcomeReply({ outcome, prompt }) {
+function OutcomeReply({ outcome, prompt, periodicPlan }) {
   if (outcome === "mainline") {
     return (
       <HunterReply
@@ -87,8 +90,8 @@ ${details.map((item) => `- ${item}`).join("\n")}
       <HunterReply
         markdown={`## 周期性任务草案
 
-- **任务目标：** 每周核验具身智能创业公司、融资和核心团队招聘变化。
-- **执行周期：** 每周一 09:00。
+- **任务目标：** ${markdownText(periodicPlan?.prompt || prompt)}
+- **执行周期：** ${markdownText(periodicPlan?.schedule || "每周一 09:00")}。
 - **结果去向：** 高价值变化进入洞察中心；公司、联系人和招聘机会草稿按当前授权等待确认。
 - **连续记忆：** 每轮读取上次成功水位、用户修正规则和最新正式资产，不重复处理没有变化的资料。
 - **异常处理：** 非阻塞来源失败会记录后继续；只有写入冲突或需要外部发送时才等待确认。
@@ -124,6 +127,9 @@ export function NewWork() {
   const [historyCollapsed, setHistoryCollapsed] = useState(false);
   const [lifecycleBusy, setLifecycleBusy] = useState(false);
   const [lifecycleError, setLifecycleError] = useState("");
+  const [periodicPlan, setPeriodicPlan] = useState(() => ({ prompt: params.get("originalPrompt") || forcedPrompts[forcedState] || "", schedule: params.get("schedule") || "每周一 09:00" }));
+  const [periodicReplies, setPeriodicReplies] = useState([]);
+  const [periodicDeclined, setPeriodicDeclined] = useState(false);
 
   useEffect(() => {
     if (signalPrompt) sessionStorage.removeItem("hunter-new-work-signal");
@@ -178,6 +184,33 @@ export function NewWork() {
     const fileNames = files.map((file) => file.name).join("、");
     const prompt = text.trim() || `请处理附件：${fileNames}`;
     if (!prompt) return;
+    if (status === "periodic") {
+      const decision = singleAssetDecision(text);
+      const schedule = periodicSchedule(text);
+      const goal = text.match(/^(?:任务目标|目标)[：:]\s*(.+)$/m)?.[1];
+      let result = "";
+      if (files.length) result = "尚未执行。周期计划的附件解析尚未接入，请在文字中明确任务目标或执行周期。";
+      else if (decision === "decline") { setPeriodicDeclined(true); result = "暂不执行，周期计划草稿已保留。"; }
+      else if (decision === "confirm") {
+        if (authMode === "analysis") result = "当前任务仅分析，尚未创建或修改周期计划。";
+        else {
+          const id = editingPeriodic || "periodic-" + crypto.randomUUID();
+          const item = { id, prompt: periodicPlan.prompt || submittedPrompt, schedule: periodicPlan.schedule };
+          try {
+            sessionStorage.setItem(periodicDraftKey, JSON.stringify([...readPeriodicDrafts().filter((entry) => entry.id !== id), item]));
+            navigate("/tasks/periodic?selected=" + encodeURIComponent(id) + "&created=1");
+            return;
+          } catch { result = "保存失败，计划草稿仍保留，尚未创建或修改。请重试。"; }
+        }
+      } else if (schedule || goal) {
+        setPeriodicPlan((plan) => ({ prompt: goal || plan.prompt || submittedPrompt, schedule: schedule || plan.schedule }));
+        setPeriodicDeclined(false);
+        result = "已更新下方周期计划草稿，尚未执行。是否按更新后的计划创建或保存？";
+      } else result = "尚未修改。当前原型无法可靠解析这条建议，请明确任务目标或执行周期，例如“执行周期：每周三 10:00”，再核对摘要。";
+      setPeriodicReplies((items) => [...items, { text, result }]);
+      setValue(""); setAttachments([]);
+      return;
+    }
     const kind = params.get("kind") || (params.get("positionId") ? "recruiting" :
       /招聘机会|招聘需求|客户开发|团队扩建|团队扩张/.test(prompt) ? "opportunity" :
       /创建岗位|解析.*JD|整理.*岗位资料/.test(prompt) ? "position-create" : "");
@@ -195,6 +228,8 @@ export function NewWork() {
     }
     if (forcedState) setParams({}, { replace: true });
     setSubmittedPrompt(prompt);
+    setPeriodicPlan((plan) => ({ prompt: editingPeriodic ? plan.prompt || prompt : prompt, schedule: periodicSchedule(prompt) || plan.schedule }));
+    setPeriodicReplies([]); setPeriodicDeclined(false);
     setValue("");
     setAttachments([]);
     setStatus("classifying");
@@ -275,36 +310,10 @@ export function NewWork() {
                     markdown="我正在判断这项任务的范围、持续时间，以及是否需要等待外部反馈或组织多步处理。"
                   />
                 ) : null}
-                <OutcomeReply outcome={status} prompt={submittedPrompt} />
+                {periodicReplies.map((reply, index) => <div key={index}><UserMessage>{reply.text}</UserMessage><HunterReply markdown={reply.result} /></div>)}
+                <OutcomeReply outcome={status} prompt={submittedPrompt} periodicPlan={periodicPlan} />
                 {status === "periodic" ? (
-                  <HunterReply>
-                    <DecisionRequest
-                      title="确认周期性任务"
-                      description="确认后开始按计划运行；每轮结果和需要处理的问题都保留在运行记录中。"
-                      options={[
-                        {
-                          value: "create",
-                          label: editingPeriodic ? "保存调整" : "按此计划创建",
-                          description: "使用当前周期、结果去向和连续记忆规则。",
-                        },
-                        {
-                          value: "custom",
-                          label: "补充或修改要求",
-                          description:
-                            "继续用自然语言修改周期、范围、授权或结果去向。",
-                        },
-                      ]}
-                      onSelect={(option) => {
-                        if (option.value === "custom") {
-                          setValue("请调整为：");
-                          return;
-                        }
-                        navigate(
-                          "/tasks/periodic?selected=periodic-startups&created=1",
-                        );
-                      }}
-                    />
-                  </HunterReply>
+                  <HunterReply markdown={(periodicDeclined ? "计划暂未执行。\n\n" : "") + "### 是否" + (editingPeriodic ? "保存这次周期计划调整" : "按此计划创建周期性任务") + "？\n\n请回复“是”“否”，或提出修改建议。"} />
                 ) : null}
                 {status === "clarify" ? (
                   <HunterReply>
