@@ -1,0 +1,1189 @@
+{
+  "capturedAt": "2026-09-07",
+  "prototypeCommit": "ead0d2e5cd89256725f3f51a054c7bd415dce6b8",
+  "screenshots": [
+    {
+      "file": "04-00.png",
+      "route": "/candidates",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "6929c4787f8476fb06fd20d4a572951f8741a3ec27ad438529a556c6e56b1ac4"
+    },
+    {
+      "file": "04-01.png",
+      "route": "/reviews/identity/candidate-linhao",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "fbd103d03bc28320b313a754f7a4f85f8bd31544313ea961b57f4da5da353d4e"
+    },
+    {
+      "file": "04-02.png",
+      "route": "/candidates?state=loading",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "7db3c32882104b6964a6a49ceb1a4b1239282dd1225cc502e76e0e4d4507a11d"
+    },
+    {
+      "file": "04-03.png",
+      "route": "/candidates?state=empty",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "da15a94c3eeec7e71932e9181f97ce47b64ed8f6d16406d154575210dd82eebc"
+    },
+    {
+      "file": "04-04.png",
+      "route": "/candidates?state=error",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "1f450a9a3231babd0937a92b2eeaad764d54acf8a800ee26ab80b0ef438be0a1"
+    },
+    {
+      "file": "04-05.png",
+      "route": "/candidates?state=limited",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "454d1d1cedd0f6df13873172d5861d5a4ad84dbec87e5e98dc6c13020fa85d64"
+    },
+    {
+      "file": "05-00.png",
+      "route": "/candidates/candidate-linhao?tab=relations",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2110
+      },
+      "sha256": "65aba7d4b3850c6c379f88efebc6eaaeea3242b4b04885d4e535b999615bc5eb"
+    },
+    {
+      "file": "05-01.png",
+      "route": "/candidates/candidate-linhao?tab=contact-path",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "cbde842f29c870f26b70bd334d419e4c9896a9580cf732ffcbbd25a8ffaca40b"
+    },
+    {
+      "file": "05-02.png",
+      "route": "/candidates",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "6929c4787f8476fb06fd20d4a572951f8741a3ec27ad438529a556c6e56b1ac4"
+    },
+    {
+      "file": "05-03.png",
+      "route": "/candidates/candidate-linhao",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1858
+      },
+      "sha256": "1c2556e67e2845bdb80260d28d9051721603022a923d299919c752c8a09bb10a"
+    },
+    {
+      "file": "05-04.png",
+      "route": "/reviews/fields/candidate-linhao",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "2f2f3b4fd157f1691146bbf39672ea0a76ffaba81ca115970aa8178b670af32d"
+    },
+    {
+      "file": "05-05.png",
+      "route": "/candidates/candidate-linhao?state=loading",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "053af059f95d5b59a745753fb4aaa4466ded41d83133ea1bad076137afb59333"
+    },
+    {
+      "file": "05-06.png",
+      "route": "/candidates/candidate-linhao?state=error",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "d7022735539934ed14ccee35be94a0d88c5303b499407970d4a5e1bf25297e28"
+    },
+    {
+      "file": "05-07.png",
+      "route": "/candidates/candidate-linhao?state=limited",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1926
+      },
+      "sha256": "69209f9f656fe8e07ef0a128ce8d3aacd23ce2fd7140421b433bb247d4b59ed3"
+    },
+    {
+      "file": "05-08.png",
+      "route": "/candidates/candidate-linhao?state=identity-conflict",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1929
+      },
+      "sha256": "3df2bc1e30b7bb01536277a8217ef2057cb136f40fa604b977b9baa75c8906e1"
+    },
+    {
+      "file": "05-09.png",
+      "route": "/candidates/candidate-linhao?tab=relations",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2110
+      },
+      "sha256": "65aba7d4b3850c6c379f88efebc6eaaeea3242b4b04885d4e535b999615bc5eb"
+    },
+    {
+      "file": "05-10.png",
+      "route": "/candidates/new?mode=upload&match=selected",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "1f2c4ae88c6916f2f3cefce8ce1a49a0700c273e101190ff9d408caf49709ad4"
+    },
+    {
+      "file": "05-11.png",
+      "route": "/reviews/identity/candidate-linhao?from=upload&match=selected&positions=1",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "abf08a5a18d2997ee896d2fd3dd0e032e102226a2e8796686c3f3da5ce7fbfdd"
+    },
+    {
+      "file": "06-00.png",
+      "route": "/positions/position-vla?tab=profile",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "cf23f579c6eaa15d15cf086d2ee2f26d173288cc25b235981c6d67a337a6fc05"
+    },
+    {
+      "file": "06-01.png",
+      "route": "/positions/position-vla?tab=matching&state=running",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1229
+      },
+      "sha256": "8ba84de38064a0811100d3acf7ca279d1e580b5d728f407e95e6409ebc0a87b9"
+    },
+    {
+      "file": "06-02.png",
+      "route": "/positions/position-vla?tab=profile&profile=analysis",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1744
+      },
+      "sha256": "48a356f13dadded0d30c764f43906d8cf4d114fa16416a3d9202703d67bcda6e"
+    },
+    {
+      "file": "06-03.png",
+      "route": "/positions/position-vla?tab=profile&ai=review&panel=review",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1133
+      },
+      "sha256": "edd52a989b82daf0e97a83f7d46b972814b2180fdba712c6cf727e99a98030ab"
+    },
+    {
+      "file": "06-04.png",
+      "route": "/positions/position-vla?tab=interview",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1364
+      },
+      "sha256": "733199fdfe6eded98f182fc1f44b7df10d5b013587d770bb0df95bffff81a854"
+    },
+    {
+      "file": "06-05.png",
+      "route": "/positions/position-vla?tab=interview&section=guide",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "3547b926812689ad5f9b63a04dab6ceb7579b54d02a380dcfc02815be7478c45"
+    },
+    {
+      "file": "06-06.png",
+      "route": "/positions/new?mode=ai",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "24776bb06775077b9a5853746054abaa5169b6fe70fa38b4387ac40758438775"
+    },
+    {
+      "file": "06-07.png",
+      "route": "/positions/new?match=all",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1110
+      },
+      "sha256": "e5433e8c9bac9f4db1e6dbd201335e700bae9dd9d92087e741b127ea0ad2e7b8"
+    },
+    {
+      "file": "07-00.png",
+      "route": "/companies/company-xinglan",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1755
+      },
+      "sha256": "60379bb9e45375ac87c8b25f4ed919c1de784f5402dfb803538f53fb87d8b5e8"
+    },
+    {
+      "file": "07-01.png",
+      "route": "/companies/company-xinglan/contacts/contact-chenyu?tab=timeline",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "aac9005c402cb8e7fd50dfeab8e695f6694e2bc03f6bbbb9412ce5334e01fda2"
+    },
+    {
+      "file": "07-02.png",
+      "route": "/opportunities/opportunity-xinglan?tab=directions",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "2c143c8d14d56021682e1ee9c49d451eedc2e7f0ed38facf34e1ff81994948d6"
+    },
+    {
+      "file": "07-03.png",
+      "route": "/companies?state=empty",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "f41b84f9c8b276c6e664d16e7d8360eba89fdf594902625ac1de3e4eb7c96ae4"
+    },
+    {
+      "file": "07-04.png",
+      "route": "/companies?state=error",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "e7f19e84ac2adfd9569c29a4997b3ff8fee61085e73b12d6a1d00dc6d75c5201"
+    },
+    {
+      "file": "07-05.png",
+      "route": "/companies/company-xinglan?state=draft",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1757
+      },
+      "sha256": "f149d586cb3e780b62a9bfd4394a86fb4a2dfab59bfbda7fc9c51e09f7ac9f88"
+    },
+    {
+      "file": "07-06.png",
+      "route": "/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path&state=empty",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "68ef0f245a61ee9b114bd6908bff897d55090a427ae490289f367e1b15be3789"
+    },
+    {
+      "file": "07-07.png",
+      "route": "/companies/company-xinglan/contacts/contact-chenyu?tab=contact-path",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1134
+      },
+      "sha256": "25b4c4adcbfe45b3e6be959fa398e90c0624411af4add0d5ea3ff17a005cae8e"
+    },
+    {
+      "file": "07-08.png",
+      "route": "/opportunities/opportunity-xinglan",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1152
+      },
+      "sha256": "98c114d552b4b325d077746eb57489c74cba2151d0b9ceaba8b39e43b51f4b68"
+    },
+    {
+      "file": "08-00.png",
+      "route": "/mappings",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "1bd3856aeb13f4d281959f0aa40a980762bff6a9b6b3581333524fdd9358ac0c"
+    },
+    {
+      "file": "08-01.png",
+      "route": "/mappings/mapping-embodied",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1023
+      },
+      "sha256": "452426b166d1a21bf0b13c6620dd10afd115a64802c04d5b332aa52cdf3e26e0"
+    },
+    {
+      "file": "08-02.png",
+      "route": "/mappings/mapping-embodied?tab=content&view=table",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1023
+      },
+      "sha256": "802d3fe272e8806a973a96486d6faf013847ffebd413f60a568a19e78308da40"
+    },
+    {
+      "file": "08-03.png",
+      "route": "/mappings/mapping-embodied?tab=reviews",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1064
+      },
+      "sha256": "7ef967f7b9f7c1d8a7fcc76c0bb4e1c396394e273530c6f0675db9a97e6e0c4a"
+    },
+    {
+      "file": "08-04.png",
+      "route": "/mappings/mapping-embodied?panel=import&case=multi-root",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1023
+      },
+      "sha256": "2ac46dad1f45641bb7a429978ddcc36f08f623469e91606ac458e14f1e9e28de"
+    },
+    {
+      "file": "08-05.png",
+      "route": "/mappings/mapping-embodied?state=analyzing",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1107
+      },
+      "sha256": "7fc920e3d185c7a6750e0a6edf3d14a886861668be40d2f6453f85cefb0455b3"
+    },
+    {
+      "file": "08-06.png",
+      "route": "/mappings/mapping-embodied?tab=history",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1130
+      },
+      "sha256": "b63b342d0db3cc7d612dbe642ca8396ca952b55af1f9f8c51ba698e546055e6f"
+    },
+    {
+      "file": "09-00.png",
+      "route": "/papers",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1422
+      },
+      "sha256": "72cd61a18d1251d2b9916ec857e2891f5786193ba2df0b60efc0fcce1458e412"
+    },
+    {
+      "file": "09-01.png",
+      "route": "/patents",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1097
+      },
+      "sha256": "0a95968be14e66dfcc3dc752c7931bc128a4fb8447e9f9ac31f9172ef80e3aae"
+    },
+    {
+      "file": "09-02.png",
+      "route": "/papers/paper-vla-survey",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1471
+      },
+      "sha256": "24a5ddfc64490934e7eacf35d48a4c176d6299066f76beafbc890fea1b0b828a"
+    },
+    {
+      "file": "09-03.png",
+      "route": "/patents/patent-manipulation",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1609
+      },
+      "sha256": "18d98433c8a33bb05847187cf7258910a6fde8d32cc7f8c000eddfc6f2a8ce01"
+    },
+    {
+      "file": "09-04.png",
+      "route": "/papers/paper-vla-survey?state=identity-review",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "538ff21546ef44e001f3bfa6fca6c781f575ab86d1b7e2b846885f9ef7850ce3"
+    },
+    {
+      "file": "09-07.png",
+      "route": "/papers/paper-vla-survey?state=identity-review",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "538ff21546ef44e001f3bfa6fca6c781f575ab86d1b7e2b846885f9ef7850ce3"
+    },
+    {
+      "file": "10-00.png",
+      "route": "/signals",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "2c64cefd113d3ba945fee8f9e9902f1702f13ae1b520683e3a6a154a69f0c856"
+    },
+    {
+      "file": "10-01.png",
+      "route": "/recycle-bin",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "bc878f2cc17e87e94719a03d9989d843f647b6516f6cca2ed9aa4208958db47e"
+    },
+    {
+      "file": "10-02.png",
+      "route": "/home?state=loading",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1940
+      },
+      "sha256": "fafe27ca889caf916709469f52126fe96f2f3167d12266f9bb3063de9ddfc64b"
+    },
+    {
+      "file": "10-03.png",
+      "route": "/home?state=empty",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "8179b59f43d3fdd38823c491b24d6ac4c6aed955c50d0005979367c58be6c324"
+    },
+    {
+      "file": "10-04.png",
+      "route": "/home?state=error",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2023
+      },
+      "sha256": "f38435083e9f4bb3565151661bff73f2422321156e1d03c72b3ad2aa27801318"
+    },
+    {
+      "file": "10-05.png",
+      "route": "/home?state=limited",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2109
+      },
+      "sha256": "752947cbda401d51eabbec4eb46a5955ebefb98f73b064a8b3dcc9aec56b0802"
+    },
+    {
+      "file": "10-06.png",
+      "route": "/data/imports?state=error",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "d94b2e72b9dcd0a08284b04f72d8bcc84726a478753a562abf666c006bab647b"
+    },
+    {
+      "file": "10-07.png",
+      "route": "/tasks/periodic?view=runs&run=run-startups-active",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "64cb08243130b9929070acd5036e307f90ea08bbb5ffcc835d0afb35fac4363f"
+    },
+    {
+      "file": "10-08.png",
+      "route": "/data/imports?type=candidates&match=all",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "7cbf4d156d75d26339793224427265b9c07b56b00f89cfa477d87f09e37a429f"
+    },
+    {
+      "file": "10-09.png",
+      "route": "/signals?signal=signal-cloudchip",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "2c64cefd113d3ba945fee8f9e9902f1702f13ae1b520683e3a6a154a69f0c856"
+    },
+    {
+      "file": "12-00.png",
+      "route": "/settings/profile",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1231
+      },
+      "sha256": "d7f740edccae5307f8d4edab33d650a41363397898d8c0e643a410cf7f5dd08a"
+    },
+    {
+      "file": "12-01.png",
+      "route": "/settings/notifications",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1186
+      },
+      "sha256": "81fa17c9f3f27cb1265bd3af66067d8ae0be9a9df710e48f5d28b176cf06c471"
+    },
+    {
+      "file": "12-02.png",
+      "route": "/settings/automation",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "fbc0f1558040a4c4861d2b407e777b5475130ed47fac2aabc4d7f628012e91c4"
+    },
+    {
+      "file": "12-03.png",
+      "route": "/settings/connections",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "91b75d53a2007fbe32a0f4d481da8ea8025790c5f20dc78886aee1e0d192adb6"
+    },
+    {
+      "file": "12-04.png",
+      "route": "/settings/subscription?state=limited",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1238
+      },
+      "sha256": "4621145d3b39215b11093624f2e646895ba921d335f1e8e29cf8a27f24b81f74"
+    },
+    {
+      "file": "12-05.png",
+      "route": "/settings/data-privacy",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "04abcacb09534e5a30507b1d896217aa2dea7d500d7a2dd6648c438fc4e8e66e"
+    },
+    {
+      "file": "13-00.png",
+      "route": "/ops/overview",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1434
+      },
+      "sha256": "e4364230e01fa85006bb28eb5813ba4b268d7054ab4ebafa4f0e3aed48e55ebb"
+    },
+    {
+      "file": "13-01.png",
+      "route": "/ops/users-workspaces",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "d634092c03de4dfcd238cd336ff98d2125c2b1f60cbe29486f9636d905e02a98"
+    },
+    {
+      "file": "13-02.png",
+      "route": "/ops/users-workspaces?tab=trials",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "d485b5c7a22d1919195c10a6dfb03c10c419cbc00a0d3d12e593da87341786f7"
+    },
+    {
+      "file": "13-03.png",
+      "route": "/ops/subscriptions",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "69a85efafd1fe8740888af24b375140c0625b8654c58b032f51cca5643db3b24"
+    },
+    {
+      "file": "13-04.png",
+      "route": "/ops/tasks?tab=runs",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1056
+      },
+      "sha256": "9b38fc65e2c8154184c76722b4ea890de9ce7c688607c8fd577ace770cb339ec"
+    },
+    {
+      "file": "13-05.png",
+      "route": "/ops/tasks/TASK-260824-019",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2015
+      },
+      "sha256": "8a6bdf7b80e18a4880195b1c5a3865c1ffa91c85a539e6d952989043b5f9d87a"
+    },
+    {
+      "file": "13-06.png",
+      "route": "/ops/tasks?tab=runs",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1056
+      },
+      "sha256": "9b38fc65e2c8154184c76722b4ea890de9ce7c688607c8fd577ace770cb339ec"
+    },
+    {
+      "file": "13-07.png",
+      "route": "/ops/capabilities?tab=configuration",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "e9eceeb3d2fa8716545a01c9bc8761abfd129353010c5ec089ef1c2d1c0e8983"
+    },
+    {
+      "file": "13-08.png",
+      "route": "/ops/capabilities?tab=sources",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "df90a36508867901cb68552dbeb8cf00cfd6eaf38b8730f6bc86087fe81ae0e6"
+    },
+    {
+      "file": "13-09.png",
+      "route": "/ops/support?tab=diagnostics",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "80dc0d3e5496cca8cbefd638ca568affcb0058e9021d0dd3e6eb8396c699f9e7"
+    },
+    {
+      "file": "13-10.png",
+      "route": "/ops/overview?state=partial-error",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1514
+      },
+      "sha256": "887e26c858c97b68ae1a02c8629d2065c2c18c972350ef61fcdbfced4ed71fad"
+    },
+    {
+      "file": "13-11.png",
+      "route": "/ops/tasks/TASK-260824-019",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2015
+      },
+      "sha256": "8a6bdf7b80e18a4880195b1c5a3865c1ffa91c85a539e6d952989043b5f9d87a"
+    },
+    {
+      "file": "13-12.png",
+      "route": "/ops/tasks/TASK-260824-018",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2015
+      },
+      "sha256": "1af9ffae76dade5b19f785a0c40ce69c3b3e8021fc426677d4888282b731546f"
+    },
+    {
+      "file": "13-13.png",
+      "route": "/ops/capabilities?tab=configuration&state=validation-failed",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "e9eceeb3d2fa8716545a01c9bc8761abfd129353010c5ec089ef1c2d1c0e8983"
+    },
+    {
+      "file": "13-14.png",
+      "route": "/ops/capabilities?tab=configuration&state=limited",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "2b4bb9cb5c7715501dac6578eedc2899aa35c50a5baadccc2c9305d6c7176ea2"
+    },
+    {
+      "file": "13-15.png",
+      "route": "/ops/users-workspaces?tab=trials&state=empty",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "27390a96abbc565f746f143b8513c0c238651b8ea362031229afbaedc8bbda0c"
+    },
+    {
+      "file": "13-16.png",
+      "route": "/ops/overview",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1434
+      },
+      "sha256": "e4364230e01fa85006bb28eb5813ba4b268d7054ab4ebafa4f0e3aed48e55ebb"
+    },
+    {
+      "file": "04-related-tasks.png",
+      "route": "/companies/company-xinglan/contacts/contact-chenyu?tab=work",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "3ae68d10dc7b54ff54a88b2ad6d6ceca628faa431fe1e7e48a7410b57ee9d6a1"
+    },
+    {
+      "file": "07-contact-list.png",
+      "route": "/companies/company-xinglan?tab=contacts",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "a7513b630465ca516d26070d17cd8a9d3d5b7ecbf249f3e909d61964216144e8"
+    },
+    {
+      "file": "07-contact-create.png",
+      "route": "/companies/company-xinglan/contacts/new",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "71ced8b904fd97b72ab18c8648bd076a52a8ea2608ded1c4ac369bb02a5f531e"
+    },
+    {
+      "file": "08-create.png",
+      "route": "/mappings/new?from=type%3Dtalent-map",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "007a178dcd3ca028971461c9c666567d0b9cb1e6c5d435f4e8479b77f0b439cb"
+    },
+    {
+      "file": "10-normal.png",
+      "route": "/home",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2023
+      },
+      "sha256": "f045ab5f7a46a4f3561964ad8cad94ef2e6b1c79c5bc8caeff0f62d4805692ad"
+    },
+    {
+      "file": "10-empty-tasks.png",
+      "route": "/home?empty=tasks",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1754
+      },
+      "sha256": "b6dc670a46118d57febda458dd4cb16522e46b85839896163e55e5871b7d23f0"
+    },
+    {
+      "file": "10-empty-insights.png",
+      "route": "/home?empty=insights",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 2023
+      },
+      "sha256": "39d6d8e37f8c74a58b0263540ad59b17448ece0b6fdaf49b601b3da8585daab7"
+    },
+    {
+      "file": "10-empty-assets.png",
+      "route": "/home?empty=assets",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1823
+      },
+      "sha256": "5cb9a98839fb10b0eb639545719a81d82af4c4da805ddf3f91b8119ca88abc34"
+    },
+    {
+      "file": "12-navigation.png",
+      "route": "/settings/navigation",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1427
+      },
+      "sha256": "19d5153b889e809a78601bbb84a89f8f9785fabbeaa87920e99a75cae32b51f5"
+    },
+    {
+      "file": "12-usage.png",
+      "route": "/home",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "image": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "d6847bc906bf9c824d4a78c4a14e8780965de0467ff35d21f3be1f951677b3a1"
+    }
+  ]
+}
