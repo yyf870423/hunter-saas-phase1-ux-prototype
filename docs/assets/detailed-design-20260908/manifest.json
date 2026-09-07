@@ -1,0 +1,151 @@
+{
+  "capturedAt": "2026-09-08",
+  "applicationCommit": "c44494f4743cc11c37c145764066b260261c0010",
+  "source": "https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/",
+  "screenshots": [
+    {
+      "file": "02-candidate-confirmation.png",
+      "route": "/tasks/position-vla?state=candidate-ingestion",
+      "section": "16.1 任务内候选人写入选择",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "8f7447042846e9f6c905f078ed909b666f327002794650509ec66e348c77485b"
+    },
+    {
+      "file": "02-position-confirmation.png",
+      "route": "/tasks/task-create-position?state=position-ingestion",
+      "section": "16.2 单个岗位的对话确认",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "1de52c274f4a1a202a89dca9f53bfd029a08a2e78b16599cbf0d5c77004b4691"
+    },
+    {
+      "file": "02-opportunity-confirmation.png",
+      "route": "/tasks/client-xinglan?state=no-contact",
+      "section": "7.10 单个资产确认与持续补充",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "9b4a21d77e9600bdd53b4277b073000766619c76695f9068d0c2506eaca91295"
+    },
+    {
+      "file": "02-task-types.png",
+      "route": "/tasks",
+      "section": "五、任务入口与查找",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "0f90d4f8bb82f9e06db2039051132d75a9fad58654ffc9f54d68624ecb844251"
+    },
+    {
+      "file": "06-position-ai-input.png",
+      "route": "/positions/new",
+      "section": "17.7 新建岗位的 AI 解析输入",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "b3fa48c51931601824b079e84f2f47c2c6486117a3ae69c52776839afc2e6000"
+    },
+    {
+      "file": "06-position-manual.png",
+      "route": "/positions/new?match=all",
+      "section": "17.8 手动创建岗位后立即匹配",
+      "width": 1440,
+      "height": 1500,
+      "sha256": "3a0c7a7a7f5f7b1d227d8d9bb70befaa8a3878424ae179cd5b28c769d5d02255"
+    },
+    {
+      "file": "06-position-formed.png",
+      "route": "/opportunities/opportunity-xinglan?tab=directions",
+      "section": "4.4 从机会方向形成岗位",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "31253529b4b808e7a3c7eb3a4d745362faf5686291d1ab47c0cdaa3dbeb27a0c"
+    },
+    {
+      "file": "07-opportunity-directions.png",
+      "route": "/opportunities/opportunity-xinglan?tab=directions",
+      "section": "6.3 形成岗位",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "7f109176a23184d9bc0931391fd7b8d05e5b24bcf6371489836b2b659fd0833b"
+    },
+    {
+      "file": "07-opportunity-profile.png",
+      "route": "/opportunities/opportunity-xinglan",
+      "section": "14.6 招聘机会的联系人入口",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "c8a3aad3c16ab622410d91bf082b287f852cae0245987d7d43d58ed4aa88388d"
+    },
+    {
+      "file": "07-opportunity-source.png",
+      "route": "/opportunities/new?companyId=company-xinglan",
+      "section": "6.5 资料、方向和全部形成入口",
+      "width": 1440,
+      "height": 1500,
+      "sha256": "35fb3593d28b79cf73efeaa2320aa33189b7f5acd23fc064715aab4c24fb63fd"
+    },
+    {
+      "file": "07-followup-record.png",
+      "route": "/opportunities/opportunity-xinglan",
+      "section": "6.6 持续跟进记录与未来安排",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "232065fe3f2886598681d58df2619503f6f8cf1215aedb7ad4e40aaa7f89d9dd"
+    },
+    {
+      "file": "07-followup-schedule.png",
+      "route": "/opportunities/opportunity-xinglan",
+      "section": "6.6 持续跟进记录与未来安排",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "b2829f7041403b49f461ef5378d63f02ad6a8816ea64caf4714804f235b96431"
+    },
+    {
+      "file": "07-position-conversion.png",
+      "route": "/opportunities/opportunity-xinglan?tab=directions",
+      "section": "6.7 招聘方向与岗位关系",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "57462dd429f3180327762a575c8aed2440af2efeaab4fb380ade10c95d943864"
+    },
+    {
+      "file": "10-followup-notification.png",
+      "route": "/opportunities/opportunity-xinglan",
+      "section": "7.4 招聘机会跟进通知",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "e73fbb45777d813b283f1b4c6691180ca830394c701b6c9d1e853f34b0caf9bc"
+    },
+    {
+      "file": "10-global-create.png",
+      "route": "/home",
+      "section": "7.5 洞察到潜在机会及全局新建",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "8dd4ce94550bad7b06efe443b8b03e344c7b15b3393aa754c0e49b3f96753c3e"
+    },
+    {
+      "file": "10-home-current.png",
+      "route": "/home",
+      "section": "五、工作台布局与交互",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "778d8d3e20d5d7b810a7f05159dc1bc8c3f34c123761af07688cdb6b5b6f11ea"
+    },
+    {
+      "file": "12-subscription-normal.png",
+      "route": "/settings/subscription",
+      "section": "11.4 用量展示与自动授权边界",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "ee33928149152d1da89c4f176b9a729ef48f76d70b19f876179ddd90ab14f3c4"
+    },
+    {
+      "file": "12-subscription-expired.png",
+      "route": "/settings/subscription?state=limited",
+      "section": "11.3 订阅到期",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "9c1817aeb900b34f8fb76237de45d3ff6e1d13e5ebc1f23bc6cd21c979aa3d86"
+    }
+  ]
+}
