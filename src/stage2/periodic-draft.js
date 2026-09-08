@@ -9,8 +9,11 @@ export function periodicGoal(text) {
   return trimmed.replace(cadence, "") || trimmed;
 }
 
-export function periodicSchedule(text) {
-  return text.match(/(?:每两周周[一二三四五六日天]|每周[一二三四五六日天]|每天|每\s*[1-9]\d*\s*天|每月\s*(?:[1-9]|[12]\d|3[01])\s*日)\s*(?:[01]?\d|2[0-3]):[0-5]\d/)?.[0].replace(/\s+/g, " ") || "";
+export function periodicSchedule(text, defaultTime = "") {
+  const schedule = text.match(/(?:每两周周[一二三四五六日天]|每周[一二三四五六日天]|每天|每\s*[1-9]\d*\s*天|每月\s*(?:[1-9]|[12]\d|3[01])\s*日)\s*(?:[01]?\d|2[0-3]):[0-5]\d/)?.[0].replace(/\s+/g, " ");
+  if (schedule || !defaultTime) return schedule || "";
+  const frequency = text.match(/(?:每两周周[一二三四五六日天]|每周[一二三四五六日天]|每天|每\s*[1-9]\d*\s*天|每月\s*(?:[1-9]|[12]\d|3[01])\s*日)/)?.[0];
+  return frequency ? frequency.replace(/\s+/g, " ") + " " + defaultTime : "";
 }
 
 export function readPeriodicOverrides(storage = sessionStorage) {

@@ -73,10 +73,10 @@ export function RecruitingCandidateReview({ task }) {
   </div></FieldGroup>;
 }
 
-export function SingleAssetTaskSummary({ task, askConfirmation = true }) {
+export function SingleAssetTaskSummary({ task, askConfirmation = true, confirmationReply = "是" }) {
   const state = useOpportunityState();
   return <>
-    {["review", "cancelled"].includes(task.phase) ? <HunterReply markdown={draftSummaryMarkdown(task, { ...state, ...getOpportunityContext() }, askConfirmation)} /> : null}
+    {["review", "cancelled"].includes(task.phase) ? <HunterReply markdown={draftSummaryMarkdown(task, { ...state, ...getOpportunityContext() }, askConfirmation, confirmationReply)} /> : null}
   </>;
 }
 
@@ -184,7 +184,7 @@ export function LegacyOpportunityResult({ taskId, showFollowup = true, awaitingC
       {message.fileIds?.length ? <OpportunityFiles ids={message.fileIds} readOnly /> : null}</div> : <HunterReply key={message.id} markdown={message.content} />)}
     {task.phase === "input" ? <HunterReply streaming markdown="正在整理招聘需求与来源资料。" /> : null}
     {task.results.filter((result, index, items) => result.type === "opportunity" && items.findLastIndex((item) => item.type === "opportunity" && item.id === result.id) === index).map((result) => <OpportunityWriteResult key={result.id + "-" + result.version} result={result} />)}
-    <SingleAssetTaskSummary task={task} askConfirmation={!(awaitingContinuation && task.phase === "cancelled")} />
+    <SingleAssetTaskSummary task={task} askConfirmation={!(awaitingContinuation && task.phase === "cancelled")} confirmationReply="确认" />
     {showFollowup && task.opportunityId && task.phase === "result" ? <TaskOpportunityFollowup task={task} /> : null}
     {error ? <HunterReply markdown={"> " + markdownText(error)} /> : null}
   </>;

@@ -291,7 +291,7 @@ test("统一新建入口覆盖歧义、自由补充和权限受限", async ({ pa
 });
 
 test("统一自然语言入口可以创建周期性任务", async ({ page }) => {
-  await page.goto("#/new?mode=periodic");
+  await page.goto("#/new");
   const input = page.locator(".s2-composer textarea");
   await input.fill("每周一检查具身智能创业公司和招聘变化，有重要发现时提醒我");
   await input.press("Enter");

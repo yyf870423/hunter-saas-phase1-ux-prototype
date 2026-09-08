@@ -3,7 +3,7 @@ import { displayDateTime } from "./OpportunityComponents";
 
 export const markdownText = (value) => String(value ?? "待确认").replace(/[\\`*_{}\[\]()#+.!>~-]/g, "\\$&");
 
-export function draftSummaryMarkdown(task, state, askConfirmation = true) {
+export function draftSummaryMarkdown(task, state, askConfirmation = true, confirmationReply = "是") {
   const draft = task.draft || {};
   const patch = draft.patch || {};
   const position = task.kind === "position-create";
@@ -26,7 +26,7 @@ export function draftSummaryMarkdown(task, state, askConfirmation = true) {
     task.authMode === "analyze" ? "> 当前仅分析，尚未获得正式写入授权。" : "",
     state.limited ? "> 当前权限受限，不能写入或修改资料。草稿已保留。" : "",
     draft.feedback ? "> " + markdownText(draft.feedback) : "",
-    askConfirmation ? "**" + (previous ? "是否应用以上修改？" : "是否将这份" + (position ? "岗位" : "招聘机会") + "入库？") + "**\n\n请回复“是”“否”，或提出修改建议。" : "",
+    askConfirmation ? "**" + (previous ? "是否应用以上修改？" : "是否将这份" + (position ? "岗位" : "招聘机会") + "入库？") + "**\n\n请回复“" + confirmationReply + "”“否”，或提出修改建议。" : "",
   ].filter(Boolean).join("\n\n");
 }
 

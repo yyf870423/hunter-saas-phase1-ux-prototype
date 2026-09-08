@@ -8,7 +8,7 @@ export async function confirmClientOpportunity(page) {
   await expect(entry.or(result).or(contacts).first()).toBeVisible({ timeout: 15000 });
   if (await entry.isVisible()) {
     await expect(contacts).toHaveCount(0);
-    await replyToAsset(page, "是");
+    await replyToAsset(page, "确认");
     await expect(result).toBeVisible();
   }
   const next = page.getByText("是否继续核实联系人？请回复“是”“否”，或提出建议。联系人核实与对外发送分别确认。", { exact: true });

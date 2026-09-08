@@ -28,6 +28,8 @@ import {
   mappingCompanies,
   mappingPeople,
   mappingRelationshipViews,
+  mappingSaveOutcomes,
+  mappingRemainingWork,
 } from "./data";
 import { getOpportunitySnapshot, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
 import { explicitInputFields, prepareLegacyOpportunityDiscovery, saveLegacyOpportunityReply } from "../stage4/opportunity-task-adapter";
@@ -43,6 +45,7 @@ function forcedPhase(scenarioId, state) {
     if (state === "reply") return 6;
   }
   if (scenarioId === "mapping-embodied") {
+    if (state === "completed") return 5;
     if (state === "conflict" || state === "gaps" || state === "waiting")
       return 4;
   }
@@ -52,6 +55,14 @@ function forcedPhase(scenarioId, state) {
     if (state === "new-resume") return 6;
   }
   return null;
+}
+
+function readMappingMessages(storageKey, forcedState) {
+  try {
+    const messages = JSON.parse(sessionStorage.getItem(`${storageKey}-messages`) || "null");
+    if (Array.isArray(messages) && messages.every((item) => item && typeof item.text === "string" && typeof item.result === "string") && (!forcedState || forcedState === "completed" && messages.some((item) => Object.values(mappingSaveOutcomes).some((outcome) => item.result === outcome.result)))) return messages;
+  } catch { /* An invalid demonstration cache falls back to the selected state. */ }
+  return forcedState === "completed" ? [mappingSaveOutcomes.report] : [];
 }
 
 function buildPlan(scenario, phase, paused, planAdjusted) {
@@ -395,7 +406,7 @@ ${createMarkdownTable(
       ) : null}
       {phase >= 4 ? (
         <HunterReply
-          markdown={`## 人物与关系批次可以审核
+          markdown={`## ${phase >= 5 ? "人物与关系批次已审核" : "人物与关系批次可以审核"}
 
 共定位 30 位人物：18 位身份已确认，11 位保留为人物线索，1 位存在同名与单位时间冲突。9 条人物关系可以写入，1 条关系需要等待确认。${
             forcedState === "conflict"
@@ -411,12 +422,12 @@ ${createMarkdownTable(
               : ""
           }`}
         >
-          <ReviewEntry
+          {phase < 5 ? <ReviewEntry
             icon="database"
             label="打开本批次更新审核"
             note="查看公司、组织、人物、关系、冲突和待补充内容；待确认内容可由用户明确确认后写入。"
             onOpen={openReview}
-          />
+          /> : null}
           <button
             type="button"
             className="s2-markdown-link"
@@ -652,7 +663,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   });
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => scenarioId === "mapping-embodied" ? readMappingMessages(storageKey, forcedState) : []);
   const [mappingSaveReview, setMappingSaveReview] = useState(null);
   const [planAdjusted, setPlanAdjusted] = useState(false);
   const [latestRequirement, setLatestRequirement] = useState("");
@@ -680,10 +691,16 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
 
   useEffect(() => {
     if (directPhase !== null) setPhase(directPhase);
+    if (scenarioId === "mapping-embodied" && forcedState === "completed") setMessages(readMappingMessages(storageKey, forcedState));
     setPaused(forcedState === "limited");
     setStreamError(forcedState === "stream-error");
     setLocalError(forcedState === "error");
-  }, [directPhase, forcedState]);
+  }, [directPhase, forcedState, scenarioId, storageKey]);
+
+  useEffect(() => {
+    if (scenarioId !== "mapping-embodied" || (forcedState && forcedState !== "completed")) return;
+    sessionStorage.setItem(`${storageKey}-messages`, JSON.stringify(messages));
+  }, [scenarioId, forcedState, storageKey, messages]);
 
   useEffect(() => {
     if (
@@ -724,6 +741,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
 
   const plan = useMemo(
     () => buildPlan(scenario, phase, paused, planAdjusted).map((step) => {
+      if (scenarioId === "mapping-embodied" && step.id === "update") return { ...step, title: "审核并保存摸排结果" };
       if (scenarioId !== "client-xinglan") return step;
       if (step.id === "record-opportunity" && opportunityDecided) return { ...step, status: "done" };
       if (step.id === "contacts" && phase === 2 && opportunityDecided) return { ...step, status: "waiting-user", title: "继续核实联系人" };
@@ -748,6 +766,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         }
       : null;
   const status =
+    scenarioId === "mapping-embodied" && phase >= 5 ? "本轮完成" :
     scenarioId === "client-xinglan" && phase >= 6 && ["collect", "review"].includes(lifecycleTask?.followupDraft?.stage) ? "等待用户" :
     scenarioId === "client-xinglan" && !opportunityDecided && phase >= 2 ? "等待用户" : scenarioId === "client-xinglan" && phase >= 7 ? "可继续" : phase === 5 && scenarioId !== "mapping-embodied"
       ? "等待外部"
@@ -755,7 +774,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         ? "等待用户"
         : "推进中";
   const statusTone =
-    status === "推进中"
+    status === "本轮完成" ? "success" : status === "推进中"
       ? "info"
       : status === "等待外部"
         ? "neutral"
@@ -772,6 +791,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
     setComposer("");
     setAttachments([]);
     setMessages([]);
+    if (scenarioId === "mapping-embodied") sessionStorage.removeItem(`${storageKey}-messages`);
     setMappingSaveReview(null);
     setPlanAdjusted(false);
     setLatestRequirement("");
@@ -1003,23 +1023,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 openReview={() => setReviewOpen(true)}
                 saveReview={mappingSaveReview}
                 onSaveDestination={(option) => {
-                  const copy = {
-                    new: {
-                      text: "将本批次结果按主题保存为 3 个新图谱。",
-                      result:
-                        "## 3 个新图谱已经创建\n\n组织、公司关系和候选人关系已分别写入独立图谱，待确认项、原始证据和用户决定均已保留。",
-                    },
-                    update: {
-                      text: "更新已有的 3 个独立知识图谱。",
-                      result:
-                        "## 3 个已有图谱已经更新\n\n本批次审核结果已按主题写入，三个图谱各自的更新前版本均已保留；后续资产关系变化会继续自动刷新可信内容。",
-                    },
-                    report: {
-                      text: "本次只保留摸排报告。",
-                      result:
-                        "## 摸排报告已经保存\n\n本次没有创建或更新图谱资产；审核决定、冲突说明和原始证据仍可从当前任务查看。",
-                    },
-                  }[option.value];
+                  const copy = mappingSaveOutcomes[option.value];
                   setMessages((items) => [...items, copy]);
                   setMappingSaveReview(null);
                   setPhase(5);
@@ -1083,6 +1087,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
               >
                 <UserMessage time="刚刚">{message.text}</UserMessage>
                 <HunterReply markdown={message.result} />
+                {scenarioId === "mapping-embodied" && phase >= 5 && Object.values(mappingSaveOutcomes).some((outcome) => message.result === outcome.result) ? <HunterReply markdown={mappingRemainingWork} /> : null}
               </div>
             ))}
             {scenarioId === "client-xinglan" && phase >= 6 ? <LegacyOpportunityResult taskId={scenarioId} /> : null}

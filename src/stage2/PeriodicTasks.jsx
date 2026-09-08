@@ -240,7 +240,7 @@ function StateView({ state, onReset }) {
         description="用自然语言说明要重复完成的猎头工作和执行周期，Hunter 会整理成可确认的计划。"
         action={
           <Button tone="primary" icon="plus" onClick={onReset}>
-            新建周期性任务
+            新建任务
           </Button>
         }
       />
@@ -318,7 +318,7 @@ function PeriodicTaskDetail({ task, runs, onRun, onToggle, onDelete, onBack }) {
         <Button
           tone="secondary"
           icon="edit"
-          onClick={() => navigate(`/new?mode=periodic&edit=${task.id}&originalPrompt=${encodeURIComponent(task.prompt)}&schedule=${encodeURIComponent(task.schedule)}`)}
+          onClick={() => navigate(`/new?edit=${task.id}&originalPrompt=${encodeURIComponent(task.prompt)}&schedule=${encodeURIComponent(task.schedule)}`)}
         >
           调整任务
         </Button>
@@ -725,7 +725,7 @@ export function PeriodicTasksPage() {
     setParams(nextView === "runs" ? { view: "runs" } : {});
   };
   const resetState = () => {
-    if (state === "empty") navigate("/new?mode=periodic");
+    if (state === "empty") navigate("/new");
     else if (state === "disabled") setParams({ view: "runs" });
     else setParams(view === "runs" ? { view: "runs" } : {});
   };
@@ -774,9 +774,10 @@ export function PeriodicTasksPage() {
         <Button
           tone="primary"
           icon="plus"
-          onClick={() => navigate("/new?mode=periodic")}
+          aria-label="新建任务"
+          onClick={() => navigate("/new")}
         >
-          新建周期性任务
+          新建任务
         </Button>
       </header>
       <div
@@ -808,7 +809,7 @@ export function PeriodicTasksPage() {
       ) : view === "tasks" && !tasks.length ? (
         <StateView
           state="empty"
-          onReset={() => navigate("/new?mode=periodic")}
+          onReset={() => navigate("/new")}
         />
       ) : (
         <section

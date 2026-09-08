@@ -34,7 +34,7 @@ const forcedPrompts = {
 };
 
 function classifyWork(prompt) {
-  if (/每(天|周|月|季度)|每\s*\d+\s*(天|周|月)|定期|周期|工作日/.test(prompt))
+  if (/每(天|周|月|季度)|每\s*(?:\d+|两|二)\s*(天|周|月)|定期|周期|工作日/.test(prompt))
     return "periodic";
   if (/核验|消歧|是不是同一个人|是否为同一人/.test(prompt)) return "task";
   if (/整理|归纳|改写|总结/.test(prompt)) return "direct";
@@ -107,7 +107,6 @@ export function NewWork() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const forcedState = params.get("state");
-  const periodicMode = params.get("mode") === "periodic";
   const editingPeriodic = params.get("edit");
   const signalPrompt = sessionStorage.getItem("hunter-new-work-signal") || "";
   const initialStatus = forcedPrompts[forcedState] ? forcedState : "idle";
@@ -136,6 +135,13 @@ export function NewWork() {
   }, [signalPrompt]);
 
   useEffect(() => {
+    if (params.get("mode") !== "periodic") return;
+    const next = new URLSearchParams(params);
+    next.delete("mode");
+    setParams(next, { replace: true });
+  }, [params, setParams]);
+
+  useEffect(() => {
     if (!forcedPrompts[forcedState]) return;
     setSubmittedPrompt(forcedPrompts[forcedState]);
     setStatus(forcedState);
@@ -153,14 +159,14 @@ export function NewWork() {
     const timer = window.setTimeout(
       () =>
         setStatus(
-          periodicMode || editingPeriodic
+          editingPeriodic
             ? "periodic"
             : classifyWork(submittedPrompt),
         ),
       850,
     );
     return () => window.clearTimeout(timer);
-  }, [editingPeriodic, forcedState, periodicMode, status, submittedPrompt]);
+  }, [editingPeriodic, forcedState, status, submittedPrompt]);
 
   useEffect(() => {
     if (forcedState || !["mainline", "task", "direct"].includes(status))
@@ -214,7 +220,8 @@ export function NewWork() {
     const kind = params.get("kind") || (params.get("positionId") ? "recruiting" :
       /招聘机会|招聘需求|客户开发|团队扩建|团队扩张/.test(prompt) ? "opportunity" :
       /创建岗位|解析.*JD|整理.*岗位资料/.test(prompt) ? "position-create" : "");
-    if (["opportunity", "position-create", "recruiting"].includes(kind) && !periodicMode && !editingPeriodic) {
+    const periodicRequest = Boolean(editingPeriodic) || classifyWork(prompt) === "periodic";
+    if (["opportunity", "position-create", "recruiting"].includes(kind) && !periodicRequest) {
       if (lifecycleBusy) return;
       setLifecycleBusy(true); setLifecycleError("");
       try {
@@ -228,7 +235,7 @@ export function NewWork() {
     }
     if (forcedState) setParams({}, { replace: true });
     setSubmittedPrompt(prompt);
-    setPeriodicPlan((plan) => ({ prompt: periodicGoal(editingPeriodic ? plan.prompt || prompt : prompt), schedule: periodicSchedule(prompt) || plan.schedule }));
+    setPeriodicPlan((plan) => ({ prompt: periodicGoal(editingPeriodic ? plan.prompt || prompt : prompt), schedule: periodicSchedule(prompt, "09:00") || plan.schedule }));
     setPeriodicReplies([]); setPeriodicDeclined(false);
     setValue("");
     setAttachments([]);
@@ -275,11 +282,7 @@ export function NewWork() {
                 <Icon name="sparkles" />
               </span>
               <h1>
-                {editingPeriodic
-                  ? "调整周期性任务"
-                  : periodicMode
-                    ? "新建周期性任务"
-                    : "新建任务"}
+                {editingPeriodic ? "调整周期性任务" : "新建任务"}
               </h1>
               <p>
                 描述你希望 Hunter
@@ -373,10 +376,7 @@ export function NewWork() {
               <div className="s2-starter-prompts">
                 <small>可以从这些真实目标开始</small>
                 <div>
-                  {(periodicMode
-                    ? [starterPrompts[4], starterPrompts[0], starterPrompts[2]]
-                    : starterPrompts
-                  ).map((suggestion) => (
+                  {starterPrompts.map((suggestion) => (
                     <button
                       type="button"
                       key={suggestion}

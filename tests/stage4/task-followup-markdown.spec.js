@@ -103,7 +103,7 @@ test("普通机会任务复用跟进确认，改期建议、取消和仅分析�
 });
 
 test("周期计划回复、否定与建议仍停留在同一草稿，确认后列表反映真实计划", async ({ page }) => {
-  await page.goto("#/new?mode=periodic");
+  await page.goto("#/new");
   await replyToAsset(page, "每周一检查机器人公司的公开招聘变化");
   await expect(page.getByRole("heading", { name: "周期性任务草案" })).toBeVisible();
   await expect(page.locator(".s2-decision-request")).toHaveCount(0);

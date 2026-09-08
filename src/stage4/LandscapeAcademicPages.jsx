@@ -1184,9 +1184,6 @@ function AcademicCardList({ kind }) {
           <span>
             已选 {selected.size} 篇{label}
           </span>
-          <Button size="sm" onClick={() => notify("已加入知识图谱")}>
-            加入知识图谱
-          </Button>
           <Button
             size="sm"
             tone="danger-outline"
@@ -1966,7 +1963,6 @@ export function PatentDetailPage() {
           { label: item.relation, tone: "info" },
         ]}
         onBack={() => navigate("/patents")}
-        onEdit={() => notify("已打开专利资料编辑")}
         onDelete={() => setDeleteOpen(true)}
       />
       <div className="s4-detail-stack">

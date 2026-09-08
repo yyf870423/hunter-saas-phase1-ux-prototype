@@ -78,6 +78,23 @@ export const contactReviewRows = [
   },
 ];
 
+export const mappingSaveOutcomes = {
+  new: {
+    text: "将本批次结果按主题保存为 3 个新图谱。",
+    result: "## 3 个新图谱已经创建\n\n组织、公司关系和候选人关系已分别写入独立图谱，待确认项、原始证据和用户决定均已保留。",
+  },
+  update: {
+    text: "更新已有的 3 个独立知识图谱。",
+    result: "## 3 个已有图谱已经更新\n\n本批次审核结果已按主题写入，三个图谱各自的更新前版本均已保留；后续资产关系变化会继续自动刷新可信内容。",
+  },
+  report: {
+    text: "本次只保留摸排报告。",
+    result: "## 摸排报告已经保存\n\n本次没有创建或更新图谱资产；审核决定、冲突说明和原始证据仍可从当前任务查看。",
+  },
+};
+
+export const mappingRemainingWork = "### 待补充信息与下一步\n\n- 拓界机器人技术负责人：补充可核验的人物资料及任职时间。\n- 穹顶智能汇报关系：补充组织来源，未核实前不写入关系。\n- 王奕身份冲突：核对论文作者与公开活动名单的单位时间线，未确认前不合并。\n\n可以继续补充资料或指定其中一项；已确认成果保留，不自动扩大摸排范围。";
+
 export const mappingCompanies = [
   {
     company: "星澜机器人",
@@ -1698,7 +1715,7 @@ export const businessScenarios = {
         title: "确认待补充信息与下一步",
         detail: "明确还缺什么、能做什么和执行后的预期结果。",
         requirement: "不使用无法指导行动的抽象完成百分比。",
-        doneAt: 6,
+        doneAt: 5,
       },
     ],
     tasks: [
