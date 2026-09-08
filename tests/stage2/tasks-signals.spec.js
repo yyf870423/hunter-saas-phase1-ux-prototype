@@ -72,7 +72,7 @@ test("周期性任务覆盖配置、运行记录和等待用户状态", async ({
   ).toBeVisible();
   await expect(page.locator(".s2-run-conversation")).toBeVisible();
   await expect(page.getByLabel("任务对话输入")).toBeVisible();
-  await expect(page.getByText("2 项身份冲突需要一起确认")).toBeVisible();
+  await expect(page.getByText("确认当前两份候选人资料的身份关系")).toBeVisible();
   await page.getByRole("button", { name: /跳过本轮冲突项/ }).click();
   await expect(page.getByText("运行已继续")).toBeVisible();
   await page.getByRole("button", { name: "停止", exact: true }).click();

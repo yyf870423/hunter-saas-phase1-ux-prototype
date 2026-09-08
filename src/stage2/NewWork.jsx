@@ -14,7 +14,7 @@ import { StateBanner } from "../stage4/asset-ui";
 import { createOpportunityTask } from "../stage4/opportunity-task-adapter";
 import { singleAssetDecision } from "../stage4/single-asset-confirmation";
 import { markdownText } from "../stage4/opportunity-task-markdown";
-import { periodicDraftKey, periodicSchedule, readPeriodicDrafts } from "./periodic-draft";
+import { periodicDraftKey, periodicGoal, periodicSchedule, readPeriodicDrafts } from "./periodic-draft";
 
 const starterPrompts = [
   "为星澜机器人的 VLA 算法负责人岗位持续寻找合适候选人",
@@ -127,7 +127,7 @@ export function NewWork() {
   const [historyCollapsed, setHistoryCollapsed] = useState(false);
   const [lifecycleBusy, setLifecycleBusy] = useState(false);
   const [lifecycleError, setLifecycleError] = useState("");
-  const [periodicPlan, setPeriodicPlan] = useState(() => ({ prompt: params.get("originalPrompt") || forcedPrompts[forcedState] || "", schedule: params.get("schedule") || "每周一 09:00" }));
+  const [periodicPlan, setPeriodicPlan] = useState(() => ({ prompt: periodicGoal(params.get("originalPrompt") || forcedPrompts[forcedState] || ""), schedule: params.get("schedule") || "每周一 09:00" }));
   const [periodicReplies, setPeriodicReplies] = useState([]);
   const [periodicDeclined, setPeriodicDeclined] = useState(false);
 
@@ -198,12 +198,12 @@ export function NewWork() {
           const item = { id, prompt: periodicPlan.prompt || submittedPrompt, schedule: periodicPlan.schedule };
           try {
             sessionStorage.setItem(periodicDraftKey, JSON.stringify([...readPeriodicDrafts().filter((entry) => entry.id !== id), item]));
-            navigate("/tasks/periodic?selected=" + encodeURIComponent(id) + "&created=1");
+            navigate("/tasks/periodic?selected=" + encodeURIComponent(id) + (editingPeriodic ? "&updated=1" : "&created=1"));
             return;
           } catch { result = "保存失败，计划草稿仍保留，尚未创建或修改。请重试。"; }
         }
       } else if (schedule || goal) {
-        setPeriodicPlan((plan) => ({ prompt: goal || plan.prompt || submittedPrompt, schedule: schedule || plan.schedule }));
+        setPeriodicPlan((plan) => ({ prompt: periodicGoal(goal || plan.prompt || submittedPrompt), schedule: schedule || plan.schedule }));
         setPeriodicDeclined(false);
         result = "已更新下方周期计划草稿，尚未执行。是否按更新后的计划创建或保存？";
       } else result = "尚未修改。当前原型无法可靠解析这条建议，请明确任务目标或执行周期，例如“执行周期：每周三 10:00”，再核对摘要。";
@@ -228,7 +228,7 @@ export function NewWork() {
     }
     if (forcedState) setParams({}, { replace: true });
     setSubmittedPrompt(prompt);
-    setPeriodicPlan((plan) => ({ prompt: editingPeriodic ? plan.prompt || prompt : prompt, schedule: periodicSchedule(prompt) || plan.schedule }));
+    setPeriodicPlan((plan) => ({ prompt: periodicGoal(editingPeriodic ? plan.prompt || prompt : prompt), schedule: periodicSchedule(prompt) || plan.schedule }));
     setPeriodicReplies([]); setPeriodicDeclined(false);
     setValue("");
     setAttachments([]);

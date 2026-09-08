@@ -774,6 +774,7 @@ export function applyOpportunityCommand(current, command, context = {}) {
     validateFollowupOwner(state, task.opportunityId, task.id);
     const plan = currentFollowup(state, task.opportunityId);
     if ((plan?.id || "") !== draft.planId) fail("跟进安排已变化，请重新核对。", "CONFLICT");
+    if (draft.action === "record" && draft.complete && !plan) fail("当前没有可完成的跟进事项，请取消同时完成后再保存记录。", "STATE");
     if (plan) {
       assertVersion(plan, draft.planVersion);
       if (plan.ownerTaskId && plan.ownerTaskId !== task.id) fail("该事项由原任务维护，请返回原任务处理。", "TASK_OWNED");

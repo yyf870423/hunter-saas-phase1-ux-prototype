@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { readPeriodicDrafts } from "./periodic-draft";
+import { periodicOverridesKey, periodicRunsKey, readPeriodicDrafts, readPeriodicOverrides, readPeriodicRuns } from "./periodic-draft";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
@@ -377,7 +377,7 @@ function buildRunPlan(run, resolved, followUpCount, stopped) {
   const waiting = run.status === "等待用户" && !resolved;
   const running = run.status === "正在运行" && !stopped;
   const stoppedRun = run.status === "已停止" || stopped;
-  const followUpRunning = followUpCount > 0;
+  const followUpRunning = followUpCount > 0 && running;
 
   return [
     {
@@ -416,49 +416,41 @@ function buildRunPlan(run, resolved, followUpCount, stopped) {
   ];
 }
 
-function RunDetail({ run, onBack }) {
-  const [resolved, setResolved] = useState(false);
+function RunDetail({ run, onBack, onUpdate }) {
+  const resolved = Boolean(run.decision);
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
-  const [authMode, setAuthMode] = useState("confirm");
+  const authMode = run.authMode || "confirm";
   const [planOpen, setPlanOpen] = useState(false);
-  const [stopped, setStopped] = useState(false);
-  const [followUps, setFollowUps] = useState([]);
+  const stopped = run.status === "已停止";
+  const followUps = run.followUps || [];
   const notify = useToast();
   useEffect(() => {
-    setResolved(false);
     setComposer("");
     setAttachments([]);
     setPlanOpen(false);
-    setStopped(false);
-    setFollowUps([]);
   }, [run.id]);
-  const followUpActive = followUps.length > 0 && !stopped;
-  const effectiveStatus = stopped
-    ? "已停止"
-    : resolved || followUpActive
-      ? "正在运行"
-      : run.status;
-  const effectiveTone = stopped
-    ? "neutral"
-    : resolved || followUpActive
-      ? "info"
-      : run.tone;
+  const effectiveStatus = run.status;
+  const effectiveTone = run.tone;
   const plan = buildRunPlan(run, resolved, followUps.length, stopped);
   const send = (text, files) => {
     const normalized = text.trim();
-    setFollowUps((items) => [
-      ...items,
-      {
-        id: `${run.id}-${items.length + 1}`,
-        text: normalized,
-        files: files.map((file) => ({ name: file.name, size: file.size })),
-      },
-    ]);
+    const waiting = run.status === "等待用户";
+    const followUp = {
+      followUps: [
+        ...followUps,
+        {
+          id: crypto.randomUUID(),
+          text: normalized,
+          files: files.map((file) => ({ name: file.name, size: file.size })),
+          waiting,
+        },
+      ],
+      ...(waiting ? {} : { status: "正在运行", tone: "info" }),
+    };
+    if (!onUpdate(run.id, followUp)) return;
     setComposer("");
     setAttachments([]);
-    setStopped(false);
-    if (run.status === "等待用户") setResolved(true);
     notify("补充要求已加入当前运行会话", "success");
   };
   return (
@@ -517,7 +509,7 @@ ${run.summary}
           {run.status === "等待用户" && !resolved ? (
             <HunterReply>
               <DecisionRequest
-                title="2 项身份冲突需要一起确认"
+                title="确认当前两份候选人资料的身份关系"
                 description="确认后会继续同一轮运行；本次决定不会自动成为后续长期规则。"
                 options={[
                   {
@@ -544,25 +536,19 @@ ${run.summary}
                 ]}
                 onSelect={(option) => {
                   if (option.value === "custom") {
-                    setComposer("关于这两项身份冲突，请按以下要求处理：");
+                    setComposer("关于当前身份冲突，请按以下要求处理：");
                     return;
                   }
-                  setResolved(true);
+                  if (authMode === "analysis" && option.value !== "skip") {
+                    notify("当前仅分析，尚未修改身份关系；可跳过冲突项或调整授权。", "warning");
+                    return;
+                  }
+                  if (!onUpdate(run.id, { decision: option.label, status: "正在运行", tone: "info",
+                    followUps: [...followUps, { id: crypto.randomUUID(), text: option.label, files: [], decision: true }] })) return;
                   notify("已记录决定，并从当前检查点继续运行", "success");
                 }}
               />
             </HunterReply>
-          ) : null}
-          {resolved ? (
-            <>
-              <UserMessage time="刚刚">按刚才选择的方式继续处理。</UserMessage>
-              <HunterReply
-                streaming={!stopped}
-                markdown={`## 运行已继续
-
-决定已经写入当前运行会话，我会从身份冲突检查点继续，不重复执行已完成的 6 个岗位。后续独立确认项会合并后再提醒。`}
-              />
-            </>
           ) : null}
           {followUps.map((message) => (
             <div className="s2-decision-thread" key={message.id}>
@@ -583,8 +569,8 @@ ${run.summary}
                 ))}
               </UserMessage>
               <HunterReply
-                streaming={!stopped}
-                markdown={`已收到补充要求，并加入本次运行的上下文。我会保留已经完成的结果，只重新执行受影响的步骤；新的结论仍记录在本次运行会话中。`}
+                streaming={effectiveStatus === "正在运行"}
+                markdown={message.decision ? "## 运行已继续\n\n决定已经写入当前运行会话，我会从身份冲突检查点继续，不重复执行已完成的 6 个岗位。后续独立问题逐项确认，不沿用本次决定。" : message.waiting ? "补充内容已保留，尚未据此修改身份关系。请核对当前身份问题并明确选择处理方式；本轮仍在等待确认。" : "已收到补充要求，并加入本次运行的上下文。我会保留已经完成的结果，只重新执行受影响的步骤；新的结论仍记录在本次运行会话中。"}
               />
             </div>
           ))}
@@ -622,14 +608,14 @@ ${run.summary}
             onSend={send}
             authMode={authMode}
             onAuthChange={(mode) => {
-              setAuthMode(mode);
+              if (!onUpdate(run.id, { authMode: mode })) return;
               notify("本次运行的授权模式已更新", "info");
             }}
             attachments={attachments}
             onAttachmentsChange={setAttachments}
             streaming={effectiveStatus === "正在运行"}
             onStop={() => {
-              setStopped(true);
+              if (!onUpdate(run.id, { status: "已停止", tone: "neutral" })) return;
               notify("本轮运行已停止，当前进度已经保留", "info");
             }}
             placeholder="继续补充信息、文件、链接或新的处理要求"
@@ -651,12 +637,47 @@ export function PeriodicTasksPage() {
   const requestedRunStatus = params.get("status") || "";
   const [tasks, setTasks] = useState(() => {
     const drafts = readPeriodicDrafts();
-    const merged = periodicTasks.map((task) => ({ ...task, ...drafts.find((item) => item.id === task.id) }));
+    const overrides = readPeriodicOverrides();
+    const merged = periodicTasks.map((task) => {
+      const draft = drafts.find((item) => item.id === task.id);
+      return draft ? { ...task, ...draft, title: draft.prompt, nextRun: draft.schedule } : task;
+    });
     return [...drafts.filter((item) => !periodicTasks.some((task) => task.id === item.id)).map((item) => ({ ...item, title: item.prompt,
       scenarios: ["周期任务"], status: "已启用", tone: "success", nextRun: "待下次执行周期", lastRun: "尚未运行",
-      destination: "高价值变化进入洞察中心；资产草稿等待确认", memory: "尚无成功运行记录" })), ...merged];
+      destination: "高价值变化进入洞察中心；资产草稿等待确认", memory: "尚无成功运行记录" })), ...merged]
+      .filter((task) => !overrides[task.id]?.deleted)
+      .map((task) => overrides[task.id]?.paused === true ? { ...task, status: "已暂停", tone: "neutral", nextRun: "已暂停" }
+        : overrides[task.id]?.paused === false ? { ...task, status: "已启用", tone: "success", nextRun: task.schedule } : task);
   });
-  const [runs, setRuns] = useState(periodicRuns);
+  const [runs, setRuns] = useState(() => readPeriodicRuns(periodicRuns));
+  const saveRuns = (next) => {
+    try {
+      sessionStorage.setItem(periodicRunsKey, JSON.stringify(next));
+      setRuns(next);
+      return true;
+    } catch { notify("运行状态保存失败，尚未变更，请重试。", "error"); return false; }
+  };
+  const updateRun = (id, patch) => {
+    if (!saveRuns(runs.map((run) => run.id === id ? { ...run, ...patch } : run))) return false;
+    if (patch.status) {
+      const next = new URLSearchParams(params);
+      next.set("run", id);
+      setRunId(id);
+      if (params.get("status")) {
+        next.set("status", patch.status);
+        setRunStatus(patch.status);
+      }
+      setParams(next, { replace: true });
+    }
+    return true;
+  };
+  const saveTaskChange = (id, patch) => {
+    try {
+      const values = readPeriodicOverrides();
+      sessionStorage.setItem(periodicOverridesKey, JSON.stringify({ ...values, [id]: { ...values[id], ...patch } }));
+      return true;
+    } catch { notify("任务配置保存失败，尚未变更，请重试。", "error"); return false; }
+  };
   const [query, setQuery] = useState("");
   const [runStatus, setRunStatus] = useState(requestedRunStatus);
   const [timeRange, setTimeRange] = useState("近一周");
@@ -671,14 +692,19 @@ export function PeriodicTasksPage() {
     Boolean(requestedRunId || requestedTaskId),
   );
   const creationNotified = useRef(false);
-  const selected = tasks.find((task) => task.id === selectedId) || tasks[0];
+  const taskViews = useMemo(() => tasks.map((task) => {
+    if (task.status === "已暂停") return task;
+    const waiting = runs.some((run) => run.taskId === task.id && run.status === "等待用户");
+    return { ...task, status: waiting ? "等待用户" : "已启用", tone: waiting ? "warning" : "success" };
+  }), [tasks, runs]);
+  const selected = taskViews.find((task) => task.id === selectedId) || taskViews[0];
   const runStatusOptions = useMemo(
     () => ["全部状态", ...new Set(runs.map((run) => run.status))],
     [runs],
   );
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase();
-    const source = view === "runs" ? runs : tasks;
+    const source = view === "runs" ? runs : taskViews;
     return source.filter(
       (item) =>
         (view !== "runs" ||
@@ -689,7 +715,7 @@ export function PeriodicTasksPage() {
             .toLowerCase()
             .includes(keyword)),
     );
-  }, [customEnd, customStart, query, runStatus, runs, tasks, timeRange, view]);
+  }, [customEnd, customStart, query, runStatus, runs, taskViews, timeRange, view]);
   const selectedRun =
     visible.find((run) => view === "runs" && run.id === runId) ||
     (view === "runs" ? visible[0] : null);
@@ -714,11 +740,12 @@ export function PeriodicTasksPage() {
     );
   };
   useEffect(() => {
-    if (params.get("created") !== "1" || creationNotified.current) return;
+    if ((params.get("created") !== "1" && params.get("updated") !== "1") || creationNotified.current) return;
     creationNotified.current = true;
-    notify("周期性任务已创建，将按确认的计划运行", "success");
+    notify(params.get("updated") === "1" ? "周期性任务已更新" : "周期性任务已创建，将按确认的计划运行", "success");
     const next = new URLSearchParams(params);
     next.delete("created");
+    next.delete("updated");
     setParams(next, { replace: true });
   }, [notify, params, setParams]);
   useEffect(() => {
@@ -924,7 +951,7 @@ export function PeriodicTasksPage() {
           </div>
           {view === "runs" ? (
             selectedRun ? (
-              <RunDetail run={selectedRun} onBack={closeMobileDetail} />
+              <RunDetail run={selectedRun} onBack={closeMobileDetail} onUpdate={updateRun} />
             ) : (
               <aside className="s2-periodic-detail">
                 <EmptyState
@@ -940,8 +967,16 @@ export function PeriodicTasksPage() {
               runs={runs}
               onBack={closeMobileDetail}
               onRun={() => {
+                const existing = runs.find((run) => run.taskId === selected.id && ["正在运行", "等待用户"].includes(run.status));
+                if (existing) {
+                  setTimeRange("近一个月");
+                  setQuery("");
+                  setParams({ view: "runs", run: existing.id });
+                  notify("当前已有未结束运行，已打开该运行记录。", "info");
+                  return;
+                }
                 const activeRun = {
-                  id: `run-${selected.id}-manual`,
+                  id: `run-${selected.id}-${crypto.randomUUID()}`,
                   taskId: selected.id,
                   task: selected.title,
                   startedAt: "刚刚",
@@ -954,10 +989,9 @@ export function PeriodicTasksPage() {
                   result: "正在准备本轮执行范围",
                   memory: "本轮完成前不会覆盖上一次成功记忆和处理水位。",
                 };
-                setRuns((items) => [
-                  activeRun,
-                  ...items.filter((item) => item.id !== activeRun.id),
-                ]);
+                if (!saveRuns([activeRun, ...runs])) return;
+                setTimeRange("近一周");
+                setQuery("");
                 setRunId(activeRun.id);
                 setRunStatus("正在运行");
                 setMobileDetailOpen(true);
@@ -970,6 +1004,7 @@ export function PeriodicTasksPage() {
               }}
               onToggle={() => {
                 const pause = selected.status !== "已暂停";
+                if (!saveTaskChange(selected.id, { paused: pause })) return;
                 setTasks((items) =>
                   items.map((item) =>
                     item.id === selected.id
@@ -1003,6 +1038,7 @@ export function PeriodicTasksPage() {
             <Button
               tone="danger"
               onClick={() => {
+                if (!selected || !saveTaskChange(selected.id, { deleted: true })) return;
                 const remaining = tasks.filter(
                   (item) => item.id !== selected.id,
                 );

@@ -215,7 +215,7 @@ export function ImportsPage() {
           </article>
         ))}
       </div>
-      <Pagination page={page} pages={taskPages} onChange={setPage} />
+      <Pagination page={page} pages={taskPages} pageSize={2} onChange={setPage} />
       <Modal
         open={wizardOpen}
         close={closeWizard}

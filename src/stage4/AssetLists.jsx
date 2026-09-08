@@ -592,6 +592,7 @@ export function AssetListPage({ type }) {
         <Pagination
           page={Math.min(controller.page, pages)}
           pages={pages}
+          pageSize={6}
           onChange={controller.setPage}
         />
       </AssetListState>

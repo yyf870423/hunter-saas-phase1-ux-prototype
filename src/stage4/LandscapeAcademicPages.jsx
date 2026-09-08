@@ -161,6 +161,7 @@ export function MappingsListPage() {
       <Pagination
         page={controller.page}
         pages={controller.pages}
+        pageSize={6}
         onChange={controller.setPage}
       />
     </div>
@@ -996,6 +997,7 @@ function AcademicCardList({ kind }) {
     4,
   );
   const [selected, setSelected] = useState(new Set());
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [typeFilters, setTypeFilters] = useState([]);
   const [relationFilters, setRelationFilters] = useState([]);
   const label = kind === "papers" ? "论文" : "专利";
@@ -1188,7 +1190,7 @@ function AcademicCardList({ kind }) {
           <Button
             size="sm"
             tone="danger-outline"
-            onClick={() => notify("已移至回收站")}
+            onClick={() => setDeleteOpen(true)}
           >
             删除
           </Button>
@@ -1200,7 +1202,16 @@ function AcademicCardList({ kind }) {
       <Pagination
         page={controller.page}
         pages={pages}
+        pageSize={4}
         onChange={controller.setPage}
+      />
+      <DeleteAssetModal
+        open={deleteOpen}
+        close={() => setDeleteOpen(false)}
+        assetLabel={label}
+        assetName={`已选的 ${selected.size} 项${label}`}
+        impact="候选人、人物线索和知识图谱不会删除；已有关系保留已删除引用。"
+        onConfirm={() => { setDeleteOpen(false); setSelected(new Set()); }}
       />
     </div>
   );
@@ -1821,7 +1832,6 @@ export function PaperDetailPage() {
           { label: item.relation, tone: "success" },
         ]}
         onBack={() => navigate("/papers")}
-        onEdit={() => notify("已打开论文资料编辑")}
         onDelete={() => setDeleteOpen(true)}
       />
       <section className="s4-paper-hero">
@@ -1922,7 +1932,6 @@ export function PaperDetailPage() {
         impact="候选人、人物线索和知识图谱不会删除；人物关系显示论文已删除引用。"
         onConfirm={() => {
           setDeleteOpen(false);
-          notify("论文已进入回收站");
           navigate("/papers");
         }}
       />
@@ -2062,7 +2071,6 @@ export function PatentDetailPage() {
         impact="候选人、人物线索和知识图谱不会删除；共同发明人关系保留已删除引用。"
         onConfirm={() => {
           setDeleteOpen(false);
-          notify("专利已进入回收站");
           navigate("/patents");
         }}
       />

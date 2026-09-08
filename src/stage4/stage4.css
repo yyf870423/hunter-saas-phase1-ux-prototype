@@ -4674,6 +4674,14 @@
   .tg-graph-main,
   .tg-graph-main.is-table {
     grid-template-columns: 1fr;
+    height: auto;
+    grid-template-rows: 520px auto;
+  }
+  .tg-graph-main.is-detail-closed {
+    grid-template-rows: 520px;
+  }
+  .tg-content-shell.is-fullscreen .tg-graph-main {
+    overflow-y: auto;
   }
   .tg-detail-panel {
     min-height: 300px;
@@ -13302,6 +13310,7 @@
   }
   .s4-recycle-table article > .s4-checkbox {
     position: absolute;
+    top: 13px;
     right: 12px;
   }
   .s4-recycle-table article {

@@ -4,7 +4,7 @@ import { applyOpportunityCommand } from "../../src/stage4/opportunity-domain.js"
 import { createOpportunitySeed } from "../../src/stage4/opportunity-seed.js";
 import { companies, contacts, candidates } from "../../src/stage4/data.js";
 import { followupDate, missingFollowupField, nextFollowupDraft } from "../../src/stage4/task-followup.js";
-import { periodicSchedule, readPeriodicDrafts } from "../../src/stage2/periodic-draft.js";
+import { periodicGoal, periodicSchedule, readPeriodicDrafts, readPeriodicOverrides, readPeriodicRuns } from "../../src/stage2/periodic-draft.js";
 
 const context = { companies, contacts, candidates, deletedCompanies: [] };
 const command = (state, type, data, options = {}) => applyOpportunityCommand(state, { type, data, ...options }, context);
@@ -103,4 +103,26 @@ test("date and periodic draft parsing rejects rollover, malformed storage and im
   assert.equal(periodicSchedule("改为每周三 10:00"), "每周三 10:00");
   assert.equal(periodicSchedule("每周三 25:00"), "");
   assert.deepEqual(readPeriodicDrafts({ getItem: () => "bad" }), []);
+});
+
+test("record cannot complete a missing plan and does not write a partial record", () => {
+  let { state, id, opportunityId } = setup();
+  state = draft(state, id, "记录跟进\n跟进内容：已核实预算\n实际跟进时间：2026-09-07 10:00\n完成当前事项：是");
+  const before = structuredClone(state);
+  assert.throws(() => confirm(state, id), /没有可完成的跟进事项/);
+  assert.deepEqual(state, before);
+  state = draft(state, id, "完成当前事项：否");
+  state = confirm(state, id).state;
+  assert.equal(state.opportunities.find((item) => item.id === opportunityId).records.at(-1).content, "已核实预算");
+  assert.equal(state.followups.length, 0);
+});
+
+test("periodic goal and stored UI state keep cadence separate without stripping substantive requirements", () => {
+  assert.equal(periodicGoal("每周一检查具身智能创业公司"), "检查具身智能创业公司");
+  assert.equal(periodicGoal("每周三 10:00，核验招聘变化"), "核验招聘变化");
+  assert.equal(periodicGoal("检查公司，每周一保留历史对比"), "检查公司，每周一保留历史对比");
+  assert.equal(periodicGoal("每 3 天 10:00 更新岗位"), "更新岗位");
+  assert.equal(periodicSchedule("每两周周五 17:00"), "每两周周五 17:00");
+  assert.deepEqual(readPeriodicOverrides({ getItem: () => "[]" }), {});
+  assert.deepEqual(readPeriodicRuns(["fallback"], { getItem: () => "[null]" }), ["fallback"]);
 });

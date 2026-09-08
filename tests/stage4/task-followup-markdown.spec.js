@@ -145,7 +145,7 @@ test("各类任务回复后不重新出现普通状态卡，复杂审核和产�
     await expect(page.locator(".s2-user-message").filter({ hasText: text })).toBeVisible();
   }
   await page.goto("#/tasks/periodic?view=runs&run=run-position-waiting");
-  await expect(page.locator(".s2-decision-request")).toContainText("2 项身份冲突需要一起确认");
+  await expect(page.locator(".s2-decision-request")).toContainText("确认当前两份候选人资料的身份关系");
   await page.getByRole("button", { name: /^保留为不同人物/ }).click();
   await expect(page.locator(".s2-decision-request")).toHaveCount(0);
   await errors();
