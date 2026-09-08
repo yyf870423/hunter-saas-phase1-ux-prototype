@@ -39,10 +39,9 @@
 9. `Modal` / `Drawer`：统一尺寸、遮罩、焦点和关闭逻辑。
 10. `Toast`：成功、信息、警告和错误。
 11. 用量摘要：2026-09-07 起用户右拉菜单只显示已用百分比和到期日期，公共 Modal 保留相同两字段及订阅管理入口；取消侧栏用量环、任务次数和分项说明。
-12. `DashboardSection`：2026-09-07 取消 `MainlineFocus`，以统一任务表格及洞察、资产变化双栏替代。区域使用中性标题带、语义图标与实际数量；任务区到动态区留白 40px、动态双栏之间留白 48px 并设中线，窄屏单列间距 24px。没有浮动卡片外框或阴影，空态与加载态保留同样边界。
-13. `TaskSummaryTable` / `TaskProgressSummary`：复用公共表格、状态和 Tooltip，四个字段为类型、名称、进度、状态；手机重排。按工作台最新反馈，进度为“已完成 X / Y 步”及当前计划步骤，缺少计划时显示“计划待生成”，不再用业务对象数量表示进度。
-    工作台使用显式关注状态排序：待你处理、待你验收、正在推进、等待外部，同组保持原顺序，先排序再取最多 10 条。状态列复用公共 `StatusBadge`，处理为 warning，验收和推进为 info，外部等待为 neutral；保留详情原始执行状态，不增加优先级列或卡片。
-14. `DashboardFeed` / `DashboardListSkeleton`：洞察和资产变化共用名称优先的连续摘要行及骨架，类型、时间与状态说明作为辅助层；桌面上下留白 20px、手机 16px。三个摘要区均最多 10 条；公共 `EmptyState` 的 compact 规格承载局部空态。详细布局和状态入口见 `dashboard-layout-prototype.md`。
+12. `DashboardSection`：2026-09-08 按用户授权改为任务焦点、洞察卡片与资产时间线。无外框标题含语义图标、实际数量与全量入口；标题区桌面最小 48px、手机 44px，分区与双栏间距 32px、手机 28px。页面分区没有卡片外框或阴影。
+13. `TaskFocusBoard` / `TaskPlanMilestones` / `TaskProgressSummary`：任务焦点与可切换预览保留类型、名称、进度和状态，焦点补充原对象、摘要及真实计划节点。按待处理、待验收、推进、外部等待稳定排序，先排序再取最多 10 条；切换不改业务状态，独立箭头直接打开详情。复用公共按钮、状态与 Tooltip；任务标题桌面 22px、手机 20px，辅助字不小于 12px，切换项最小 88px。无计划不伪造节点。
+14. `DashboardInsightCards` / `DashboardAssetTimeline` / `DashboardListSkeleton`：共用数据渲染，洞察单项卡片圆角 8px，资产变化使用图标时间线，不嵌套卡片。保留完整名称、类型、来源、时间、状态和说明；三区各最多 10 条，任务骨架对应焦点布局，公共 compact `EmptyState` 承载空态。详细响应式与状态入口见 `dashboard-layout-prototype.md`。
 15. `ActionQueue`：默认收起的人工行动摘要。
 16. `Skeleton` / `EmptyState` / `ErrorState` / `PermissionState`：全局状态组件。
 17. `UserMenu`：显示当前用户和工作空间，并承载设置、切换工作空间和退出登录；支持外部点击与 `Escape` 关闭。

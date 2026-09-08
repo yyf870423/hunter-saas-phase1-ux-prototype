@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
-import { getDashboardData } from "./dashboard-data";
+import { dashboardItemLimit, getDashboardData } from "./dashboard-data";
 import {
   ActionQueue,
-  DashboardFeed,
+  DashboardInsightCards,
+  DashboardAssetTimeline,
   DashboardListSkeleton,
   DashboardSection,
   DashboardTaskStarter,
-  TaskSummaryTable,
+  TaskFocusBoard,
 } from "./DashboardWidgets";
 import { Button, useToast } from "./ui";
 import { getOpportunityActions, mergeLifecycleTasks, useOpportunityState } from "../stage4/opportunity-store";
@@ -82,7 +83,7 @@ export function Dashboard() {
         id="dashboard-tasks-title"
         title="任务"
         icon="task"
-        count={loading ? undefined : tasks.length}
+        count={loading ? undefined : Math.min(tasks.length, dashboardItemLimit)}
         loading={loading}
         className="s1-dashboard-tasks"
         action={
@@ -100,7 +101,7 @@ export function Dashboard() {
         {loading ? (
           <DashboardListSkeleton rows={5} table />
         ) : (
-          <TaskSummaryTable
+          <TaskFocusBoard
             items={tasks}
             onOpen={navigate}
             onCreate={() => navigate("/new")}
@@ -144,7 +145,7 @@ export function Dashboard() {
               </Button>
             </div>
           ) : (
-            <DashboardFeed items={insights} onOpen={navigate} kind="insights" />
+            <DashboardInsightCards items={insights} onOpen={navigate} />
           )}
         </DashboardSection>
         <DashboardSection
@@ -158,10 +159,9 @@ export function Dashboard() {
           {loading ? (
             <DashboardListSkeleton rows={10} />
           ) : (
-            <DashboardFeed
+            <DashboardAssetTimeline
               items={assets}
               onOpen={navigate}
-              kind="assets"
               emptyAction={
                 <Button icon="upload" onClick={() => navigate("/data/imports")}>
                   导入数据

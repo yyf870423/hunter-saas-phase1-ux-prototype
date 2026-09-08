@@ -13,7 +13,7 @@ import {
 import { expectNoHorizontalOverflow, trackConsoleErrors } from "./helpers";
 
 test.use({ reducedMotion: "reduce" });
-const taskRows = (page) => page.locator(".s1-task-summary-table tbody tr");
+const taskRows = (page) => page.locator(".s1-dashboard-task-item");
 const insightRows = (page) =>
   page.locator(".s1-dashboard-feed-insights > button");
 const assetRows = (page) => page.locator(".s1-dashboard-feed-assets > button");
@@ -119,7 +119,7 @@ test("工作台进度按当前计划统计完成步数，未知和重复完成 I
   });
 });
 
-test("三个摘要区共享明确标题带，动态双栏有间距和分隔，名称先于元信息", async ({
+test("首页采用任务焦点、洞察卡片和资产时间线，明暗主题结构一致", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -148,18 +148,27 @@ test("三个摘要区共享明确标题带，动态双栏有间距和分隔，�
       "database",
     ]);
     for (const header of headers) {
-      expect(header.height).toBeGreaterThanOrEqual(56);
-      expect(header.border).toBe("1px");
-      expect(header.background).not.toBe("rgba(0, 0, 0, 0)");
+      expect(header.height).toBeGreaterThanOrEqual(48);
+      expect(header.border).toBe("0px");
     }
     const divider = await page
       .locator(".s1-dashboard-updates")
       .evaluate((node) => ({
-        width: getComputedStyle(node, "::before").width,
         gap: getComputedStyle(node).columnGap,
         margin: getComputedStyle(node).marginTop,
       }));
-    expect(divider).toEqual({ width: "1px", gap: "48px", margin: "40px" });
+    expect(divider).toEqual({ gap: "32px", margin: "32px" });
+    await expect(page.getByRole("tabpanel")).toBeVisible();
+    expect(
+      await insightRows(page)
+        .first()
+        .evaluate((node) => getComputedStyle(node).borderRadius),
+    ).toBe("8px");
+    expect(
+      await page
+        .locator(".s1-dashboard-feed-assets")
+        .evaluate((node) => getComputedStyle(node, "::before").width),
+    ).toBe("1px");
   }
   const title = await insightRows(page).first().locator("b").boundingBox();
   const meta = await insightRows(page)
@@ -184,7 +193,7 @@ test("工作台任务按处理优先级展示四个字段，洞察和资产变�
   await expect(taskRows(page)).toHaveCount(5);
   await expect(insightRows(page)).toHaveCount(8);
   await expect(assetRows(page)).toHaveCount(10);
-  await expect(taskRows(page).locator(".s4-data-col-status")).toHaveText([
+  await expect(taskRows(page).locator(".s1-status")).toHaveText([
     "待你处理",
     "待你处理",
     "待你验收",
@@ -197,20 +206,13 @@ test("工作台任务按处理优先级展示四个字段，洞察和资产变�
   await expect(
     page.locator(".s1-mainline-focus, .s1-mainline-primary"),
   ).toHaveCount(0);
-  await expect(page.locator(".s1-task-summary-table th")).toHaveText([
-    "任务类型",
-    "任务名称",
-    "进度",
-    "状态",
-  ]);
-  const heights = await taskRows(page).evaluateAll((rows) =>
-    rows.map((row) => row.getBoundingClientRect().height),
-  );
-  expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(1);
+  await expect(
+    page.getByRole("tablist", { name: "工作台任务预览" }).getByRole("tab"),
+  ).toHaveCount(5);
   for (const task of dashboardTasks) {
     const row = taskRows(page).filter({ hasText: task.title });
-    await expect(row.locator(".s4-data-col-type")).toHaveText(task.type);
-    await expect(row.locator(".s4-data-col-status")).toHaveText(
+    await expect(row.locator(".s1-task-summary-type")).toHaveText(task.type);
+    await expect(row.locator(".s1-status")).toHaveText(
       getDashboardTaskState(task).label,
     );
     await expect(
@@ -229,13 +231,12 @@ test("工作台任务按处理优先级展示四个字段，洞察和资产变�
   await check();
 });
 
-test("五个任务从名称直接进入对应详情，不再先切换焦点", async ({ page }) => {
+test("五个任务都可通过独立箭头直接进入详情", async ({ page }) => {
   const check = trackConsoleErrors(page);
   for (const task of dashboardTasks) {
     await page.goto("#/home");
     await page
-      .locator(".s1-task-summary-table")
-      .getByRole("button", { name: task.title, exact: true })
+      .getByRole("button", { name: "打开任务：" + task.title, exact: true })
       .click();
     await expect.poll(() => new URL(page.url()).hash).toBe(`#${task.route}`);
     await expect(
@@ -243,6 +244,63 @@ test("五个任务从名称直接进入对应详情，不再先切换焦点", as
     ).toBeVisible();
   }
   await check();
+});
+
+test("切换预览同步真实计划步骤，键盘选择和详情入口均可用", async ({ page }) => {
+  await page.goto("#/home");
+  const tabs = page
+    .getByRole("tablist", { name: "工作台任务预览" })
+    .getByRole("tab");
+  const panel = page.getByRole("tabpanel");
+  for (const task of getDashboardData(new URLSearchParams()).tasks) {
+    await tabs.filter({ hasText: task.title }).click();
+    await expect(page).toHaveURL(/#\/home$/);
+    await expect(
+      panel.getByRole("heading", { name: task.title, exact: true }),
+    ).toBeVisible();
+    await expect(panel.locator(".s1-task-plan-milestones li")).toHaveCount(
+      task.progress.total,
+    );
+    await expect(
+      panel.locator(".s1-task-plan-milestones .is-done"),
+    ).toHaveCount(task.progress.completed);
+    await expect(panel.locator("[aria-current=step]")).toHaveCount(1);
+    await expect(panel.locator(".s1-task-plan-milestones b")).toHaveText(
+      task.planSteps.map((step) => step.title),
+    );
+  }
+  await tabs.last().press("Home");
+  await expect(tabs.first()).toBeFocused();
+  await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
+  await tabs.first().press("ArrowDown");
+  await expect(tabs.nth(1)).toBeFocused();
+  await tabs.nth(1).press("End");
+  await expect(tabs.last()).toBeFocused();
+  await panel.getByRole("button", { name: "进入任务", exact: true }).click();
+  await expect(page).toHaveURL(/#\/tasks\/career-linhao$/);
+});
+
+test("手机切换任务后回到可见预览，打开箭头有公共提示", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#/home");
+  await page
+    .getByRole("tablist", { name: "工作台任务预览" })
+    .getByRole("tab")
+    .last()
+    .click();
+  const heading = page
+    .getByRole("tabpanel")
+    .getByRole("heading", { name: "林昊职业机会", exact: true });
+  await expect(heading).toBeInViewport();
+  await expect(page).toHaveURL(/#\/home$/);
+  const open = page.getByRole("button", {
+    name: "打开任务：林昊职业机会",
+    exact: true,
+  });
+  await open.focus();
+  await expect(page.getByRole("tooltip")).toHaveText("打开任务详情");
+  await open.press("Escape");
+  await expect(page.getByRole("tooltip")).toHaveCount(0);
 });
 
 test("八条洞察沿用来源状态和下一步，并进入对应详情", async ({ page }) => {
@@ -310,7 +368,9 @@ test("行动队列默认收起，展开后进入事项来源", async ({ page }) 
   await summary.click();
   await expect(page.locator(".s1-action-list")).toHaveCount(0);
   await summary.click();
-  await page.getByRole("button", { name: /确认是否记录星澜机器人潜在机会/ }).click();
+  await page
+    .getByRole("button", { name: /确认是否记录星澜机器人潜在机会/ })
+    .click();
   await expect(page).toHaveURL(/#\/tasks\/client-xinglan$/);
 });
 
@@ -405,7 +465,7 @@ test("组件库最大容量向每类传入 12 条但只呈现 10 条", async ({ 
         .locator(".s1-dashboard-component-preview .s1-dashboard-feed")
         .getByText(/容量示例 1[12]$/),
     ).toHaveCount(0);
-    await expect(taskRows(page).locator(".s4-data-col-status")).toHaveText([
+    await expect(taskRows(page).locator(".s1-status")).toHaveText([
       ...Array(5).fill("待你处理"),
       ...Array(3).fill("待你验收"),
       ...Array(2).fill("正在推进"),
@@ -416,7 +476,10 @@ test("组件库最大容量向每类传入 12 条但只呈现 10 条", async ({ 
       animations: "disabled",
     });
   }
-  await page.getByRole("tablist", { name: "工作台组件状态" }).getByRole("tab", { name: "空状态", exact: true }).click();
+  await page
+    .getByRole("tablist", { name: "工作台组件状态" })
+    .getByRole("tab", { name: "空状态", exact: true })
+    .click();
   await expect(
     page.locator(".s1-dashboard-component-preview .s1-empty-state"),
   ).toHaveCount(3);
@@ -437,10 +500,17 @@ test("桌面、平板、手机的正常、空态、局部空与深色截图", as
       await expectNoHorizontalOverflow(page);
       if (width === 390 && name === "normal") {
         const row = taskRows(page).first();
-        for (const key of ["type", "title", "progress", "status"])
-          await expect(row.locator(`.s4-data-col-${key}`)).toBeVisible();
+        for (const selector of [
+          ".s1-task-summary-type",
+          ".s1-task-summary-name",
+          ".s1-task-progress-summary",
+          ".s1-status",
+        ])
+          await expect(row.locator(selector)).toBeVisible();
         const type = await row.locator(".s1-task-summary-type").boundingBox();
-        const cell = await row.locator(".s4-data-col-type").boundingBox();
+        const cell = await row
+          .locator(".s1-dashboard-task-heading")
+          .boundingBox();
         expect(cell.width).toBeGreaterThanOrEqual(type.width);
         expect(type.height).toBeLessThan(25);
       }

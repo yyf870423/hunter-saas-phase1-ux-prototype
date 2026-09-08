@@ -34,7 +34,7 @@
 
 2026-09-07 知识图谱二级类型导航、导航密度与设置偏好见 `graph-types-navigation-prototype.md`；全原型筛选样式回归见 `filter-controls-consistency.md`。
 
-工作台任务按待处理、待验收、推进中、等待外部排序，先排序后限量且同组稳定；状态列区分关注状态，不修改原始执行状态。5/8/10 摘要布局、全局与局部空态见 `dashboard-layout-prototype.md`，对应 `tests/stage1/dashboard.spec.js`。
+工作台任务按待处理、待验收、推进中、等待外部排序，先排序后限量且同组稳定；2026-09-08 展示改为任务焦点、可切换预览、洞察卡片与资产时间线。保留全部原字段与 5/8/10，新增方向键、Home/End 选择和独立详情入口，计划节点来自原数据。全局/局部空、异常、容量和响应式见 `dashboard-layout-prototype.md`，对应 `tests/stage1/dashboard.spec.js`。
 
 - Playwright：以仓库最新全量测试结果为准，并单独覆盖平铺资产、“其他”及设置显隐、持久化、移动端。最新范围见 `asset-navigation-preferences.md`。
 - 视口：`1440 × 900`、`820 × 1180`、`390 × 844`。

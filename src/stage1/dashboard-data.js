@@ -103,6 +103,15 @@ export const dashboardTasks = Object.entries(taskPlanSnapshots).map(
       ...summarizeDashboardPlan(snapshot.steps, snapshot.completedStepIds),
       icon: snapshot.icon,
     },
+    planSteps: snapshot.steps.map((step) => ({
+      id: step.id,
+      title: step.title,
+      state: snapshot.completedStepIds.includes(step.id)
+        ? "done"
+        : snapshot.steps.find((item) => !snapshot.completedStepIds.includes(item.id))?.id === step.id
+          ? "current"
+          : "pending",
+    })),
     route: `/tasks/${id}`,
   }),
 );

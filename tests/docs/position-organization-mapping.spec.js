@@ -81,6 +81,9 @@ for (const [device, width, height] of [
     await page.setViewportSize({ width, height });
     await page.goto("#/tasks/mapping-embodied?state=gaps");
     await expect(
+      page.locator(".s2-history-list button.is-active .s2-history-scenes"),
+    ).toHaveText("公司组织梳理人才地图");
+    await expect(
       page.getByRole("heading", {
         name: "具身智能目标公司组织梳理",
         exact: true,
@@ -232,11 +235,9 @@ test("新建公司组织梳理保留单家公司范围，不扩成四家公司",
   await button(page, "完成审核并返回对话").click();
   await page.getByRole("button", { name: /^更新人才地图 / }).click();
   await expect(
-    page
-      .locator(".s2-hunter-reply")
-      .filter({
-        has: page.getByRole("heading", { name: "人才地图已更新", exact: true }),
-      }),
+    page.locator(".s2-hunter-reply").filter({
+      has: page.getByRole("heading", { name: "人才地图已更新", exact: true }),
+    }),
   ).toContainText("1 家公司");
   const graph = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("hunter-topic-graphs-v1")).graphs.find(

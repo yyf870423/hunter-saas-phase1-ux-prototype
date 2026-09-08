@@ -713,7 +713,7 @@ export const workItems = [
         : item.id === "client-xinglan"
           ? ["客户开发", "招聘机会"]
           : item.id === "mapping-embodied"
-            ? ["公司组织梳理", "知识图谱"]
+            ? ["公司组织梳理", "人才地图"]
             : ["候选人求职", "人岗匹配"],
   })),
   {

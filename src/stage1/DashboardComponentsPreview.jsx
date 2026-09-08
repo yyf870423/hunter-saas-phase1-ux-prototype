@@ -1,8 +1,9 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  DashboardFeed,
+  DashboardInsightCards,
+  DashboardAssetTimeline,
   DashboardSection,
-  TaskSummaryTable,
+  TaskFocusBoard,
 } from "./DashboardWidgets";
 import {
   dashboardAssetChanges,
@@ -56,7 +57,7 @@ export function DashboardComponentsPreview() {
         icon="task"
         count={limitDashboardItems(tasks).length}
       >
-        <TaskSummaryTable
+        <TaskFocusBoard
           items={tasks}
           onOpen={navigate}
           onCreate={() => navigate("/new")}
@@ -69,7 +70,7 @@ export function DashboardComponentsPreview() {
           icon="signal"
           count={limitDashboardItems(insights).length}
         >
-          <DashboardFeed kind="insights" items={insights} onOpen={navigate} />
+          <DashboardInsightCards items={insights} onOpen={navigate} />
         </DashboardSection>
         <DashboardSection
           id="sample-assets-title"
@@ -77,7 +78,7 @@ export function DashboardComponentsPreview() {
           icon="database"
           count={limitDashboardItems(assets).length}
         >
-          <DashboardFeed kind="assets" items={assets} onOpen={navigate} />
+          <DashboardAssetTimeline items={assets} onOpen={navigate} />
         </DashboardSection>
       </div>
     </section>

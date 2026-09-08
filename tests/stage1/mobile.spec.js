@@ -29,8 +29,10 @@ test("iPhone 搜索、通知和任务直达可用", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
   await page.keyboard.press("Escape");
   await page
-    .locator(".s1-task-summary-table")
-    .getByRole("button", { name: "具身智能 VLA 算法负责人", exact: true })
+    .getByRole("button", {
+      name: "打开任务：具身智能 VLA 算法负责人",
+      exact: true,
+    })
     .click();
   await expect(page).toHaveURL(/#\/tasks\/position-vla$/);
   await expect(
