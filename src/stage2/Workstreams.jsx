@@ -22,6 +22,7 @@ import {
 } from "./data";
 import { CandidateReviewWorkspace, InspectionPanel } from "./ReviewWorkspace";
 import { TaskAreaNav } from "./TaskAreaNav";
+import { runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
 
 const defaultPrompt =
   "为星澜机器人“具身智能 VLA 算法负责人”岗位做多渠道找人。优先北京，候选人要有机器人学习或多模态策略经验，也要真正做过产品落地和团队管理。本轮先给我 20 位以内值得判断的人选，不要直接联系。";
@@ -124,6 +125,9 @@ export function WorkstreamHeader({
 }
 
 export function AutomationWorkspace() {
+  const opportunityState = useOpportunityState();
+  const talentResult = opportunityState.positions.find((item) => item.id === "position-vla")?.talentMap;
+  const reviewPositionVersion = useRef(opportunityState.positions.find((item) => item.id === "position-vla")?.version).current;
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const notify = useToast();
@@ -331,6 +335,13 @@ export function AutomationWorkspace() {
     setContactStage("scope");
   };
 
+  const applyCandidateReview = (selected, text) => {
+    try {
+      const result = runOpportunityCommand("recruiting.legacy-review", { positionId: "position-vla", taskId: "position-vla", reviewIds: selected, authMode, expectedVersion: reviewPositionVersion });
+      completeDecision(text, `已应用审核决定：${result.candidateIds.length} 位候选人已加入或保留在岗位流程，岗位人才梳理同步更新为 v${result.talentMapVersion}。已有推进阶段不会回退；未选择的人选继续保留在本轮审核结果中，尚未对外联系。\n\n[查看岗位储备](#/positions/position-vla?tab=pipeline) · [查看人才梳理](#/positions/position-vla?tab=talent-map)`);
+    } catch (error) { notify(error.message, "danger"); }
+  };
+
   const send = (text, files) => {
     const attachmentText = files.length
       ? `；附带 ${files.map((file) => file.name).join("、")}`
@@ -349,10 +360,7 @@ export function AutomationWorkspace() {
       setLatestPlanRequirement(`${text}${attachmentText}`);
     } else if (/85|八十五/.test(text)) {
       const omitted = /赵星羽/.test(text);
-      completeDecision(
-        `${text}${attachmentText}`,
-        `已按同一审核规则处理：${omitted ? "未选择赵星羽，" : ""}4 位候选人已加入岗位储备；其余候选人继续保留在本轮审核结果中。下一步可以继续指定需要联系的人选。`,
-      );
+      applyCandidateReview(candidates.filter((person) => person.score >= 85 && (!omitted || person.name !== "赵星羽")).map((person) => person.id), `${text}${attachmentText}`);
     } else if (contactStage === "waiting") {
       setUserDecisions((items) => [
         ...items,
@@ -481,10 +489,7 @@ export function AutomationWorkspace() {
           candidates={candidates}
           onClose={() => setReviewOpen(false)}
           onApply={({ selected }) => {
-            completeDecision(
-              `将已选择的 ${selected.length} 位候选人加入岗位储备。`,
-              `已应用审核决定：${selected.length} 位候选人已加入岗位储备。未选择的人选继续保留在本轮审核结果中；下一步可以继续指定需要联系的人选。`,
-            );
+            applyCandidateReview(selected, `将已选择的 ${selected.length} 位候选人加入岗位储备，并同步更新人才梳理。`);
           }}
         />
       </div>
@@ -843,6 +848,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
 > 可以补充新的渠道或调整岗位边界后重做受影响步骤；Hunter 不会为了凑数量放宽已经确认的硬门槛。`}
               />
             ) : null}
+            {talentResult && !userDecisions.length ? <HunterReply markdown={`## 岗位找人结果已保存\n\n岗位人才梳理 v${talentResult.version} 已保留 ${talentResult.rows.length} 位已审核人选的匹配依据、风险和来源；岗位流程状态同步显示。\n\n[查看岗位储备](#/positions/position-vla?tab=pipeline) · [查看人才梳理](#/positions/position-vla?tab=talent-map)`} /> : null}
             {userDecisions.map((decision, index) => (
               <div
                 className="s2-decision-thread"

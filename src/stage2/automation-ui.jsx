@@ -678,7 +678,7 @@ export function WorkHistory({
                 name={
                   item.type === "岗位招聘"
                     ? "briefcase"
-                    : item.type === "人才摸排"
+                    : item.type === "公司组织梳理"
                       ? "database"
                       : item.type === "候选人求职"
                         ? "user"

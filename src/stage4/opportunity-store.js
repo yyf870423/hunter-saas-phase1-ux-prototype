@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { candidates } from "./data.js";
+import { sourcingCandidates } from "../stage2/recruiting-review-data.js";
 import { getCompanyContactSnapshot } from "./company-contact-store.js";
 import { applyOpportunityCommand, OpportunityError, opportunityNow } from "./opportunity-domain.js";
 import { createOpportunitySeed } from "./opportunity-seed.js";
@@ -39,7 +40,7 @@ export const getOpportunitySnapshot = () => state;
 export const getOpportunityStoreError = () => loadError;
 export const getOpportunityNotificationError = () => notificationError;
 export const getOpportunityPermission = () => permissionLimited || Boolean(loadError);
-export const getOpportunityContext = () => ({ ...getCompanyContactSnapshot(), candidates, limited: permissionLimited });
+export const getOpportunityContext = () => ({ ...getCompanyContactSnapshot(), candidates, sourcingCandidates, limited: permissionLimited });
 export function useOpportunityState() {
   return useSyncExternalStore((listener) => { listeners.add(listener); return () => listeners.delete(listener); }, () => state);
 }

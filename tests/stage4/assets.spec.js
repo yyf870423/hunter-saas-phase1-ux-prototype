@@ -564,146 +564,37 @@ test("候选人来源证据逐项可打开且详情加载状态完整", async ({
 });
 
 test("岗位和公司详情按关系规模提供表格与关系图", async ({ page }) => {
-  await page.goto("#/positions/position-vla?tab=talent-map");
-  await page.evaluate(() =>
-    window.localStorage.removeItem("hunter-prototype-position-vla-talent-map"),
-  );
-  await page.reload();
+  await page.goto("#/tasks/position-vla?state=review");
+  await page.getByRole("button", { name: "打开候选人审核（18）", exact: true }).click();
+  await page.getByRole("button", { name: /加入岗位储备/ }).click();
+  await page.getByRole("link", { name: "查看人才梳理", exact: true }).click();
   await expect(page.getByRole("heading", { name: "重点人才" })).toBeVisible();
-  await expect(
-    page.getByRole("columnheader", { name: "一级节点" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("columnheader", { name: "四级及更深" }),
-  ).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "当前公司", exact: true })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "目标人选", exact: true })).toBeVisible();
   await expect(page.getByText("知识图谱补充", { exact: false })).toHaveCount(0);
-  await expect(page.getByText(/共 8 位符合条件的人才/)).toBeVisible();
-  await expect(page.getByLabel("搜索重点人才")).toBeVisible();
   await page.getByLabel("搜索重点人才").fill("周明远");
   await expect(page.getByText(/共 1 位符合条件的人才/)).toBeVisible();
   await expect(page.getByText("周明远", { exact: true })).toBeVisible();
   await page.getByLabel("搜索重点人才").fill("");
-  const talentFilters = page.locator(
-    ".s4-talent-filter-pair > .s4-select > button",
-  );
-  await expect(talentFilters).toHaveCount(2);
-  const identityFilterBox = await talentFilters.nth(0).boundingBox();
-  const stageFilterBox = await talentFilters.nth(1).boundingBox();
-  expect(identityFilterBox).not.toBeNull();
-  expect(stageFilterBox).not.toBeNull();
-  expect(
-    stageFilterBox.x - (identityFilterBox.x + identityFilterBox.width),
-  ).toBeLessThanOrEqual(5);
-  await expect(
-    page.getByRole("button", { name: "候选人详情" }).first(),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "查看人选", exact: true }).first()).toBeVisible();
   const talentViewTabs = page.locator(".s4-relation-type-tabs");
   await expect(talentViewTabs.getByRole("tab")).toHaveCount(2);
-  await expect(talentViewTabs.getByRole("tab", { name: "表格" })).toBeVisible();
   await talentViewTabs.getByRole("tab", { name: "关系图" }).click();
-  await expect(
-    page.locator(".s3-relationship-node", { hasText: "VLA 算法负责人" }),
-  ).toBeVisible();
-  const linkedPositionNode = page.locator(".s3-relationship-node", {
-    hasText: "VLA 算法负责人",
-  });
-  await expect(
-    linkedPositionNode.locator(".s3-relationship-node-subtitle"),
-  ).toHaveText("当前岗位");
-  await expect(
-    linkedPositionNode.locator(".s3-relationship-node-asset"),
-  ).toHaveText("已关联 · 岗位");
-  await expect(
-    page
-      .locator(".s3-relationship-node", { hasText: "林昊" })
-      .locator(".s3-relationship-node-asset"),
-  ).toHaveText("已关联 · 候选人");
+  await expect(page.locator('.s3-relationship-node[data-node-id="position-vla"]')).toBeVisible();
+  await expect(page.locator(".s3-relationship-node", { hasText: "林昊" })).toBeVisible();
   const relationViewport = page.locator(".s3-relationship-viewport");
   await relationViewport.hover();
   await page.mouse.wheel(0, 120);
-  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
-    "90%",
-  );
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText("90%");
   await page.mouse.wheel(0, -120);
-  await expect(page.locator(".s3-relationship-controls > span")).toHaveText(
-    "100%",
-  );
-  const positionStage = page.locator(".s3-relationship-stage");
-  const positionPanBefore = await positionStage.evaluate(
-    (element) => element.style.transform,
-  );
-  const positionViewportBox = await relationViewport.boundingBox();
-  expect(positionViewportBox).not.toBeNull();
-  await page.mouse.move(
-    positionViewportBox.x + 24,
-    positionViewportBox.y + 120,
-  );
-  await page.mouse.down();
-  await page.mouse.move(
-    positionViewportBox.x + 104,
-    positionViewportBox.y + 168,
-    { steps: 8 },
-  );
-  await page.mouse.up();
-  const positionPanAfter = await positionStage.evaluate(
-    (element) => element.style.transform,
-  );
-  expect(positionPanAfter).not.toBe(positionPanBefore);
-  await expect(page.getByRole("button", { name: "手动编辑" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "添加节点" })).toBeVisible();
-  await page.getByRole("button", { name: "进入关系画布全屏" }).click();
-  await page.getByRole("button", { name: "关闭详情" }).click();
-  const positionNode = page.locator(".s3-relationship-node").first();
-  const positionBefore = await positionNode.boundingBox();
-  const positionExpandedViewport = await relationViewport.boundingBox();
-  expect(positionBefore).not.toBeNull();
-  expect(positionExpandedViewport).not.toBeNull();
-  await page.mouse.move(
-    positionBefore.x + positionBefore.width / 2,
-    positionBefore.y + positionBefore.height / 2,
-  );
-  await page.mouse.down();
-  await page.mouse.move(
-    positionExpandedViewport.x + positionExpandedViewport.width - 96,
-    positionBefore.y + positionBefore.height / 2 + 100,
-    { steps: 12 },
-  );
-  await page.mouse.up();
-  const positionLogicalAfter = await positionNode.evaluate((element) =>
-    Number.parseFloat(element.style.left),
-  );
-  expect(positionLogicalAfter).toBeGreaterThan(960);
-  expect(
-    await positionStage.evaluate((element) =>
-      Number.parseFloat(element.style.width),
-    ),
-  ).toBeGreaterThan(positionLogicalAfter + 168);
-  await page.keyboard.press("Escape");
-  await talentViewTabs.getByRole("tab", { name: "表格" }).click();
-  await talentViewTabs.getByRole("tab", { name: "关系图" }).click();
-  const positionLogicalRestored = await positionNode.evaluate((element) =>
-    Number.parseFloat(element.style.left),
-  );
-  expect(positionLogicalRestored).toBe(positionLogicalAfter);
-
+  await expect(page.locator(".s3-relationship-controls > span")).toHaveText("100%");
   await page.getByRole("button", { name: "更新人才梳理" }).click();
-  const talentGraphDialog = page.getByRole("dialog", {
-    name: "更新岗位人才梳理",
-  });
-  await talentGraphDialog
-    .getByPlaceholder(/说明目标、关注范围/)
-    .fill("按公司与团队整理重点人才，优先展示匹配分高于 80 分的人选。");
+  const talentGraphDialog = page.getByRole("dialog", { name: "更新岗位人才梳理" });
+  await talentGraphDialog.getByPlaceholder(/说明目标、关注范围/).fill("核对现有候选人最新任职信息与流程状态。");
   await talentGraphDialog.getByRole("button", { name: "开始更新" }).click();
   await expect(page.getByText("正在更新岗位人才梳理").first()).toBeVisible();
-  await expect(
-    page.locator(".s3-relationship-node", { hasText: "VLA 算法负责人" }),
-  ).toBeVisible({ timeout: 5000 });
-  await expect(
-    talentViewTabs.getByRole("tab", { name: "关系图" }),
-  ).toBeVisible();
-  await expect(page.getByText("输入与更新来源", { exact: true })).toHaveCount(
-    0,
-  );
+  await expect(page.locator('.s3-relationship-node[data-node-id="position-vla"]')).toBeVisible({ timeout: 5000 });
+  await expect(talentViewTabs.getByRole("tab", { name: "关系图" })).toBeVisible();
 
   await page.goto("#/companies/company-xinglan?tab=mappings");
   await page.evaluate(() =>

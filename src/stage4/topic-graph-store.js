@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { isGraphType } from "./graph-types";
 import { topicGraphs } from "./topic-graph-data";
+import { organizationBatchId, organizationGraphPages, organizationScope } from "../stage3/organization-mapping-data";
 
 export const graphStorageKey = "hunter-topic-graphs-v1";
 export const graphOrderStorageKey = "hunter-topic-graph-order";
@@ -45,6 +46,10 @@ export function normalizeTopicGraphs(value) {
     description: graph.description,
     typeId: graph.typeId,
     pageIds: [...new Set(graph.pageIds)],
+    ...(Array.isArray(graph.pages) && graph.pages.every((page) => page && typeof page.id === "string" && Array.isArray(page.nodes) && Array.isArray(page.edges)) ? { pages: graph.pages } : {}),
+    batchIds: Array.isArray(graph.batchIds) ? graph.batchIds : [],
+    versions: Array.isArray(graph.versions) ? graph.versions : [],
+    sourceTaskId: typeof graph.sourceTaskId === "string" ? graph.sourceTaskId : "",
     ...Object.fromEntries(
       ["pageCount", "nodeCount", "linkedAssets", "pending"].map((key) => [
         key,
@@ -75,6 +80,7 @@ const subscribe = (listener) => {
   return () => listeners.delete(listener);
 };
 const getSnapshot = () => graphs;
+export const getTopicGraphSnapshot = getSnapshot;
 const emit = () => listeners.forEach((listener) => listener());
 if (typeof window !== "undefined") {
   window.addEventListener("storage", (event) => {
@@ -101,6 +107,41 @@ function commit(next) {
   }
   graphs = next;
   emit();
+}
+
+export function saveGraphPages(id, pages) {
+  const graph = graphs.find((item) => item.id === id && !item.deletedAt);
+  if (!graph || !graph.pages || JSON.stringify(graph.pages) === JSON.stringify(pages)) return;
+  const editedPages = pages.map((page) => {
+    const previous = graph.pages.find((item) => item.id === page.id);
+    return JSON.stringify(previous) === JSON.stringify(page) ? page : { ...page, userEdited: true };
+  });
+  commit(graphs.map((item) => item.id === id ? { ...item, pages: editedPages, pageIds: pages.map((page) => page.id), pageCount: pages.length,
+    nodeCount: pages.reduce((count, page) => count + page.nodes.length, 0), updatedAt: "刚刚" } : item));
+}
+
+export function publishOrganizationMap(decisions = {}, scope = organizationScope) {
+  const id = "mapping-embodied";
+  const graph = graphs.find((item) => item.id === id);
+  if (!graph || graph.deletedAt) throw new Error("目标人才地图不存在或已删除，请先恢复资产，再保存本批次。");
+  if (Object.entries(decisions).some(([key, value]) => !["wangyi", "qiongding"].includes(key) || !["pending", "write", "skip"].includes(value))) throw new Error("审核决定不合法，人才地图未改变。");
+  if (!scope.length || scope.some((company) => !organizationScope.some((item) => item.id === company.id))) throw new Error("请明确本轮目标公司，人才地图未改变。");
+  const batchId = organizationBatchId(scope);
+  if (graph.batchIds?.includes(batchId)) return graph;
+  const incoming = organizationGraphPages(decisions, scope).map((page) => {
+    const previous = graph.pages?.find((item) => item.id === page.id);
+    return previous?.userEdited ? previous : page;
+  });
+  const pages = [...(graph.pages || []).filter((page) => !incoming.some((item) => item.id === page.id)), ...incoming];
+  const result = { ...graph, name: "具身智能目标公司人才地图", description: "星澜、拓界、穹顶和灵跃的组织、关键岗位、任职人与待核实信息。",
+    pages, pageIds: pages.map((page) => page.id), pageCount: pages.length, nodeCount: pages.reduce((count, page) => count + page.nodes.length, 0),
+    pending: pages.reduce((count, page) => count + page.nodes.filter((node) => node.status === "review").length, 0),
+    linkedAssets: pages.reduce((count, page) => count + page.nodes.filter((node) => node.assetPath).length, 0),
+    sourceTaskId: "mapping-embodied", batchIds: [...(graph.batchIds || []), batchId], updatedAt: "刚刚",
+    versions: [...(graph.versions || []), { at: new Date().toISOString(), name: graph.name, pages: graph.pages || null, pageIds: graph.pageIds, decisions }],
+  };
+  commit(graphs.map((item) => item.id === id ? result : item));
+  return result;
 }
 
 export function validateGraphMetadata(draft, records = graphs, id) {

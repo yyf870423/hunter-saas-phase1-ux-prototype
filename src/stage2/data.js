@@ -36,13 +36,13 @@ export const workstreamHistory = [
   {
     id: "mapping-embodied",
     assetRefs: [{ type: "graph", id: "mapping-embodied" }],
-    type: "人才摸排",
-    title: "具身智能 VLA 人才摸排",
-    object: "VLA、机器人学习与灵巧操作",
+    type: "公司组织梳理",
+    title: "具身智能目标公司组织梳理",
+    object: "星澜、拓界、穹顶、灵跃",
     status: "进行中",
     tone: "success",
     time: "今天 08:40",
-    summary: "已覆盖八家公司和三十七位确认人物，正在补充五个关键角色。",
+    summary: "已定位四家公司、七个关键岗位及五位任职人或线索；未知任职人和汇报关系继续核实。",
   },
   {
     id: "career-linhao",
@@ -693,11 +693,11 @@ export const sideTasks = sideTaskRows.map(
 
 const sideTaskBusinessScenarios = {
   "task-recommend-linhao": "岗位招聘",
-  "task-hand-team": "人才摸排",
-  "task-shlab": "人才摸排",
+  "task-hand-team": "公司组织梳理",
+  "task-shlab": "公司组织梳理",
   "task-zhaoxingyu": "岗位招聘",
   "task-li-auto": "客户开发",
-  "task-patent": "人才摸排",
+  "task-patent": "其他任务",
   "task-cloudchip": "客户开发",
   "task-role": "候选人求职",
 };
@@ -713,7 +713,7 @@ export const workItems = [
         : item.id === "client-xinglan"
           ? ["客户开发", "招聘机会"]
           : item.id === "mapping-embodied"
-            ? ["人才摸排", "知识图谱"]
+            ? ["公司组织梳理", "知识图谱"]
             : ["候选人求职", "人岗匹配"],
   })),
   {

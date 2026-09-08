@@ -37,7 +37,7 @@ const tabs = [
   ["all", "全部"],
   ["client", "客户开发"],
   ["position", "岗位招聘"],
-  ["mapping", "人才摸排"],
+  ["mapping", "公司组织梳理"],
   ["career", "候选人求职"],
   ["other", "其他任务"],
 ];
@@ -45,7 +45,7 @@ const tabs = [
 const scenarioByTab = {
   client: "客户开发",
   position: "岗位招聘",
-  mapping: "人才摸排",
+  mapping: "公司组织梳理",
   career: "候选人求职",
 };
 

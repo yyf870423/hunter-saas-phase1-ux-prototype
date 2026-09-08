@@ -6,6 +6,7 @@ import { AssetRelatedTasks } from "./AssetRelatedTasks";
 import { displayDateTime, PositionFields, useOpportunityAction } from "./OpportunityComponents";
 import { getOpportunityPermission, runOpportunityCommand, useOpportunityState } from "./opportunity-store";
 import { candidates } from "./data";
+import { PositionTalentMap } from "./PositionTalentMap";
 
 export function RecruitingTaskStart({ position, close }) {
   const [prompt, setPrompt] = useState("为“" + position.name + "”寻找合适候选人，先提交候选人审核，不自动联系。\n\n当前 JD：\n" + position.jd);
@@ -105,7 +106,7 @@ export function CreatedPositionWorkspace({ position }) {
     <Button icon="users" onClick={() => changeTab("matching")}>人岗匹配</Button><Button icon="sparkles" disabled={position.status !== "招聘中" || getOpportunityPermission()} onClick={() => setStart(true)}>开始找人</Button>
   </DetailHeader>
     <DetailTabs value={tab} onChange={changeTab} tabs={[{ value: "profile", label: "岗位资料" }, { value: "pipeline", label: "候选人流程", count: position.pipeline.length },
-      { value: "matching", label: "匹配结果", count: position.matches.length }, { value: "talent-map", label: "人才梳理", count: 0 }, { value: "interview", label: "面试资料" }, { value: "work", label: "关联任务" }, { value: "history", label: "处理与记录" }]} />
+      { value: "matching", label: "匹配结果", count: position.matches.length }, { value: "talent-map", label: "人才梳理", count: position.talentMap?.rows.length || 0 }, { value: "interview", label: "面试资料" }, { value: "work", label: "关联任务" }, { value: "history", label: "处理与记录" }]} />
     {tab === "profile" ? <div className="s4-detail-stack"><DetailTabs value={profile} onChange={(value) => setParams({ tab, profile: value })} tabs={[{ value: "information", label: "岗位信息" }, { value: "analysis", label: "招聘分析" }]} />
       {profile === "analysis" ? <FieldGroup title="岗位解析"><StateBanner title="尚无已确认招聘分析" /></FieldGroup> : <>
         <FieldGroup title="岗位基本资料" action={<div className="s4-command-actions"><Button size="sm" icon="edit" disabled={getOpportunityPermission()} onClick={() => setEdit("base")}>编辑资料</Button>
@@ -121,7 +122,7 @@ export function CreatedPositionWorkspace({ position }) {
         <FieldGroup title="已确认招聘要求" action={<Button size="sm" icon="edit" disabled={getOpportunityPermission()} onClick={() => setEdit("requirements")}>编辑要求</Button>}><p className="s4-long-copy">{position.requirements || "暂无单独确认的招聘要求"}</p></FieldGroup>
         <FieldGroup title="用户备注"><p className="s4-long-copy">{position.note || "暂无备注"}</p></FieldGroup>
       </>}
-    </div> : tab === "pipeline" ? <PositionPipeline position={position} /> : tab === "matching" ? <PositionMatching position={position} /> : tab === "work" ? <AssetRelatedTasks assetType="position" assetId={position.id} /> : tab === "history" ? <div className="s4-detail-stack">
+    </div> : tab === "talent-map" ? <PositionTalentMap position={position} /> : tab === "pipeline" ? <PositionPipeline position={position} /> : tab === "matching" ? <PositionMatching position={position} /> : tab === "work" ? <AssetRelatedTasks assetType="position" assetId={position.id} /> : tab === "history" ? <div className="s4-detail-stack">
       <FieldGroup title="AI 处理记录">{!position.processing.length ? <StateBanner title="暂无 AI 处理记录" /> : <SourceList items={position.processing.map((item) => ({ id: item.id,
         title: "人岗匹配 · v" + item.version, meta: displayDateTime(item.at), description: "处理对象：" + position.name, status: { running: "运行中", complete: "已完成", failed: "失败" }[item.status], tone: item.status === "failed" ? "danger" : "info", onClick: () => changeTab("matching") }))} />}</FieldGroup>
       <FieldGroup title="创建来源"><SourceList items={position.sources.map((source) => ({ id: source.id, title: source.label, description: source.content, status: "已保存",

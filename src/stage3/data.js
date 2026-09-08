@@ -79,17 +79,9 @@ export const contactReviewRows = [
 ];
 
 export const mappingSaveOutcomes = {
-  new: {
-    text: "将本批次结果按主题保存为 3 个新图谱。",
-    result: "## 3 个新图谱已经创建\n\n组织、公司关系和候选人关系已分别写入独立图谱，待确认项、原始证据和用户决定均已保留。",
-  },
   update: {
-    text: "更新已有的 3 个独立知识图谱。",
-    result: "## 3 个已有图谱已经更新\n\n本批次审核结果已按主题写入，三个图谱各自的更新前版本均已保留；后续资产关系变化会继续自动刷新可信内容。",
-  },
-  report: {
-    text: "本次只保留摸排报告。",
-    result: "## 摸排报告已经保存\n\n本次没有创建或更新图谱资产；审核决定、冲突说明和原始证据仍可从当前任务查看。",
+    text: "将已审核组织与任职人更新到目标公司人才地图，保留待核实项。",
+    result: "## 人才地图已更新\n\n已按四家公司保存组织与关键岗位图页：7 个关键岗位、5 位任职人或人物线索。任职人未知、身份冲突和汇报关系缺口均明确保留，没有加入任何岗位储备。\n\n[查看人才地图](#/mappings/mapping-embodied) · [查看来源任务](#/tasks/mapping-embodied)",
   },
 };
 
@@ -1672,18 +1664,18 @@ export const businessScenarios = {
   },
   "mapping-embodied": {
     id: "mapping-embodied",
-    type: "人才摸排",
-    title: "具身智能 VLA 人才摸排",
-    object: "VLA、机器人学习与灵巧操作",
+    type: "公司组织梳理",
+    title: "具身智能目标公司组织梳理",
+    object: "星澜、拓界、穹顶、灵跃 · 组织与关键岗位",
     prompt:
-      "把国内具身智能方向做一次人才摸排，先覆盖 VLA、机器人学习和灵巧操作。重点看星澜、拓界、穹顶和灵跃四家公司，整理组织方向、关键角色、人物关系和能够联系到人的路径。",
+      "整理星澜、拓界、穹顶和灵跃四家公司的具身智能相关组织架构，明确部门、团队和关键岗位，核实对应任职人的身份、职责和任职时间。未知位置保留待核实，不把合作关系当成汇报关系；本轮交付人才地图，不针对招聘岗位找人。",
     autoStopPhase: 4,
     maxPhase: 5,
     defaultAuth: "confirm",
     plan: [
       {
         id: "scope",
-        title: "确认摸排目标与范围清单",
+        title: "确认目标公司与组织范围",
         detail: "拆分公司、方向、角色和关系目标，保留未知项。",
         requirement: "围绕四家公司和三个方向，不计算未知市场覆盖率。",
         doneAt: 2,
@@ -1697,14 +1689,14 @@ export const businessScenarios = {
       },
       {
         id: "people",
-        title: "定位人物、角色与联系路径",
-        detail: "结合候选人、论文、专利和公开资料识别人和关系。",
+        title: "定位关键岗位与任职人",
+        detail: "结合已有档案和公开资料核对身份、任职时间与汇报关系。",
         requirement: "身份与关系不确定时进入待确认，不允许猜测。",
         doneAt: 4,
       },
       {
         id: "update",
-        title: "审核并增量更新知识图谱",
+        title: "审核并更新人才地图",
         detail: "按批次写入通过门禁的结果，冲突内容等待用户判断。",
         requirement: "每批更新说明新增、冲突、缺口和下一步动作。",
         doneAt: 5,
@@ -1724,7 +1716,7 @@ export const businessScenarios = {
         title: "公司与组织方向研究",
         status: "完成",
         tone: "success",
-        action: "4 家公司、7 个团队方向已形成可核验结构",
+        action: "4 家公司、7 个关键岗位已定位",
         duration: "4 分 26 秒",
       },
       {
@@ -1732,15 +1724,15 @@ export const businessScenarios = {
         title: "关键人物与身份检查",
         status: "完成",
         tone: "success",
-        action: "30 位人物中 18 位已确认，11 位为线索，1 位身份冲突",
+        action: "5 位任职人或线索已定位，2 个关键岗位任职人未知",
         duration: "6 分 11 秒",
       },
       {
         id: "mapping-relations",
-        title: "人物关系与联系路径",
+        title: "组织隶属与任职关系",
         status: "等待用户",
         tone: "warning",
-        action: "9 条关系可写入，1 条冲突需要审核",
+        action: "任职与汇报关系分开核验，待核实项保持标注",
         duration: "2 分 48 秒",
       },
     ],

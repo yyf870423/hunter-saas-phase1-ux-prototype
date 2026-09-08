@@ -56,6 +56,8 @@ import {
   orderTopicGraphs,
   recycleGraph,
   saveGraphMetadata,
+  saveGraphPages,
+  getTopicGraphSnapshot,
   saveGraphOrder,
   useTopicGraphs,
   validateGraphMetadata,
@@ -266,7 +268,8 @@ const relationKindLabel = {
 };
 
 const deepClonePages = (mappingId) => {
-  const graph = topicGraphs.find((item) => item.id === mappingId);
+  const graph = getTopicGraphSnapshot().find((item) => item.id === mappingId);
+  if (graph?.pages) return structuredClone(graph.pages);
   const pageIds = graph?.pageIds || [];
   return initialGraphPages
     .filter((page) => pageIds.includes(page.id))
@@ -4028,6 +4031,7 @@ export function MappingDetailPage() {
   const [pages, setPages] = useState(() =>
     mappingId === "graph-empty" ? [] : deepClonePages(mappingId),
   );
+  const [pagesOwner, setPagesOwner] = useState(mappingId);
   const availableTabs = detailTabs.filter(
     (item) => pages.length || ["content", "work"].includes(item.value),
   );
@@ -4052,6 +4056,7 @@ export function MappingDetailPage() {
     const nextPages =
       mappingId === "graph-empty" ? [] : deepClonePages(mappingId);
     setPages(nextPages);
+    setPagesOwner(mappingId);
     setActivePageId(params.get("page") || nextPages[0]?.id);
     setNewPageOpen(false);
     setImportOpen(panel === "import");
@@ -4060,6 +4065,11 @@ export function MappingDetailPage() {
     if (requestedPageId) setActivePageId(requestedPageId);
   }, [requestedPageId]);
   useEffect(() => setImportOpen(panel === "import"), [panel]);
+  useEffect(() => {
+    if (limited || !graph?.pages || pagesOwner !== mappingId) return;
+    try { saveGraphPages(mappingId, pages); }
+    catch (error) { notify(error.message, "danger"); }
+  }, [mappingId, pages, pagesOwner, limited]);
   const analysisActive = ["running", "paused"].includes(analysisState);
   const activeReviewItems = useMemo(
     () =>

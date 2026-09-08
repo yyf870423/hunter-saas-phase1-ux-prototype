@@ -1,3 +1,5 @@
+import { updatePositionTalentMap } from "./position-talent-results.js";
+
 export const OPPORTUNITY_STATUSES = ["跟进中", "已完成", "已关闭"];
 export const DIRECTION_STATUSES = ["待处理", "已形成或关联岗位", "不再推进"];
 export const OPPORTUNITY_FIELDS = [
@@ -652,6 +654,34 @@ export function applyOpportunityCommand(current, command, context = {}) {
       }
     }
     result.positionId = position.id;
+  } else if (command.type === "position.talent-map.refresh") {
+    const position = getPosition(state, data.id);
+    if (!position.talentMap?.rows.length) fail("暂无已审核人选，请先完成岗位找人审核。", "STATE");
+    const people = position.talentMap.rows.map((row) => {
+      const person = [...(context.candidates || []), ...(context.sourcingCandidates || [])].find((item) => item.id === row.id);
+      return person ? { ...row, company: person.company, title: person.title || person.role, location: person.location || person.city } : row;
+    });
+    const previousVersion = position.talentMap.version;
+    const talentMap = updatePositionTalentMap(position, people, "", now);
+    result = { positionId: position.id, talentMapVersion: talentMap.version, changed: previousVersion !== talentMap.version };
+  } else if (command.type === "recruiting.legacy-review") {
+    if (data.positionId !== "position-vla" || data.taskId !== "position-vla") fail("任务与目标岗位不一致。", "REFERENCE");
+    if (data.authMode === "analysis" || data.authMode === "analyze") fail("当前仅分析，不能写入岗位储备。", "AUTHORIZATION");
+    if (!["confirm", "auto"].includes(data.authMode)) fail("授权方式不合法。", "AUTHORIZATION");
+    if (!Array.isArray(data.reviewIds) || !data.reviewIds.length) fail("请至少选择一位候选人。");
+    const position = getPosition(state, data.positionId);
+    if (position.status !== "招聘中") fail("岗位当前不在招聘中，不能加入新的岗位储备。", "STATE");
+    assertVersion(position, data.expectedVersion);
+    const people = [...new Set(data.reviewIds)].map((id) => context.sourcingCandidates?.find((item) => item.reviewId === id));
+    if (people.some((person) => !person)) fail("审核结果引用了不存在的候选人。", "REFERENCE");
+    for (const person of people) {
+      if (!position.pipeline.some((entry) => entry.candidateId === person.id))
+        position.pipeline.push({ candidateId: person.id, candidate: person, stage: "reserve", at: now,
+          history: [{ stage: "reserve", at: now }], taskId: data.taskId });
+    }
+    const talentMap = updatePositionTalentMap(position, people, data.taskId, now);
+    position.updatedAt = now;
+    result = { positionId: position.id, candidateIds: people.map((person) => person.id), talentMapVersion: talentMap.version };
   } else if (command.type === "pipeline.add" || command.type === "pipeline.move") {
     const position = getPosition(state, data.positionId);
     position.pipeline ||= [];
@@ -663,6 +693,7 @@ export function applyOpportunityCommand(current, command, context = {}) {
         if (!position.pipeline.some((item) => item.candidateId === id))
           position.pipeline.push({ candidateId: id, stage: "reserve", at: now, history: [{ stage: "reserve", at: now }] });
       }
+      updatePositionTalentMap(position, context.candidates.filter((person) => (data.candidateIds || []).includes(person.id)).map((person) => ({ ...person, assetPath: "/candidates/" + person.id })), "", now);
     } else {
       const item = position.pipeline.find((entry) => entry.candidateId === data.candidateId);
       if (!item || !position.stages.some((stage) => stage.id === data.stage))
@@ -687,6 +718,7 @@ export function applyOpportunityCommand(current, command, context = {}) {
       if (!position.pipeline.some((entry) => entry.candidateId === id))
         position.pipeline.push({ candidateId: id, stage: "reserve", at: now, history: [{ stage: "reserve", at: now }], taskId: task.id });
     }
+    const talentMap = updatePositionTalentMap(position, ids.map((id) => ({ ...context.candidates.find((person) => person.id === id), assetPath: "/candidates/" + id })), task.id, now);
     task.results.push({ type: "pipeline", id: position.id, candidateIds: ids, at: now });
     task.status = "可继续";
     task.phase = "result";
@@ -694,7 +726,7 @@ export function applyOpportunityCommand(current, command, context = {}) {
     task.updatedAt = now;
     task.version += 1;
     position.updatedAt = now;
-    result = { positionId: position.id, candidateIds: ids };
+    result = { positionId: position.id, candidateIds: ids, talentMapVersion: talentMap.version };
   } else if (command.type === "task.create") {
     if (!["opportunity", "position-create", "recruiting"].includes(data.kind))
       fail("任务类型不合法。", "SCHEMA");

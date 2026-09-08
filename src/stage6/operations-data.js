@@ -403,7 +403,7 @@ export const tasks = [
     type: "学术搜索",
     scope: "普通任务运行",
     workId: "WORK-260824-006",
-    workTitle: "具身智能 VLA 人才摸排",
+    workTitle: "具身智能目标公司组织梳理",
     trigger: "任务编排",
     status: "失败",
     phase: "结果整合",

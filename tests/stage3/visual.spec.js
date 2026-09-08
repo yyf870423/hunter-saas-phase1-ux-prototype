@@ -28,7 +28,7 @@ test.beforeAll(async () => {
 
 for (const scenario of [
   ["client-xinglan", "待确认的招聘机会", "client"],
-  ["mapping-embodied", "人物与关系批次可以审核", "mapping"],
+  ["mapping-embodied", "组织与任职人批次可以审核", "mapping"],
   ["career-linhao", "系统内有 3 个岗位值得查看", "career"],
 ]) {
   for (const viewport of [
@@ -65,8 +65,8 @@ test("截取三类业务审核工作区", async ({ page }) => {
     ],
     [
       "mapping-embodied",
-      "人物与关系批次可以审核",
-      "打开本批次更新审核",
+      "组织与任职人批次可以审核",
+      "打开人才地图批次审核",
       "mapping-review",
     ],
     [
@@ -110,12 +110,12 @@ test("截取三类业务审核工作区", async ({ page }) => {
 test("人才摸排关系影响区域宽于左侧变化列表", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/tasks/mapping-embodied");
-  await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
+  await expect(page.getByText("组织与任职人批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
-  await page.getByRole("button", { name: "打开本批次更新审核" }).click();
-  await page.getByRole("tab", { name: /人物与关系/ }).click();
-  await page.getByRole("button", { name: /王奕的身份与成果关系/ }).click();
+  await page.getByRole("button", { name: "打开人才地图批次审核" }).click();
+  await page.getByRole("tab", { name: /关键岗位与任职人/ }).click();
+  await page.locator(".s3-context-change-list").getByRole("button", { name: /机器人学习研究员/ }).click();
   const list = await page.locator(".s3-context-change-list").boundingBox();
   const detail = await page.locator(".s3-context-graph").boundingBox();
   expect(list).not.toBeNull();
@@ -132,11 +132,11 @@ test("人才摸排关系影响区域宽于左侧变化列表", async ({ page }) 
   ).toBeVisible();
   await expect(
     page
-      .getByRole("button", { name: /王奕的身份与成果关系/ })
+      .getByRole("button", { name: /机器人学习研究员/ })
       .getByText("已确认写入", { exact: true }),
   ).toBeVisible();
   await page.getByRole("tab", { name: /冲突与待补充/ }).click();
-  await page.getByRole("button", { name: /王奕身份关系冲突/ }).click();
+  await page.locator(".s3-context-change-list").getByRole("button", { name: /机器人学习研究员/ }).click();
   await page.screenshot({
     path: `${output}/desktop-mapping-pending-review.png`,
     fullPage: true,
@@ -146,15 +146,15 @@ test("人才摸排关系影响区域宽于左侧变化列表", async ({ page }) 
 test("截取人才摸排变化项对应的关系影响", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/tasks/mapping-embodied");
-  await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
+  await expect(page.getByText("组织与任职人批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
-  await page.getByRole("button", { name: "打开本批次更新审核" }).click();
+  await page.getByRole("button", { name: "打开人才地图批次审核" }).click();
   for (const [item, file] of [
-    ["星澜机器人组织层级补充", "organization"],
-    ["目标公司生态关系更新", "ecosystem"],
-    ["方向与关键角色覆盖更新", "direction-role"],
-    ["近 24 个月人才流动更新", "talent-flow"],
+    ["星澜机器人组织与关键岗位", "xinglan"],
+    ["拓界机器人组织与关键岗位", "tuojie"],
+    ["穹顶智能组织与关键岗位", "qiongding"],
+    ["灵跃科技组织与关键岗位", "lingyue"],
   ]) {
     await page.getByRole("button", { name: new RegExp(item) }).click();
     await expectNoHorizontalOverflow(page);
@@ -163,11 +163,11 @@ test("截取人才摸排变化项对应的关系影响", async ({ page }) => {
       fullPage: true,
     });
   }
-  await page.getByRole("tab", { name: /人物与关系/ }).click();
+  await page.getByRole("tab", { name: /关键岗位与任职人/ }).click();
   for (const [item, file] of [
-    ["林昊的人物关系补充", "people"],
-    ["赵星羽的可联系路径补充", "contact-path"],
-    ["周明远的成果关系补充", "academic"],
+    ["拓界机器人 · 机器人学习负责人", "linhao"],
+    ["星澜机器人 · VLA 算法负责人", "zhaoxingyu"],
+    ["穹顶智能 · 具身智能算法总监", "zhoumingyuan"],
   ]) {
     await page.getByRole("button", { name: new RegExp(item) }).click();
     await expectNoHorizontalOverflow(page);
@@ -181,12 +181,12 @@ test("截取人才摸排变化项对应的关系影响", async ({ page }) => {
 test("截取移动端人才摸排关系画布", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("#/tasks/mapping-embodied");
-  await expect(page.getByText("人物与关系批次可以审核")).toBeVisible({
+  await expect(page.getByText("组织与任职人批次可以审核")).toBeVisible({
     timeout: 10_000,
   });
-  await page.getByRole("button", { name: "打开本批次更新审核" }).click();
-  await page.getByRole("tab", { name: /人物与关系/ }).click();
-  await page.getByRole("button", { name: /赵星羽的可联系路径补充/ }).click();
+  await page.getByRole("button", { name: "打开人才地图批次审核" }).click();
+  await page.getByRole("tab", { name: /关键岗位与任职人/ }).click();
+  await page.getByRole("button", { name: /星澜机器人 · VLA 算法负责人/ }).click();
   await expectNoHorizontalOverflow(page);
   await page.screenshot({
     path: `${output}/iphone-mapping-contact-path-graph.png`,
@@ -217,7 +217,7 @@ test("截取阶段三等待、冲突和资料回流状态", async ({ page }) => 
     ["client-xinglan?state=reply", "待确认的招聘机会", "client-reply"],
     [
       "mapping-embodied?state=conflict",
-      "人物与关系批次可以审核",
+      "组织与任职人批次可以审核",
       "mapping-conflict",
     ],
     [

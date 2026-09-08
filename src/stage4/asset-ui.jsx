@@ -2074,6 +2074,7 @@ export function HierarchyTable({
   rowClassName,
   scrollLabel = "横向滚动层级表格",
   testId,
+  levelColumns = ["一级节点", "二级节点", "三级节点", "四级及更深"].map((label) => ({ label })),
 }) {
   const scrollRef = useRef(null);
   useEffect(() => {
@@ -2100,19 +2101,17 @@ export function HierarchyTable({
         <table>
           <thead>
             <tr aria-label="层级表格列">
-              <th>一级节点</th>
-              <th>二级节点</th>
-              <th>三级节点</th>
-              <th>四级及更深</th>
+              {levelColumns.map((column) => <th key={column.label} style={{ width: column.width }}>{column.label}</th>)}
               {columns.map((column) => (
-                <th key={column.key}>{column.label}</th>
+                <th key={column.key} style={{ width: column.width }}>{column.label}</th>
               ))}
             </tr>
           </thead>
           <tbody>
+            {!rows.length ? <tr><td colSpan={levelColumns.length + columns.length}>没有符合条件的数据</td></tr> : null}
             {rows.map((row, rowIndex) => (
               <tr key={row.id} className={rowClassName?.(row) || ""}>
-                {[0, 1, 2, 3].map((level) => {
+                {levelColumns.map((_, level) => {
                   const cell = hierarchyLevelCell(rows, rowIndex, level);
                   if (!cell) return null;
                   return (

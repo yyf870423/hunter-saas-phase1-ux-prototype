@@ -9,3 +9,8 @@ export function draftFailureText(error) {
   const fields = Object.values(error.details?.fields || {}).filter(Boolean);
   return ["尚未写入：" + error.message, ...fields.map((message) => "- " + message)].join("\n\n");
 }
+
+export function displayDraftConfirmation(task, message) {
+  const first = task.id === "client-xinglan" && task.messages.find((item) => item.role === "user" && item.sourceKind === "decision" && singleAssetDecision(item.content) === "confirm");
+  return first?.id === message.id && message.content.trim() === "是" ? "确认" : message.content;
+}

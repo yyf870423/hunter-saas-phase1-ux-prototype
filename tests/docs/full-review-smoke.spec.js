@@ -24,7 +24,7 @@ const routes = [
 const readyMarkers = {
   "position-task": "首批候选人已经可以审核",
   "client-task": "待确认的招聘机会",
-  "mapping-task": "人物与关系批次可以审核",
+  "mapping-task": "组织与任职人批次可以审核",
   "career-task": "系统内有 3 个岗位值得查看",
 };
 

@@ -12,6 +12,7 @@ import { getOpportunityContext, getOpportunityPermission, getOpportunitySnapshot
 import { advanceLifecycleTask, collectTaskAttachments, respondToSingleAssetDraft, respondToTaskFollowup, respondToTaskFollowupFiles, taskAuthorization } from "./opportunity-task-adapter";
 import { draftSummaryMarkdown, markdownText, writeResultMarkdown } from "./opportunity-task-markdown";
 import { activeTaskPlan, missingFollowupField } from "./task-followup";
+import { displayDraftConfirmation } from "./single-asset-confirmation";
 
 export function TaskOpportunityFollowup({ task }) {
   const state = useOpportunityState();
@@ -152,7 +153,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
         {task.kind === "recruiting" && ["candidate-review", "result"].includes(task.phase) ? <RecruitingCandidateReview task={task} /> : null}
         {actualResults.map((result, index) => <OpportunityWriteResult key={result.type + result.id + index} result={result} />)}
         {["opportunity", "position-create"].includes(task.kind) ? <SingleAssetTaskSummary task={task} /> : null}
-        {pipelineResults.map((result, index) => <HunterReply key={index} markdown={"已将 " + result.candidateIds.map((id) => candidates.find((candidate) => candidate.id === id)?.name || id).join("、") + " 加入岗位储备。未发送联系消息。"} />)}
+        {pipelineResults.map((result, index) => <HunterReply key={index} markdown={"已将 " + result.candidateIds.map((id) => candidates.find((candidate) => candidate.id === id)?.name || id).join("、") + " 加入岗位储备，并同步更新岗位人才梳理。未发送联系消息。\n\n[查看人才梳理](#/positions/" + encodeURIComponent(result.id) + "?tab=talent-map)"} />)}
         {task.opportunityId && task.kind === "opportunity" && task.phase === "result" ? <TaskOpportunityFollowup task={task} /> : null}
         {error ? <><HunterReply markdown={"> " + markdownText(error)} />{task.phase === "input" ? <Button icon="refresh" onClick={prepare}>重试整理</Button> : null}</> : null}
       </div><div className="s2-task-composer-dock"><div className="s2-task-plan"><Button size="sm" icon="task" onClick={() => setPlanOpen(!planOpen)}>{planOpen ? "收起执行计划" : "执行计划"}</Button>
@@ -180,7 +181,7 @@ export function LegacyOpportunityResult({ taskId, showFollowup = true, awaitingC
   }, [taskId, task?.phase]);
   if (!task) return <HunterReply markdown="尚无可整理的客户回复。" />;
   return <>
-    {task.messages.slice(1).map((message) => message.role === "user" ? <div key={message.id}><UserMessage>{message.content}</UserMessage>
+    {task.messages.slice(1).map((message) => message.role === "user" ? <div key={message.id}><UserMessage>{displayDraftConfirmation(task, message)}</UserMessage>
       {message.fileIds?.length ? <OpportunityFiles ids={message.fileIds} readOnly /> : null}</div> : <HunterReply key={message.id} markdown={message.content} />)}
     {task.phase === "input" ? <HunterReply streaming markdown="正在整理招聘需求与来源资料。" /> : null}
     {task.results.filter((result, index, items) => result.type === "opportunity" && items.findLastIndex((item) => item.type === "opportunity" && item.id === result.id) === index).map((result) => <OpportunityWriteResult key={result.id + "-" + result.version} result={result} />)}

@@ -4426,6 +4426,7 @@
 
 .s4-relation-type-tabs {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 2px;
   padding: 2px;
@@ -4436,6 +4437,8 @@
 
 .s4-relation-type-tabs button {
   height: 28px;
+  white-space: nowrap;
+  flex: 0 0 auto;
   padding: 0 10px;
   color: var(--s1-muted);
   font-size: 11px;
@@ -9866,7 +9869,7 @@
 }
 .s4-landscape-summary-card dl {
   display: grid;
-  grid-template-columns: repeat(3, 64px);
+  grid-template-columns: repeat(3, 80px);
   margin: 0;
 }
 .s4-landscape-summary-card dl div {
@@ -13335,6 +13338,17 @@
   .s4-large-relations-toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+  .s4-talent-table-toolbar .s4-inline-search,
+  .s4-talent-table-toolbar .s4-select {
+    width: 100%;
+    flex: 0 0 auto;
+  }
+  .s4-hierarchy-table .tg-table-pagination {
+    flex-wrap: wrap;
+  }
+  .s4-hierarchy-table .tg-table-pagination > .s4-pagination {
+    width: 100%;
   }
   .s4-employment-relations-filters {
     align-items: stretch;

@@ -15,6 +15,9 @@ import { createOpportunityTask } from "../stage4/opportunity-task-adapter";
 import { singleAssetDecision } from "../stage4/single-asset-confirmation";
 import { markdownText } from "../stage4/opportunity-task-markdown";
 import { periodicDraftKey, periodicGoal, periodicSchedule, readPeriodicDrafts } from "./periodic-draft";
+import { organizationScope } from "../stage3/organization-mapping-data";
+
+const organizationTargets = (prompt) => organizationScope.filter((company) => prompt.includes(company.name.slice(0, 2)));
 
 const starterPrompts = [
   "为星澜机器人的 VLA 算法负责人岗位持续寻找合适候选人",
@@ -36,6 +39,7 @@ const forcedPrompts = {
 function classifyWork(prompt) {
   if (/每(天|周|月|季度)|每\s*(?:\d+|两|二)\s*(天|周|月)|定期|周期|工作日/.test(prompt))
     return "periodic";
+  if (/组织架构|人才地图|组织梳理/.test(prompt)) return "organization";
   if (/核验|消歧|是不是同一个人|是否为同一人/.test(prompt)) return "task";
   if (/整理|归纳|改写|总结/.test(prompt)) return "direct";
   if (/帮我看看|了解一下|查一下/.test(prompt) && prompt.length < 20)
@@ -44,6 +48,9 @@ function classifyWork(prompt) {
 }
 
 function OutcomeReply({ outcome, prompt, periodicPlan }) {
+  if (outcome === "organization") return <HunterReply markdown={organizationTargets(prompt).length
+    ? "本轮整理“" + organizationTargets(prompt).map((company) => company.name).join("、") + "”的组织、团队、关键岗位与任职人，交付人才地图。未知项保留待核实，不针对招聘岗位找人。\n\n正在创建公司组织梳理任务。"
+    : "请补充明确的目标公司名称。\n\n【原型说明，正式实现不展示】当前可交互样例包含星澜机器人、拓界机器人、穹顶智能和灵跃科技，可指定一家或多家公司。"} />;
   if (outcome === "mainline") {
     return (
       <HunterReply
@@ -169,10 +176,15 @@ export function NewWork() {
   }, [editingPeriodic, forcedState, status, submittedPrompt]);
 
   useEffect(() => {
-    if (forcedState || !["mainline", "task", "direct"].includes(status))
+    if (forcedState || !["mainline", "task", "direct", "organization"].includes(status) || status === "organization" && !organizationTargets(submittedPrompt).length)
       return undefined;
     const timer = window.setTimeout(() => {
-      if (status === "mainline") {
+      if (status === "organization") {
+        const scope = organizationTargets(submittedPrompt).map((company) => company.id).join(",");
+        sessionStorage.setItem("hunter-organization-prompt-" + scope, submittedPrompt);
+        sessionStorage.setItem("hunter-organization-auth-" + scope, authMode);
+        navigate("/tasks/mapping-embodied?companies=" + scope);
+      } else if (status === "mainline") {
         sessionStorage.setItem("hunter-new-workstream-prompt", submittedPrompt);
         navigate("/tasks/position-vla");
       } else if (status === "task") {
@@ -188,7 +200,8 @@ export function NewWork() {
 
   const begin = async (text, files = []) => {
     const fileNames = files.map((file) => file.name).join("、");
-    const prompt = text.trim() || `请处理附件：${fileNames}`;
+    const prompt = status === "organization" && !organizationTargets(submittedPrompt).length
+      ? submittedPrompt + "\n目标公司：" + text.trim() : text.trim() || `请处理附件：${fileNames}`;
     if (!prompt) return;
     if (status === "periodic") {
       const decision = singleAssetDecision(text);
@@ -221,7 +234,7 @@ export function NewWork() {
       /招聘机会|招聘需求|客户开发|团队扩建|团队扩张/.test(prompt) ? "opportunity" :
       /创建岗位|解析.*JD|整理.*岗位资料/.test(prompt) ? "position-create" : "");
     const periodicRequest = Boolean(editingPeriodic) || classifyWork(prompt) === "periodic";
-    if (["opportunity", "position-create", "recruiting"].includes(kind) && !periodicRequest) {
+    if (["opportunity", "position-create", "recruiting"].includes(kind) && !periodicRequest && !(classifyWork(prompt) === "organization" && !params.get("positionId"))) {
       if (lifecycleBusy) return;
       setLifecycleBusy(true); setLifecycleError("");
       try {

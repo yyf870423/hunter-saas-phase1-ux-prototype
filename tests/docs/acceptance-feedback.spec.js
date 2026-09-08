@@ -38,18 +38,18 @@ for (const [device, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 
     const errors = trackConsoleErrors(page);
     await page.setViewportSize({ width, height });
     await page.goto("#/tasks/mapping-embodied?state=completed");
-    await expect(page.getByRole("heading", { name: "摸排报告已经保存", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "人物与关系批次已审核", exact: true })).toHaveCount(1);
+    await expect(page.getByRole("heading", { name: "人才地图已更新", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "组织与任职人批次已审核", exact: true })).toHaveCount(1);
     await expect(page.getByText("本轮完成", { exact: true })).toHaveCount(1);
     await expect(page.getByRole("heading", { name: "待补充信息与下一步", exact: true })).toBeVisible();
-    await expect(button(page, "打开本批次更新审核")).toHaveCount(0);
+    await expect(button(page, "打开人才地图批次审核")).toHaveCount(0);
     expect(await page.locator(".s2-hunter-reply").count()).toBeGreaterThanOrEqual(6);
     await capture(page, `${device}-mapping-completed`);
     await replyToAsset(page, "请优先核实拓界技术负责人的任职时间");
     await expect(page.locator(".s2-user-message").filter({ hasText: "请优先核实拓界技术负责人的任职时间" })).toBeVisible();
     await page.reload();
     await expect(page.locator(".s2-user-message").filter({ hasText: "请优先核实拓界技术负责人的任职时间" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "摸排报告已经保存", exact: true })).toHaveCount(1);
+    await expect(page.getByRole("heading", { name: "人才地图已更新", exact: true })).toHaveCount(1);
     await errors();
   });
 
@@ -108,5 +108,5 @@ test("摸排完成直达不被未开始会话的空缓存覆盖", async ({ page 
   await page.evaluate(() => sessionStorage.setItem("hunter-stage3-mapping-embodied-messages", "[]"));
   await page.goto("#/tasks/mapping-embodied?state=completed");
   await page.reload();
-  await expect(page.getByRole("heading", { name: "摸排报告已经保存", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "人才地图已更新", exact: true })).toBeVisible();
 });
