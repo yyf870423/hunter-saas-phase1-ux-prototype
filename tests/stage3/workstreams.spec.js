@@ -13,7 +13,7 @@ test("四类持续任务可以从同一任务历史区切换且内容不同", as
     page.getByRole("heading", { name: "星澜机器人招聘合作" }),
   ).toBeVisible();
   await page
-    .locator(".s2-history-list > button")
+    .locator(".s2-history-item")
     .filter({ hasText: "具身智能目标公司组织梳理" })
     .first()
     .click();
@@ -21,13 +21,13 @@ test("四类持续任务可以从同一任务历史区切换且内容不同", as
   await expect(
     page.getByRole("heading", { name: "具身智能目标公司组织梳理" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: /林昊职业机会/ }).click();
+  await page.locator(".s2-history-item").filter({ hasText: "林昊职业机会" }).click();
   await expect(page).toHaveURL(/tasks\/career-linhao/);
   await expect(
     page.getByRole("heading", { name: "林昊职业机会" }),
   ).toBeVisible();
   await page
-    .locator(".s2-history-list > button")
+    .locator(".s2-history-item")
     .filter({ hasText: "具身智能 VLA 算法负责人" })
     .first()
     .click();

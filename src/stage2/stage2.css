@@ -89,7 +89,7 @@
   padding: 0 7px 14px;
 }
 
-.s2-history-list > button {
+.s2-history-item {
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -103,18 +103,18 @@
   cursor: pointer;
 }
 
-.s2-history-list > button:hover {
+.s2-history-item:hover {
   background: var(--s1-surface);
   border-color: var(--s1-line);
 }
 
-.s2-history-list > button.is-active {
+.s2-history-item.is-active {
   color: var(--s1-accent);
   background: var(--s1-accent-soft);
   border-color: color-mix(in srgb, var(--s1-accent) 20%, var(--s1-line));
 }
 
-.s2-history-list > button > span {
+.s2-history-item > span {
   display: block;
   min-width: 0;
 }

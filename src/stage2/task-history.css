@@ -1,0 +1,119 @@
+.s2-history-entry {
+  position: relative;
+  min-width: 0;
+}
+
+.s2-history-entry .s2-history-item {
+  width: 100%;
+}
+
+.s2-history-item .s2-history-copy {
+  grid-column: 1 / -1;
+  padding-right: 30px;
+}
+
+.s2-history-item .s1-status,
+.s2-history-item time {
+  grid-row: 2;
+  align-self: center;
+}
+
+.s2-history-item .s1-status {
+  justify-self: start;
+}
+
+.s2-history-entry .s2-task-pin {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  width: 30px;
+  height: 30px;
+  opacity: 0;
+}
+
+.s2-task-pin .s1-icon-button {
+  width: 30px;
+  height: 30px;
+  color: var(--s1-muted);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.s2-task-pin.is-pinned .s1-icon-button {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+}
+
+.s2-task-pin .s1-icon-button:hover {
+  border-color: var(--s1-line-strong);
+  background: var(--s1-surface);
+}
+
+.s2-history-entry:hover .s2-task-pin,
+.s2-history-entry:focus-within .s2-task-pin,
+.s2-history-entry .s2-task-pin.is-pinned {
+  opacity: 1;
+}
+
+.s1-icon-button.s2-history-mobile-trigger {
+  display: none;
+}
+
+.s1-drawer.s2-history-drawer {
+  width: min(360px, 100vw);
+}
+
+.s2-history-drawer .s1-drawer-body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+  overflow: hidden;
+  padding: 14px 8px 0;
+}
+
+.s2-history-drawer-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-inline: 6px;
+}
+
+.s2-history-drawer-tools .s1-search-field {
+  min-width: 0;
+  flex: 1;
+}
+
+.s2-history-drawer .s2-history-list {
+  display: grid;
+}
+
+.s2-history-drawer .s2-task-pin,
+.s2-history-drawer .s2-task-pin .s1-icon-button {
+  width: 40px;
+  height: 40px;
+  opacity: 1;
+}
+
+.s2-history-drawer .s2-history-copy {
+  padding-right: 42px;
+}
+
+@media (max-width: 1180px) {
+  .s1-icon-button.s2-history-mobile-trigger {
+    position: fixed;
+    z-index: 30;
+    top: 64px;
+    right: 12px;
+    display: grid;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (hover: none) {
+  .s2-history-entry .s2-task-pin {
+    opacity: 1;
+  }
+}

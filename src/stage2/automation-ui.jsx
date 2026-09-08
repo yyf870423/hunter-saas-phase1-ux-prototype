@@ -2,8 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Icon } from "../components/Icon";
-import { Button, IconButton, SearchField, StatusBadge } from "../stage1/ui";
+import { Button, Drawer, IconButton, SearchField, StatusBadge } from "../stage1/ui";
 import { mergeLifecycleTasks, useOpportunityState } from "../stage4/opportunity-store";
+import { applyTaskPins, useTaskPins } from "./task-pin-store";
+import { TaskHistoryList } from "./TaskHistoryList";
+import "./task-history.css";
 
 export const authorizationModes = [
   {
@@ -627,12 +630,17 @@ export function WorkHistory({
   onCreate,
 }) {
   const lifecycle = useOpportunityState();
-  items = useMemo(() => mergeLifecycleTasks(items, lifecycle), [items, lifecycle]);
+  const pins = useTaskPins();
+  const orderedItems = useMemo(
+    () => applyTaskPins(mergeLifecycleTasks(items, lifecycle), pins),
+    [items, lifecycle, pins],
+  );
   const [query, setQuery] = useState("");
   const [showArchived, setShowArchived] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase();
-    const scoped = items.filter(
+    const scoped = orderedItems.filter(
       (item) => Boolean(item.archived) === showArchived,
     );
     return keyword
@@ -642,94 +650,117 @@ export function WorkHistory({
             .includes(keyword),
         )
       : scoped;
-  }, [items, query, showArchived]);
+  }, [orderedItems, query, showArchived]);
   return (
-    <aside className={`s2-history ${collapsed ? "is-collapsed" : ""}`}>
-      <header>
-        {collapsed ? null : <b>任务</b>}
-        <div>
-          {!collapsed ? (
-            <IconButton
-              icon="folder"
-              label={showArchived ? "查看最近任务" : "查看已归档任务"}
-              className={showArchived ? "is-active" : ""}
-              onClick={() => setShowArchived((current) => !current)}
-            />
-          ) : null}
-          <IconButton icon="plus" label="新建任务" onClick={onCreate} />
-          <IconButton
-            icon={collapsed ? "panelRight" : "panelLeft"}
-            label={collapsed ? "展开任务历史" : "收起任务历史"}
-            onClick={onToggle}
-          />
-        </div>
-      </header>
-      {collapsed ? (
-        <div className="s2-history-collapsed-items">
-          {items.slice(0, 4).map((item) => (
-            <button
-              type="button"
-              aria-label={item.title}
-              className={item.id === currentId ? "is-active" : ""}
-              key={item.id}
-              onClick={() => onSelect(item)}
-            >
-              <Icon
-                name={
-                  item.type === "岗位招聘"
-                    ? "briefcase"
-                    : item.type === "公司组织梳理"
-                      ? "database"
-                      : item.type === "候选人求职"
-                        ? "user"
-                        : "building"
-                }
+    <>
+      <aside className={`s2-history ${collapsed ? "is-collapsed" : ""}`}>
+        <header>
+          {collapsed ? null : <b>任务</b>}
+          <div>
+            {!collapsed ? (
+              <IconButton
+                icon="folder"
+                label={showArchived ? "查看最近任务" : "查看已归档任务"}
+                className={showArchived ? "is-active" : ""}
+                onClick={() => setShowArchived((current) => !current)}
               />
-              <i className={`tone-${item.tone}`} />
-            </button>
-          ))}
-        </div>
-      ) : (
-        <>
+            ) : null}
+            <IconButton icon="plus" label="新建任务" onClick={onCreate} />
+            <IconButton
+              icon={collapsed ? "panelRight" : "panelLeft"}
+              label={collapsed ? "展开任务历史" : "收起任务历史"}
+              onClick={onToggle}
+            />
+          </div>
+        </header>
+        {collapsed ? (
+          <div className="s2-history-collapsed-items">
+            {visible.slice(0, 4).map((item) => (
+              <button
+                type="button"
+                aria-label={item.title}
+                className={item.id === currentId ? "is-active" : ""}
+                key={item.id}
+                onClick={() => onSelect(item)}
+              >
+                <Icon
+                  name={
+                    item.type === "岗位招聘"
+                      ? "briefcase"
+                      : item.type === "公司组织梳理"
+                        ? "database"
+                        : item.type === "候选人求职"
+                          ? "user"
+                          : "building"
+                  }
+                />
+                <i className={`tone-${item.tone}`} />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            <SearchField
+              value={query}
+              onChange={setQuery}
+              placeholder="搜索任务"
+            />
+            <TaskHistoryList
+              items={visible}
+              currentId={currentId}
+              onSelect={onSelect}
+              query={query}
+              archived={showArchived}
+            />
+          </>
+        )}
+      </aside>
+      <IconButton
+        className="s2-history-mobile-trigger"
+        icon="panelLeft"
+        label="打开任务列表"
+        onClick={() => setMobileOpen(true)}
+      />
+      <Drawer
+        open={mobileOpen}
+        close={() => setMobileOpen(false)}
+        title="任务列表"
+        side="left"
+        className="s2-history-drawer"
+      >
+        <div className="s2-history-drawer-tools">
           <SearchField
             value={query}
             onChange={setQuery}
             placeholder="搜索任务"
           />
-          <div className="s2-history-list">
-            {visible.map((item) => (
-              <button
-                type="button"
-                className={item.id === currentId ? "is-active" : ""}
-                key={item.id}
-                onClick={() => onSelect(item)}
-              >
-                <span>
-                  <small>
-                    <span className="s2-history-scenes">
-                      {(item.scenarios || [item.scenario || item.type])
-                        .slice(0, 2)
-                        .map((scene) => (
-                          <em key={scene}>{scene}</em>
-                        ))}
-                    </span>
-                    {item.pinned ? <Icon name="pin" /> : null}
-                  </small>
-                  <b>{item.title}</b>
-                  <em>{item.object}</em>
-                </span>
-                {["运行中", "等待用户", "等待外部", "错误"].includes(
-                  item.status,
-                ) ? (
-                  <StatusBadge tone={item.tone}>{item.status}</StatusBadge>
-                ) : null}
-                <time>{item.time}</time>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </aside>
+          <IconButton
+            icon="folder"
+            label={showArchived ? "查看最近任务" : "查看已归档任务"}
+            className={showArchived ? "is-active" : ""}
+            onClick={() => setShowArchived((current) => !current)}
+          />
+          <IconButton
+            icon="plus"
+            label="新建任务"
+            onClick={() => {
+              setMobileOpen(false);
+              onCreate();
+            }}
+          />
+        </div>
+        <TaskHistoryList
+          items={visible}
+          currentId={currentId}
+          onSelect={(item) => {
+            setMobileOpen(false);
+            onSelect(item);
+          }}
+          query={query}
+          archived={showArchived}
+        />
+      </Drawer>
+    </>
   );
 }
 
