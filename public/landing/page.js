@@ -24,8 +24,8 @@
       <div class="f-container f-header-inner">
         <a href="#main" aria-label="铂寻 Boseek 首页">${ui.brand()}</a>
         <nav class="f-nav" id="f-navigation" aria-label="主导航">
-          <a href="#work">工作示例</a>
-          <a href="#research">研究与推进</a>
+          <a href="#work">业务场景</a>
+          <a href="#research">决策支持</a>
           <a href="#about">关于铂寻</a>
         </nav>
         <div class="f-header-actions">
@@ -51,7 +51,7 @@
             ${trial ? '<p class="f-coming-soon">产品开发中，即将上线</p>' : ""}
             <p class="f-hero-statement">猎头的 AI 工作伙伴</p>
             <p class="f-hero-description">围绕岗位跨渠道找人，整理身份、经历与匹配依据。<br />关联公司、岗位和专业成果，让研究持续积累，把关键判断留给你。</p>
-            <div class="f-hero-actions">${trial ? ui.button("申请试用", "#apply") + ui.button("看工作示例", "#work", true) : ui.button("看工作示例", "#work")}</div>
+            <div class="f-hero-actions">${trial ? ui.button("申请试用", "#apply") + ui.button("查看场景", "#work", true) : ui.button("查看场景", "#work")}</div>
           </div>
         </div>
       </section>
@@ -64,7 +64,7 @@
             <p>HunterBuddy 沿着你的目标查找资料、关联人物与公司，把分散的信息整理成有依据的人选、客户线索、人才版图和岗位机会。</p>
           </div>
           <div class="f-work-demo">
-            <div class="f-tabs" role="tablist" aria-label="猎头工作示例">
+            <div class="f-tabs" role="tablist" aria-label="猎头业务场景">
               ${data.works.map((work, index) => `<button type="button" class="f-tab" id="f-work-tab-${work.id}" role="tab" aria-selected="${index === 0}" aria-controls="f-work-panel" tabindex="${index === 0 ? 0 : -1}">${e(work.label)}</button>`).join("")}
             </div>
             <div class="f-work-panel" id="f-work-panel" role="tabpanel" tabindex="0" aria-labelledby="f-work-tab-${e(data.works[0].id)}"></div>

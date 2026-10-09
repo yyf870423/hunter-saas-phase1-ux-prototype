@@ -25,6 +25,15 @@ for (const [width, height] of [
       "content",
       "disabled",
     );
+    const navigation = page.locator("#f-navigation");
+    await expect(
+      navigation.getByRole("link", { includeHidden: true }),
+    ).toHaveText(["业务场景", "决策支持", "关于铂寻"]);
+    await expect(
+      page
+        .locator(".f-hero")
+        .getByRole("link", { name: "查看场景", exact: true }),
+    ).toHaveAttribute("href", "#work");
     for (const image of await page.locator("img").all()) {
       await image.scrollIntoViewIfNeeded();
       await image.evaluate((el) => el.decode());
@@ -41,6 +50,32 @@ for (const [width, height] of [
       fullPage: true,
       animations: "disabled",
     });
+    if (width < 760) {
+      await page.getByRole("button", { name: "打开导航", exact: true }).click();
+      await page.screenshot({
+        path: testInfo.outputPath(`navigation-${width}.png`),
+        animations: "disabled",
+      });
+    } else {
+      await page
+        .locator(".f-header")
+        .screenshot({
+          path: testInfo.outputPath(`navigation-${width}.png`),
+          animations: "disabled",
+        });
+    }
+    for (const [name, anchor] of [
+      ["业务场景", "work"],
+      ["决策支持", "research"],
+    ]) {
+      if (width < 760 && !(await navigation.isVisible()))
+        await page
+          .getByRole("button", { name: "打开导航", exact: true })
+          .click();
+      await navigation.getByRole("link", { name, exact: true }).click();
+      await expect(page).toHaveURL(new RegExp(`#${anchor}$`));
+      await expect(page.locator(`#${anchor}`)).toBeFocused();
+    }
 
     if (process.env.LANDING_REFERENCE_URL) {
       const reference = await browser.newPage({
@@ -98,7 +133,7 @@ for (const [width, height] of [
     }
 
     for (const tab of await page
-      .getByRole("tablist", { name: "猎头工作示例" })
+      .getByRole("tablist", { name: "猎头业务场景" })
       .getByRole("tab")
       .all()) {
       await tab.click();
