@@ -57,12 +57,10 @@ for (const [width, height] of [
         animations: "disabled",
       });
     } else {
-      await page
-        .locator(".f-header")
-        .screenshot({
-          path: testInfo.outputPath(`navigation-${width}.png`),
-          animations: "disabled",
-        });
+      await page.locator(".f-header").screenshot({
+        path: testInfo.outputPath(`navigation-${width}.png`),
+        animations: "disabled",
+      });
     }
     for (const [name, anchor] of [
       ["业务场景", "work"],
