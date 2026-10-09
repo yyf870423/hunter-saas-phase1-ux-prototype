@@ -1,0 +1,303 @@
+:root {
+  --f-error: #b42318;
+  --f-success: #16754a;
+  --f-control-border: #c6d1de;
+  --f-control-border-hover: #9cacc0;
+}
+
+.f-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 24px;
+}
+
+.f-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.f-form-wide {
+  grid-column: 1 / -1;
+}
+
+.f-form-field label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.f-required {
+  margin-left: 6px;
+  color: var(--f-accent-text);
+}
+
+.f-input {
+  width: 100%;
+  height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--f-control-border);
+  border-radius: 4px;
+  background: var(--f-surface);
+  color: var(--f-ink);
+  font: inherit;
+  font-size: 16px;
+  line-height: 26px;
+  caret-color: var(--f-accent-text);
+  transition: border-color 160ms ease;
+}
+
+.f-input:hover {
+  border-color: var(--f-control-border-hover);
+}
+
+.f-input:focus-visible,
+.f-check-control input:focus-visible {
+  outline: 2px solid var(--f-accent-text);
+  outline-offset: 3px;
+  border-color: var(--f-accent-text);
+}
+
+.f-input[aria-invalid="true"],
+.f-check-control input[aria-invalid="true"] {
+  border-color: var(--f-error);
+}
+
+.f-input[readonly],
+.f-select-trigger:disabled {
+  background: var(--f-section-muted);
+  color: var(--f-muted);
+}
+
+.f-field-feedback {
+  min-height: 20px;
+}
+
+.f-field-help,
+.f-field-error {
+  display: block;
+  font-size: 12px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+
+.f-field-help {
+  color: var(--f-muted);
+}
+
+.f-field-help:empty {
+  display: none;
+}
+
+.f-field-error {
+  color: var(--f-error);
+}
+
+.f-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.f-select-trigger [data-select-label] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.f-select-trigger[data-empty="true"] {
+  color: var(--f-muted);
+}
+
+.f-select-trigger > .f-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  transform: rotate(90deg);
+}
+
+.f-select-trigger[aria-expanded="true"] > .f-icon {
+  transform: rotate(-90deg);
+}
+
+.f-select-menu {
+  position: fixed;
+  z-index: 60;
+  padding: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 4px;
+  background: var(--f-surface);
+  box-shadow: var(--f-shadow);
+  scrollbar-width: thin;
+  scrollbar-color: var(--f-muted) var(--f-surface);
+}
+
+.f-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--f-ink);
+  font-size: 14px;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.f-select-option:hover,
+.f-select-option[data-active="true"] {
+  background: var(--f-soft);
+}
+
+.f-select-option .f-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--f-accent-text);
+  visibility: hidden;
+}
+
+.f-select-option[aria-selected="true"] .f-icon {
+  visibility: visible;
+}
+
+.f-select-other {
+  display: grid;
+  gap: 6px;
+}
+
+.f-select-summary {
+  color: var(--f-muted);
+  font-size: 12px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+
+.f-form-consent {
+  margin-top: 14px;
+}
+
+.f-check-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--f-muted);
+  font-size: 13px;
+  line-height: 24px;
+}
+
+.f-check-control {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.f-check-control input {
+  appearance: none;
+  display: block;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--f-muted);
+  border-radius: 3px;
+  background: var(--f-surface);
+  cursor: pointer;
+}
+
+.f-check-control input:checked {
+  background: var(--f-accent-text);
+  border-color: var(--f-accent-text);
+}
+
+.f-check-control .f-icon {
+  position: absolute;
+  inset: 2px;
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  color: var(--f-surface);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.f-check-control input:checked + .f-icon {
+  visibility: visible;
+}
+
+.f-check-control input:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.f-form-consent > .f-field-error {
+  display: block;
+  padding-left: 32px;
+}
+
+.f-form-status {
+  min-height: 48px;
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 24px;
+  color: var(--f-muted);
+  overflow-wrap: anywhere;
+}
+
+.f-form-status[data-tone="error"] {
+  color: var(--f-error);
+}
+
+.f-form-status[data-tone="success"] {
+  color: var(--f-success);
+}
+
+.f-form-success {
+  min-height: 460px;
+  padding-top: 36px;
+  border-top: 1px solid var(--f-line);
+}
+
+.f-form-success h3 {
+  margin-bottom: 14px;
+  color: var(--f-success);
+  font-size: 26px;
+  line-height: 1.6;
+}
+
+.f-form-success p {
+  max-width: 42ch;
+  color: var(--f-muted);
+  font-size: 15px;
+}
+
+.f-form-success .f-text-link {
+  margin-top: 24px;
+}
+
+@media (max-width: 800px) {
+  .f-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (forced-colors: active) {
+  .f-check-control input {
+    appearance: auto;
+  }
+  .f-check-control .f-icon {
+    display: none;
+  }
+}

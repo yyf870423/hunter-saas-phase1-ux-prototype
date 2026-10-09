@@ -25,6 +25,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Verify isolated landing page artifact
+        run: node scripts/verify-pages-artifact.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
