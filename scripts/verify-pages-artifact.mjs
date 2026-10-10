@@ -75,6 +75,69 @@ assert(
   !original.includes('id="homepage"'),
   "Do not replace the original homepage with the new landing",
 );
+const assets = expected.filter((file) => file.startsWith("assets/"));
+const alternatives = {
+  "landing-origin": [
+    "index.html",
+    "origin.css",
+    "origin.js",
+    "shared-origin.css",
+    "shared-origin-network.css",
+    "shared-origin-network.js",
+    ...assets,
+    "assets/fonts/dm-serif-display.ttf",
+    "assets/fonts/dmserifdisplay-OFL.txt",
+    "assets/fonts/noto-serif-sc.ttf",
+    "assets/fonts/notoserifsc-OFL.txt",
+  ],
+  "landing-signal": [
+    "index.html",
+    "signal.js",
+    "shared-signal.css",
+    "shared-signal.js",
+    ...assets,
+    "assets/ai-talent-evidence-cn.webp",
+    "assets/ai-company-mapping-cn.webp",
+    "assets/ai-research-talent-cn.webp",
+  ],
+  homepages: [
+    "index.html",
+    "shared-homepage-catalog.css",
+    "shared-homepage-catalog.js",
+    "assets/original.png",
+    "assets/signal.png",
+    "assets/finesse.png",
+    "assets/origin.png",
+  ],
+};
+for (const [directory, files] of Object.entries(alternatives)) {
+  const allowlist = files.toSorted();
+  const publicPath = resolve(root, "public", directory);
+  const buildPath = resolve(root, "dist", directory);
+  assert.deepEqual(
+    await entries(publicPath),
+    allowlist,
+    `${directory} source allowlist`,
+  );
+  assert.deepEqual(
+    await entries(buildPath),
+    allowlist,
+    `${directory} output allowlist`,
+  );
+  for (const file of allowlist)
+    assert.equal(
+      hash(await readFile(join(publicPath, file))),
+      hash(await readFile(join(buildPath, file))),
+      `${directory}/${file}`,
+    );
+  if (directory !== "homepages")
+    assert(
+      (await readFile(join(buildPath, "index.html"), "utf8")).includes(
+        '<meta name="trial-api" content="disabled" />',
+      ),
+      `${directory} must not submit to an unconfigured API`,
+    );
+}
 console.log(
-  `PASS original application retained; ${expected.length} allowlisted landing files match build output; no backend or private files published`,
+  `PASS original application retained; ${expected.length + Object.values(alternatives).reduce((count, files) => count + files.length, 0)} allowlisted homepage files match build output; no backend or private files published`,
 );

@@ -1,0 +1,569 @@
+.f-hero {
+  height: min(780px, calc(100svh - var(--f-nav-h) - 100px));
+  min-height: 570px;
+  background: #0f1011;
+}
+
+.f-hero-depth {
+  inset: 0;
+  animation: none;
+  transform: none;
+}
+
+.f-hero-pointer,
+.f-hero-breath {
+  transform: none;
+  animation: none;
+}
+
+.f-hero-breath img {
+  object-position: 50% 65%;
+}
+
+.f-hero-depth::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 22%);
+}
+
+.f-hero-inner {
+  justify-content: center;
+  align-items: start;
+  padding: 76px 0 44px;
+}
+
+.f-hero-copy {
+  width: min(850px, 100%);
+  max-width: none;
+  text-align: center;
+}
+
+.f-hero h1 {
+  font-family: var(--o-display);
+  font-size: 104px;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.f-coming-soon {
+  width: fit-content;
+  padding: 6px 16px;
+  margin: 0 auto 26px;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 8%);
+  color: #d8d8de;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.f-hero-statement {
+  margin-top: 20px;
+  font-family: var(--o-display);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.f-hero-description {
+  max-width: 710px;
+  margin: 22px auto 0;
+  font-size: 15px;
+  line-height: 1.95;
+  color: #e3e3e7;
+}
+
+.f-hero-actions {
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.f-hero-actions .f-text-link {
+  min-height: 48px;
+  padding: 11px 20px;
+  border: 1px solid #a3a7ae;
+  border-radius: 8px;
+  background: rgb(15 16 17 / 25%);
+  color: #ffffff;
+}
+
+.f-work,
+.p-research,
+.f-memory,
+.f-about,
+.f-trial {
+  padding-block: 88px;
+}
+
+.f-work {
+  padding-top: 64px;
+  background: #0f1011;
+}
+
+.f-work-intro {
+  max-width: 780px;
+}
+
+.f-work-intro h2,
+.p-intro h2,
+.f-memory h2,
+.f-about h2 {
+  font-family: var(--o-display);
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1.42;
+}
+
+.f-work-intro p,
+.p-intro p,
+.f-memory > .f-container > p,
+.f-about-copy > p {
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.f-work-intro p {
+  max-width: 710px;
+}
+
+.f-work-demo {
+  margin-top: 40px;
+}
+
+.f-work-demo > .f-tabs {
+  max-width: 880px;
+  margin-inline: auto;
+}
+
+.f-work-panel {
+  gap: 72px;
+  padding-block: 44px 26px;
+  --f-panel-floor: 450px;
+}
+
+.f-work-context {
+  width: fit-content;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #5c5c60;
+  font-size: 12px;
+  color: #b3b3b8;
+}
+
+.f-work-lead h3 {
+  font-family: var(--o-display);
+  font-size: 31px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.f-work-lead > p:not(.f-work-context) {
+  max-width: 440px;
+  font-size: 14px;
+  line-height: 1.95;
+}
+
+.f-result-title h4 {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.f-result-list li {
+  padding-block: 19px;
+}
+
+.f-result-list strong {
+  font-size: 16px;
+}
+
+.f-result-list small,
+.f-result-list p {
+  color: #a9a9ac;
+}
+
+.f-work-bottom {
+  padding-bottom: 12px;
+}
+
+.p-research {
+  background: #090a0b;
+}
+
+.p-container {
+  max-width: 1200px;
+}
+
+.p-intro {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.p-intro h2 > span {
+  display: block;
+}
+
+.p-intro p {
+  max-width: 720px;
+  margin: 22px auto 0;
+}
+
+.p-carousel-ready .p-photo {
+  aspect-ratio: 2 / 1;
+  min-height: 480px;
+  max-height: none;
+  background: #0f1011;
+}
+
+.p-slide::after,
+.p-fallback-scene::after {
+  background: #0f1011;
+  width: 51%;
+  right: auto;
+}
+
+.p-slide img {
+  filter: saturate(0.55);
+}
+
+.p-copy {
+  width: 48%;
+}
+
+.p-copy h3 {
+  font-family: var(--o-display);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.p-copy p {
+  color: #b8b8bd;
+  font-size: 15px;
+  line-height: 1.95;
+}
+
+.p-carousel-controls .f-icon-button,
+.p-carousel-controls .f-icon-button:is(:hover, :active) {
+  color: #b4b4b9;
+  background: transparent;
+}
+
+.p-carousel-controls .f-icon {
+  filter: none;
+}
+
+.p-carousel-controls .f-icon-button:hover {
+  color: #ffffff;
+}
+
+.f-memory {
+  background: #0f1011;
+}
+
+.f-memory > .f-container > p {
+  max-width: 900px;
+}
+
+.f-network-story h3 {
+  font-family: var(--o-display);
+  font-size: 25px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.f-network-check {
+  padding-top: 14px;
+  border-top: 1px solid #343436;
+}
+
+.f-about {
+  background: #cacaca;
+  color: #171719;
+}
+
+.f-about-copy {
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.f-about-copy > p {
+  max-width: 680px;
+  margin: 24px auto 0;
+  color: #414146;
+}
+
+.f-about-copy > p:first-of-type {
+  color: #252528;
+}
+
+.f-about-image {
+  display: none;
+}
+
+.f-trial {
+  background: #090a0b;
+}
+
+.f-trial-layout {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 100px;
+}
+
+.f-trial-intro h2 {
+  font-family: var(--o-display);
+  font-size: 35px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.f-trial-intro .f-trial-thought {
+  margin-top: 44px;
+  font-family: var(--o-display);
+  font-size: 30px;
+  line-height: 1.65;
+}
+
+.f-form-grid {
+  gap: 6px 16px;
+}
+
+.f-footer {
+  padding-top: 64px;
+}
+
+.f-footer-bottom {
+  text-align: left;
+}
+
+.f-footer-meta,
+.f-footer-records {
+  justify-content: flex-start;
+}
+
+@media (min-width: 1600px) {
+  .f-hero {
+    height: min(820px, calc(100svh - var(--f-nav-h) - 120px));
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 801px) {
+  .f-work-panel {
+    gap: 40px;
+  }
+
+  .f-trial-layout {
+    gap: 48px;
+  }
+
+  .p-copy h3 {
+    font-size: 27px;
+  }
+}
+
+@media (max-height: 740px) and (min-width: 801px) {
+  .f-hero {
+    min-height: 410px;
+    height: calc(100svh - var(--f-nav-h) - 84px);
+  }
+
+  .f-hero-inner {
+    padding-top: 32px;
+  }
+
+  .f-hero h1 {
+    font-size: 80px;
+  }
+
+  .f-coming-soon {
+    margin-bottom: 16px;
+  }
+
+  .f-hero-statement {
+    margin-top: 12px;
+    font-size: 26px;
+  }
+
+  .f-hero-description {
+    margin-top: 12px;
+  }
+
+  .f-hero-actions {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 800px) {
+  .f-hero {
+    height: calc(100svh - var(--f-nav-h) - 100px);
+    min-height: 495px;
+    max-height: 690px;
+  }
+
+  .f-hero-inner {
+    padding-top: 42px;
+  }
+
+  .f-hero-depth {
+    inset: 0;
+  }
+
+  .f-hero h1 {
+    font-size: 56px;
+  }
+
+  .f-coming-soon {
+    font-size: 11px;
+    margin: 0 auto 24px;
+  }
+
+  .f-hero-statement {
+    font-size: 23px;
+    margin-top: 18px;
+  }
+
+  .f-hero-description {
+    max-width: 410px;
+    font-size: 13px;
+    margin-top: 18px;
+    line-height: 1.95;
+  }
+
+  .f-hero-actions {
+    gap: 14px;
+    margin-top: 26px;
+  }
+
+  .f-hero-actions .f-text-link {
+    padding-inline: 16px;
+  }
+
+  .f-work,
+  .p-research,
+  .f-memory,
+  .f-about,
+  .f-trial {
+    padding-block: 60px;
+  }
+
+  .f-work {
+    padding-top: 32px;
+  }
+
+  .f-work-intro h2,
+  .p-intro h2,
+  .f-memory h2,
+  .f-about h2 {
+    font-size: 30px;
+    line-height: 1.5;
+  }
+
+  .f-work-intro p,
+  .p-intro p,
+  .f-memory > .f-container > p,
+  .f-about-copy > p {
+    font-size: 14px;
+  }
+
+  .f-work-panel {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 32px 20px;
+  }
+
+  .f-work-lead h3 {
+    font-size: 27px;
+  }
+
+  .p-carousel-ready .p-photo {
+    aspect-ratio: auto;
+    height: 640px;
+    min-height: 640px;
+  }
+
+  .p-slide::after,
+  .p-fallback-scene::after {
+    inset: 44% 0 0;
+    width: 100%;
+    background: #0f1011;
+  }
+
+  .p-copy {
+    width: 100%;
+    padding: 28px 24px 30px;
+  }
+
+  .p-copy h3 {
+    font-size: 27px;
+    line-height: 1.5;
+  }
+
+  .p-copy p {
+    font-size: 14px;
+    margin-top: 18px;
+  }
+
+  .p-carousel-controls {
+    top: 23%;
+  }
+
+  .f-network-story h3 {
+    font-size: 23px;
+  }
+
+  .f-trial-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .f-trial-intro h2 {
+    font-size: 29px;
+  }
+
+  .f-trial-intro .f-trial-thought {
+    font-size: 23px;
+    margin-top: 24px;
+  }
+
+  .f-footer {
+    padding-top: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  .f-hero h1 {
+    font-size: 47px;
+  }
+
+  .f-hero-statement {
+    font-size: 21px;
+  }
+
+  .f-hero-actions {
+    gap: 12px;
+  }
+
+  .f-hero-actions .f-button,
+  .f-hero-actions .f-text-link {
+    padding-inline: 14px;
+    font-size: 13px;
+    gap: 10px;
+  }
+
+  .f-work-intro h2,
+  .p-intro h2,
+  .f-memory h2,
+  .f-about h2 {
+    font-size: 27px;
+  }
+
+  .f-work-lead h3,
+  .p-copy h3 {
+    font-size: 24px;
+  }
+
+  .p-copy {
+    padding-inline: 20px;
+  }
+}

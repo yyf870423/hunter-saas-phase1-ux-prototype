@@ -1,0 +1,110 @@
+.o-asset-network {
+  --o-network-signal: #00b3dd;
+}
+
+.o-asset-network .f-network-node,
+.o-asset-network .f-network-node.is-active {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #2e2e2e;
+  box-shadow: none;
+}
+
+.o-asset-network .f-network-node.is-active h3,
+.o-asset-network .f-network-node.is-active > .f-icon {
+  color: #f5f5f7;
+}
+
+.o-asset-network .f-network-node.is-active p {
+  color: #b6b6bb;
+}
+
+.o-asset-network[data-active-path] .f-network-node:not(.is-active) {
+  border-color: #6f6f76;
+  background: #0f1011;
+}
+
+.o-asset-network[data-active-path] .f-network-node:not(.is-active) h3,
+.o-asset-network[data-active-path] .f-network-node:not(.is-active) p {
+  color: #939397;
+}
+
+.o-asset-network[data-active-path] .f-network-node:not(.is-active) > .f-icon {
+  color: #77777a;
+  opacity: 1;
+}
+
+.o-asset-network .f-network-node.is-start {
+  background: #cacaca;
+}
+
+.o-asset-network .f-network-node.is-start h3,
+.o-asset-network .f-network-node.is-start > .f-icon {
+  color: #171719;
+}
+
+.o-asset-network .f-network-node.is-start p {
+  color: #414146;
+}
+
+.o-asset-network .f-network-wires {
+  stroke: #6f6f76;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.o-asset-network[data-active-path]
+  .f-network-wires
+  path[data-wire]:not(.is-active) {
+  opacity: 1;
+}
+
+.o-asset-network .f-network-wires .is-active {
+  stroke: var(--o-network-signal);
+  stroke-width: 1.5;
+}
+
+.o-asset-network[data-active-path] .f-network-wires path.o-network-trace {
+  stroke: var(--o-network-signal);
+  stroke-width: 2.5;
+  opacity: 1;
+  transition: none;
+}
+
+.o-asset-network[data-active-path] .f-network-wires path.o-network-mask {
+  stroke: #ffffff;
+  stroke-width: 6;
+  opacity: 1;
+  transition: none;
+}
+
+.o-asset-network .f-network-relation {
+  background: #0f1011;
+  color: #939397;
+}
+
+.o-asset-network .f-network-relation[data-edge="experience"],
+.o-asset-network .f-network-relation[data-edge="connection"] {
+  text-align: right;
+}
+
+.o-asset-network .f-network-relation[data-edge="fit"],
+.o-asset-network .f-network-relation[data-edge="authorship"] {
+  text-align: left;
+}
+
+.o-asset-network .f-network-relation.is-active > span:not(.f-network-sr) {
+  color: #f5f5f7;
+  font-weight: 400;
+}
+
+.o-asset-network .f-network-relation.is-active small {
+  color: #a9a9ac;
+}
+
+@media (max-width: 800px) {
+  .o-asset-network .f-network-relation[data-edge="authorship"] {
+    width: 88px;
+  }
+}

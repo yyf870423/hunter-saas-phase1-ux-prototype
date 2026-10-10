@@ -1,0 +1,112 @@
+.h-header {
+  border-bottom: 1px solid var(--f-line);
+  background: white;
+}
+.h-header > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+}
+.h-header > div > span {
+  color: var(--f-muted);
+  font-size: 14px;
+}
+.h-catalog {
+  padding-block: 48px 64px;
+}
+.h-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.h-heading h1 {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.h-heading > span {
+  color: var(--f-muted);
+  font-size: 14px;
+}
+.h-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+}
+.h-option {
+  display: block;
+  overflow: clip;
+  border: 1px solid var(--f-line);
+  border-radius: 8px;
+  background: white;
+  transition: border-color 180ms ease;
+}
+.h-option:hover {
+  border-color: var(--f-accent);
+}
+.h-option:focus-visible {
+  outline: 3px solid var(--f-accent);
+  outline-offset: 4px;
+}
+.h-option > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.6;
+  object-fit: cover;
+  border-bottom: 1px solid var(--f-line);
+}
+.h-option-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 72px;
+  padding: 20px 24px;
+}
+.h-option-label h2 {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.h-option-label > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--f-accent-text);
+}
+.h-footer {
+  border-top: 1px solid var(--f-line);
+  padding-block: 24px;
+  color: var(--f-muted);
+  font-size: 13px;
+}
+@media (max-width: 760px) {
+  .h-catalog {
+    padding-block: 32px 48px;
+  }
+  .h-options {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .h-heading h1 {
+    font-size: 28px;
+  }
+  .h-option-label {
+    padding: 16px 20px;
+    min-height: 64px;
+  }
+  .h-option-label h2 {
+    font-size: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .h-option {
+    transition: none;
+  }
+}

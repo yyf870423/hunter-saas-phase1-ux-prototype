@@ -1,0 +1,364 @@
+@font-face {
+  font-family: "Origin Display";
+  src: url("assets/fonts/dm-serif-display.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Origin Chinese";
+  src: url("assets/fonts/noto-serif-sc.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  --f-bg: #090a0b;
+  --f-surface: #0f1011;
+  --f-ink: #f5f5f7;
+  --f-muted: #a9a9ac;
+  --f-accent: #ffffff;
+  --f-accent-text: #f5f5f7;
+  --f-deep: #cacaca;
+  --f-line: #343436;
+  --f-soft: #191a1c;
+  --f-section-muted: #090a0b;
+  --f-backdrop: rgb(0 0 0 / 72%);
+  --f-shadow: none;
+  --f-focus: rgb(255 255 255 / 28%);
+  --f-error: #ffaaa0;
+  --f-success: #9de1bc;
+  --f-control-border: #49494c;
+  --f-control-border-hover: #77777a;
+  --f-network-line: #a1a1a5;
+  --f-network-border: #57575b;
+  --o-display:
+    "Origin Display", "Origin Chinese", "Songti SC", "Noto Serif SC", Georgia,
+    serif;
+  --o-mono: "SFMono-Regular", Consolas, monospace;
+  --o-iris: #d1c9ff;
+  --o-orchid: #dd90d8;
+  --o-blue: #90b8f0;
+  --o-silver: #cacaca;
+}
+
+html,
+body,
+button,
+input {
+  letter-spacing: 0;
+}
+
+body::after {
+  display: none;
+}
+
+.f-container {
+  width: min(1200px, calc(100% - 96px));
+}
+
+.f-brand img {
+  filter: grayscale(1) brightness(0) invert(1);
+}
+
+.f-header {
+  background: rgb(15 16 17 / 88%);
+  backdrop-filter: blur(24px);
+  border-color: rgb(255 255 255 / 9%);
+}
+
+.f-header-inner {
+  gap: 24px;
+}
+
+.f-nav {
+  gap: 8px;
+}
+
+.f-nav a {
+  min-height: 38px;
+  padding: 6px 14px;
+  border: 1px solid #444446;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.f-nav a:hover,
+.f-nav a[aria-current="true"] {
+  background: #2e2e2e;
+  border-color: #939395;
+}
+
+.f-nav a::after {
+  display: none;
+}
+
+.f-login-link,
+.f-button {
+  min-height: 48px;
+  padding: 11px 22px;
+  gap: 16px;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f1011;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.f-login-link:hover,
+.f-button:hover {
+  background: #d9d9db;
+  border-color: #d9d9db;
+  color: #0f1011;
+}
+
+.f-icon-button {
+  border-radius: 8px;
+}
+
+.f-icon-button:hover {
+  background: #2e2e2e;
+}
+
+.f-text-link {
+  font-weight: 400;
+  color: #e4e4e7;
+}
+
+.f-tooltip {
+  border: 1px solid #515154;
+  border-radius: 4px;
+  background: #242426;
+  color: #f5f5f7;
+}
+
+.f-dialog {
+  background: #191a1c;
+  box-shadow: none;
+  border-color: #57575b;
+}
+
+.f-dialog-header h2 {
+  font-size: 20px;
+}
+
+.f-input,
+.f-select-menu {
+  border-radius: 8px;
+  background: #191a1c;
+}
+
+.f-select-menu {
+  border: 1px solid #57575b;
+  box-shadow: none;
+}
+
+.f-select-option {
+  border-radius: 4px;
+}
+
+.f-select-option:hover,
+.f-select-option[data-active="true"] {
+  background: #3f4041;
+}
+
+.f-field-help,
+.f-field-error,
+.f-select-summary {
+  font-size: 12px;
+}
+
+.f-required {
+  color: #a9a9ac;
+}
+
+.f-check-control input:checked {
+  background: #ffffff;
+}
+
+.f-check-control input:checked + .f-icon {
+  color: #0f1011;
+}
+
+.o-scenario-tabs {
+  gap: 0;
+  border: 0;
+}
+
+.o-scenario-tabs .f-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  padding: 10px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--f-line);
+  border-radius: 0;
+  background: transparent;
+  color: #b6b6bb;
+  font-family: var(--f-font);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 26px;
+  white-space: nowrap;
+  transition: color 200ms ease;
+}
+
+.o-scenario-tabs .f-tab::after {
+  right: 24px;
+  left: 24px;
+  height: 3px;
+  background: #77777a;
+  transition:
+    transform 200ms ease,
+    background-color 200ms ease;
+}
+
+.o-scenario-tabs .f-tab:hover {
+  color: #f5f5f7;
+}
+
+.o-scenario-tabs .f-tab:hover::after {
+  transform: scaleX(0.35);
+}
+
+.o-scenario-tabs .f-tab[aria-selected="true"] {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.o-scenario-tabs .f-tab[aria-selected="true"]::after {
+  background: #ffffff;
+  transform: scaleX(1);
+}
+
+.o-scenario-tabs .f-tab:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -4px;
+}
+
+.o-tab-icon,
+.o-tab-icon .f-icon {
+  display: block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.f-network-tabs {
+  gap: 4px;
+  border-bottom: 1px solid #57575b;
+}
+
+.f-network-tabs .f-tab {
+  font-size: 15px;
+}
+
+.f-network-node {
+  border-radius: 8px;
+  background: #242426;
+}
+
+.f-network-node.is-active {
+  border-color: #e2e2e5;
+  background: #323234;
+}
+
+.f-asset-network[data-active-path] .f-network-node:not(.is-active) {
+  background: #0f1011;
+  border-color: #2d2e30;
+}
+
+.f-asset-network[data-active-path] .f-network-node:not(.is-active) h3 {
+  color: #8d8d91;
+}
+
+.f-asset-network[data-active-path] .f-network-node:not(.is-active) p {
+  color: #939397;
+}
+
+.f-network-relation {
+  background: #0f1011;
+}
+
+.f-network-wires .is-active {
+  stroke: #00b3dd;
+}
+
+.f-network-origin {
+  border-color: #343436;
+}
+
+.f-footer {
+  background: #090a0b;
+}
+
+.f-footer-group ul {
+  color: #a9a9ac;
+}
+
+@media (max-width: 800px) {
+  .f-container {
+    width: calc(100% - 40px);
+  }
+
+  .f-header-inner {
+    gap: 8px;
+  }
+
+  .f-nav {
+    gap: 12px;
+    background: #191a1c;
+    padding-inline: 20px;
+  }
+
+  .f-nav a {
+    padding: 8px 14px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .f-login-link {
+    padding-inline: 14px;
+    min-height: 40px;
+    font-size: 12px;
+  }
+
+  .f-header-actions {
+    gap: 6px;
+  }
+
+  .o-scenario-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 0;
+  }
+
+  .o-scenario-tabs .f-tab {
+    padding-inline: 12px;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .o-scenario-tabs .f-tab::after {
+    right: 16px;
+    left: 16px;
+  }
+
+  .o-tab-icon,
+  .o-tab-icon .f-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 360px) {
+  .o-scenario-tabs .f-tab {
+    font-size: 13px;
+  }
+}
