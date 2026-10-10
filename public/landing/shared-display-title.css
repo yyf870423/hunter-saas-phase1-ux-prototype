@@ -1,0 +1,13 @@
+@font-face {
+  font-family: "Origin Display";
+  src: url("assets/fonts/dm-serif-display.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+#homepage .f-hero h1,
+#homepage .f-static-fallback > h1 {
+  font-family: "Origin Display", Georgia, serif;
+  font-weight: 400;
+}

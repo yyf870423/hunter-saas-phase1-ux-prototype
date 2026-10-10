@@ -9,6 +9,7 @@ const expected = [
   "shared-ui.css",
   "shared-ui.js",
   "page.css",
+  "shared-display-title.css",
   "page.js",
   "shared-footer.css",
   "shared-footer.js",
@@ -27,6 +28,8 @@ const expected = [
   "vendor/LICENSE",
   "vendor/LICENSE.Apache",
   "assets/boseek-wordmark.svg",
+  "assets/fonts/dm-serif-display.ttf",
+  "assets/fonts/dmserifdisplay-OFL.txt",
   "assets/hero-research.webp",
   "assets/hero-research-mobile.webp",
   "assets/research-detail.webp",
@@ -75,7 +78,9 @@ assert(
   !original.includes('id="homepage"'),
   "Do not replace the original homepage with the new landing",
 );
-const assets = expected.filter((file) => file.startsWith("assets/"));
+const assets = expected.filter(
+  (file) => file.startsWith("assets/") && !file.startsWith("assets/fonts/"),
+);
 const alternatives = {
   "landing-origin": [
     "index.html",

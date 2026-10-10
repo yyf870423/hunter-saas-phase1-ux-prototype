@@ -15,6 +15,11 @@ try {
     ["finesse", "landing/"],
     ["origin", "landing-origin/"],
   ]) {
+    if (
+      process.env.HOMEPAGE_CAPTURE_OPTION &&
+      process.env.HOMEPAGE_CAPTURE_OPTION !== name
+    )
+      continue;
     await page.goto(new URL(route, base).href);
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(400);

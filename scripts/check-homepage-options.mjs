@@ -302,7 +302,11 @@ try {
         "utf8",
       ),
     );
-    for (const item of hashes)
+    // The second homepage HTML now loads the user-approved display font.
+    const unchanged = hashes.filter(
+      (item) => item.file !== "dist/landing/index.html",
+    );
+    for (const item of unchanged)
       assert.equal(
         createHash("sha256")
           .update(await fs.readFile(item.file))
@@ -310,7 +314,10 @@ try {
         item.sha256,
         item.file,
       );
-    check(true, `${hashes.length} original build files remain byte-identical`);
+    check(
+      true,
+      `${unchanged.length} unchanged build files remain byte-identical; second homepage title checked separately`,
+    );
   }
   await fs.writeFile(
     path.join(out, "report.json"),
