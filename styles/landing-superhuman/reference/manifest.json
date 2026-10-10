@@ -1,0 +1,31 @@
+{
+  "source": "https://styles.refero.design/style/418b374a-be64-44f0-b17e-1d45308c7e62",
+  "retrievedAt": "2026-10-10T14:08:39.551Z",
+  "interpretation": "Refero normalized style exports, not original Superhuman source code",
+  "exports": {
+    "DESIGN.md": {
+      "tab": "DESIGN.md",
+      "mode": "Extended",
+      "sha256": "b01ca4d11d9103296524ab4c7a1299af4046de6e95d654cc63f1818888e0c47a",
+      "bytes": 21627
+    },
+    "tailwind.css": {
+      "tab": "Tailwind v4",
+      "mode": "Extended",
+      "sha256": "be220dda8fc3d11ad5a0a6406117d50543a488965a8821a47a490a2589e17481",
+      "bytes": 1549
+    },
+    "variables.css": {
+      "tab": "CSS Variables",
+      "mode": "Extended",
+      "sha256": "be455322aecda5186eb80f7acf1745f47758370304e11301d43026997fe9ec47",
+      "bytes": 2256
+    },
+    "tokens.json": {
+      "tab": "Design Tokens",
+      "mode": "Extended",
+      "sha256": "be8d3feb0bb6de1f4663d121d779b82c3bc2a87374ff03af255e37f01f15e149",
+      "bytes": 12783
+    }
+  }
+}

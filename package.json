@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "build:superhuman-style": "node scripts/build-superhuman-style.mjs",
+    "prebuild": "npm run build:superhuman-style",
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "format:check": "prettier --check .",
@@ -30,7 +32,11 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
+    "@tailwindcss/cli": "4.3.3",
     "jszip": "^3.10.1",
-    "prettier": "^3.9.6"
+    "parse5": "8.0.0",
+    "postcss": "8.5.26",
+    "prettier": "^3.9.6",
+    "tailwindcss": "4.3.3"
   }
 }

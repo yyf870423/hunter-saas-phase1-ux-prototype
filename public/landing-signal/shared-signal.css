@@ -88,7 +88,7 @@
 }
 
 .s-overview {
-  padding: 76px 0 88px;
+  padding: 56px 0 0;
   background: var(--f-deep);
   color: white;
 }
@@ -99,107 +99,54 @@
   line-height: 1.5;
 }
 
-.s-overview-links {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 48px;
-  border-top: 1px solid rgba(255, 255, 255, 0.24);
+.s-scenario-tabs {
+  margin-top: 32px;
+  border-color: rgba(255, 255, 255, 0.24);
 }
 
-.s-overview-links a {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 112px;
-  padding: 24px;
-  border-right: 1px solid rgba(255, 255, 255, 0.24);
+.s-scenario-tabs .f-tab {
+  color: #bbcbdc;
+  font-size: 18px;
+}
+
+.s-scenario-tabs .f-tab[aria-selected="true"],
+.s-scenario-tabs .f-tab:hover {
   color: white;
-  font-size: 22px;
-  transition: background-color 180ms ease;
 }
 
-.s-overview-links a:first-child {
-  padding-left: 0;
-}
-.s-overview-links a:last-child {
-  border-right: 0;
-}
-.s-overview-links a:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.s-homepage .f-work {
-  padding: 96px 0;
-  background: var(--f-bg);
-}
-
-.s-client-brief {
-  margin: 0;
-  padding: 32px;
-  border: 1px solid var(--f-line);
-  border-radius: 8px;
+.s-scenario-tabs .f-tab::after {
   background: white;
 }
 
-.s-homepage .f-work-panel {
+.s-scenario-tabs .f-tab:focus-visible {
+  outline: 2px solid white;
+  outline-offset: -6px;
+}
+
+.s-homepage .f-work {
   padding: 0;
-  min-height: 0 !important;
+  background: var(--f-bg);
+}
+
+.s-work-content {
+  padding-block: 48px 80px;
+}
+
+.s-work-switcher {
+  margin: 0;
+}
+
+.s-homepage .f-work-panel {
+  --f-panel-floor: 0px;
+  padding: 0 0 32px;
   gap: 64px;
 }
 
 .s-homepage .f-work-lead h3 {
+  max-width: none;
   font-size: 38px;
   line-height: 1.5;
-}
-
-.s-capabilities {
-  padding: 52px 0 96px;
-  background: white;
-}
-
-.s-capability {
-  padding: 52px 0;
-  border-top: 1px solid var(--f-line);
-  scroll-margin-top: 100px;
-}
-
-.s-capability-top {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: 80px;
-  align-items: center;
-}
-
-.s-capability:nth-child(even) .f-work-lead {
-  order: 2;
-}
-
-.s-capability figure {
-  width: 100%;
-  height: 420px;
-  overflow: clip;
-}
-
-.s-capability figure img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.s-capability-result {
-  margin-top: 40px;
-}
-.s-capability .f-result-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 28px;
-}
-.s-capability .f-people-list li {
-  display: block;
-}
-.s-capability .f-person-evidence {
-  margin-top: 12px;
+  text-wrap: pretty;
 }
 
 .s-homepage .f-about {
@@ -218,9 +165,6 @@
 }
 
 @media (max-width: 1100px) {
-  .s-capability-top {
-    gap: 40px;
-  }
   .s-homepage .f-hero h1 {
     font-size: 72px;
   }
@@ -285,57 +229,26 @@
     padding-top: 0;
   }
   .s-overview {
-    padding: 48px 0;
+    padding: 40px 0 0;
   }
   .s-overview-heading p {
     font-size: 26px;
   }
-  .s-overview-links {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .s-scenario-tabs {
     margin-top: 24px;
   }
-  .s-overview-links a {
-    min-height: 84px;
-    font-size: 18px;
-    padding: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.24);
+  .s-scenario-tabs .f-tab {
+    font-size: 14px;
   }
-  .s-overview-links a:first-child {
-    padding-left: 16px;
+  .s-work-content {
+    padding-block: 36px 56px;
   }
-  .s-overview-links a:nth-child(even) {
-    border-right: 0;
-  }
-  .s-homepage .f-work {
-    padding: 56px 0;
-  }
-  .s-client-brief {
-    padding: 24px;
-  }
-  .s-homepage .f-work-panel,
-  .s-capability-top {
+  .s-homepage .f-work-panel {
     grid-template-columns: 1fr;
     gap: 28px;
   }
   .s-homepage .f-work-lead h3 {
     font-size: 29px;
-  }
-  .s-capability:nth-child(even) .f-work-lead {
-    order: 0;
-  }
-  .s-capability figure {
-    height: auto;
-    aspect-ratio: 1.5;
-  }
-  .s-capabilities {
-    padding: 12px 0 48px;
-  }
-  .s-capability {
-    padding: 40px 0;
-  }
-  .s-capability .f-result-list {
-    grid-template-columns: 1fr;
-    gap: 0;
   }
   .s-homepage .f-about {
     padding: 56px 0;
@@ -355,8 +268,11 @@
   .s-homepage .f-work-intro h2 {
     font-size: 30px;
   }
-  .s-client-brief {
-    padding: 16px;
+  .s-scenario-tabs .f-tab {
+    font-size: 13px;
+  }
+  .s-homepage .f-work-lead h3 {
+    font-size: 26px;
   }
 }
 

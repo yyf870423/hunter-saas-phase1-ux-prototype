@@ -88,6 +88,8 @@ try {
     });
     const body = await page.locator("#homepage").innerText();
     for (const item of baseline.data.works) {
+      await page.getByRole("tab", { name: item.label, exact: true }).click();
+      const selectedBody = await page.locator("#work").innerText();
       for (const text of [
         item.label,
         item.headline,
@@ -96,14 +98,10 @@ try {
         ...item.rows.map((row) => row.copy),
       ].filter(Boolean))
         check(
-          body.includes(text),
+          selectedBody.includes(text),
           `${width}: ${item.label} copy and results retained`,
         );
-      const button = page.locator(
-        item.id === baseline.data.works[1].id
-          ? "[data-evidence]"
-          : `[data-signal-evidence="${item.id}"]`,
-      );
+      const button = page.locator("[data-evidence]");
       await button.click();
       const dialog = page.getByRole("dialog");
       check(await dialog.isVisible(), `${width}: ${item.label} evidence opens`);
@@ -120,7 +118,6 @@ try {
       ".s-opening",
       ".s-overview",
       "#work",
-      ".s-capabilities",
       ".f-memory",
       "#about",
     ]) {
@@ -220,8 +217,8 @@ try {
       await image.evaluate((image) => image.decode());
     }
     check(
-      (await page.locator(".h-option").count()) === 4,
-      `${width}: all four homepage choices`,
+      (await page.locator(".h-option").count()) === 5,
+      `${width}: all homepage choices`,
     );
     check(
       await page.evaluate(
@@ -239,6 +236,7 @@ try {
       [1, "landing-signal/"],
       [2, "landing/"],
       [3, "landing-origin/"],
+      [4, "landing-superhuman/"],
     ]) {
       const popupPromise = page.waitForEvent("popup");
       await page.locator(".h-option").nth(index).click();
@@ -260,9 +258,15 @@ try {
         await preview.evaluate(() => window.opener === null),
         `${width}: preview cannot control the catalog tab`,
       );
-      await preview.locator(route ? ".f-hero h1" : ".lp-hero h1").waitFor();
+      const heroSelector =
+        route === "landing-superhuman/"
+          ? "#sh-hero-title"
+          : route
+            ? ".f-hero h1"
+            : ".lp-hero h1";
+      await preview.locator(heroSelector).waitFor();
       check(
-        await preview.locator(route ? ".f-hero h1" : ".lp-hero h1").isVisible(),
+        await preview.locator(heroSelector).isVisible(),
         `${width}: choice ${index + 1} loads`,
       );
       await preview.close();
@@ -296,27 +300,44 @@ try {
     await page.close();
   }
   if (!process.env.HOMEPAGE_SKIP_LOCAL_HASHES) {
+    const reviewedSharedChanges = {
+      "dist/landing/research-chapters.js": {
+        before:
+          "6e9fdd259d87be912f4d7714fba214b033a6c97386e7ae79aa0b2558542b8d54",
+        after:
+          "941b5008b529e8d68a5203a2c6941c03755982293809c14b09df883f809d686b",
+      },
+    };
     const hashes = JSON.parse(
       await fs.readFile(
         "artifacts/homepage-options-20261010/baseline/build-hashes.json",
         "utf8",
       ),
     );
-    // The second homepage HTML now loads the user-approved display font.
+    // These files are explicitly changed by the approved title and scenario updates.
     const unchanged = hashes.filter(
-      (item) => item.file !== "dist/landing/index.html",
+      (item) =>
+        ![
+          "dist/landing/index.html",
+          "dist/landing-signal/index.html",
+          "dist/landing-signal/shared-signal.js",
+          "dist/landing-signal/shared-signal.css",
+        ].includes(item.file),
     );
-    for (const item of unchanged)
+    for (const item of unchanged) {
+      const sharedChange = reviewedSharedChanges[item.file];
+      if (sharedChange) assert.equal(item.sha256, sharedChange.before);
       assert.equal(
         createHash("sha256")
           .update(await fs.readFile(item.file))
           .digest("hex"),
-        item.sha256,
+        sharedChange?.after || item.sha256,
         item.file,
       );
+    }
     check(
       true,
-      `${unchanged.length} unchanged build files remain byte-identical; second homepage title checked separately`,
+      `${unchanged.length} other build files remain byte-identical; changed copy checked above`,
     );
   }
   await fs.writeFile(

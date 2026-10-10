@@ -2,6 +2,27 @@ import assert from "node:assert/strict";
 import { lstat, readFile, readdir } from "node:fs/promises";
 import { resolve, join } from "node:path";
 import { createHash } from "node:crypto";
+import { parse } from "parse5";
+
+async function disabledTrialApi(source) {
+  function findMeta(node) {
+    if (
+      node.tagName === "meta" &&
+      node.attrs.some(
+        (attr) => attr.name === "name" && attr.value === "trial-api",
+      )
+    )
+      return node;
+    for (const child of node.childNodes || []) {
+      const result = findMeta(child);
+      if (result) return result;
+    }
+  }
+  return (
+    findMeta(parse(source))?.attrs.find((attr) => attr.name === "content")
+      ?.value === "disabled"
+  );
+}
 
 const root = resolve(import.meta.dirname, "..");
 const expected = [
@@ -113,8 +134,43 @@ const alternatives = {
     "assets/signal.png",
     "assets/finesse.png",
     "assets/origin.png",
+    "assets/superhuman.png",
+  ],
+  "landing-superhuman": [
+    "index.html",
+    "page.js",
+    "shared-superhuman.js",
+    "shared-superhuman.css",
+    "shared-ledger.js",
+    "shared-ledger.css",
+    "reference-system.css",
+    "design-tokens.json",
+    "assets/hero-ai-human.webp",
+    "assets/hero-ai-human.webp.json",
+    "assets/about-ai-human.webp",
+    "assets/about-ai-human.webp.json",
+    "assets/boseek-wordmark.svg",
+    "assets/boseek-wordmark-dark.svg",
+    "assets/fonts/inter-variable.ttf",
+    "assets/fonts/inter-OFL.txt",
+    "assets/fonts/noto/index.css",
+    "assets/fonts/noto/LICENSE",
+    ...(
+      await readdir(
+        resolve(root, "node_modules/@fontsource-variable/noto-sans-sc/files"),
+      )
+    )
+      .filter((file) => file.endsWith(".woff2"))
+      .map((file) => `assets/fonts/noto/files/${file}`),
   ],
 };
+for (const directory of ["public", "dist"])
+  for (const withdrawn of ["landing-explore", "landing-particle"])
+    await assert.rejects(
+      lstat(resolve(root, directory, withdrawn)),
+      { code: "ENOENT" },
+      "Rejected homepage samples must not be served or published",
+    );
 for (const [directory, files] of Object.entries(alternatives)) {
   const allowlist = files.toSorted();
   const publicPath = resolve(root, "public", directory);
@@ -135,12 +191,12 @@ for (const [directory, files] of Object.entries(alternatives)) {
       hash(await readFile(join(buildPath, file))),
       `${directory}/${file}`,
     );
-  if (directory !== "homepages")
+  for (const entry of allowlist.filter(
+    (file) => file.endsWith(".html") && directory !== "homepages",
+  ))
     assert(
-      (await readFile(join(buildPath, "index.html"), "utf8")).includes(
-        '<meta name="trial-api" content="disabled" />',
-      ),
-      `${directory} must not submit to an unconfigured API`,
+      await disabledTrialApi(await readFile(join(buildPath, entry), "utf8")),
+      `${directory}/${entry} must not submit to an unconfigured API`,
     );
 }
 console.log(

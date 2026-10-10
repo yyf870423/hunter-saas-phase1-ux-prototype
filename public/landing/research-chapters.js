@@ -43,7 +43,10 @@
     });
   }
 
-  function mountCarousel(root) {
+  function mountCarousel(
+    root,
+    { photoErrors = true, label = "研究图片，空格暂停或继续自动轮播" } = {},
+  ) {
     const stage = root.querySelector(".p-stage");
     const photo = root.querySelector(".p-photo");
     const controls = root.querySelector(".p-carousel-controls");
@@ -130,9 +133,9 @@
     controls.hidden = false;
     stage.tabIndex = 0;
     stage.setAttribute("role", "group");
-    stage.setAttribute("aria-label", "研究图片，空格暂停或继续自动轮播");
+    stage.setAttribute("aria-label", label);
     stage.setAttribute("aria-keyshortcuts", "Space");
-    mountPhotoErrors(slides);
+    if (photoErrors) mountPhotoErrors(slides);
     select(0);
     schedule();
     root
@@ -265,8 +268,9 @@
     };
   }
 
-  function mount(root, data) {
-    if (root.dataset.presentation === "carousel") return mountCarousel(root);
+  function mount(root, data, options) {
+    if (root.dataset.presentation === "carousel")
+      return mountCarousel(root, options);
     const stage = root.querySelector(".p-stage");
     const runway = root.querySelector(".p-runway");
     const slides = [...root.querySelectorAll("[data-chapter-slide]")];

@@ -1,0 +1,40 @@
+{
+  "colors": {
+    "midnight-wine": "#06193A",
+    "royal-violet": "#0070F7",
+    "lilac-mist": "#EAF2FE",
+    "deep-lagoon": "#06193A",
+    "warm-parchment": "#F7F9FC",
+    "soft-mist": "#C8D2DF",
+    "ink-charcoal": "#06193A",
+    "stone-gray": "#4F6078",
+    "paper-white": "#FFFFFF"
+  },
+  "fonts": {
+    "latin": "\"Inter Variable\", ui-sans-serif, system-ui, sans-serif",
+    "chinese": "\"Noto Sans SC Variable\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif"
+  },
+  "variables": {
+    "--leading-caption": "1.65",
+    "--leading-body-sm": "1.65",
+    "--leading-body": "1.75",
+    "--leading-subheading": "1.5",
+    "--leading-heading-sm": "1.5",
+    "--leading-heading-lg": "1.4",
+    "--leading-display": "1.08",
+    "--tracking-heading-sm": "0",
+    "--tracking-heading-lg": "0",
+    "--tracking-display": "0",
+    "--section-gap": "96px"
+  },
+  "chinese": {
+    "headline": { "fontSize": "44px", "fontWeight": 500, "lineHeight": 1.4 },
+    "headline-mobile": {
+      "fontSize": "28px",
+      "fontWeight": 500,
+      "lineHeight": 1.4
+    },
+    "body": { "fontSize": "16px", "fontWeight": 400, "lineHeight": 1.75 }
+  },
+  "reason": "Map Refero color roles to bo identity, use the reference's permitted Inter substitute, preserve approved CJK readability and zero tracking; resolve the source's 64-96px range to its upper spacing token. Other spacing, radius and layout primitives remain unchanged."
+}

@@ -1,0 +1,7 @@
+{
+  "public/landing/research-chapters.js": {
+    "before": "6e9fdd259d87be912f4d7714fba214b033a6c97386e7ae79aa0b2558542b8d54",
+    "after": "941b5008b529e8d68a5203a2c6941c03755982293809c14b09df883f809d686b",
+    "reason": "第五版复用第二版控制器，新增 opt-in 无图模式和名称；原默认行为保持不变，另行验证第二版。"
+  }
+}
