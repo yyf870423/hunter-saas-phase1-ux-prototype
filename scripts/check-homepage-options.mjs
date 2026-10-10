@@ -240,17 +240,32 @@ try {
       [2, "landing/"],
       [3, "landing-origin/"],
     ]) {
+      const popupPromise = page.waitForEvent("popup");
       await page.locator(".h-option").nth(index).click();
+      const preview = await popupPromise;
+      preview.on("pageerror", (error) => errors.push(error.message));
+      preview.on("response", (response) => {
+        if (response.status() >= 400) failures.push(response.url());
+      });
+      await preview.waitForLoadState();
       check(
-        page.url() === url(route),
+        preview.url() === url(route),
         `${width}: catalog links stay within GitHub repository path`,
       );
-      await page.locator(route ? ".f-hero h1" : ".lp-hero h1").waitFor();
       check(
-        await page.locator(route ? ".f-hero h1" : ".lp-hero h1").isVisible(),
+        page.url() === url("homepages/"),
+        `${width}: catalog stays open while preview uses a new tab`,
+      );
+      check(
+        await preview.evaluate(() => window.opener === null),
+        `${width}: preview cannot control the catalog tab`,
+      );
+      await preview.locator(route ? ".f-hero h1" : ".lp-hero h1").waitFor();
+      check(
+        await preview.locator(route ? ".f-hero h1" : ".lp-hero h1").isVisible(),
         `${width}: choice ${index + 1} loads`,
       );
-      await page.goBack();
+      await preview.close();
     }
     check(
       errors.length === 0,
