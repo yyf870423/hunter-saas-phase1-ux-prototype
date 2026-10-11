@@ -102,38 +102,120 @@
     markChapter(index);
   });
 
-  /* scenario tabs */
-  const tabs = [...document.querySelectorAll("[data-tabs] .tab")];
+  /* hero data flow: hold still for reduced motion, and pause while off screen */
+  const flow = document.querySelector("svg[data-flow]");
+  if (flow?.pauseAnimations) {
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = true;
+    const sync = () => (visible && !still.matches ? flow.unpauseAnimations() : flow.pauseAnimations());
+    if ("IntersectionObserver" in window)
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        sync();
+      }).observe(flow);
+    still.addEventListener?.("change", sync);
+    sync();
+  }
+
+  /* scenario tabs: a sliding selection marker, and a panel that fades out, swaps, then eases back in */
+  const tabList = document.querySelector("[data-tabs]");
+  const tabs = [...tabList.querySelectorAll(".tab")];
   const panel = document.querySelector("[data-panel]");
   const slot = (name) => panel.querySelector(`[data-f="${name}"]`);
-  function showWork(index, focus = false) {
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const marker = el("span", "tab-ink");
+  marker.setAttribute("aria-hidden", "true");
+  tabList.prepend(marker);
+  tabList.classList.add("has-ink");
+  let current = Math.max(0, tabs.findIndex((tab) => tab.getAttribute("aria-selected") === "true"));
+  let swap = 0;
+
+  function moveMarker(instant = false) {
+    const tab = tabs[current];
+    if (instant) marker.style.transition = "none";
+    marker.style.width = `${tab.offsetWidth}px`;
+    marker.style.height = `${tab.offsetHeight}px`;
+    marker.style.transform = `translate(${tab.offsetLeft}px, ${tab.offsetTop}px)`;
+    if (instant) {
+      void marker.offsetWidth;
+      marker.style.transition = "";
+    }
+  }
+  moveMarker(true);
+  window.addEventListener("resize", () => moveMarker(true));
+  document.fonts?.ready.then(() => moveMarker(true));
+
+  const stagger = (nodes, from = 0) =>
+    nodes.map((node, i) => {
+      node.classList.add("anim-in");
+      node.style.setProperty("--i", String(from + i));
+      return node;
+    });
+
+  function renderWork(index) {
     const work = WORKS[index];
+    ["headline", "description", "detail", "context", "subject"].forEach((key) => {
+      slot(key).textContent = work[key];
+    });
+    slot("questions").replaceChildren(...stagger(work.questions.map((q) => el("div", "q", q)), 2));
+    slot("rows").replaceChildren(
+      ...stagger(
+        work.rows.map((row) => {
+          const item = el("div", "row");
+          item.append(el("strong", "", row.t), el("span", "k", row.k), el("p", "", row.c));
+          if (row.f) item.append(el("p", "follow", `仍需了解：${row.f}`));
+          return item;
+        }),
+        1,
+      ),
+    );
+    slot("evidence").replaceChildren(
+      ...stagger(
+        work.evidence.map(([title, copy]) => {
+          const item = el("div");
+          item.append(el("b", "", `${title}：`), document.createTextNode(copy));
+          return item;
+        }),
+        4,
+      ),
+    );
+  }
+
+  function showWork(index, focus = false) {
+    if (focus) tabs[index].focus();
+    if (index === current) return;
+    current = index;
     tabs.forEach((tab, i) => {
       const on = i === index;
       tab.setAttribute("aria-selected", String(on));
       tab.tabIndex = on ? 0 : -1;
     });
-    if (focus) tabs[index].focus();
     panel.setAttribute("aria-labelledby", tabs[index].id);
-    ["headline", "description", "detail", "context", "subject"].forEach((key) => {
-      slot(key).textContent = work[key];
-    });
-    slot("questions").replaceChildren(...work.questions.map((q) => el("div", "q", q)));
-    slot("rows").replaceChildren(
-      ...work.rows.map((row) => {
-        const item = el("div", "row");
-        item.append(el("strong", "", row.t), el("span", "k", row.k), el("p", "", row.c));
-        if (row.f) item.append(el("p", "follow", `仍需了解：${row.f}`));
-        return item;
-      }),
-    );
-    slot("evidence").replaceChildren(
-      ...work.evidence.map(([title, copy]) => {
-        const item = el("div");
-        item.append(el("b", "", `${title}：`), document.createTextNode(copy));
-        return item;
-      }),
-    );
+    moveMarker();
+    if (calm.matches) {
+      renderWork(index);
+      return;
+    }
+    const token = ++swap;
+    const from = panel.offsetHeight;
+    panel.style.height = `${from}px`;
+    panel.classList.add("is-sizing", "is-out");
+    setTimeout(() => {
+      if (token !== swap) return;
+      renderWork(index);
+      panel.classList.replace("is-out", "is-in");
+      panel.style.height = "auto";
+      const to = panel.offsetHeight;
+      panel.style.height = `${from}px`;
+      void panel.offsetHeight;
+      panel.classList.remove("is-in");
+      panel.style.height = `${to}px`;
+      setTimeout(() => {
+        if (token !== swap) return;
+        panel.style.height = "";
+        panel.classList.remove("is-sizing");
+      }, 480);
+    }, 170);
   }
   tabs.forEach((tab, i) => {
     tab.addEventListener("click", () => showWork(i));

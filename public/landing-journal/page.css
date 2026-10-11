@@ -114,6 +114,9 @@ h1, h2, h3 { margin: 0; }
 .pipeline svg text { font-family: var(--mono); }
 .pipeline .narrow { display: none; }
 .pipeline figcaption { margin-top: 18px; text-align: center; }
+.pipeline .flow-dash { stroke-dasharray: 2 12; animation: flow-dash 1.1s linear infinite; }
+@keyframes flow-dash { to { stroke-dashoffset: -14; } }
+@media (prefers-reduced-motion: reduce) { .pipeline .flow-dash { animation: none; } .pipeline .packet, .pipeline .pulse { display: none; } }
 
 /* sections */
 section { scroll-margin-top: 80px; }
@@ -233,6 +236,24 @@ legend { font-size: 13px; letter-spacing: 0.06em; color: var(--graphite); paddin
 .foot-cols a:hover { text-decoration: underline; }
 .foot-cols img { width: 140px; height: 50px; object-fit: contain; object-position: left center; }
 .foot-meta { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--ash); display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 13px; color: var(--smoke); }
+
+/* scenario switching motion */
+.tabs { position: relative; }
+.tab-ink { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; transition: transform .42s cubic-bezier(.22, .8, .24, 1), width .42s cubic-bezier(.22, .8, .24, 1), height .42s cubic-bezier(.22, .8, .24, 1); }
+.tab { position: relative; z-index: 1; transition: color .25s ease, border-color .25s ease, background-color .25s ease; }
+.panel.is-sizing { overflow: hidden; transition: height .44s cubic-bezier(.22, .8, .24, 1); }
+.panel > * { transition: opacity .3s ease, transform .44s cubic-bezier(.22, .8, .24, 1); }
+.panel > :nth-child(2) { transition-delay: .05s; }
+.panel.is-out > * { opacity: 0; transform: translateY(-6px); transition: opacity .16s ease-in, transform .16s ease-in; }
+.panel.is-in > * { opacity: 0; transform: translateY(12px); transition: none; }
+.anim-in { animation: hb-rise .5s cubic-bezier(.22, .8, .24, 1) both; animation-delay: calc(var(--i, 0) * 60ms + 140ms); }
+@keyframes hb-rise { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) {
+  .tab-ink, .tab, .panel, .panel > * { transition: none !important; }
+  .anim-in { animation: none; }
+}
+.tab-ink { border-radius: var(--r-pill); background: var(--off-black); }
+.tabs.has-ink .tab[aria-selected="true"] { background: transparent; }
 
 @media (max-width: 1100px) {
   .links { display: none; }
