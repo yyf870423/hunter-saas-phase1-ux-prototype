@@ -134,7 +134,6 @@ const alternatives = {
     "assets/signal.png",
     "assets/finesse.png",
     "assets/origin.png",
-    "assets/superhuman.png",
     "assets/editorial.png",
     "assets/journal.png",
   ],
