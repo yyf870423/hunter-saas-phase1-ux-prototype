@@ -139,7 +139,14 @@ const alternatives = {
     "assets/constellation.png",
     "assets/magazine.png",
   ],
-  "landing-constellation": ["index.html", "page.css", "page.js"],
+  "landing-constellation": [
+    "index.html",
+    "page.css",
+    "page.js",
+    "field.js",
+    "assets/hunterbuddy-constellation.mp4",
+    "assets/constellation-poster.jpg",
+  ],
   "landing-magazine": [
     "index.html",
     "page.css",

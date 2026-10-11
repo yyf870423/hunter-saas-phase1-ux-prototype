@@ -78,195 +78,89 @@
   };
 
   const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const PALETTE = [
-    ["#2f86ff", 30], // product action blue, brighter for the dark stage
-    ["#8fd3ff", 22], // sky
-    ["#19b38c", 16], // verdant
-    ["#ffb829", 14], // amber
-    ["#b9a4ff", 10], // lilac
-    ["#ff7a59", 8], // coral
-  ];
-  const pickColor = (r) => {
-    let acc = 0;
-    for (const [c, w] of PALETTE) {
-      acc += w / 100;
-      if (r <= acc) return c;
-    }
-    return PALETTE[0][0];
-  };
-  const rand = (() => {
-    let s = 20261011;
-    return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
-  })();
-  const ease = (x) => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
 
-  /* a person in profile, facing left toward the headline (400 × 440 design space) */
-  const HEAD =
-    "M200 40 C270 40 330 90 335 165 C340 215 322 250 300 272 C290 285 288 300 292 318 C300 340 340 352 380 362 L400 368 L400 440 L0 440 L0 380 C30 372 80 360 120 352 C140 348 150 330 150 310 C150 300 140 292 128 290 C112 288 104 280 104 270 C104 262 100 258 96 256 C92 254 94 248 98 246 C92 242 88 236 92 232 C86 230 78 228 76 222 C74 216 80 210 84 204 C92 190 92 176 90 166 C88 156 92 148 96 142 C104 96 148 40 200 40 Z";
-
-  function sampleHead(count) {
-    const shape = new Path2D(HEAD);
-    const probe = document.createElement("canvas").getContext("2d");
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "0");
-    svg.setAttribute("height", "0");
-    svg.style.position = "absolute";
-    const outline = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    outline.setAttribute("d", HEAD);
-    svg.appendChild(outline);
-    document.body.appendChild(svg);
-    const length = outline.getTotalLength();
-    const pts = [];
-    const edge = Math.round(count * 0.46);
-    for (let i = 0; i < edge; i++) {
-      const p = outline.getPointAtLength((i / edge) * length + rand() * 2);
-      if (p.y > 420 || p.x < 4 || p.x > 396) continue; // the frame edges are not part of the figure
-      pts.push([p.x + (rand() - 0.5) * 3, p.y + (rand() - 0.5) * 3, true]);
-    }
-    // denser along the face so the profile reads: brow, nose, lips, chin
-    for (let i = 0; i < 900 && pts.length < edge + count * 0.14; i++) {
-      const p = outline.getPointAtLength(rand() * length);
-      if (p.x < 160 && p.y > 130 && p.y < 320) pts.push([p.x + (rand() - 0.5) * 2, p.y + (rand() - 0.5) * 2, true]);
-    }
-    svg.remove();
-    while (pts.length < count) {
-      const x = rand() * 400;
-      const y = 40 + rand() * 400;
-      if (probe.isPointInPath(shape, x, y)) pts.push([x, y, false]);
-    }
-    return pts;
-  }
-
-  function constellation(canvas, mode) {
-    const ctx = canvas.getContext("2d");
-    const host = canvas.parentElement;
-    let W = 0, H = 0, dpr = 1, parts = [], born = performance.now(), running = false, raf = 0;
-    const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-
-    function layout() {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      W = host.clientWidth;
-      H = host.clientHeight;
-      canvas.width = Math.round(W * dpr);
-      canvas.height = Math.round(H * dpr);
-      const small = W < 900;
-      if (mode === "hero") {
-        // wide screens: the figure stands to the right of the headline; narrow screens: below the call to action
-        const scale = small ? Math.min(W * 0.86, 380) / 440 : Math.min(H * 0.92, W * 0.5) / 440;
-        const cx = small ? W * 0.56 : W * 0.73;
-        const cy = small ? H - 220 * scale - 24 : H * 0.55;
-        const pts = sampleHead(small ? 360 : 640);
-        parts = pts.map(([x, y, isEdge]) => {
-          const angle = (rand() - 0.5) * Math.PI * 1.4;
-          const far = Math.max(W, H) * (0.35 + rand() * 0.5);
-          return {
-            tx: cx + (x - 200) * scale,
-            ty: cy + (y - 240) * scale,
-            fade: y > 340 ? Math.max(0, 1 - (y - 340) / 100) : 1,
-            sx: cx + Math.cos(angle) * far,
-            sy: cy + Math.sin(angle) * far,
-            size: (isEdge ? 3.5 : 3) + rand() * (isEdge ? 4 : 5.5),
-            rot: rand() * Math.PI * 2,
-            spin: (rand() - 0.5) * 0.4,
-            phase: rand() * Math.PI * 2,
-            delay: rand() * 1.5 + (isEdge ? 0.4 : 0),
-            color: pickColor(rand()),
-            alpha: 0.62 + rand() * 0.38,
-            stream: rand() < 0.1, // a few keep arriving, like new leads
-            period: 4 + rand() * 4,
-          };
+  /* the field: one population of triangles behind the whole page, reshaped at each section */
+  const canvas = document.querySelector("[data-field]");
+  if (canvas && window.HBField) {
+    const narrow = () => window.innerWidth < 900;
+    const field = window.HBField(canvas, { small: window.innerWidth < 760 });
+    let keys = [];
+    const parse = (str) => {
+      const [x, y, s, ry, a] = str.split(",").map(Number);
+      return { x, y, s, ry, a };
+    };
+    function measure() {
+      const H = window.innerHeight;
+      keys = [];
+      document.querySelectorAll("[data-shape]").forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        const top = rect.top + window.scrollY;
+        const shapes = el.dataset.shape.split(",");
+        const at = el.dataset.at ? el.dataset.at.split(",").map(Number) : [];
+        const layout = parse((narrow() && el.dataset.lm) || el.dataset.l);
+        shapes.forEach((shape, k) => {
+          let y = top + rect.height * (Number.isFinite(at[k]) ? at[k] : 0.5);
+          if (el.classList.contains("hero")) y = H / 2; // fully formed at the top of the page
+          keys.push({ y, shape, layout });
         });
-      } else {
-        parts = Array.from({ length: Math.round((W * H) / 9000) }, () => ({
-          tx: rand() * W, ty: rand() * H, size: 3 + rand() * 6, rot: rand() * 6.28, spin: (rand() - 0.5) * 0.3,
-          phase: rand() * 6.28, color: pickColor(rand()), alpha: 0.35 + rand() * 0.45, vx: 6 + rand() * 14, vy: (rand() - 0.5) * 4,
-        }));
-      }
-    }
-
-    function tri(x, y, s, r) {
-      ctx.moveTo(x + Math.cos(r) * s, y + Math.sin(r) * s);
-      ctx.lineTo(x + Math.cos(r + 2.094) * s, y + Math.sin(r + 2.094) * s);
-      ctx.lineTo(x + Math.cos(r + 4.189) * s, y + Math.sin(r + 4.189) * s);
-      ctx.closePath();
-    }
-
-    function draw(now) {
-      const t = calm.matches ? 99 : (now - born) / 1000;
-      pointer.x += (pointer.tx - pointer.x) * 0.06;
-      pointer.y += (pointer.ty - pointer.y) * 0.06;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, W, H);
-      ctx.lineWidth = 1.2;
-      for (const p of parts) {
-        let x, y, a = p.alpha;
-        if (mode === "hero") {
-          if (p.stream && t > 4) {
-            const u = ((t - p.delay) % p.period) / p.period;
-            const k = ease(u * 1.15);
-            x = p.sx + (p.tx - p.sx) * k;
-            y = p.sy + (p.ty - p.sy) * k;
-            a *= Math.min(1, u * 5) * (u > 0.9 ? (1 - u) * 10 : 1) * p.fade;
-          } else {
-            const k = ease((t - p.delay) / 2.4);
-            x = p.sx + (p.tx - p.sx) * k + Math.sin(t * 0.7 + p.phase) * 2.2;
-            y = p.sy + (p.ty - p.sy) * k + Math.cos(t * 0.6 + p.phase) * 2.2;
-            a *= Math.min(1, (t - p.delay + 0.4) * 1.5) * p.fade;
-          }
-          x += pointer.x * (p.size / 9);
-          y += pointer.y * (p.size / 9);
-        } else {
-          x = (p.tx + p.vx * t) % (W + 40) - 20;
-          y = p.ty + p.vy * t + Math.sin(t * 0.5 + p.phase) * 8;
-        }
-        if (a <= 0.01) continue;
-        ctx.globalAlpha = a;
-        ctx.strokeStyle = p.color;
-        ctx.beginPath();
-        tri(x, y, p.size, p.rot + t * p.spin);
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    function loop(now) {
-      draw(now);
-      if (running) raf = requestAnimationFrame(loop);
-    }
-    function start() {
-      if (running || calm.matches) return;
-      running = true;
-      raf = requestAnimationFrame(loop);
-    }
-    function stop() {
-      running = false;
-      cancelAnimationFrame(raf);
-    }
-
-    layout();
-    draw(performance.now());
-    if ("IntersectionObserver" in window)
-      new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop())).observe(canvas);
-    else start();
-    let resizeTimer = 0;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        const keep = born;
-        layout();
-        born = keep - 10000; // re-layout lands assembled, no second fly-in
-        draw(performance.now());
-      }, 150);
-    });
-    if (mode === "hero")
-      host.addEventListener("pointermove", (e) => {
-        const r = host.getBoundingClientRect();
-        pointer.tx = ((e.clientX - r.left) / r.width - 0.5) * 16;
-        pointer.ty = ((e.clientY - r.top) / r.height - 0.5) * 12;
       });
-    calm.addEventListener?.("change", () => (calm.matches ? (stop(), draw(performance.now())) : start()));
+      keys.sort((a, b) => a.y - b.y);
+    }
+    function resize() {
+      field.resize(window.innerWidth, window.innerHeight, Math.min(1.75, window.devicePixelRatio || 1));
+      measure();
+    }
+    resize();
+    window.addEventListener("resize", resize);
+    document.fonts?.ready.then(measure);
+    window.addEventListener("load", measure);
+    if ("ResizeObserver" in window) new ResizeObserver(measure).observe(document.body);
+
+    const pointer = field.pointer;
+    let drag = 0;
+    window.addEventListener("pointermove", (e) => {
+      if (e.pointerType === "touch") return;
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+      pointer.active = true;
+    });
+    document.addEventListener("pointerleave", () => (pointer.active = false));
+    window.addEventListener("blur", () => (pointer.active = false));
+
+    const born = performance.now();
+    let raf = 0;
+    function frame(now) {
+      const H = window.innerHeight;
+      const c = window.scrollY + H / 2;
+      let i = 0;
+      while (i < keys.length - 2 && c > keys[i + 1].y) i++;
+      const A = keys[i], B = keys[Math.min(i + 1, keys.length - 1)];
+      const u = B.y > A.y ? (c - A.y) / (B.y - A.y) : 0;
+      // hold each shape while its section is read, morph in between
+      const t = Math.min(1, Math.max(0, (u - 0.26) / 0.48));
+      const quiet = calm.matches;
+      const targetDrag = pointer.active && !quiet ? (pointer.x / window.innerWidth - 0.5) * 0.5 : 0;
+      drag += (targetDrag - drag) * 0.05;
+      field.render({
+        a: A.shape,
+        b: B.shape,
+        t: u <= 0 ? 0 : t,
+        la: A.layout,
+        lb: B.layout,
+        time: (now - born) / 1000,
+        intro: quiet ? 1 : Math.min(1, (now - born) / 2600),
+        calm: quiet,
+        drag,
+        scrollShift: window.scrollY,
+      });
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+    document.addEventListener("visibilitychange", () => {
+      cancelAnimationFrame(raf);
+      if (!document.hidden) raf = requestAnimationFrame(frame);
+    });
   }
-  document.querySelectorAll("canvas[data-constellation]").forEach((c) => constellation(c, c.dataset.constellation));
 
   /* film chapters */
   const video = document.querySelector("[data-film]");

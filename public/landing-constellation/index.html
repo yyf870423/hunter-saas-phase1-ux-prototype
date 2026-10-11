@@ -13,10 +13,12 @@
     <title>HunterBuddy · 猎头的 AI 工作伙伴 · 铂寻 Boseek</title>
     <link rel="stylesheet" href="../landing-superhuman/assets/fonts/noto/index.css" />
     <link rel="stylesheet" href="page.css" />
+    <script defer src="field.js"></script>
     <script defer src="page.js"></script>
   </head>
   <body>
     <a class="skip" href="#main">跳到正文</a>
+    <canvas class="stage-field" aria-hidden="true" data-field></canvas>
 
     <header class="nav">
       <div class="wrap">
@@ -36,8 +38,7 @@
     </header>
 
     <main id="main">
-      <section class="hero" id="top" aria-labelledby="hero-title">
-        <canvas data-constellation="hero" aria-hidden="true"></canvas>
+      <section class="hero" id="top" aria-labelledby="hero-title" data-shape="head" data-l=".73,.56,.9,-.15,1" data-lm=".5,.77,.64,0,.9">
         <div class="wrap">
           <div class="hero-copy">
             <span class="eyebrow">HunterBuddy · 猎头的 AI 工作伙伴</span>
@@ -53,7 +54,7 @@
         <div class="scroll-cue caption" aria-hidden="true"><i></i>向下了解</div>
       </section>
 
-      <section class="section" aria-labelledby="scatter-title">
+      <section class="section problem" aria-labelledby="scatter-title" data-shape="scatter" data-l=".5,.5,1.05,0,.75" data-lm=".5,.5,1.15,0,.35">
         <div class="wrap split">
           <div class="stack">
             <span class="eyebrow">问题</span>
@@ -71,22 +72,22 @@
         </div>
       </section>
 
-      <section class="section band" id="product" aria-labelledby="product-title">
+      <section class="section" id="product" aria-labelledby="product-title" data-shape="ring" data-l=".305,.5,.94,0,1" data-lm=".5,.3,.8,0,.7">
         <div class="wrap split">
           <div class="film">
-            <video data-film src="../landing-editorial/assets/hunterbuddy-film.mp4" poster="../landing-editorial/assets/film-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片"></video>
+            <video data-film src="assets/hunterbuddy-constellation.mp4" poster="assets/constellation-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片"></video>
           </div>
           <div class="stack">
             <span class="eyebrow">产品短片</span>
             <h2 class="h" id="product-title">60 秒，看它怎样<br />为一个难岗位找人。</h2>
             <p class="body">建议打开声音观看。点选章节，直接跳到那一段。</p>
             <ol class="chapters" data-chapters>
-              <li><button class="chapter" type="button" data-t="12" aria-pressed="false"><b>01</b><span>先吃透岗位</span><small>0:12</small></button></li>
-              <li><button class="chapter" type="button" data-t="18.5" aria-pressed="false"><b>02</b><span>多路召回</span><small>0:18</small></button></li>
-              <li><button class="chapter" type="button" data-t="26" aria-pressed="false"><b>03</b><span>统一身份</span><small>0:26</small></button></li>
-              <li><button class="chapter" type="button" data-t="34" aria-pressed="false"><b>04</b><span>匹配依据</span><small>0:34</small></button></li>
-              <li><button class="chapter" type="button" data-t="40" aria-pressed="false"><b>05</b><span>人工判断</span><small>0:40</small></button></li>
-              <li><button class="chapter" type="button" data-t="48" aria-pressed="false"><b>06</b><span>研究沉淀</span><small>0:48</small></button></li>
+              <li><button class="chapter" type="button" data-t="16.8" aria-pressed="false"><b>01</b><span>先吃透岗位</span><small>0:16</small></button></li>
+              <li><button class="chapter" type="button" data-t="21.6" aria-pressed="false"><b>02</b><span>多路召回</span><small>0:21</small></button></li>
+              <li><button class="chapter" type="button" data-t="26.4" aria-pressed="false"><b>03</b><span>统一身份</span><small>0:26</small></button></li>
+              <li><button class="chapter" type="button" data-t="31.2" aria-pressed="false"><b>04</b><span>匹配依据</span><small>0:31</small></button></li>
+              <li><button class="chapter" type="button" data-t="36" aria-pressed="false"><b>05</b><span>人工判断</span><small>0:36</small></button></li>
+              <li><button class="chapter" type="button" data-t="43.2" aria-pressed="false"><b>06</b><span>研究沉淀</span><small>0:43</small></button></li>
             </ol>
           </div>
         </div>
@@ -99,61 +100,65 @@
             <h2 class="h-lg" id="how-title">从一个岗位，<br />走到一个人。</h2>
           </div>
           <div class="rows">
-            <article class="row">
+            <article class="row" data-shape="doc" data-l=".74,.5,.64,-.42,1" data-lm=".78,.5,.6,0,.2">
               <div class="row-copy">
                 <span class="eyebrow">01 · 先吃透岗位</span>
                 <h3 class="h">哪些必须，哪些加分，<br />哪些还不知道。</h3>
                 <p class="body">从岗位与客户要求出发，拆出条件。客户没说的，标为未知，不去猜。</p>
+                <div class="readout" aria-label="岗位条件示例">
+                  <div class="line"><span class="k">必须</span><span class="v">工业视觉 · 团队管理</span></div>
+                  <div class="line"><span class="k">加分</span><span class="v">量产落地 · 论文 / 专利</span></div>
+                  <div class="line"><span class="k">未知</span><span class="v open">薪酬范围 · 到岗时间<small>标为未知，等你去问</small></span></div>
+                </div>
               </div>
-              <div class="readout" aria-label="岗位条件示例">
-                <div class="line"><span class="k">必须</span><span class="v">工业视觉 · 团队管理</span></div>
-                <div class="line"><span class="k">加分</span><span class="v">量产落地 · 论文 / 专利</span></div>
-                <div class="line"><span class="k">未知</span><span class="v open">薪酬范围 · 到岗时间<small>标为未知，等你去问</small></span></div>
-              </div>
+              <div class="row-space" aria-hidden="true"></div>
             </article>
-            <article class="row">
+            <article class="row" data-shape="three,one" data-at=".22,.78" data-l=".26,.5,.66,0,1" data-lm=".78,.5,.62,0,.2">
               <div class="row-copy">
                 <span class="eyebrow">02 · 统一身份</span>
                 <h3 class="h">三个名字，<br />认出是同一个人。</h3>
                 <p class="body">六路召回之后，核对简历、论文作者与开源账号是否为同一人，合并重复资料，补全彼此缺的部分。</p>
+                <div class="readout" aria-label="身份合并示例">
+                  <div class="line"><span class="k">简历库</span><span class="v">林越<small>2019 年简历</small></span></div>
+                  <div class="line"><span class="k">论文</span><span class="v">Lin Y.<small>视觉检测方向论文作者</small></span></div>
+                  <div class="line"><span class="k">开源</span><span class="v">lin-yue<small>代码贡献者</small></span></div>
+                  <div class="line merge"><span class="k">合并</span><span class="v">林越 · 工业视觉 · 团队负责人<small>3 个来源 · 身份核对有依据</small></span></div>
+                </div>
               </div>
-              <div class="readout" aria-label="身份合并示例">
-                <div class="line"><span class="k">简历库</span><span class="v">林越<small>2019 年简历</small></span></div>
-                <div class="line"><span class="k">论文</span><span class="v">Lin Y.<small>视觉检测方向论文作者</small></span></div>
-                <div class="line"><span class="k">开源</span><span class="v">lin-yue<small>代码贡献者</small></span></div>
-                <div class="line merge"><span class="k">合并</span><span class="v">林越 · 工业视觉 · 团队负责人<small>3 个来源 · 身份核对有依据</small></span></div>
-              </div>
+              <div class="row-space" aria-hidden="true"></div>
             </article>
-            <article class="row">
+            <article class="row" data-shape="check" data-l=".74,.5,.6,.25,1" data-lm=".78,.5,.6,0,.2">
               <div class="row-copy">
                 <span class="eyebrow">03 · 匹配依据</span>
                 <h3 class="h">理由，<br />连同来源。</h3>
                 <p class="body">每条匹配理由都对应资料来源；没有可靠依据的，标为待确认或待了解，不把推测当事实。</p>
+                <div class="readout" aria-label="匹配依据示例">
+                  <div class="line"><span class="k ok">有依据</span><span class="v">产线视觉与算法团队经历<small>简历 · 团队页</small></span></div>
+                  <div class="line"><span class="k ok">有依据</span><span class="v">视觉检测方向的论文<small>论文作者 · 已核对</small></span></div>
+                  <div class="line"><span class="k">待了解</span><span class="v open">实际管理范围<small>暂无可靠来源</small></span></div>
+                  <div class="line"><span class="k">待确认</span><span class="v open">本人求职意向<small>需要本人沟通</small></span></div>
+                </div>
               </div>
-              <div class="readout" aria-label="匹配依据示例">
-                <div class="line"><span class="k ok">有依据</span><span class="v">产线视觉与算法团队经历<small>简历 · 团队页</small></span></div>
-                <div class="line"><span class="k ok">有依据</span><span class="v">视觉检测方向的论文<small>论文作者 · 已核对</small></span></div>
-                <div class="line"><span class="k">待了解</span><span class="v open">实际管理范围<small>暂无可靠来源</small></span></div>
-                <div class="line"><span class="k">待确认</span><span class="v open">本人求职意向<small>需要本人沟通</small></span></div>
-              </div>
+              <div class="row-space" aria-hidden="true"></div>
             </article>
-            <article class="row" id="boundary">
+            <article class="row" id="boundary" data-shape="gate" data-l=".26,.5,.6,-.3,1" data-lm=".7,.5,.6,0,.2">
               <div class="row-copy">
                 <span class="eyebrow">04 · 人工判断</span>
                 <h3 class="h">到这里，它停下。<br /><span class="amber">联系和推荐，你来定。</span></h3>
                 <p class="body">找人、查重、匹配交给 HunterBuddy。候选人温度、客户关系、联系时机和正式推荐，需要懂这盘业务的你来决定。</p>
+                <div class="readout judge" aria-label="由你决定的事">
+                  <div class="line"><span class="k">你来决定</span><span class="v">谁值得联系、先联系谁</span></div>
+                  <div class="line"><span class="k">你来决定</span><span class="v">何时开口、怎么说</span></div>
+                  <div class="line"><span class="k">你来决定</span><span class="v">是否正式推荐、做出承诺</span></div>
+                </div>
               </div>
-              <div class="readout judge" aria-label="由你决定的事">
-                <div class="line"><span class="k">你来决定</span><span class="v">谁值得联系、先联系谁</span></div>
-                <div class="line"><span class="k">你来决定</span><span class="v">何时开口、怎么说</span></div>
-                <div class="line"><span class="k">你来决定</span><span class="v">是否正式推荐、做出承诺</span></div>
-              </div>
+              <div class="row-space" aria-hidden="true"></div>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="section band" id="work" aria-labelledby="work-title">
+      <section class="section" id="work" aria-labelledby="work-title" data-shape="globe" data-at=".42" data-l=".8,.5,.6,0,.3" data-lm=".5,.5,.85,0,.16">
         <div class="wrap">
           <div class="scen-head">
             <div class="stack" style="max-width: 760px">
@@ -169,14 +174,12 @@
         </div>
       </section>
 
-      <section class="section" id="assets" aria-labelledby="assets-title">
+      <section class="section" id="assets" aria-labelledby="assets-title" data-shape="pent" data-at=".3" data-l=".75,.5,.56,0,.9" data-lm=".72,.5,.65,0,.22">
         <div class="wrap">
-          <div class="split" style="margin-bottom: 72px">
-            <div class="stack">
-              <span class="eyebrow">研究资产</span>
-              <h2 class="h-lg" id="assets-title">做过的研究，<br />不必从头再来。</h2>
-            </div>
-            <p class="body" style="align-self: end">不只保存五类资料，更把职业经历、招聘需求、人物角色与技术成果连在一起。关系里待核实的部分，会一直标着。</p>
+          <div class="stack assets-head">
+            <span class="eyebrow">研究资产</span>
+            <h2 class="h-lg" id="assets-title">做过的研究，<br />不必从头再来。</h2>
+            <p class="body">不只保存五类资料，更把职业经历、招聘需求、人物角色与技术成果连在一起。关系里待核实的部分，会一直标着。</p>
           </div>
           <ul class="assets" aria-label="五类研究资产">
             <li>公司</li>
@@ -201,8 +204,7 @@
         </div>
       </section>
 
-      <section class="closing band" aria-labelledby="closing-title">
-        <canvas data-constellation="drift" aria-hidden="true"></canvas>
+      <section class="closing" aria-labelledby="closing-title" data-shape="logo" data-l=".76,.5,.6,-.2,1" data-lm=".72,.5,.6,0,.22">
         <div class="wrap">
           <span class="eyebrow">带上一个真实的难题</span>
           <h2 class="h-lg" id="closing-title">带个难岗位来，<br />看看 HunterBuddy <span class="nb">能找到谁。</span></h2>
@@ -211,7 +213,7 @@
         </div>
       </section>
 
-      <section class="section" id="apply" aria-labelledby="apply-title">
+      <section class="section" id="apply" aria-labelledby="apply-title" data-shape="dust" data-l=".5,.5,1.1,0,.5" data-lm=".5,.5,1.1,0,.3">
         <div class="wrap split rev">
           <div class="about" id="about">
             <span class="eyebrow">关于铂寻</span>
