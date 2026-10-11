@@ -135,6 +135,16 @@ const alternatives = {
     "assets/finesse.png",
     "assets/origin.png",
     "assets/superhuman.png",
+    "assets/editorial.png",
+  ],
+  "landing-editorial": [
+    "index.html",
+    "page.css",
+    "page.js",
+    "assets/boseek-navy.svg",
+    "assets/boseek-white.svg",
+    "assets/film-poster.jpg",
+    "assets/hunterbuddy-film.mp4",
   ],
   "landing-superhuman": [
     "index.html",
