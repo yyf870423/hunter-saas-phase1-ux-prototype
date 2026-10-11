@@ -136,7 +136,9 @@ const alternatives = {
     "assets/origin.png",
     "assets/editorial.png",
     "assets/journal.png",
+    "assets/constellation.png",
   ],
+  "landing-constellation": ["index.html", "page.css", "page.js"],
   "landing-journal": [
     "index.html",
     "page.css",
