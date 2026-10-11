@@ -136,16 +136,7 @@ const alternatives = {
     "assets/origin.png",
     "assets/editorial.png",
     "assets/journal.png",
-    "assets/constellation.png",
     "assets/magazine.png",
-  ],
-  "landing-constellation": [
-    "index.html",
-    "page.css",
-    "page.js",
-    "field.js",
-    "assets/hunterbuddy-constellation.mp4",
-    "assets/constellation-poster.jpg",
   ],
   "landing-magazine": [
     "index.html",
@@ -204,7 +195,7 @@ const alternatives = {
   ],
 };
 for (const directory of ["public", "dist"])
-  for (const withdrawn of ["landing-explore", "landing-particle"])
+  for (const withdrawn of ["landing-explore", "landing-particle", "landing-constellation"])
     await assert.rejects(
       lstat(resolve(root, directory, withdrawn)),
       { code: "ENOENT" },
