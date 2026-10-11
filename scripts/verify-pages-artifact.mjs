@@ -137,8 +137,16 @@ const alternatives = {
     "assets/editorial.png",
     "assets/journal.png",
     "assets/constellation.png",
+    "assets/magazine.png",
   ],
   "landing-constellation": ["index.html", "page.css", "page.js"],
+  "landing-magazine": [
+    "index.html",
+    "page.css",
+    "page.js",
+    "assets/fonts/serif-subset.woff",
+    "assets/fonts/notoserifsc-OFL.txt",
+  ],
   "landing-journal": [
     "index.html",
     "page.css",
