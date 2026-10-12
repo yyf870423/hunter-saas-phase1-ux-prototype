@@ -159,31 +159,11 @@
     rules.push(r);
   }
 
-  /* ---------------- scenarios advance as you scroll ---------------- */
+  /* ---------------- scenarios: one continuous section, switched by click ---------------- */
   const work = root.querySelector("#work");
-  const overview = work.querySelector(".s-overview");
-  const tablist = work.querySelector(".s-scenario-tabs");
-  const content = work.querySelector(".s-work-content");
   const panel = work.querySelector(".f-work-panel");
-  const tabs = [...tablist.querySelectorAll('[role="tab"]')];
-  const header = root.querySelector(".f-header");
-  const bar = el("div", "s-tabbar", '<div class="f-container"></div>');
-  const progress = el("span", "s-progress");
-  progress.setAttribute("aria-hidden", "true");
-  bar.firstElementChild.append(tablist);
-  bar.append(progress);
-  tabs.forEach((tab, i) => {
-    const step = el("span", "s-step", `0${i + 1}`);
-    step.setAttribute("aria-hidden", "true");
-    tab.append(step);
-  });
-  const stick = el("div", "s-stick");
-  content.before(stick);
-  stick.append(bar, content);
-  const spacer = el("div", "s-spacer");
-  spacer.setAttribute("aria-hidden", "true");
-  work.append(spacer);
-
+  const tabs = [...work.querySelectorAll('.s-scenario-tabs [role="tab"]')];
+  let shownIndex = Math.max(0, tabs.findIndex((t) => t.getAttribute("aria-selected") === "true"));
   const rowsIn = () => {
     if (reduced.matches) return;
     panel.querySelectorAll(".f-work-lead > *").forEach((n, i) =>
@@ -193,45 +173,113 @@
       n.animate([{ opacity: 0, transform: "translateX(-14px)" }, { opacity: 1, transform: "none" }], { duration: 560, delay: 120 + i * 90, easing: EASE, fill: "backwards" }),
     );
   };
+  const followTabs = () => {
+    const i = tabs.findIndex((t) => t.getAttribute("aria-selected") === "true");
+    if (i >= 0 && i !== shownIndex) { shownIndex = i; rowsIn(); }
+  };
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", followTabs);
+    tab.addEventListener("keydown", () => setTimeout(followTabs));
+  });
 
-  let pinned = false, range = 0, lockUntil = 0, shownIndex = 0;
-  const selectedIndex = () => Math.max(0, tabs.findIndex((t) => t.getAttribute("aria-selected") === "true"));
-  function layout() {
-    const headerH = header ? header.offsetHeight : 72;
-    root.style.setProperty("--s-header-h", `${headerH}px`);
-    const want = innerWidth >= 1100 && !reduced.matches;
-    work.classList.toggle("s-pinned", want);
-    pinned = want && stick.offsetHeight + headerH + 12 <= innerHeight;
-    work.classList.toggle("s-pinned", pinned);
-    range = pinned ? Math.round(innerHeight * 0.7) * (tabs.length - 1) : 0;
-    spacer.style.height = `${range}px`;
-    sync();
+  /* ---------------- 研究资产: an editorial arc diagram ---------------- */
+  // Five assets sit on one baseline; relations are arcs above it (ordered so no two arcs cross).
+  // The selected task draws its arcs in blue and numbers its stops; dashed arcs still need confirming.
+  const net = root.querySelector(".f-asset-network");
+  const resources = window.FinesseHomepageData?.resources;
+  const model = window.FinesseHomepageData?.assetNetwork;
+  if (net && resources && model) {
+    const NS = "http://www.w3.org/2000/svg";
+    const svgEl = (tag, attrs = {}, text) => {
+      const n = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      if (text != null) n.textContent = text;
+      return n;
+    };
+    const ORDER = ["research", "candidate", "job", "company", "contact"];
+    const label = new Map(resources.map((r) => [r.id, r]));
+    const W = 760, H = 400, BASE = 292, STEP = 155, X0 = 70;
+    const X = (id) => X0 + ORDER.indexOf(id) * STEP;
+    const holder = el("div", "s-arcs");
+    holder.setAttribute("aria-hidden", "true");
+    net.querySelector(".f-network-map").after(holder);
+    net.classList.add("s-arcs-on");
+    let parts = null;
+    let lastPath = "";
+
+    const build = () => {
+      const w = holder.clientWidth || 640;
+      const k = W / w; // viewBox units per screen pixel
+      const compact = w < 560;
+      const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, class: compact ? "is-compact" : "" });
+      svg.append(svgEl("line", { x1: 30, y1: BASE, x2: W - 30, y2: BASE, class: "s-arc-base" }));
+      const arcs = new Map();
+      model.edges.forEach((edge) => {
+        const [a, b] = [X(edge.from), X(edge.to)].sort((p, q) => p - q);
+        const rx = (b - a) / 2, ry = Math.min(rx * 0.96, 212);
+        const d = `M${a} ${BASE} A${rx} ${ry} 0 0 1 ${b} ${BASE}`;
+        const g = svgEl("g", { class: `s-arc${edge.pending ? " is-pending" : ""}` });
+        g.append(svgEl("path", { d, class: "s-arc-line" }));
+        const ink = svgEl("path", edge.pending ? { d, class: "s-arc-ink" } : { d, class: "s-arc-ink", pathLength: 1 });
+        g.append(ink);
+        const tx = (a + b) / 2, ty = BASE - ry - 10 * k;
+        g.append(svgEl("text", { x: tx, y: ty - 15 * k, class: "s-arc-label", "font-size": (13 * k).toFixed(1) }, edge.label));
+        g.append(svgEl("text", { x: tx, y: ty - 1 * k, class: "s-arc-note", "font-size": (11 * k).toFixed(1) }, edge.note));
+        svg.append(g);
+        arcs.set(edge.id, { g, ink });
+      });
+      const dots = new Map();
+      ORDER.forEach((id) => {
+        const x = X(id);
+        const g = svgEl("g", { class: `s-node${id === "candidate" ? " is-hub" : ""}` });
+        g.append(svgEl("circle", { cx: x, cy: BASE, r: (id === "candidate" ? 7 : 5) * k, class: "s-node-dot" }));
+        g.append(svgEl("circle", { cx: x, cy: BASE, r: 11 * k, class: "s-node-step" }));
+        const num = svgEl("text", { x, y: BASE + 4 * k, class: "s-node-num", "font-size": (11 * k).toFixed(1) }, "");
+        g.append(num);
+        g.append(svgEl("text", { x, y: BASE + 34 * k, class: "s-node-label", "font-size": (compact ? 14 : 19) * k }, label.get(id).label));
+        if (!compact) g.append(svgEl("text", { x, y: BASE + 54 * k, class: "s-node-detail", "font-size": 12 * k }, label.get(id).detail));
+        svg.append(g);
+        dots.set(id, { g, num });
+      });
+      holder.replaceChildren(svg);
+      parts = { arcs, dots };
+      lastPath = "";
+      update(false);
+    };
+
+    const update = (animate = true) => {
+      if (!parts) return;
+      const path = model.paths.find((p) => p.id === net.dataset.activePath) || model.paths[0];
+      if (path.id === lastPath) return;
+      lastPath = path.id;
+      const motion = animate && !reduced.matches && Element.prototype.animate;
+      parts.arcs.forEach(({ g, ink }, id) => {
+        const i = path.edges.indexOf(id);
+        g.classList.toggle("is-active", i >= 0);
+        ink.getAnimations?.().forEach((a) => a.cancel());
+        if (i >= 0 && motion)
+          ink.animate(
+            ink.hasAttribute("pathLength") ? [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }] : [{ opacity: 0 }, { opacity: 1 }],
+            { duration: 700, delay: 120 + i * 220, easing: EASE, fill: "backwards" },
+          );
+      });
+      parts.dots.forEach(({ g, num }, id) => {
+        const i = path.nodes.indexOf(id);
+        g.classList.toggle("is-active", i >= 0);
+        num.textContent = i >= 0 ? String(i + 1) : "";
+        if (i >= 0 && motion)
+          g.animate([{ opacity: 0.4 }, { opacity: 1 }], { duration: 500, delay: 80 + i * 220, easing: EASE, fill: "backwards" });
+      });
+    };
+
+    new MutationObserver(() => update()).observe(net, { attributes: true, attributeFilter: ["data-active-path"] });
+    let lastW = 0;
+    new ResizeObserver(() => {
+      const w = Math.round(holder.clientWidth);
+      if (w && Math.abs(w - lastW) > 4) { lastW = w; build(); }
+    }).observe(holder);
+    build();
   }
-  function start() {
-    return overview.getBoundingClientRect().bottom + scrollY - (header ? header.offsetHeight : 72);
-  }
-  function sync() {
-    if (!pinned) { progress.style.transform = "scaleX(0)"; return; }
-    const p = clamp((scrollY - start()) / Math.max(1, range));
-    progress.style.transform = `scaleX(${p.toFixed(4)})`;
-    if (performance.now() < lockUntil) return;
-    const index = Math.min(tabs.length - 1, Math.floor(p * (tabs.length - 1) + 0.5));
-    if (index !== selectedIndex()) tabs[index].click();
-  }
-  tabs.forEach((tab, i) =>
-    tab.addEventListener("click", (event) => {
-      if (shownIndex !== i) { shownIndex = i; rowsIn(); }
-      if (!event.isTrusted || !pinned) return;
-      // a reader's click moves the page to that scenario's stretch of the scroll
-      lockUntil = performance.now() + 1100;
-      scrollTo({ top: start() + (range * i) / (tabs.length - 1) + 1, behavior: "smooth" });
-    }),
-  );
-  addEventListener("scroll", sync, { passive: true });
-  let resizeTimer = 0;
-  addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(layout, 120); });
-  reduced.addEventListener?.("change", layout);
-  layout();
 
   /* ---------------- research carousel: counter and timer line ---------------- */
   const research = root.querySelector("#research");
@@ -271,7 +319,7 @@
     [".f-work-intro h2", rise(36), () => 100, 1000],
     [".f-work-intro > p", rise(24), () => 260, 900],
     [".s-overview-heading p", rise(24), () => 0, 900],
-    [".s-tabbar", rise(16), () => 120, 800],
+    [".s-scenario-tabs", rise(16), () => 120, 800],
     [".s-work-content", rise(32), () => 220, 1000],
     [".p-intro h2 > span", lineUp, (i) => i * 120, 900],
     [".p-intro > p", rise(20), () => 260, 900],

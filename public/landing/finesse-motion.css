@@ -156,6 +156,145 @@
   will-change: transform;
 }
 
+/* ---------- 研究资产: research route map (replaces the flowchart) ---------- */
+.fx-map-on .f-network-map {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.fx-map {
+  width: 100%;
+}
+.fx-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 18px 30px rgba(6, 25, 58, 0.08));
+}
+.fx-ground {
+  fill: #ffffff;
+}
+.fx-contours path {
+  fill: none;
+  stroke: #e3ecf7;
+  stroke-width: 1;
+}
+.fx-road-case {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+.fx-road-line {
+  fill: none;
+  stroke: #d2dcea;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease;
+}
+.fx-road.is-pending .fx-road-line {
+  stroke-dasharray: 0.1 7;
+  stroke-width: 3.5;
+}
+.fx-road-ink {
+  fill: none;
+  stroke: #0064dc;
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.fx-road-ink.is-pending {
+  stroke-dasharray: 0.1 8;
+  stroke-width: 5;
+}
+.fx-road-ink.is-active {
+  opacity: 1;
+}
+.fx-road-tag text {
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.fx-road-label {
+  fill: #8796a8;
+  transition: fill 0.35s ease;
+}
+.fx-road-tag.is-active .fx-road-label {
+  fill: #06193a;
+  font-weight: 500;
+}
+.fx-road-note {
+  fill: #0064dc;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.fx-road-tag.is-active .fx-road-note {
+  opacity: 1;
+}
+.is-compact .fx-road-tag:not(.is-active),
+.is-compact .fx-road-note {
+  display: none;
+}
+.fx-pin-ring {
+  fill: #ffffff;
+  stroke: #b7c5d6;
+  stroke-width: 1.5;
+}
+.fx-pin-dot {
+  fill: #9fb0c4;
+}
+.fx-pin.is-active .fx-pin-ring {
+  stroke: #0064dc;
+}
+.fx-stop {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.fx-pin.is-active .fx-stop {
+  opacity: 1;
+}
+.fx-stop circle {
+  fill: #0064dc;
+}
+.fx-stop text {
+  fill: #ffffff;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.fx-card-plate {
+  fill: rgba(255, 255, 255, 0.92);
+  stroke: rgba(6, 25, 58, 0.06);
+}
+.fx-card-label {
+  fill: #8796a8;
+  font-weight: 500;
+  transition: fill 0.35s ease;
+}
+.fx-pin.is-active .fx-card-label {
+  fill: #06193a;
+}
+.fx-card-detail {
+  fill: #9aa7b6;
+}
+.fx-traveller-halo {
+  fill: rgba(0, 100, 220, 0.16);
+}
+.fx-traveller-dot {
+  fill: #0064dc;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+.fx-route-probe {
+  fill: none;
+  stroke: none;
+}
+
 /* ---------- scroll reveals: hidden until finesse-motion.js animates them in ---------- */
 .motion #homepage.fx-on :is(.f-work-intro > *, .f-work-demo .f-tabs, .f-work-panel, .f-work-bottom, .p-intro h2 > span,
   .p-intro > p, .fx-steps, .fx-photo-col, .f-memory h2, .f-memory .f-container > p, .f-network-tabs, .f-network-story,

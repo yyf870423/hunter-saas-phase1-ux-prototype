@@ -123,6 +123,199 @@
   reduced.addEventListener?.("change", storyOn);
   storyOn();
 
+  /* ---------------- 研究资产: a research route map ---------------- */
+  // The five assets are places on a light map; relations are roads. Each task is a route:
+  // its roads turn blue, its stops are numbered, and a marker keeps travelling along it.
+  const net = root.querySelector(".f-asset-network");
+  const resources = window.FinesseHomepageData?.resources;
+  const model = window.FinesseHomepageData?.assetNetwork;
+  if (net && resources && model) {
+    const NS = "http://www.w3.org/2000/svg";
+    const svgEl = (tag, attrs = {}, text) => {
+      const n = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      if (text != null) n.textContent = text;
+      return n;
+    };
+    const W = 760;
+    const WIDE = { h: 460, at: { company: [175, 122], job: [590, 104], candidate: [388, 258], contact: [168, 370], research: [598, 368] } };
+    // on phones the map turns portrait so labels keep their room
+    const TALL = { h: 980, at: { company: [190, 170], job: [580, 150], candidate: [385, 500], contact: [175, 830], research: [585, 810] } };
+    let H = WIDE.h, PLACE = WIDE.at;
+    const BEND = { demand: -0.14, role: 0.16, experience: -0.1, fit: 0.1, connection: -0.14, authorship: 0.12 };
+    const info = new Map(resources.map((r) => [r.id, r]));
+    const control = (edge) => {
+      const [ax, ay] = PLACE[edge.from], [bx, by] = PLACE[edge.to];
+      const mx = (ax + bx) / 2, my = (ay + by) / 2, len = Math.hypot(bx - ax, by - ay);
+      const nx = -(by - ay) / len, ny = (bx - ax) / len, c = (BEND[edge.id] || 0.1) * len;
+      return [mx + nx * c, my + ny * c];
+    };
+    const curve = (edge, reverse = false) => {
+      const [cx, cy] = control(edge);
+      const [a, b] = reverse ? [PLACE[edge.to], PLACE[edge.from]] : [PLACE[edge.from], PLACE[edge.to]];
+      return { start: a, d: `Q${cx.toFixed(1)} ${cy.toFixed(1)} ${b[0]} ${b[1]}`, end: b };
+    };
+    const holder = el("div", "fx-map");
+    holder.setAttribute("aria-hidden", "true");
+    net.querySelector(".f-network-map").after(holder);
+    net.classList.add("fx-map-on");
+    let parts = null, lastPath = "", route = null, routeLen = 0, mapOn = false, travelRaf = 0;
+
+    const contours = () => {
+      const g = svgEl("g", { class: "fx-contours" });
+      const sy = H / 460;
+      [[300, 170, [36, 66, 98, 132]], [640, 260, [28, 54, 82]], [110, 250, [30, 58]], [470, 420, [40, 74]]].forEach(([cx, cy0, radii], h) => {
+        const cy = cy0 * sy;
+        radii.forEach((r, i) => {
+          let d = "";
+          for (let s = 0; s <= 48; s++) {
+            const a = (s / 48) * Math.PI * 2;
+            const rr = r * (1 + 0.12 * Math.sin(a * 3 + h + i * 0.7) + 0.06 * Math.cos(a * 5 + h));
+            d += `${s ? "L" : "M"}${(cx + Math.cos(a) * rr * 1.25).toFixed(1)} ${(cy + Math.sin(a) * rr * 0.85).toFixed(1)}`;
+          }
+          g.append(svgEl("path", { d: d + "Z" }));
+        });
+      });
+      return g;
+    };
+
+    const build = () => {
+      const w = holder.clientWidth || 640;
+      const k = W / w;
+      const compact = w < 560;
+      ({ h: H, at: PLACE } = compact ? TALL : WIDE);
+      const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, class: compact ? "is-compact" : "" });
+      const defs = svgEl("defs");
+      const clip = svgEl("clipPath", { id: "fx-map-clip" });
+      clip.append(svgEl("rect", { x: 0, y: 0, width: W, height: H, rx: 18 }));
+      defs.append(clip);
+      svg.append(defs);
+      const ground = svgEl("g", { "clip-path": "url(#fx-map-clip)" });
+      ground.append(svgEl("rect", { x: 0, y: 0, width: W, height: H, class: "fx-ground" }));
+      ground.append(contours());
+      svg.append(ground);
+      const roads = new Map();
+      const roadLayer = svgEl("g");
+      const inkLayer = svgEl("g");
+      const labelLayer = svgEl("g");
+      model.edges.forEach((edge) => {
+        const c = curve(edge);
+        const d = `M${c.start[0]} ${c.start[1]} ${c.d}`;
+        const g = svgEl("g", { class: `fx-road${edge.pending ? " is-pending" : ""}` });
+        g.append(svgEl("path", { d, class: "fx-road-case" }), svgEl("path", { d, class: "fx-road-line" }));
+        roadLayer.append(g);
+        const ink = svgEl("path", { d, class: `fx-road-ink${edge.pending ? " is-pending" : ""}` });
+        inkLayer.append(ink);
+        const [cx, cy] = control(edge);
+        const [ax, ay] = c.start, [bx, by] = c.end;
+        const lx = 0.25 * ax + 0.5 * cx + 0.25 * bx, ly = 0.25 * ay + 0.5 * cy + 0.25 * by;
+        const t = svgEl("g", { class: "fx-road-tag" });
+        t.append(svgEl("text", { x: lx, y: ly - 3 * k, "font-size": (12.5 * k).toFixed(1), class: "fx-road-label" }, edge.label));
+        t.append(svgEl("text", { x: lx, y: ly + 12 * k, "font-size": (10.5 * k).toFixed(1), class: "fx-road-note" }, edge.note));
+        labelLayer.append(t);
+        roads.set(edge.id, { g, ink, tag: t });
+      });
+      svg.append(roadLayer, inkLayer);
+      const marker = svgEl("g", { class: "fx-traveller" });
+      marker.append(svgEl("circle", { r: 13 * k, class: "fx-traveller-halo" }), svgEl("circle", { r: 5 * k, class: "fx-traveller-dot" }));
+      const pins = new Map();
+      Object.entries(PLACE).forEach(([id, [x, y]]) => {
+        const g = svgEl("g", { class: `fx-pin${id === "candidate" ? " is-hub" : ""}` });
+        g.append(svgEl("circle", { cx: x, cy: y, r: 10 * k, class: "fx-pin-ring" }));
+        g.append(svgEl("circle", { cx: x, cy: y, r: 4 * k, class: "fx-pin-dot" }));
+        const stop = svgEl("g", { class: "fx-stop" });
+        stop.append(svgEl("circle", { cx: x, cy: y, r: 11 * k }));
+        const num = svgEl("text", { x, y: y + 4 * k, "font-size": (11 * k).toFixed(1) }, "");
+        stop.append(num);
+        g.append(stop);
+        const right = x < W * 0.62;
+        const card = svgEl("g", { class: "fx-card" });
+        const lx = x + (right ? 20 : -20) * k;
+        const label = svgEl("text", { x: lx, y: y - (compact ? -5 : 2) * k, "font-size": ((compact ? 13 : 16) * k).toFixed(1), class: "fx-card-label", "text-anchor": right ? "start" : "end" }, info.get(id).label);
+        card.append(label);
+        if (!compact) card.append(svgEl("text", { x: lx, y: y + 15 * k, "font-size": (11 * k).toFixed(1), class: "fx-card-detail", "text-anchor": right ? "start" : "end" }, info.get(id).detail));
+        g.append(card);
+        pins.set(id, { g, num });
+      });
+      const pinLayer = svgEl("g");
+      pins.forEach(({ g }) => pinLayer.append(g));
+      svg.append(labelLayer, marker, pinLayer);
+      const routePath = svgEl("path", { class: "fx-route-probe" });
+      svg.append(routePath);
+      holder.replaceChildren(svg);
+      parts = { roads, pins, marker, routePath, k };
+      // place cards behind a soft plate so they stay legible over roads
+      pins.forEach(({ g }) => {
+        const card = g.querySelector(".fx-card");
+        const bb = card.getBBox();
+        const plate = svgEl("rect", { x: bb.x - 8 * k, y: bb.y - 5 * k, width: bb.width + 16 * k, height: bb.height + 10 * k, rx: 8 * k, class: "fx-card-plate" });
+        card.prepend(plate);
+      });
+      lastPath = "";
+      update(false);
+    };
+
+    const update = (animate = true) => {
+      if (!parts) return;
+      const path = model.paths.find((p) => p.id === net.dataset.activePath) || model.paths[0];
+      if (path.id === lastPath) return;
+      lastPath = path.id;
+      const motion = animate && !reduced.matches;
+      parts.roads.forEach(({ g, ink, tag }, id) => {
+        const i = path.edges.indexOf(id);
+        g.classList.toggle("is-active", i >= 0);
+        tag.classList.toggle("is-active", i >= 0);
+        ink.classList.toggle("is-active", i >= 0);
+        ink.getAnimations?.().forEach((a) => a.cancel());
+        if (i >= 0 && motion && !ink.classList.contains("is-pending")) {
+          const len = ink.getTotalLength();
+          ink.animate([{ strokeDasharray: `${len}`, strokeDashoffset: len }, { strokeDasharray: `${len}`, strokeDashoffset: 0 }], { duration: 650, delay: 100 + i * 260, easing: EASE, fill: "backwards" });
+        }
+      });
+      parts.pins.forEach(({ g, num }, id) => {
+        const i = path.nodes.indexOf(id);
+        g.classList.toggle("is-active", i >= 0);
+        num.textContent = i >= 0 ? String(i + 1) : "";
+      });
+      // one continuous route through the task's roads, for the travelling marker
+      let at = path.nodes[0], d = `M${PLACE[at][0]} ${PLACE[at][1]}`;
+      path.edges.forEach((id) => {
+        const edge = model.edges.find((e) => e.id === id);
+        const reverse = edge.to === at;
+        const c = curve(edge, reverse);
+        if (c.start !== PLACE[at]) d += ` M${c.start[0]} ${c.start[1]}`;
+        d += ` ${c.d}`;
+        at = reverse ? edge.from : edge.to;
+      });
+      parts.routePath.setAttribute("d", d);
+      routeLen = parts.routePath.getTotalLength();
+      route = { started: performance.now() + (motion ? 100 + path.edges.length * 260 : 0), dur: 1900 * path.edges.length };
+      travel();
+    };
+
+    const travel = () => { if (!travelRaf) travelRaf = requestAnimationFrame(step); };
+    const step = (now) => {
+      travelRaf = 0;
+      if (!parts || !route || !mapOn || document.hidden || reduced.matches) { parts?.marker.setAttribute("opacity", "0"); return; }
+      const t = ((now - route.started) % route.dur + route.dur) % route.dur / route.dur;
+      const visible = now >= route.started;
+      const pt = parts.routePath.getPointAtLength(t * routeLen);
+      parts.marker.setAttribute("transform", `translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)})`);
+      parts.marker.setAttribute("opacity", visible ? (Math.min(1, t * 8, (1 - t) * 8)).toFixed(2) : "0");
+      travelRaf = requestAnimationFrame(step);
+    };
+
+    new MutationObserver(() => update()).observe(net, { attributes: true, attributeFilter: ["data-active-path"] });
+    new IntersectionObserver(([en]) => { mapOn = en.isIntersecting; travel(); }).observe(holder);
+    document.addEventListener("visibilitychange", travel);
+    let lastW = 0;
+    new ResizeObserver(() => {
+      const w = Math.round(holder.clientWidth);
+      if (w && Math.abs(w - lastW) > 4) { lastW = w; build(); }
+    }).observe(holder);
+    build();
+  }
+
   /* ---------------- about: the photo drifts as it passes ---------------- */
   const aboutImg = root.querySelector(".f-about-image img");
   if (aboutImg) {

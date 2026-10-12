@@ -67,7 +67,7 @@
   cloudsOn();
 
   /* ---------------- dark cards catch a glow that follows the cursor ---------------- */
-  const glowTargets = [".f-network-map [data-node]", ".p-stage", ".f-trial-form", ".f-work-panel"];
+  const glowTargets = [".p-stage", ".f-trial-form", ".f-work-panel"];
   const hosts = [];
   glowTargets.forEach((sel) =>
     root.querySelectorAll(sel).forEach((host) => {
@@ -90,20 +90,116 @@
     host.addEventListener("pointerleave", () => host.classList.remove("is-glowing"));
   });
 
-  /* ---------------- network: data keeps flowing along the active path ---------------- */
-  const network = root.querySelector(".f-asset-network");
-  const wiresSvg = network?.querySelector(".f-network-wires");
+  /* ---------------- 研究资产: a constellation ---------------- */
+  // Assets are stars on a night sky; relations are faint lines between them. The selected task
+  // lights up as a constellation — numbered stars, bright lines and small packets of light flowing on.
+  const net = root.querySelector(".f-asset-network");
+  const resources = window.FinesseHomepageData?.resources;
   const model = window.FinesseHomepageData?.assetNetwork;
-  if (network && wiresSvg && model) {
+  if (net && resources && model) {
     const NS = "http://www.w3.org/2000/svg";
-    const group = document.createElementNS(NS, "g");
-    group.setAttribute("class", "o-packets");
-    wiresSvg.append(group);
-    const wire = (id) => wiresSvg.querySelector(`[data-wire="${id}"]`);
-    let flows = [];
-    const plan = () => {
-      group.replaceChildren();
-      const path = model.paths.find((p) => p.id === network.dataset.activePath) || model.paths[0];
+    const svgEl = (tag, attrs = {}, text) => {
+      const n = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      if (text != null) n.textContent = text;
+      return n;
+    };
+    const W = 760;
+    const WIDE = { h: 470, at: { research: [140, 128], candidate: [360, 218], company: [592, 118], job: [640, 350], contact: [300, 410] } };
+    const TALL = { h: 960, at: { research: [160, 180], candidate: [500, 480], company: [610, 150], job: [600, 790], contact: [170, 770] } };
+    let H = WIDE.h, AT = WIDE.at;
+    const info = new Map(resources.map((r) => [r.id, r]));
+    const holder = el("div", "o-sky");
+    holder.setAttribute("aria-hidden", "true");
+    net.querySelector(".f-network-map").after(holder);
+    net.classList.add("o-sky-on");
+    let parts = null, lastPath = "", flows = [], skyOn = false, skyRaf = 0;
+    let seed = 7;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+    const build = () => {
+      const w = holder.clientWidth || 640;
+      const k = W / w;
+      const compact = w < 560;
+      ({ h: H, at: AT } = compact ? TALL : WIDE);
+      seed = 7;
+      const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, class: compact ? "is-compact" : "" });
+      const defs = svgEl("defs");
+      const glow = svgEl("radialGradient", { id: "o-star-glow" });
+      glow.append(svgEl("stop", { offset: "0", "stop-color": "#d1c9ff", "stop-opacity": "0.55" }), svgEl("stop", { offset: "1", "stop-color": "#d1c9ff", "stop-opacity": "0" }));
+      defs.append(glow);
+      svg.append(defs);
+      const field = svgEl("g", { class: "o-field" });
+      for (let i = 0; i < 140; i++) {
+        const s = svgEl("circle", { cx: (rnd() * W).toFixed(1), cy: (rnd() * H).toFixed(1), r: ((0.5 + rnd() * 1.1) * k * 0.8).toFixed(2), opacity: (0.12 + rnd() * 0.45).toFixed(2) });
+        if (i % 9 === 0) { s.setAttribute("class", "is-twinkle"); s.style.animationDelay = `${(-rnd() * 6).toFixed(2)}s`; }
+        field.append(s);
+      }
+      svg.append(field);
+      const lines = new Map();
+      const lineLayer = svgEl("g"), inkLayer = svgEl("g"), tagLayer = svgEl("g"), packetLayer = svgEl("g", { class: "o-packets" });
+      model.edges.forEach((edge) => {
+        const [ax, ay] = AT[edge.from], [bx, by] = AT[edge.to];
+        const d = `M${ax} ${ay} L${bx} ${by}`;
+        lineLayer.append(svgEl("path", { d, class: `o-line${edge.pending ? " is-pending" : ""}` }));
+        const ink = svgEl("path", edge.pending ? { d, class: "o-line-ink is-pending" } : { d, class: "o-line-ink", pathLength: 1 });
+        inkLayer.append(ink);
+        const len = Math.hypot(bx - ax, by - ay);
+        const nx = -(by - ay) / len, ny = (bx - ax) / len;
+        const off = 15 * k * (ny > 0 ? -1 : 1);
+        const mx = (ax + bx) / 2 + nx * off, my = (ay + by) / 2 + ny * off;
+        const tag = svgEl("g", { class: "o-tag" });
+        tag.append(svgEl("text", { x: mx, y: my, "font-size": (12 * k).toFixed(1), class: "o-tag-label" }, edge.label));
+        tag.append(svgEl("text", { x: mx, y: my + 14 * k, "font-size": (10.5 * k).toFixed(1), class: "o-tag-note" }, edge.note));
+        tagLayer.append(tag);
+        lines.set(edge.id, { ink, tag, edge });
+      });
+      svg.append(lineLayer, inkLayer, tagLayer, packetLayer);
+      const stars = new Map();
+      Object.entries(AT).forEach(([id, [x, y]]) => {
+        const g = svgEl("g", { class: `o-star${id === "candidate" ? " is-hub" : ""}` });
+        const halo = svgEl("circle", { cx: x, cy: y, r: (id === "candidate" ? 34 : 24) * k, fill: "url(#o-star-glow)", class: "o-star-halo" });
+        g.append(halo);
+        g.append(svgEl("circle", { cx: x, cy: y, r: 12 * k, class: "o-star-ring" }));
+        g.append(svgEl("circle", { cx: x, cy: y, r: (id === "candidate" ? 5.5 : 3.8) * k, class: "o-star-core" }));
+        const left = x > W * 0.55;
+        const below = compact && id === "candidate"; // on phones the hub's name sits under it, clear of the lines
+        const tx = below ? x : x + (left ? -20 : 20) * k;
+        const anchor = below ? "middle" : left ? "end" : "start";
+        const num = svgEl("text", { x: tx, y: y - (below ? 24 : 16) * k, "font-size": (10.5 * k).toFixed(1), class: "o-star-num", "text-anchor": anchor }, "");
+        g.append(num);
+        g.append(svgEl("text", { x: tx, y: y + (below ? 36 : 6) * k, "font-size": ((compact ? 15 : 18) * k).toFixed(1), class: "o-star-label", "text-anchor": anchor }, info.get(id).label));
+        if (!compact) g.append(svgEl("text", { x: tx, y: y + 23 * k, "font-size": (11 * k).toFixed(1), class: "o-star-detail", "text-anchor": anchor }, info.get(id).detail));
+        svg.append(g);
+        stars.set(id, { g, num, halo });
+      });
+      holder.replaceChildren(svg);
+      parts = { lines, stars, packetLayer, k };
+      lastPath = "";
+      update(false);
+    };
+
+    const update = (animate = true) => {
+      if (!parts) return;
+      const path = model.paths.find((p) => p.id === net.dataset.activePath) || model.paths[0];
+      if (path.id === lastPath) return;
+      lastPath = path.id;
+      const motion = animate && !reduced.matches;
+      parts.lines.forEach(({ ink, tag }, id) => {
+        const i = path.edges.indexOf(id);
+        ink.classList.toggle("is-active", i >= 0);
+        tag.classList.toggle("is-active", i >= 0);
+        ink.getAnimations?.().forEach((a) => a.cancel());
+        if (i >= 0 && motion)
+          ink.animate(ink.hasAttribute("pathLength") ? [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }] : [{ opacity: 0 }, { opacity: 1 }], { duration: 750, delay: 150 + i * 240, easing: EASE, fill: "backwards" });
+      });
+      parts.stars.forEach(({ g, num, halo }, id) => {
+        const i = path.nodes.indexOf(id);
+        g.classList.toggle("is-active", i >= 0);
+        num.textContent = i >= 0 ? `0${i + 1}` : "";
+        if (i >= 0 && motion) halo.animate([{ scale: 0.4, opacity: 0 }, { scale: 1.4, opacity: 1 }, { scale: 1, opacity: 1 }], { duration: 900, delay: 100 + i * 240, easing: EASE, fill: "backwards" });
+      });
+      // packets of light travel along the task's lines, outward from where the task starts
       const depths = new Map([[path.nodes[0], 0]]);
       const edges = model.edges.filter((e) => path.edges.includes(e.id));
       const queue = [path.nodes[0]];
@@ -112,41 +208,43 @@
           const other = edge.from === node ? edge.to : edge.to === node ? edge.from : null;
           if (other && !depths.has(other)) { depths.set(other, depths.get(node) + 1); queue.push(other); }
         });
+      parts.packetLayer.replaceChildren();
       flows = edges.flatMap((edge) => {
         const reverse = depths.get(edge.from) > depths.get(edge.to);
+        const [a, b] = reverse ? [AT[edge.to], AT[edge.from]] : [AT[edge.from], AT[edge.to]];
         const order = Math.min(depths.get(edge.from), depths.get(edge.to));
         return [0, 0.5].map((phase) => {
-          const dot = document.createElementNS(NS, "circle");
-          dot.setAttribute("r", "3");
-          if (edge.pending) dot.setAttribute("class", "is-pending");
-          group.append(dot);
-          return { dot, id: edge.id, reverse, phase: phase + order * 0.18 };
+          const dot = svgEl("circle", { r: (2.6 * parts.k).toFixed(2), class: edge.pending ? "is-pending" : "" });
+          parts.packetLayer.append(dot);
+          return { dot, a, b, phase: phase + order * 0.18 };
         });
       });
+      fly();
     };
-    let netOn = false, netRaf = 0;
+
+    const fly = () => { if (!skyRaf) skyRaf = requestAnimationFrame(tick); };
     const tick = (now) => {
-      netRaf = 0;
-      if (!netOn || reduced.matches || document.hidden) { group.style.display = "none"; return; }
-      group.style.display = "";
+      skyRaf = 0;
+      if (!parts || !skyOn || reduced.matches || document.hidden) { if (parts) parts.packetLayer.style.display = "none"; return; }
+      parts.packetLayer.style.display = "";
       for (const f of flows) {
-        const w = wire(f.id);
-        if (!w) continue;
-        const len = w.getTotalLength();
-        let u = (now / 2600 + f.phase) % 1;
-        if (f.reverse) u = 1 - u;
-        const pt = w.getPointAtLength(u * len);
-        f.dot.setAttribute("cx", pt.x.toFixed(1));
-        f.dot.setAttribute("cy", pt.y.toFixed(1));
-        f.dot.setAttribute("opacity", (Math.sin(Math.PI * ((now / 2600 + f.phase) % 1)) * 0.9 + 0.1).toFixed(2));
+        const u = (now / 2600 + f.phase) % 1;
+        f.dot.setAttribute("cx", (f.a[0] + (f.b[0] - f.a[0]) * u).toFixed(1));
+        f.dot.setAttribute("cy", (f.a[1] + (f.b[1] - f.a[1]) * u).toFixed(1));
+        f.dot.setAttribute("opacity", (Math.sin(Math.PI * u) * 0.9 + 0.1).toFixed(2));
       }
-      netRaf = requestAnimationFrame(tick);
+      skyRaf = requestAnimationFrame(tick);
     };
-    const go = () => { if (!netRaf) netRaf = requestAnimationFrame(tick); };
-    new MutationObserver(() => { plan(); go(); }).observe(network, { attributes: true, attributeFilter: ["data-active-path"] });
-    new IntersectionObserver(([en]) => { netOn = en.isIntersecting; go(); }).observe(network);
-    document.addEventListener("visibilitychange", go);
-    plan();
+
+    new MutationObserver(() => update()).observe(net, { attributes: true, attributeFilter: ["data-active-path"] });
+    new IntersectionObserver(([en]) => { skyOn = en.isIntersecting; fly(); }).observe(holder);
+    document.addEventListener("visibilitychange", fly);
+    let lastW = 0;
+    new ResizeObserver(() => {
+      const w = Math.round(holder.clientWidth);
+      if (w && Math.abs(w - lastW) > 4) { lastW = w; build(); }
+    }).observe(holder);
+    build();
   }
 
   /* ---------------- reveals: things come out of the haze ---------------- */

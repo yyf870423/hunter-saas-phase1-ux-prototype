@@ -170,58 +170,33 @@
   }
 }
 
-/* ---------- scenarios: the tab bar and panel pin, scrolling advances the scenario ---------- */
-.s-overview {
-  padding-bottom: 8px;
-}
-.s-tabbar {
-  position: relative;
-  background: var(--f-deep);
-}
-.s-tabbar .s-scenario-tabs {
-  margin-top: 0;
-}
-.s-stick {
+/* ---------- scenarios: one continuous light section (no navy band), switched by click ---------- */
+.s-homepage .s-overview {
+  padding: 8px 0 0;
   background: var(--f-bg);
+  color: var(--f-deep);
 }
-.s-progress {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 2px;
-  width: 100%;
-  background: #8fc2ff;
-  transform-origin: 0 50%;
-  transform: scaleX(0);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.s-homepage .s-overview-heading p {
+  color: var(--f-deep);
 }
-.s-pinned .s-progress {
-  opacity: 1;
+.s-homepage .s-scenario-tabs {
+  border-color: var(--f-line);
 }
-.s-pinned .s-stick {
-  position: sticky;
-  top: var(--s-header-h, 72px);
-  z-index: 4;
+.s-homepage .s-scenario-tabs .f-tab {
+  color: #5b6b80;
 }
-.s-pinned .s-work-content {
-  padding-block: 28px 20px;
+.s-homepage .s-scenario-tabs .f-tab[aria-selected="true"],
+.s-homepage .s-scenario-tabs .f-tab:hover {
+  color: var(--f-deep);
 }
-.s-pinned .s-tabbar .s-step {
-  display: inline-block;
+.s-homepage .s-scenario-tabs .f-tab::after {
+  background: var(--f-accent-text);
 }
-.s-tabbar .s-step {
-  display: none;
-  margin-left: 10px;
-  color: #8fa7c2;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
+.s-homepage .s-scenario-tabs .f-tab:focus-visible {
+  outline-color: var(--f-accent-text);
 }
-.s-spacer {
-  display: none;
-}
-.s-pinned .s-spacer {
-  display: block;
+.s-homepage .s-opening {
+  padding-bottom: 40px;
 }
 
 /* ---------- research carousel: visible controls, a counter and a timer line ---------- */
@@ -286,9 +261,117 @@
   }
 }
 
+/* ---------- 研究资产: editorial arc diagram (replaces the flowchart) ---------- */
+.s-arcs-on .f-network-map {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.s-arcs {
+  width: 100%;
+  padding: 8px 0 4px;
+}
+.s-arcs svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.s-arc-base {
+  stroke: #9fb3c8;
+  stroke-width: 1;
+}
+.s-arc-line {
+  fill: none;
+  stroke: #c3d2e3;
+  stroke-width: 1.2;
+  transition: stroke 0.4s ease, opacity 0.4s ease;
+}
+.s-arc.is-pending .s-arc-line,
+.s-arc.is-pending .s-arc-ink {
+  stroke-dasharray: 5 6;
+}
+.s-arc-ink {
+  fill: none;
+  stroke: #0064dc;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.s-arc.is-active .s-arc-ink {
+  opacity: 1;
+}
+.s-arc.is-active.is-pending .s-arc-ink {
+  stroke-width: 2;
+}
+.s-arc-label,
+.s-arc-note,
+.s-node-label,
+.s-node-detail,
+.s-node-num {
+  text-anchor: middle;
+}
+.s-arc-label {
+  fill: #7d8fa5;
+  font-family: Georgia, "Songti SC", serif;
+  transition: fill 0.35s ease;
+}
+.s-arc.is-active .s-arc-label {
+  fill: #06193a;
+}
+.s-arc-note {
+  fill: #0064dc;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.s-arc.is-active .s-arc-note {
+  opacity: 1;
+}
+.s-arc.is-pending.is-active .s-arc-note {
+  fill: #a05a00;
+}
+.is-compact .s-arc:not(.is-active) .s-arc-label,
+.is-compact .s-arc-note {
+  display: none;
+}
+.s-node-dot {
+  fill: #f8fafc;
+  stroke: #7d8fa5;
+  stroke-width: 1.5;
+  transition: fill 0.35s ease, stroke 0.35s ease;
+}
+.s-node-step {
+  fill: #06193a;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.s-node.is-active .s-node-step {
+  opacity: 1;
+}
+.s-node-num {
+  fill: #fff;
+  font-weight: 600;
+}
+.s-node-label {
+  fill: #7d8fa5;
+  font-family: Georgia, "Songti SC", serif;
+  transition: fill 0.35s ease;
+}
+.s-node.is-active .s-node-label {
+  fill: #06193a;
+}
+.s-node-detail {
+  fill: #8a9bb0;
+}
+
 /* ---------- scroll reveals: hidden until signal-motion.js animates them in ---------- */
 .motion .s-homepage :is(.s-opening .s-section-label, .f-work-intro h2, .f-work-intro > p, .s-overview-heading p,
-  .s-tabbar, .s-work-content, .p-intro h2 > span, .p-intro > p, .p-stage, .f-memory h2, .f-memory .f-container > p,
+  .s-scenario-tabs, .s-work-content, .p-intro h2 > span, .p-intro > p, .p-stage, .f-memory h2, .f-memory .f-container > p,
   .f-network-tabs, .f-network-story, .f-network-figure, .f-network-origin, .s-about-grid > *, .f-trial-intro > *,
   .f-trial-content):not(.in) {
   opacity: 0;
