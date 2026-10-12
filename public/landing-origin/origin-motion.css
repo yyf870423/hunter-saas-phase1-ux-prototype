@@ -141,12 +141,12 @@
   0%, 100% { opacity: 0.12; }
   50% { opacity: 0.8; }
 }
-.o-line {
+.o-edge {
   stroke: #3a3a40;
   stroke-width: 1;
   fill: none;
 }
-.o-line.is-pending,
+.o-edge.is-pending,
 .o-line-ink.is-pending {
   stroke-dasharray: 4 6;
 }

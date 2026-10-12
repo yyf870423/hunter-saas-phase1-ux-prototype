@@ -141,7 +141,7 @@
       model.edges.forEach((edge) => {
         const [ax, ay] = AT[edge.from], [bx, by] = AT[edge.to];
         const d = `M${ax} ${ay} L${bx} ${by}`;
-        lineLayer.append(svgEl("path", { d, class: `o-line${edge.pending ? " is-pending" : ""}` }));
+        lineLayer.append(svgEl("path", { d, class: `o-edge${edge.pending ? " is-pending" : ""}` }));
         const ink = svgEl("path", edge.pending ? { d, class: "o-line-ink is-pending" } : { d, class: "o-line-ink", pathLength: 1 });
         inkLayer.append(ink);
         const len = Math.hypot(bx - ax, by - ay);
