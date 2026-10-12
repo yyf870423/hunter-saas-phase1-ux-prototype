@@ -4,7 +4,7 @@
   const fine = matchMedia("(hover: hover) and (pointer: fine)");
   const narrow = matchMedia("(max-width: 720px)");
   const stacked = matchMedia("(max-width: 980px)");
-  const PH = (name) => `assets/photos/${name}.webp`;
+  const PH = (name) => `assets/photos/${name}.webp?v=2`;
   const el = (tag, cls, text) => {
     const n = document.createElement(tag);
     if (cls) n.className = cls;
