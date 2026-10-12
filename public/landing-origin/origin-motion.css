@@ -267,8 +267,212 @@
   color: #e3e3e7;
 }
 
+/* ---------- 产品短片《夜航》: chapters are waypoints on a course ---------- */
+.o-film {
+  position: relative;
+  padding: 96px 0 72px;
+  background: #0f1011;
+  color: #f5f5f7;
+}
+.o-film::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(50% 60% at 50% 0%, rgba(209, 201, 255, 0.08), transparent 70%);
+  pointer-events: none;
+}
+.o-film .f-container {
+  position: relative;
+}
+.o-film-head {
+  max-width: 820px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+.o-film-kicker {
+  margin: 0 0 16px;
+  color: #a9a2e0;
+  font-family: var(--o-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+}
+.o-film-head h2 {
+  margin: 0;
+  font-family: var(--o-display);
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1.32;
+}
+.o-film-head h2 span {
+  display: inline-block;
+}
+.o-film-lead {
+  max-width: 700px;
+  margin: 22px auto 0;
+  color: #a9a9ac;
+  font-size: 15px;
+  line-height: 1.9;
+  text-wrap: pretty;
+}
+.o-film-frame {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 18px;
+  background: #07080b;
+  box-shadow: 0 40px 120px -40px rgba(209, 201, 255, 0.22);
+}
+.o-film-frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #07080b;
+}
+.o-course {
+  position: relative;
+  margin-top: 40px;
+}
+.o-course-line {
+  position: absolute;
+  top: 11px;
+  left: calc(100% / 12);
+  right: calc(100% / 12);
+  height: 2px;
+  background: repeating-linear-gradient(90deg, #4a4a52 0 2px, transparent 2px 10px);
+}
+.o-course-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #d1c9ff 80%, #ff9c86 80%);
+  clip-path: inset(0 max(0%, calc(100% - var(--p) * 120%)) 0 0);
+  filter: drop-shadow(0 0 4px rgba(209, 201, 255, 0.6));
+}
+.o-course-craft {
+  position: absolute;
+  top: -3px;
+  left: calc(min(var(--p) * 120%, 100%));
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: #ff9c86;
+  box-shadow: 0 0 0 4px rgba(255, 156, 134, 0.18), 0 0 14px rgba(255, 156, 134, 0.9);
+  animation: o-blink 0.625s steps(1) infinite;
+}
+@keyframes o-blink {
+  0%, 18% { opacity: 1; }
+  19%, 100% { opacity: 0.45; }
+}
+.o-course-stops {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.o-course-stops button {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 4px 8px;
+  border: 0;
+  background: none;
+  color: #8c8c94;
+  font: inherit;
+  cursor: pointer;
+}
+.o-stop-dot {
+  width: 10px;
+  height: 10px;
+  margin: 3px 0 6px;
+  border: 1px solid #6f6f76;
+  border-radius: 50%;
+  background: #0f1011;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.o-course-stops .is-passed .o-stop-dot {
+  border-color: #d1c9ff;
+  background: #d1c9ff;
+  box-shadow: 0 0 10px rgba(209, 201, 255, 0.8);
+}
+.o-course-stops .is-yours.is-passed .o-stop-dot {
+  border-color: #ff9c86;
+  background: #ff9c86;
+  box-shadow: 0 0 10px rgba(255, 156, 134, 0.8);
+}
+.o-stop-time {
+  color: #6f6f76;
+  font-family: var(--o-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.o-stop-name {
+  font-family: var(--o-display);
+  font-size: 17px;
+  transition: color 0.3s ease;
+}
+.o-course-stops button:hover .o-stop-name,
+.o-course-stops button[aria-pressed="true"] .o-stop-name {
+  color: #f5f5f7;
+}
+.o-course-stops .is-yours button[aria-pressed="true"] .o-stop-name {
+  color: #ffb9a9;
+}
+.o-course-stops button:focus-visible {
+  outline: 1px solid #d1c9ff;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+@media (max-width: 900px) {
+  .o-film {
+    padding: 64px 0 48px;
+  }
+  .o-film-head h2 {
+    font-size: 34px;
+  }
+  .o-film-frame {
+    border-radius: 12px;
+  }
+  .o-course-line {
+    display: none;
+  }
+  .o-course-stops {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 12px;
+  }
+  .o-course-stops button {
+    grid-template-columns: auto auto 1fr;
+    justify-items: start;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    text-align: left;
+  }
+  .o-stop-dot {
+    margin: 0;
+  }
+  .o-stop-name {
+    font-size: 15px;
+  }
+}
+@media (max-width: 560px) {
+  .o-film-head h2 {
+    font-size: 28px;
+  }
+  .o-course-stops {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .o-course-stops button {
+    padding: 9px 0;
+  }
+}
+
 /* ---------- reveals: hidden until origin-motion.js brings them out of the haze ---------- */
-.motion #homepage :is(.f-hero-copy > *, .f-work-intro > *, .f-work-demo > .f-tabs, .f-work-panel, .f-work-bottom,
+.motion #homepage :is(.o-film-head > *, .o-film-frame, .o-course, .f-hero-copy > *, .f-work-intro > *, .f-work-demo > .f-tabs, .f-work-panel, .f-work-bottom,
   .p-intro h2 > span, .p-intro > p, .p-stage, .f-memory h2, .f-memory .f-container > p, .f-network-tabs, .f-network-story,
   .f-network-figure, .f-network-origin, .f-about-copy > *, .f-trial-intro > *, .f-trial-content):not(.in) {
   opacity: 0;

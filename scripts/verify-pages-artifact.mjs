@@ -47,6 +47,8 @@ const expected = [
   "demo-data.js",
   "finesse-motion.css",
   "finesse-motion.js",
+  "media/hunterbuddy-finesse.mp4",
+  "media/finesse-film-poster.jpg",
   "vendor/libphonenumber-max.js",
   "vendor/LICENSE",
   "vendor/LICENSE.Apache",
@@ -119,6 +121,8 @@ const alternatives = {
     "assets/fonts/dmserifdisplay-OFL.txt",
     "assets/fonts/noto-serif-sc.ttf",
     "assets/fonts/notoserifsc-OFL.txt",
+    "assets/hunterbuddy-origin.mp4",
+    "assets/origin-film-poster.jpg",
   ],
   "landing-signal": [
     "index.html",
@@ -131,6 +135,8 @@ const alternatives = {
     "assets/ai-talent-evidence-cn.webp",
     "assets/ai-company-mapping-cn.webp",
     "assets/ai-research-talent-cn.webp",
+    "assets/hunterbuddy-signal.mp4",
+    "assets/signal-film-poster.jpg",
   ],
   homepages: [
     "index.html",

@@ -66,8 +66,88 @@
   reduced.addEventListener?.("change", cloudsOn);
   cloudsOn();
 
+  /* ---------------- 产品短片《夜航》: chapters are waypoints on a course ---------------- */
+  const CHAPTERS = [
+    [0, "夜航"],
+    [7.5, "六处回音"],
+    [20, "三线定位"],
+    [27.6, "规划航线"],
+    [38.75, "最后一段交给你"],
+    [47.5, "天亮"],
+  ];
+  const mmss = (s) => `00:${String(Math.floor(s)).padStart(2, "0")}`;
+  const film = el("section", "o-film");
+  film.id = "film";
+  film.setAttribute("aria-labelledby", "o-film-title");
+  film.innerHTML = `
+    <div class="f-container">
+      <header class="o-film-head">
+        <p class="o-film-kicker">产品短片 · 夜航</p>
+        <h2 id="o-film-title"><span>最难的岗位，</span><span>像在夜里找一盏灯。</span></h2>
+        <p class="o-film-lead">六十秒的夜航：HunterBuddy 一路发出信号，六个地方都有回音，其中三处指向同一个人。航线上的每一盏灯都写着依据，拿不准的标为“待确认”；最后一段航程，由你来开。建议打开声音观看。</p>
+      </header>
+      <figure class="o-film-frame">
+        <video data-film src="assets/hunterbuddy-origin.mp4" poster="assets/origin-film-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片《夜航》"></video>
+      </figure>
+      <div class="o-course" style="--p: 0">
+        <div class="o-course-line" aria-hidden="true"><span class="o-course-craft"></span></div>
+        <ol class="o-course-stops" aria-label="短片章节">${CHAPTERS.map(
+          ([t, name], i) =>
+            `<li${i >= 4 ? ' class="is-yours"' : ""}><button type="button" data-t="${t}" aria-pressed="false"><span class="o-stop-dot"></span><span class="o-stop-time">${mmss(t)}</span><span class="o-stop-name">${name}</span></button></li>`,
+        ).join("")}</ol>
+      </div>
+    </div>`;
+  hero.after(film);
+  const video = film.querySelector("video");
+  const course = film.querySelector(".o-course");
+  const stops = [...film.querySelectorAll(".o-course-stops button")];
+  // the craft reaches waypoint i exactly when chapter i begins, so it travels piecewise
+  const coursePos = (time) => {
+    const n = CHAPTERS.length;
+    const end = video.duration || 60;
+    for (let i = n - 1; i >= 0; i--) {
+      if (time >= CHAPTERS[i][0]) {
+        const next = i + 1 < n ? CHAPTERS[i + 1][0] : end;
+        return (i + clamp((time - CHAPTERS[i][0]) / Math.max(0.1, next - CHAPTERS[i][0]))) / n;
+      }
+    }
+    return 0;
+  };
+  const markStop = (index) => stops.forEach((b, i) => {
+    b.setAttribute("aria-pressed", String(i === index));
+    b.parentElement.classList.toggle("is-passed", i <= index);
+  });
+  const follow = () => {
+    course.style.setProperty("--p", coursePos(video.currentTime).toFixed(4));
+    let index = -1;
+    stops.forEach((b, i) => {
+      if (video.currentTime >= Number(b.dataset.t)) index = i;
+    });
+    markStop(video.currentTime > 0 || !video.paused ? index : -1);
+  };
+  let filmRaf = 0;
+  const filmTick = () => {
+    follow();
+    filmRaf = video.paused ? 0 : requestAnimationFrame(filmTick);
+  };
+  stops.forEach((b, i) =>
+    b.addEventListener("click", () => {
+      try {
+        video.currentTime = Number(b.dataset.t);
+      } catch {
+        /* metadata not loaded yet: playback starts from the top */
+      }
+      video.play()?.catch?.(() => {});
+      markStop(i);
+    }),
+  );
+  video.addEventListener("play", () => { if (!filmRaf) filmRaf = requestAnimationFrame(filmTick); });
+  video.addEventListener("timeupdate", follow);
+  video.addEventListener("seeked", follow);
+  new IntersectionObserver(([en]) => !en.isIntersecting && !video.paused && video.pause(), { threshold: 0 }).observe(video);
+
   /* ---------------- dark cards catch a glow that follows the cursor ---------------- */
-  const glowTargets = [".p-stage", ".f-trial-form", ".f-work-panel"];
+  const glowTargets = [".o-film-frame", ".p-stage", ".f-trial-form", ".f-work-panel"];
   const hosts = [];
   glowTargets.forEach((sel) =>
     root.querySelectorAll(sel).forEach((host) => {
@@ -258,6 +338,9 @@
     { opacity: 1, transform: "none", filter: "blur(0px)" },
   ];
   const SPEC = [
+    [".o-film-head > *", haze(28), (i) => i * 130, 1100],
+    [".o-film-frame", [{ opacity: 0, transform: "scale(.96)", filter: "blur(12px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }], () => 200, 1400],
+    [".o-course", haze(14), () => 380, 1000],
     [".f-work-intro > *", haze(30), (i) => i * 120, 1100],
     [".f-work-demo > .f-tabs", haze(16), () => 0, 900],
     [".f-work-panel", haze(30), () => 140, 1100],

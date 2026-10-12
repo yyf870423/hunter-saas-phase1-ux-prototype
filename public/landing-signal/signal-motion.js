@@ -159,6 +159,64 @@
     rules.push(r);
   }
 
+  /* ---------------- 产品短片《寻人启事》: its own story, not a replay of this page ---------------- */
+  const CHAPTERS = [
+    [2, "一则启事"],
+    [8, "对的人"],
+    [16, "读完其余版面"],
+    [28, "一页人物档案"],
+    [33, "脚注与待确认"],
+    [46, "签发由你"],
+  ];
+  const mmss = (s) => `00:${String(Math.floor(s)).padStart(2, "0")}`;
+  const film = el("section", "s-film");
+  film.id = "film";
+  film.setAttribute("aria-labelledby", "s-film-title");
+  film.innerHTML = `
+    <div class="f-container">
+      <div class="s-section-label s-film-label">产品短片</div>
+      <div class="s-film-head">
+        <h2 id="s-film-title"><span>一则挂了三个月的</span><span>寻人启事。</span></h2>
+        <p>对的人，不看招聘启事。六十秒里，HunterBuddy 读完其余所有版面，把散在三处、用着三个名字的同一个人，排成一页带脚注的人物档案；不知道的，写“待确认”。签发，由你。建议打开声音观看。</p>
+      </div>
+      <figure class="s-film-frame">
+        <video data-film src="assets/hunterbuddy-signal.mp4" poster="assets/signal-film-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片《寻人启事》"></video>
+      </figure>
+      <ol class="s-chapters" aria-label="短片章节">${CHAPTERS.map(
+        ([t, name], i) =>
+          `<li><button type="button" data-t="${t}" aria-pressed="false"><span class="s-ch-no">${String(i + 1).padStart(2, "0")}</span><span class="s-ch-name">${name}</span><span class="s-ch-time">${mmss(t)}</span></button></li>`,
+      ).join("")}</ol>
+    </div>`;
+  hero.after(film);
+  {
+    const r = el("span", "s-rule");
+    film.querySelector(".s-film-label").append(r);
+    rules.push(r);
+  }
+  const video = film.querySelector("video");
+  const chapterButtons = [...film.querySelectorAll(".s-chapters button")];
+  const markChapter = (index) => chapterButtons.forEach((b, i) => b.setAttribute("aria-pressed", String(i === index)));
+  chapterButtons.forEach((b, i) =>
+    b.addEventListener("click", () => {
+      try {
+        video.currentTime = Number(b.dataset.t);
+      } catch {
+        /* metadata not loaded yet: playback starts from the top */
+      }
+      video.play()?.catch?.(() => {});
+      markChapter(i);
+    }),
+  );
+  video.addEventListener("timeupdate", () => {
+    let index = -1;
+    chapterButtons.forEach((b, i) => {
+      if (video.currentTime >= Number(b.dataset.t)) index = i;
+    });
+    markChapter(index);
+  });
+  // stop playing once the film has scrolled well out of view
+  new IntersectionObserver(([en]) => !en.isIntersecting && !video.paused && video.pause(), { threshold: 0 }).observe(video);
+
   /* ---------------- scenarios: one continuous section, switched by click ---------------- */
   const work = root.querySelector("#work");
   const panel = work.querySelector(".f-work-panel");
@@ -315,6 +373,10 @@
     { opacity: 1, transform: "none", clipPath: "inset(0 0 0% 0)" },
   ];
   const SPEC = [
+    [".s-film-label", rise(12), () => 0, 700],
+    [".s-film-head > *", rise(28), (i) => 100 + i * 140, 1000],
+    [".s-film-frame", [{ opacity: 0, clipPath: "inset(0 0 100% 0)" }, { opacity: 1, clipPath: "inset(0 0 0% 0)" }], () => 200, 1300],
+    [".s-chapters li", rise(14), (i) => 320 + i * 70, 700],
     [".s-opening .s-section-label", rise(12), () => 0, 700],
     [".f-work-intro h2", rise(36), () => 100, 1000],
     [".f-work-intro > p", rise(24), () => 260, 900],

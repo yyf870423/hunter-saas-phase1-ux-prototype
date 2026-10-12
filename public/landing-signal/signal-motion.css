@@ -369,8 +369,145 @@
   fill: #8a9bb0;
 }
 
+/* ---------- 产品短片《寻人启事》 ---------- */
+.s-film {
+  padding: 72px 0 24px;
+  background: var(--f-bg);
+  color: var(--f-deep);
+}
+.s-film-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 0;
+}
+.s-film-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px 64px;
+  align-items: end;
+  margin: 20px 0 36px;
+}
+.s-film-head h2 {
+  margin: 0;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+.s-film-head h2 span {
+  display: inline-block;
+}
+.s-film-head p {
+  margin: 0 0 8px;
+  color: #4d5d72;
+  font-size: 16px;
+  line-height: 1.85;
+  text-wrap: pretty;
+}
+.s-film-frame {
+  margin: 0;
+  border: 1px solid var(--f-line);
+  background: #f4f6f9;
+  box-shadow: 0 30px 60px -40px rgba(6, 25, 58, 0.45);
+}
+.s-film-frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #f4f6f9;
+}
+.s-chapters {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--f-line);
+}
+.s-chapters button {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  width: 100%;
+  min-height: 72px;
+  padding: 16px 14px 14px 0;
+  border: 0;
+  background: none;
+  color: #5b6b80;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.s-chapters button::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 14px;
+  height: 2px;
+  background: var(--f-accent-text);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.4s cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.s-chapters button:hover,
+.s-chapters button[aria-pressed="true"] {
+  color: var(--f-deep);
+}
+.s-chapters button[aria-pressed="true"]::before {
+  transform: scaleX(1);
+}
+.s-chapters button:focus-visible {
+  outline: 2px solid var(--f-accent-text);
+  outline-offset: -2px;
+}
+.s-ch-no {
+  grid-row: span 2;
+  color: var(--f-accent-text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+}
+.s-ch-name {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.s-ch-time {
+  color: #8a9bb0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 900px) {
+  .s-film {
+    padding-top: 56px;
+  }
+  .s-film-head {
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 28px;
+  }
+  .s-film-head h2 {
+    font-size: 34px;
+  }
+  .s-chapters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .s-film-head h2 {
+    font-size: 28px;
+  }
+  .s-chapters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .s-chapters button {
+    min-height: 64px;
+  }
+}
+
 /* ---------- scroll reveals: hidden until signal-motion.js animates them in ---------- */
-.motion .s-homepage :is(.s-opening .s-section-label, .f-work-intro h2, .f-work-intro > p, .s-overview-heading p,
+.motion .s-homepage :is(.s-film-label, .s-film-head > *, .s-film-frame, .s-chapters li, .s-opening .s-section-label, .f-work-intro h2, .f-work-intro > p, .s-overview-heading p,
   .s-scenario-tabs, .s-work-content, .p-intro h2 > span, .p-intro > p, .p-stage, .f-memory h2, .f-memory .f-container > p,
   .f-network-tabs, .f-network-story, .f-network-figure, .f-network-origin, .s-about-grid > *, .f-trial-intro > *,
   .f-trial-content):not(.in) {

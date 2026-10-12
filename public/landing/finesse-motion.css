@@ -296,7 +296,195 @@
 }
 
 /* ---------- scroll reveals: hidden until finesse-motion.js animates them in ---------- */
-.motion #homepage.fx-on :is(.f-work-intro > *, .f-work-demo .f-tabs, .f-work-panel, .f-work-bottom, .p-intro h2 > span,
+/* ---------- 产品短片《对焦》: a wide screen, chapters on a lens distance scale ---------- */
+.fx-film {
+  position: relative;
+  padding: 88px 0 72px;
+  background: var(--f-surface);
+}
+.fx-film-head {
+  max-width: 760px;
+  margin: 0 auto 44px;
+  text-align: center;
+}
+.fx-film-kicker {
+  margin: 0 0 14px;
+  color: var(--f-accent-text);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+.fx-film-head h2 {
+  margin: 0;
+  color: var(--f-ink);
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+.fx-film-head h2 span {
+  display: inline-block;
+}
+.fx-film-lead {
+  margin: 22px auto 0;
+  max-width: 660px;
+  color: var(--f-muted);
+  font-size: 16px;
+  line-height: 1.9;
+  text-wrap: pretty;
+}
+.fx-film-frame {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #eef3f9;
+  box-shadow: var(--f-shadow);
+}
+.fx-film-frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #eef3f9;
+}
+.fx-scale {
+  position: relative;
+  margin: 34px 0 0;
+  padding-top: 18px;
+}
+.fx-scale-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background:
+    repeating-linear-gradient(90deg, var(--f-line) 0 1px, transparent 1px calc(100% / 60)) bottom / 100% 6px no-repeat,
+    linear-gradient(var(--f-line), var(--f-line)) bottom / 100% 1px no-repeat;
+}
+.fx-scale-track::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--f-accent);
+  transform: scaleX(var(--p));
+  transform-origin: 0 50%;
+}
+.fx-scale-head {
+  position: absolute;
+  bottom: -5px;
+  left: calc(var(--p) * 100%);
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border: 2px solid var(--f-accent);
+  border-radius: 50%;
+  background: var(--f-surface);
+}
+.fx-scale-marks {
+  position: relative;
+  height: 64px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fx-scale-marks li {
+  position: absolute;
+  top: 0;
+  left: var(--at);
+}
+.fx-scale-marks button {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 10px 0 6px 10px;
+  border: 0;
+  background: none;
+  color: var(--f-muted);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.fx-scale-marks button::before {
+  content: "";
+  position: absolute;
+  top: -18px;
+  left: 0;
+  width: 1px;
+  height: 22px;
+  background: #9fb0c4;
+}
+.fx-mark-time {
+  color: #8796ab;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.fx-mark-name {
+  font-size: 15px;
+  transition: color 0.25s ease;
+}
+.fx-scale-marks button:hover .fx-mark-name,
+.fx-scale-marks button[aria-pressed="true"] .fx-mark-name {
+  color: var(--f-accent-text);
+}
+.fx-scale-marks button[aria-pressed="true"]::before {
+  width: 2px;
+  background: var(--f-accent);
+}
+.fx-scale-marks button:focus-visible {
+  outline: 2px solid var(--f-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+@media (max-width: 1100px) {
+  .fx-mark-name {
+    font-size: 13px;
+  }
+}
+@media (max-width: 900px) {
+  .fx-film {
+    padding: 64px 0 48px;
+  }
+  .fx-film-head h2 {
+    font-size: 34px;
+  }
+  .fx-film-frame {
+    border-radius: 14px;
+  }
+  /* too narrow for a scale: the marks become a two-column list, the track stays as a progress line */
+  .fx-scale-marks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 16px;
+    height: auto;
+  }
+  .fx-scale-marks li {
+    position: static;
+  }
+  .fx-scale-marks button {
+    grid-template-columns: 44px 1fr;
+    width: 100%;
+    padding: 10px 0;
+    text-align: left;
+  }
+  .fx-scale-marks button::before {
+    display: none;
+  }
+  .fx-mark-time {
+    line-height: 22px;
+  }
+  .fx-mark-name {
+    font-size: 15px;
+  }
+}
+@media (max-width: 560px) {
+  .fx-film-head h2 {
+    font-size: 28px;
+  }
+}
+
+.motion #homepage.fx-on :is(.fx-film-head > *, .fx-film-frame, .fx-scale, .f-work-intro > *, .f-work-demo .f-tabs, .f-work-panel, .f-work-bottom, .p-intro h2 > span,
   .p-intro > p, .fx-steps, .fx-photo-col, .f-memory h2, .f-memory .f-container > p, .f-network-tabs, .f-network-story,
   .f-network-figure, .f-network-origin, .f-about-copy > *, .f-about-image, .f-trial-intro > *, .f-trial-content,
   .f-hero-copy > *):not(.in) {

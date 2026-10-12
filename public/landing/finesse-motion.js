@@ -60,6 +60,73 @@
   reduced.addEventListener?.("change", pushOn);
   pushOn();
 
+  /* ---------------- 产品短片《对焦》: chapters sit on a lens distance scale ---------------- */
+  const FILM_LEN = 60;
+  const CHAPTERS = [
+    [0, "人很多"],
+    [7.5, "手动对焦"],
+    [15.6, "按岗位对焦"],
+    [25.6, "重合成一个人"],
+    [33, "标着来源"],
+    [42.5, "快门留给你"],
+    [50.2, "收进底片册"],
+  ];
+  const mmss = (s) => `00:${String(Math.floor(s)).padStart(2, "0")}`;
+  const film = el("section", "fx-film");
+  film.id = "film";
+  film.setAttribute("aria-labelledby", "fx-film-title");
+  film.innerHTML = `
+    <div class="f-container">
+      <header class="fx-film-head">
+        <p class="fx-film-kicker">产品短片 · 对焦</p>
+        <h2 id="fx-film-title"><span>人很多。</span><span>对焦，是找出那一个。</span></h2>
+        <p class="fx-film-lead">关键词、职位名、公司名，都只对上一半。HunterBuddy 按岗位对焦：三个来源里的影子，重合成同一个人；每个参数都标着来源，拿不准的写明“待确认”。快门，留给你。建议打开声音观看。</p>
+      </header>
+      <figure class="fx-film-frame">
+        <video data-film src="media/hunterbuddy-finesse.mp4" poster="media/finesse-film-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片《对焦》"></video>
+      </figure>
+      <div class="fx-scale" style="--p: 0">
+        <div class="fx-scale-track" aria-hidden="true"><span class="fx-scale-head"></span></div>
+        <ol class="fx-scale-marks" aria-label="短片章节">${CHAPTERS.map(
+          ([t, name]) =>
+            `<li style="--at: ${((t / FILM_LEN) * 100).toFixed(2)}%"><button type="button" data-t="${t}" aria-pressed="false"><span class="fx-mark-time">${mmss(t)}</span><span class="fx-mark-name">${name}</span></button></li>`,
+        ).join("")}</ol>
+      </div>
+    </div>`;
+  hero.after(film);
+  const video = film.querySelector("video");
+  const scale = film.querySelector(".fx-scale");
+  const marks = [...film.querySelectorAll(".fx-scale-marks button")];
+  const markChapter = (index) => marks.forEach((b, i) => b.setAttribute("aria-pressed", String(i === index)));
+  const follow = () => {
+    scale.style.setProperty("--p", String(clamp(video.currentTime / (video.duration || FILM_LEN))));
+    let index = -1;
+    marks.forEach((b, i) => {
+      if (video.currentTime >= Number(b.dataset.t)) index = i;
+    });
+    markChapter(video.currentTime > 0 || !video.paused ? index : -1);
+  };
+  let filmRaf = 0;
+  const tick = () => {
+    follow();
+    filmRaf = video.paused ? 0 : requestAnimationFrame(tick);
+  };
+  marks.forEach((b, i) =>
+    b.addEventListener("click", () => {
+      try {
+        video.currentTime = Number(b.dataset.t);
+      } catch {
+        /* metadata not loaded yet: playback starts from the top */
+      }
+      video.play()?.catch?.(() => {});
+      markChapter(i);
+    }),
+  );
+  video.addEventListener("play", () => { if (!filmRaf) filmRaf = requestAnimationFrame(tick); });
+  video.addEventListener("timeupdate", follow);
+  video.addEventListener("seeked", follow);
+  new IntersectionObserver(([en]) => !en.isIntersecting && !video.paused && video.pause(), { threshold: 0 }).observe(video);
+
   /* ---------------- research: chapters scroll past a pinned photo ---------------- */
   const research = root.querySelector("#research");
   const story = window.FinesseResearchChaptersData;
@@ -340,6 +407,9 @@
   const rise = (y = 28) => [{ opacity: 0, transform: `translate3d(0, ${y}px, 0)` }, { opacity: 1, transform: "none" }];
   const curtain = [{ opacity: 1, clipPath: "inset(100% 0 0 0)" }, { opacity: 1, clipPath: "inset(0% 0 0 0)" }];
   const SPEC = [
+    [".fx-film-head > *", rise(28), (i) => i * 120, 1000],
+    [".fx-film-frame", [{ opacity: 0, transform: "scale(.94)", filter: "blur(14px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], () => 200, 1300],
+    [".fx-scale", rise(16), () => 350, 900],
     [".f-work-intro > *", rise(30), (i) => i * 110, 1000],
     [".f-work-demo .f-tabs", rise(18), () => 0, 800],
     [".f-work-panel", rise(30), () => 140, 1000],
