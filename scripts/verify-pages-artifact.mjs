@@ -121,6 +121,8 @@ const alternatives = {
     "signal.js",
     "shared-signal.css",
     "shared-signal.js",
+    "signal-motion.css",
+    "signal-motion.js",
     ...assets,
     "assets/ai-talent-evidence-cn.webp",
     "assets/ai-company-mapping-cn.webp",

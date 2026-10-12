@@ -27,6 +27,13 @@
       href="../landing/research-chapters.css?v=20261009-carousel-e"
     />
     <link rel="stylesheet" href="shared-signal.css?v=20261010-signal-tabs-a" />
+    <link rel="stylesheet" href="signal-motion.css?v=20261012-b" />
+    <script>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("motion");
+        setTimeout(() => window.__hbReveal || document.documentElement.classList.remove("motion"), 3000);
+      }
+    </script>
     <script defer src="../landing/demo-data.js?v=20261008-copy-e"></script>
     <script defer src="../landing/shared-ui.js?v=20261009-carousel-a"></script>
     <script
@@ -55,6 +62,7 @@
     ></script>
     <script defer src="shared-signal.js?v=20261010-signal-tabs-a"></script>
     <script defer src="signal.js?v=20261010-signal-a"></script>
+    <script defer src="signal-motion.js?v=20261012-a"></script>
   </head>
   <body>
     <div

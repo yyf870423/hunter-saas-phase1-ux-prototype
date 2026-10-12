@@ -1,0 +1,310 @@
+/* 第一版 · 蓝白编辑 — presentation, interaction and motion layer.
+   A live research wall in the hero, scenarios that advance as you scroll, editorial reveals
+   (rules draw, lines rise) and a clearer research carousel. Loaded after shared-signal.css. */
+
+/* ---------- hero: the promise leads, the product name becomes the eyebrow ---------- */
+.s-homepage .f-hero-copy .s-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  color: var(--f-accent-text);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+.s-homepage .f-hero-copy .s-eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+}
+.s-homepage .f-hero h1.s-promise {
+  font-size: 62px;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+}
+.s-homepage .f-hero h1.s-promise .s-line {
+  display: block;
+  width: fit-content;
+}
+.s-homepage .f-hero-copy .f-coming-soon {
+  margin-top: 18px;
+}
+.s-homepage .f-hero-inner {
+  position: relative;
+  z-index: 3;
+}
+
+@media (max-width: 1100px) {
+  .s-homepage .f-hero h1.s-promise {
+    font-size: 52px;
+  }
+}
+@media (min-width: 801px) and (max-height: 700px) {
+  .s-homepage .f-hero h1.s-promise {
+    font-size: 46px;
+  }
+  .s-homepage .f-hero-copy .s-eyebrow {
+    margin-bottom: 12px;
+  }
+}
+@media (max-width: 800px) {
+  .s-homepage .f-hero h1.s-promise {
+    font-size: 36px;
+  }
+  .s-homepage .f-hero-copy .s-eyebrow {
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+}
+@media (max-width: 360px) {
+  .s-homepage .f-hero h1.s-promise {
+    font-size: 30px;
+  }
+}
+
+/* ---------- hero: the research wall ---------- */
+.s-wall {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.s-wall svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.s-wall .s-link {
+  fill: none;
+  stroke: #1d6fe0;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.s-wall .s-anchor {
+  fill: #1d6fe0;
+}
+.s-card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 1px rgba(15, 45, 90, 0.08), 0 10px 24px -12px rgba(15, 45, 90, 0.35);
+  color: #0f1f36;
+  font-size: 13px;
+  line-height: 1.35;
+  white-space: nowrap;
+  will-change: transform;
+  transition: box-shadow 0.45s ease, background-color 0.45s ease;
+}
+.s-card small {
+  display: block;
+  color: #5b6b80;
+  font-size: 11px;
+}
+.s-card .s-ico {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f1fd;
+  color: #1d6fe0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.s-card .s-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 15px;
+}
+.s-card.is-lit {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 0 0 1.5px #1d6fe0, 0 0 0 7px rgba(29, 111, 224, 0.14), 0 14px 30px -12px rgba(15, 45, 90, 0.45);
+}
+@media (max-width: 1000px) {
+  .s-wall {
+    display: none;
+  }
+}
+
+/* ---------- opening: label sits above the heading, a rule draws across ---------- */
+.s-homepage .s-opening-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+.s-homepage .s-opening .s-section-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 0;
+}
+.s-rule {
+  display: block;
+  flex: 1;
+  height: 1px;
+  background: var(--f-line);
+  transform-origin: 0 50%;
+}
+.s-homepage .f-work-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px 64px;
+  align-items: end;
+}
+.s-homepage .f-work-intro > p {
+  margin: 0 0 12px;
+}
+@media (max-width: 900px) {
+  .s-homepage .f-work-intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- scenarios: the tab bar and panel pin, scrolling advances the scenario ---------- */
+.s-overview {
+  padding-bottom: 8px;
+}
+.s-tabbar {
+  position: relative;
+  background: var(--f-deep);
+}
+.s-tabbar .s-scenario-tabs {
+  margin-top: 0;
+}
+.s-stick {
+  background: var(--f-bg);
+}
+.s-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: #8fc2ff;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.s-pinned .s-progress {
+  opacity: 1;
+}
+.s-pinned .s-stick {
+  position: sticky;
+  top: var(--s-header-h, 72px);
+  z-index: 4;
+}
+.s-pinned .s-work-content {
+  padding-block: 28px 20px;
+}
+.s-pinned .s-tabbar .s-step {
+  display: inline-block;
+}
+.s-tabbar .s-step {
+  display: none;
+  margin-left: 10px;
+  color: #8fa7c2;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.s-spacer {
+  display: none;
+}
+.s-pinned .s-spacer {
+  display: block;
+}
+
+/* ---------- research carousel: visible controls, a counter and a timer line ---------- */
+.s-homepage .p-carousel-controls .f-icon-button {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--f-deep);
+  box-shadow: 0 0 0 1px rgba(15, 45, 90, 0.08), 0 8px 18px -10px rgba(15, 45, 90, 0.5);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.s-homepage .p-carousel-controls .f-icon-button:is(:hover, :active) {
+  background: #fff;
+  color: var(--f-deep);
+  transform: scale(1.06);
+}
+.s-homepage .p-carousel-controls .f-icon {
+  width: 24px;
+  height: 24px;
+  filter: none;
+}
+.s-homepage .p-carousel-controls {
+  padding-inline: 16px;
+}
+.s-homepage .p-copy h3 {
+  font-size: 38px;
+}
+.s-homepage .p-copy p {
+  font-size: 16px;
+}
+.s-count {
+  position: absolute;
+  left: 72px;
+  bottom: 28px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--f-deep);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+.s-count .s-track {
+  width: 120px;
+  height: 2px;
+  background: rgba(15, 45, 90, 0.14);
+  overflow: hidden;
+}
+.s-count .s-fill {
+  display: block;
+  height: 100%;
+  background: var(--f-deep);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+@media (max-width: 800px) {
+  .s-count {
+    left: 20px;
+    bottom: 16px;
+  }
+}
+
+/* ---------- scroll reveals: hidden until signal-motion.js animates them in ---------- */
+.motion .s-homepage :is(.s-opening .s-section-label, .f-work-intro h2, .f-work-intro > p, .s-overview-heading p,
+  .s-tabbar, .s-work-content, .p-intro h2 > span, .p-intro > p, .p-stage, .f-memory h2, .f-memory .f-container > p,
+  .f-network-tabs, .f-network-story, .f-network-figure, .f-network-origin, .s-about-grid > *, .f-trial-intro > *,
+  .f-trial-content):not(.in) {
+  opacity: 0;
+}
+.motion .s-homepage .f-hero-copy > :not(.in) {
+  opacity: 0;
+}
+.motion .f-footer :is(.f-footer-top > *, .f-footer-bottom):not(.in) {
+  opacity: 0;
+}
+.motion .s-homepage .s-rule:not(.in) {
+  transform: scaleX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s-card {
+    transition: none;
+  }
+}
