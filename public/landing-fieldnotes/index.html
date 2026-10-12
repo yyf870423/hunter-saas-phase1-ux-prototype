@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f2f8f7" />
+    <meta
+      name="description"
+      content="HunterBuddy，猎头的 AI 工作伙伴。给它一个难岗位，它跨渠道找人、认出同一个人，把匹配理由和来源放在一起；联系和推荐，由你决定。"
+    />
+    <meta name="trial-api" content="disabled" />
+    <title>HunterBuddy · 猎头的 AI 工作伙伴 · 铂寻 Boseek</title>
+    <link rel="stylesheet" href="../landing-superhuman/assets/fonts/noto/index.css" />
+    <link rel="stylesheet" href="page.css" />
+    <script>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("motion");
+        setTimeout(() => window.__hbReveal || document.documentElement.classList.remove("motion"), 3000);
+      }
+    </script>
+    <script defer src="page.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到正文</a>
+
+    <!-- one wobble filter gives every drawing its hand-inked edge -->
+    <svg class="defs" aria-hidden="true" focusable="false">
+      <filter id="wobble" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" />
+        <feDisplacementMap in="SourceGraphic" scale="2.6" />
+      </filter>
+    </svg>
+
+    <header class="nav">
+      <div class="wrap">
+        <a class="brand" href="#top" aria-label="HunterBuddy 首页">
+          <img src="../landing-editorial/assets/boseek-navy.svg" alt="铂寻 Boseek" width="104" height="37" />
+          <span class="rule" aria-hidden="true"></span>
+          <span>HunterBuddy</span>
+        </a>
+        <nav class="links" aria-label="主导航">
+          <a href="#film">产品短片</a>
+          <a href="#how">工作方式</a>
+          <a href="#work">应用场景</a>
+          <a href="#assets">研究资产</a>
+          <a href="#about">关于铂寻</a>
+        </nav>
+        <a class="btn teal sm" href="#apply">申请试用</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="wrap hero-grid">
+          <div class="hero-art left" data-sketch="hunter" aria-hidden="true"></div>
+          <div class="hero-copy">
+            <a class="note-pill" href="#apply">
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 14 10l7.5 2-7.5 2-2 7.5-2-7.5L2.5 12 10 10Z" fill="#1c5d5f" /></svg>
+              <span class="mono">AI 查找，人来判断</span>
+              <span>产品开发中，现已开放试用申请</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+            <h1 class="serif display" id="hero-title">
+              <span class="line">给我一个难岗位，</span>
+              <span class="line">把<span class="mark" data-mark="underline">该找的人</span>找出来。</span>
+            </h1>
+            <p class="lede">围绕岗位跨渠道找人，认出同一个人，把匹配理由和来源放在一起。关键判断，留给你。</p>
+            <div class="actions">
+              <a class="btn teal" href="#apply">申请试用</a>
+              <a class="btn ghost" href="#film">观看 60 秒短片</a>
+            </div>
+          </div>
+          <div class="hero-art right" data-sketch="candidate" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <div class="strip" role="list" aria-label="HunterBuddy 的工作方式">
+        <div class="wrap">
+          <span role="listitem"><b>六路来源</b>同时召回</span>
+          <span role="listitem"><b>同一个人</b>核对合并</span>
+          <span role="listitem"><b>每条理由</b>附上来源</span>
+          <span role="listitem"><b>联系与推荐</b>由你决定</span>
+        </div>
+      </div>
+
+      <section class="section" id="film" aria-labelledby="film-title">
+        <div class="wrap">
+          <div class="head center">
+            <span class="eyebrow"><i class="dot teal"></i>产品短片 · Film</span>
+            <h2 class="serif h1" id="film-title">一本研究手记的<span class="mark" data-mark="circle">六十秒</span>。</h2>
+            <p class="lede">难岗位的第一页，总是空白的。HunterBuddy 把六个地方的线索画到同一页上，认出三张速写其实是同一个人，每一笔都注明出处；最后一笔，留给你。建议打开声音观看。</p>
+          </div>
+          <figure class="film-window">
+            <div class="chrome" aria-hidden="true"><i></i><i></i><i></i><span class="mono">HunterBuddy · 研究手记</span></div>
+            <video data-film src="assets/hunterbuddy-fieldnotes.mp4" poster="assets/fieldnotes-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片《研究手记》"></video>
+          </figure>
+          <div class="chapters" role="group" aria-label="短片章节" data-chapters></div>
+        </div>
+      </section>
+
+      <section class="section tint" id="how" aria-labelledby="how-title">
+        <div class="wrap">
+          <div class="head">
+            <span class="eyebrow"><i class="dot navy"></i>工作方式 · How it works</span>
+            <h2 class="serif h1" id="how-title">从一个岗位，<span class="nb">走到<span class="mark" data-mark="underline">一个人</span>。</span></h2>
+            <p class="lede">每一步都留下依据。HunterBuddy 承接查找与整理，关键判断与对外沟通，仍由你掌握。</p>
+          </div>
+
+          <div class="steps">
+            <article class="card mint step">
+              <div class="mock" aria-label="岗位条件拆解示意">
+                <div class="mock-hd"><b>岗位条件 · 视觉算法负责人</b><span>机器人公司</span></div>
+                <div class="mock-row"><span class="k">必须</span><span class="chips"><span class="chip on">工业视觉</span><span class="chip on">团队管理</span></span></div>
+                <div class="mock-row"><span class="k">加分</span><span class="chips"><span class="chip">量产落地</span><span class="chip">论文 / 专利</span></span></div>
+                <div class="mock-row"><span class="k">未知</span><span class="chips"><span class="chip dash">薪酬范围</span><span class="chip dash">到岗时间</span></span></div>
+              </div>
+              <span class="eyebrow small"><i class="dot teal"></i>01 · 先吃透岗位</span>
+              <h3 class="serif h3"><span class="nb">哪些必须，</span><span class="nb">哪些加分，</span><span class="nb">哪些还不知道。</span></h3>
+              <ul class="checks">
+                <li>拆出必须、加分与未知条件</li>
+                <li>客户没说的，标为未知，不去猜</li>
+                <li>需要你确认的问题，单独列出</li>
+              </ul>
+            </article>
+
+            <article class="card blush step">
+              <div class="mock" aria-label="身份合并示意">
+                <div class="mock-hd"><b>身份核对</b><span>3 个来源</span></div>
+                <div class="mock-row"><span class="chip">简历库</span><span class="t">林越 · 2019 年简历</span></div>
+                <div class="mock-row"><span class="chip">论文</span><span class="t">Lin Y. · 视觉检测方向</span></div>
+                <div class="mock-row"><span class="chip">开源</span><span class="t">lin-yue · 代码贡献者</span></div>
+                <div class="mock-row merged"><span class="tick" aria-hidden="true"></span><span class="t"><b>合并为：林越</b></span><span class="ok">已核对</span></div>
+              </div>
+              <span class="eyebrow small"><i class="dot rose"></i>02 · 多路召回 · 统一身份</span>
+              <h3 class="serif h3"><span class="nb">六路一起找，</span><span class="nb">认出同一个人。</span></h3>
+              <ul class="checks">
+                <li>已有候选人、知识图谱、公开网络</li>
+                <li>论文与专利、开源项目、上传简历</li>
+                <li>简历、论文作者与开源账号，核对后合并</li>
+              </ul>
+            </article>
+
+            <article class="card mint step">
+              <div class="mock" aria-label="匹配依据示意">
+                <div class="mock-hd"><b>林越 · 对照岗位</b><span>候选人档案</span></div>
+                <div class="mock-row"><span class="tick" aria-hidden="true"></span><span class="t">产线视觉与算法团队经历<small>来源：简历 · 团队页</small></span><span class="ok">有依据</span></div>
+                <div class="mock-row"><span class="tick" aria-hidden="true"></span><span class="t">视觉检测方向的论文<small>来源：论文作者 · 已核对</small></span><span class="ok">有依据</span></div>
+                <div class="mock-row"><span class="ask" aria-hidden="true">?</span><span class="t">本人求职意向<small>需要本人沟通</small></span><span class="wait">待确认</span></div>
+              </div>
+              <span class="eyebrow small"><i class="dot sage"></i>03 · 匹配依据</span>
+              <h3 class="serif h3">理由，连同来源。</h3>
+              <ul class="checks">
+                <li>每条匹配理由，对应资料来源</li>
+                <li>没有可靠依据的，标为待确认</li>
+                <li>不把推测当作事实</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="card blush boundary" id="boundary">
+            <div class="boundary-copy">
+              <span class="eyebrow"><i class="dot rose"></i>04 · 人工判断</span>
+              <h2 class="serif h2">到这里，它停下。<br /><span class="nb">联系和推荐，<span class="mark" data-mark="underline">你来定</span>。</span></h2>
+              <p>找人、查重、匹配交给 HunterBuddy。候选人温度、客户关系、联系时机和正式推荐，需要懂这盘业务的你来决定。</p>
+              <ul class="boxes" aria-label="由你决定的事">
+                <li>谁值得联系、先联系谁</li>
+                <li>何时开口、怎么说</li>
+                <li>是否正式推荐、做出承诺</li>
+              </ul>
+            </div>
+            <div class="boundary-art" data-sketch="handoff" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="work" aria-labelledby="work-title">
+        <div class="wrap">
+          <div class="head center">
+            <span class="eyebrow"><i class="dot sage"></i>应用场景 · Use cases</span>
+            <h2 class="serif h1" id="work-title"><span class="nb">从找人到找机会，</span><span class="nb">把工作接起来。</span></h2>
+            <p class="lede">一个岗位、一家目标公司或一位候选人，都可以成为工作的起点。</p>
+          </div>
+          <div class="pills" role="tablist" aria-label="应用场景" data-scenario-tabs></div>
+          <div class="card mint scenario" role="tabpanel" data-scenario-panel></div>
+        </div>
+      </section>
+
+      <section class="section tint" id="assets" aria-labelledby="assets-title">
+        <div class="wrap">
+          <div class="head">
+            <span class="eyebrow"><i class="dot teal"></i>研究资产 · Research assets</span>
+            <h2 class="serif h1" id="assets-title"><span class="nb">做过的研究，</span><span class="nb">不必从头再来。</span></h2>
+            <p class="lede">公司、联系人、岗位、候选人、论文与专利，彼此关联。关系里待核实的部分，会一直标着。</p>
+          </div>
+          <div class="assets-grid">
+            <div class="card paper map" data-map aria-hidden="true"></div>
+            <div class="map-side">
+              <div class="pills" role="tablist" aria-label="研究任务" data-path-tabs></div>
+              <div class="path-copy" role="tabpanel" data-path-panel></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="cta-title">
+        <div class="wrap">
+          <div class="card foam cta">
+            <div class="cta-doodles" data-sketch="doodles" aria-hidden="true"></div>
+            <span class="eyebrow"><i class="dot navy"></i>带上一个真实的难题</span>
+            <h2 class="serif h1" id="cta-title"><span class="nb">带个难岗位来，</span><span class="nb">看看 HunterBuddy 能找到谁。</span></h2>
+            <p class="lede">带上岗位要求、你已经知道的线索，以及目前找过的渠道。我们用真实约束演示怎样召回、核验、去重和匹配。</p>
+            <div class="actions">
+              <a class="btn teal" href="#apply">申请试用</a>
+              <a class="btn ghost" href="#film">再看一遍短片</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="apply" aria-labelledby="apply-title">
+        <div class="wrap apply">
+          <div class="about" id="about">
+            <span class="eyebrow"><i class="dot sage"></i>关于铂寻 · About</span>
+            <h2 class="serif h2">铂寻，为猎头化繁解难。</h2>
+            <p>铂寻为独立猎头与精品团队打造 HunterBuddy。我们希望 AI 承接繁琐的资料查找与整理，让猎头把更多时间留给理解客户、判断人才和建立信任。</p>
+            <p>工具连接信息；专业判断与人与人的沟通，始终由你掌握。</p>
+            <a class="textlink" href="https://www.boseekai.com" rel="noopener">www.boseekai.com <span aria-hidden="true">→</span></a>
+            <div class="about-art" data-sketch="notebook" aria-hidden="true"></div>
+          </div>
+
+          <form class="card mint form" novalidate aria-labelledby="apply-title" data-trial-form>
+            <div class="form-head">
+              <span class="eyebrow small"><i class="dot teal"></i>申请试用 · Trial</span>
+              <h2 class="serif h3" id="apply-title">申请 HunterBuddy 试用</h2>
+              <p>产品正在开发中。留下你的信息，开放试用后我们会与你联系。</p>
+            </div>
+            <div class="fields">
+              <label class="field">姓名 *<input name="name" autocomplete="name" maxlength="80" required /></label>
+              <label class="field">公司 *<input name="company" autocomplete="organization" maxlength="160" placeholder="独立猎头可填写“独立猎头”" required /></label>
+              <label class="field">电话 *<input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="40" placeholder="可包含国家区号" required /></label>
+              <label class="field">邮箱 *<input name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required /></label>
+              <label class="field"
+                >职位 *<select name="role" required>
+                  <option value="">请选择</option>
+                  <option>独立猎头</option>
+                  <option>猎头顾问</option>
+                  <option>资深猎头顾问</option>
+                  <option>团队负责人</option>
+                  <option>合伙人 / 创始人</option>
+                  <option>企业招聘 / HR</option>
+                  <option>其他</option>
+                </select></label
+              >
+              <label class="field"
+                >同时招聘的岗位数 *<select name="activePositions" required>
+                  <option value="">请选择</option>
+                  <option>0-5</option>
+                  <option>6-10</option>
+                  <option>11-20</option>
+                  <option>21-50</option>
+                  <option>51及以上</option>
+                </select></label
+              >
+            </div>
+            <fieldset data-industries>
+              <legend>行业 *（可多选）</legend>
+              <div class="toggles">
+                <button class="toggle" type="button" aria-pressed="false">互联网与软件</button>
+                <button class="toggle" type="button" aria-pressed="false">智能制造</button>
+                <button class="toggle" type="button" aria-pressed="false">半导体与电子</button>
+                <button class="toggle" type="button" aria-pressed="false">汽车与新能源</button>
+                <button class="toggle" type="button" aria-pressed="false">医疗健康</button>
+                <button class="toggle" type="button" aria-pressed="false">金融</button>
+                <button class="toggle" type="button" aria-pressed="false">消费与零售</button>
+                <button class="toggle" type="button" aria-pressed="false">物流与供应链</button>
+                <button class="toggle" type="button" aria-pressed="false">其他</button>
+              </div>
+            </fieldset>
+            <label class="consent"><input name="acknowledgedPurpose" type="checkbox" />我已了解：以上信息将用于处理本次试用申请，并在开放试用后联系我。</label>
+            <div class="form-status" role="status" aria-live="polite" data-status hidden></div>
+            <div class="actions">
+              <button class="btn teal" type="submit" data-submit>提交试用申请</button>
+              <a class="btn ghost" href="#work">先看看应用场景</a>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap">
+        <div class="foot">
+          <div class="foot-brand">
+            <img src="../landing-editorial/assets/boseek-navy.svg" alt="铂寻 Boseek" width="120" height="43" />
+            <span>HunterBuddy，猎头的 AI 工作伙伴。<br />铂寻为独立猎头与精品团队打造。</span>
+          </div>
+          <div>
+            <b class="mono">产品</b>
+            <a href="#film">产品短片</a>
+            <a href="#how">工作方式</a>
+            <a href="#work">应用场景</a>
+            <a href="#assets">研究资产</a>
+          </div>
+          <div>
+            <b class="mono">法律</b>
+            <span>隐私政策（即将发布）</span>
+            <span>服务条款（即将发布）</span>
+            <span>数据处理协议（即将发布）</span>
+          </div>
+          <div>
+            <b class="mono">联系</b>
+            <a href="https://www.boseekai.com" rel="noopener">www.boseekai.com</a>
+            <span>联系邮箱：待补充</span>
+          </div>
+        </div>
+        <div class="foot-meta">
+          <span>© 2026 铂寻 Boseek</span>
+          <span>网站主体：北京铂寻智能科技有限公司</span>
+          <span>ICP 备案号：待补充</span>
+          <span>公安备案号：待补充</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
