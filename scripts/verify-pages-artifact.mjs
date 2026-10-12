@@ -148,6 +148,18 @@ const alternatives = {
     "assets/editorial.png",
     "assets/journal.png",
     "assets/magazine.png",
+    "assets/fieldnotes.png",
+  ],
+  "landing-fieldnotes": [
+    "index.html",
+    "page.css",
+    "page.js",
+    "assets/fonts/serif-subset.woff",
+    "assets/fonts/notoserifsc-OFL.txt",
+    "assets/fonts/jetbrains-mono.woff2",
+    "assets/fonts/jetbrains-mono-OFL.txt",
+    "assets/hunterbuddy-fieldnotes.mp4",
+    "assets/fieldnotes-poster.jpg",
   ],
   "landing-magazine": [
     "index.html",
