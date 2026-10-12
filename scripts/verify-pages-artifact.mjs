@@ -130,7 +130,6 @@ const alternatives = {
     "index.html",
     "shared-homepage-catalog.css",
     "shared-homepage-catalog.js",
-    "assets/original.png",
     "assets/signal.png",
     "assets/finesse.png",
     "assets/origin.png",
