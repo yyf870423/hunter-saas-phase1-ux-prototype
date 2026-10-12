@@ -1,0 +1,170 @@
+/* 第三版 · 深色云海 — presentation, interaction and motion layer. Loaded after origin.css.
+   Two layers of cloud drift at different speeds and the page flies up through them as you scroll;
+   dark cards catch a glow that follows the cursor; data keeps flowing along the research network. */
+
+/* ---------- hero: the promise leads ---------- */
+.o-mark {
+  margin: 0 0 14px;
+  font-family: "Origin Display", Georgia, serif;
+  font-size: 34px;
+  line-height: 1.1;
+  color: #d8d8de;
+}
+#homepage .f-hero h1.o-promise {
+  font-size: 68px;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+#homepage .f-hero h1.o-promise .o-line {
+  display: block;
+}
+@media (max-height: 740px) and (min-width: 801px) {
+  #homepage .f-hero h1.o-promise {
+    font-size: 54px;
+  }
+  .o-mark {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+}
+@media (max-width: 800px) {
+  #homepage .f-hero h1.o-promise {
+    font-size: 38px;
+  }
+  .o-mark {
+    font-size: 26px;
+  }
+}
+@media (max-width: 360px) {
+  #homepage .f-hero h1.o-promise {
+    font-size: 32px;
+  }
+}
+
+/* ---------- hero: two layers of cloud ---------- */
+.o-front {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 38%, #000 72%);
+  mask-image: linear-gradient(180deg, transparent 38%, #000 72%);
+}
+.o-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 65%;
+  transform: scale(1.12);
+}
+.o-fly {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(15, 16, 17, 0) 20%, #0f1011 95%);
+  opacity: 0;
+  pointer-events: none;
+}
+.o-cloudy .f-hero-breath,
+.o-cloudy .o-front {
+  will-change: transform;
+}
+.o-cloudy .f-hero-breath img {
+  animation: o-drift-back 38s ease-in-out infinite alternate;
+}
+.o-cloudy .o-front img {
+  animation: o-drift-front 22s ease-in-out infinite alternate;
+}
+@keyframes o-drift-back {
+  from { transform: scale(1.06) translate3d(-1.2%, 0, 0); }
+  to { transform: scale(1.06) translate3d(1.2%, -0.6%, 0); }
+}
+@keyframes o-drift-front {
+  from { transform: scale(1.14) translate3d(2.2%, 0.4%, 0); }
+  to { transform: scale(1.14) translate3d(-2.2%, -0.4%, 0); }
+}
+
+/* ---------- glow that follows the cursor on dark cards ---------- */
+.o-glow-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(209, 201, 255, 0.07), transparent 62%);
+}
+.o-glow-fx::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(209, 201, 255, 0.75), rgba(144, 184, 240, 0.25) 40%, transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.o-glow.is-glowing > .o-glow-fx {
+  opacity: 1;
+}
+.o-glow-host {
+  position: relative;
+}
+
+/* ---------- network: data keeps flowing along the active path ---------- */
+.o-packets circle {
+  fill: #d1c9ff;
+  filter: drop-shadow(0 0 4px rgba(209, 201, 255, 0.9));
+}
+.o-packets circle.is-pending {
+  fill: #dd90d8;
+  filter: drop-shadow(0 0 4px rgba(221, 144, 216, 0.85));
+}
+
+/* ---------- about: dark like the rest of the page ---------- */
+#homepage .f-about {
+  position: relative;
+  isolation: isolate;
+  background: #0b0c0d;
+  color: #f5f5f7;
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+#homepage .f-about::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(60% 90% at 50% 0%, rgba(209, 201, 255, 0.12), transparent 70%);
+}
+#homepage .f-about h2 {
+  color: #f5f5f7;
+}
+#homepage .f-about-copy > p {
+  color: #a9a9ac;
+}
+#homepage .f-about-copy > p:first-of-type {
+  color: #e3e3e7;
+}
+
+/* ---------- reveals: hidden until origin-motion.js brings them out of the haze ---------- */
+.motion #homepage :is(.f-hero-copy > *, .f-work-intro > *, .f-work-demo > .f-tabs, .f-work-panel, .f-work-bottom,
+  .p-intro h2 > span, .p-intro > p, .p-stage, .f-memory h2, .f-memory .f-container > p, .f-network-tabs, .f-network-story,
+  .f-network-figure, .f-network-origin, .f-about-copy > *, .f-trial-intro > *, .f-trial-content):not(.in) {
+  opacity: 0;
+}
+.motion .f-footer :is(.f-footer-top > *, .f-footer-bottom):not(.in) {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .o-cloudy .f-hero-breath img,
+  .o-cloudy .o-front img {
+    animation: none;
+  }
+  .o-glow-fx {
+    transition: none;
+  }
+}

@@ -109,6 +109,8 @@ const alternatives = {
     "index.html",
     "origin.css",
     "origin.js",
+    "origin-motion.css",
+    "origin-motion.js",
     "shared-origin.css",
     "shared-origin-network.css",
     "shared-origin-network.js",

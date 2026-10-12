@@ -32,6 +32,13 @@
       href="shared-origin-network.css?v=20261010-network-d"
     />
     <link rel="stylesheet" href="origin.css?v=20261010-network-c" />
+    <link rel="stylesheet" href="origin-motion.css?v=20261012-a" />
+    <script>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("motion");
+        setTimeout(() => window.__hbReveal || document.documentElement.classList.remove("motion"), 3000);
+      }
+    </script>
     <script defer src="../landing/demo-data.js?v=20261008-copy-e"></script>
     <script defer src="../landing/shared-ui.js?v=20261009-carousel-a"></script>
     <script
@@ -60,6 +67,7 @@
     ></script>
     <script defer src="shared-origin-network.js?v=20261010-network-c"></script>
     <script defer src="origin.js?v=20261010-network-c"></script>
+    <script defer src="origin-motion.js?v=20261012-a"></script>
   </head>
   <body>
     <div id="homepage" data-trial-preview data-integrated-page>
