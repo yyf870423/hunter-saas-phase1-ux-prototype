@@ -144,6 +144,8 @@ const alternatives = {
     "page.js",
     "assets/fonts/serif-subset.woff",
     "assets/fonts/notoserifsc-OFL.txt",
+    "assets/hunterbuddy-magazine.mp4",
+    "assets/magazine-poster.jpg",
   ],
   "landing-journal": [
     "index.html",
