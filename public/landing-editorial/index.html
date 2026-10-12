@@ -12,6 +12,12 @@
     <title>HunterBuddy · 猎头的 AI 工作伙伴 · 铂寻 Boseek</title>
     <link rel="stylesheet" href="../landing-superhuman/assets/fonts/noto/index.css" />
     <link rel="stylesheet" href="page.css" />
+    <script>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("motion");
+        setTimeout(() => window.__hbReveal || document.documentElement.classList.remove("motion"), 3000);
+      }
+    </script>
     <script defer src="page.js"></script>
   </head>
   <body>

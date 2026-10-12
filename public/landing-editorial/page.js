@@ -224,6 +224,106 @@
     });
   });
 
+  /* scroll reveals: every part of every section arrives with its own motion, the first time it is seen */
+  (() => {
+    window.__hbReveal = true;
+    if (!document.documentElement.classList.contains("motion") || !Element.prototype.animate) {
+      document.documentElement.classList.remove("motion");
+      return;
+    }
+    const EASE = "cubic-bezier(.2, .75, .2, 1)";
+    const rise = (y = 28, x = 0, s = 1) => [
+      { opacity: 0, transform: `translate3d(${x}px, ${y}px, 0) scale(${s})` },
+      { opacity: 1, transform: "none" },
+    ];
+    // [selector, keyframes, delay(i), duration]; i = position among revealed siblings
+    const SPEC = [
+      [".hero-copy > *", rise(24), (i) => 60 + i * 110, 1000],
+      [".floats .glass", rise(40, 0, 0.96), (i) => 520 + i * 160, 1100],
+      [".head-row .head-col > *", rise(28), (i) => i * 90, 900],
+      [".head-row > .body", rise(28), () => 200, 900],
+      [".head-col:not(.head-row .head-col) > *", rise(28), (i) => i * 90, 900],
+      [".film-frame", [{ opacity: 0.4, clipPath: "inset(8% 10% round 24px)", transform: "scale(.97)" }, { opacity: 1, clipPath: "inset(0% 0% round 24px)", transform: "none" }], () => 0, 1300],
+      [".chapters .chapter", rise(14), (i) => 300 + i * 60, 700],
+      ["section[aria-label='召回渠道'] .body", rise(20), () => 0, 800],
+      [".channel", rise(26, 0, 0.97), (i) => 120 + i * 80, 800],
+      [".tabs", rise(20), () => 0, 800],
+      [".panel-copy", rise(28), () => 120, 900],
+      [".panel > .card", rise(56, 0, 0.98), () => 220, 1100],
+      [".band-art", [{ opacity: 0, transform: "scale(.94)" }, { opacity: 1, transform: "none" }], () => 0, 1200],
+      [".band-copy > *", rise(28), (i) => 150 + i * 100, 900],
+      [".duo li", rise(0, -14), (i) => 500 + i * 80, 700],
+      [".photo-card", rise(48, 0, 0.98), (i) => i * 140, 1100],
+      [".asset", rise(30, 0, 0.97), (i) => i * 90, 900],
+      [".relation", rise(16, 0, 0.96), (i) => 200 + i * 70, 700],
+      [".flows .flow", rise(24), (i) => 150 + i * 110, 900],
+      [".gradient .wrap > *", rise(32), (i) => i * 120, 1000],
+      [".about > *", rise(28), (i) => i * 80, 900],
+      [".form", rise(44), () => 160, 1000],
+      [".foot-cols > div", rise(20), (i) => i * 80, 800],
+      [".foot-meta", rise(12), () => 300, 800],
+    ];
+    const jobs = new Map();
+    SPEC.forEach(([sel, frames, delay, duration]) => {
+      const seen = new Map();
+      document.querySelectorAll(sel).forEach((n) => {
+        if (jobs.has(n)) return;
+        const i = seen.get(n.parentElement) || 0;
+        seen.set(n.parentElement, i + 1);
+        jobs.set(n, { frames, delay: delay(i), duration });
+      });
+    });
+
+    // the dark band: the record cards and the line toward the gate draw themselves in
+    const art = document.querySelector(".band-art svg");
+    const solid = art ? [...art.querySelectorAll("rect, line, path, circle")].filter((n) => !n.getAttribute("stroke-dasharray") && n.getAttribute("stroke")) : [];
+    solid.forEach((n) => { n.setAttribute("pathLength", "1"); n.classList.add("draw"); });
+    const drawArt = () => {
+      solid.forEach((n, i) =>
+        n.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 1000, delay: 250 + i * 70, easing: EASE, fill: "both" }),
+      );
+      [...art.querySelectorAll("[stroke-dasharray], circle[fill]:not([stroke])")].forEach((n, i) =>
+        n.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, delay: 900 + i * 90, easing: "ease-out", fill: "backwards" }),
+      );
+    };
+
+    const show = (n) => {
+      const job = jobs.get(n);
+      n.classList.add("in");
+      n.animate(job.frames, { duration: job.duration, delay: job.delay, easing: EASE, fill: "backwards" });
+      if (n.matches(".panel > .card"))
+        n.querySelectorAll(".row").forEach((row, i) =>
+          row.animate(rise(0, -12), { duration: 700, delay: 560 + i * 110, easing: EASE, fill: "backwards" }),
+        );
+      if (n.matches(".photo-card"))
+        n.querySelector("img")?.animate([{ transform: "scale(1.08)" }, { transform: "none" }], { duration: 1600, delay: job.delay, easing: EASE, fill: "backwards" });
+      if (n.matches(".band-art") && art) drawArt();
+    };
+    const pending = new Set();
+    const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); show(n); };
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => en.isIntersecting && reveal(en.target)), {
+      rootMargin: "0px 0px -8% 0px",
+    });
+    // at the very bottom of the page the last items can never cross the trigger line, so let them in
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (pending.size && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4)
+          [...pending].filter((n) => n.getBoundingClientRect().top < window.innerHeight).forEach(reveal);
+      },
+      { passive: true },
+    );
+    jobs.forEach((_, n) => {
+      if (n.getBoundingClientRect().bottom < 0) {
+        n.classList.add("in");
+        solid.forEach((p) => p.style.setProperty("stroke-dashoffset", "0"));
+      } else {
+        pending.add(n);
+        io.observe(n);
+      }
+    });
+  })();
+
   /* trial application */
   const form = document.querySelector("[data-trial-form]");
   if (!form) return;

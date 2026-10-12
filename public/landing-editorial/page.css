@@ -245,6 +245,11 @@ legend { font-size: 14px; font-weight: 600; padding: 0; margin-bottom: 10px; }
 .panel.is-in > * { opacity: 0; transform: translateY(12px); transition: none; }
 .anim-in { animation: hb-rise .5s cubic-bezier(.22, .8, .24, 1) both; animation-delay: calc(var(--i, 0) * 60ms + 140ms); }
 @keyframes hb-rise { from { opacity: 0; transform: translateY(8px); } }
+/* scroll reveals: hidden until page.js animates them in (only when html.motion is set) */
+.motion :is(.hero-copy > *, .floats .glass, .head-row .head-col > *, .head-row > .body, .head-col:not(.head-row .head-col) > *, .film-frame, .chapters .chapter, section[aria-label='召回渠道'] .body, .channel, .tabs, .panel-copy, .panel > .card, .band-art, .band-copy > *, .duo li, .photo-card, .asset, .relation, .flows .flow, .gradient .wrap > *, .about > *, .form, .foot-cols > div, .foot-meta):not(.in) { opacity: 0; }
+.band-art .draw { stroke-dasharray: 1; }
+.motion .band-art:not(.in) .draw { stroke-dashoffset: 1; }
+
 @media (prefers-reduced-motion: reduce) {
   .tab-ink, .tab, .panel, .panel > * { transition: none !important; }
   .anim-in { animation: none; }
