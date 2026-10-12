@@ -117,6 +117,151 @@
     sync();
   }
 
+  /* hero assembly (after steep.app, in this page's journal idiom): while the hero is pinned, the pills
+     that float around the headline fly into Figure 01, the hub appears, connectors draw, data flows. */
+  (() => {
+    const hero = document.querySelector("[data-hero]");
+    const svg = hero?.querySelector("svg[data-flow]");
+    if (!hero || !svg) return;
+    const pin = hero.querySelector(".pin");
+    const wrap = pin.querySelector(".wrap");
+    const copy = hero.querySelector(".hero-copy");
+    const title = copy.querySelector("h1");
+    const others = [...copy.children].filter((n) => n !== title);
+    const figure = hero.querySelector(".pipeline");
+    const caption = figure.querySelector("figcaption");
+    const washes = [...hero.querySelectorAll(".wash")];
+    const nodes = [...svg.querySelectorAll(".pn:not(.hub)")];
+    const hub = svg.querySelector(".pn.hub");
+    const glow = svg.querySelector(".lay-glow");
+    const labels = svg.querySelector(".lay-label");
+    const packets = svg.querySelector(".lay-packet");
+    const drawn = [...svg.querySelectorAll('.lay-wire path[pathLength="1"]')];
+    const faded = [...svg.querySelectorAll(".lay-wire path:not([pathLength])")];
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const roomy = window.matchMedia("(min-width: 1100px) and (min-height: 700px)");
+    const clamp = (x) => Math.max(0, Math.min(1, x));
+    const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const out = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3));
+    // where each pill floats before assembly: centre offset from the headline's centre (px), and a tilt
+    const FLOAT = {
+      s0: [-560, -230, -4], s1: [560, -250, 3], s2: [-625, -40, 2], s3: [615, -80, -3], s4: [-520, 140, 3],
+      s5: [525, 100, -2], o0: [-600, 300, 2], o1: [600, 270, -3], o2: [70, 330, 1],
+    };
+    let on = false, geo = null, shown = -1, raf = 0, visible = true;
+
+    const centre = (g) => { const b = g.getBBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
+
+    function measure() {
+      [title, ...others].forEach((n) => { n.style.transform = ""; n.style.opacity = ""; });
+      const pinH = pin.clientHeight;
+      const cs = getComputedStyle(wrap);
+      const innerW = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      const ts = 0.56;
+      const titleH = title.offsetHeight * ts;
+      const s = Math.min(1, innerW / 1368, (pinH - titleH - 120) / 452);
+      const fw = 1368 * s, fh = 452 * s;
+      const total = titleH + 36 + fh + 44;
+      const top0 = Math.max(16, (pinH - total) / 2);
+      const ft = top0 + titleH + 36;
+      figure.style.setProperty("--fw", `${fw}px`);
+      figure.style.setProperty("--ft", `${ft}px`);
+      const pinTop = pin.getBoundingClientRect().top;
+      const t = title.getBoundingClientRect();
+      const copyMid = copy.getBoundingClientRect().top + copy.offsetHeight / 2 - pinTop;
+      const qx = Math.min(1, innerW / 1368), qy = Math.min(1, (pinH - 60) / 760);
+      geo = {
+        s, ts, titleDy: top0 - (t.top - pinTop),
+        items: nodes.map((g) => {
+          const [cx, cy] = centre(g);
+          const [fx, fy, rot] = FLOAT[g.dataset.n];
+          const lim = window.innerWidth / 2 - 24 - 110 * s; // keep every pill fully on screen
+          const px = Math.max(-lim, Math.min(lim, fx * qx));
+          const vx = 684 + px / s, vy = (copyMid - ft) / s + (fy * qy) / s;
+          return { g, cx, cy, dx: vx - cx, dy: vy - cy, rot, i: Object.keys(FLOAT).indexOf(g.dataset.n) };
+        }),
+      };
+      shown = -1;
+    }
+
+    function progress() {
+      const r = hero.getBoundingClientRect();
+      return clamp((81 - r.top) / Math.max(1, hero.offsetHeight - pin.offsetHeight));
+    }
+
+    function paint(p, now) {
+      const { s, ts, titleDy, items } = geo;
+      const c = out(p / 0.38);
+      others.forEach((n, i) => {
+        n.style.opacity = String(1 - clamp(c * 1.3));
+        n.style.transform = `translateY(${(i === others.length - 1 ? 36 : -24) * c}px)`;
+        n.style.visibility = c > 0.97 ? "hidden" : "";
+      });
+      const g = ease(clamp(p / 0.7));
+      title.style.transform = `translateY(${titleDy * g}px) scale(${1 - (1 - ts) * g})`;
+      washes.forEach((w, i) => (w.style.transform = `translate(${(i ? -1 : 1) * 70 * p}px, ${-40 * p}px)`));
+      for (const it of items) {
+        const f = ease(clamp((p - 0.1 - it.i * 0.035) / 0.56));
+        const bob = (Math.sin(now / 1000 * (0.8 + it.i * 0.07) + it.i * 1.7) * 6 * (1 - f)) / s;
+        it.g.setAttribute("transform", `translate(${it.dx * (1 - f)} ${it.dy * (1 - f) + bob}) rotate(${it.rot * (1 - f)} ${it.cx} ${it.cy})`);
+      }
+      const h = out(clamp((p - 0.42) / 0.26));
+      hub.setAttribute("transform", `translate(684 236) scale(${0.6 + 0.4 * h}) translate(-684 -236)`);
+      hub.style.opacity = String(h);
+      glow.style.opacity = String(h);
+      const wIn = ease(clamp((p - 0.5) / 0.32)), wOut = ease(clamp((p - 0.64) / 0.26));
+      drawn.forEach((path) => {
+        const d = path.id.startsWith("pf-o") ? wOut : wIn;
+        path.style.strokeDasharray = "1";
+        path.style.strokeDashoffset = String(1 - d);
+      });
+      faded.forEach((path) => (path.style.opacity = String(path.classList.contains("flow-dash") ? clamp((p - 0.84) / 0.12) : wOut)));
+      packets.style.opacity = String(clamp((p - 0.86) / 0.12));
+      labels.style.opacity = String(clamp((p - 0.74) / 0.2));
+      caption.style.opacity = String(clamp((p - 0.82) / 0.16));
+    }
+
+    function frame(now) {
+      raf = 0;
+      if (!on || !geo) return;
+      const target = progress();
+      shown = shown < 0 ? target : shown + (target - shown) * 0.14;
+      if (Math.abs(target - shown) < 0.0004) shown = target;
+      paint(shown, now);
+      if (visible && (shown !== target || shown < 0.98)) raf = requestAnimationFrame(frame);
+    }
+    const kick = () => { if (on && !raf) raf = requestAnimationFrame(frame); };
+
+    function reset() {
+      [title, ...others, ...washes].forEach((n) => { n.style.transform = ""; n.style.opacity = ""; n.style.visibility = ""; });
+      [...nodes, hub].forEach((g) => { g.removeAttribute("transform"); g.style.opacity = ""; });
+      [glow, labels, packets, caption, ...faded].forEach((n) => (n.style.opacity = ""));
+      drawn.forEach((path) => { path.style.strokeDasharray = ""; path.style.strokeDashoffset = ""; });
+      figure.style.removeProperty("--fw");
+      figure.style.removeProperty("--ft");
+      geo = null;
+    }
+
+    function setup() {
+      const want = roomy.matches && !still.matches;
+      if (want !== on) {
+        on = want;
+        hero.classList.toggle("assemble", on);
+        if (!on) return reset();
+      }
+      if (on) { measure(); kick(); }
+    }
+
+    let resizeTimer = 0;
+    window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(setup, 120); });
+    window.addEventListener("scroll", kick, { passive: true });
+    roomy.addEventListener?.("change", setup);
+    still.addEventListener?.("change", setup);
+    new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; kick(); }).observe(hero);
+    setup();
+    document.fonts?.ready.then(() => on && (measure(), kick()));
+  })();
+
   /* scenario tabs: a sliding selection marker, and a panel that fades out, swaps, then eases back in */
   const tabList = document.querySelector("[data-tabs]");
   const tabs = [...tabList.querySelectorAll(".tab")];
@@ -230,6 +375,102 @@
       }
     });
   });
+
+  /* scroll reveals: every part of every section arrives with its own motion, the first time it is seen */
+  (() => {
+    window.__hbReveal = true;
+    if (!document.documentElement.classList.contains("motion") || !Element.prototype.animate) {
+      document.documentElement.classList.remove("motion");
+      return;
+    }
+    const EASE = "cubic-bezier(.2, .75, .2, 1)";
+    const rise = (y = 28, x = 0, s = 1) => [
+      { opacity: 0, transform: `translate3d(${x}px, ${y}px, 0) scale(${s})` },
+      { opacity: 1, transform: "none" },
+    ];
+    // [selector, keyframes, delay(i), duration]; i = position among revealed siblings
+    const SPEC = [
+      [".sec-head .left > *", rise(28), (i) => i * 90, 900],
+      [".sec-head > .lead", rise(28), () => 220, 900],
+      [".film", [{ opacity: 0.3, clipPath: "inset(9% 11% round 40px)", transform: "scale(.97)" }, { opacity: 1, clipPath: "inset(0% 0% round 40px)", transform: "none" }], () => 0, 1300],
+      [".chapters .chapter", rise(14), (i) => 320 + i * 60, 700],
+      [".grid3 .feature", rise(44, 0, 0.98), (i) => (i % 3) * 110 + Math.floor(i / 3) * 160, 1000],
+      [".tabs", rise(20), () => 0, 800],
+      [".panel-copy", rise(28), () => 120, 900],
+      [".elevated", rise(56, 0, 0.98), () => 220, 1100],
+      [".statement", rise(40), () => 0, 1100],
+      [".gate", [{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)" }], () => 150, 1700],
+      [".duo .card", rise(36), (i) => i * 140, 1000],
+      [".duo li", rise(0, -14), (i) => 380 + i * 90, 700],
+      ["#boundary .wrap > .body", rise(24), () => 120, 900],
+      [".graph", rise(40, 0, 0.98), () => 0, 1000],
+      [".flows .flow", rise(28), (i) => 160 + i * 120, 900],
+      [".faq details", rise(20), (i) => i * 70, 800],
+      [".band", [{ opacity: 0, transform: "scale(.95)" }, { opacity: 1, transform: "none" }], () => 0, 1100],
+      [".band > :not(.wash)", rise(24), (i) => 260 + i * 100, 900],
+      [".about > *", rise(28), (i) => i * 80, 900],
+      [".facts li", rise(0, -12), (i) => 300 + i * 60, 600],
+      [".form", rise(44), () => 160, 1000],
+      [".foot-cols > div", rise(20), (i) => i * 80, 800],
+      [".foot-meta", rise(12), () => 300, 800],
+    ];
+    const jobs = new Map();
+    SPEC.forEach(([sel, frames, delay, duration]) => {
+      const seen = new Map();
+      document.querySelectorAll(sel).forEach((n) => {
+        if (jobs.has(n)) return;
+        const i = seen.get(n.parentElement) || 0;
+        seen.set(n.parentElement, i + 1);
+        jobs.set(n, { frames, delay: delay(i), duration });
+      });
+    });
+
+    // Figure 05: edges draw from the candidate outward, then the labels and nodes settle
+    const graph = document.querySelector(".graph svg");
+    graph?.querySelectorAll("path").forEach((p) => { p.setAttribute("pathLength", "1"); p.classList.add("edge"); });
+    const drawGraph = () => {
+      graph.querySelectorAll("path").forEach((p, i) =>
+        p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 900, delay: 350 + i * 110, easing: EASE, fill: "both" }),
+      );
+      [...graph.children].filter((n) => n.tagName !== "path").forEach((n, i) =>
+        n.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 700 + i * 45, easing: "ease-out", fill: "backwards" }),
+      );
+    };
+
+    const show = (n) => {
+      const job = jobs.get(n);
+      n.classList.add("in");
+      n.animate(job.frames, { duration: job.duration, delay: job.delay, easing: EASE, fill: "backwards" });
+      if (n.matches(".elevated"))
+        n.querySelectorAll(".row").forEach((row, i) =>
+          row.animate(rise(0, -12), { duration: 700, delay: 560 + i * 110, easing: EASE, fill: "backwards" }),
+        );
+      if (n.matches(".graph") && graph) drawGraph();
+    };
+    const pending = new Set();
+    const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); show(n); };
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => en.isIntersecting && reveal(en.target)), {
+      rootMargin: "0px 0px -8% 0px",
+    });
+    // at the very bottom of the page the last items can never cross the trigger line, so let them in
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (pending.size && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4)
+          [...pending].filter((n) => n.getBoundingClientRect().top < window.innerHeight).forEach(reveal);
+      },
+      { passive: true },
+    );
+    jobs.forEach((_, n) => {
+      if (n.getBoundingClientRect().bottom < 0) {
+        n.classList.add("in");
+        graph?.querySelectorAll(".edge").forEach((p) => p.style.setProperty("stroke-dashoffset", "0"));
+      } else {
+        pending.add(n);
+        io.observe(n);
+      }
+    });
+  })();
 
   /* trial application */
   const form = document.querySelector("[data-trial-form]");

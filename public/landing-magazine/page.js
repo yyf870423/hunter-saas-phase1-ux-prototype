@@ -77,9 +77,117 @@
     return node;
   };
 
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+
   /* hero: artifacts settle in once, then drift gently */
   const stage = document.querySelector("[data-intro]");
-  if (stage && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) stage.classList.add("intro");
+  if (stage && !calm.matches) stage.classList.add("intro");
+
+  /* hero assembly (after steep.app): the hero pins while you scroll; the headline recedes, a workspace
+     window rises, and each floating fragment flies into its slot until the hero reads as one product page. */
+  (() => {
+    const hero = document.querySelector("[data-hero]");
+    if (!hero) return;
+    const app = hero.querySelector("[data-app]");
+    const canvas = hero.querySelector("[data-canvas]");
+    const copy = hero.querySelector(".hero-copy");
+    const arts = [...hero.querySelectorAll("[data-art]")];
+    const roomy = window.matchMedia("(min-width: 1100px) and (min-height: 620px)");
+    const W = 1152, H = 700, CW = 1152, CH = 820, TOP = 112;
+    const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const out = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3));
+    const clamp = (x) => Math.max(0, Math.min(1, x));
+    // stagger: [start, length] in scroll progress, per fragment
+    const TIMING = { a1: [0.1, 0.62], a2: [0.15, 0.62], a3: [0.2, 0.62], a4: [0.25, 0.62], hb: [0.3, 0.62], you: [0.34, 0.62] };
+    const BOB = { a1: [7, 0], a2: [8, 1.8], a3: [7.5, 3.1], a4: [8.5, 4.4], hb: [6, 0.6], you: [6.5, 2.4] };
+    let on = false, geo = null, shown = -1, target = 0, raf = 0, visible = true;
+
+    function measure() {
+      arts.forEach((a) => (a.style.transform = ""));
+      const sw = canvas.parentElement.clientWidth, sh = canvas.parentElement.clientHeight;
+      const k = Math.min(1, (sh - TOP - 12) / CH, sw / CW);
+      canvas.style.setProperty("--k", k);
+      const fit = Math.min(1, sw / W, (sh - 48) / H);
+      const top = Math.max(24, (sh - H * fit) / 2);
+      arts.forEach((a) => {
+        const slot = app.querySelector(`[data-slot="${a.dataset.art}"]`);
+        if (!slot.classList.contains("cur")) slot.style.height = `${a.offsetHeight}px`;
+      });
+      geo = {
+        sw, sh, k, fit, top,
+        items: arts.map((a) => {
+          const slot = app.querySelector(`[data-slot="${a.dataset.art}"]`);
+          let lx = 0, ly = 0;
+          for (let n = slot; n && n !== app; n = n.offsetParent) { lx += n.offsetLeft; ly += n.offsetTop; }
+          const tx = sw / 2 + (lx - W / 2) * fit, ty = top + ly * fit; // slot, in stage pixels
+          const cx = (tx - sw / 2) / k + CW / 2, cy = (ty - TOP) / k; // the same point in canvas units
+          return { a, name: a.dataset.art, dx: cx - a.offsetLeft, dy: cy - a.offsetTop, s: fit / k };
+        }),
+      };
+      shown = -1;
+    }
+
+    function progress() {
+      const r = hero.getBoundingClientRect();
+      return clamp(-r.top / Math.max(1, hero.offsetHeight - window.innerHeight));
+    }
+
+    function paint(p, now) {
+      const { sh, fit, top, items } = geo;
+      const c = out(p / 0.5);
+      copy.style.transform = `translateY(${-70 * c}px) scale(${1 - 0.2 * c})`;
+      copy.style.opacity = String(1 - clamp(c * 1.25));
+      copy.style.visibility = c > 0.97 ? "hidden" : "";
+      const e = ease(clamp((p - 0.04) / 0.66));
+      app.style.transform = `translateY(${top + (1 - e) * sh * 0.55}px) scale(${fit * (0.86 + 0.14 * e)})`;
+      app.style.opacity = String(clamp(e * 2.4));
+      for (const it of items) {
+        const [s0, len] = TIMING[it.name];
+        const f = ease(clamp((p - s0) / len));
+        const [period, phase] = BOB[it.name];
+        const bob = Math.sin(((now / 1000 + phase) / period) * Math.PI * 2) * 6 * (1 - f);
+        const sc = 1 + (it.s - 1) * f;
+        it.a.style.transform = `translate(${it.dx * f}px, ${it.dy * f + bob}px) scale(${sc})`;
+        it.a.style.setProperty("--lift", (1 - f).toFixed(3));
+      }
+    }
+
+    function frame(now) {
+      raf = 0;
+      if (!on || !geo) return;
+      target = progress();
+      shown = shown < 0 ? target : shown + (target - shown) * 0.14;
+      if (Math.abs(target - shown) < 0.0004) shown = target;
+      paint(shown, now);
+      // keep running while settling, or while fragments still float (they bob until docked)
+      if (visible && (shown !== target || shown < 0.98)) raf = requestAnimationFrame(frame);
+    }
+    const kick = () => { if (on && !raf) raf = requestAnimationFrame(frame); };
+
+    function setup() {
+      const want = roomy.matches && !calm.matches;
+      if (want !== on) {
+        on = want;
+        hero.classList.toggle("assemble", on);
+        if (!on) {
+          [copy, app, ...arts].forEach((n) => { n.style.transform = ""; n.style.opacity = ""; n.style.visibility = ""; });
+          canvas.style.removeProperty("--k");
+          geo = null;
+          return;
+        }
+      }
+      if (on) { measure(); kick(); }
+    }
+
+    let resizeTimer = 0;
+    window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(setup, 120); });
+    window.addEventListener("scroll", kick, { passive: true });
+    roomy.addEventListener?.("change", setup);
+    calm.addEventListener?.("change", setup);
+    new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; kick(); }).observe(hero);
+    setup();
+    document.fonts?.ready.then(() => on && (measure(), kick()));
+  })();
 
   /* film chapters */
   const video = document.querySelector("[data-film]");
@@ -125,6 +233,71 @@
     card.append(el("span", "tag", `${LABELS[i]} · ${work.context}`), title, el("p", "", work.description), rows);
     grid.append(card);
   });
+
+  /* scroll reveals: each section's parts arrive in sequence the first time they enter the viewport */
+  (() => {
+    window.__hbReveal = true;
+    const root = document.documentElement;
+    if (!root.classList.contains("motion")) return;
+    const SEL = [
+      ".section .head > *", ".feature .copy > *", ".feature .panel", ".feature .panel > .artifact", ".film", ".chapters .chapter",
+      ".peach", ".peach > div > *", ".peach li", ".grid2 .card", ".rel-list .rel", ".flows .flow", ".section .wrap.center > *",
+      ".about > *", ".form", ".foot > div", ".foot-meta",
+    ].join(",");
+    const nodes = [...document.querySelectorAll(SEL)];
+    const order = new Map();
+    nodes.forEach((n) => {
+      const i = order.get(n.parentElement) || 0;
+      n.style.setProperty("--d", i);
+      order.set(n.parentElement, i + 1);
+    });
+    document.querySelectorAll(".section .panel").forEach((panel) => {
+      panel.querySelectorAll(".ev").forEach((row, i) => row.style.setProperty("--r", i));
+      panel.querySelectorAll(".chip").forEach((chip, i) => chip.style.setProperty("--c", i));
+    });
+
+    // "43 → 18": count the leads up, then let duplicates merge away
+    const count = (metric) => {
+      const m = metric.textContent.trim().match(/^(\d+) → (\d+)$/);
+      if (!m) return;
+      const [a, b] = [Number(m[1]), Number(m[2])];
+      const t0 = performance.now() + 450;
+      const step = (now) => {
+        const x = Math.max(0, now - t0) / 1000;
+        const up = Math.min(1, x / 0.7), down = Math.min(1, Math.max(0, x - 0.8) / 0.9);
+        const e = (v) => 1 - Math.pow(1 - v, 3);
+        metric.textContent = `${Math.round(a * e(up))} → ${Math.round(a + (b - a) * e(down))}`;
+        if (down < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+
+    const show = (n) => {
+      n.classList.add("in");
+      if (n.matches(".feature .panel > .artifact")) n.querySelectorAll(".metric").forEach(count);
+    };
+    const pending = new Set();
+    const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); show(n); };
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => en.isIntersecting && reveal(en.target)), {
+      rootMargin: "0px 0px -8% 0px",
+    });
+    // at the very bottom of the page the last items can never cross the trigger line, so let them in
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (pending.size && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4)
+          [...pending].filter((n) => n.getBoundingClientRect().top < window.innerHeight).forEach(reveal);
+      },
+      { passive: true },
+    );
+    nodes.forEach((n) => {
+      if (n.getBoundingClientRect().bottom < 0) n.classList.add("in");
+      else {
+        pending.add(n);
+        io.observe(n);
+      }
+    });
+  })();
 
   /* trial application */
   const form = document.querySelector("[data-trial-form]");
