@@ -163,6 +163,8 @@ const alternatives = {
     "assets/photos/g-city.webp",
     "assets/photos/g-code.webp",
     "assets/photos/g-coffee.webp",
+    "assets/photos/g-decide-recommend.webp",
+    "assets/photos/g-decide-who.webp",
     "assets/photos/g-gallery.webp",
     "assets/photos/g-notebook.webp",
     "assets/photos/g-paper.webp",
