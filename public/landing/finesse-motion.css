@@ -462,8 +462,14 @@
   .fx-scale-marks li {
     position: static;
   }
+  /* each mark is centred in its column; an odd last mark takes the whole row */
+  .fx-scale-marks li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
   .fx-scale-marks button {
-    grid-template-columns: 44px 1fr;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
     padding: 10px 0;
     text-align: left;

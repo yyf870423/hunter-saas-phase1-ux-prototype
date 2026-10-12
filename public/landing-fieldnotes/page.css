@@ -1346,6 +1346,23 @@ legend {
   opacity: 0;
   transform: translateY(26px);
 }
+/* the film comes out of the haze, like 第三版: it waits for its poster, then sharpens into place */
+.film-window.rv {
+  transition: opacity 1.4s var(--ease) 0.2s, transform 1.4s var(--ease) 0.2s, filter 1.4s var(--ease) 0.2s;
+}
+.motion .film-window.rv:not(.in) {
+  opacity: 0;
+  transform: scale(0.96);
+  filter: blur(12px);
+}
+.chapters.rv {
+  transition: opacity 1s var(--ease) 0.38s, transform 1s var(--ease) 0.38s, filter 1s var(--ease) 0.38s;
+}
+.motion .chapters.rv:not(.in) {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(8px);
+}
 /* cards are laid down like pages: a slight tilt that settles */
 .motion .card.rv:not(.in) {
   transform: translateY(34px) rotate(var(--tilt, -1.4deg));

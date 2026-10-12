@@ -368,6 +368,8 @@
     return;
   }
   const rise = (y = 28, x = 0) => [{ opacity: 0, transform: `translate3d(${x}px, ${y}px, 0)` }, { opacity: 1, transform: "none" }];
+  const FILM_IN = [{ opacity: 0, transform: "scale(.96)", filter: "blur(12px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }];
+  const HAZE = (y) => [{ opacity: 0, transform: `translate3d(0, ${y}px, 0)`, filter: "blur(8px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }];
   const lineUp = [
     { opacity: 0, transform: "translateY(60%)", clipPath: "inset(0 0 100% 0)" },
     { opacity: 1, transform: "none", clipPath: "inset(0 0 0% 0)" },
@@ -375,8 +377,8 @@
   const SPEC = [
     [".s-film-label", rise(12), () => 0, 700],
     [".s-film-head > *", rise(28), (i) => 100 + i * 140, 1000],
-    [".s-film-frame", [{ opacity: 0, clipPath: "inset(0 0 100% 0)" }, { opacity: 1, clipPath: "inset(0 0 0% 0)" }], () => 200, 1300],
-    [".s-chapters li", rise(14), (i) => 320 + i * 70, 700],
+    [".s-film-frame", FILM_IN, () => 200, 1400],
+    [".s-chapters li", HAZE(14), (i) => 380 + i * 60, 1000],
     [".s-opening .s-section-label", rise(12), () => 0, 700],
     [".f-work-intro h2", rise(36), () => 100, 1000],
     [".f-work-intro > p", rise(24), () => 260, 900],
@@ -415,7 +417,14 @@
     n.animate(job.frames, { duration: job.duration, delay: job.delay, easing: EASE, fill: "backwards" });
   };
   const pending = new Set();
-  const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); show(n); };
+  // the film waits for its poster, then comes out of the haze (the 第三版 entrance)
+  const filmVideo = document.querySelector(".s-film-frame video");
+  const posterIn = filmVideo?.poster
+    ? new Promise((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = filmVideo.poster; })
+    : null;
+  const whenFilm = (n, go) =>
+    posterIn && (n.contains(filmVideo) || n.matches(".s-chapters li")) ? Promise.race([posterIn, new Promise((r) => setTimeout(r, 900))]).then(go) : go();
+  const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); whenFilm(n, () => show(n)); };
   const io = new IntersectionObserver((entries) => entries.forEach((en) => en.isIntersecting && reveal(en.target)), {
     rootMargin: "0px 0px -8% 0px",
   });

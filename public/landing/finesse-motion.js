@@ -405,11 +405,13 @@
     return;
   }
   const rise = (y = 28) => [{ opacity: 0, transform: `translate3d(0, ${y}px, 0)` }, { opacity: 1, transform: "none" }];
+  const FILM_IN = [{ opacity: 0, transform: "scale(.96)", filter: "blur(12px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }];
+  const HAZE = (y) => [{ opacity: 0, transform: `translate3d(0, ${y}px, 0)`, filter: "blur(8px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }];
   const curtain = [{ opacity: 1, clipPath: "inset(100% 0 0 0)" }, { opacity: 1, clipPath: "inset(0% 0 0 0)" }];
   const SPEC = [
     [".fx-film-head > *", rise(28), (i) => i * 120, 1000],
-    [".fx-film-frame", [{ opacity: 0, transform: "scale(.94)", filter: "blur(14px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], () => 200, 1300],
-    [".fx-scale", rise(16), () => 350, 900],
+    [".fx-film-frame", FILM_IN, () => 200, 1400],
+    [".fx-scale", HAZE(14), () => 380, 1000],
     [".f-work-intro > *", rise(30), (i) => i * 110, 1000],
     [".f-work-demo .f-tabs", rise(18), () => 0, 800],
     [".f-work-panel", rise(30), () => 140, 1000],
@@ -449,7 +451,14 @@
       n.querySelector("img")?.animate([{ scale: 1.18 }, { scale: 1 }], { duration: 1800, delay: job.delay, easing: EASE, fill: "backwards" });
   };
   const pending = new Set();
-  const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); show(n); };
+  // the film waits for its poster, then comes out of the haze (the 第三版 entrance)
+  const filmVideo = document.querySelector(".fx-film-frame video");
+  const posterIn = filmVideo?.poster
+    ? new Promise((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = filmVideo.poster; })
+    : null;
+  const whenFilm = (n, go) =>
+    posterIn && (n.contains(filmVideo) || n.matches(".fx-scale")) ? Promise.race([posterIn, new Promise((r) => setTimeout(r, 900))]).then(go) : go();
+  const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); whenFilm(n, () => show(n)); };
   const io = new IntersectionObserver((entries) => entries.forEach((en) => en.isIntersecting && reveal(en.target)), {
     rootMargin: "0px 0px -8% 0px",
   });

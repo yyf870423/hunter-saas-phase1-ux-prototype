@@ -490,10 +490,37 @@ p {
 .chapters {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
   margin: 20px 0 0;
   padding: 0;
   list-style: none;
+}
+/* wide enough for one line: the chapters share the whole row; narrower: centred rows; phones: a two-column grid */
+@media (min-width: 1000px) {
+  .chapters {
+    flex-wrap: nowrap;
+  }
+  .chapters li {
+    flex: 1 1 auto;
+  }
+  .chapters .chip-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+@media (max-width: 720px) {
+  .chapters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .chapters .chip-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .chapters li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 /* ---------- how it works: image-first cards with a small white overlay ---------- */
@@ -1178,6 +1205,23 @@ legend {
 .motion .rv:not(.in) {
   opacity: 0;
   transform: translateY(20px);
+}
+/* the film comes out of the haze, like 第三版: it waits for its poster, then sharpens into place */
+.screen.rv {
+  transition: opacity 1.4s var(--ease) 0.2s, transform 1.4s var(--ease) 0.2s, filter 1.4s var(--ease) 0.2s;
+}
+.motion .screen.rv:not(.in) {
+  opacity: 0;
+  transform: scale(0.96);
+  filter: blur(12px);
+}
+.chapters.rv {
+  transition: opacity 1s var(--ease) 0.38s, transform 1s var(--ease) 0.38s, filter 1s var(--ease) 0.38s;
+}
+.motion .chapters.rv:not(.in) {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(8px);
 }
 .display .line.rv {
   transition-duration: 1s, 1.1s;

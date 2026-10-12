@@ -236,6 +236,8 @@
       { opacity: 0, transform: `translate3d(${x}px, ${y}px, 0) scale(${s})` },
       { opacity: 1, transform: "none" },
     ];
+    const FILM_IN = [{ opacity: 0, transform: "scale(.96)", filter: "blur(12px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }];
+    const HAZE = (y) => [{ opacity: 0, transform: `translate3d(0, ${y}px, 0)`, filter: "blur(8px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }];
     // [selector, keyframes, delay(i), duration]; i = position among revealed siblings
     const SPEC = [
       [".hero-copy > *", rise(24), (i) => 60 + i * 110, 1000],
@@ -243,8 +245,8 @@
       [".head-row .head-col > *", rise(28), (i) => i * 90, 900],
       [".head-row > .body", rise(28), () => 200, 900],
       [".head-col:not(.head-row .head-col) > *", rise(28), (i) => i * 90, 900],
-      [".film-frame", [{ opacity: 0.4, clipPath: "inset(8% 10% round 24px)", transform: "scale(.97)" }, { opacity: 1, clipPath: "inset(0% 0% round 24px)", transform: "none" }], () => 0, 1300],
-      [".chapters .chapter", rise(14), (i) => 300 + i * 60, 700],
+      [".film-frame", FILM_IN, () => 200, 1400],
+      [".chapters .chapter", HAZE(14), (i) => 380 + i * 60, 1000],
       ["section[aria-label='召回渠道'] .body", rise(20), () => 0, 800],
       [".channel", rise(26, 0, 0.97), (i) => 120 + i * 80, 800],
       [".tabs", rise(20), () => 0, 800],
@@ -300,7 +302,14 @@
       if (n.matches(".band-art") && art) drawArt();
     };
     const pending = new Set();
-    const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); show(n); };
+    // the film waits for its poster, then comes out of the haze (the 第三版 entrance)
+    const filmVideo = document.querySelector(".film-frame video");
+    const posterIn = filmVideo?.poster
+      ? new Promise((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = filmVideo.poster; })
+      : null;
+    const whenFilm = (n, go) =>
+      posterIn && (n.contains(filmVideo) || n.matches(".chapters .chapter")) ? Promise.race([posterIn, new Promise((r) => setTimeout(r, 900))]).then(go) : go();
+    const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); whenFilm(n, () => show(n)); };
     const io = new IntersectionObserver((entries) => entries.forEach((en) => en.isIntersecting && reveal(en.target)), {
       rootMargin: "0px 0px -8% 0px",
     });

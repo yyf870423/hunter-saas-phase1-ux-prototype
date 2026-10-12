@@ -375,7 +375,14 @@
     n.animate(job.frames, { duration: job.duration, delay: job.delay, easing: EASE, fill: "backwards" });
   };
   const pending = new Set();
-  const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); show(n); };
+  // the film waits for its poster, then comes out of the haze (the 第三版 entrance)
+  const filmVideo = document.querySelector(".o-film-frame video");
+  const posterIn = filmVideo?.poster
+    ? new Promise((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = filmVideo.poster; })
+    : null;
+  const whenFilm = (n, go) =>
+    posterIn && (n.contains(filmVideo) || n.matches(".o-course")) ? Promise.race([posterIn, new Promise((r) => setTimeout(r, 900))]).then(go) : go();
+  const reveal = (n) => { if (!pending.delete(n)) return; io.unobserve(n); whenFilm(n, () => show(n)); };
   const io = new IntersectionObserver((entries) => entries.forEach((en) => en.isIntersecting && reveal(en.target)), {
     rootMargin: "0px 0px -8% 0px",
   });
