@@ -20,7 +20,9 @@ for (const [width, height] of [
       if (response.status() >= 400) failed.push(response.url());
     });
     await page.goto("./landing/");
-    await expect(page.locator(".f-hero h1")).toHaveText("HunterBuddy");
+    await expect(page.locator(".f-hero h1")).toHaveText(
+      "给我一个难岗位，把该找的人找出来。",
+    );
     await expect(page.locator("meta[name='trial-api']")).toHaveAttribute(
       "content",
       "disabled",

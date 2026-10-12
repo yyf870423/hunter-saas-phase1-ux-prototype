@@ -45,6 +45,8 @@ const expected = [
   "research-story-data.js",
   "research-chapters-data.js",
   "demo-data.js",
+  "finesse-motion.css",
+  "finesse-motion.js",
   "vendor/libphonenumber-max.js",
   "vendor/LICENSE",
   "vendor/LICENSE.Apache",

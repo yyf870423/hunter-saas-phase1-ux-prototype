@@ -1,0 +1,176 @@
+/* 第二版 · 实景大图 — presentation, interaction and motion layer (loaded only by landing/index.html).
+   Photographic motion: the camera pushes in on the hero photo as you scroll, the research chapters
+   become a scroll story beside a pinned photo, and images open like curtains. */
+
+/* ---------- hero: the promise leads, the wordmark stays as the brand line ---------- */
+#homepage.fx-on .f-hero-copy .fx-mark {
+  margin: 0 0 18px;
+  font-family: "Origin Display", Georgia, serif;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--f-deep);
+}
+#homepage.fx-on .f-hero h1.fx-promise {
+  font-family: inherit;
+  font-size: 58px;
+  font-weight: 300;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+#homepage.fx-on .f-hero h1.fx-promise .fx-line {
+  display: block;
+}
+#homepage.fx-on .f-hero-copy .f-coming-soon {
+  margin-top: 18px;
+}
+@media (max-width: 800px) {
+  #homepage.fx-on .f-hero-copy .fx-mark {
+    font-size: 30px;
+  }
+  #homepage.fx-on .f-hero h1.fx-promise {
+    font-size: 36px;
+  }
+}
+
+/* ---------- hero: camera push-in (driven by finesse-motion.js) ---------- */
+#homepage.fx-push .f-hero-depth,
+#homepage.fx-push .f-hero-breath {
+  animation: none !important;
+}
+#homepage.fx-push .f-hero-breath {
+  transform-origin: 66% 80%;
+  will-change: transform;
+}
+#homepage.fx-push .f-hero-copy {
+  will-change: transform, opacity;
+}
+.fx-veil {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  height: 55%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--f-surface) 92%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- research: a scroll story beside a pinned photo ---------- */
+.fx-story {
+  display: none;
+}
+#homepage.fx-story-on .p-runway {
+  display: none;
+}
+#homepage.fx-story-on .fx-story {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 64px;
+  margin-top: 40px;
+}
+.fx-steps {
+  display: flex;
+  flex-direction: column;
+}
+.fx-step {
+  min-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px 0;
+  opacity: 0.32;
+  transition: opacity 0.5s ease;
+}
+.fx-step.is-on {
+  opacity: 1;
+}
+.fx-step .fx-no {
+  color: var(--f-accent-text);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+.fx-step h3 {
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+.fx-step h3 span {
+  display: block;
+}
+.fx-step p {
+  max-width: 420px;
+  color: var(--f-ink);
+  font-size: 16px;
+  line-height: 1.95;
+}
+.fx-photo-col {
+  position: relative;
+}
+.fx-photo {
+  position: sticky;
+  top: calc(var(--f-nav-h) + (100vh - var(--f-nav-h) - min(62vh, 560px)) / 2);
+  height: min(62vh, 560px);
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--f-bg);
+}
+.fx-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.08);
+  transition: opacity 0.9s ease, transform 1.6s cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.fx-photo img.is-on {
+  opacity: 1;
+  transform: scale(1);
+}
+.fx-dots {
+  position: absolute;
+  left: 24px;
+  bottom: 22px;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+}
+.fx-dots i {
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+  transition: background-color 0.4s ease, width 0.4s ease;
+}
+.fx-dots i.is-on {
+  width: 44px;
+  background: #fff;
+}
+
+/* ---------- about: the photo opens like a curtain and drifts ---------- */
+#homepage.fx-on .f-about-image {
+  overflow: hidden;
+}
+#homepage.fx-on .f-about-image img {
+  will-change: transform;
+}
+
+/* ---------- scroll reveals: hidden until finesse-motion.js animates them in ---------- */
+.motion #homepage.fx-on :is(.f-work-intro > *, .f-work-demo .f-tabs, .f-work-panel, .f-work-bottom, .p-intro h2 > span,
+  .p-intro > p, .fx-steps, .fx-photo-col, .f-memory h2, .f-memory .f-container > p, .f-network-tabs, .f-network-story,
+  .f-network-figure, .f-network-origin, .f-about-copy > *, .f-about-image, .f-trial-intro > *, .f-trial-content,
+  .f-hero-copy > *):not(.in) {
+  opacity: 0;
+}
+.motion .f-footer :is(.f-footer-top > *, .f-footer-bottom):not(.in) {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-step,
+  .fx-photo img,
+  .fx-dots i {
+    transition: none;
+  }
+}
