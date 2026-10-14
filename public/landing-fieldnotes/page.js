@@ -57,7 +57,6 @@
         : "") +
       L("circle", { cx: -11, cy: 4, r: 2.1, fill: INK, "stroke-width": 1 }) +
       L("circle", { cx: 11, cy: 4, r: 2.1, fill: INK, "stroke-width": 1 }) +
-      (o.beard ? L("path", { d: "M-25 12C-23 33-11 40 0 40C11 40 23 33 25 12" }) : "") +
       L("path", { d: o.mouth === "o" ? "M-3 19Q0 23 3 19Q0 16-3 19Z" : "M-7 18Q0 24 7 18" })
     }</g>`;
   }
@@ -128,7 +127,7 @@
       svg(
         "0 0 344 344",
         win(70, 46, 240, 212) +
-          clip(71, 73, 238, 184, person(190, 152, 1, { hair: "side", shirt: NAVY, glasses: true, beard: true, collar: "round" })) +
+          clip(71, 73, 238, 184, person(190, 152, 1, { hair: "side", shirt: NAVY, glasses: true, collar: "round" })) +
           L("circle", { cx: 300, cy: 74, r: 26, fill: "rgba(202,225,226,.55)", "stroke-width": 2.6 }) +
           L("path", { d: "M319 93L338 112", "stroke-width": 6 }) +
           tag(6, 96, 70, "简历库") +
@@ -149,7 +148,7 @@
         win(10, 30, 196, 196) +
           clip(11, 57, 194, 168, person(108, 140, 0.86, { hair: "bob", shirt: SAGE })) +
           win(252, 92, 196, 196) +
-          clip(253, 119, 194, 168, person(350, 202, 0.86, { hair: "side", shirt: NAVY, glasses: true, beard: true, collar: "round" })) +
+          clip(253, 119, 194, 168, person(350, 202, 0.86, { hair: "side", shirt: NAVY, glasses: true, collar: "round" })) +
           F("path", { d: "M186 236C186 214 206 202 232 202C260 202 280 214 280 236C280 258 260 270 232 270C222 270 214 268 206 264L190 274L194 258C188 252 186 244 186 236Z", fill: "#fff", stroke: INK, "stroke-width": 2, "stroke-dasharray": "6 6" }) +
           F("circle", { cx: 214, cy: 236, r: 3.4, fill: INK }) +
           F("circle", { cx: 232, cy: 236, r: 3.4, fill: INK }) +
