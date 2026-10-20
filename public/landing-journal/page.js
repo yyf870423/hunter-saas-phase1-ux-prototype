@@ -143,6 +143,11 @@
   }
   moveMarker(true);
   window.addEventListener("resize", () => moveMarker(true));
+  // the card beside the panel lines up with the top of the tabs; it needs to know how tall the tab row is
+  const workSection = tabList.closest("section");
+  const syncTabsHeight = () => workSection?.style.setProperty("--tabs-h", `${tabList.offsetHeight}px`);
+  syncTabsHeight();
+  if ("ResizeObserver" in window) new ResizeObserver(syncTabsHeight).observe(tabList);
   document.fonts?.ready.then(() => moveMarker(true));
 
   const stagger = (nodes, from = 0) =>
