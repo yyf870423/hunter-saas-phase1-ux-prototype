@@ -1,73 +1,161 @@
 (() => {
   const WORKS = [
     {
-      headline: "给出岗位要求，找到人，也看清为什么。",
-      description: "从岗位与客户要求出发，围绕目标公司，在已有候选人、公开履历、论文与专利中跨渠道找人。",
-      detail: "核对身份、合并重复资料，对照岗位留下匹配理由、来源与待确认条件。谁值得联系，由你判断。",
-      context: "机器人公司 · 视觉算法负责人",
-      subject: "值得进一步了解的人选与匹配依据",
-      rows: [
-        { t: "林越", k: "工业视觉 · 团队负责人", c: "产线视觉与算法团队经历。", f: "实际管理范围" },
-        { t: "周宁", k: "机器人感知 · 技术骨干", c: "相关论文与项目经历。", f: "量产落地经验" },
-        { t: "陈思", k: "视觉算法 · 项目负责人", c: "跨团队交付经历。", f: "近期职责与求职意向" },
+      "headline": "一条融资新闻，可能就是下一个岗位。",
+      "beats": [
+        "周一早上，HunterBuddy 提醒你：星川机器人刚拿到 B 轮融资，可能要扩招。",
+        "它先去找有没有具体岗位：官网招聘页上多了视觉算法负责人。找到岗位，再找对口的联系人：负责视觉团队的技术负责人许晴。她的直接联系方式没找到，才去翻你的人脉：你的老客户张远是星川的投资人，能帮你引荐。",
+        "一个确认过的岗位、一位对口联系人，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD，它就是一个正式岗位。"
       ],
-      evidence: [
-        ["岗位要求", "负责工业视觉方向，具备项目交付与团队协作经历。未提供的条件保持未知。"],
-        ["候选人资料", "匹配理由对应已有经历与相关成果，资料来源和需要进一步了解的条件分别保留。"],
+      "questions": [
+        "他们真的在招这个岗位吗？",
+        "直接联系许晴，还是请张远引荐？",
+        "合作方式和优先级怎么谈？"
       ],
-      questions: ["岗位中哪些条件不可妥协？", "人选当前任职与项目职责是否准确？", "本人求职意向及联系许可是否已确认？"],
+      "context": "每周一 09:00 · 帮你盯着的赛道",
+      "subject": "星川机器人 · 可能有新岗位",
+      "rows": [
+        {
+          "t": "官网招聘页新增视觉算法负责人",
+          "k": "找到岗位 · 两处来源",
+          "c": "招聘页和融资新闻都能对上。"
+        },
+        {
+          "t": "许晴 · 技术负责人",
+          "k": "对口联系人",
+          "c": "公开资料能确认她负责视觉团队。",
+          "f": "直接联系方式"
+        },
+        {
+          "t": "张远 → 许晴",
+          "k": "备用 · 引荐路线",
+          "c": "直接联系不上时，你的老客户张远（星川的投资人）能帮你引荐。"
+        }
+      ],
+      "relations": [
+        "公司新闻",
+        "招聘页",
+        "对口联系人",
+        "你的人脉"
+      ]
     },
     {
-      headline: "从公司变化，找到值得跟进的客户机会。",
-      description: "结合新业务、新基地和招聘动态，梳理公司业务、相关岗位与关键角色，发现潜在客户需求。",
-      detail: "留下值得关注的原因、负责人线索和沟通切入点。带着背景核实需求，让下一次客户沟通有备而来。",
-      context: "机器人与智能制造",
-      subject: "星川机器人",
-      rows: [
-        { t: "新基地与技术岗位信息同时出现", k: "观察到的变化", c: "新生产基地的公开信息，与视觉、控制方向的岗位需求同时出现。" },
-        { t: "业务扩张出现技术团队需求线索", k: "潜在需求", c: "招聘优先级、预算与需求有效性，仍需进一步沟通确认。" },
-        { t: "从新基地交付计划与岗位需求聊起", k: "沟通切入点", c: "进一步核实相关负责角色和有效的联系路径，判断是否值得跟进。" },
+      "headline": "想摸清一个团队，资料却东一块西一块。",
+      "beats": [
+        "星川要招人，你得先知道这类人都在哪。星川和两家对标公司的团队信息，散在官网、新闻、论文和你的简历库里。",
+        "它按公司、团队、关键岗位、在职的人一层层排好，把官网上的任职信息、你库里的候选人、论文和专利里的名字对上号。一起写过论文的人，不会被当成上下级。",
+        "一张人才地图：谁在什么位置，消息从哪来，哪里还是空白。你手上的 Excel 人才地图也能导进来接着补。"
       ],
-      evidence: [
-        ["生产基地动态", "新增产线与交付计划可支持业务扩张线索，但不能直接认定招聘委托已经成立。"],
-        ["岗位信息", "视觉算法与运动控制方向的岗位需求，仍需核实优先级、招聘预算、负责人与对外渠道。"],
+      "questions": [
+        "团队名字和分工还对吗？",
+        "这些名字和你库里的候选人是同一个人吗？",
+        "哪些空白值得下次去补？"
       ],
-      questions: ["招聘需求是否仍然有效？", "哪位负责人适合进一步沟通？", "现有联系路径是否已获授权？"],
+      "context": "目标公司 · 人才地图",
+      "subject": "星川和两家对标公司",
+      "rows": [
+        {
+          "t": "拓界机器人 · 视觉团队",
+          "k": "负责人已确认",
+          "c": "官网任职和团队页都能对上，就是你库里的林越。"
+        },
+        {
+          "t": "穹顶智能 · 控制团队",
+          "k": "在职的人待确认",
+          "c": "从论文作者里找到线索，身份和现在的职位还要核对。"
+        },
+        {
+          "t": "星川机器人 · 产品交付",
+          "k": "空白",
+          "c": "知道有这个关键岗位，还不知道是谁，不等于这个位置空着。"
+        }
+      ],
+      "relations": [
+        "团队结构",
+        "在职",
+        "论文作者"
+      ]
     },
     {
-      headline: "从一家公司，梳理团队与关键人才。",
-      description: "围绕目标公司的团队与关键岗位，关联公开任职、候选人资料以及论文、专利中的人物线索。",
-      detail: "把人物角色、关系依据和未覆盖的岗位放在同一份研究里。已知继续核对，缺口继续补充，让下一轮寻访有方向。",
-      context: "目标公司 · 团队研究",
-      subject: "星川机器人 · 关键角色",
-      rows: [
-        { t: "视觉团队", k: "视觉算法负责人", c: "有负责人任职线索，人物身份与当前职责待确认。" },
-        { t: "控制团队", k: "运动控制负责人", c: "有相关技术成果线索，作者或发明人与真实任职的对应关系待核实。" },
-        { t: "产品团队", k: "产品交付负责人", c: "负责人尚未覆盖，保留为下一轮资料补充方向。" },
+      "headline": "JD 到手，先看你手上已经有谁。",
+      "beats": [
+        "张远引荐之后，许晴发来视觉算法负责人的 JD，只有几行字。合适的人很少，线索也很散。",
+        "它不从零开始：先看人才地图里的目标团队、这类人通常从哪些公司出来、你库里谁最接近，再去网上、论文专利和开源社区补齐。简历里的林越、论文里的 Lin Y. 和开源社区的 lin-yue，核对后发现是同一个人。",
+        "几位值得聊聊的人选。为什么合适、消息从哪来、哪里还不清楚，都写在旁边。先联系谁，你来判断。"
       ],
-      evidence: [
-        ["团队与岗位", "不同团队按各自公开线索整理，不把合作、共同作者或联系关系当作汇报关系。"],
-        ["技术成果", "论文与专利只支持技术方向与人物发现，需要进一步核验身份和真实任职。"],
+      "questions": [
+        "JD 里哪些条件不能让步？",
+        "人选现在的职位和负责的项目准确吗？",
+        "本人想不想动、能不能联系，问过了吗？"
       ],
-      questions: ["团队名称与职责是否仍然有效？", "线索人物能否与已有候选人核验为同一人？", "哪些岗位与汇报关系尚没有可靠依据？"],
+      "context": "星川机器人 · 视觉算法负责人",
+      "subject": "值得聊聊的人选",
+      "rows": [
+        {
+          "t": "林越",
+          "k": "工业视觉 · 团队负责人",
+          "c": "做过产线视觉和算法团队，三个地方的资料已合并。",
+          "f": "实际带多大团队"
+        },
+        {
+          "t": "周宁",
+          "k": "机器人感知 · 技术骨干",
+          "c": "有相关论文和项目经历。",
+          "f": "有没有做过量产"
+        },
+        {
+          "t": "陈思",
+          "k": "视觉算法 · 项目负责人",
+          "c": "带过跨团队的项目。",
+          "f": "最近在做什么、想不想动"
+        }
+      ],
+      "relations": [
+        "人才地图",
+        "跳槽去向",
+        "同公司",
+        "一起写过论文"
+      ]
     },
     {
-      headline: "从候选人的经历，找到值得讨论的下一站。",
-      description: "结合专业方向、项目经历与候选人意向，研究相关公司和岗位，寻找手上岗位之外的机会。",
-      detail: "对照经历、职责与地点，保留匹配依据和待确认条件。哪些机会值得沟通、是否推荐，由你判断。",
-      context: "候选人 · 新机会研究",
-      subject: "林越 · 工业视觉与团队管理",
-      rows: [
-        { t: "算法落地与小团队交付", k: "已有经验", c: "沿已有项目经历研究相关岗位，保留资料来源与不确定处。" },
-        { t: "工业视觉与机器人感知岗位", k: "可继续研究的方向", c: "从专业方向与已有经历出发，进一步了解公司与岗位要求。" },
-        { t: "岗位职责、工作地点与本人意向", k: "需要比较的条件", c: "缺失条件保留待确认。先讨论方向、核实机会，再决定是否对外推荐。" },
+      "headline": "半年后，林越的团队变了。",
+      "beats": [
+        "上次林越没动。你让 HunterBuddy 每两周看一次重点候选人，这次它发现：拓界机器人的视觉团队并进了新成立的平台部，而林越在现在的岗位上已经做了四年。",
+        "它不替你下结论，先问你要不要核实。你点头后，它整理林越的最新情况，对照你手上所有在招的岗位和熟悉的公司，看哪些值得聊。",
+        "几个有理有据的机会。打不打这通电话、推不推荐，你说了算。聊完把新简历发给它，资料和匹配都会更新。"
       ],
-      evidence: [
-        ["本人要求", "人选希望继续工业视觉方向。未提供的薪酬、地点与到岗时间保持未知。"],
-        ["市场机会", "公开岗位线索仅供研究，不意味着公司已接受推荐或人选已同意对外传递资料。"],
+      "questions": [
+        "他这次最在意什么？",
+        "这些机会的职责和要求核实过吗？",
+        "推荐出去的内容，他同意了吗？"
       ],
-      questions: ["本人下一步最在意的条件是什么？", "机会的职责与要求是否已核实？", "对外推荐的内容和范围是否得到同意？"],
-    },
+      "context": "重点候选人 · 林越",
+      "subject": "林越 · 可以聊的下一站",
+      "rows": [
+        {
+          "t": "穹顶智能 · 视觉平台负责人",
+          "k": "你在招的岗位",
+          "c": "技术方向和带团队经历都对得上。",
+          "f": "地点和薪资"
+        },
+        {
+          "t": "星川机器人 · 新产线视觉团队",
+          "k": "人脉里的新机会",
+          "c": "星川扩张后的新方向，和林越的产线经历相关。",
+          "f": "需求是不是真的"
+        },
+        {
+          "t": "本人意向",
+          "k": "只是迹象",
+          "c": "团队调整不等于想走，愿不愿意看机会，要你去问。"
+        }
+      ],
+      "relations": [
+        "团队调整",
+        "在招岗位",
+        "熟悉的公司"
+      ]
+    }
   ];
 
   const el = (tag, cls, text) => {
@@ -80,6 +168,24 @@
   /* film chapters: seek on click, follow playback */
   const video = document.querySelector("[data-film]");
   const chapters = [...document.querySelectorAll("[data-chapters] .chapter")];
+  /* before it is started the film shows only its designed cover: no player bar on top. Clicking the cover (or
+     Enter / Space on it) starts it, and from then on the normal controls are there. */
+  if (video) {
+    video.removeAttribute("controls");
+    video.tabIndex = 0;
+    const start = () => {
+      video.controls = true;
+      video.play()?.catch?.(() => {});
+    };
+    video.addEventListener("click", () => { if (!video.controls) start(); });
+    video.addEventListener("keydown", (event) => {
+      if (!video.controls && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        start();
+      }
+    });
+    video.addEventListener("play", () => { video.controls = true; });
+  }
   const markChapter = (index) =>
     chapters.forEach((button, i) => button.setAttribute("aria-pressed", String(i === index)));
   chapters.forEach((button, i) =>
@@ -102,7 +208,7 @@
     markChapter(index);
   });
 
-  /* data-flow figures (hero, 人机协作): hold still for reduced motion, and pause while off screen */
+  /* data-flow figures (hero, 分工): hold still for reduced motion, and pause while off screen */
   document.querySelectorAll("svg[data-flow]").forEach((flow) => {
     if (!flow.pauseAnimations) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -168,31 +274,36 @@
 
   function renderWork(index) {
     const work = WORKS[index];
-    ["headline", "description", "detail", "context", "subject"].forEach((key) => {
+    ["headline", "context"].forEach((key) => {
       slot(key).textContent = work[key];
     });
-    slot("questions").replaceChildren(...stagger(work.questions.map((q) => el("div", "q", q)), 2));
+    /* keep each half of "公司 · 说明" on one line so a narrow card breaks at the dot */
+    slot("subject").replaceChildren(
+      ...work.subject.split(" · ").flatMap((part, i) => [...(i ? [" · "] : []), el("span", "nw", part)]),
+    );
+    slot("beats").replaceChildren(
+      ...stagger(
+        work.beats.map((text, i) => {
+          const beat = el("div", "beat");
+          beat.append(el("span", "beat-k", ["看到", "它来查", "交给你"][i]), el("p", "body", text));
+          return beat;
+        }),
+        1,
+      ),
+    );
+    slot("questions").replaceChildren(...stagger(work.questions.map((q) => el("div", "q", q)), 4));
     slot("rows").replaceChildren(
       ...stagger(
         work.rows.map((row) => {
           const item = el("div", "row");
           item.append(el("strong", "", row.t), el("span", "k", row.k), el("p", "", row.c));
-          if (row.f) item.append(el("p", "follow", `仍需了解：${row.f}`));
+          if (row.f) item.append(el("p", "follow", `待确认：${row.f}`));
           return item;
         }),
         1,
       ),
     );
-    slot("evidence").replaceChildren(
-      ...stagger(
-        work.evidence.map(([title, copy]) => {
-          const item = el("div");
-          item.append(el("b", "", `${title}：`), document.createTextNode(copy));
-          return item;
-        }),
-        4,
-      ),
-    );
+    slot("relations").replaceChildren(...stagger(work.relations.map((r) => el("span", "rel-tag", r)), 4));
   }
 
   function showWork(index, focus = false) {
@@ -244,6 +355,45 @@
       }
     });
   });
+
+  /* the four scenarios step through by themselves. A click (or arrow key) jumps straight to one and the cycle carries
+     on from there; the open tab shows a thin progress line. While the pointer rests on the panel, someone is reading,
+     so the cycle holds until it leaves. */
+  {
+    const DWELL = 9000;
+    let elapsed = 0;
+    let last = 0;
+    let visible = false;
+    let looping = false;
+    let reading = false;
+    const setP = () => tabs.forEach((t, i) => t.style.setProperty("--p", i === current ? Math.min(1, elapsed / DWELL).toFixed(4) : 0));
+    const tick = (now) => {
+      const dt = Math.min(now - last, 100);
+      last = now;
+      if (!calm.matches && !reading && !document.hidden) {
+        elapsed += dt;
+        if (elapsed >= DWELL) {
+          elapsed = 0;
+          showWork((current + 1) % tabs.length);
+        }
+        setP();
+      }
+      if (visible) requestAnimationFrame(tick);
+      else looping = false;
+    };
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (!visible || looping) return;
+      looping = true;
+      last = performance.now();
+      requestAnimationFrame(tick);
+    }, { threshold: 0.2 }).observe(panel);
+    const restart = () => { elapsed = 0; setP(); };
+    tabs.forEach((tab) => tab.addEventListener("click", restart));
+    tabList.addEventListener("keydown", restart);
+    panel.addEventListener("pointerenter", (event) => { if (event.pointerType === "mouse") reading = true; });
+    panel.addEventListener("pointerleave", (event) => { if (event.pointerType === "mouse") reading = false; });
+  }
 
   /* how it works: six columns in one strip. On wide screens it steps through by itself (the open column's
      top bar fills as its turn runs out); pointing the mouse at the strip stops it on the step you point at,
@@ -432,7 +582,7 @@
     const svg = fig?.querySelector("svg[data-scenes]");
     const flowsBox = document.querySelector(".flows");
     const flows = [...document.querySelectorAll(".flows .flow")];
-    if (!svg || flows.length !== 3) return;
+    if (!svg || flows.length !== 4) return;
     const NS = "http://www.w3.org/2000/svg";
     const mk = (tag, attrs, parent) => {
       const n = document.createElementNS(NS, tag);
@@ -447,11 +597,12 @@
       const n = p.getAttribute("d").match(/-?\d+(?:\.\d+)?/g).map(Number);
       return [[n[0], n[1]], [n[2], n[3]], [n[4], n[5]]];
     });
-    const ENDS = [["company", "role"], ["company", "cand"], ["role", "cand"], ["contact", "cand"], ["paper", "cand"], ["company", "contact"]];
+    const ENDS = baseEdges.map((p) => [p.dataset.a, p.dataset.b]);
     const SCENES = [
-      ["paper", "cand", "company", "contact"], // 找信息
-      ["role", "cand", "paper"], // 找人
-      ["cand", "company", "role"], // 找岗位
+      ["company", "role", "contact"], // 发现新岗位
+      ["company", "map", "cand"], // 摸清团队
+      ["role", "map", "cand", "paper"], // 为岗位找人
+      ["cand", "company", "role"], // 为人选找机会
     ];
     const hop = (a, b) => {
       const i = ENDS.findIndex(([x, y]) => (x === a && y === b) || (x === b && y === a));
@@ -844,6 +995,7 @@
     snapshot ||= {
       ...Object.fromEntries(required.map((name) => [name, form.elements.namedItem(name).value.trim()])),
       industry: industries.join("、"),
+      notes: form.elements.namedItem("notes").value.trim(),
       acknowledgedPurpose: true,
       submissionId: crypto.randomUUID(),
     };
@@ -864,7 +1016,7 @@
         form.reset();
         toggles.forEach((t) => t.setAttribute("aria-pressed", "false"));
         snapshot = null;
-        say("申请已收到。开放试用后，我们会通过你留下的联系方式与你联系。提交申请不代表试用已开通。", "ok");
+        say("申请已收到。我们会逐一审核，并在开通时通过你留下的联系方式与你联系。", "ok");
       } else if (result.status === "rate_limited") {
         say("提交过于频繁，请稍后再试。已填写的信息会保留在当前页面。");
       } else if (result.status === "invalid") {
