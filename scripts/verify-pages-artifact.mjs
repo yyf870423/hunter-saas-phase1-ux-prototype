@@ -201,7 +201,7 @@ const alternatives = {
     "index.html",
     "page.css",
     "page.js",
-    "assets/boseek-navy.svg",
+    "assets/boseek-b5.svg",
     "assets/hunterbuddy-story.mp4",
     "assets/story-poster.jpg",
     "assets/fonts/jetbrains-mono.woff2",
