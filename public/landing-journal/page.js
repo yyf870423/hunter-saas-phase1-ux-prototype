@@ -245,7 +245,8 @@
     });
   });
 
-  /* how it works: six columns in one strip; a click (or Enter / Space) opens a step, the others stay narrow */
+  /* how it works: six columns in one strip; the step the mouse points at opens (tap, Tab focus or
+     Enter / Space do the same), the others stay narrow */
   (() => {
     const cols = [...document.querySelectorAll("[data-s6] .s6-col")];
     const open = (col) =>
@@ -255,6 +256,8 @@
       });
     cols.forEach((col) => {
       col.setAttribute("role", "button");
+      col.addEventListener("pointerenter", (event) => event.pointerType === "mouse" && open(col));
+      col.addEventListener("focus", () => open(col));
       col.addEventListener("click", () => open(col));
       col.addEventListener("keydown", (event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
