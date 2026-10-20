@@ -421,7 +421,7 @@
     const phone = form.elements.namedItem("phone");
     if (!/^\+?[\d ()-]{6,20}$/.test(phone.value.trim()) || phone.value.replace(/\D/g, "").length < 7) {
       phone.closest(".field").dataset.invalid = "true";
-      say("请填写有效的联系电话；境外号码请包含国家区号。");
+      say("请填写有效的联系电话，境外号码请包含国家区号。");
       phone.focus();
       return;
     }
@@ -464,7 +464,7 @@
         form.reset();
         toggles.forEach((t) => t.setAttribute("aria-pressed", "false"));
         snapshot = null;
-        say("申请已收到。开放试用后，我们会通过你留下的联系方式与你联系；提交申请不代表试用已开通。", "ok");
+        say("申请已收到。开放试用后，我们会通过你留下的联系方式与你联系。提交申请不代表试用已开通。", "ok");
       } else if (result.status === "rate_limited") {
         say("提交过于频繁，请稍后再试。已填写的信息会保留在当前页面。");
       } else if (result.status === "invalid") {
@@ -474,7 +474,7 @@
         say("申请暂未提交，请稍后重试。已填写的信息会保留在当前页面。");
       }
     } catch {
-      say("暂未确认申请结果。请重试；为避免重复，重试会使用相同资料。");
+      say("暂未确认申请结果，请重试。为避免重复，重试会使用相同资料。");
     } finally {
       clearTimeout(timer);
       submit.disabled = false;
