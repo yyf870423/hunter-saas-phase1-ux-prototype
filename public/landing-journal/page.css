@@ -9,7 +9,7 @@
 }
 @font-face {
   font-family: "HB Serif";
-  src: url("assets/fonts/serif-subset.woff?v=20261020b") format("woff");
+  src: url("assets/fonts/serif-subset.woff?v=20261020c") format("woff");
   font-weight: 400;
   font-display: swap;
 }
@@ -266,23 +266,39 @@ section { scroll-margin-top: 80px; }
 /* apply */
 .apply-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
 .about { display: flex; flex-direction: column; gap: 24px; }
-/* figure 07: scattered leads, one pass through HunterBuddy, one dossier, then you */
-.untangle { margin: 8px 0 0; border: 1px solid var(--ash); border-radius: var(--r-card); padding: 30px 30px 22px; display: flex; flex-direction: column; gap: 16px; }
-.untangle svg { width: 100%; height: auto; overflow: visible; }
-.untangle svg text { font-family: var(--mono); }
-.untangle :is(.ut-hub, .ut-glow) { transform-box: fill-box; transform-origin: center; }
-.untangle .edge { stroke-dasharray: 1; }
-.motion .untangle:not(.in) .edge { stroke-dashoffset: 1; }
-/* narrower columns shrink the figure, so its labels step up to stay readable */
-@media (max-width: 1320px) {
-  .untangle { padding: 24px 22px 18px; }
-  .untangle svg > text { font-size: 15px; }
-  .untangle .ut-src text { font-size: 16px; }
-  .untangle .ut-card text { font-size: 16px; }
-  .untangle .ut-row text { font-size: 15px; }
-  .untangle .ut-you text { font-size: 17px; }
+/* colophon: the about block closes like a journal's imprint page */
+.colophon { position: relative; margin-top: 12px; padding-top: 22px; }
+.colo-rule { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--off-black); transform-origin: left center; }
+.colo-rule::after { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 1px; background: var(--off-black); }
+.colo-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 20px; }
+.colo-head > div { display: flex; flex-direction: column; gap: 6px; }
+.colo-name { font-size: clamp(28px, 2.4vw, 34px); line-height: 1.1; color: var(--off-black); }
+.colo-sub { font-size: 14px; letter-spacing: 0.04em; color: var(--graphite); }
+.colo-issue { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 20px; line-height: 1.2; color: var(--off-black); white-space: nowrap; }
+.colo-issue small { font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em; color: var(--smoke); }
+.colo-grid { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--ash); border-bottom: 1px solid var(--ash); }
+.colo-cell { padding: 16px 16px 18px 0; }
+.colo-cell:first-child { grid-column: 1 / -1; border-bottom: 1px solid var(--ash); }
+.colo-cell:nth-child(3) { border-left: 1px solid var(--ash); padding-left: 20px; }
+.colo-cell dt { font-size: 12px; letter-spacing: 0.12em; color: var(--smoke); }
+.colo-cell dd { margin: 8px 0 0; font-size: 17px; line-height: 1.5; color: var(--off-black); }
+.colo-cell a { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; padding-bottom: 2px; }
+.colo-cell a:hover { color: var(--lake); }
+.colo-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 16px; font-size: 13px; letter-spacing: 0.04em; color: var(--smoke); }
+.colo-foot img { width: 98px; height: 35px; object-fit: contain; object-position: left center; }
+@media (max-width: 720px) {
+  .colo-grid { grid-template-columns: minmax(0, 1fr); }
+  .colo-cell, .colo-cell:nth-child(3) { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-left: 0; }
+  .colo-cell:first-child { border-bottom: 0; }
+  .colo-cell + .colo-cell { border-top: 1px solid var(--ash); }
+  .colo-cell dd { margin: 0; text-align: right; font-size: 15px; }
 }
-@media (max-width: 1100px) { .untangle { max-width: 620px; } }
+/* two columns: the imprint sits at the foot of the left column, level with the bottom of the form */
+@media (min-width: 1101px) {
+  .apply-grid { align-items: stretch; }
+  .about > p:last-of-type { margin-bottom: 16px; }
+  .about .colophon { margin-top: auto; }
+}
 .form { border: 1px solid var(--ash); border-radius: var(--r-card); padding: 40px; display: flex; flex-direction: column; gap: 24px; }
 .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .field { display: flex; flex-direction: column; gap: 8px; font-size: 13px; letter-spacing: 0.06em; color: var(--graphite); }
@@ -329,7 +345,7 @@ legend { font-size: 13px; letter-spacing: 0.06em; color: var(--graphite); paddin
 .tabs.has-ink .tab[aria-selected="true"] { background: transparent; }
 
 /* scroll reveals: hidden until page.js animates them in (only when html.motion is set) */
-.motion :is(.hero-copy > *, .pipeline, .sec-head .left > *, .sec-head > .lead, .film, .chapters .chapter, .s6, .tabs, .panel-copy, .elevated, .statement, .gate, .duo .card, .duo li, #boundary .wrap > .body, .graph, .flows .flow, .faq details, .band, .band > :not(.wash), .about > *, .form, .foot-cols > div, .foot-meta):not(.in) { opacity: 0; }
+.motion :is(.hero-copy > *, .pipeline, .sec-head .left > *, .sec-head > .lead, .film, .chapters .chapter, .s6, .tabs, .panel-copy, .elevated, .statement, .gate, .duo .card, .duo li, #boundary .wrap > .body, .graph, .flows .flow, .faq details, .band, .band > :not(.wash), .about > *, .colo-cell, .form, .foot-cols > div, .foot-meta):not(.in) { opacity: 0; }
 .graph .edge { stroke-dasharray: 1; }
 .motion .graph:not(.in) .edge { stroke-dashoffset: 1; }
 
@@ -344,7 +360,6 @@ legend { font-size: 13px; letter-spacing: 0.06em; color: var(--graphite); paddin
   .brand .rule, .brand span { display: none; }
   .duo, .fields { grid-template-columns: minmax(0, 1fr); }
   .form, .elevated, .duo .card { padding: 28px; }
-  .untangle { padding: 22px 18px 18px; }
   .s6-col { grid-template-columns: 26px minmax(0, 1fr); padding: 18px 20px; }
   .s6-body { grid-column: 2; }
   .s6-who { display: none; }

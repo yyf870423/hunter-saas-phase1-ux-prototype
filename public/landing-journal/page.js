@@ -293,6 +293,7 @@
       [".band", [{ opacity: 0, transform: "scale(.95)" }, { opacity: 1, transform: "none" }], () => 0, 1100],
       [".band > :not(.wash)", rise(24), (i) => 260 + i * 100, 900],
       [".about > *", rise(28), (i) => i * 80, 900],
+      [".colo-cell", rise(0, -12), (i) => 520 + i * 90, 700],
       [".form", rise(44), () => 160, 1000],
       [".foot-cols > div", rise(20), (i) => i * 80, 800],
       [".foot-meta", rise(12), () => 300, 800],
@@ -320,33 +321,6 @@
       );
     };
 
-    // Figure 07: the leads tangle in, HunterBuddy lights up, three clean threads straighten into the dossier, then 你
-    const untangle = document.querySelector(".untangle svg");
-    untangle?.querySelectorAll(".ut-in, .ut-out").forEach((p) => { p.setAttribute("pathLength", "1"); p.classList.add("edge"); });
-    const drawUntangle = (d0) => {
-      const q = (sel) => untangle.querySelectorAll(sel);
-      const fade = (n, at, dur = 520, from = { opacity: 0 }) =>
-        n.animate([from, { opacity: 1, transform: "none" }], { duration: dur, delay: d0 + at, easing: EASE, fill: "backwards" });
-      const draw = (p, at, dur) => p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: dur, delay: d0 + at, easing: EASE, fill: "both" });
-      q(".ut-src").forEach((g, i) => fade(g, 120 + i * 60));
-      q(".ut-in").forEach((p, i) => draw(p, 260 + i * 45, 1000));
-      q(".ut-glow").forEach((g) => fade(g, 820, 900, { opacity: 0, transform: "scale(.5)" }));
-      q(".ut-hub").forEach((g) => fade(g, 1000, 600, { opacity: 0, transform: "scale(.3)" }));
-      q(".ut-out").forEach((p, i) => {
-        const at = 1180 + i * 90;
-        draw(p, at, 800);
-        if (!p.dataset.wave || !window.SVGAnimationElement) return;
-        const morph = document.createElementNS("http://www.w3.org/2000/svg", "animate");
-        [["attributeName", "d"], ["values", `${p.dataset.wave};${p.getAttribute("d")}`], ["dur", "1.1s"], ["begin", "indefinite"], ["fill", "freeze"],
-          ["calcMode", "spline"], ["keyTimes", "0;1"], ["keySplines", ".2 .75 .2 1"]].forEach(([k, v]) => morph.setAttribute(k, v));
-        p.append(morph);
-        morph.beginElementAt((d0 + at) / 1000);
-      });
-      q(".ut-card").forEach((g) => fade(g, 1240, 700, { opacity: 0, transform: "translateX(10px)" }));
-      q(".ut-row").forEach((g, i) => fade(g, 1640 + i * 130, 560, { opacity: 0, transform: "translateX(-6px)" }));
-      q(".ut-you").forEach((g) => fade(g, 2260, 700, { opacity: 0, transform: "translateY(-6px)" }));
-    };
-
     const show = (n) => {
       const job = jobs.get(n);
       n.classList.add("in");
@@ -356,7 +330,8 @@
           row.animate(rise(0, -12), { duration: 700, delay: 560 + i * 110, easing: EASE, fill: "backwards" }),
         );
       if (n.matches(".graph") && graph) drawGraph();
-      if (n.matches(".untangle") && untangle) drawUntangle(job.delay);
+      if (n.matches(".colophon"))
+        n.querySelector(".colo-rule")?.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: 1100, delay: job.delay + 120, easing: EASE, fill: "backwards" });
     };
     const pending = new Set();
     // the film waits for its poster, then comes out of the haze (the 第三版 entrance)
