@@ -117,6 +117,12 @@
     sync();
   });
 
+  /* figure 05: its two glows drift only while the figure is on screen */
+  document.querySelectorAll(".graph").forEach((fig) => {
+    if (!("IntersectionObserver" in window)) return fig.classList.add("is-live");
+    new IntersectionObserver(([entry]) => fig.classList.toggle("is-live", entry.isIntersecting)).observe(fig);
+  });
+
   /* scenario tabs: a sliding selection marker, and a panel that fades out, swaps, then eases back in */
   const tabList = document.querySelector("[data-tabs]");
   const tabs = [...tabList.querySelectorAll(".tab")];
@@ -374,6 +380,149 @@
       toggle.setAttribute("aria-pressed", String(toggle.getAttribute("aria-pressed") !== "true")),
     ),
   );
+  /* dropdowns: the native <select> still holds the value, a listbox in the page's own style drives it */
+  const dropdowns = [...form.querySelectorAll(".field select")].map((select, n) => {
+    const field = select.closest(".field");
+    const text = [...field.childNodes].find((c) => c.nodeType === 3 && c.textContent.trim());
+    const name = el("span", "field-name", text.textContent.trim());
+    name.id = `dd-name-${n}`;
+    text.replaceWith(name);
+    const blank = select.options[0]?.value === "" ? select.options[0].textContent : "请选择";
+    const box = el("div", "dd");
+    const trigger = el("button", "dd-trigger");
+    const value = el("span", "dd-value");
+    const chev = el("span", "dd-chev");
+    const list = el("ul", "dd-list");
+    trigger.type = "button";
+    value.id = `dd-value-${n}`;
+    list.id = `dd-list-${n}`;
+    chev.setAttribute("aria-hidden", "true");
+    chev.innerHTML = '<svg viewBox="0 0 12 12" width="12" height="12"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const attrs = (node, map) => Object.entries(map).forEach(([k, v]) => node.setAttribute(k, v));
+    attrs(trigger, { role: "combobox", "aria-haspopup": "listbox", "aria-expanded": "false", "aria-controls": list.id, "aria-labelledby": `${name.id} ${value.id}` });
+    attrs(list, { role: "listbox", "aria-labelledby": name.id, tabindex: "-1" });
+    const opts = [...select.options].filter((o) => o.value !== "").map((o, i) => {
+      const li = el("li", "dd-opt", o.textContent);
+      li.id = `${list.id}-${i}`;
+      li.dataset.value = o.value;
+      attrs(li, { role: "option", "aria-selected": "false" });
+      list.append(li);
+      return li;
+    });
+    trigger.append(value, chev);
+    box.append(trigger, list);
+    select.after(box);
+    select.classList.add("dd-native");
+    attrs(select, { tabindex: "-1", "aria-hidden": "true" });
+    select.hbTrigger = trigger;
+
+    let active = -1;
+    let typed = "";
+    let typedAt = 0;
+    const isOpen = () => box.classList.contains("is-open");
+    const chosen = () => opts.findIndex((o) => o.dataset.value === select.value);
+    const sync = () => {
+      const i = chosen();
+      opts.forEach((o, k) => o.setAttribute("aria-selected", String(k === i)));
+      value.textContent = i < 0 ? blank : opts[i].textContent;
+      value.classList.toggle("is-blank", i < 0);
+    };
+    const mark = (i, scroll = true) => {
+      active = Math.max(0, Math.min(opts.length - 1, i));
+      opts.forEach((o, k) => o.classList.toggle("is-active", k === active));
+      trigger.setAttribute("aria-activedescendant", opts[active].id);
+      if (!scroll) return;
+      const o = opts[active];
+      if (o.offsetTop < list.scrollTop) list.scrollTop = o.offsetTop - 6;
+      else if (o.offsetTop + o.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = o.offsetTop + o.offsetHeight - list.clientHeight + 6;
+    };
+    const close = () => {
+      if (!isOpen()) return;
+      box.classList.remove("is-open");
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.removeAttribute("aria-activedescendant");
+      opts.forEach((o) => o.classList.remove("is-active"));
+    };
+    const open = (i) => {
+      if (!isOpen()) {
+        dropdowns.forEach((d) => d.box !== box && d.close());
+        const r = trigger.getBoundingClientRect();
+        const need = Math.min(list.scrollHeight, 312) + 16;
+        list.classList.toggle("up", innerHeight - r.bottom < need && r.top > innerHeight - r.bottom);
+        box.classList.add("is-open");
+        trigger.setAttribute("aria-expanded", "true");
+      }
+      mark(i);
+    };
+    const choose = (i, refocus = true) => {
+      select.value = opts[i].dataset.value;
+      sync();
+      field.dataset.invalid = "false";
+      select.dispatchEvent(new Event("input", { bubbles: true }));
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      close();
+      if (refocus) trigger.focus();
+    };
+    const seek = (key) => {
+      const now = Date.now();
+      typed = (now - typedAt > 700 ? "" : typed) + key.toLowerCase();
+      typedAt = now;
+      const from = typed.length > 1 ? active : active + 1;
+      for (let k = 0; k < opts.length; k++) {
+        const i = (Math.max(from, 0) + k) % opts.length;
+        if (opts[i].textContent.toLowerCase().startsWith(typed)) return i;
+      }
+      return -1;
+    };
+
+    trigger.addEventListener("click", () => (isOpen() ? close() : open(Math.max(chosen(), 0))));
+    trigger.addEventListener("keydown", (event) => {
+      const { key } = event;
+      const here = chosen();
+      if (!isOpen()) {
+        if (key === "ArrowDown" || key === "Enter" || key === " ") open(Math.max(here, 0));
+        else if (key === "ArrowUp") open(here < 0 ? opts.length - 1 : here);
+        else if (key === "Home") open(0);
+        else if (key === "End") open(opts.length - 1);
+        else if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+          const i = seek(key);
+          if (i >= 0) open(i);
+          return;
+        } else return;
+        event.preventDefault();
+        return;
+      }
+      if (key === "ArrowDown") mark(active + 1);
+      else if (key === "ArrowUp") mark(active - 1);
+      else if (key === "Home" || key === "PageUp") mark(0);
+      else if (key === "End" || key === "PageDown") mark(opts.length - 1);
+      else if (key === "Enter" || key === " ") choose(active);
+      else if (key === "Escape") close();
+      else if (key === "Tab") return choose(active, false);
+      else if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        const i = seek(key);
+        if (i >= 0) mark(i);
+      } else return;
+      event.preventDefault();
+    });
+    trigger.addEventListener("blur", close);
+    opts.forEach((o, i) => {
+      o.addEventListener("pointerdown", (event) => event.preventDefault());
+      o.addEventListener("pointermove", () => active !== i && mark(i, false));
+      o.addEventListener("click", () => choose(i));
+    });
+    // the wrapping <label> would hand clicks to the hidden select: send them to the trigger instead
+    field.addEventListener("click", (event) => {
+      if (trigger.contains(event.target)) return;
+      event.preventDefault();
+      if (!box.contains(event.target)) trigger.focus();
+    });
+    document.addEventListener("pointerdown", (event) => !box.contains(event.target) && close());
+    sync();
+    return { box, close, sync };
+  });
+  form.addEventListener("reset", () => setTimeout(() => dropdowns.forEach((d) => d.sync())));
+
   const status = form.querySelector("[data-status]");
   const submit = form.querySelector("[data-submit]");
   const say = (text, tone = "warn") => {
@@ -410,7 +559,7 @@
     const consent = form.elements.namedItem("acknowledgedPurpose");
     if (first || !industries.length || !consent.checked) {
       say("还有必填项没有完成：请补全带 * 的信息，选择至少一个行业，并勾选信息用途说明。");
-      (first || (!industries.length ? toggles[0] : consent)).focus();
+      (first?.hbTrigger || first || (!industries.length ? toggles[0] : consent)).focus();
       return;
     }
     const email = form.elements.namedItem("email");
