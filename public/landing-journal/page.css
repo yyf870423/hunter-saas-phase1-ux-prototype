@@ -282,33 +282,17 @@ section { scroll-margin-top: 80px; }
 /* apply */
 .apply-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
 .about { display: flex; flex-direction: column; gap: 24px; }
-/* colophon: the about block closes like a journal's imprint page */
-.colophon { position: relative; margin-top: 16px; padding-top: 22px; }
-.colo-rule { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--off-black); transform-origin: left center; }
-.colo-rule::after { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 1px; background: var(--off-black); }
-.colo-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 20px; }
-.colo-head > div { display: flex; flex-direction: column; gap: 6px; }
-.colo-name { font-size: clamp(28px, 2.4vw, 34px); line-height: 1.1; color: var(--off-black); }
-.colo-sub { font-size: 14px; letter-spacing: 0.04em; color: var(--graphite); }
-.colo-issue { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 20px; line-height: 1.2; color: var(--off-black); white-space: nowrap; }
-.colo-issue small { font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em; color: var(--smoke); }
-.colo-grid { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--ash); border-bottom: 1px solid var(--ash); }
-.colo-cell { padding: 16px 16px 18px 0; }
-.colo-cell:first-child { grid-column: 1 / -1; border-bottom: 1px solid var(--ash); }
-.colo-cell:nth-child(3) { border-left: 1px solid var(--ash); padding-left: 20px; }
-.colo-cell dt { font-size: 12px; letter-spacing: 0.12em; color: var(--smoke); }
-.colo-cell dd { margin: 8px 0 0; font-size: 17px; line-height: 1.5; color: var(--off-black); }
-.colo-cell a { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; padding-bottom: 2px; }
-.colo-cell a:hover { color: var(--lake); }
-.colo-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 16px; font-size: 13px; letter-spacing: 0.04em; color: var(--smoke); }
-.colo-foot img { width: 98px; height: 35px; object-fit: contain; object-position: left center; }
-@media (max-width: 720px) {
-  .colo-grid { grid-template-columns: minmax(0, 1fr); }
-  .colo-cell, .colo-cell:nth-child(3) { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-left: 0; }
-  .colo-cell:first-child { border-bottom: 0; }
-  .colo-cell + .colo-cell { border-top: 1px solid var(--ash); }
-  .colo-cell dd { margin: 0; text-align: right; font-size: 15px; }
-}
+/* about: an ink drawing in the 第七版 manner, inked in line by line on reveal (page.js numbers the strokes) */
+.about-art { width: min(520px, 100%); margin-top: 16px; }
+.about-art svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sketch .ln { stroke-dasharray: 1 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1.1s cubic-bezier(.2, .75, .2, 1) calc(var(--i, 0) * 40ms), fill-opacity .6s ease calc(.5s + var(--i, 0) * 40ms); }
+.sketch .fade { transform-box: fill-box; transform-origin: center; transition: opacity .6s ease calc(.7s + var(--i, 0) * 40ms), transform .7s cubic-bezier(.2, .75, .2, 1) calc(.7s + var(--i, 0) * 40ms); }
+.motion .sketch:not(.in) .ln { stroke-dashoffset: 1; fill-opacity: 0; }
+.motion .sketch:not(.in) .fade { opacity: 0; transform: scale(.6); }
+.sketch .tw { transform-box: fill-box; transform-origin: center; animation: twinkle 3.8s ease-in-out infinite alternate; }
+.sketch .tw.late { animation-duration: 4.6s; animation-delay: -2s; }
+@keyframes twinkle { to { transform: rotate(16deg) scale(1.12); } }
+@media (prefers-reduced-motion: reduce) { .sketch .tw { animation: none; } }
 .form { border: 1px solid var(--ash); border-radius: var(--r-card); padding: 40px; display: flex; flex-direction: column; gap: 24px; }
 .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .field { display: flex; flex-direction: column; gap: 8px; font-size: 13px; letter-spacing: 0.06em; color: var(--graphite); }
@@ -380,7 +364,7 @@ legend { font-size: 13px; letter-spacing: 0.06em; color: var(--graphite); paddin
 .tabs.has-ink .tab[aria-selected="true"] { background: transparent; }
 
 /* scroll reveals: hidden until page.js animates them in (only when html.motion is set) */
-.motion :is(.hero-copy > *, .pipeline, .sec-head .left > *, .sec-head > .lead, .film, .chapters .chapter, .s6, .tabs, .panel-copy, .elevated, .statement, .gate, .duo .card, .duo li, #boundary .wrap > .body, .graph, .flows .flow, .faq details, .band, .band > :not(.wash), .about > *, .colo-cell, .form, .foot-cols > div, .foot-meta):not(.in) { opacity: 0; }
+.motion :is(.hero-copy > *, .pipeline, .sec-head .left > *, .sec-head > .lead, .film, .chapters .chapter, .s6, .tabs, .panel-copy, .elevated, .statement, .gate, .duo .card, .duo li, #boundary .wrap > .body, .graph, .flows .flow, .faq details, .band, .band > :not(.wash), .about > *, .form, .foot-cols > div, .foot-meta):not(.in) { opacity: 0; }
 .graph .edge { stroke-dasharray: 1; }
 .motion .graph:not(.in) .edge { stroke-dashoffset: 1; }
 

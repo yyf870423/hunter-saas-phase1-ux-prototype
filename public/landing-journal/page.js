@@ -117,6 +117,9 @@
     sync();
   });
 
+  /* about drawing: number the strokes so they ink in one after another */
+  document.querySelectorAll(".sketch").forEach((art) => art.querySelectorAll(".ln, .fade").forEach((n, i) => n.style.setProperty("--i", i)));
+
   /* figure 05: its two glows drift only while the figure is on screen */
   document.querySelectorAll(".graph").forEach((fig) => {
     if (!("IntersectionObserver" in window)) return fig.classList.add("is-live");
@@ -299,7 +302,6 @@
       [".band", [{ opacity: 0, transform: "scale(.95)" }, { opacity: 1, transform: "none" }], () => 0, 1100],
       [".band > :not(.wash)", rise(24), (i) => 260 + i * 100, 900],
       [".about > *", rise(28), (i) => i * 80, 900],
-      [".colo-cell", rise(0, -12), (i) => 520 + i * 90, 700],
       [".form", rise(44), () => 160, 1000],
       [".foot-cols > div", rise(20), (i) => i * 80, 800],
       [".foot-meta", rise(12), () => 300, 800],
@@ -336,8 +338,6 @@
           row.animate(rise(0, -12), { duration: 700, delay: 560 + i * 110, easing: EASE, fill: "backwards" }),
         );
       if (n.matches(".graph") && graph) drawGraph();
-      if (n.matches(".colophon"))
-        n.querySelector(".colo-rule")?.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: 1100, delay: job.delay + 120, easing: EASE, fill: "backwards" });
     };
     const pending = new Set();
     // the film waits for its poster, then comes out of the haze (the 第三版 entrance)
