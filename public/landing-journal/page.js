@@ -322,12 +322,12 @@
 
     // Figure 05: edges draw from the candidate outward, then the labels and nodes settle
     const graph = document.querySelector(".graph svg");
-    graph?.querySelectorAll("path").forEach((p) => { p.setAttribute("pathLength", "1"); p.classList.add("edge"); });
+    graph?.querySelectorAll("path[data-edge]").forEach((p) => { p.setAttribute("pathLength", "1"); p.classList.add("edge"); });
     const drawGraph = () => {
-      graph.querySelectorAll("path").forEach((p, i) =>
+      graph.querySelectorAll("path[data-edge]").forEach((p, i) =>
         p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 900, delay: 350 + i * 110, easing: EASE, fill: "both" }),
       );
-      [...graph.children].filter((n) => n.tagName !== "path").forEach((n, i) =>
+      [...graph.children].filter((n) => n.tagName !== "path" && !n.matches(".route, .marks")).forEach((n, i) =>
         n.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 700 + i * 45, easing: "ease-out", fill: "backwards" }),
       );
     };
@@ -372,6 +372,202 @@
         io.observe(n);
       }
     });
+  })();
+
+  /* figure 05: three ways through the research assets, in turn. A route draws itself edge by edge, its nodes
+     light up with step numbers, the last one gets a coral ring (yours to confirm), then packets run along it.
+     The matching item in the list follows along; pointing at an item (or the figure) holds the cycle. */
+  (() => {
+    const fig = document.querySelector(".graph");
+    const svg = fig?.querySelector("svg[data-scenes]");
+    const flowsBox = document.querySelector(".flows");
+    const flows = [...document.querySelectorAll(".flows .flow")];
+    if (!svg || flows.length !== 3) return;
+    const NS = "http://www.w3.org/2000/svg";
+    const mk = (tag, attrs, parent) => {
+      const n = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      parent?.append(n);
+      return n;
+    };
+    const baseEdges = [...svg.querySelectorAll("path[data-edge]")];
+    const labels = [...svg.querySelectorAll(".elabel")];
+    const nodes = Object.fromEntries([...svg.querySelectorAll(".node")].map((g) => [g.dataset.node, g]));
+    const geo = baseEdges.map((p) => {
+      const n = p.getAttribute("d").match(/-?\d+(?:\.\d+)?/g).map(Number);
+      return [[n[0], n[1]], [n[2], n[3]], [n[4], n[5]]];
+    });
+    const ENDS = [["company", "role"], ["company", "cand"], ["role", "cand"], ["contact", "cand"], ["paper", "cand"], ["company", "contact"]];
+    const SCENES = [
+      ["paper", "cand", "company", "contact"], // 找信息
+      ["role", "cand", "paper"], // 找人
+      ["cand", "company", "role"], // 找岗位
+    ];
+    const hop = (a, b) => {
+      const i = ENDS.findIndex(([x, y]) => (x === a && y === b) || (x === b && y === a));
+      const [p0, c, p1] = geo[i];
+      return ENDS[i][0] === a ? { i, s: p0, c, e: p1 } : { i, s: p1, c, e: p0 };
+    };
+    const layer = mk("g", { class: "route", "aria-hidden": "true" });
+    svg.insertBefore(layer, svg.querySelector(".elabel"));
+    const marks = mk("g", { class: "marks", "aria-hidden": "true" }, svg);
+
+    flows.forEach((flow, k) => {
+      const chain = flow.querySelector(".chain");
+      const names = chain.textContent.split("→").map((t) => t.trim());
+      chain.textContent = "";
+      names.forEach((name, j) => {
+        if (j) chain.append(el("span", "arr", " → "));
+        chain.append(el("span", "hop", name));
+      });
+      flow.append(el("span", "flow-progress"));
+      flow.setAttribute("role", "button");
+      flow.setAttribute("aria-pressed", "false");
+      flow.tabIndex = 0;
+    });
+
+    const calm = matchMedia("(prefers-reduced-motion: reduce)");
+    const DWELL = 7000;
+    const STEP = 560;
+    const SPEED = 230; // svg units per second
+    let cur = -1;
+    let elapsed = 0;
+    let held = 0;
+    let visible = false;
+    let started = false;
+    let timers = [];
+    let packets = [];
+    let route = null;
+    let routeLen = 1;
+    let routeT0 = 0;
+
+    const light = (k, name, j, total) => {
+      if (k !== cur) return;
+      const g = nodes[name];
+      g.classList.add("lit");
+      const r = g.querySelector("rect");
+      const [x, y, w, h] = ["x", "y", "width", "height"].map((a) => +r.getAttribute(a));
+      if (j === total - 1) mk("rect", { class: "confirm", x: x - 6, y: y - 6, width: w + 12, height: h + 12, rx: h / 2 + 6 }, marks);
+      const at = mk("g", { transform: `translate(${x + 6} ${y + 1})` }, marks);
+      const badge = mk("g", { class: "badge" }, at);
+      mk("circle", { r: 11 }, badge);
+      mk("text", { y: 4.2, "text-anchor": "middle" }, badge).textContent = j + 1;
+      flows[k].querySelectorAll(".hop")[j]?.classList.add("lit");
+    };
+
+    function show(k) {
+      cur = k;
+      elapsed = 0;
+      timers.forEach(clearTimeout);
+      timers = [];
+      const names = SCENES[k];
+      const hops = names.slice(1).map((name, j) => hop(names[j], name));
+      const still = calm.matches || !Element.prototype.animate;
+      svg.classList.add("has-scene");
+      flowsBox.classList.add("has-scene");
+      baseEdges.forEach((p, i) => p.classList.toggle("on", hops.some((h) => h.i === i)));
+      labels.forEach((g, i) => g.classList.toggle("on", hops.some((h) => h.i === i)));
+      Object.entries(nodes).forEach(([name, g]) => {
+        g.classList.remove("lit");
+        g.classList.toggle("on", names.includes(name));
+      });
+      flows.forEach((f, j) => {
+        f.classList.toggle("on", j === k);
+        f.setAttribute("aria-pressed", String(j === k));
+        f.style.setProperty("--p", 0);
+        f.querySelectorAll(".hop").forEach((h) => h.classList.remove("lit"));
+      });
+      layer.replaceChildren();
+      layer.classList.remove("flowing");
+      marks.replaceChildren();
+      packets = [];
+      hops.forEach((h, j) => {
+        const line = mk("path", { class: "route-line", pathLength: 1, d: `M${h.s} Q${h.c} ${h.e}`.replace(/,/g, " ") }, layer);
+        if (!still) line.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: STEP + 60, delay: 180 + j * STEP, easing: "cubic-bezier(.45, 0, .25, 1)", fill: "backwards" });
+      });
+      route = mk("path", { class: "route-path", d: `M${hops[0].s} ` + hops.map((h) => `Q${h.c} ${h.e}`).join(" ") }, layer);
+      route.setAttribute("d", route.getAttribute("d").replace(/,/g, " "));
+      routeLen = route.getTotalLength();
+      names.forEach((name, j) => timers.push(setTimeout(() => light(k, name, j, names.length), still ? 0 : 180 + j * STEP - (j ? 40 : 0))));
+      if (still) return;
+      timers.push(
+        setTimeout(() => {
+          if (k !== cur) return;
+          layer.classList.add("flowing");
+          routeT0 = performance.now();
+          packets = [0, 0.5].map((phase) => {
+            const g = mk("g", { class: "packet" }, layer);
+            mk("circle", { class: "halo", r: 11 }, g);
+            mk("circle", { class: "core", r: 4.4 }, g);
+            return { phase, g };
+          });
+        }, 180 + hops.length * STEP + 120),
+      );
+    }
+
+    let last = 0;
+    let looping = false;
+    const tick = (now) => {
+      const dt = Math.min(now - last, 100);
+      last = now;
+      if (started && !held && !calm.matches) {
+        elapsed += dt;
+        flows[cur].style.setProperty("--p", Math.min(1, elapsed / DWELL).toFixed(4));
+        if (elapsed >= DWELL) show((cur + 1) % SCENES.length);
+      }
+      const span = (routeLen / SPEED) * 1000;
+      packets.forEach(({ phase, g }) => {
+        const u = ((now - routeT0) / span + phase) % 1;
+        const pt = route.getPointAtLength(u * routeLen);
+        g.setAttribute("transform", `translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)})`);
+        g.style.opacity = Math.max(0, Math.min(1, u / 0.06, (1 - u) / 0.06)).toFixed(3);
+      });
+      if (visible) requestAnimationFrame(tick);
+      else looping = false;
+    };
+    const run = () => {
+      if (looping) return;
+      looping = true;
+      last = performance.now();
+      requestAnimationFrame(tick);
+    };
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) run();
+    }).observe(fig);
+
+    // pointing at the figure or an item holds the cycle; an item also switches to its scene
+    const hold = (on) => (held = Math.max(0, held + (on ? 1 : -1)));
+    fig.addEventListener("pointerenter", (e) => e.pointerType === "mouse" && hold(true));
+    fig.addEventListener("pointerleave", (e) => e.pointerType === "mouse" && hold(false));
+    flows.forEach((flow, k) => {
+      const pick = () => started && k !== cur && show(k);
+      flow.addEventListener("pointerenter", (e) => { if (e.pointerType !== "mouse") return; hold(true); pick(); });
+      flow.addEventListener("pointerleave", (e) => e.pointerType === "mouse" && hold(false));
+      flow.addEventListener("click", pick);
+      flow.addEventListener("focus", () => { hold(true); pick(); });
+      flow.addEventListener("blur", () => hold(false));
+      flow.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        pick();
+      });
+    });
+
+    // begin once the figure has drawn itself in (or straight away when nothing animates in)
+    const start = () => {
+      if (started) return;
+      started = true;
+      show(0);
+      if (visible) run();
+    };
+    if (!document.documentElement.classList.contains("motion") || fig.classList.contains("in")) start();
+    else
+      new MutationObserver((_, mo) => {
+        if (!fig.classList.contains("in")) return;
+        mo.disconnect();
+        setTimeout(start, 1900);
+      }).observe(fig, { attributes: true, attributeFilter: ["class"] });
   })();
 
   /* trial application */

@@ -365,6 +365,38 @@ legend { font-size: 13px; letter-spacing: 0.06em; color: var(--graphite); paddin
 /* scroll reveals: hidden until page.js animates them in (only when html.motion is set) */
 .motion :is(.hero-copy > *, .pipeline, .sec-head .left > *, .sec-head > .lead, .film, .chapters .chapter, .s6, .tabs, .panel-copy, .elevated, .statement, .gate, .duo .card, .duo li, #boundary .wrap > .body, .graph, .flows .flow, .faq details, .band, .band > :not(.wash), .about > *, .form, .foot-cols > div, .foot-meta):not(.in) { opacity: 0; }
 .graph .edge { stroke-dasharray: 1; }
+/* figure 05 scenes: the route in play stays bright, the rest steps back */
+.graph svg path[data-edge], .graph .elabel, .graph .node { transition: opacity .45s ease; }
+.graph svg.has-scene path[data-edge]:not(.on) { opacity: .38; }
+.graph svg.has-scene .elabel:not(.on) { opacity: .26; }
+.graph svg.has-scene .elabel.on text { fill: #242424; }
+.graph svg.has-scene .node:not(.on) { opacity: .36; }
+.graph .node rect { transition: fill .4s ease, stroke .4s ease; }
+.graph .node.lit rect { fill: #e2e9f8; stroke: #242424; }
+.graph .route-line { fill: none; stroke: #242424; stroke-width: 1.7; stroke-linecap: round; stroke-dasharray: 1 1; }
+.graph .route-path { fill: none; stroke: none; }
+.graph .packet .halo { fill: #a7fccd; opacity: .7; }
+.graph .packet .core { fill: #242424; }
+.graph .marks text { font-family: var(--mono); font-size: 12px; fill: var(--parchment); }
+.graph .marks .badge { animation: badge-pop .45s cubic-bezier(.2, .75, .2, 1) both; transform-box: fill-box; transform-origin: center; }
+.graph .marks .badge circle { fill: #242424; }
+.graph .marks .confirm { fill: none; stroke: #ff9473; stroke-width: 1.5; stroke-dasharray: 6 5; animation: flow-slow 2.4s linear infinite, mark-in .5s ease both; }
+@keyframes badge-pop { from { opacity: 0; transform: scale(.3); } }
+@keyframes mark-in { from { opacity: 0; } }
+.flow { position: relative; cursor: pointer; outline: none; }
+.flow:focus-visible { box-shadow: inset 3px 0 0 var(--lake); }
+.flow .hop { transition: color .3s ease, background-size .45s cubic-bezier(.2, .75, .2, 1); background: linear-gradient(rgba(167, 252, 205, .75), rgba(167, 252, 205, .75)) 0 88% / 0 38% no-repeat; }
+.flows.has-scene .flow :is(.kicker, .chain, .body) { transition: color .35s ease; }
+.flows.has-scene .flow:not(.on) :is(.kicker, .chain, .body) { color: var(--smoke); }
+.flow.on .hop { color: var(--smoke); }
+.flow.on .hop.lit { color: var(--off-black); background-size: 100% 38%; }
+.flow-progress { position: absolute; left: 0; right: 0; top: -1px; height: 2px; background: var(--off-black); transform-origin: left center; transform: scaleX(var(--p, 0)); opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+.flow.on .flow-progress { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .graph .marks .badge, .graph .marks .confirm { animation: none; }
+  .flow-progress { display: none; }
+  .flow .hop { transition: none; }
+}
 .motion .graph:not(.in) .edge { stroke-dashoffset: 1; }
 
 @media (max-width: 1100px) {
