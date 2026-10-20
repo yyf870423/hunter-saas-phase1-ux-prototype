@@ -267,7 +267,7 @@ section { scroll-margin-top: 80px; }
 .apply-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
 .about { display: flex; flex-direction: column; gap: 24px; }
 /* colophon: the about block closes like a journal's imprint page */
-.colophon { position: relative; margin-top: 12px; padding-top: 22px; }
+.colophon { position: relative; margin-top: 16px; padding-top: 22px; }
 .colo-rule { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--off-black); transform-origin: left center; }
 .colo-rule::after { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 1px; background: var(--off-black); }
 .colo-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 20px; }
@@ -292,12 +292,6 @@ section { scroll-margin-top: 80px; }
   .colo-cell:first-child { border-bottom: 0; }
   .colo-cell + .colo-cell { border-top: 1px solid var(--ash); }
   .colo-cell dd { margin: 0; text-align: right; font-size: 15px; }
-}
-/* two columns: the imprint sits at the foot of the left column, level with the bottom of the form */
-@media (min-width: 1101px) {
-  .apply-grid { align-items: stretch; }
-  .about > p:last-of-type { margin-bottom: 16px; }
-  .about .colophon { margin-top: auto; }
 }
 .form { border: 1px solid var(--ash); border-radius: var(--r-card); padding: 40px; display: flex; flex-direction: column; gap: 24px; }
 .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
