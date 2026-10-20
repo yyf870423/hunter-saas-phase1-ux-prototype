@@ -102,9 +102,9 @@
     markChapter(index);
   });
 
-  /* hero data flow: hold still for reduced motion, and pause while off screen */
-  const flow = document.querySelector("svg[data-flow]");
-  if (flow?.pauseAnimations) {
+  /* data-flow figures (hero, 人机协作): hold still for reduced motion, and pause while off screen */
+  document.querySelectorAll("svg[data-flow]").forEach((flow) => {
+    if (!flow.pauseAnimations) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
     let visible = true;
     const sync = () => (visible && !still.matches ? flow.unpauseAnimations() : flow.pauseAnimations());
@@ -115,7 +115,7 @@
       }).observe(flow);
     still.addEventListener?.("change", sync);
     sync();
-  }
+  });
 
   /* scenario tabs: a sliding selection marker, and a panel that fades out, swaps, then eases back in */
   const tabList = document.querySelector("[data-tabs]");
