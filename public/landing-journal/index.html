@@ -11,14 +11,14 @@
     <meta name="trial-api" content="disabled" />
     <title>HunterBuddy · 猎头的 AI 工作伙伴 · 铂寻 Boseek</title>
     <link rel="stylesheet" href="../landing-superhuman/assets/fonts/noto/index.css" />
-    <link rel="stylesheet" href="page.css?v=20261020-run" />
+    <link rel="stylesheet" href="page.css?v=20261020-s6" />
     <script>
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.documentElement.classList.add("motion");
         setTimeout(() => window.__hbReveal || document.documentElement.classList.remove("motion"), 3000);
       }
     </script>
-    <script defer src="page.js?v=20261020-run"></script>
+    <script defer src="page.js?v=20261020-s6"></script>
   </head>
   <body>
     <a class="skip" href="#main">跳到正文</a>
@@ -166,57 +166,32 @@
             </div>
             <p class="lead">每一步都留下依据。HunterBuddy 承接查找与整理，关键判断与对外沟通，仍由你掌握。</p>
           </div>
-          <div class="run" data-run>
-            <div class="run-head">
-              <span class="run-dot" aria-hidden="true"></span>
-              <span class="run-name">Run · 视觉算法负责人 · 机器人公司</span>
-              <span class="run-state" data-run-state aria-live="polite">研究日志</span>
-              <span class="run-count" data-run-count>6 步</span>
-              <button class="run-replay" type="button" data-run-replay>重新运行 ↻</button>
-            </div>
-            <ol class="run-list">
-              <li class="run-step">
-                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">01</span></div>
-                <div class="rs-copy"><h3 class="serif">先吃透岗位</h3><p>拆出必须、加分与未知条件。客户没说的，标为未知，不去猜。</p></div>
-                <div class="rs-viz v-brief" aria-hidden="true"><span class="vp must">必须</span><span class="vp must">必须</span><span class="vp">加分</span><span class="vp unk">未知</span><span class="vp unk">未知</span></div>
-                <div class="rs-out">→ <b>5</b> 条条件 · <b>2</b> 条未知</div>
+          <ol class="s6" data-s6 aria-label="工作方式 · 六步">
+              <li class="s6-col is-open" tabindex="0">
+                <div class="s6-top"><span class="s6-no">01</span><span class="s6-who">HunterBuddy</span></div>
+                <div class="s6-body"><h3 class="serif">先吃透岗位</h3><p>拆出必须、加分与未知条件。客户没说的，标为未知，不去猜。</p><span class="s6-out">→ 必须 · 加分 · 未知条件清单</span></div>
               </li>
-              <li class="run-step">
-                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">02</span></div>
-                <div class="rs-copy"><h3 class="serif">多路召回</h3><p>已有候选人、知识图谱、公开网络、论文与专利、开源项目、上传简历，一起跑。</p></div>
-                <div class="rs-viz v-bars" aria-hidden="true"><span><b>12</b><i style="--h:1"></i><em>候选人</em></span><span><b>5</b><i style="--h:.42"></i><em>图谱</em></span><span><b>7</b><i style="--h:.58"></i><em>网络</em></span><span><b>6</b><i style="--h:.5"></i><em>论文</em></span><span><b>4</b><i style="--h:.33"></i><em>开源</em></span><span><b>5</b><i style="--h:.42"></i><em>简历</em></span></div>
-                <div class="rs-out">→ <b>39</b> 条线索 · <b>6</b> 个渠道</div>
+              <li class="s6-col" tabindex="0">
+                <div class="s6-top"><span class="s6-no">02</span><span class="s6-who">HunterBuddy</span></div>
+                <div class="s6-body"><h3 class="serif">多路召回</h3><p>已有候选人、知识图谱、公开网络、论文与专利、开源项目、上传简历，一起跑。</p><span class="s6-out">→ 每条线索都记着来源渠道</span></div>
               </li>
-              <li class="run-step">
-                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">03</span></div>
-                <div class="rs-copy"><h3 class="serif">统一身份</h3><p>核对简历、论文作者与开源账号是否为同一个人，合并重复资料。</p></div>
-                <div class="rs-viz v-merge" aria-hidden="true">
-                  <svg viewBox="0 0 280 72"><text x="0" y="17">林越</text><text x="0" y="40">Lin Y.</text><text x="0" y="63">lin-yue</text><path pathLength="1" d="M66 12 C 120 12 130 36 176 36" /><path pathLength="1" d="M66 36 L 176 36" /><path pathLength="1" d="M66 59 C 120 59 130 36 176 36" /><circle cx="184" cy="36" r="7" /><text class="em" x="198" y="41">同一人</text></svg>
-                </div>
-                <div class="rs-out">→ <b>3</b> 份资料 → <b>1</b> 人</div>
+              <li class="s6-col" tabindex="0">
+                <div class="s6-top"><span class="s6-no">03</span><span class="s6-who">HunterBuddy</span></div>
+                <div class="s6-body"><h3 class="serif">统一身份</h3><p>核对简历、论文作者与开源账号是否为同一个人，合并重复资料。</p><span class="s6-out">→ 一份合并后的人物档案</span></div>
               </li>
-              <li class="run-step">
-                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">04</span></div>
-                <div class="rs-copy"><h3 class="serif">匹配依据</h3><p>匹配理由与资料来源放在一起；没有可靠依据的，标为待确认。</p></div>
-                <div class="rs-viz v-cite" aria-hidden="true"><span class="vt ok">✓ 有依据 ×2</span><span class="vt wait">? 待确认 ×2</span><span class="vs">简历</span><span class="vs">团队页</span><span class="vs">论文</span></div>
-                <div class="rs-out">→ 每条理由 · 都有出处</div>
+              <li class="s6-col" tabindex="0">
+                <div class="s6-top"><span class="s6-no">04</span><span class="s6-who">HunterBuddy</span></div>
+                <div class="s6-body"><h3 class="serif">匹配依据</h3><p>匹配理由与资料来源放在一起；没有可靠依据的，标为待确认。</p><span class="s6-out">→ 理由连着出处，待确认单列</span></div>
               </li>
-              <li class="run-step human">
-                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">05</span></div>
-                <div class="rs-copy"><h3 class="serif">人工判断</h3><p>到这里它会停下。联系谁、何时开口、是否推荐，由你决定。</p></div>
-                <div class="rs-viz v-gate"><span class="g-ai" aria-hidden="true">AI</span><span class="g-line" aria-hidden="true"></span><span class="g-you serif" aria-hidden="true">你</span><button class="g-btn" type="button" data-run-human>我来判断 →</button><span class="g-done">✓ 由你决定</span></div>
-                <div class="rs-out">→ 联系 · 时机 · 推荐，<b>由你</b></div>
+              <li class="s6-col human" tabindex="0">
+                <div class="s6-top"><span class="s6-no">05</span><span class="s6-who">你来定</span></div>
+                <div class="s6-body"><h3 class="serif">人工判断</h3><p>到这里它会停下。联系谁、何时开口、是否推荐，由你决定。</p><span class="s6-out">→ 联系、时机与推荐，由你来定</span></div>
               </li>
-              <li class="run-step">
-                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">06</span></div>
-                <div class="rs-copy"><h3 class="serif">研究沉淀</h3><p>公司、联系人、岗位、候选人、论文与专利彼此关联，下一次接着用。</p></div>
-                <div class="rs-viz v-web" aria-hidden="true">
-                  <svg viewBox="0 0 280 72"><path pathLength="1" d="M140 36 L 40 14" /><path pathLength="1" d="M140 36 L 40 58" /><path pathLength="1" d="M140 36 L 240 14" /><path pathLength="1" d="M140 36 L 240 58" /><path pathLength="1" d="M140 36 L 140 8" /><path pathLength="1" d="M40 14 L 40 58" /><circle cx="40" cy="14" r="5" /><circle cx="40" cy="58" r="5" /><circle cx="240" cy="14" r="5" /><circle cx="240" cy="58" r="5" /><circle cx="140" cy="8" r="5" /><circle class="core" cx="140" cy="36" r="8" /></svg>
-                </div>
-                <div class="rs-out">→ <b>6</b> 类资产 · 彼此关联</div>
+              <li class="s6-col" tabindex="0">
+                <div class="s6-top"><span class="s6-no">06</span><span class="s6-who">HunterBuddy</span></div>
+                <div class="s6-body"><h3 class="serif">研究沉淀</h3><p>公司、联系人、岗位、候选人、论文与专利彼此关联，下一次接着用。</p><span class="s6-out">→ 下一个岗位的起点</span></div>
               </li>
-            </ol>
-          </div>
+          </ol>
         </div>
       </section>
 
