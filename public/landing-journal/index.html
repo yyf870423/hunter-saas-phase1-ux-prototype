@@ -11,14 +11,14 @@
     <meta name="trial-api" content="disabled" />
     <title>HunterBuddy · 猎头的 AI 工作伙伴 · 铂寻 Boseek</title>
     <link rel="stylesheet" href="../landing-superhuman/assets/fonts/noto/index.css" />
-    <link rel="stylesheet" href="page.css?v=20261020-route" />
+    <link rel="stylesheet" href="page.css?v=20261020-run" />
     <script>
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.documentElement.classList.add("motion");
         setTimeout(() => window.__hbReveal || document.documentElement.classList.remove("motion"), 3000);
       }
     </script>
-    <script defer src="page.js?v=20261020-route"></script>
+    <script defer src="page.js?v=20261020-run"></script>
   </head>
   <body>
     <a class="skip" href="#main">跳到正文</a>
@@ -166,137 +166,56 @@
             </div>
             <p class="lead">每一步都留下依据。HunterBuddy 承接查找与整理，关键判断与对外沟通，仍由你掌握。</p>
           </div>
-          <div class="route" data-route>
-            <div class="route-track" role="tablist" aria-label="工作方式 · 六步" data-route-track>
-              <span class="route-line" aria-hidden="true"><i class="route-fill"></i><i class="route-gate"><b>由你决定</b></i></span>
-              <button class="station" type="button" role="tab" id="step-tab-0" aria-controls="step-0" aria-selected="true"><span class="node"></span><span class="sno">01</span><span class="sname">先吃透岗位</span><span class="sbar"><i></i></span></button>
-              <button class="station" type="button" role="tab" id="step-tab-1" aria-controls="step-1" aria-selected="false" tabindex="-1"><span class="node"></span><span class="sno">02</span><span class="sname">多路召回</span><span class="sbar"><i></i></span></button>
-              <button class="station" type="button" role="tab" id="step-tab-2" aria-controls="step-2" aria-selected="false" tabindex="-1"><span class="node"></span><span class="sno">03</span><span class="sname">统一身份</span><span class="sbar"><i></i></span></button>
-              <button class="station" type="button" role="tab" id="step-tab-3" aria-controls="step-3" aria-selected="false" tabindex="-1"><span class="node"></span><span class="sno">04</span><span class="sname">匹配依据</span><span class="sbar"><i></i></span></button>
-              <button class="station human" type="button" role="tab" id="step-tab-4" aria-controls="step-4" aria-selected="false" tabindex="-1"><span class="node"></span><span class="sno">05</span><span class="sname">人工判断</span><span class="sbar"><i></i></span></button>
-              <button class="station" type="button" role="tab" id="step-tab-5" aria-controls="step-5" aria-selected="false" tabindex="-1"><span class="node"></span><span class="sno">06</span><span class="sname">研究沉淀</span><span class="sbar"><i></i></span></button>
+          <div class="run" data-run>
+            <div class="run-head">
+              <span class="run-dot" aria-hidden="true"></span>
+              <span class="run-name">Run · 视觉算法负责人 · 机器人公司</span>
+              <span class="run-state" data-run-state aria-live="polite">研究日志</span>
+              <span class="run-count" data-run-count>6 步</span>
+              <button class="run-replay" type="button" data-run-replay>重新运行 ↻</button>
             </div>
-
-            <div class="stage" data-route-stage>
-              <div class="step" role="tabpanel" id="step-0" aria-labelledby="step-tab-0">
-                <div class="step-copy">
-                  <span class="kicker">Step 01 / 06</span>
-                  <h3 class="serif d32">先吃透岗位</h3>
-                  <p class="body">拆出必须、加分与未知条件。客户没说的，标为未知，不去猜。</p>
-                  <div class="leaves"><b>这一步留下</b><span>必须 · 加分 · 未知条件清单</span><span>需要向客户确认的问题</span></div>
+            <ol class="run-list">
+              <li class="run-step">
+                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">01</span></div>
+                <div class="rs-copy"><h3 class="serif">先吃透岗位</h3><p>拆出必须、加分与未知条件。客户没说的，标为未知，不去猜。</p></div>
+                <div class="rs-viz v-brief" aria-hidden="true"><span class="vp must">必须</span><span class="vp must">必须</span><span class="vp">加分</span><span class="vp unk">未知</span><span class="vp unk">未知</span></div>
+                <div class="rs-out">→ <b>5</b> 条条件 · <b>2</b> 条未知</div>
+              </li>
+              <li class="run-step">
+                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">02</span></div>
+                <div class="rs-copy"><h3 class="serif">多路召回</h3><p>已有候选人、知识图谱、公开网络、论文与专利、开源项目、上传简历，一起跑。</p></div>
+                <div class="rs-viz v-bars" aria-hidden="true"><span><b>12</b><i style="--h:1"></i><em>候选人</em></span><span><b>5</b><i style="--h:.42"></i><em>图谱</em></span><span><b>7</b><i style="--h:.58"></i><em>网络</em></span><span><b>6</b><i style="--h:.5"></i><em>论文</em></span><span><b>4</b><i style="--h:.33"></i><em>开源</em></span><span><b>5</b><i style="--h:.42"></i><em>简历</em></span></div>
+                <div class="rs-out">→ <b>39</b> 条线索 · <b>6</b> 个渠道</div>
+              </li>
+              <li class="run-step">
+                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">03</span></div>
+                <div class="rs-copy"><h3 class="serif">统一身份</h3><p>核对简历、论文作者与开源账号是否为同一个人，合并重复资料。</p></div>
+                <div class="rs-viz v-merge" aria-hidden="true">
+                  <svg viewBox="0 0 280 72"><text x="0" y="17">林越</text><text x="0" y="40">Lin Y.</text><text x="0" y="63">lin-yue</text><path pathLength="1" d="M66 12 C 120 12 130 36 176 36" /><path pathLength="1" d="M66 36 L 176 36" /><path pathLength="1" d="M66 59 C 120 59 130 36 176 36" /><circle cx="184" cy="36" r="7" /><text class="em" x="198" y="41">同一人</text></svg>
                 </div>
-                <div class="art">
-                  <div class="art-top"><span>JOB BRIEF · 岗位拆解</span><span>5 条条件</span></div>
-                  <h4 class="serif art-title">视觉算法负责人</h4>
-                  <div class="art-list">
-                    <div class="cond"><span class="ck must">必须</span><span>负责工业视觉检测算法方向</span></div>
-                    <div class="cond"><span class="ck must">必须</span><span>有项目交付经历</span></div>
-                    <div class="cond"><span class="ck plus">加分</span><span>带过算法小团队</span></div>
-                    <div class="cond"><span class="ck unknown">未知</span><span>薪酬范围</span><em>客户未提供</em></div>
-                    <div class="cond"><span class="ck unknown">未知</span><span>到岗时间</span><em>待确认</em></div>
-                  </div>
+                <div class="rs-out">→ <b>3</b> 份资料 → <b>1</b> 人</div>
+              </li>
+              <li class="run-step">
+                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">04</span></div>
+                <div class="rs-copy"><h3 class="serif">匹配依据</h3><p>匹配理由与资料来源放在一起；没有可靠依据的，标为待确认。</p></div>
+                <div class="rs-viz v-cite" aria-hidden="true"><span class="vt ok">✓ 有依据 ×2</span><span class="vt wait">? 待确认 ×2</span><span class="vs">简历</span><span class="vs">团队页</span><span class="vs">论文</span></div>
+                <div class="rs-out">→ 每条理由 · 都有出处</div>
+              </li>
+              <li class="run-step human">
+                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">05</span></div>
+                <div class="rs-copy"><h3 class="serif">人工判断</h3><p>到这里它会停下。联系谁、何时开口、是否推荐，由你决定。</p></div>
+                <div class="rs-viz v-gate"><span class="g-ai" aria-hidden="true">AI</span><span class="g-line" aria-hidden="true"></span><span class="g-you serif" aria-hidden="true">你</span><button class="g-btn" type="button" data-run-human>我来判断 →</button><span class="g-done">✓ 由你决定</span></div>
+                <div class="rs-out">→ 联系 · 时机 · 推荐，<b>由你</b></div>
+              </li>
+              <li class="run-step">
+                <div class="rs-mark"><span class="rs-dot"></span><span class="rs-no">06</span></div>
+                <div class="rs-copy"><h3 class="serif">研究沉淀</h3><p>公司、联系人、岗位、候选人、论文与专利彼此关联，下一次接着用。</p></div>
+                <div class="rs-viz v-web" aria-hidden="true">
+                  <svg viewBox="0 0 280 72"><path pathLength="1" d="M140 36 L 40 14" /><path pathLength="1" d="M140 36 L 40 58" /><path pathLength="1" d="M140 36 L 240 14" /><path pathLength="1" d="M140 36 L 240 58" /><path pathLength="1" d="M140 36 L 140 8" /><path pathLength="1" d="M40 14 L 40 58" /><circle cx="40" cy="14" r="5" /><circle cx="40" cy="58" r="5" /><circle cx="240" cy="14" r="5" /><circle cx="240" cy="58" r="5" /><circle cx="140" cy="8" r="5" /><circle class="core" cx="140" cy="36" r="8" /></svg>
                 </div>
-              </div>
-
-              <div class="step" role="tabpanel" id="step-1" aria-labelledby="step-tab-1" hidden>
-                <div class="step-copy">
-                  <span class="kicker">Step 02 / 06</span>
-                  <h3 class="serif d32">多路召回</h3>
-                  <p class="body">已有候选人、知识图谱、公开网络、论文与专利、开源项目、上传简历，一起跑。</p>
-                  <div class="leaves"><b>这一步留下</b><span>每条线索的来源渠道</span><span>哪里覆盖到了、哪里还是缺口</span></div>
-                </div>
-                <div class="art">
-                  <div class="art-top"><span>PARALLEL RECALL · 并行召回</span><span>6 个渠道</span></div>
-                  <h4 class="serif art-title">围绕岗位，同时找</h4>
-                  <div class="art-list">
-                    <div class="chan"><span>已有候选人</span><i style="--w:.92"></i><b>12</b></div>
-                    <div class="chan"><span>知识图谱</span><i style="--w:.42"></i><b>5</b></div>
-                    <div class="chan"><span>公开网络</span><i style="--w:.6"></i><b>7</b></div>
-                    <div class="chan"><span>论文与专利</span><i style="--w:.5"></i><b>6</b></div>
-                    <div class="chan"><span>开源项目</span><i style="--w:.34"></i><b>4</b></div>
-                    <div class="chan"><span>上传简历</span><i style="--w:.42"></i><b>5</b></div>
-                  </div>
-                  <div class="art-foot">合计 39 条线索 · 下一步：认出同一个人</div>
-                </div>
-              </div>
-
-              <div class="step" role="tabpanel" id="step-2" aria-labelledby="step-tab-2" hidden>
-                <div class="step-copy">
-                  <span class="kicker">Step 03 / 06</span>
-                  <h3 class="serif d32">统一身份</h3>
-                  <p class="body">核对简历、论文作者与开源账号是否为同一个人，合并重复资料。</p>
-                  <div class="leaves"><b>这一步留下</b><span>一份合并后的人物档案</span><span>每条核对理由，可回看</span></div>
-                </div>
-                <div class="art">
-                  <div class="art-top"><span>IDENTITY · 身份核对</span><span>3 份资料</span></div>
-                  <div class="recs">
-                    <div class="rec"><small>简历库 · 2019</small><strong class="serif">林越</strong></div>
-                    <div class="rec"><small>论文作者</small><strong class="serif">Lin Y.</strong></div>
-                    <div class="rec"><small>开源社区</small><strong class="serif">lin-yue</strong></div>
-                  </div>
-                  <div class="checks"><span class="tag"><b>✓</b>名字拼写一致</span><span class="tag"><b>✓</b>研究方向一致</span><span class="tag"><b>✓</b>时间线吻合</span></div>
-                  <div class="merged"><span class="tag mint"><span class="dot"></span>林越 · 同一人 · 3 处来源</span><small>重复资料已合并</small></div>
-                </div>
-              </div>
-
-              <div class="step" role="tabpanel" id="step-3" aria-labelledby="step-tab-3" hidden>
-                <div class="step-copy">
-                  <span class="kicker">Step 04 / 06</span>
-                  <h3 class="serif d32">匹配依据</h3>
-                  <p class="body">匹配理由与资料来源放在一起；没有可靠依据的，标为待确认。</p>
-                  <div class="leaves"><b>这一步留下</b><span>每条匹配理由及其出处</span><span>待确认的条件，单独列出</span></div>
-                </div>
-                <div class="art">
-                  <div class="art-top"><span>CITED · 对照岗位</span><span>林越</span></div>
-                  <div class="art-list">
-                    <div class="judge"><span>产线视觉与算法团队经历</span><span class="srcs"><i>简历</i><i>团队页</i></span><span class="st ok">有依据</span></div>
-                    <div class="judge"><span>视觉检测方向论文</span><span class="srcs"><i>论文</i></span><span class="st ok">有依据</span></div>
-                    <div class="judge"><span>实际管理范围</span><span class="srcs"></span><span class="st wait">待确认</span></div>
-                    <div class="judge"><span>本人求职意向</span><span class="srcs"></span><span class="st wait">待确认</span></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="step" role="tabpanel" id="step-4" aria-labelledby="step-tab-4" hidden>
-                <div class="step-copy">
-                  <span class="kicker">Step 05 / 06</span>
-                  <h3 class="serif d32">人工判断</h3>
-                  <p class="body">到这里它会停下。联系谁、何时开口、是否推荐，由你决定。</p>
-                  <div class="leaves"><b>这一步留下</b><span>一份可以直接拿来判断的档案</span><span>还需要你确认的问题</span></div>
-                </div>
-                <div class="art human">
-                  <div class="art-top"><span>AI 停在这里 · 人工判断</span><span>由你决定</span></div>
-                  <h4 class="serif art-title">三件事，留给你</h4>
-                  <div class="art-list">
-                    <div class="decide"><span class="box"></span><span>谁值得联系、先联系谁</span></div>
-                    <div class="decide"><span class="box"></span><span>何时开口、怎么说</span></div>
-                    <div class="decide"><span class="box"></span><span>是否正式推荐、做出承诺</span></div>
-                  </div>
-                  <div class="art-foot">候选人温度、客户关系和联系时机，需要懂这盘业务的你来判断。</div>
-                </div>
-              </div>
-
-              <div class="step" role="tabpanel" id="step-5" aria-labelledby="step-tab-5" hidden>
-                <div class="step-copy">
-                  <span class="kicker">Step 06 / 06</span>
-                  <h3 class="serif d32">研究沉淀</h3>
-                  <p class="body">公司、联系人、岗位、候选人、论文与专利彼此关联，下一次接着用。</p>
-                  <div class="leaves"><b>这一步留下</b><span>彼此关联的研究资产</span><span>下一个岗位的起点</span></div>
-                </div>
-                <div class="art">
-                  <div class="art-top"><span>RESEARCH ASSETS · 研究资产</span><span>6 类 · 彼此关联</span></div>
-                  <div class="web">
-                    <svg viewBox="0 0 600 260" preserveAspectRatio="none" aria-hidden="true"><path d="M300 130 C 220 70 160 60 110 50" /><path d="M300 130 C 380 70 440 60 490 50" /><path d="M300 130 C 200 150 140 190 100 210" /><path d="M300 130 C 400 150 460 190 500 210" /><path d="M300 130 C 300 180 300 200 300 225" /></svg>
-                    <span class="tag node-c" style="left:50%; top:50%"><span class="dot"></span>候选人 · 林越</span>
-                    <span class="tag" style="left:18%; top:19%">公司 · 星川机器人</span>
-                    <span class="tag" style="left:82%; top:19%">岗位 · 视觉算法负责人</span>
-                    <span class="tag" style="left:17%; top:81%">论文 · 视觉检测</span>
-                    <span class="tag" style="left:83%; top:81%">专利 · 镜头标定</span>
-                    <span class="tag" style="left:50%; top:89%">联系人 · 视觉团队</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                <div class="rs-out">→ <b>6</b> 类资产 · 彼此关联</div>
+              </li>
+            </ol>
           </div>
         </div>
       </section>

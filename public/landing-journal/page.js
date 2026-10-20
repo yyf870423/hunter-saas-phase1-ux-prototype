@@ -231,114 +231,83 @@
     });
   });
 
-  /* how it works: six stations on one route. The stage shows one step at a time; while the section is in
-     view it moves on by itself, pauses under the pointer, and stops for good once someone picks a step. */
+  /* how it works: a research run, logged line by line. It starts when the section comes into view, stops at
+     the human gate until the visitor takes the decision, then finishes the last step and can be run again. */
   (() => {
-    const route = document.querySelector("[data-route]");
-    if (!route) return;
-    const track = route.querySelector("[data-route-track]");
-    const stations = [...track.querySelectorAll(".station")];
-    const stage = route.querySelector("[data-route-stage]");
-    const steps = [...stage.querySelectorAll(".step")];
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let at = 0;
-    let token = 0;
-    const mark = () => {
-      track.style.setProperty("--at", String(at));
-      stations.forEach((station, i) => {
-        const on = i === at;
-        station.setAttribute("aria-selected", String(on));
-        station.tabIndex = on ? 0 : -1;
-        station.classList.toggle("done", i < at);
-      });
+    const run = document.querySelector("[data-run]");
+    if (!run) return;
+    const rows = [...run.querySelectorAll(".run-step")];
+    const stateEl = run.querySelector("[data-run-state]");
+    const countEl = run.querySelector("[data-run-count]");
+    const human = run.querySelector("[data-run-human]");
+    const replay = run.querySelector("[data-run-replay]");
+    const GATE = rows.findIndex((row) => row.classList.contains("human"));
+    const WORDS = { idle: "等待运行", running: "运行中", waiting: "AI 停在这里 · 等你判断", done: "运行完成" };
+    rows.forEach((row) =>
+      row.querySelectorAll(".rs-viz > *, .v-bars i").forEach((node, i) => node.style.setProperty("--i", String(i % 6))),
+    );
+    let timers = [];
+    const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+    const setRun = (state) => {
+      run.dataset.state = state;
+      stateEl.textContent = WORDS[state];
     };
-    const enter = (step) => {
-      step.classList.remove("is-enter");
-      void step.offsetWidth;
-      [step.querySelectorAll(".step-copy > *"), step.querySelectorAll(".art > *"), step.querySelectorAll(".chan")].forEach((list) =>
-        list.forEach((node, i) => node.style.setProperty("--i", String(i))),
-      );
-      step.classList.add("is-enter");
+    const count = () => {
+      countEl.textContent = `${rows.filter((row) => row.dataset.state === "done").length} / ${rows.length}`;
     };
-    function go(index, focus = false) {
-      index = (index + steps.length) % steps.length;
-      if (focus) stations[index].focus();
-      if (index === at) return;
-      const from = steps[at];
-      const to = steps[index];
-      at = index;
-      mark();
-      if (still.matches) {
-        steps.forEach((step) => (step.hidden = step !== to));
+    const step = (i) => {
+      if (i >= rows.length) {
+        setRun("done");
         return;
       }
-      const t = ++token;
-      const h0 = stage.offsetHeight;
-      stage.style.height = `${h0}px`;
-      stage.classList.add("is-sizing");
-      from.classList.add("is-out");
-      setTimeout(() => {
-        if (t !== token) return;
-        steps.forEach((step) => {
-          step.hidden = step !== to;
-          step.classList.remove("is-out");
-        });
-        enter(to);
-        stage.style.height = "auto";
-        const h1 = stage.offsetHeight;
-        stage.style.height = `${h0}px`;
-        void stage.offsetHeight;
-        stage.style.height = `${h1}px`;
-        setTimeout(() => {
-          if (t !== token) return;
-          stage.style.height = "";
-          stage.classList.remove("is-sizing");
-        }, 460);
-      }, 170);
-    }
-    const stop = () => route.classList.remove("auto");
-    stations.forEach((station, i) => {
-      station.addEventListener("click", () => {
-        stop();
-        go(i);
-      });
-      station.addEventListener("keydown", (event) => {
-        const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 1, ArrowUp: -1 }[event.key];
-        if (event.key === "Home" || event.key === "End") {
-          event.preventDefault();
-          stop();
-          go(event.key === "Home" ? 0 : steps.length - 1, true);
-        } else if (step) {
-          event.preventDefault();
-          stop();
-          go(i + step, true);
+      rows[i].dataset.state = "running";
+      setRun("running");
+      later(() => {
+        if (i === GATE) {
+          rows[i].dataset.state = "wait";
+          setRun("waiting");
+          return;
         }
-      });
+        rows[i].dataset.state = "done";
+        count();
+        later(() => step(i + 1), 240);
+      }, 1100);
+    };
+    const reset = () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+      rows.forEach((row) => (row.dataset.state = "pending"));
+      setRun("idle");
+      count();
+    };
+    human.addEventListener("click", () => {
+      if (rows[GATE].dataset.state !== "wait") return;
+      rows[GATE].dataset.state = "done";
+      count();
+      replay.focus({ preventScroll: true });
+      later(() => step(GATE + 1), 280);
     });
-    mark();
-    if (still.matches || !("IntersectionObserver" in window)) return;
-    route.classList.add("auto", "paused");
-    let seen = false;
-    let held = false;
-    const sync = () => route.classList.toggle("paused", !seen || held);
-    track.addEventListener("animationend", (event) => {
-      if (event.animationName === "route-tick" && route.classList.contains("auto")) go(at + 1);
+    replay.addEventListener("click", () => {
+      reset();
+      later(() => step(0), 300);
     });
-    new IntersectionObserver(([entry]) => {
-      seen = entry.isIntersecting;
-      sync();
-    }, { threshold: 0.35 }).observe(route);
-    route.addEventListener("pointerenter", (event) => {
-      if (event.pointerType === "mouse") {
-        held = true;
-        sync();
-      }
-    });
-    route.addEventListener("pointerleave", () => {
-      held = false;
-      sync();
-    });
-    still.addEventListener?.("change", () => still.matches && stop());
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (still.matches || !("IntersectionObserver" in window)) {
+      rows.forEach((row) => (row.dataset.state = "done"));
+      setRun("done");
+      count();
+      return;
+    }
+    reset();
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        later(() => step(0), 500);
+      },
+      { threshold: 0.3 },
+    );
+    io.observe(run);
   })();
 
   /* scroll reveals: every part of every section arrives with its own motion, the first time it is seen */
@@ -363,8 +332,7 @@
       [".sec-head > .lead", rise(28), () => 220, 900],
       [".film", FILM_IN, () => 200, 1400],
       [".chapters .chapter", HAZE(14), (i) => 380 + i * 60, 1000],
-      [".route-track", rise(24), () => 0, 900],
-      [".stage", rise(44, 0, 0.98), () => 160, 1100],
+      [".run", rise(40, 0, 0.985), () => 0, 1000],
       [".tabs", rise(20), () => 0, 800],
       [".panel-copy", rise(28), () => 120, 900],
       [".elevated", rise(56, 0, 0.98), () => 220, 1100],
