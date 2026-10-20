@@ -245,15 +245,65 @@
     });
   });
 
-  /* how it works: six columns in one strip; the step the mouse points at opens (tap, Tab focus or
-     Enter / Space do the same), the others stay narrow */
+  /* how it works: six columns in one strip. On wide screens it steps through by itself (the open column's
+     top bar fills as its turn runs out); pointing the mouse at the strip stops it on the step you point at,
+     leaving resumes it. Tab focus holds it too, a tap hands control over for good. Narrow screens (an
+     accordion) and reduced motion stay manual. */
   (() => {
-    const cols = [...document.querySelectorAll("[data-s6] .s6-col")];
-    const open = (col) =>
+    const strip = document.querySelector("[data-s6]");
+    if (!strip) return;
+    const cols = [...strip.querySelectorAll(".s6-col")];
+    const calm = matchMedia("(prefers-reduced-motion: reduce)");
+    const wide = matchMedia("(min-width: 1181px)");
+    const DWELL = 4200;
+    let cur = 0;
+    let elapsed = 0;
+    let hovering = false;
+    let focused = false;
+    let handed = false;
+    let visible = false;
+    let looping = false;
+    let last = 0;
+    const auto = () => !handed && !calm.matches && wide.matches;
+    const running = () => auto() && !hovering && !focused;
+    const open = (col) => {
+      cur = cols.indexOf(col);
+      elapsed = 0;
       cols.forEach((c) => {
         c.classList.toggle("is-open", c === col);
         c.setAttribute("aria-expanded", String(c === col));
+        c.style.setProperty("--p", c === col && running() ? 0 : 1);
       });
+    };
+    const sync = () => {
+      elapsed = 0;
+      cols[cur].style.setProperty("--p", running() ? 0 : 1);
+    };
+    const tick = (now) => {
+      const dt = Math.min(now - last, 100);
+      last = now;
+      if (running()) {
+        elapsed += dt;
+        cols[cur].style.setProperty("--p", Math.min(1, elapsed / DWELL).toFixed(4));
+        if (elapsed >= DWELL) open(cols[(cur + 1) % cols.length]);
+      }
+      if (visible) requestAnimationFrame(tick);
+      else looping = false;
+    };
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (!visible || looping) return;
+      looping = true;
+      last = performance.now();
+      requestAnimationFrame(tick);
+    }).observe(strip);
+
+    strip.addEventListener("pointerenter", (event) => { if (event.pointerType === "mouse") { hovering = true; sync(); } });
+    strip.addEventListener("pointerleave", (event) => { if (event.pointerType === "mouse") { hovering = false; sync(); } });
+    strip.addEventListener("focusin", () => { focused = true; sync(); });
+    strip.addEventListener("focusout", (event) => { if (!strip.contains(event.relatedTarget)) { focused = false; sync(); } });
+    strip.addEventListener("pointerdown", (event) => { if (event.pointerType !== "mouse") { handed = true; sync(); } });
+    [calm, wide].forEach((mq) => mq.addEventListener?.("change", sync));
     cols.forEach((col) => {
       col.setAttribute("role", "button");
       col.addEventListener("pointerenter", (event) => event.pointerType === "mouse" && open(col));
