@@ -1,0 +1,33 @@
+name: Theme preview build (no deploy)
+
+on:
+  push:
+    branches: [theme-origin]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: theme-preview
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Publish the built prototype to the preview branch (videos left out)
+        run: |
+          find dist -type f \( -name "*.mp4" -o -name "*.webm" \) -delete
+          cd dist
+          git init -q
+          git checkout -q -b theme-origin-dist
+          git add -A
+          git -c user.name=theme-preview -c user.email=theme-preview@users.noreply.github.com commit -qm "preview build of ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" theme-origin-dist
