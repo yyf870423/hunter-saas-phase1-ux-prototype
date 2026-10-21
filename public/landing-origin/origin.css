@@ -312,10 +312,12 @@
 }
 
 .f-trial-intro h2 {
+  max-width: none;
   font-family: var(--o-display);
   font-size: 35px;
   font-weight: 400;
   line-height: 1.5;
+  white-space: nowrap;
 }
 
 .f-trial-intro .f-trial-thought {
@@ -323,6 +325,11 @@
   font-family: var(--o-display);
   font-size: 30px;
   line-height: 1.65;
+}
+
+.o-trial-thought-line {
+  display: block;
+  white-space: nowrap;
 }
 
 .f-form-grid {
@@ -359,6 +366,12 @@
 
   .p-copy h3 {
     font-size: 27px;
+  }
+}
+
+@media (max-width: 1000px) and (min-width: 801px) {
+  .f-trial-intro h2 {
+    font-size: 28px;
   }
 }
 
@@ -532,6 +545,10 @@
 }
 
 @media (max-width: 360px) {
+  .f-trial-intro h2 {
+    font-size: 26px;
+  }
+
   .f-hero h1 {
     font-size: 47px;
   }
