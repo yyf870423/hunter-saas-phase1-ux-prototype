@@ -514,3 +514,45 @@
 @media (max-width: 800px) {
   #homepage .f-hero h1.o-promise { font-size: min(38px, calc((100vw - 48px) / 10.6)); }
 }
+
+/* ---------- section rhythm: each part of the page reads as its own leg ---------- */
+/* base and raised night tones alternate, every section opens on a hairline and a small label */
+#homepage {
+  --o-base: #0f1011;
+  --o-raised: #1b1c1f;
+}
+#homepage :is(.f-work, .p-research, .f-memory, .f-about, .f-trial) {
+  border-top: 1px solid rgb(255 255 255 / 9%);
+}
+#homepage :is(.o-film, .p-research) {
+  background: var(--o-base);
+}
+#homepage :is(.f-work, .f-memory, .f-trial) {
+  background: var(--o-raised);
+}
+#homepage .f-about {
+  border-bottom: 0;
+}
+.f-footer {
+  background: #08090a;
+}
+#homepage .p-carousel-ready .p-photo,
+#homepage :is(.p-slide, .p-fallback-scene)::after {
+  background: #17181b;
+}
+#homepage .p-carousel-ready .p-photo {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%);
+}
+#homepage .f-trial :is(input, textarea, .f-select-trigger, button[aria-haspopup]) {
+  background: var(--o-base);
+}
+#homepage .f-memory :is(.o-tag text, .o-star text) {
+  stroke: var(--o-raised);
+}
+.o-kicker {
+  margin: 0 0 16px;
+  color: #a9a2e0;
+  font-family: var(--o-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+}

@@ -66,6 +66,18 @@
   reduced.addEventListener?.("change", cloudsOn);
   cloudsOn();
 
+  /* ---------------- every section opens with a small label, like the film's ---------------- */
+  [
+    [".f-work-intro h2", "能做什么 · 四件事"],
+    [".p-intro h2", "工作方式"],
+    [".f-memory h2", "人和关系"],
+    [".f-about-copy h2", "关于铂寻"],
+    [".f-trial-intro h2", "申请试用"],
+  ].forEach(([sel, text]) => {
+    const h = root.querySelector(sel);
+    if (h && !h.previousElementSibling?.classList.contains("o-kicker")) h.before(el("p", "o-kicker", text));
+  });
+
   /* ---------------- 产品短片: chapters are waypoints on a course ---------------- */
   const CHAPTERS = [
     [10, "发现新岗位"],
@@ -397,6 +409,7 @@
     { opacity: 1, transform: "none", filter: "blur(0px)" },
   ];
   const SPEC = [
+    [".o-kicker", haze(14), () => 0, 900],
     [".o-film-head > *", haze(28), (i) => i * 130, 1100],
     [".o-film-frame", [{ opacity: 0, transform: "scale(.96)", filter: "blur(12px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }], () => 200, 1400],
     [".o-course", haze(14), () => 380, 1000],
