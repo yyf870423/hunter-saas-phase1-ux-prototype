@@ -570,3 +570,37 @@
 
 /* 2026-10-21 · the dark-ground B5 logo keeps its colour */
 .f-brand img { filter: none; }
+
+/* 2026-10-21 · top navigation: plain text links, no boxes, centred in the bar */
+@media (min-width: 801px) {
+  .f-header-inner { position: relative; }
+  .f-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
+    gap: 34px;
+  }
+  .f-nav a {
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: rgb(245 245 247 / 72%);
+    font-size: 14px;
+  }
+  .f-nav a:hover,
+  .f-nav a[aria-current="true"] {
+    background: none;
+    color: #ffffff;
+  }
+  .f-nav a::after {
+    display: block;
+    background: #ffffff;
+  }
+  .f-header-actions { margin-left: auto; }
+}
+@media (min-width: 801px) and (max-width: 1000px) {
+  .f-nav { gap: 22px; }
+}

@@ -526,3 +526,15 @@
     transition: none;
   }
 }
+
+/* 2026-10-21 · four routes now: the tab row keeps all four on one line instead of pushing the fourth under the story */
+.f-network-tabs {
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
+  width: min(460px, 100%);
+}
+.f-network-tabs .f-tab,
+.f-network-split .f-network-tabs .f-tab {
+  padding-inline: 2px;
+  font-size: 14px;
+}

@@ -1539,3 +1539,9 @@ video[data-film]:not([controls]) { cursor: pointer; }
 
 /* long heading lines break between phrases, never inside one */
 .ph { display: inline-block; }
+/* four tabs: one row on desktop, two even rows on phones */
+:is([data-path-tabs], [data-scenario-tabs]) .pill { padding: 0 14px; }
+@media (max-width: 720px) {
+  :is([data-path-tabs], [data-scenario-tabs]) { display: grid; grid-template-columns: 1fr 1fr; }
+  :is([data-path-tabs], [data-scenario-tabs]) .pill { justify-content: center; }
+}

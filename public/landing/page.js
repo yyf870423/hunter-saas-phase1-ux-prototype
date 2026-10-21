@@ -199,8 +199,8 @@
 
   /* the four tabs step through by themselves (a thin line under the open tab fills as its turn runs out);
      clicking a tab jumps straight to it and the rotation carries on from there. Pointing the mouse at the
-     panel holds it while you read. Reduced motion stays manual. */
-  {
+     panel holds it while you read. Reduced motion stays manual. A page can opt out with data-still-tabs. */
+  if (!root.hasAttribute("data-still-tabs")) {
     const DWELL = 9000;
     const tabList = root.querySelector(".f-work-demo .f-tabs");
     const tabButtons = [...tabList.querySelectorAll("[role='tab']")];

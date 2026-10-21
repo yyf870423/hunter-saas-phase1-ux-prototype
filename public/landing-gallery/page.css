@@ -1461,3 +1461,8 @@ h2.u, .display.sm.u { font-size: min(44px, calc((min(100vw, 1328px) - 128px) / 2
 /* the film's own cover already carries the title and the play button, so the overlay just takes the click */
 .screen-cover, .screen-cover:hover { background: transparent; }
 .screen-cover > span { display: none; }
+/* four tabs: two even rows on phones */
+@media (max-width: 720px) {
+  [data-tasks] { display: grid; grid-template-columns: 1fr 1fr; }
+  [data-tasks] .chip-btn { justify-content: center; }
+}

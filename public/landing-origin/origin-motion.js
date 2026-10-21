@@ -86,7 +86,7 @@
         <p class="o-film-lead">周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到岗位、摸清团队、找到人选，半年后又帮候选人找到下一个机会。建议打开声音。</p>
       </header>
       <figure class="o-film-frame">
-        <video data-film src="assets/hunterbuddy-origin.mp4?v=20261021" poster="assets/origin-film-poster.jpg?v=20261021" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
+        <video data-film src="assets/hunterbuddy-origin.mp4?v=20261021-night" poster="assets/origin-film-poster.jpg?v=20261021-night" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
       </figure>
       <div class="o-course" style="--p: 0">
         <div class="o-course-line" aria-hidden="true"><span class="o-course-craft"></span></div>
