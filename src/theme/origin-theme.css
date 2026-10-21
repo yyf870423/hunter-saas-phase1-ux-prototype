@@ -93,7 +93,7 @@
   --b-on-ink: #0f1011;
   --b-focus: rgba(245, 245, 247, 0.42);
   --b-kicker: #a9a2e0;
-  --b-sweep: rgba(255, 255, 255, 0.06);
+  --b-sweep: rgba(255, 255, 255, 0.07);
 
   --s1-accent: #b9b1f2;
   --s1-accent-hover: #d1c9ff;
@@ -623,7 +623,7 @@
 .s1-app[data-theme="dark"] .s4-list-loading i {
   background:
     linear-gradient(100deg, transparent 30%, var(--b-sweep) 50%, transparent 70%) 0 0 / 240% 100% no-repeat,
-    #1b1c1f;
+    #222326;
 }
 
 @keyframes b-sweep {
