@@ -1,6 +1,10 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import boseekLogo from "../assets/brand/boseek-logo.svg";
+import boseekLogoDark from "../assets/brand/boseek-logo-dark.svg";
+import boseekMark from "../assets/brand/boseek-mark.svg";
+import boseekMarkDark from "../assets/brand/boseek-mark-dark.svg";
 import { TooltipText } from "../stage4/asset-ui";
 import { StateBanner } from "../stage4/asset-ui";
 import { getOpportunityNotificationError, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
@@ -39,18 +43,16 @@ import {
   useToast,
 } from "./ui";
 
+// The website's Boseek logo: the full lockup when the sidebar is open, the "bo" mark when it is
+// collapsed. Each comes in a light-ground and a dark-ground version; CSS shows the one that
+// matches the current theme.
 function Brand({ expanded }) {
+  const light = expanded ? boseekLogo : boseekMark;
+  const dark = expanded ? boseekLogoDark : boseekMarkDark;
   return (
-    <span className="s1-brand">
-      <i>
-        <Icon name="sparkles" />
-      </i>
-      {expanded ? (
-        <span>
-          <b>Hunter</b>
-          <small>智能猎头工作空间</small>
-        </span>
-      ) : null}
+    <span className={`s1-brand ${expanded ? "is-full" : "is-mark"}`}>
+      <img className="s1-brand-art is-light" src={light} alt="铂寻 Boseek" />
+      <img className="s1-brand-art is-dark" src={dark} alt="" aria-hidden="true" />
     </span>
   );
 }

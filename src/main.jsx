@@ -12,6 +12,7 @@ import "./stage4/stage4.css";
 import "./stage5/stage5.css";
 import "./stage6/stage6.css";
 import "./components/components.css";
+import "./theme/origin-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

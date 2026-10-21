@@ -274,9 +274,24 @@ export function EmptyState({
 }) {
   return (
     <section className={`s1-empty-state ${compact ? "is-compact" : ""}`}>
-      <i>
-        <Icon name={icon} />
-      </i>
+      <span className="s1-empty-mark" aria-hidden="true">
+        {compact ? null : (
+          // the website's research network, quiet: four unconnected sources and one live wire
+          <svg className="s1-empty-net" viewBox="0 0 168 96" fill="none">
+            <path className="w" d="M84 48 30 20" />
+            <path className="w" d="M84 48 22 72" />
+            <path className="w" d="M84 48 140 18" />
+            <path className="w live" d="M84 48 148 70" />
+            <circle className="n" cx="30" cy="20" r="4" />
+            <circle className="n" cx="22" cy="72" r="3" />
+            <circle className="n" cx="140" cy="18" r="3" />
+            <circle className="n on" cx="148" cy="70" r="4.5" />
+          </svg>
+        )}
+        <i>
+          <Icon name={icon} />
+        </i>
+      </span>
       <h2>{title}</h2>
       <p>{description}</p>
       {action}
