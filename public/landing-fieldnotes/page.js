@@ -272,42 +272,6 @@
     video.addEventListener("play", () => { video.controls = true; });
   }
 
-  /* tabs that step through by themselves: a thin line under the open tab fills as its turn runs out. A click jumps
-     straight to that tab and the rotation carries on from there. Pointing the mouse at the panel holds it while
-     you read. Reduced motion stays manual. */
-  function rotateTabs(host, panelEl, select, now, count) {
-    const DWELL = 9000;
-    const still = matchMedia("(prefers-reduced-motion: reduce)");
-    let elapsed = 0, last = 0, visible = false, looping = false, reading = false;
-    const setP = () => [...host.querySelectorAll('[role="tab"]')].forEach((b, i) => b.style.setProperty("--p", i === now() ? Math.min(1, elapsed / DWELL).toFixed(4) : 0));
-    const tick = (t) => {
-      const dt = Math.min(t - last, 100);
-      last = t;
-      if (!still.matches && !reading && !document.hidden) {
-        elapsed += dt;
-        if (elapsed >= DWELL) {
-          elapsed = 0;
-          select((now() + 1) % count);
-        }
-        setP();
-      }
-      if (visible) requestAnimationFrame(tick);
-      else looping = false;
-    };
-    new IntersectionObserver(([en]) => {
-      visible = en.isIntersecting;
-      if (!visible || looping) return;
-      looping = true;
-      last = performance.now();
-      requestAnimationFrame(tick);
-    }, { threshold: 0.2 }).observe(panelEl);
-    const restart = () => { elapsed = 0; setP(); };
-    host.addEventListener("click", restart);
-    host.addEventListener("keydown", restart);
-    panelEl.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") reading = true; });
-    panelEl.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") reading = false; });
-  }
-
   /* ---------------- tabs helper: click or arrow keys ---------------- */
   function tabs(host, labels, render, name) {
     const buttons = labels.map((label, i) => {
@@ -513,7 +477,6 @@
   let scenarioNow = 0;
   const selectScenario = tabs(scenarioTabs, WORKS.map((w) => w.label), (i, id) => { scenarioNow = i; showScenario(i, id); }, "scenario");
   selectScenario(0);
-  rotateTabs(scenarioTabs, panel, selectScenario, () => scenarioNow, WORKS.length);
 
   /* ---------------- 研究资产: a sketched map with a route drawn per task ---------------- */
   const NODES = {

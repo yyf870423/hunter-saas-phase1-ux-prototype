@@ -282,7 +282,6 @@ legend { font-size: 14px; font-weight: 600; padding: 0; margin-bottom: 10px; }
 }
 @media (max-width: 960px) { .wrap h2.u { font-size: min(34px, calc((100vw - 48px) / 12.4)); } }
 .flows { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.tab::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: 6px; height: 2px; border-radius: 2px; background: currentColor; opacity: .45; transform-origin: left; transform: scaleX(var(--p, 0)); }
 video[data-film]:not([controls]) { cursor: pointer; }
 
 /* long heading lines break between phrases, never inside one */

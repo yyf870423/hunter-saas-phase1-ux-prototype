@@ -1454,7 +1454,6 @@ h2.u, .display.sm.u { font-size: min(44px, calc((min(100vw, 1328px) - 128px) / 2
 @media (max-width: 980px) and (min-width: 721px) { h2.u, .display.sm.u { font-size: min(44px, calc((100vw - 48px) / 15.4)); } }
 @media (max-width: 720px) { h2.u, .display.sm.u { font-size: min(34px, calc((100vw - 32px) / 12.4)); } }
 .collection { position: relative; }
-.collection::after { content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 2px; border-radius: 2px; background: var(--ink); opacity: .55; transform-origin: left; transform: scaleX(var(--p, 0)); }
 
 /* long heading lines break between phrases, never inside one */
 .ph { display: inline-block; }

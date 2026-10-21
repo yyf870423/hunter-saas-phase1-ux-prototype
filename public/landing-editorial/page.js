@@ -329,45 +329,6 @@
     });
   });
 
-  /* the four tabs step through by themselves (a thin line under the open tab fills as its turn runs out);
-     clicking a tab jumps straight to it and the rotation carries on from there. Pointing the mouse at the
-     panel holds it while you read. Reduced motion stays manual. */
-  {
-    const DWELL = 9000;
-    let elapsed = 0;
-    let last = 0;
-    let visible = false;
-    let looping = false;
-    let reading = false;
-    const setP = () => tabs.forEach((t, i) => t.style.setProperty("--p", i === current ? Math.min(1, elapsed / DWELL).toFixed(4) : 0));
-    const tick = (now) => {
-      const dt = Math.min(now - last, 100);
-      last = now;
-      if (!calm.matches && !reading && !document.hidden) {
-        elapsed += dt;
-        if (elapsed >= DWELL) {
-          elapsed = 0;
-          showWork((current + 1) % tabs.length);
-        }
-        setP();
-      }
-      if (visible) requestAnimationFrame(tick);
-      else looping = false;
-    };
-    new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      if (!visible || looping) return;
-      looping = true;
-      last = performance.now();
-      requestAnimationFrame(tick);
-    }, { threshold: 0.2 }).observe(panel);
-    const restart = () => { elapsed = 0; setP(); };
-    tabs.forEach((tab) => tab.addEventListener("click", restart));
-    tabList.addEventListener("keydown", restart);
-    panel.addEventListener("pointerenter", (event) => { if (event.pointerType === "mouse") reading = true; });
-    panel.addEventListener("pointerleave", (event) => { if (event.pointerType === "mouse") reading = false; });
-  }
-
   /* scroll reveals: every part of every section arrives with its own motion, the first time it is seen */
   (() => {
     window.__hbReveal = true;

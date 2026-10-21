@@ -519,3 +519,18 @@
 @media (max-width: 800px) {
   #homepage.fx-on .f-hero h1.fx-promise { font-size: min(36px, calc((100vw - 40px) / 10.6)); }
 }
+
+/* 2026-10-21 · top navigation centred in the bar, the trial link stays at the right */
+@media (min-width: 801px) {
+  .f-header-inner { position: relative; }
+  .f-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
+  }
+  .f-header-actions { margin-left: auto; }
+}
+@media (min-width: 801px) and (max-width: 1000px) {
+  .f-nav { gap: 22px; }
+}

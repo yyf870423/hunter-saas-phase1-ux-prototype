@@ -543,3 +543,18 @@
   .s-homepage .s-overview-heading p { font-size: min(24px, calc((100vw - 40px) / 14.4)); }
   .s-chapters li:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
+
+/* 2026-10-21 · top navigation centred in the bar, the trial link stays at the right */
+@media (min-width: 801px) {
+  .f-header-inner { position: relative; }
+  .f-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
+  }
+  .f-header-actions { margin-left: auto; }
+}
+@media (min-width: 801px) and (max-width: 1000px) {
+  .f-nav { gap: 22px; }
+}
