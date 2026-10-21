@@ -21,7 +21,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - run: npm run build -- --base ./
       - name: Publish the built prototype to the preview branch (videos left out)
         run: |
           find dist -type f \( -name "*.mp4" -o -name "*.webm" \) -delete
