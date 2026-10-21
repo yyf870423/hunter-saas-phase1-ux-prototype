@@ -179,7 +179,7 @@
         <p>周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到岗位、摸清团队、找到人选，半年后又帮候选人找到下一个机会。建议打开声音。</p>
       </div>
       <figure class="s-film-frame">
-        <video data-film src="assets/hunterbuddy-signal.mp4?v=20261021" poster="assets/signal-film-poster.jpg?v=20261021" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
+        <video data-film src="assets/hunterbuddy-signal.mp4?v=20261021-paper2" poster="assets/signal-film-poster.jpg?v=20261021-paper2" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
       </figure>
       <ol class="s-chapters" aria-label="短片章节">${CHAPTERS.map(
         ([t, name], i) =>
