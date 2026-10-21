@@ -538,3 +538,7 @@
   padding-inline: 2px;
   font-size: 14px;
 }
+@media (min-width: 1181px) {
+  .f-network-split { --f-network-copy-width: 360px; }
+  .f-network-split .f-network-tabs .f-tab { font-size: 15px; }
+}

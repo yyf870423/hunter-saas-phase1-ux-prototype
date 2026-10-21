@@ -582,7 +582,49 @@
     const s = { x: A.x + ux * (R + 8), y: A.y + uy * (R + 8) };
     const e = { x: B.x - ux * (R + 8), y: B.y - uy * (R + 8) };
     const c = { x: (s.x + e.x) / 2 - dy * bend, y: (s.y + e.y) / 2 + dx * bend };
-    return { d: `M${s.x.toFixed(1)} ${s.y.toFixed(1)}Q${c.x.toFixed(1)} ${c.y.toFixed(1)} ${e.x.toFixed(1)} ${e.y.toFixed(1)}`, mid: { x: 0.25 * s.x + 0.5 * c.x + 0.25 * e.x, y: 0.25 * s.y + 0.5 * c.y + 0.25 * e.y }, e, c };
+    return { d: `M${s.x.toFixed(1)} ${s.y.toFixed(1)}Q${c.x.toFixed(1)} ${c.y.toFixed(1)} ${e.x.toFixed(1)} ${e.y.toFixed(1)}`, mid: { x: 0.25 * s.x + 0.5 * c.x + 0.25 * e.x, y: 0.25 * s.y + 0.5 * c.y + 0.25 * e.y }, s, e, c };
+  }
+  // each line's name sits beside it: never on a line, and clear of the circles, their names and other names
+  function placeTags(fs, labelSize, detailSize, [, , W, H], marks) {
+    const ems = (s, latin) => [...s].reduce((n, ch) => n + (/[\u3000-\u9fff\uff00-\uffef]/.test(ch) ? 1 : latin), 0);
+    const overlap = (a, b, m = 0) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) + m - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) + m - Math.max(a.y, b.y));
+    const centred = (x, y, s, size) => { const w = ems(s, 0.56) * size; return { x: x - w / 2, y: y - 0.92 * size, w, h: 1.16 * size, m: 14 }; };
+    const blocks = marks.map(([x, y, r]) => ({ x: x - r, y: y - r, w: 2 * r, h: 2 * r }));
+    Object.values(NODES).forEach((n) => {
+      blocks.push({ x: n.x - R - 6, y: n.y - R - 6, w: 2 * R + 12, h: 2 * R + 12 });
+      blocks.push({ x: n.x + R * 0.7 - 12, y: n.y - R * 0.7 - 12, w: 24, h: 24 });
+      blocks.push(centred(n.x, n.y + R + 24, n.label, labelSize), centred(n.x, n.y + R + 42, n.detail, detailSize));
+    });
+    const bez = (k, t) => {
+      const [{ x: ax, y: ay }, c, e] = [k.s, k.c, k.e], s = 1 - t;
+      return { x: s * s * ax + 2 * s * t * c.x + t * t * e.x, y: s * s * ay + 2 * s * t * c.y + t * t * e.y, dx: 2 * s * (c.x - ax) + 2 * t * (e.x - c.x), dy: 2 * s * (c.y - ay) + 2 * t * (e.y - c.y) };
+    };
+    const curves = Object.fromEntries(Object.entries(EDGES).map(([id, e]) => [id, curve(e.from, e.to, e.bend)]));
+    const samples = Object.entries(curves).map(([id, k]) => [id, Array.from({ length: 49 }, (_, i) => bez(k, i / 48))]);
+    const span = (id) => Math.hypot(curves[id].e.x - curves[id].s.x, curves[id].e.y - curves[id].s.y);
+    const out = {};
+    Object.keys(EDGES).sort((a, b) => span(a) - span(b)).forEach((id) => {
+      const w = ems(EDGES[id].label, 0.64) * fs, h = 1.16 * fs;
+      let best = null;
+      [0.5, 0.42, 0.58, 0.34, 0.66, 0.27, 0.73].forEach((t) => [1, -1].forEach((side) => {
+        const p = bez(curves[id], t), len = Math.hypot(p.dx, p.dy);
+        const nx = (-p.dy / len) * side, ny = (p.dx / len) * side;
+        const dist = 6 + Math.abs(nx) * w / 2 + Math.abs(ny) * h / 2;
+        const cx = p.x + nx * dist, cy = p.y + ny * dist;
+        const box = { x: cx - w / 2, y: cy - h / 2, w, h };
+        let score = Math.abs(t - 0.5) * 120;
+        blocks.forEach((b) => (score += overlap(box, b, b.m ?? 6) * 6));
+        samples.forEach(([other, pts]) => pts.forEach((q) => {
+          const m = other === id ? 2 : 5;
+          if (q.x > box.x - m && q.x < box.x + w + m && q.y > box.y - m && q.y < box.y + h + m) score += 400;
+        }));
+        score += (Math.max(0, 8 - box.x) + Math.max(0, box.x + w - W + 8) + Math.max(0, 8 - box.y) + Math.max(0, box.y + h - H + 8)) * 80;
+        if (!best || score < best.score) best = { score, box, x: cx, y: cy + 0.34 * fs };
+      }));
+      blocks.push({ ...best.box, m: 12 });
+      out[id] = best;
+    });
+    return out;
   }
   const map = document.querySelector("[data-map]");
   // a wide sheet on desktop; on phones the same map is redrawn tall so its labels stay readable
@@ -591,13 +633,13 @@
       vb: "0 0 660 440",
       pos: { company: [150, 104], job: [494, 96], contact: [120, 334], candidate: [330, 246], research: [540, 340] },
       deco: () => star4(620, 40, 12, SAGE) + plus(40, 40, 8, ROSE) + ring(630, 200, 6, FOAM),
-      nudge: { owner: [92, -36] },
+      marks: [[620, 40, 12], [40, 40, 8], [630, 200, 6]],
     },
     tall: {
       vb: "0 0 360 640",
       pos: { company: [96, 92], job: [268, 100], contact: [88, 530], candidate: [190, 318], research: [274, 536] },
       deco: () => star4(330, 230, 10, SAGE) + plus(30, 330, 7, ROSE) + ring(330, 410, 5, FOAM),
-      nudge: { connection: [-34, 4], authorship: [36, 4], experience: [14, 26], owner: [-34, -42] },
+      marks: [[330, 230, 10], [30, 330, 7], [330, 410, 5]],
     },
   };
   const tall = matchMedia("(max-width: 720px)");
@@ -605,11 +647,11 @@
   function buildMap() {
     const layout = tall.matches ? LAYOUTS.tall : LAYOUTS.wide;
     Object.entries(layout.pos).forEach(([id, [x, y]]) => Object.assign(NODES[id], { x, y }));
+    const tags = placeTags(tall.matches ? 12.5 : 10.5, tall.matches ? 17 : 15, tall.matches ? 12.5 : 11.5, layout.vb.split(" ").map(Number), layout.marks);
     const edgeSvg = Object.entries(EDGES)
       .map(([id, e]) => {
         const k = curve(e.from, e.to, e.bend);
-        const [nx, ny] = layout.nudge?.[id] || [0, 0];
-        return `<path class="edge ${e.pending ? "pending fade" : "ln"}" ${e.pending ? "" : 'pathLength="1"'} d="${k.d}"/><text class="edge-label fade" x="${(k.mid.x + nx).toFixed(1)}" y="${(k.mid.y - 8 + ny).toFixed(1)}">${e.label}</text>`;
+        return `<path class="edge ${e.pending ? "pending fade" : "ln"}" ${e.pending ? "" : 'pathLength="1"'} d="${k.d}"/><text class="edge-label fade" x="${tags[id].x.toFixed(1)}" y="${tags[id].y.toFixed(1)}">${e.label}</text>`;
       })
       .join("");
     const nodeSvg = Object.entries(NODES)

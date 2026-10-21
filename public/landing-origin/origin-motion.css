@@ -169,6 +169,9 @@
 }
 .o-tag text {
   text-anchor: middle;
+  paint-order: stroke;
+  stroke: #0f1011;
+  stroke-linejoin: round;
 }
 .o-tag-label {
   fill: #6f6f76;
@@ -220,6 +223,11 @@
   fill: #a9a2e0;
   font-family: var(--o-mono);
   letter-spacing: 0.08em;
+}
+.o-star text {
+  paint-order: stroke;
+  stroke: #0f1011;
+  stroke-linejoin: round;
 }
 .o-star-label {
   fill: #8c8c94;

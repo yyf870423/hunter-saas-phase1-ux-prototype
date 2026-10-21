@@ -280,12 +280,9 @@
         roadLayer.append(g);
         const ink = svgEl("path", { d, class: `fx-road-ink${edge.pending ? " is-pending" : ""}` });
         inkLayer.append(ink);
-        const [cx, cy] = control(edge);
-        const [ax, ay] = c.start, [bx, by] = c.end;
-        const lx = 0.25 * ax + 0.5 * cx + 0.25 * bx, ly = 0.25 * ay + 0.5 * cy + 0.25 * by;
         const t = svgEl("g", { class: "fx-road-tag" });
-        t.append(svgEl("text", { x: lx, y: ly - 3 * k, "font-size": (12.5 * k).toFixed(1), class: "fx-road-label" }, edge.label));
-        t.append(svgEl("text", { x: lx, y: ly + 12 * k, "font-size": (10.5 * k).toFixed(1), class: "fx-road-note" }, edge.note));
+        t.append(svgEl("text", { "font-size": (12.5 * k).toFixed(1), class: "fx-road-label" }, edge.label));
+        t.append(svgEl("text", { "font-size": (10.5 * k).toFixed(1), class: "fx-road-note" }, edge.note));
         labelLayer.append(t);
         roads.set(edge.id, { g, ink, tag: t });
       });
@@ -324,6 +321,51 @@
         const bb = card.getBBox();
         const plate = svgEl("rect", { x: bb.x - 8 * k, y: bb.y - 5 * k, width: bb.width + 16 * k, height: bb.height + 10 * k, rx: 8 * k, class: "fx-card-plate" });
         card.prepend(plate);
+      });
+      // each road's name sits beside it: never on the road, and clear of other roads, place cards and names
+      const ems = (s) => [...s].reduce((n, ch) => n + (/[\u3000-\u9fff\uff00-\uffef]/.test(ch) ? 1 : 0.56), 0);
+      const overlap = (a, b, m = 0) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) + m - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) + m - Math.max(a.y, b.y));
+      const blocks = [];
+      pins.forEach(({ g }, id) => {
+        const [x, y] = PLACE[id];
+        blocks.push({ x: x - 14 * k, y: y - 14 * k, w: 28 * k, h: 28 * k });
+        const bb = g.querySelector(".fx-card").getBBox();
+        blocks.push({ x: bb.x, y: bb.y, w: bb.width, h: bb.height, m: 8 * k });
+      });
+      const bez = (edge, t) => {
+        const [ax, ay] = PLACE[edge.from], [bx, by] = PLACE[edge.to], [cx, cy] = control(edge);
+        const s = 1 - t;
+        return {
+          x: s * s * ax + 2 * s * t * cx + t * t * bx, y: s * s * ay + 2 * s * t * cy + t * t * by,
+          dx: 2 * s * (cx - ax) + 2 * t * (bx - cx), dy: 2 * s * (cy - ay) + 2 * t * (by - cy),
+        };
+      };
+      const samples = new Map(model.edges.map((edge) => [edge.id, Array.from({ length: 49 }, (_, i) => bez(edge, i / 48))]));
+      const top = -14.5 * k, bottom = (compact ? 0 : 14.5) * k;
+      const span = (edge) => Math.hypot(PLACE[edge.from][0] - PLACE[edge.to][0], PLACE[edge.from][1] - PLACE[edge.to][1]);
+      [...model.edges].sort((a, b) => span(a) - span(b)).forEach((edge) => {
+        const w = Math.max(ems(edge.label) * 12.5 * k, compact ? 0 : ems(edge.note) * 10.5 * k), h = bottom - top;
+        let best = null;
+        [0.5, 0.42, 0.58, 0.34, 0.66, 0.27, 0.73].forEach((t) => [1, -1].forEach((side) => {
+          const p = bez(edge, t), len = Math.hypot(p.dx, p.dy);
+          const nx = (-p.dy / len) * side, ny = (p.dx / len) * side;
+          const dist = 7 * k + Math.abs(nx) * w / 2 + Math.abs(ny) * h / 2;
+          const cx = p.x + nx * dist, cy = p.y + ny * dist;
+          const box = { x: cx - w / 2, y: cy - h / 2, w, h };
+          let score = Math.abs(t - 0.5) * 120;
+          blocks.forEach((b) => (score += overlap(box, b, b.m ?? 4 * k) * 6));
+          samples.forEach((pts, id) => pts.forEach((q) => {
+            const m = id === edge.id ? 2 * k : 5 * k;
+            if (q.x > box.x - m && q.x < box.x + w + m && q.y > box.y - m && q.y < box.y + h + m) score += 400;
+          }));
+          score += (Math.max(0, 8 * k - box.x) + Math.max(0, box.x + w - W + 8 * k) + Math.max(0, 8 * k - box.y) + Math.max(0, box.y + h - H + 8 * k)) * 80;
+          if (!best || score < best.score) best = { score, box, cx, cy };
+        }));
+        blocks.push({ ...best.box, m: 12 * k });
+        const base = best.cy - (top + bottom) / 2;
+        const [label, note] = roads.get(edge.id).tag.children;
+        label.setAttribute("x", best.cx.toFixed(1)); label.setAttribute("y", (base - 3 * k).toFixed(1));
+        note.setAttribute("x", best.cx.toFixed(1)); note.setAttribute("y", (base + 12 * k).toFixed(1));
       });
       lastPath = "";
       update(false);

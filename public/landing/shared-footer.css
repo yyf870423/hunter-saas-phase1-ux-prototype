@@ -52,7 +52,7 @@
 .f-footer-group ul {
   display: grid;
   gap: 12px;
-  margin: auto 0 0;
+  margin: 0;
   padding: 24px 0 0;
   list-style: none;
   color: var(--f-muted);

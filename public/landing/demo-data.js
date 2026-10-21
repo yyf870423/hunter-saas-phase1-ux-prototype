@@ -202,7 +202,7 @@ window.FinesseHomepageData = {
         from: "company",
         to: "job",
         label: "在招",
-        note: "还在不在招，待确认",
+        note: "招聘状态 · 待确认",
         route: "top",
       },
       {
@@ -210,7 +210,7 @@ window.FinesseHomepageData = {
         from: "company",
         to: "contact",
         label: "在职",
-        note: "现在负责什么，待确认",
+        note: "职责 · 待确认",
         route: "left",
       },
       {
@@ -218,14 +218,14 @@ window.FinesseHomepageData = {
         from: "company",
         to: "candidate",
         label: "待过",
-        note: "任职时间，待核对",
+        note: "任职时间 · 待核对",
       },
       {
         id: "fit",
         from: "job",
         to: "candidate",
         label: "匹配理由",
-        note: "条件和意向，待确认",
+        note: "条件和意向 · 待确认",
         pending: true,
       },
       {
@@ -233,7 +233,7 @@ window.FinesseHomepageData = {
         from: "contact",
         to: "candidate",
         label: "认识",
-        note: "能不能引荐，待确认",
+        note: "能否引荐 · 待确认",
         pending: true,
       },
       {
@@ -241,7 +241,7 @@ window.FinesseHomepageData = {
         from: "research",
         to: "candidate",
         label: "作者 / 发明人",
-        note: "同名的人，要核对",
+        note: "同名 · 要核对",
       },
     ],
     paths: [

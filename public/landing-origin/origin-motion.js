@@ -193,9 +193,18 @@
       return n;
     };
     const W = 760;
-    const WIDE = { h: 470, at: { research: [140, 128], candidate: [360, 218], company: [592, 118], job: [640, 350], contact: [300, 410] } };
-    const TALL = { h: 960, at: { research: [160, 180], candidate: [500, 480], company: [610, 150], job: [600, 790], contact: [170, 770] } };
-    let H = WIDE.h, AT = WIDE.at;
+    // where each star sits, and which side its name goes: r = right, l = left, b = below
+    const WIDE = {
+      h: 470,
+      at: { company: [205, 108], job: [600, 90], candidate: [420, 250], contact: [190, 382], research: [650, 380] },
+      side: { company: "l", job: "r", candidate: "b", contact: "l", research: "b" },
+    };
+    const TALL = {
+      h: 960,
+      at: { research: [160, 180], candidate: [500, 480], company: [610, 150], job: [600, 790], contact: [170, 770] },
+      side: { research: "r", candidate: "b", company: "l", job: "l", contact: "r" },
+    };
+    let H = WIDE.h, AT = WIDE.at, SIDE = WIDE.side;
     const info = new Map(resources.map((r) => [r.id, r]));
     const holder = el("div", "o-sky");
     holder.setAttribute("aria-hidden", "true");
@@ -209,7 +218,11 @@
       const w = holder.clientWidth || 640;
       const k = W / w;
       const compact = w < 560;
-      ({ h: H, at: AT } = compact ? TALL : WIDE);
+      ({ h: H, at: AT, side: SIDE } = compact ? TALL : WIDE);
+      const spot = (id, x, y) => {
+        const below = SIDE[id] === "b", left = SIDE[id] === "l";
+        return { below, tx: below ? x : x + (left ? -20 : 20) * k, anchor: below ? "middle" : left ? "end" : "start" };
+      };
       seed = 7;
       const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, class: compact ? "is-compact" : "" });
       const defs = svgEl("defs");
@@ -232,32 +245,70 @@
         lineLayer.append(svgEl("path", { d, class: `o-edge${edge.pending ? " is-pending" : ""}` }));
         const ink = svgEl("path", edge.pending ? { d, class: "o-line-ink is-pending" } : { d, class: "o-line-ink", pathLength: 1 });
         inkLayer.append(ink);
-        const len = Math.hypot(bx - ax, by - ay);
-        const nx = -(by - ay) / len, ny = (bx - ax) / len;
-        const off = 15 * k * (ny > 0 ? -1 : 1);
-        const mx = (ax + bx) / 2 + nx * off, my = (ay + by) / 2 + ny * off;
-        const tag = svgEl("g", { class: "o-tag" });
-        tag.append(svgEl("text", { x: mx, y: my, "font-size": (12 * k).toFixed(1), class: "o-tag-label" }, edge.label));
-        tag.append(svgEl("text", { x: mx, y: my + 14 * k, "font-size": (10.5 * k).toFixed(1), class: "o-tag-note" }, edge.note));
+        const tag = svgEl("g", { class: "o-tag", "stroke-width": (4 * k).toFixed(1) });
+        tag.append(svgEl("text", { "font-size": (12 * k).toFixed(1), class: "o-tag-label" }, edge.label));
+        tag.append(svgEl("text", { "font-size": (10.5 * k).toFixed(1), class: "o-tag-note" }, edge.note));
         tagLayer.append(tag);
         lines.set(edge.id, { ink, tag, edge });
       });
       svg.append(lineLayer, inkLayer, tagLayer, packetLayer);
+      // star names, so the tags can keep clear of them
+      const ems = (s, latin) => [...s].reduce((n, ch) => n + (/[　-鿿＀-￯]/.test(ch) ? 1 : latin), 0);
+      const textBox = (x, y, s, size, anchor, latin = 0.56) => {
+        const w = ems(s, latin) * size;
+        return { x: anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x, y: y - 0.92 * size, w, h: 1.16 * size, m: 10 * k };
+      };
+      const blocks = [];
+      Object.entries(AT).forEach(([id, [x, y]]) => {
+        const { below, tx, anchor } = spot(id, x, y);
+        blocks.push({ x: x - 16 * k, y: y - 16 * k, w: 32 * k, h: 32 * k });
+        blocks.push(textBox(tx, y - (below ? 24 : 16) * k, "00", 10.5 * k, anchor, 0.7));
+        blocks.push(textBox(tx, y + (below ? 36 : 6) * k, info.get(id).label, (compact ? 15 : 18) * k, anchor));
+        if (!compact) blocks.push(textBox(tx, y + (below ? 53 : 23) * k, info.get(id).detail, 11 * k, anchor));
+      });
+      // each tag sits beside its own line: never on it, and clear of other lines, star names and tags
+      const overlap = (a, b, m = 0) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) + m - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) + m - Math.max(a.y, b.y));
+      const samples = new Map(model.edges.map((edge) => {
+        const [ax, ay] = AT[edge.from], [bx, by] = AT[edge.to];
+        return [edge.id, Array.from({ length: 41 }, (_, i) => [ax + ((bx - ax) * i) / 40, ay + ((by - ay) * i) / 40])];
+      }));
+      const top = -11 * k, bottom = (compact ? 3 : 17) * k;
+      [...model.edges].sort((a, b) => Math.hypot(...AT[a.from].map((v, i) => v - AT[a.to][i])) - Math.hypot(...AT[b.from].map((v, i) => v - AT[b.to][i]))).forEach((edge) => {
+        const [ax, ay] = AT[edge.from], [bx, by] = AT[edge.to];
+        const len = Math.hypot(bx - ax, by - ay), ux = (bx - ax) / len, uy = (by - ay) / len;
+        const w = Math.max(ems(edge.label, 0.6) * 12 * k, compact ? 0 : ems(edge.note, 0.56) * 10.5 * k), h = bottom - top;
+        let best = null;
+        [0.5, 0.42, 0.58, 0.34, 0.66, 0.27, 0.73].forEach((t) => [1, -1].forEach((side) => {
+          const nx = -uy * side, ny = ux * side;
+          const dist = 6 * k + Math.abs(nx) * w / 2 + Math.abs(ny) * h / 2;
+          const cx = ax + (bx - ax) * t + nx * dist, cy = ay + (by - ay) * t + ny * dist;
+          const box = { x: cx - w / 2, y: cy - h / 2, w, h };
+          let score = Math.abs(t - 0.5) * 120;
+          blocks.forEach((b) => (score += overlap(box, b, b.m ?? 4 * k) * 6));
+          samples.forEach((pts, id) => id !== edge.id && pts.forEach(([px, py]) => {
+            if (px > box.x - 4 * k && px < box.x + w + 4 * k && py > box.y - 4 * k && py < box.y + h + 4 * k) score += 400;
+          }));
+          score += (Math.max(0, 6 * k - box.x) + Math.max(0, box.x + w - W + 6 * k) + Math.max(0, 6 * k - box.y) + Math.max(0, box.y + h - H + 6 * k)) * 80;
+          if (!best || score < best.score) best = { score, box, cx, cy };
+        }));
+        blocks.push({ ...best.box, m: 12 * k });
+        const my = best.cy - (top + bottom) / 2;
+        const [label, note] = lines.get(edge.id).tag.children;
+        label.setAttribute("x", best.cx.toFixed(1)); label.setAttribute("y", my.toFixed(1));
+        note.setAttribute("x", best.cx.toFixed(1)); note.setAttribute("y", (my + 14 * k).toFixed(1));
+      });
       const stars = new Map();
       Object.entries(AT).forEach(([id, [x, y]]) => {
-        const g = svgEl("g", { class: `o-star${id === "candidate" ? " is-hub" : ""}` });
+        const g = svgEl("g", { class: `o-star${id === "candidate" ? " is-hub" : ""}`, "stroke-width": (4 * k).toFixed(1) });
         const halo = svgEl("circle", { cx: x, cy: y, r: (id === "candidate" ? 34 : 24) * k, fill: "url(#o-star-glow)", class: "o-star-halo" });
         g.append(halo);
         g.append(svgEl("circle", { cx: x, cy: y, r: 12 * k, class: "o-star-ring" }));
         g.append(svgEl("circle", { cx: x, cy: y, r: (id === "candidate" ? 5.5 : 3.8) * k, class: "o-star-core" }));
-        const left = x > W * 0.55;
-        const below = compact && id === "candidate"; // on phones the hub's name sits under it, clear of the lines
-        const tx = below ? x : x + (left ? -20 : 20) * k;
-        const anchor = below ? "middle" : left ? "end" : "start";
+        const { below, tx, anchor } = spot(id, x, y);
         const num = svgEl("text", { x: tx, y: y - (below ? 24 : 16) * k, "font-size": (10.5 * k).toFixed(1), class: "o-star-num", "text-anchor": anchor }, "");
         g.append(num);
         g.append(svgEl("text", { x: tx, y: y + (below ? 36 : 6) * k, "font-size": ((compact ? 15 : 18) * k).toFixed(1), class: "o-star-label", "text-anchor": anchor }, info.get(id).label));
-        if (!compact) g.append(svgEl("text", { x: tx, y: y + 23 * k, "font-size": (11 * k).toFixed(1), class: "o-star-detail", "text-anchor": anchor }, info.get(id).detail));
+        if (!compact) g.append(svgEl("text", { x: tx, y: y + (below ? 53 : 23) * k, "font-size": (11 * k).toFixed(1), class: "o-star-detail", "text-anchor": anchor }, info.get(id).detail));
         svg.append(g);
         stars.set(id, { g, num, halo });
       });
