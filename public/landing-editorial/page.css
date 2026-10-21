@@ -287,3 +287,7 @@ video[data-film]:not([controls]) { cursor: pointer; }
 /* long heading lines break between phrases, never inside one */
 .ph { display: inline-block; }
 @media (max-width: 640px) { .chapters .chapter:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+
+/* footer: the ICP record links to the MIIT lookup in the footer colour */
+.foot-meta a { color: inherit; text-decoration: none; }
+.foot-meta a:hover { text-decoration: underline; }
