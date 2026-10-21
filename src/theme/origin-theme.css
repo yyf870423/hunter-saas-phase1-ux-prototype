@@ -786,3 +786,91 @@
 :root {
   --b-net: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 168 96' fill='none' stroke='black' stroke-width='1'%3E%3Cpath stroke-dasharray='2 4' d='M84 48 33.6 21.8M84 48 24.8 70.9M84 48 137.4 19.4M84 48 143.7 68.5'/%3E%3Ccircle cx='30' cy='20' r='4'/%3E%3Ccircle cx='22' cy='72' r='3'/%3E%3Ccircle cx='140' cy='18' r='3'/%3E%3Ccircle cx='148' cy='70' r='4.5'/%3E%3C/svg%3E");
 }
+
+/* ---------------------------------------------------------------- the website's palette for categories and identity */
+:root,
+.s1-app {
+  --b-cat-iris: #5b50c8;
+  --b-cat-cyan: #0b7891;
+  --b-cat-blue: #3a68ad;
+  --b-cat-orchid: #a1479b;
+  --b-cat-amber: #93650a;
+  /* the logo's gradient, used for people and for the new-task mark */
+  --b-brand-gradient: linear-gradient(135deg, #7653ad 0%, #946ab6 34%, #a274b0 46%, #c3809f 78%, #d49aa8 100%);
+}
+
+.s1-app[data-theme="dark"] {
+  --b-cat-iris: #b9b1f2;
+  --b-cat-cyan: #5cc9e0;
+  --b-cat-blue: #90b8f0;
+  --b-cat-orchid: #dd90d8;
+  --b-cat-amber: #e7c27a;
+  --b-brand-gradient: linear-gradient(135deg, #8f74c8 0%, #a983c9 40%, #c58cb3 78%, #d39aae 100%);
+}
+
+.tg-node.is-person .tg-node-kind {
+  color: var(--b-cat-iris);
+  background: color-mix(in srgb, var(--b-cat-iris) 12%, var(--s1-surface));
+}
+
+.tg-node.is-company .tg-node-kind {
+  color: var(--b-cat-cyan);
+  background: color-mix(in srgb, var(--b-cat-cyan) 12%, var(--s1-surface));
+}
+
+.tg-node.is-position .tg-node-kind {
+  color: var(--b-cat-amber);
+  background: color-mix(in srgb, var(--b-cat-amber) 12%, var(--s1-surface));
+}
+
+.tg-node.is-industry .tg-node-kind {
+  color: var(--b-cat-blue);
+  background: color-mix(in srgb, var(--b-cat-blue) 12%, var(--s1-surface));
+}
+
+.tg-create-page {
+  --tg-update: var(--b-cat-cyan);
+}
+
+.s3-relationship-node.is-organization {
+  border-left-color: var(--b-cat-blue);
+}
+
+.s3-relationship-node.is-paper,
+.s3-relationship-node.is-patent {
+  border-left-color: var(--b-cat-orchid);
+}
+
+.s4-tag-violet {
+  color: var(--b-cat-iris);
+  background: color-mix(in srgb, var(--b-cat-iris) 10%, transparent);
+  border-color: color-mix(in srgb, var(--b-cat-iris) 30%, transparent);
+}
+
+.s1-usage-ring .s1-usage-ring-progress {
+  stroke: var(--s1-accent);
+}
+
+/* people: the logo gradient, white initials */
+.s1-account-menu > header > i,
+.s1-profile-entry > i,
+.s5-avatar-editor > i:not(.has-image),
+.s5-avatar-placeholder > i,
+.s1-mobile-account-section > header > i {
+  color: #ffffff;
+  background: var(--b-brand-gradient);
+  box-shadow: none;
+}
+
+/* the new-task mark */
+.s2-new-work-inner > header > span {
+  color: #ffffff;
+  background: var(--b-brand-gradient);
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.s2-new-work-inner > header h1 {
+  font-size: 30px;
+  line-height: 40px;
+}
