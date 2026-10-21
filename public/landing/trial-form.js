@@ -105,7 +105,7 @@
           <form class="f-trial-form" novalidate aria-label="HunterBuddy 试用申请" data-state="empty">
             <div class="f-form-grid">${fields.map((field) => (field.options ? forms.selectField : forms.field)(field)).join("")}</div>
             ${forms.consent("我已了解：以上信息将用于处理本次试用申请，并在开放试用后联系我。")}
-            <button class="f-button f-trial-submit" type="submit"><span data-submit-label>提交试用申请</span>${ui.icon("chevronRight")}</button>
+            <button class="f-button f-trial-submit" type="submit" disabled><span data-submit-label>提交试用申请</span>${ui.icon("chevronRight")}</button>
             <div class="f-form-status" role="status" aria-live="polite" aria-atomic="true" data-form-status></div>
           </form>
           <div class="f-form-success" tabindex="-1" data-form-success hidden>
@@ -141,6 +141,10 @@
     let unresolved = false;
     let submitted = false;
     let snapshot = null;
+
+    function syncSubmitState() {
+      button.disabled = busy || submitted || !consent.checked;
+    }
 
     function errorFor(field) {
       const value = controls[field.name].value.trim();
@@ -247,6 +251,7 @@
       });
     });
     consent.addEventListener("change", () => {
+      syncSubmitState();
       forms.setError(consent, consent.checked ? "" : "请先确认信息用途");
       if (!busy && !unresolved) {
         snapshot = null;
@@ -254,10 +259,20 @@
         label.textContent = "提交试用申请";
       }
     });
+    form.addEventListener("reset", () => queueMicrotask(syncSubmitState));
+    syncSubmitState();
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (busy || submitted) return;
+      if (!consent.checked) {
+        syncSubmitState();
+        forms.setError(consent, "请先确认信息用途");
+        message("请先勾选“我已了解”，再提交申请。");
+        form.dataset.state = "invalid";
+        consent.focus();
+        return;
+      }
       if (!unresolved && !validate()) return;
       let endpoint;
       try {
@@ -274,12 +289,12 @@
         snapshot = Object.fromEntries(
           fields.map(({ name }) => [name, controls[name].value.trim()]),
         );
-        snapshot.acknowledgedPurpose = true;
+        snapshot.acknowledgedPurpose = consent.checked;
         snapshot.submissionId = crypto.randomUUID();
       }
       busy = true;
       lock(true);
-      button.disabled = true;
+      syncSubmitState();
       form.setAttribute("aria-busy", "true");
       form.dataset.state = "submitting";
       label.textContent = "提交中";
@@ -361,7 +376,7 @@
       } finally {
         clearTimeout(timer);
         busy = false;
-        button.disabled = submitted;
+        syncSubmitState();
         form.removeAttribute("aria-busy");
         label.textContent =
           form.dataset.state === "invalid" ? "提交试用申请" : "重试提交";
