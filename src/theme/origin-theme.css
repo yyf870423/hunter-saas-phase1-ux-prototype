@@ -176,7 +176,7 @@
 
 .s1-brand-art {
   display: block;
-  height: 34px;
+  height: 38px;
   width: auto;
 }
 
@@ -352,58 +352,6 @@
   color: var(--s1-danger);
   background: color-mix(in srgb, var(--s1-danger) 9%, transparent);
   border-color: color-mix(in srgb, var(--s1-danger) 30%, transparent);
-}
-
-/* ---------------------------------------------------------------- tabs: the website's underline tabs */
-.s1-tabs {
-  gap: 2px;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--s1-line);
-  border-radius: 0;
-}
-
-.s1-tabs button {
-  position: relative;
-  height: 34px;
-  padding: 0 10px;
-  font-weight: 400;
-  border-radius: 0;
-  transition: color 160ms ease;
-}
-
-.s1-tabs button::after {
-  content: "";
-  position: absolute;
-  right: 8px;
-  bottom: -1px;
-  left: 8px;
-  height: 2px;
-  background: var(--s1-ink);
-  transform: scaleX(0);
-  transition: transform 200ms ease;
-}
-
-.s1-tabs button:hover {
-  color: var(--s1-ink);
-}
-
-.s1-tabs button:hover::after {
-  transform: scaleX(0.35);
-  background: var(--s1-subtle);
-}
-
-.s1-tabs button.is-active {
-  color: var(--s1-ink);
-  font-weight: 500;
-  background: transparent;
-  box-shadow: none;
-}
-
-.s1-tabs button.is-active::after {
-  transform: scaleX(1);
-  background: var(--s1-ink);
 }
 
 /* ---------------------------------------------------------------- fields */
@@ -708,4 +656,133 @@
 /* ---------------------------------------------------------------- scrollbars */
 .s1-app {
   scrollbar-color: var(--s1-line-strong) transparent;
+}
+
+/* ---------------------------------------------------------------- tabs: the website's underline tabs, in ink */
+.s1-tabs.app-tabs {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--s1-line);
+  border-radius: 0;
+}
+
+.app-tabs > button,
+.s2-signal-tabs.app-tabs > button {
+  margin-bottom: -1px;
+  font-weight: 400;
+  border-bottom-width: 2px;
+  transition:
+    color 160ms ease,
+    border-color 200ms ease;
+}
+
+.app-tabs > button:hover,
+.s2-signal-tabs.app-tabs > button:hover {
+  color: var(--s1-ink);
+  border-bottom-color: var(--s1-line-strong);
+}
+
+.app-tabs > button.is-active,
+.app-tabs > button[aria-selected="true"],
+.s2-signal-tabs.app-tabs > button.is-active {
+  color: var(--s1-ink);
+  font-weight: 500;
+  border-bottom-color: var(--s1-ink);
+}
+
+.app-tabs > button:focus-visible {
+  outline-color: var(--b-focus);
+}
+
+.app-tabs > button em {
+  border-radius: 999px;
+}
+
+.s3-relationship-view-tabs button:hover {
+  background: transparent;
+}
+
+.s3-relationship-view-tabs button.is-active {
+  color: var(--s1-ink);
+  border-bottom-color: var(--s1-ink);
+}
+
+.s2-module-tabs button.is-active {
+  color: var(--s1-ink);
+  background: var(--s1-surface-strong);
+  border-color: var(--s1-line-strong);
+}
+
+/* ---------------------------------------------------------------- more kickers */
+.s1-dashboard-head small,
+.s1-section-heading small,
+.s2-periodic-heading small,
+.s2-page-heading small,
+.s3-detail-kicker,
+.s4-academic-main > small {
+  color: var(--b-kicker);
+  font-family: var(--b-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+}
+
+/* ---------------------------------------------------------------- dashboard headings in the serif */
+.s1-dashboard-section-head h2 {
+  font-family: var(--b-display);
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.s1-dashboard-section-head h2 > svg {
+  width: 16px;
+  height: 16px;
+  flex-basis: 16px;
+}
+
+.s1-task-focus-detail h3 {
+  font-family: var(--b-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* ---------------------------------------------------------------- the other empty states get the same network, drawn behind the icon */
+.s4-custom-empty::before,
+.s2-empty::before {
+  content: "";
+  width: 168px;
+  height: 96px;
+  margin-bottom: -72px;
+  background: var(--s1-line-strong);
+  -webkit-mask: var(--b-net) center / contain no-repeat;
+  mask: var(--b-net) center / contain no-repeat;
+}
+
+.s4-custom-empty > svg:first-child,
+.s2-empty > svg:first-child {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0;
+  padding: 13px;
+  color: var(--s1-ink);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.s4-custom-empty b,
+.s2-empty h2 {
+  margin-top: 16px;
+  font-family: var(--b-display);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+:root {
+  --b-net: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 168 96' fill='none' stroke='black' stroke-width='1'%3E%3Cpath stroke-dasharray='2 4' d='M84 48 33.6 21.8M84 48 24.8 70.9M84 48 137.4 19.4M84 48 143.7 68.5'/%3E%3Ccircle cx='30' cy='20' r='4'/%3E%3Ccircle cx='22' cy='72' r='3'/%3E%3Ccircle cx='140' cy='18' r='3'/%3E%3Ccircle cx='148' cy='70' r='4.5'/%3E%3C/svg%3E");
 }
