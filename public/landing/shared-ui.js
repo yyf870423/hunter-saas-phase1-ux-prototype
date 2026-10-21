@@ -63,7 +63,7 @@
   }
 
   function brand(small = false) {
-    return `<span class="f-brand${small ? " f-brand-small" : ""}"><img src="assets/boseek-wordmark.svg" alt="Boseek 铂寻" width="187" height="187" /></span>`;
+    return `<span class="f-brand${small ? " f-brand-small" : ""}"><img src="assets/boseek-b5.svg" alt="Boseek 铂寻" width="150" height="54" /></span>`;
   }
 
   function button(label, href, secondary = false) {

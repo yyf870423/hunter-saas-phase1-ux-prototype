@@ -1443,3 +1443,21 @@ legend {
     gap: 16px;
   }
 }
+
+/* 2026-10-21 · 第五版 copy and rules */
+.hero .display { font-size: clamp(36px, 4.6vw, 60px); }
+.hero-copy .lede { max-width: 640px; }
+@media (max-width: 720px) { br.bd { display: none; } }
+/* every section heading shares one size; on wider screens each line stays on one line */
+h2.u, .display.sm.u { font-size: min(44px, calc((min(100vw, 1328px) - 128px) / 2 / 15.4)); line-height: 1.18; letter-spacing: -0.03em; }
+@media (min-width: 721px) { h2.u .ln { white-space: nowrap; } }
+@media (max-width: 980px) and (min-width: 721px) { h2.u, .display.sm.u { font-size: min(44px, calc((100vw - 48px) / 15.4)); } }
+@media (max-width: 720px) { h2.u, .display.sm.u { font-size: min(34px, calc((100vw - 32px) / 12.4)); } }
+.collection { position: relative; }
+.collection::after { content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 2px; border-radius: 2px; background: var(--ink); opacity: .55; transform-origin: left; transform: scaleX(var(--p, 0)); }
+
+/* long heading lines break between phrases, never inside one */
+.ph { display: inline-block; }
+/* the film's own cover already carries the title and the play button, so the overlay just takes the click */
+.screen-cover, .screen-cover:hover { background: transparent; }
+.screen-cover > span { display: none; }

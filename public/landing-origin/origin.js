@@ -6,10 +6,11 @@
   const hero = root.querySelector(".f-hero-copy");
   const status = hero.querySelector(".f-coming-soon");
   if (status) hero.prepend(status);
+  document.querySelectorAll(".f-brand img").forEach((img) => (img.src = "assets/boseek-b5-dark.svg"));
   const image = root.querySelector(".f-hero-breath img");
   image.alt = "冷色天空与辽阔的银蓝色云海";
 
-  const icons = ["users", "building", "link", "briefcase"];
+  const icons = ["building", "link", "users", "briefcase"];
   root.querySelector(".f-work-demo > .f-tabs").classList.add("o-scenario-tabs");
   root
     .querySelectorAll(".f-work-demo > .f-tabs .f-tab")

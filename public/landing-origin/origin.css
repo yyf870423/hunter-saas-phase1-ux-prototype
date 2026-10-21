@@ -567,3 +567,6 @@
     padding-inline: 20px;
   }
 }
+
+/* 2026-10-21 · the dark-ground B5 logo keeps its colour */
+.f-brand img { filter: none; }

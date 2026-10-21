@@ -61,7 +61,7 @@
       pause < 0
         ? e(path.title)
         : `<span class="f-network-heading-line">${e(path.title.slice(0, pause + 1))}</span><span class="f-network-heading-line">${e(path.title.slice(pause + 1))}</span>`;
-    return `<ol class="f-network-trail" aria-label="研究路径">${path.nodes.map((id, index) => `<li>${index ? ui.icon("chevronRight") : ""}<span>${e(labels.get(id))}</span></li>`).join("")}</ol><h3>${title}</h3><p>${e(path.copy)}</p><p class="f-network-check">${e(path.check)}</p>`;
+    return `<ol class="f-network-trail" aria-label="查找路线">${path.nodes.map((id, index) => `<li>${index ? ui.icon("chevronRight") : ""}<span>${e(labels.get(id))}</span></li>`).join("")}</ol><h3>${title}</h3><p>${e(path.copy)}</p><p class="f-network-check">${e(path.check)}</p>`;
   }
 
   function render(nodes, network, { layout } = {}) {
@@ -70,20 +70,20 @@
     const story = `<div class="f-network-story${split ? " f-network-story--split" : ""}" aria-live="polite">${storyMarkup(nodes, network.paths[0], split)}</div>`;
     const labels = new Map(nodes.map((node) => [node.id, node.label]));
     return `<div class="f-asset-network${split ? " f-network-split" : ""}">
-      <div class="f-tabs f-network-tabs" role="tablist" aria-label="资产支持的研究目标">${network.paths.map((path, index) => `<button type="button" class="f-tab" id="f-network-tab-${e(path.id)}" role="tab" aria-selected="${index === 0}" aria-controls="f-network-panel" tabindex="${index === 0 ? 0 : -1}">${e(path.label)}</button>`).join("")}</div>
+      <div class="f-tabs f-network-tabs" role="tablist" aria-label="四件事各走一条路">${network.paths.map((path, index) => `<button type="button" class="f-tab" id="f-network-tab-${e(path.id)}" role="tab" aria-selected="${index === 0}" aria-controls="f-network-panel" tabindex="${index === 0 ? 0 : -1}">${e(path.label)}</button>`).join("")}</div>
       <div id="f-network-panel" role="tabpanel" tabindex="0" aria-labelledby="f-network-tab-${e(network.paths[0].id)}">
         ${split ? story : ""}
         <figure class="f-network-figure" aria-labelledby="f-network-caption">
           <div class="f-network-map">
             <svg class="f-network-wires" aria-hidden="true">${network.edges.map((edge) => `<path data-wire="${e(edge.id)}" class="${edge.pending ? "is-pending" : ""}" />`).join("")}</svg>
-            <ul class="f-network-nodes" aria-label="五类核心资产">${nodes.map((node) => `<li class="f-network-node${node.id === "candidate" ? " f-network-center" : ""}" data-node="${e(node.id)}" style="--f-node-x:${positions[node.id][0]}%;--f-node-y:${positions[node.id][1]}%">${ui.icon(node.icon)}<h3>${e(node.label)}</h3><p>${e(node.detail)}</p></li>`).join("")}</ul>
-            <ul class="f-network-relations" aria-label="资产之间的关系">${network.edges.map((edge) => `<li class="f-network-relation" data-edge="${e(edge.id)}"><span class="f-network-sr">${e(labels.get(edge.from))}与${e(labels.get(edge.to))}：</span><span>${e(edge.label)}</span><small>${e(edge.note)}</small></li>`).join("")}</ul>
+            <ul class="f-network-nodes" aria-label="存下来的五类资料">${nodes.map((node) => `<li class="f-network-node${node.id === "candidate" ? " f-network-center" : ""}" data-node="${e(node.id)}" style="--f-node-x:${positions[node.id][0]}%;--f-node-y:${positions[node.id][1]}%">${ui.icon(node.icon)}<h3>${e(node.label)}</h3><p>${e(node.detail)}</p></li>`).join("")}</ul>
+            <ul class="f-network-relations" aria-label="它们之间的关系">${network.edges.map((edge) => `<li class="f-network-relation" data-edge="${e(edge.id)}"><span class="f-network-sr">${e(labels.get(edge.from))}与${e(labels.get(edge.to))}：</span><span>${e(edge.label)}</span><small>${e(edge.note)}</small></li>`).join("")}</ul>
           </div>
-          <figcaption id="f-network-caption">资产关系示意<span>虚线为需确认的匹配或联系线索</span></figcaption>
+          <figcaption id="f-network-caption">人和关系示意<span>虚线是还要确认的匹配或引荐</span></figcaption>
         </figure>
         ${split ? "" : story}
       </div>
-      <p class="f-network-origin">${ui.icon("link")}有效资料与来源、关系一起保存，成为下一次研究的起点。</p>
+      <p class="f-network-origin">${ui.icon("link")}查过的资料连同来源和关系一起存下来，下一件事从这里接着做。</p>
     </div>`;
   }
 

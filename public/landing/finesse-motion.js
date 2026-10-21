@@ -25,7 +25,7 @@
   const soon = copy.querySelector(".f-coming-soon");
   const mark = el("p", "fx-mark", "HunterBuddy");
   title.classList.add("fx-promise");
-  title.innerHTML = '<span class="fx-line">给我一个难岗位，</span><span class="fx-line">把该找的人找出来。</span>';
+  title.innerHTML = '<span class="fx-line">从杂乱的信息里，</span><span class="fx-line">找出岗位、人和时机。</span>';
   copy.prepend(mark);
   statement?.remove();
   if (soon) copy.append(soon);
@@ -60,30 +60,28 @@
   reduced.addEventListener?.("change", pushOn);
   pushOn();
 
-  /* ---------------- 产品短片《对焦》: chapters sit on a lens distance scale ---------------- */
-  const FILM_LEN = 60;
+  /* ---------------- 产品短片: chapters sit on a lens distance scale ---------------- */
+  const FILM_LEN = 134.5;
   const CHAPTERS = [
-    [0, "人很多"],
-    [7.5, "手动对焦"],
-    [15.6, "按岗位对焦"],
-    [25.6, "重合成一个人"],
-    [33, "标着来源"],
-    [42.5, "快门留给你"],
-    [50.2, "收进底片册"],
+    [10, "发现新岗位"],
+    [36.5, "摸清团队"],
+    [61, "为岗位找人"],
+    [89.5, "为人选找机会"],
+    [112, "人和关系都存下来了"],
   ];
-  const mmss = (s) => `00:${String(Math.floor(s)).padStart(2, "0")}`;
+  const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
   const film = el("section", "fx-film");
   film.id = "film";
   film.setAttribute("aria-labelledby", "fx-film-title");
   film.innerHTML = `
     <div class="f-container">
       <header class="fx-film-head">
-        <p class="fx-film-kicker">产品短片 · 对焦</p>
-        <h2 id="fx-film-title"><span>人很多。</span><span>对焦，是找出那一个。</span></h2>
-        <p class="fx-film-lead">关键词、职位名、公司名，都只对上一半。HunterBuddy 按岗位对焦：三个来源里的影子，重合成同一个人；每个参数都标着来源，拿不准的写明“待确认”。快门，留给你。建议打开声音观看。</p>
+        <p class="fx-film-kicker">产品短片 · 两分钟</p>
+        <h2 id="fx-film-title"><span class="ln">两分钟，</span><span class="ln">跟着一家公司走一遍。</span></h2>
+        <p class="fx-film-lead">周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到岗位、摸清团队、找到人选，半年后又帮候选人找到下一个机会。建议打开声音。</p>
       </header>
       <figure class="fx-film-frame">
-        <video data-film src="media/hunterbuddy-finesse.mp4" poster="media/finesse-film-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片《对焦》"></video>
+        <video data-film src="media/hunterbuddy-finesse.mp4?v=20261021" poster="media/finesse-film-poster.jpg?v=20261021" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
       </figure>
       <div class="fx-scale" style="--p: 0">
         <div class="fx-scale-track" aria-hidden="true"><span class="fx-scale-head"></span></div>
@@ -95,6 +93,15 @@
     </div>`;
   hero.after(film);
   const video = film.querySelector("video");
+  /* the film shows its cover with no player controls until someone starts it */
+  if (video) {
+    video.removeAttribute("controls");
+    video.tabIndex = 0;
+    const start = () => { video.controls = true; video.play()?.catch?.(() => {}); };
+    video.addEventListener("click", () => { if (!video.controls) start(); });
+    video.addEventListener("keydown", (e) => { if (!video.controls && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); start(); } });
+    video.addEventListener("play", () => { video.controls = true; });
+  }
   const scale = film.querySelector(".fx-scale");
   const marks = [...film.querySelectorAll(".fx-scale-marks button")];
   const markChapter = (index) => marks.forEach((b, i) => b.setAttribute("aria-pressed", String(i === index)));

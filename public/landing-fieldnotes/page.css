@@ -1523,3 +1523,19 @@ legend {
     font-size: 13px;
   }
 }
+
+/* 2026-10-21 · 第五版 copy and rules */
+.hero .display { font-size: clamp(34px, 4.6vw, 56px); }
+@media (max-width: 720px) { br.bd { display: none; } }
+/* every section heading shares one size; on wider screens each line stays on one line */
+.serif.u { font-size: min(48px, calc((min(100vw, 1200px) - 48px) * .66 / 15.4)); line-height: 1.26; }
+@media (min-width: 721px) { .serif.u .ln { white-space: nowrap; } }
+@media (max-width: 720px) { .serif.u { font-size: min(34px, calc((100vw - 32px) / 12.4)); } }
+.boundary-head { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+.boundary { align-items: start; }
+.pill[role="tab"] { position: relative; }
+.pill[role="tab"]::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 5px; height: 2px; border-radius: 2px; background: currentColor; opacity: .5; transform-origin: left; transform: scaleX(var(--p, 0)); }
+video[data-film]:not([controls]) { cursor: pointer; }
+
+/* long heading lines break between phrases, never inside one */
+.ph { display: inline-block; }

@@ -6,32 +6,33 @@
     <meta name="theme-color" content="#f7f5f3" />
     <meta
       name="description"
-      content="HunterBuddy，猎头的 AI 工作伙伴。给它一个难岗位，它跨渠道找人、认出同一个人，把匹配理由和来源放在一起；联系和推荐，由你决定。"
+      content="从杂乱的信息里，找出岗位、人和时机。HunterBuddy 把融资新闻、招聘页、简历和论文跟你的客户、人脉和简历库连在一起，帮猎头发现新岗位、摸清团队、为岗位找人、为人选找机会。联系谁、推不推荐，你说了算。"
     />
     <meta name="trial-api" content="disabled" />
     <title>HunterBuddy · 猎头的 AI 工作伙伴 · 铂寻 Boseek</title>
-    <link rel="stylesheet" href="page.css?v=20261012-haze" />
+    <link rel="stylesheet" href="page.css?v=20261021" />
     <script>
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.documentElement.classList.add("motion");
         setTimeout(() => window.__hbReveal || document.documentElement.classList.remove("motion"), 3000);
       }
     </script>
-    <script defer src="page.js?v=20261012-haze"></script>
+    <script defer src="page.js?v=20261021"></script>
   </head>
   <body>
     <a class="skip" href="#main">跳到正文</a>
 
     <header class="nav" data-nav>
       <a class="brand" href="#top" aria-label="HunterBuddy 首页">
-        <img src="assets/boseek-ink.svg" alt="铂寻 Boseek" width="86" height="31" />
+        <img src="../landing-journal/assets/boseek-b5.svg" alt="铂寻 Boseek" width="86" height="31" />
         <span>HunterBuddy</span>
       </a>
       <nav class="links" aria-label="主导航">
-        <a href="#film">短片</a>
+        <a href="#film">产品短片</a>
         <a href="#how">工作方式</a>
-        <a href="#work">应用场景</a>
-        <a href="#assets">研究资产</a>
+        <a href="#boundary">谁做什么</a>
+        <a href="#work">能做什么</a>
+        <a href="#assets">人和关系</a>
         <a href="#about">关于铂寻</a>
       </nav>
       <a class="btn ink sm" href="#apply">申请试用</a>
@@ -42,30 +43,30 @@
         <div class="tiles" data-tiles aria-hidden="true"></div>
         <div class="hero-copy">
           <p class="eyebrow">HunterBuddy · 猎头的 AI 工作伙伴</p>
-          <h1 class="display" id="hero-title"><span class="line">给我一个难岗位，</span><span class="line">把该找的人找出来。</span></h1>
-          <p class="lede">围绕岗位跨渠道找人，认出同一个人，把匹配理由和来源挂在一起。关键判断，留给你。</p>
+          <h1 class="display" id="hero-title"><span class="line">从杂乱的信息里，</span><span class="line">找出岗位、人和时机。</span></h1>
+          <p class="lede">一条融资新闻、一份旧简历、一次主页变动，连起来就是下一个机会。<br class="bd" />HunterBuddy 替你找线索、连关系，联系谁、何时开口，你说了算。</p>
           <div class="actions">
             <a class="btn ink" href="#apply">申请试用</a>
             <a class="btn line" href="#film">观看短片</a>
           </div>
-          <a class="playlink" href="#film" data-play-film><span class="tri" aria-hidden="true"></span>观看 60 秒短片《一面墙》</a>
-          <p class="soon">产品开发中 · 现已开放试用申请</p>
+          <a class="playlink" href="#film" data-play-film><span class="tri" aria-hidden="true"></span>观看两分钟短片</a>
+          <p class="soon">正在开发中 · 邀请制试用申请已开放</p>
         </div>
       </section>
 
       <section class="room" id="film" aria-labelledby="film-title">
         <div class="wrap">
           <div class="room-head">
-            <h2 class="h-lg" id="film-title">一面墙，六十秒。</h2>
-            <p>一个难岗位，从一面空墙开始。线索很快挂满了墙；HunterBuddy 把它重新挂了一遍，把三处线索挂进同一个画框，每一件都配上标明出处的展签。最后挂哪一幅，由你决定。</p>
+            <h2 class="h-lg u" id="film-title"><span class="ln">两分钟，</span><br /><span class="ln">跟着一家公司走一遍。</span></h2>
+            <p>周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到岗位、摸清团队、找到人选，半年后又帮候选人找到下一个机会。建议打开声音。</p>
           </div>
           <figure class="screen" data-screen>
-            <video data-film src="assets/hunterbuddy-gallery.mp4?v=4" poster="assets/gallery-poster.jpg?v=2" playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片《一面墙》"></video>
-            <button class="screen-cover" type="button" data-cover aria-label="播放短片《一面墙》">
+            <video data-film src="assets/hunterbuddy-gallery.mp4?v=20261021" poster="assets/gallery-poster.jpg?v=20261021" playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
+            <button class="screen-cover" type="button" data-cover aria-label="播放两分钟短片">
               <span class="cover-l">观看</span>
               <span class="cover-play" aria-hidden="true"><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="tri"></span></span>
               <span class="cover-r">这支短片</span>
-              <span class="cover-cap">《一面墙》· 60 秒 · 建议打开声音</span>
+              <span class="cover-cap">两分钟 · 建议打开声音</span>
             </button>
           </figure>
           <ol class="chapters" aria-label="短片章节" data-chapters></ol>
@@ -75,8 +76,8 @@
       <section class="room" id="how" aria-labelledby="how-title">
         <div class="wrap">
           <div class="room-head">
-            <h2 class="h-lg" id="how-title">从一个岗位，走到一个人。</h2>
-            <p>每一步都留下依据。HunterBuddy 承接查找与整理，关键判断与对外沟通，仍由你掌握。</p>
+            <h2 class="h-lg u" id="how-title"><span class="ln">先理清，再去找，</span><br /><span class="ln">最后核对清楚。</span></h2>
+            <p>不管从一条新闻、一份 JD 还是一位候选人开始，它都先理清要什么，再从你手上的资源找起，最后把资料核对清楚。每个判断都写着来源，联系谁、怎么说，由你来定。</p>
           </div>
           <div class="cards3" data-cards></div>
         </div>
@@ -86,13 +87,13 @@
         <div class="wrap">
           <img class="stop-photo l" src="assets/photos/g-decide-who.webp" alt="" width="900" height="1125" loading="lazy" />
           <img class="stop-photo r" src="assets/photos/g-decide-recommend.webp" alt="" width="900" height="1125" loading="lazy" />
-          <p class="eyebrow">人工判断</p>
-          <h2 class="display sm" id="boundary-title"><span class="line">到这里，它停下。</span><span class="line">联系和推荐，你来定。</span></h2>
-          <p class="lede">找人、查重、匹配交给 HunterBuddy。候选人温度、客户关系、联系时机和正式推荐，需要懂这盘业务的你来决定。</p>
+          <p class="eyebrow">谁做什么</p>
+          <h2 class="display sm u" id="boundary-title"><span class="line ln"><span class="ph">找线索、对资料、</span><span class="ph">写理由，</span><span class="ph">交给它。</span></span><span class="line ln">联系和推荐，你说了算。</span></h2>
+          <p class="lede">资料可以交给它读，人得你来谈。HunterBuddy 能核对两份资料是不是同一个人，拿不准的单独标出来，也能把合适和不合适的理由摆在一起。但候选人的意愿、客户的关系、开口的时机和正式推荐，还得靠懂行的你。</p>
           <ul class="yours" aria-label="由你决定的事">
             <li><b>谁值得联系、先联系谁</b><span>由你决定</span></li>
-            <li><b>何时开口、怎么说</b><span>由你决定</span></li>
-            <li><b>是否正式推荐、做出承诺</b><span>由你决定</span></li>
+            <li><b>什么时候开口、怎么说</b><span>由你决定</span></li>
+            <li><b>要不要正式推荐、怎么跟客户承诺</b><span>由你决定</span></li>
           </ul>
         </div>
       </section>
@@ -100,10 +101,10 @@
       <section class="room" id="work" aria-labelledby="work-title">
         <div class="wrap">
           <div class="room-head">
-            <h2 class="h-lg" id="work-title"><span class="nb">从找人到找机会，</span><span class="nb">把工作接起来。</span></h2>
-            <p>一个岗位、一家目标公司或一位候选人，都可以成为工作的起点。每个起点，都是一组可以继续添加的线索。</p>
+            <h2 class="h-lg u" id="work-title"><span class="ln">猎头每天在做的四件事，</span><br /><span class="ln">它都能帮上忙。</span></h2>
+            <p>做猎头不只是找人：先要发现谁在招，再摸清对方的团队，然后找到合适的人。手上的候选人想动了，还要帮他找下一个机会。下面用星川机器人这一家公司，把四件事走一遍。</p>
           </div>
-          <div class="collections" role="tablist" aria-label="应用场景" data-collections></div>
+          <div class="collections" role="tablist" aria-label="四件事" data-collections></div>
           <div class="card detail" role="tabpanel" data-collection-panel></div>
         </div>
       </section>
@@ -111,10 +112,10 @@
       <section class="room" id="assets" aria-labelledby="assets-title">
         <div class="wrap">
           <div class="room-head">
-            <h2 class="h-lg" id="assets-title"><span class="nb">做过的研究，</span><span class="nb">不必从头再来。</span></h2>
-            <p>公司、联系人、岗位、候选人、论文与专利，挂在同一面墙上，彼此相连。关系里待核实的部分，会一直标着。</p>
+            <h2 class="h-lg u" id="assets-title"><span class="ln"><span class="ph">查过的人和公司</span><span class="ph">都存下来了，</span></span><br /><span class="ln"><span class="ph">谁和谁是什么关系，</span><span class="ph">也存下来了。</span></span></h2>
+            <p>四件事查过的公司、岗位和人，都存下来了。谁在哪家公司待过、谁和谁一起写过论文、谁能帮你引荐谁，这些关系也都存着。资料一更新，这些关系和匹配也跟着更新，没确认的会一直标着“待确认”。</p>
           </div>
-          <div class="tasks" role="tablist" aria-label="研究任务" data-tasks></div>
+          <div class="tasks" role="tablist" aria-label="四件事各走一条路" data-tasks></div>
           <div class="wall-grid">
             <div class="wall" data-wall aria-hidden="true"></div>
             <div class="wall-copy" role="tabpanel" data-task-panel></div>
@@ -125,9 +126,9 @@
       <section class="room cta" aria-labelledby="cta-title">
         <div class="tiles small" data-tiles="cta" aria-hidden="true"></div>
         <div class="wrap">
-          <p class="eyebrow">带上一个真实的难题</p>
-          <h2 class="display sm" id="cta-title"><span class="line">带个难岗位来，</span><span class="line">看看 HunterBuddy 能找到谁。</span></h2>
-          <p class="lede">带上岗位要求、你已经知道的线索，以及目前找过的渠道。我们用真实约束演示怎样召回、核验、去重和匹配。</p>
+          <p class="eyebrow">带上一件正在做的事</p>
+          <h2 class="display sm u" id="cta-title"><span class="line ln">带一件手上的事来，</span><span class="line ln"><span class="ph">看看 HunterBuddy</span> <span class="ph">能帮你找到什么。</span></span></h2>
+          <p class="lede">一个难岗位、一家想开发的公司，或一位可能要动的候选人都可以。<br class="bd" />我们用真实情况陪你走一遍：从手上已有的找起，来源都摆给你看。</p>
           <div class="actions">
             <a class="btn ink" href="#apply">申请试用</a>
             <a class="btn line" href="#film">再看一遍短片</a>
@@ -139,16 +140,16 @@
         <div class="wrap apply">
           <div class="about" id="about">
             <p class="eyebrow">关于铂寻</p>
-            <h2 class="h-lg">铂寻，为猎头化繁解难。</h2>
-            <p>铂寻为独立猎头与精品团队打造 HunterBuddy。我们希望 AI 承接繁琐的资料查找与整理，让猎头把更多时间留给理解客户、判断人才和建立信任。</p>
-            <p>工具连接信息；专业判断与人与人的沟通，始终由你掌握。</p>
+            <h2 class="h-lg u"><span class="ln">铂寻，</span><br /><span class="ln">为猎头化繁解难。</span></h2>
+            <p>猎头最值钱的时间，应该花在理解客户、判断人才和建立信任上，而不是一页页翻资料。铂寻为独立猎头和资深顾问打造 HunterBuddy，让 AI 承接繁琐的查找与整理，把这些时间还给你。</p>
+            <p>工具负责连接信息，专业判断与人与人的沟通，始终由你掌握。</p>
             <a class="playlink" href="https://www.boseekai.com" rel="noopener">www.boseekai.com <span aria-hidden="true">→</span></a>
           </div>
 
           <form class="form" novalidate aria-labelledby="apply-title" data-trial-form>
             <div class="form-head">
               <h2 class="h-md" id="apply-title">申请 HunterBuddy 试用</h2>
-              <p>产品正在开发中。留下你的信息，开放试用后我们会与你联系。</p>
+              <p>目前采用邀请制试用。留下你的信息，我们会逐一审核，并在开通时与你联系。</p>
             </div>
             <div class="fields">
               <label class="field">姓名 *<input name="name" autocomplete="name" maxlength="80" required /></label>
@@ -168,7 +169,7 @@
                 </select></label
               >
               <label class="field"
-                >同时招聘的岗位数 *<select name="activePositions" required>
+                >目前同时在做的岗位数 *<select name="activePositions" required>
                   <option value="">请选择</option>
                   <option>0-5</option>
                   <option>6-10</option>
@@ -196,7 +197,7 @@
             <div class="form-status" role="status" aria-live="polite" data-status hidden></div>
             <div class="actions">
               <button class="btn ink" type="submit" data-submit>提交试用申请</button>
-              <a class="btn line" href="#work">先看看应用场景</a>
+              <a class="btn line" href="#work">先看看能做什么</a>
             </div>
           </form>
         </div>
@@ -207,33 +208,31 @@
       <div class="wrap">
         <div class="foot">
           <div class="foot-brand">
-            <img src="assets/boseek-ink.svg" alt="铂寻 Boseek" width="110" height="39" />
-            <span>HunterBuddy，猎头的 AI 工作伙伴。<br />铂寻为独立猎头与精品团队打造。</span>
+            <img src="../landing-journal/assets/boseek-b5.svg" alt="铂寻 Boseek" width="110" height="39" />
+            <span>HunterBuddy，猎头的 AI 工作伙伴。<br />铂寻为独立猎头和资深顾问打造。</span>
           </div>
           <div>
             <b>产品</b>
             <a href="#film">产品短片</a>
             <a href="#how">工作方式</a>
-            <a href="#work">应用场景</a>
-            <a href="#assets">研究资产</a>
+            <a href="#boundary">谁做什么</a>
+            <a href="#work">能做什么</a>
+            <a href="#assets">人和关系</a>
           </div>
           <div>
             <b>法律</b>
-            <span>隐私政策（即将发布）</span>
-            <span>服务条款（即将发布）</span>
-            <span>数据处理协议（即将发布）</span>
+            <span>隐私政策</span>
+            <span>服务条款</span>
+            <span>数据处理协议</span>
           </div>
           <div>
             <b>联系</b>
             <a href="https://www.boseekai.com" rel="noopener">www.boseekai.com</a>
-            <span>联系邮箱：待补充</span>
           </div>
         </div>
         <div class="foot-meta">
           <span>© 2026 铂寻 Boseek</span>
           <span>网站主体：北京铂寻智能科技有限公司</span>
-          <span>ICP 备案号：待补充</span>
-          <span>公安备案号：待补充</span>
         </div>
       </div>
     </footer>

@@ -29,7 +29,7 @@
     { note: ["开源", "lin-yue · 代码贡献者"], x: 9, y: 50, w: 176, rot: -3 },
     { p: "g-city", x: 7, y: 82, w: 96, rot: -2 },
     { p: "g-team-wall", x: 33, y: 90, w: 82, rot: -4 },
-    { note: ["岗位 · 机器人公司", "视觉算法负责人"], x: 40, y: 17, w: 176, rot: -1 },
+    { note: ["岗位 · 星川机器人", "视觉算法负责人"], x: 40, y: 17, w: 176, rot: -1 },
     { p: "g-patent", x: 67, y: 20, w: 80, rot: -3 },
     { p: "g-paper", x: 85, y: 22, w: 126, rot: 4, m: 1 },
     { p: "g-code", x: 79, y: 45, w: 92, rot: 2 },
@@ -40,7 +40,7 @@
   const CTA = [
     { p: "g-notebook", x: 10, y: 28, w: 110, rot: -4 },
     { p: "g-shelf", x: 17, y: 74, w: 92, rot: 3 },
-    { note: ["待确认", "本人求职意向"], x: 84, y: 24, w: 168, rot: 3 },
+    { note: ["待确认", "本人想不想动"], x: 84, y: 24, w: 168, rot: 3 },
     { p: "g-gallery", x: 90, y: 66, w: 116, rot: -3 },
   ];
   function hang(host, list) {
@@ -98,13 +98,11 @@
 
   /* ---------------- the film: a screen with a cover, and chapters ---------------- */
   const CHAPTERS = [
-    [0, "空墙"],
-    [8, "线索满墙"],
-    [16, "重新挂一遍"],
-    [24, "同一个画框"],
-    [32, "展签"],
-    [40, "留给你的画框"],
-    [48, "展厅"],
+    [10, "发现新岗位"],
+    [36.5, "摸清团队"],
+    [61, "为岗位找人"],
+    [89.5, "为人选找机会"],
+    [112, "人和关系都存下来了"],
   ];
   const screen = document.querySelector("[data-screen]");
   const video = screen.querySelector("video");
@@ -132,7 +130,7 @@
     const b = el("button", "chip-btn");
     b.type = "button";
     b.setAttribute("aria-pressed", "false");
-    b.append(name, el("small", "", `0:${String(t).padStart(2, "0")}`));
+    b.append(name, el("small", "", `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`));
     b.addEventListener("click", () => start(t));
     li.append(b);
     chapterHost.append(li);
@@ -149,37 +147,37 @@
   const FEATURES = [
     {
       p: "g-resumes",
-      title: "岗位条件 · 视觉算法负责人",
+      title: "岗位要求 · 视觉算法负责人",
       opts: [
-        ["必须", "工业视觉、团队管理。"],
-        ["加分", "量产落地、论文或专利。"],
-        ["未知", "薪酬范围、到岗时间——客户没说的，不去猜。"],
+        ["必须", "工业视觉、带过团队。"],
+        ["加分", "做过量产、有论文或专利。"],
+        ["未知", "薪资范围、到岗时间。客户没说的，不去猜。"],
       ],
-      label: "先吃透岗位",
-      desc: "拆出必须、加分与未知条件；需要你确认的问题，单独列出。",
+      label: "弄清要什么",
+      desc: "理清要什么、已经知道什么、还缺什么。要你确认的问题，单独列出来。",
     },
     {
       p: "g-team-wall",
-      title: "身份核对 · 3 个来源",
+      title: "是不是同一个人 · 3 处资料",
       opts: [
         ["简历", "林越 · 2019 年简历。"],
         ["论文", "Lin Y. · 视觉检测方向的论文作者。"],
-        ["开源", "lin-yue · 开源项目的代码贡献者。"],
+        ["开源", "lin-yue · 开源社区的代码贡献者。"],
       ],
-      foot: "核对之后，合并为同一人：林越。",
+      foot: "核对之后，合并成同一个人：林越。",
       label: "认出同一个人",
-      desc: "已有候选人、知识图谱、公开网络、论文与专利、开源项目、上传简历六路召回，核对后合并成一份档案。",
+      desc: "先翻你的候选人、人才地图和人脉，再去公开网络、论文专利和开源社区补齐，核对后合并成一份。",
     },
     {
       p: "g-paper",
       title: "林越 · 对照岗位",
       opts: [
-        ["有依据", "产线视觉与算法团队经历。来源：简历、团队页。"],
-        ["待了解", "实际管理范围。暂无可靠来源。"],
-        ["待确认", "本人求职意向。需要本人沟通。"],
+        ["有来源", "产线视觉和算法团队经历。来源：简历、团队页。"],
+        ["待了解", "实际带多大团队。暂时没有可靠来源。"],
+        ["待确认", "本人想不想动。要本人聊过才知道。"],
       ],
       label: "理由，连同来源",
-      desc: "每条匹配理由都对应资料来源；没有可靠依据的，标为待确认，不把推测当事实。",
+      desc: "每条匹配理由都写着从哪来。没有可靠来源的标“待确认”，不把猜测当成事实。",
     },
   ];
   const cardsHost = document.querySelector("[data-cards]");
@@ -213,6 +211,42 @@
     cardsHost.append(card);
   });
 
+  /* tabs that step through by themselves: a thin line under the open tab fills as its turn runs out. A click jumps
+     straight to that tab and the rotation carries on from there. Pointing the mouse at the panel holds it while
+     you read. Reduced motion stays manual. */
+  function rotateTabs(host, panelEl, select, now, count) {
+    const DWELL = 9000;
+    const still = matchMedia("(prefers-reduced-motion: reduce)");
+    let elapsed = 0, last = 0, visible = false, looping = false, reading = false;
+    const setP = () => [...host.querySelectorAll('[role="tab"]')].forEach((b, i) => b.style.setProperty("--p", i === now() ? Math.min(1, elapsed / DWELL).toFixed(4) : 0));
+    const tick = (t) => {
+      const dt = Math.min(t - last, 100);
+      last = t;
+      if (!still.matches && !reading && !document.hidden) {
+        elapsed += dt;
+        if (elapsed >= DWELL) {
+          elapsed = 0;
+          select((now() + 1) % count);
+        }
+        setP();
+      }
+      if (visible) requestAnimationFrame(tick);
+      else looping = false;
+    };
+    new IntersectionObserver(([en]) => {
+      visible = en.isIntersecting;
+      if (!visible || looping) return;
+      looping = true;
+      last = performance.now();
+      requestAnimationFrame(tick);
+    }, { threshold: 0.2 }).observe(panelEl);
+    const restart = () => { elapsed = 0; setP(); };
+    host.addEventListener("click", restart);
+    host.addEventListener("keydown", restart);
+    panelEl.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") reading = true; });
+    panelEl.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") reading = false; });
+  }
+
   /* ---------------- tabs helper: click or arrow keys ---------------- */
   function tabs(buttons, render) {
     const select = (i, focus) => {
@@ -243,65 +277,151 @@
   /* ---------------- scenarios: four collections ---------------- */
   const WORKS = [
     {
-      label: "岗位找人",
-      cover: ["g-resumes", "g-vision-line", "g-paper"],
-      headline: "给出岗位要求，找到人，也看清为什么。",
-      description: "从岗位与客户要求出发，围绕目标公司，在已有候选人、公开履历、论文与专利中跨渠道找人。",
-      detail: "核对身份、合并重复资料，对照岗位留下匹配理由、来源与待确认条件。谁值得联系，由你判断。",
-      context: "机器人公司 · 视觉算法负责人",
-      subject: "值得进一步了解的人选与匹配依据",
-      rows: [
-        { t: "林越", k: "工业视觉 · 团队负责人", c: "推荐依据：产线视觉与算法团队经历。", f: "实际管理范围" },
-        { t: "周宁", k: "机器人感知 · 技术骨干", c: "推荐依据：相关论文与项目经历。", f: "量产落地经验" },
-        { t: "陈思", k: "视觉算法 · 项目负责人", c: "推荐依据：跨团队交付经历。", f: "近期职责与求职意向" },
+      "label": "发现新岗位",
+      "cover": [
+        "g-city",
+        "g-robot-arm",
+        "g-coffee"
       ],
-      questions: ["岗位中哪些条件不可妥协？", "人选当前任职与项目职责是否准确？", "本人求职意向及联系许可是否已确认？"],
+      "headline": "一条融资新闻，可能就是下一个岗位。",
+      "description": "周一早上，HunterBuddy 提醒你：星川机器人刚拿到 B 轮融资，可能要扩招。它先去找有没有具体岗位：官网招聘页上多了视觉算法负责人。找到岗位，再找对口的联系人：负责视觉团队的技术负责人许晴。她的直接联系方式没找到，才去翻你的人脉：你的老客户张远是星川的投资人，能帮你引荐。",
+      "detail": "一个确认过的岗位、一位对口联系人，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD，它就是一个正式岗位。",
+      "context": "每周一 09:00 · 帮你盯着的赛道",
+      "subject": "星川机器人 · 可能有新岗位",
+      "rows": [
+        {
+          "t": "官网招聘页新增视觉算法负责人",
+          "k": "找到岗位 · 两处来源",
+          "c": "招聘页和融资新闻都能对上。"
+        },
+        {
+          "t": "许晴 · 技术负责人",
+          "k": "对口联系人",
+          "c": "公开资料能确认她负责视觉团队。",
+          "f": "直接联系方式"
+        },
+        {
+          "t": "张远 → 许晴",
+          "k": "备用 · 引荐路线",
+          "c": "直接联系不上时，你的老客户张远（星川的投资人）能帮你引荐。"
+        }
+      ],
+      "questions": [
+        "他们真的在招这个岗位吗？",
+        "直接联系许晴，还是请张远引荐？",
+        "合作方式和优先级怎么谈？"
+      ]
     },
     {
-      label: "客户开发",
-      cover: ["g-city", "g-robot-arm", "g-coffee"],
-      headline: "从公司变化，找到值得跟进的客户机会。",
-      description: "结合新业务、新基地和招聘动态，梳理公司业务、相关岗位与关键角色，发现潜在客户需求。",
-      detail: "留下值得关注的原因、负责人线索和沟通切入点。带着背景核实需求，让下一次客户沟通有备而来。",
-      context: "机器人与智能制造",
-      subject: "星川机器人",
-      rows: [
-        { t: "新基地与技术岗位信息同时出现", k: "观察到的变化", c: "新生产基地的公开信息，与视觉、控制方向的岗位需求同时出现。" },
-        { t: "业务扩张出现技术团队需求线索", k: "潜在需求", c: "招聘优先级、预算与需求有效性，仍需进一步沟通确认。" },
-        { t: "从新基地交付计划与岗位需求聊起", k: "沟通切入点", c: "进一步核实相关负责角色和有效的联系路径，判断是否值得跟进。" },
+      "label": "摸清团队",
+      "cover": [
+        "g-team-wall",
+        "g-patent",
+        "g-code"
       ],
-      questions: ["招聘需求是否仍然有效？", "哪位负责人适合进一步沟通？", "现有联系路径是否已获授权？"],
+      "headline": "想摸清一个团队，资料却东一块西一块。",
+      "description": "星川要招人，你得先知道这类人都在哪。星川和两家对标公司的团队信息，散在官网、新闻、论文和你的简历库里。它按公司、团队、关键岗位、在职的人一层层排好，把官网上的任职信息、你库里的候选人、论文和专利里的名字对上号。一起写过论文的人，不会被当成上下级。",
+      "detail": "一张人才地图：谁在什么位置，消息从哪来，哪里还是空白。你手上的 Excel 人才地图也能导进来接着补。",
+      "context": "目标公司 · 人才地图",
+      "subject": "星川和两家对标公司",
+      "rows": [
+        {
+          "t": "拓界机器人 · 视觉团队",
+          "k": "负责人已确认",
+          "c": "官网任职和团队页都能对上，就是你库里的林越。"
+        },
+        {
+          "t": "穹顶智能 · 控制团队",
+          "k": "在职的人待确认",
+          "c": "从论文作者里找到线索，身份和现在的职位还要核对。"
+        },
+        {
+          "t": "星川机器人 · 产品交付",
+          "k": "空白",
+          "c": "知道有这个关键岗位，还不知道是谁，不等于这个位置空着。"
+        }
+      ],
+      "questions": [
+        "团队名字和分工还对吗？",
+        "这些名字和你库里的候选人是同一个人吗？",
+        "哪些空白值得下次去补？"
+      ]
     },
     {
-      label: "人才梳理",
-      cover: ["g-team-wall", "g-patent", "g-code"],
-      headline: "从一家公司，梳理团队与关键人才。",
-      description: "围绕目标公司的团队与关键岗位，关联公开任职、候选人资料以及论文、专利中的人物线索。",
-      detail: "把人物角色、关系依据和未覆盖的岗位放在同一份研究里。已知继续核对，缺口继续补充，让下一轮寻访有方向。",
-      context: "目标公司 · 团队研究",
-      subject: "星川机器人 · 关键角色",
-      rows: [
-        { t: "视觉团队", k: "视觉算法负责人", c: "有负责人任职线索，人物身份与当前职责待确认。" },
-        { t: "控制团队", k: "运动控制负责人", c: "有相关技术成果线索，作者或发明人与真实任职的对应关系待核实。" },
-        { t: "产品团队", k: "产品交付负责人", c: "负责人尚未覆盖，保留为下一轮资料补充方向。" },
+      "label": "为岗位找人",
+      "cover": [
+        "g-resumes",
+        "g-vision-line",
+        "g-paper"
       ],
-      questions: ["团队名称与职责是否仍然有效？", "线索人物能否与已有候选人核验为同一人？", "哪些岗位与汇报关系尚没有可靠依据？"],
+      "headline": "JD 到手，先看你手上已经有谁。",
+      "description": "张远引荐之后，许晴发来视觉算法负责人的 JD，只有几行字。合适的人很少，线索也很散。它不从零开始：先看人才地图里的目标团队、这类人通常从哪些公司出来、你库里谁最接近，再去网上、论文专利和开源社区补齐。简历里的林越、论文里的 Lin Y. 和开源社区的 lin-yue，核对后发现是同一个人。",
+      "detail": "几位值得聊聊的人选。为什么合适、消息从哪来、哪里还不清楚，都写在旁边。先联系谁，你来判断。",
+      "context": "星川机器人 · 视觉算法负责人",
+      "subject": "值得聊聊的人选",
+      "rows": [
+        {
+          "t": "林越",
+          "k": "工业视觉 · 团队负责人",
+          "c": "做过产线视觉和算法团队，三个地方的资料已合并。",
+          "f": "实际带多大团队"
+        },
+        {
+          "t": "周宁",
+          "k": "机器人感知 · 技术骨干",
+          "c": "有相关论文和项目经历。",
+          "f": "有没有做过量产"
+        },
+        {
+          "t": "陈思",
+          "k": "视觉算法 · 项目负责人",
+          "c": "带过跨团队的项目。",
+          "f": "最近在做什么、想不想动"
+        }
+      ],
+      "questions": [
+        "JD 里哪些条件不能让步？",
+        "人选现在的职位和负责的项目准确吗？",
+        "本人想不想动、能不能联系，问过了吗？"
+      ]
     },
     {
-      label: "候选人机会",
-      cover: ["g-notebook", "g-gallery", "g-shelf"],
-      headline: "从候选人的经历，找到值得讨论的下一站。",
-      description: "结合专业方向、项目经历与候选人意向，研究相关公司和岗位，寻找手上岗位之外的机会。",
-      detail: "对照经历、职责与地点，保留匹配依据和待确认条件。哪些机会值得沟通、是否推荐，由你判断。",
-      context: "候选人 · 新机会研究",
-      subject: "林越 · 工业视觉与团队管理",
-      rows: [
-        { t: "算法落地与小团队交付", k: "已有经验", c: "沿已有项目经历研究相关岗位，保留资料来源与不确定处。" },
-        { t: "工业视觉与机器人感知岗位", k: "可继续研究的方向", c: "从专业方向与已有经历出发，进一步了解公司与岗位要求。" },
-        { t: "岗位职责、工作地点与本人意向", k: "需要比较的条件", c: "缺失条件保留待确认。先讨论方向、核实机会，再决定是否对外推荐。" },
+      "label": "为人选找机会",
+      "cover": [
+        "g-notebook",
+        "g-gallery",
+        "g-shelf"
       ],
-      questions: ["本人下一步最在意的条件是什么？", "机会的职责与要求是否已核实？", "对外推荐的内容和范围是否得到同意？"],
-    },
+      "headline": "半年后，林越的团队变了。",
+      "description": "上次林越没动。你让 HunterBuddy 每两周看一次重点候选人，这次它发现：拓界机器人的视觉团队并进了新成立的平台部，而林越在现在的岗位上已经做了四年。它不替你下结论，先问你要不要核实。你点头后，它整理林越的最新情况，对照你手上所有在招的岗位和熟悉的公司，看哪些值得聊。",
+      "detail": "几个有理有据的机会。打不打这通电话、推不推荐，你说了算。聊完把新简历发给它，资料和匹配都会更新。",
+      "context": "重点候选人 · 林越",
+      "subject": "林越 · 可以聊的下一站",
+      "rows": [
+        {
+          "t": "穹顶智能 · 视觉平台负责人",
+          "k": "你在招的岗位",
+          "c": "技术方向和带团队经历都对得上。",
+          "f": "地点和薪资"
+        },
+        {
+          "t": "星川机器人 · 新产线视觉团队",
+          "k": "人脉里的新机会",
+          "c": "星川扩张后的新方向，和林越的产线经历相关。",
+          "f": "需求是不是真的"
+        },
+        {
+          "t": "本人意向",
+          "k": "只是迹象",
+          "c": "团队调整不等于想走，愿不愿意看机会，要你去问。"
+        }
+      ],
+      "questions": [
+        "他这次最在意什么？",
+        "这些机会的职责和要求核实过吗？",
+        "推荐出去的内容，他同意了吗？"
+      ]
+    }
   ];
   const colHost = document.querySelector("[data-collections]");
   const colButtons = WORKS.map((w, i) => {
@@ -318,7 +438,9 @@
   });
   const colPanel = document.querySelector("[data-collection-panel]");
   let firstCol = true;
-  tabs(colButtons, (i, id) => {
+  let colNow = 0;
+  const selectCol = tabs(colButtons, (i, id) => {
+    colNow = i;
     const w = WORKS[i];
     colPanel.setAttribute("aria-labelledby", id);
     const copy = el("div", "detail-copy");
@@ -337,7 +459,7 @@
       li.append(t, el("p", "", r.c));
       if (r.f) {
         const g = el("p", "gap");
-        g.append(el("span", "ask", "?"), `仍需了解：${r.f}`);
+        g.append(el("span", "ask", "?"), `待确认：${r.f}`);
         li.append(g);
       }
       rows.append(li);
@@ -350,48 +472,59 @@
     colPanel.replaceChildren(copy, right);
     if (!firstCol && !reduced.matches) [copy, right].forEach((n, k) => { n.classList.add("swap"); n.style.animationDelay = `${k * 80}ms`; });
     firstCol = false;
-  })(0);
+  });
+  selectCol(0);
+  rotateTabs(colHost, colPanel, selectCol, () => colNow, WORKS.length);
 
   /* ---------------- 研究资产: a salon hang, joined by thread per task ---------------- */
   const ASSETS = {
-    company: { label: "公司", detail: "产业、组织与变化", p: "g-city", x: 3, y: 4, w: 27, rot: -2 },
-    job: { label: "岗位", detail: "要求与招聘需求", p: "g-resumes", x: 64, y: 0, w: 25, rot: 2 },
-    candidate: { label: "候选人", detail: "经历、能力与意向", p: "g-coffee", x: 35, y: 30, w: 28, rot: -1 },
-    contact: { label: "联系人", detail: "角色与联系路径", p: "g-team-wall", x: 4, y: 52, w: 25, rot: 3 },
-    research: { label: "论文与专利", detail: "专业方向与成果", p: "g-patent", x: 69, y: 49, w: 26, rot: -3 },
+    company: { label: "公司", detail: "行业、团队和变化", p: "g-city", x: 3, y: 4, w: 27, rot: -2 },
+    job: { label: "岗位", detail: "要求和在招的需求", p: "g-resumes", x: 64, y: 0, w: 25, rot: 2 },
+    candidate: { label: "候选人", detail: "经历、能力和意向", p: "g-coffee", x: 35, y: 30, w: 28, rot: -1 },
+    contact: { label: "联系人", detail: "负责什么、怎么联系上", p: "g-team-wall", x: 4, y: 52, w: 25, rot: 3 },
+    research: { label: "论文与专利", detail: "研究方向和成果", p: "g-patent", x: 69, y: 49, w: 26, rot: -3 },
   };
   const EDGES = {
-    demand: { from: "company", to: "job", label: "招聘需求", note: "有效性待核实" },
-    role: { from: "company", to: "contact", label: "任职与职责", note: "当前角色待核实" },
-    experience: { from: "company", to: "candidate", label: "职业经历", note: "任职信息待核实" },
-    fit: { from: "job", to: "candidate", label: "匹配依据", note: "条件与意向待核实", pending: true },
-    connection: { from: "contact", to: "candidate", label: "联系路径", note: "关系与许可需确认", pending: true },
-    authorship: { from: "research", to: "candidate", label: "作者 / 发明人", note: "同名身份需核验" },
+    demand: { from: "company", to: "job", label: "在招", note: "还在不在招，待确认" },
+    role: { from: "company", to: "contact", label: "在职", note: "现在负责什么，待确认" },
+    experience: { from: "company", to: "candidate", label: "待过", note: "任职时间，待核对" },
+    fit: { from: "job", to: "candidate", label: "匹配理由", note: "条件和意向，待确认", pending: true },
+    connection: { from: "contact", to: "candidate", label: "认识", note: "能不能引荐，待确认", pending: true },
+    authorship: { from: "research", to: "candidate", label: "作者 / 发明人", note: "同名的人，要核对" },
+    owner: { from: "job", to: "contact", label: "对口联系人", note: "直接联系方式，待确认" },
   };
   const PATHS = [
     {
-      label: "找信息",
-      nodes: ["research", "candidate", "company", "contact"],
-      edges: ["authorship", "experience", "role"],
-      title: "一项技术成果，连起人物与组织的线索。",
-      copy: "从论文与专利发现专业人物，再沿职业经历研究公司与相关角色。零散资料因此有了上下文，也有了可以追溯的来由。",
-      check: "作者身份、真实任职与联系人职责分别核验，不能把共同作者当作汇报关系。",
+      label: "发现新岗位",
+      nodes: ["company", "job", "contact"],
+      edges: ["demand", "owner"],
+      title: "一家公司在扩张，先找岗位，再找对口的人。",
+      copy: "一家公司在扩张：先找到具体岗位，再找对口的联系人。联系不上，再请熟人引荐。",
+      check: "招聘页上的岗位不等于客户已经委托。还在不在招、谁说了算，要你去确认。",
     },
     {
-      label: "找人",
+      label: "摸清团队",
+      nodes: ["company", "candidate", "research"],
+      edges: ["experience", "authorship"],
+      title: "一家公司，按团队一层层排好。",
+      copy: "想摸清一家公司：按团队和关键岗位排好，把在职的人和你库里的候选人对上号。",
+      check: "一起写过论文的人，不会被当成上下级。团队名字和分工，还要你确认。",
+    },
+    {
+      label: "为岗位找人",
       nodes: ["job", "candidate", "research"],
       edges: ["fit", "authorship"],
-      title: "一个岗位，找到有依据、可审阅的人选。",
-      copy: "岗位要求连接候选人的经历与能力，论文与专利补充专业线索。推荐不只留下姓名，也保留为什么值得继续了解的依据。",
-      check: "技术成果不等于量产或管理经验；匹配条件与本人意向仍需确认。",
+      title: "一个新岗位，先从目标团队里找人。",
+      copy: "新岗位来了：先从人才地图里的目标团队找人，再用论文和专利确认专长对得上。",
+      check: "论文写得好，不等于做过量产或带过团队。本人想不想动，要你去问。",
     },
     {
-      label: "找岗位",
+      label: "为人选找机会",
       nodes: ["candidate", "company", "job"],
       edges: ["experience", "demand"],
-      title: "一段职业经历，延伸到值得讨论的新机会。",
-      copy: "从候选人的经历与明确意向出发，研究相关公司与岗位需求。已有资产相互参照，让下一次机会研究不必重新开始。",
-      check: "公开岗位只是机会线索；需求有效性、本人意向与推荐许可需逐项确认。",
+      title: "候选人想动了，对照你在招的岗位。",
+      copy: "候选人想动了：顺着他的经历和熟悉的公司，对照你手上在招的岗位。",
+      check: "招聘页上的岗位只是线索。需求是不是真的、本人愿不愿意、能不能推荐，要一项项确认。",
     },
   ];
   const wall = document.querySelector("[data-wall]");
@@ -474,7 +607,7 @@
       rels.append(li);
     });
     const check = el("p", "check-note");
-    check.append(el("b", "", "仍需核验 · "), p.check);
+    check.append(el("b", "", "还要确认 · "), p.check);
     taskPanel.replaceChildren(chain, h, el("p", "", p.copy), rels, check);
     if (wallSeen && !reduced.matches) taskPanel.childNodes.forEach((n, k) => { n.classList.add("swap"); n.style.animationDelay = `${k * 60}ms`; });
     drawThreads(wallSeen);
@@ -633,7 +766,7 @@
     const phone = form.elements.namedItem("phone");
     if (!/^\+?[\d ()-]{6,20}$/.test(phone.value.trim()) || phone.value.replace(/\D/g, "").length < 7) {
       phone.closest(".field").dataset.invalid = "true";
-      say("请填写有效的联系电话；境外号码请包含国家区号。");
+      say("请填写有效的联系电话，境外号码请包含国家区号。");
       phone.focus();
       return;
     }
@@ -675,7 +808,7 @@
         form.reset();
         toggles.forEach((t) => t.setAttribute("aria-pressed", "false"));
         snapshot = null;
-        say("申请已收到。开放试用后，我们会通过你留下的联系方式与你联系；提交申请不代表试用已开通。", "ok");
+        say("申请已收到。我们会逐一审核，并在开通时通过你留下的联系方式与你联系。", "ok");
       } else if (result.status === "rate_limited") {
         say("提交过于频繁，请稍后再试。已填写的信息会保留在当前页面。");
       } else if (result.status === "invalid") {
@@ -685,7 +818,7 @@
         say("申请暂未提交，请稍后重试。已填写的信息会保留在当前页面。");
       }
     } catch {
-      say("暂未确认申请结果。请重试；为避免重复，重试会使用相同资料。");
+      say("暂未确认申请结果，请重试。为避免重复，重试会使用相同资料。");
     } finally {
       clearTimeout(timer);
       submit.disabled = false;

@@ -246,7 +246,7 @@ legend { font-size: 14px; font-weight: 600; padding: 0; margin-bottom: 10px; }
 .anim-in { animation: hb-rise .5s cubic-bezier(.22, .8, .24, 1) both; animation-delay: calc(var(--i, 0) * 60ms + 140ms); }
 @keyframes hb-rise { from { opacity: 0; transform: translateY(8px); } }
 /* scroll reveals: hidden until page.js animates them in (only when html.motion is set) */
-.motion :is(.hero-copy > *, .floats .glass, .head-row .head-col > *, .head-row > .body, .head-col:not(.head-row .head-col) > *, .film-frame, .chapters .chapter, section[aria-label='召回渠道'] .body, .channel, .tabs, .panel-copy, .panel > .card, .band-art, .band-copy > *, .duo li, .photo-card, .asset, .relation, .flows .flow, .gradient .wrap > *, .about > *, .form, .foot-cols > div, .foot-meta):not(.in) { opacity: 0; }
+.motion :is(.hero-copy > *, .floats .glass, .head-row .head-col > *, .head-row > .body, .head-col:not(.head-row .head-col) > *, .film-frame, .chapters .chapter, section[aria-label='找人渠道'] .body, .channel, .tabs, .panel-copy, .panel > .card, .band-art, .band-copy > *, .duo li, .photo-card, .asset, .relation, .flows .flow, .gradient .wrap > *, .about > *, .form, .foot-cols > div, .foot-meta):not(.in) { opacity: 0; }
 .band-art .draw { stroke-dasharray: 1; }
 .motion .band-art:not(.in) .draw { stroke-dashoffset: 1; }
 
@@ -268,3 +268,23 @@ legend { font-size: 14px; font-weight: 600; padding: 0; margin-bottom: 10px; }
   .brand .divider, .brand .product { display: none; }
   .form { padding: 24px; }
 }
+
+/* 2026-10-21 · 第五版 copy and rules */
+.hero .display { font-size: clamp(34px, 4.6vw, 56px); }
+.hero-lead { max-width: 600px; }
+@media (max-width: 720px) { br.bd { display: none; } }
+@media (max-width: 1200px) { .nav { gap: 22px; } }
+/* every section heading shares one size; on wide screens each line stays on one line */
+.wrap h2.u { font-size: min(46px, calc((min(100vw, 1200px) - 104px) * .65 / 16.4)); line-height: 1.2; letter-spacing: -1px; }
+@media (min-width: 961px) {
+  .band-grid { grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr); }
+  h2.u .ln { white-space: nowrap; }
+}
+@media (max-width: 960px) { .wrap h2.u { font-size: min(34px, calc((100vw - 48px) / 12.4)); } }
+.flows { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.tab::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: 6px; height: 2px; border-radius: 2px; background: currentColor; opacity: .45; transform-origin: left; transform: scaleX(var(--p, 0)); }
+video[data-film]:not([controls]) { cursor: pointer; }
+
+/* long heading lines break between phrases, never inside one */
+.ph { display: inline-block; }
+@media (max-width: 640px) { .chapters .chapter:last-child:nth-child(odd) { grid-column: 1 / -1; } }

@@ -10,7 +10,7 @@
     const opening = document.createElement("section");
     opening.className = "s-opening";
     opening.innerHTML =
-      '<div class="f-container s-opening-grid"><span class="s-section-label">业务场景</span></div>';
+      '<div class="f-container s-opening-grid"><span class="s-section-label">能做什么</span></div>';
     opening.firstElementChild.append(intro);
     root.querySelector(".f-hero").after(opening);
 

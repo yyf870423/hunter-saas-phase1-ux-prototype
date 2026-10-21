@@ -46,7 +46,7 @@
     },
     {
       name: "activePositions",
-      label: "同时招聘的岗位数",
+      label: "目前同时在做的岗位数",
       options: ["0-5", "6-10", "11-20", "21-50", "51及以上"],
       maxLength: 16,
     },
@@ -98,7 +98,7 @@
       <div class="f-container f-trial-layout">
         <div class="f-trial-intro">
           <h2 id="f-trial-title">申请 HunterBuddy 试用</h2>
-          <p>产品正在开发中。留下你的信息，开放试用后我们会与你联系。</p>
+          <p>目前采用邀请制试用。留下你的信息，我们会逐一审核，并在开通时与你联系。</p>
           <p class="f-trial-thought">把时间，留给<br />真正重要的人。</p>
         </div>
         <div class="f-trial-content">
@@ -189,7 +189,7 @@
         } catch {
           /* Invalid input is reported at the field. */
         }
-        if (!valid) return "请填写有效的联系电话；境外号码请包含国家区号";
+        if (!valid) return "请填写有效的联系电话，境外号码请包含国家区号";
       }
       return "";
     }
@@ -356,7 +356,7 @@
         unresolved = true;
         form.dataset.state = "unconfirmed";
         message(
-          "暂未确认申请结果。请重试确认这次申请；为避免重复，重试会使用相同资料。",
+          "暂未确认申请结果。请重试确认这次申请，为避免重复，重试会使用相同资料。",
         );
       } finally {
         clearTimeout(timer);

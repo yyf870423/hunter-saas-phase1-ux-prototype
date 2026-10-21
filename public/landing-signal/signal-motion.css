@@ -528,3 +528,18 @@
     transition: none;
   }
 }
+
+/* 2026-10-21 · 第五版 rules: a calmer hero, and one size for every section heading with no mid-line wraps */
+@media (min-width: 801px) {
+  .s-homepage .f-hero h1.s-promise { font-size: clamp(40px, 3.8vw, 54px); }
+  .s-homepage :is(.s-film-head h2, .f-work-intro h2, .p-intro h2, .f-memory h2, .f-about h2) { font-size: min(40px, calc((min(100vw, 1440px) - 144px) / 25)); line-height: 1.4; }
+  .s-homepage :is(h2 .ln, .p-intro h2 > span, .s-film-head h2 span) { white-space: nowrap; }
+}
+@media (max-width: 800px) {
+  .s-homepage :is(.s-film-head h2, .f-work-intro h2, .p-intro h2, .f-memory h2, .f-about h2) { font-size: min(30px, calc((100vw - 40px) / 12.4)); }
+}
+@media (max-width: 800px) {
+  .s-homepage .f-hero h1.s-promise { font-size: min(36px, calc((100vw - 40px) / 10.6)); }
+  .s-homepage .s-overview-heading p { font-size: min(24px, calc((100vw - 40px) / 14.4)); }
+  .s-chapters li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}

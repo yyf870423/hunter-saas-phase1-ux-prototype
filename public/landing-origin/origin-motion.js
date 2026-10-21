@@ -23,7 +23,7 @@
   const statement = copy.querySelector(".f-hero-statement");
   const mark = el("p", "o-mark", "HunterBuddy");
   title.classList.add("o-promise");
-  title.innerHTML = '<span class="o-line">给我一个难岗位，</span><span class="o-line">把该找的人找出来。</span>';
+  title.innerHTML = '<span class="o-line">从杂乱的信息里，</span><span class="o-line">找出岗位、人和时机。</span>';
   title.before(mark);
   statement?.remove();
 
@@ -66,45 +66,53 @@
   reduced.addEventListener?.("change", cloudsOn);
   cloudsOn();
 
-  /* ---------------- 产品短片《夜航》: chapters are waypoints on a course ---------------- */
+  /* ---------------- 产品短片: chapters are waypoints on a course ---------------- */
   const CHAPTERS = [
-    [0, "夜航"],
-    [7.5, "六处回音"],
-    [20, "三线定位"],
-    [27.6, "规划航线"],
-    [38.75, "最后一段交给你"],
-    [47.5, "天亮"],
+    [10, "发现新岗位"],
+    [36.5, "摸清团队"],
+    [61, "为岗位找人"],
+    [89.5, "为人选找机会"],
+    [112, "人和关系都存下来了"],
   ];
-  const mmss = (s) => `00:${String(Math.floor(s)).padStart(2, "0")}`;
+  const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
   const film = el("section", "o-film");
   film.id = "film";
   film.setAttribute("aria-labelledby", "o-film-title");
   film.innerHTML = `
     <div class="f-container">
       <header class="o-film-head">
-        <p class="o-film-kicker">产品短片 · 夜航</p>
-        <h2 id="o-film-title"><span>最难的岗位，</span><span>像在夜里找一盏灯。</span></h2>
-        <p class="o-film-lead">六十秒的夜航：HunterBuddy 一路发出信号，六个地方都有回音，其中三处指向同一个人。航线上的每一盏灯都写着依据，拿不准的标为“待确认”；最后一段航程，由你来开。建议打开声音观看。</p>
+        <p class="o-film-kicker">产品短片 · 两分钟</p>
+        <h2 id="o-film-title"><span class="ln">两分钟，</span><span class="ln">跟着一家公司走一遍。</span></h2>
+        <p class="o-film-lead">周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到岗位、摸清团队、找到人选，半年后又帮候选人找到下一个机会。建议打开声音。</p>
       </header>
       <figure class="o-film-frame">
-        <video data-film src="assets/hunterbuddy-origin.mp4" poster="assets/origin-film-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片《夜航》"></video>
+        <video data-film src="assets/hunterbuddy-origin.mp4?v=20261021" poster="assets/origin-film-poster.jpg?v=20261021" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
       </figure>
       <div class="o-course" style="--p: 0">
         <div class="o-course-line" aria-hidden="true"><span class="o-course-craft"></span></div>
         <ol class="o-course-stops" aria-label="短片章节">${CHAPTERS.map(
           ([t, name], i) =>
-            `<li${i >= 4 ? ' class="is-yours"' : ""}><button type="button" data-t="${t}" aria-pressed="false"><span class="o-stop-dot"></span><span class="o-stop-time">${mmss(t)}</span><span class="o-stop-name">${name}</span></button></li>`,
+            `<li><button type="button" data-t="${t}" aria-pressed="false"><span class="o-stop-dot"></span><span class="o-stop-time">${mmss(t)}</span><span class="o-stop-name">${name}</span></button></li>`,
         ).join("")}</ol>
       </div>
     </div>`;
   hero.after(film);
   const video = film.querySelector("video");
+  /* the film shows its cover with no player controls until someone starts it */
+  if (video) {
+    video.removeAttribute("controls");
+    video.tabIndex = 0;
+    const start = () => { video.controls = true; video.play()?.catch?.(() => {}); };
+    video.addEventListener("click", () => { if (!video.controls) start(); });
+    video.addEventListener("keydown", (e) => { if (!video.controls && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); start(); } });
+    video.addEventListener("play", () => { video.controls = true; });
+  }
   const course = film.querySelector(".o-course");
   const stops = [...film.querySelectorAll(".o-course-stops button")];
   // the craft reaches waypoint i exactly when chapter i begins, so it travels piecewise
   const coursePos = (time) => {
     const n = CHAPTERS.length;
-    const end = video.duration || 60;
+    const end = video.duration || 134.5;
     for (let i = n - 1; i >= 0; i--) {
       if (time >= CHAPTERS[i][0]) {
         const next = i + 1 < n ? CHAPTERS[i + 1][0] : end;

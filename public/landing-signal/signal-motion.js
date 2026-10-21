@@ -24,7 +24,7 @@
   const soon = copy.querySelector(".f-coming-soon");
   const eyebrow = el("p", "s-eyebrow", "HunterBuddy · 猎头的 AI 工作伙伴");
   title.classList.add("s-promise");
-  title.innerHTML = '<span class="s-line">给我一个难岗位，</span><span class="s-line">把该找的人找出来。</span>';
+  title.innerHTML = '<span class="s-line">从杂乱的信息里，</span><span class="s-line">找出岗位、人和时机。</span>';
   copy.prepend(eyebrow);
   statement?.remove();
   if (soon) copy.append(soon);
@@ -37,8 +37,8 @@
     { x: 0.86, y: 0.36, d: 1, ico: "&lt;/&gt;", t: "lin-yue", s: "开源社区" },
     { x: 0.66, y: 0.5, d: 0.7, ico: "司", t: "星川机器人", s: "团队页 · 视觉" },
     { x: 0.82, y: 0.64, d: 0.45, ico: "利", t: "视觉检测", s: "专利 · 发明人" },
-    { x: 0.58, y: 0.76, d: 0.8, ico: "人", t: '已有候选人 <span class="s-num" data-n="12">0</span>', s: "本轮召回" },
-    { x: 0.74, y: 0.86, d: 0.6, ico: "网", t: '公开网络 <span class="s-num" data-n="9">0</span>', s: "本轮召回" },
+    { x: 0.58, y: 0.76, d: 0.8, ico: "人", t: '你的候选人 <span class="s-num" data-n="12">0</span>', s: "这一轮找到" },
+    { x: 0.74, y: 0.86, d: 0.6, ico: "网", t: '公开网络 <span class="s-num" data-n="9">0</span>', s: "这一轮找到" },
   ];
   const wall = el("div", "s-wall");
   wall.setAttribute("aria-hidden", "true");
@@ -159,16 +159,15 @@
     rules.push(r);
   }
 
-  /* ---------------- 产品短片《寻人启事》: its own story, not a replay of this page ---------------- */
+  /* ---------------- 产品短片: two minutes with one company ---------------- */
   const CHAPTERS = [
-    [2, "一则启事"],
-    [8, "对的人"],
-    [16, "读完其余版面"],
-    [28, "一页人物档案"],
-    [33, "脚注与待确认"],
-    [46, "签发由你"],
+    [10, "发现新岗位"],
+    [36.5, "摸清团队"],
+    [61, "为岗位找人"],
+    [89.5, "为人选找机会"],
+    [112, "人和关系都存下来了"],
   ];
-  const mmss = (s) => `00:${String(Math.floor(s)).padStart(2, "0")}`;
+  const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
   const film = el("section", "s-film");
   film.id = "film";
   film.setAttribute("aria-labelledby", "s-film-title");
@@ -176,11 +175,11 @@
     <div class="f-container">
       <div class="s-section-label s-film-label">产品短片</div>
       <div class="s-film-head">
-        <h2 id="s-film-title"><span>一则挂了三个月的</span><span>寻人启事。</span></h2>
-        <p>对的人，不看招聘启事。六十秒里，HunterBuddy 读完其余所有版面，把散在三处、用着三个名字的同一个人，排成一页带脚注的人物档案；不知道的，写“待确认”。签发，由你。建议打开声音观看。</p>
+        <h2 id="s-film-title"><span class="ln">两分钟，</span><span class="ln">跟着一家公司走一遍。</span></h2>
+        <p>周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到岗位、摸清团队、找到人选，半年后又帮候选人找到下一个机会。建议打开声音。</p>
       </div>
       <figure class="s-film-frame">
-        <video data-film src="assets/hunterbuddy-signal.mp4" poster="assets/signal-film-poster.jpg" controls playsinline preload="metadata" aria-label="HunterBuddy 60 秒产品短片《寻人启事》"></video>
+        <video data-film src="assets/hunterbuddy-signal.mp4?v=20261021" poster="assets/signal-film-poster.jpg?v=20261021" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
       </figure>
       <ol class="s-chapters" aria-label="短片章节">${CHAPTERS.map(
         ([t, name], i) =>
@@ -194,6 +193,15 @@
     rules.push(r);
   }
   const video = film.querySelector("video");
+  /* the film shows its cover with no player controls until someone starts it */
+  if (video) {
+    video.removeAttribute("controls");
+    video.tabIndex = 0;
+    const start = () => { video.controls = true; video.play()?.catch?.(() => {}); };
+    video.addEventListener("click", () => { if (!video.controls) start(); });
+    video.addEventListener("keydown", (e) => { if (!video.controls && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); start(); } });
+    video.addEventListener("play", () => { video.controls = true; });
+  }
   const chapterButtons = [...film.querySelectorAll(".s-chapters button")];
   const markChapter = (index) => chapterButtons.forEach((b, i) => b.setAttribute("aria-pressed", String(i === index)));
   chapterButtons.forEach((b, i) =>

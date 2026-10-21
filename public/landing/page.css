@@ -925,3 +925,6 @@ body::after {
     transform: none !important;
   }
 }
+
+/* 2026-10-21 · the two-line hero lead keeps each sentence on its own line */
+.f-hero-description { max-width: 490px; }

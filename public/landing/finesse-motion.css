@@ -507,3 +507,15 @@
     transition: none;
   }
 }
+
+/* 2026-10-21 · 第五版 rules: a calmer hero, and one size for every section heading with no mid-line wraps */
+#homepage.fx-on .f-hero h1.fx-promise { font-size: clamp(36px, 3.8vw, 52px); }
+#homepage :is(.fx-film-head h2, .f-work-intro h2, .p-intro h2, .f-memory h2, .f-about h2) { font-size: min(46px, calc((min(100vw, 1440px) - 96px) / 21)); }
+#homepage :is(h2 .ln, .p-intro h2 > span, .fx-film-head h2 span) { white-space: nowrap; }
+@media (max-width: 900px) {
+  #homepage :is(.fx-film-head h2, .f-work-intro h2, .p-intro h2, .f-memory h2, .f-about h2) { font-size: min(32px, calc((100vw - 40px) / 12.4)); }
+  #homepage :is(h2 .ln, .p-intro h2 > span, .fx-film-head h2 span) { white-space: normal; }
+}
+@media (max-width: 800px) {
+  #homepage.fx-on .f-hero h1.fx-promise { font-size: min(36px, calc((100vw - 40px) / 10.6)); }
+}

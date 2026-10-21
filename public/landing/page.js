@@ -24,8 +24,10 @@
       <div class="f-container f-header-inner">
         <a href="#main" aria-label="铂寻 Boseek 首页">${ui.brand()}</a>
         <nav class="f-nav" id="f-navigation" aria-label="主导航">
-          <a href="#work">业务场景</a>
-          <a href="#research">决策支持</a>
+          <a href="#film">产品短片</a>
+          <a href="#work">能做什么</a>
+          <a href="#research">工作方式</a>
+          <a href="#assets">人和关系</a>
           <a href="#about">关于铂寻</a>
         </nav>
         <div class="f-header-actions">
@@ -48,10 +50,10 @@
         <div class="f-container f-hero-inner">
           <div class="f-hero-copy">
             <h1 id="f-hero-title">HunterBuddy</h1>
-            ${trial ? '<p class="f-coming-soon">产品开发中，即将上线</p>' : ""}
+            ${trial ? '<p class="f-coming-soon">正在开发中，邀请制试用申请已开放</p>' : ""}
             <p class="f-hero-statement">猎头的 AI 工作伙伴</p>
-            <p class="f-hero-description">围绕岗位跨渠道找人，整理身份、经历与匹配依据。<br />关联公司、岗位和专业成果，让研究持续积累，把关键判断留给你。</p>
-            <div class="f-hero-actions">${trial ? ui.button("申请试用", "#apply") + ui.button("查看场景", "#work", true) : ui.button("查看场景", "#work")}</div>
+            <p class="f-hero-description">一条融资新闻、一份旧简历、一次主页变动，连起来就是下一个机会。<br class="bd" />HunterBuddy 替你找线索、连关系，联系谁、何时开口，你说了算。</p>
+            <div class="f-hero-actions">${trial ? ui.button("申请试用", "#apply") + ui.button("看看能做什么", "#work", true) : ui.button("看看能做什么", "#work")}</div>
           </div>
         </div>
       </section>
@@ -59,17 +61,17 @@
       <section class="f-work" id="work" tabindex="-1" aria-labelledby="f-work-title">
         <div class="f-container">
           <div class="f-work-intro">
-            <h2 id="f-work-title">从找人到找机会，<br />把工作接起来。</h2>
-            <p>一个岗位、一家目标公司或一位候选人，都可以成为工作的起点。</p>
-            <p>HunterBuddy 沿着你的目标查找资料、关联人物与公司，把分散的信息整理成有依据的人选、客户线索、人才版图和岗位机会。</p>
+            <h2 id="f-work-title"><span class="ln">猎头每天在做的四件事，</span><br /><span class="ln">它都能帮上忙。</span></h2>
+            <p>下面用星川机器人这一家公司，把四件事走一遍。</p>
+            <p>做猎头不只是找人：先要发现谁在招，再摸清对方的团队，然后找到合适的人。手上的候选人想动了，还要帮他找下一个机会。</p>
           </div>
           <div class="f-work-demo">
-            <div class="f-tabs" role="tablist" aria-label="猎头业务场景">
+            <div class="f-tabs" role="tablist" aria-label="四件事">
               ${data.works.map((work, index) => `<button type="button" class="f-tab" id="f-work-tab-${work.id}" role="tab" aria-selected="${index === 0}" aria-controls="f-work-panel" tabindex="${index === 0 ? 0 : -1}">${e(work.label)}</button>`).join("")}
             </div>
             <div class="f-work-panel" id="f-work-panel" role="tabpanel" tabindex="0" aria-labelledby="f-work-tab-${e(data.works[0].id)}"></div>
             <div class="f-work-bottom">
-              <button type="button" class="f-text-link" data-evidence>查看研究依据 ${ui.icon("chevronRight")}</button>
+              <button type="button" class="f-text-link" data-evidence>查看结果和来源 ${ui.icon("chevronRight")}</button>
             </div>
           </div>
         </div>
@@ -84,13 +86,13 @@
           : `<section class="f-process" id="research" tabindex="-1" aria-labelledby="f-research-title">
         <div class="f-container">
           <div class="f-process-heading">
-            <h2 id="f-research-title">看得更清楚，<br />走得更从容。</h2>
-            <p>研究不只是一份名单。每条线索的来由、每个尚未确认的问题，都和下一步一起留下。</p>
+            <h2 id="f-research-title"><span class="ln">理由和来源写在一起，</span><br /><span class="ln">拿不准的单独列出来。</span></h2>
+            <p>每个判断都写着从哪来，没查到的不会被当成事实。联系谁、怎么说，还是由你来定。</p>
           </div>
           <div class="f-process-grid">
             <figure class="f-process-visual">
               <div class="f-process-photo"><img src="assets/research-detail.webp" alt="猎头用蓝色笔核对三份人选资料，纸张与研究笔记整齐排列" width="1586" height="992" loading="lazy" /></div>
-              <figcaption class="f-process-caption"><strong data-step-caption>看见线索</strong><span data-step-detail>市场变化与已有资料</span></figcaption>
+              <figcaption class="f-process-caption"><strong data-step-caption>看见线索</strong><span data-step-detail>新动向和手上的资料</span></figcaption>
             </figure>
             <div class="f-process-steps">
               <span class="f-process-rail" aria-hidden="true"><span></span></span>
@@ -101,10 +103,10 @@
       </section>`
       }
 
-      <section class="f-memory" aria-labelledby="f-memory-title">
+      <section class="f-memory" id="assets" tabindex="-1" aria-labelledby="f-memory-title">
         <div class="f-container">
-          <h2 id="f-memory-title">做过的研究，<br />不必从头再来。</h2>
-          <p>不只是保存五类资料，更把职业经历、招聘需求、人物角色与技术成果连在一起。<br />找信息、找人、找岗位，都能从已有研究继续出发。</p>
+          <h2 id="f-memory-title"><span class="ln"><span class="ph">查过的人和公司</span><span class="ph">都存下来了，</span></span><br /><span class="ln"><span class="ph">谁和谁是什么关系，</span><span class="ph">也存下来了。</span></span></h2>
+          <p>四件事查过的公司、岗位和人，都存下来了。谁在哪家公司待过、谁和谁一起写过论文、谁能帮你引荐谁，这些关系也都存着。资料一更新，这些关系和匹配也跟着更新，没确认的会一直标着“待确认”。</p>
           ${network.render(data.resources, data.assetNetwork, { layout: "split" })}
         </div>
       </section>
@@ -112,10 +114,10 @@
       <section class="f-about" id="about" tabindex="-1" aria-labelledby="f-about-title">
         <div class="f-container">
           <div class="f-about-copy">
-            <h2 id="f-about-title">铂寻，<wbr />为猎头化繁解难</h2>
-            <p>铂寻为独立猎头与精品团队打造 HunterBuddy。</p>
-            <p>我们希望 AI 承接繁琐的资料查找与整理，让猎头把更多时间留给理解客户、判断人才和建立信任。</p>
-            <p>工具连接信息，专业判断与人与人的沟通，始终由你掌握。</p>
+            <h2 id="f-about-title"><span class="ln">铂寻，</span><wbr /><span class="ln">为猎头化繁解难</span></h2>
+            <p>猎头最值钱的时间，应该花在理解客户、判断人才和建立信任上，而不是一页页翻资料。</p>
+            <p>铂寻为独立猎头和资深顾问打造 HunterBuddy，让 AI 承接繁琐的查找与整理，把这些时间还给你。</p>
+            <p>工具负责连接信息，专业判断与人与人的沟通，始终由你掌握。</p>
           </div>
         </div>
         <figure class="f-about-image"><img src="assets/human-conversation.webp" alt="自然光下，亚洲猎头与专业人士认真讨论资料" width="1916" height="821" loading="lazy" /></figure>
@@ -167,13 +169,13 @@
       return `${title}<table class="f-roles"><thead><tr><th>团队</th><th>关键岗位</th><th>当前线索</th></tr></thead><tbody>${work.rows.map((row) => `<tr><td data-label="团队">${e(row.title)}</td><td data-label="关键岗位">${e(row.label)}</td><td data-label="当前线索">${e(row.copy)}</td></tr>`).join("")}</tbody></table>`;
     }
     if (work.type === "people") {
-      return `${title}<ul class="f-result-list f-people-list">${work.rows.map((row) => `<li><div><strong>${e(row.title)}</strong><small>${e(row.label)}</small></div><div class="f-person-evidence"><p>推荐依据：${e(row.copy)}</p>${row.followUp ? `<p>仍需了解：${e(row.followUp)}</p>` : ""}</div></li>`).join("")}</ul>`;
+      return `${title}<ul class="f-result-list f-people-list">${work.rows.map((row) => `<li><div><strong>${e(row.title)}</strong><small>${e(row.label)}</small></div><div class="f-person-evidence"><p>为什么合适：${e(row.copy)}</p>${row.followUp ? `<p>待确认：${e(row.followUp)}</p>` : ""}</div></li>`).join("")}</ul>`;
     }
     return `${title}<ul class="f-result-list">${work.rows.map((row) => `<li><small>${e(row.label)}</small><strong>${e(row.title)}</strong><p>${e(row.copy)}</p></li>`).join("")}</ul>`;
   }
 
   function workMarkup(work) {
-    return `<div class="f-work-lead"><p class="f-work-context">${e(work.context)}</p><h3>${e(work.headline)}</h3><p>${e(work.description)}</p>${work.descriptionDetail ? `<p>${e(work.descriptionDetail)}</p>` : ""}</div><div class="f-result">${resultMarkup(work)}</div>`;
+    return `<div class="f-work-lead"><p class="f-work-context">${e(work.context)}</p><h3>${work.headline.split(/(?<=，)/).map((part) => `<span class="ph">${e(part)}</span>`).join("")}</h3><p>${e(work.description)}</p>${work.descriptionDetail ? `<p>${e(work.descriptionDetail)}</p>` : ""}</div><div class="f-result">${resultMarkup(work)}</div>`;
   }
 
   function renderWork(index) {
@@ -193,7 +195,44 @@
   }
 
   ui.mountNavigation(root.querySelector(".f-header"));
-  ui.mountTabs(root.querySelector(".f-tabs"), panel, renderWork);
+  const workTabs = ui.mountTabs(root.querySelector(".f-tabs"), panel, renderWork);
+
+  /* the four tabs step through by themselves (a thin line under the open tab fills as its turn runs out);
+     clicking a tab jumps straight to it and the rotation carries on from there. Pointing the mouse at the
+     panel holds it while you read. Reduced motion stays manual. */
+  {
+    const DWELL = 9000;
+    const tabList = root.querySelector(".f-work-demo .f-tabs");
+    const tabButtons = [...tabList.querySelectorAll("[role='tab']")];
+    let elapsed = 0, last = 0, visible = false, looping = false, reading = false;
+    const setP = () => tabButtons.forEach((t, i) => t.style.setProperty("--p", i === activeWork ? Math.min(1, elapsed / DWELL).toFixed(4) : 0));
+    const tick = (now) => {
+      const dt = Math.min(now - last, 100);
+      last = now;
+      if (!reduced.matches && !reading && !document.hidden) {
+        elapsed += dt;
+        if (elapsed >= DWELL) {
+          elapsed = 0;
+          workTabs.select((activeWork + 1) % tabButtons.length);
+        }
+        setP();
+      }
+      if (visible) requestAnimationFrame(tick);
+      else looping = false;
+    };
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (!visible || looping) return;
+      looping = true;
+      last = performance.now();
+      requestAnimationFrame(tick);
+    }, { threshold: 0.2 }).observe(panel);
+    const restart = () => { elapsed = 0; setP(); };
+    tabButtons.forEach((tab) => tab.addEventListener("click", restart));
+    tabList.addEventListener("keydown", restart);
+    panel.addEventListener("pointerenter", (event) => { if (event.pointerType === "mouse") reading = true; });
+    panel.addEventListener("pointerleave", (event) => { if (event.pointerType === "mouse") reading = false; });
+  }
   ui.mountStablePanel(panel, data.works.map(workMarkup));
   network.mount(
     root.querySelector(".f-asset-network"),
@@ -213,8 +252,8 @@
       .map((question) => `<li><p>${e(question)}</p></li>`)
       .join("");
     dialog.open(
-      `${work.label} · 研究依据`,
-      `<h3>来源与判断</h3><ul class="f-evidence-list">${sources}</ul><h3>仍需核实</h3><ul class="f-evidence-list">${questions}</ul>`,
+      `${work.label} · 结果和来源`,
+      `<h3>交给你的结果</h3><ul class="f-evidence-list">${sources}</ul><h3>还要你确认</h3><ul class="f-evidence-list">${questions}</ul>`,
       event.currentTarget,
     );
   });
