@@ -1,16 +1,16 @@
 <svg overflow="visible" style="display: block;" width="300" height="107" viewBox="95 297 732 262" fill="none" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <linearGradient id="b5-icon" gradientUnits="userSpaceOnUse" x1="112" y1="300" x2="330" y2="510">
-<stop offset="0" stop-color="#7653ad"/><stop offset=".26" stop-color="#946ab6"/><stop offset=".34" stop-color="#dcc3e4"/><stop offset=".4" stop-color="#a274b0"/><stop offset=".72" stop-color="#c3809f"/><stop offset="1" stop-color="#d49aa8"/>
+<stop offset="0" stop-color="#2a46a2"/><stop offset=".2" stop-color="#3256b6"/><stop offset=".245" stop-color="#4369c0"/><stop offset=".27" stop-color="#476bc2"/><stop offset=".31" stop-color="#3960bf"/><stop offset=".34" stop-color="#3159b4"/><stop offset=".5" stop-color="#396bca"/><stop offset=".63" stop-color="#4175d0"/><stop offset=".665" stop-color="#3e70c4"/><stop offset=".76" stop-color="#4a82d1"/><stop offset=".89" stop-color="#558fd2"/><stop offset="1" stop-color="#5a95d4"/>
 </linearGradient>
 <linearGradient id="b5-moon" gradientUnits="userSpaceOnUse" x1="240" y1="400" x2="290" y2="460">
-<stop offset="0" stop-color="#f7dc8f"/><stop offset="1" stop-color="#e6b552"/>
+<stop offset="0" stop-color="#ffa184"/><stop offset=".55" stop-color="#ff9e7e"/><stop offset=".62" stop-color="#fd9372"/><stop offset="1" stop-color="#fe9473"/>
 </linearGradient>
 <linearGradient id="b5-word" gradientUnits="userSpaceOnUse" x1="440" y1="340" x2="820" y2="460">
-<stop offset="0" stop-color="#4c3b8e"/><stop offset=".45" stop-color="#6e3f88"/><stop offset=".62" stop-color="#7b3f7a"/><stop offset="1" stop-color="#7a3349"/>
+<stop offset="0" stop-color="#22407f"/><stop offset=".5" stop-color="#29549f"/><stop offset="1" stop-color="#3568b0"/>
 </linearGradient>
 <linearGradient id="b5-cn" gradientUnits="userSpaceOnUse" x1="540" y1="480" x2="700" y2="560">
-<stop offset="0" stop-color="#5a4584"/><stop offset="1" stop-color="#7d4a68"/>
+<stop offset="0" stop-color="#3e527a"/><stop offset="1" stop-color="#536e93"/>
 </linearGradient>
 </defs>
 

@@ -8,7 +8,8 @@
    The website's language, carried over:
    - near-black grounds (#090a0b / #0f1011 / #191a1c) and, for light, a quiet paper grey;
    - monochrome actions: the primary button is a solid ink (white on dark, near-black on light);
-   - one brand hue, the logo's iris/lavender, for small accents, links, selection and info;
+   - the B5 bo logo's lake blue for accents, links, selection, info and the current-item marks,
+     and its coral crescent for small highlights (the live wire in empty states, unread badges);
    - hairline borders instead of shadows, 8px controls, 4px tooltips, pill-shaped chips;
    - DM Serif Display / Song serif for page titles, a mono kicker above them;
    - underline tabs, the research-network drawing for empty states, a slow light sweep for loading.
@@ -37,12 +38,15 @@
   --b-ink-fill-hover: #2c2c2f;
   --b-on-ink: #ffffff;
   --b-focus: rgba(15, 16, 17, 0.38);
-  --b-kicker: #5b50c8;
+  --b-kicker: #2f5bb8;
+  --b-coral: #e0694a;
+  --b-coral-ink: #b44c32;
+  --b-badge: #d95b3d;
   --b-sweep: rgba(255, 255, 255, 0.7);
 
-  --s1-accent: #5b50c8;
-  --s1-accent-hover: #4a40b0;
-  --s1-accent-soft: #efedfa;
+  --s1-accent: #2f5bb8;
+  --s1-accent-hover: #264b9b;
+  --s1-accent-soft: #edf2fb;
   --s1-action-fill: var(--b-ink-fill);
   --s1-action-fill-hover: var(--b-ink-fill-hover);
   --s1-action-border: var(--b-ink-fill);
@@ -68,7 +72,7 @@
   --s1-nav-active-ink: #0f1011;
   --s1-nav-line: #e2e2e6;
   --s1-nav-badge: #e4e4e8;
-  --s1-nav-avatar: #e6e3f7;
+  --s1-nav-avatar: #e3eaf7;
   --s1-success: #1b7a50;
   --s1-success-soft: #eaf5ef;
   --s1-warning: #93650a;
@@ -92,12 +96,15 @@
   --b-ink-fill-hover: #d9d9db;
   --b-on-ink: #0f1011;
   --b-focus: rgba(245, 245, 247, 0.42);
-  --b-kicker: #a9a2e0;
+  --b-kicker: #8fb4ea;
+  --b-coral: #ff9473;
+  --b-coral-ink: #ff9f80;
+  --b-badge: #ff8466;
   --b-sweep: rgba(255, 255, 255, 0.07);
 
-  --s1-accent: #b9b1f2;
-  --s1-accent-hover: #d1c9ff;
-  --s1-accent-soft: #1c1b28;
+  --s1-accent: #8fb4ea;
+  --s1-accent-hover: #b3cff4;
+  --s1-accent-soft: #141c2b;
   --s1-action-fill: var(--b-ink-fill);
   --s1-action-fill-hover: var(--b-ink-fill-hover);
   --s1-action-border: var(--b-ink-fill);
@@ -123,7 +130,7 @@
   --s1-nav-active-ink: #ffffff;
   --s1-nav-line: #1e1f21;
   --s1-nav-badge: #232427;
-  --s1-nav-avatar: #2a2838;
+  --s1-nav-avatar: #1d2a40;
   --s1-success: #9de1bc;
   --s1-success-soft: #12211a;
   --s1-warning: #e7c27a;
@@ -309,7 +316,7 @@
 
 .s1-icon-button em {
   color: #ffffff;
-  background: #d24b3f;
+  background: var(--b-badge);
 }
 
 .s1-spinner {
@@ -407,7 +414,7 @@
 }
 
 .s1-toast-info > svg {
-  color: #b9b1f2;
+  color: #8fb4ea;
 }
 
 .s1-toast-error > svg {
@@ -534,7 +541,7 @@
 }
 
 .s1-empty-net .w.live {
-  stroke: var(--s1-accent);
+  stroke: var(--b-coral);
   stroke-dasharray: 3 7;
   stroke-width: 1.4;
   animation: s1-wire-flow 1.6s linear infinite;
@@ -547,7 +554,7 @@
 }
 
 .s1-empty-net .n.on {
-  fill: var(--s1-accent);
+  fill: var(--b-coral);
   stroke: none;
 }
 
@@ -698,7 +705,7 @@
 .s2-signal-tabs.app-tabs > button.is-active {
   color: var(--s1-ink);
   font-weight: 500;
-  border-bottom-color: var(--s1-ink);
+  border-bottom-color: var(--s1-accent);
 }
 
 .app-tabs > button:focus-visible {
@@ -800,22 +807,22 @@
 /* ---------------------------------------------------------------- the website's palette for categories and identity */
 :root,
 .s1-app {
-  --b-cat-iris: #5b50c8;
+  --b-cat-iris: #2f5bb8;
   --b-cat-cyan: #0b7891;
-  --b-cat-blue: #3a68ad;
-  --b-cat-orchid: #a1479b;
+  --b-cat-blue: #b44c32;
+  --b-cat-orchid: #6d4fb0;
   --b-cat-amber: #93650a;
-  /* the logo's gradient, used for people and for the new-task mark */
-  --b-brand-gradient: linear-gradient(135deg, #7653ad 0%, #946ab6 34%, #a274b0 46%, #c3809f 78%, #d49aa8 100%);
+  /* the bo's lake-blue gradient, used for people and for the new-task mark */
+  --b-brand-gradient: linear-gradient(135deg, #2a46a2 0%, #3159b4 34%, #396bca 58%, #4f88d1 84%, #5a95d4 100%);
 }
 
 .s1-app[data-theme="dark"] {
-  --b-cat-iris: #b9b1f2;
+  --b-cat-iris: #8fb4ea;
   --b-cat-cyan: #5cc9e0;
-  --b-cat-blue: #90b8f0;
-  --b-cat-orchid: #dd90d8;
+  --b-cat-blue: #ff9f80;
+  --b-cat-orchid: #c3a6f0;
   --b-cat-amber: #e7c27a;
-  --b-brand-gradient: linear-gradient(135deg, #8f74c8 0%, #a983c9 40%, #c58cb3 78%, #d39aae 100%);
+  --b-brand-gradient: linear-gradient(135deg, #3554b0 0%, #3e6cc6 45%, #4f88d1 75%, #6aa3de 100%);
 }
 
 .tg-node.is-person .tg-node-kind {
@@ -883,4 +890,21 @@
 .s2-new-work-inner > header h1 {
   font-size: 30px;
   line-height: 40px;
+}
+
+/* ---------------------------------------------------------------- the current nav item carries a lake-blue mark, like the bo */
+.s1-nav-section nav > button.is-active::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--s1-accent);
+}
+
+.nav-collapsed .s1-nav-section nav > button.is-active::before {
+  top: 10px;
+  bottom: 10px;
 }
