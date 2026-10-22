@@ -54,7 +54,7 @@
 - 站点地图与收录提交（2026-10-23）：Google、Bing 提交 sitemap 成功；百度用普通收录 API 提交首页成功（success 1，当日剩余 9）。API 由用户在自己电脑上用 curl 调用，token 不进仓库。
 - 跳转（2026-10-23 已修）：阿里云新增 A 记录 `@ → 59.110.28.161`，证书覆盖 boseekai.com；`http://www.boseekai.com/`、`http(s)://boseekai.com/` 都 301 到 `https://www.boseekai.com/`，保留路径。Google 验证用的 TXT 记录仍在。
 
-### 第二批：英文版 `/en/`（2026-10-23，待验收）
+### 第二批：英文版 `/en/`（2026-10-23，已验收）
 决定：
 - 不按浏览器语言自动跳转，只保留切换按钮。
 - 英文标题：HunterBuddy · AI assistant for recruiters: talent mapping and sourcing | Boseek
