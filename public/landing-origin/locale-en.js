@@ -19,9 +19,9 @@ window.OriginEnglishCatalog = {
   "从杂乱的信息里，": "Connect the dots.",
   "找出岗位、人和时机。": "Find your next opportunity.",
   "一条融资新闻、一份旧简历、一次主页变动，连起来就是下一个机会。":
-    "A funding announcement. A CV in your database. A profile update. Connect them, and a new opportunity comes into focus.",
+    "A funding round. An old CV. A profile update. Connected, they point to your next opportunity.",
   "HunterBuddy 替你找线索、连关系，联系谁、何时开口，你说了算。":
-    "HunterBuddy researches the market and maps the relationships. You choose who to approach and when.",
+    "HunterBuddy finds the leads and maps the relationships. You decide who to approach, and when.",
   "猎头每天在做的四件事，": "Four essential tasks.",
   "它都能帮上忙。": "One connected workflow.",
   "下面用星川机器人这一家公司，把四件事走一遍。":
@@ -35,17 +35,17 @@ window.OriginEnglishCatalog = {
   "产品短片 · 两分钟": "A two-minute overview",
   "两分钟，": "One company.",
   "跟着一家公司走一遍。": "Every step, connected.",
-  "周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到职位、做出人才地图、寻访到人选，半年后又帮人选找到下一个机会。建议打开声音。":
-    "A funding announcement from Xingchuan Robotics sets things in motion: a new search, a talent map, then a longlist. Six months later, that research helps a candidate explore their next move. Watch with sound.",
+  "从一条融资新闻出发，看 HunterBuddy 怎么帮你拿到职位、做出人才地图、寻访到人选，半年后再帮人选找到下一个机会。建议打开声音。":
+    "From one funding announcement to a new search, a talent map and a longlist. Six months later, the same research helps a candidate find their next move. Watch with sound.",
   "HunterBuddy 两分钟产品短片": "HunterBuddy two-minute product video",
   短片章节: "Video chapters",
   人和关系都存下来了: "Research and relationships, saved",
   "理由和来源写在一起，": "See the evidence.",
   "拿不准的单独列出来。": "See what needs checking.",
   "每个判断都写着从哪来，没查到的不会被当成事实。":
-    "See the sources behind each finding. Missing information stays an open question, not an assumed fact.",
+    "See the source behind every finding. Missing information stays an open question.",
   "HunterBuddy 把资料整理好，联系谁、怎么说，还是由你来定。":
-    "HunterBuddy organizes the research. You decide who to contact and what to say.",
+    "",
   "每个判断都写着从哪来，没查到的不会被当成事实。联系谁、怎么说，还是由你来定。":
     "See the sources behind each finding and the questions still to resolve. You decide who to approach and what to say.",
   查过的人和公司: "Every search builds",
@@ -53,7 +53,7 @@ window.OriginEnglishCatalog = {
   "谁和谁是什么关系，": "on the last.",
   "也存下来了。": "",
   "四件事查过的公司、岗位和人，都存下来了。谁在哪家公司待过、谁和谁一起写过论文、谁能帮你引荐谁，这些关系也都存着。资料一更新，这些关系和匹配也跟着更新，没确认的会一直标着“待确认”。":
-    "Every company, role and person you research becomes a starting point for the next search. Employment history, co-authored papers and potential introductions stay connected. As records change, relationships and matches update too. Unverified details remain flagged.",
+    "Employment history, co-authored papers and potential introductions stay connected. As records change, matches update. Unverified details stay flagged.",
   "铂寻，": "Boseek.",
   为猎头化繁解难: "Clarity for recruiters.",
   "猎头最值钱的时间，应该花在理解客户、判断人才和建立信任上，而不是一页页翻资料。":
@@ -86,7 +86,7 @@ window.OriginEnglishCatalog = {
   "张远 → 许晴": "Yuan Zhang → Qing Xu",
   "直接联系不上时，你的老客户张远（星川的投资人）能帮你引荐。":
     "Your client, and a Xingchuan investor.",
-  交给你: "Your next step",
+  交给你: "Result",
   "一个确认过的岗位、一位对口联系人，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD，它就是一个正式岗位。":
     "A documented opening, the hiring manager and a backup introduction. You choose how to open the conversation. Once you have the JD and an agreed mandate, it becomes a live search.",
   用到的关系: "Research connections",
@@ -126,7 +126,7 @@ window.OriginEnglishCatalog = {
     "Do these identities match the candidates in your database?",
   "哪些空白值得下次去补？": "Which information gaps are worth filling next?",
   "JD 到手，先看你手上已经有谁。":
-    "Your next shortlist may already be in reach.",
+    "The JD is in. Start with who you already know.",
   "张远引荐之后，许晴发来视觉算法负责人的 JD，只有几行字。合适的人很少，线索也很散。":
     "Qing Xu sends the JD. HunterBuddy starts with your talent map and database, then searches papers, patents and open source.",
   "它不从零开始：先看人才地图里的目标团队、这类人通常从哪些公司出来、你库里谁最接近，再去网上、论文专利和开源社区补齐。简历里的林越、论文里的 Lin Y. 和开源社区的 lin-yue，核对后发现是同一个人。":
@@ -209,23 +209,23 @@ window.OriginEnglishCatalog = {
   "一家公司在扩张，先找岗位，再找对口的人。":
     "Find the opening. Reach the hiring manager.",
   "一家公司在扩张：先找到具体岗位，再找对口的联系人。联系不上，再请熟人引荐。":
-    "Find a specific role, then the hiring manager. If direct contact is not possible, look for a warm introduction.",
+    "If direct contact is not possible, look for a warm introduction.",
   "招聘页上的岗位不等于客户已经委托。还在不在招、谁说了算，要你去确认。":
     "A job posting is a lead, not a mandate. Confirm that the role is live and identify the decision-maker.",
   "一家公司，按团队一层层排好。": "One company, mapped team by team.",
   "想摸清一家公司：按团队和关键岗位排好，把在职的人和你库里的候选人对上号。":
-    "Map teams and key roles, then match current employees to the candidates you already know.",
+    "Match current employees to the candidates you already know.",
   "一起写过论文的人，不会被当成上下级。团队名字和分工，还要你确认。":
     "Co-authorship does not imply a reporting line. Team names and reporting lines still need review.",
   "一个新岗位，先从目标团队里找人。": "New role. Start with the right teams.",
   "新岗位来了：先从人才地图里的目标团队找人，再用论文和专利确认专长对得上。":
-    "Source from the target teams in your talent map. Use papers and patents to assess relevant expertise.",
+    "Then use papers and patents to check the expertise.",
   "论文写得好，不等于做过量产或带过团队。本人想不想动，要你去问。":
-    "A strong publication record does not establish production or leadership experience. A conversation is still needed to understand their interest in a move.",
+    "Strong papers do not prove production or leadership experience. Ask about their interest in a move.",
   "候选人想动了，对照你在招的岗位。":
     "The right move starts with the candidate.",
   "候选人想动了：顺着他的经历和熟悉的公司，对照你手上在招的岗位。":
-    "Match the candidate's experience against your active searches and opportunities at companies in your network.",
+    "Follow their experience and the companies they know.",
   "招聘页上的岗位只是线索。需求是不是真的、本人愿不愿意、能不能推荐，要一项项确认。":
     "A job posting is only a lead. Confirm the headcount, the candidate's interest and their consent to be submitted.",
   查找路线: "Research path",

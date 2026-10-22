@@ -645,3 +645,44 @@ html:lang(en) #homepage .f-hero .f-hero-copy h1.o-promise {
   --f-panel-floor: 300px;
   align-items: center;
 }
+
+/* 2026-10-22 · research slides on phones: the photo keeps its own band at the top (the hands and papers stay in view),
+   the copy starts right under it, and the card is only as tall as the longest copy needs. */
+@media (max-width: 800px) {
+  #homepage .p-research {
+    --o-slide-photo: min(60vw, 320px);
+    --o-slide-copy: 264px;
+  }
+  html:lang(en) #homepage .p-research {
+    --o-slide-copy: 324px;
+  }
+  #homepage .p-carousel-ready .p-photo {
+    height: calc(var(--o-slide-photo) + var(--o-slide-copy));
+    min-height: 0;
+  }
+  #homepage .p-carousel-ready .p-slide {
+    align-items: start;
+  }
+  #homepage .p-carousel-ready .p-slide img {
+    height: var(--o-slide-photo);
+  }
+  #homepage .p-carousel-ready :is(.p-slide, .p-fallback-scene)::after {
+    inset: var(--o-slide-photo) 0 0;
+  }
+  #homepage .p-carousel-ready .p-copy {
+    margin-top: var(--o-slide-photo);
+  }
+  #homepage .p-carousel-controls {
+    top: 0;
+    bottom: auto;
+    height: var(--o-slide-photo);
+  }
+}
+
+/* 2026-10-22 · section intros: balance the lines so no paragraph ends on a lone word or two characters */
+#homepage :is(.o-film-lead, .f-work-intro > p, .p-intro p, .f-memory .f-container > p, .f-about-copy p, .f-hero-description) {
+  text-wrap: balance;
+}
+html:lang(en) #homepage .f-hero-description {
+  max-width: 740px;
+}
