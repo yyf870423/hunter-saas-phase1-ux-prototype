@@ -99,6 +99,8 @@
   /* the English page plays the English cut: same timeline, so the chapter stops line up */
   const filmFile = window.FinesseLocale?.language === "en" ? "hunterbuddy-origin-en" : "hunterbuddy-origin";
   const posterFile = window.FinesseLocale?.language === "en" ? "origin-film-poster-en" : "origin-film-poster";
+  // the English film was re-cut on 2026-10-22 for more natural English; the Chinese film is unchanged
+  const filmVersion = window.FinesseLocale?.language === "en" ? "20261022-en-copy" : "20261022-terms";
   const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
   const film = el("section", "o-film");
   film.id = "film";
@@ -111,7 +113,7 @@
         <p class="o-film-lead">从一条融资新闻出发，看 HunterBuddy 怎么帮你拿到职位、做出人才地图、寻访到人选，半年后再帮人选找到下一个机会。建议打开声音。</p>
       </header>
       <figure class="o-film-frame">
-        <video data-film src="assets/${filmFile}.mp4?v=20261022-terms" poster="assets/${posterFile}.jpg?v=20261022-terms" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
+        <video data-film src="assets/${filmFile}.mp4?v=${filmVersion}" poster="assets/${posterFile}.jpg?v=${filmVersion}" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
       </figure>
       <div class="o-course" style="--p: 0">
         <div class="o-course-line" aria-hidden="true"><span class="o-course-craft"></span></div>

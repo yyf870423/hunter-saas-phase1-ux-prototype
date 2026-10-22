@@ -200,7 +200,7 @@ for (const width of [1440, 1024, 801, 390, 320]) {
       await expect(page.locator("video[data-film]")).toHaveAttribute(
         "src",
         language === "en"
-          ? "assets/hunterbuddy-origin-en.mp4?v=20261022-terms"
+          ? "assets/hunterbuddy-origin-en.mp4?v=20261022-en-copy"
           : "assets/hunterbuddy-origin.mp4?v=20261022-terms",
       );
       if (language === "zh")
