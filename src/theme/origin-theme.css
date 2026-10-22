@@ -555,6 +555,10 @@
   font-size: 15px;
 }
 
+.s1-empty-state:not(.is-compact) h2 {
+  margin-top: 18px;
+}
+
 .s1-empty-mark {
   position: relative;
   display: grid;
@@ -927,8 +931,8 @@
 .s1-app:not(.nav-expanded) .s1-nav-section nav > button:has(em[data-tone="new"])::after {
   content: "";
   position: absolute;
-  top: 7px;
-  right: 7px;
+  top: 9px;
+  right: 11px;
   width: 6px;
   height: 6px;
   background: var(--b-coral);
