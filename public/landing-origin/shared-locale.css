@@ -68,6 +68,19 @@ html:lang(en) #homepage .f-about-copy h2 {
 html:lang(en) .f-memory h2 .ph {
   display: inline;
 }
+html:lang(en) .o-scenario-tabs .f-tab {
+  height: auto;
+  min-height: 48px;
+  line-height: 1.4;
+  white-space: normal;
+}
+html:lang(en) .o-scenario-tabs .f-tab > span:not(.o-tab-icon) {
+  min-width: 0;
+  text-wrap: balance;
+}
+html:lang(en) .f-network-split .f-network-tabs {
+  grid-template-columns: repeat(4, minmax(min-content, 1fr));
+}
 html:lang(en) .f-network-split .f-network-tabs .f-tab {
   font-size: 13px;
 }
