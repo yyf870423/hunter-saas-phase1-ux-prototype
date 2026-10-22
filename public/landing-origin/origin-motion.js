@@ -71,6 +71,183 @@
   reduced.addEventListener?.("change", cloudsOn);
   cloudsOn();
 
+  /* ---------------- hero: three signals rise out of the cloud sea, join into one course, and light the name ----------------
+     The headline says it: a funding round, an old CV, a profile update — on their own easy to miss, connected they point
+     to the next opportunity. Same language as the film's cold open and the knowledge network. Decoration only (aria-hidden);
+     drawn on one canvas between the clouds and the copy; paused off-screen; reduced motion gets the finished picture. */
+  (() => {
+    const canvas = el("canvas", "o-signals");
+    canvas.setAttribute("aria-hidden", "true");
+    fly.before(canvas);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const en = window.FinesseLocale?.language === "en";
+    const LABELS = en ? ["Funding news", "A CV from two years ago", "Profile update"] : ["融资新闻", "两年前的简历", "主页变动"];
+    const IRIS = "209,201,255";
+    const ORCHID = "221,144,216";
+    let W = 0, H = 0, dpr = 1, pts = [], stars = [], markAt = null, phone = false;
+    let seed = 7;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const soft = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+    const out3 = (x) => 1 - Math.pow(1 - clamp(x), 3);
+    const inout = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+    // a quadratic course between two points, bowed downward by `bow` px
+    const qpt = (a, b, bow, u) => {
+      const cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2 + bow, v = 1 - u;
+      return { x: v * v * a.x + 2 * v * u * cx + u * u * b.x, y: v * v * a.y + 2 * v * u * cy + u * u * b.y };
+    };
+    const layout = () => {
+      const hr = hero.getBoundingClientRect();
+      W = Math.round(hr.width); H = Math.round(hr.height);
+      if (!W || !H) return;
+      dpr = Math.min(2, devicePixelRatio || 1);
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = `${W}px`; canvas.style.height = `${H}px`;
+      phone = W < 640;
+      const rel = (n) => { const r = n.getBoundingClientRect(); return { l: r.left - hr.left, r: r.right - hr.left, t: r.top - hr.top, b: r.bottom - hr.top, cx: (r.left + r.right) / 2 - hr.left, cy: (r.top + r.bottom) / 2 - hr.top }; };
+      // copy moves with scroll; measure it at rest
+      const moved = copy.style.transform; copy.style.transform = "";
+      const actions = hero.querySelector(".f-hero-actions") || copy;
+      const a = rel(actions), m = rel(mark);
+      copy.style.transform = moved;
+      markAt = { x: m.cx, y: m.cy, w: m.r - m.l, h: m.b - m.t };
+      const band = Math.max(60, H - a.b);           // the cloud band under the buttons
+      if (phone) {
+        pts = [
+          { x: W * 0.16, y: a.b + band * 0.42 },
+          { x: W * 0.5, y: a.b + band * 0.74 },
+          { x: W * 0.84, y: a.b + band * 0.46 },
+        ];
+      } else {
+        // two signals out in the open sky beside the copy, one in the clouds under the buttons
+        const side = Math.max(56, (W - (a.r - a.l)) * 0.16);
+        pts = [
+          { x: Math.max(64, W * 0.13), y: Math.min(H - 70, a.t + (a.b - a.t) * 0.2) },
+          { x: W * 0.5, y: a.b + band * 0.5 },
+          { x: Math.min(W - 64, W * 0.87), y: Math.min(H - 70, a.t - (a.b - a.t) * 0.6) },
+        ];
+        void side;
+      }
+      seed = 7;
+      const n = phone ? 34 : 78;
+      stars = Array.from({ length: n }, () => ({ x: rnd() * W, y: rnd() * H * 0.58, r: 0.35 + rnd() * 1.05, a: 0.18 + rnd() * 0.5, tw: rnd() * 6.28 }));
+    };
+    const dot = (x, y, r, rgb, a, halo) => {
+      if (a <= 0.003) return;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, halo);
+      g.addColorStop(0, `rgba(${rgb},${0.9 * a})`);
+      g.addColorStop(0.35, `rgba(${rgb},${0.32 * a})`);
+      g.addColorStop(1, `rgba(${rgb},0)`);
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, halo, 0, 6.283); ctx.fill();
+      ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill();
+    };
+    const course = (p, alpha) => {
+      if (p <= 0 || alpha <= 0.003) return;
+      const g = ctx.createLinearGradient(pts[0].x, 0, pts[2].x, 0);
+      g.addColorStop(0, `rgba(${ORCHID},${alpha})`);
+      g.addColorStop(1, `rgba(${IRIS},${alpha})`);
+      const N = 60, segs = [[pts[0], pts[1]], [pts[1], pts[2]]];
+      const path = () => {
+        ctx.beginPath();
+        let first = true;
+        segs.forEach(([a, b], k) => {
+          const local = clamp(p * 2 - k);
+          for (let i = 0; i <= N * local; i++) { const q = qpt(a, b, phone ? 10 : 34, i / N); first ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y); first = false; }
+        });
+      };
+      ctx.lineCap = "round";
+      ctx.save(); ctx.globalAlpha = 0.35; ctx.strokeStyle = g; ctx.lineWidth = 5; ctx.shadowColor = `rgba(${ORCHID},.9)`; ctx.shadowBlur = 12;
+      path(); ctx.stroke(); ctx.restore();
+      ctx.strokeStyle = g; ctx.lineWidth = 1.8; ctx.setLineDash([3, 7]);
+      path(); ctx.stroke(); ctx.setLineDash([]);
+    };
+    const along = (u) => (u < 0.5 ? qpt(pts[0], pts[1], phone ? 10 : 34, u * 2) : qpt(pts[1], pts[2], phone ? 10 : 34, u * 2 - 1));
+    const label = (i, a) => {
+      if (a <= 0.01) return;
+      const p = pts[i];
+      ctx.font = `500 ${phone ? 11 : 13}px "Boseek Sans", "PingFang SC", "Microsoft YaHei", sans-serif`;
+      ctx.fillStyle = `rgba(232,228,255,${0.92 * a})`;
+      ctx.shadowColor = "rgba(0,0,0,.8)"; ctx.shadowBlur = 10;
+      const right = i === 2;
+      ctx.textAlign = right ? "right" : "left";
+      ctx.fillText(LABELS[i], p.x + (right ? -14 : 14), p.y - 10);
+      ctx.shadowBlur = 0;
+    };
+    let t0 = performance.now(), frame = 0, visible = true;
+    const draw = (t) => {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      if (!pts.length) return;
+      // stars in the open sky
+      const sky = soft((t - 0.3) / 1.4);
+      for (const s of stars) {
+        const a = s.a * sky * (0.6 + 0.4 * Math.sin(t * 0.9 + s.tw));
+        if (a < 0.02) continue;
+        ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill();
+      }
+      // the name takes the light once the signals reach it, then breathes
+      if (markAt) {
+        const bloom = soft((t - 5.4) / 0.8), settle = 1 - 0.35 * soft((t - 6.4) / 1.8);
+        const a = bloom * settle * (0.85 + 0.15 * Math.sin((t - 6.6) * 0.8));
+        if (a > 0.005) {
+          const rx = markAt.w * 0.7, ry = markAt.h * 1.7;
+          ctx.save(); ctx.translate(markAt.x, markAt.y); ctx.scale(1, ry / rx);
+          const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+          g.addColorStop(0, `rgba(${ORCHID},${0.55 * a})`);
+          g.addColorStop(0.5, `rgba(${ORCHID},${0.18 * a})`);
+          g.addColorStop(1, `rgba(${IRIS},0)`);
+          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, rx, 0, 6.283); ctx.fill(); ctx.restore();
+        }
+      }
+      // the course joins the three
+      const drawn = inout((t - 3.0) / 1.4);
+      course(drawn, 0.95);
+      // three signals rise out of the cloud sea
+      pts.forEach((p, i) => {
+        const at = 1.5 + i * 0.5, up = out3((t - at) / 0.9), a = soft((t - at) / 0.5);
+        const y = p.y + (1 - up) * 26;
+        dot(p.x, y, 3, IRIS, a * (0.85 + 0.15 * Math.sin(t * 1.6 + i * 2)), phone ? 30 : 40);
+        // a ring opens as each signal appears
+        const ring = (t - at) / 1.2;
+        if (ring > 0 && ring < 1) {
+          ctx.strokeStyle = `rgba(${IRIS},${0.6 * (1 - ring)})`; ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.arc(p.x, y, 6 + 34 * out3(ring), 0, 6.283); ctx.stroke();
+        }
+        label(i, soft((t - at - 0.3) / 0.6) * (phone && i === 1 ? 0.9 : 1));
+      });
+      // once: a spark runs the course and climbs to the name
+      const run = (t - 4.3) / 0.8;
+      if (run > 0 && run < 1) { const q = along(0.5 * inout(run)); dot(q.x, q.y, 2.6, "255,255,255", 1, 28); }
+      const climb = (t - 4.9) / 0.9;
+      if (climb > 0 && climb < 1 && markAt) {
+        const k = inout(climb), from = pts[1], to = { x: markAt.x, y: markAt.y + markAt.h * 0.2 };
+        const x = from.x + (to.x - from.x) * k, y = from.y + (to.y - from.y) * k;
+        dot(x, y, 2.6, "255,255,255", 1 - soft((climb - 0.7) / 0.3), 30);
+      }
+      // afterwards, every few seconds a light travels the course
+      const loop = t - 7.5;
+      if (loop > 0) {
+        const u = (loop % 7) / 2.6;
+        if (u < 1) { const q = along(inout(u)); dot(q.x, q.y, 2.2, "255,255,255", Math.sin(Math.PI * u), 22); }
+      }
+    };
+    const tick = (now) => {
+      frame = 0;
+      draw((now - t0) / 1000);
+      if (visible && !reduced.matches && !document.hidden) frame = requestAnimationFrame(tick);
+    };
+    const start = () => { if (!frame && visible && !reduced.matches) frame = requestAnimationFrame(tick); };
+    const still = () => { cancelAnimationFrame(frame); frame = 0; draw(60); };
+    const refresh = () => { layout(); reduced.matches ? still() : (frame || draw((performance.now() - t0) / 1000)); };
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : (cancelAnimationFrame(frame), frame = 0); }).observe(hero);
+    document.addEventListener("visibilitychange", start);
+    reduced.addEventListener?.("change", () => { t0 = performance.now(); reduced.matches ? still() : start(); });
+    new ResizeObserver(refresh).observe(hero);
+    document.fonts?.ready.then(refresh);
+    layout();
+    reduced.matches ? still() : start();
+  })();
+
   /* ---------------- every section opens with a small label, like the film's ---------------- */
   [
     [".f-work-intro h2", "能做什么 · 四件事"],

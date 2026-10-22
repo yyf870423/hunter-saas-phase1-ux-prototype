@@ -57,6 +57,13 @@
   object-position: 50% 65%;
   transform: scale(1.12);
 }
+/* the three signals and the light on the name (drawn by origin-motion.js) sit between the clouds and the copy */
+.o-signals {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
 .o-fly {
   position: absolute;
   inset: 0;
