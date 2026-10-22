@@ -26,7 +26,11 @@
   title.classList.add("o-promise");
   title.innerHTML = ui.localizeHTML('<span class="o-line">从杂乱的信息里，</span><span class="o-line">找出岗位、人和时机。</span>');
   title.before(mark);
-  statement?.remove();
+  /* the product name leads the first screen; what it is ("猎头的 AI 工作伙伴") sits right under it */
+  if (statement) {
+    statement.classList.add("o-role");
+    mark.after(statement);
+  }
 
   /* ---------------- hero: two layers of cloud, and a flight up through them ---------------- */
   const back = hero.querySelector(".f-hero-breath");
@@ -478,6 +482,6 @@
   // the hero arrives out of the clouds
   [...copy.children].forEach((n, i) => {
     n.classList.add("in");
-    n.animate(haze(i === 2 ? 30 : 16), { duration: 1300, delay: 120 + i * 140, easing: EASE, fill: "backwards" });
+    n.animate(haze(n.classList.contains("o-mark") ? 30 : 16), { duration: 1300, delay: 120 + i * 140, easing: EASE, fill: "backwards" });
   });
 })();
