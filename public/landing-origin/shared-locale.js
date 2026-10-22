@@ -26,8 +26,30 @@
   catalog.set("请选择目前同时在做的岗位数", "Select a range");
   catalog.set("其他职位", "Specify your job title");
 
+  // 中文页：共享文件里的原文换成第三版定稿（locale-zh.js），表单字段名派生出的提示一并替换。
+  const revisions = new Map(
+    Object.entries(window.OriginChineseRevisions || {}),
+  );
+  for (const [zh, revised] of [...revisions]) {
+    if (!(zh in fields)) continue;
+    for (const pattern of [
+      (name) => `请选择${name}`,
+      (name) => `请填写${name}`,
+      (name) => `请选择${name}，选择其他时请补充内容`,
+      (name) => `${name}内容过长，请精简后再提交`,
+      (name) => `请检查${name}后重新提交`,
+      (name) => `其他${name}`,
+    ])
+      revisions.set(pattern(zh), pattern(revised));
+  }
+
   function text(value) {
-    if (language !== "en" || typeof value !== "string") return value;
+    if (typeof value !== "string") return value;
+    if (language !== "en") {
+      const normalized = value.trim();
+      const revised = revisions.get(normalized);
+      return revised === undefined ? value : value.replace(normalized, revised);
+    }
     const normalized = value.trim();
     const translated = catalog.get(normalized);
     if (translated !== undefined) return value.replace(normalized, translated);
@@ -81,7 +103,7 @@
   }
 
   function html(source) {
-    if (language !== "en") return source;
+    if (language !== "en" && !revisions.size) return source;
     const template = document.createElement("template");
     template.innerHTML = source;
     translateDOM(template.content);
@@ -100,16 +122,16 @@
 
   window.FinesseLocale = { language, text, html, missing };
   document.documentElement.lang = language === "en" ? "en" : "zh-CN";
+  for (const name of [
+    "FinesseHomepageData",
+    "FinesseResearchStoryData",
+    "FinesseResearchChaptersData",
+  ])
+    if (window[name]) window[name] = localizeData(window[name]);
   if (language === "en") {
-    for (const name of [
-      "FinesseHomepageData",
-      "FinesseResearchStoryData",
-      "FinesseResearchChaptersData",
-    ])
-      if (window[name]) window[name] = localizeData(window[name]);
     document.title = "Boseek · HunterBuddy, your AI partner in recruitment";
     document.querySelector('meta[name="description"]').content =
-      "Connect hiring signals, talent maps and candidate research. HunterBuddy helps recruiters find opportunities and build shortlists. You make the decisions.";
+      "Connect hiring signals, talent maps and candidate research. HunterBuddy helps recruiters uncover new searches, map the market and build longlists. You make the decisions.";
     translateDOM(document.querySelector("[data-finesse-footer]"));
   }
 

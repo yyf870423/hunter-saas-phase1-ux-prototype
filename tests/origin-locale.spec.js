@@ -199,8 +199,14 @@ for (const width of [1440, 1024, 801, 390, 320]) {
       }
       await expect(page.locator("video[data-film]")).toHaveAttribute(
         "src",
-        "assets/hunterbuddy-origin.mp4?v=20261021-night2",
+        language === "en"
+          ? "assets/hunterbuddy-origin-en.mp4?v=20261022-terms"
+          : "assets/hunterbuddy-origin.mp4?v=20261022-terms",
       );
+      if (language === "zh")
+        await expect(
+          page.locator(".f-work-demo > .f-tabs [role=tab]"),
+        ).toHaveText(["客户开发", "人才地图", "职位寻访", "人选维护"]);
       await expect(page.locator("meta[name='trial-api']")).toHaveAttribute(
         "content",
         "disabled",
@@ -222,10 +228,10 @@ test("English interactions translate all scenes, slides, errors and canonical fo
   await page.goto("./landing-origin/?lang=en");
   const tabs = page.locator(".f-work-demo > .f-tabs [role=tab]");
   await expect(tabs).toHaveText([
-    "New roles",
-    "Team map",
+    "Business development",
+    "Talent mapping",
     "Sourcing",
-    "Next move",
+    "Candidate nurturing",
   ]);
   for (const tab of await tabs.all()) {
     await tab.click();

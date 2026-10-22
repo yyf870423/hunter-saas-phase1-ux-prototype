@@ -71,6 +71,16 @@ html:lang(en) .f-memory h2 .ph {
 html:lang(en) .f-network-split .f-network-tabs .f-tab {
   font-size: 13px;
 }
+/* the English route names (Business development, Candidate nurturing) are longer than the Chinese ones:
+   let each name break onto two lines instead of running into its neighbour */
+html:lang(en) .f-network-tabs .f-tab {
+  height: auto;
+  min-height: 66px;
+  padding-block: 10px;
+  line-height: 1.3;
+  white-space: normal;
+  text-wrap: balance;
+}
 html:lang(en) .f-nav {
   gap: 22px;
 }

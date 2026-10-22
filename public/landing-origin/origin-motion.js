@@ -81,12 +81,15 @@
 
   /* ---------------- 产品短片: chapters are waypoints on a course ---------------- */
   const CHAPTERS = [
-    [10, "发现新岗位"],
-    [36.5, "摸清团队"],
-    [61, "为岗位找人"],
-    [89.5, "为人选找机会"],
+    [10, "客户开发"],
+    [36.5, "人才地图"],
+    [61, "职位寻访"],
+    [89.5, "人选维护"],
     [112, "人和关系都存下来了"],
   ];
+  /* the English page plays the English cut: same timeline, so the chapter stops line up */
+  const filmFile = window.FinesseLocale?.language === "en" ? "hunterbuddy-origin-en" : "hunterbuddy-origin";
+  const posterFile = window.FinesseLocale?.language === "en" ? "origin-film-poster-en" : "origin-film-poster";
   const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
   const film = el("section", "o-film");
   film.id = "film";
@@ -96,10 +99,10 @@
       <header class="o-film-head">
         <p class="o-film-kicker">产品短片 · 两分钟</p>
         <h2 id="o-film-title"><span class="ln">两分钟，</span><span class="ln">跟着一家公司走一遍。</span></h2>
-        <p class="o-film-lead">周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到岗位、摸清团队、找到人选，半年后又帮候选人找到下一个机会。建议打开声音。</p>
+        <p class="o-film-lead">周一早上，你让 HunterBuddy 盯着的赛道里有了新消息：星川机器人刚拿到融资。接下来两分钟，看它怎么从这条新闻出发，帮你拿到职位、做出人才地图、寻访到人选，半年后又帮人选找到下一个机会。建议打开声音。</p>
       </header>
       <figure class="o-film-frame">
-        <video data-film src="assets/hunterbuddy-origin.mp4?v=20261021-night2" poster="assets/origin-film-poster.jpg?v=20261021-night2" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
+        <video data-film src="assets/${filmFile}.mp4?v=20261022-terms" poster="assets/${posterFile}.jpg?v=20261022-terms" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
       </figure>
       <div class="o-course" style="--p: 0">
         <div class="o-course-line" aria-hidden="true"><span class="o-course-craft"></span></div>
