@@ -83,8 +83,8 @@
     if (!ctx) return;
     const en = window.FinesseLocale?.language === "en";
     const LABELS = en ? ["Funding news", "A CV from two years ago", "Profile update"] : ["融资新闻", "两年前的简历", "主页变动"];
-    const IRIS = "209,201,255";
-    const ORCHID = "221,144,216";
+    // colours of the course (two ends), the signal dots and the light on the name: moonlight silver, the same cool key as the clouds and stars
+    const PAL = { from: "232,236,248", to: "232,236,248", dot: "240,244,255", name: "222,228,246" };
     let W = 0, H = 0, dpr = 1, pts = [], stars = [], markAt = null, phone = false;
     let seed = 7;
     const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
@@ -144,8 +144,8 @@
     const course = (p, alpha) => {
       if (p <= 0 || alpha <= 0.003) return;
       const g = ctx.createLinearGradient(pts[0].x, 0, pts[2].x, 0);
-      g.addColorStop(0, `rgba(${ORCHID},${alpha})`);
-      g.addColorStop(1, `rgba(${IRIS},${alpha})`);
+      g.addColorStop(0, `rgba(${PAL.from},${alpha})`);
+      g.addColorStop(1, `rgba(${PAL.to},${alpha})`);
       const N = 60, segs = [[pts[0], pts[1]], [pts[1], pts[2]]];
       const path = () => {
         ctx.beginPath();
@@ -156,7 +156,7 @@
         });
       };
       ctx.lineCap = "round";
-      ctx.save(); ctx.globalAlpha = 0.35; ctx.strokeStyle = g; ctx.lineWidth = 5; ctx.shadowColor = `rgba(${ORCHID},.9)`; ctx.shadowBlur = 12;
+      ctx.save(); ctx.globalAlpha = 0.35; ctx.strokeStyle = g; ctx.lineWidth = 5; ctx.shadowColor = `rgba(${PAL.from},.9)`; ctx.shadowBlur = 12;
       path(); ctx.stroke(); ctx.restore();
       ctx.strokeStyle = g; ctx.lineWidth = 1.8; ctx.setLineDash([3, 7]);
       path(); ctx.stroke(); ctx.setLineDash([]);
@@ -193,9 +193,9 @@
           const rx = markAt.w * 0.7, ry = markAt.h * 1.7;
           ctx.save(); ctx.translate(markAt.x, markAt.y); ctx.scale(1, ry / rx);
           const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
-          g.addColorStop(0, `rgba(${ORCHID},${0.55 * a})`);
-          g.addColorStop(0.5, `rgba(${ORCHID},${0.18 * a})`);
-          g.addColorStop(1, `rgba(${IRIS},0)`);
+          g.addColorStop(0, `rgba(${PAL.name},${0.55 * a})`);
+          g.addColorStop(0.5, `rgba(${PAL.name},${0.18 * a})`);
+          g.addColorStop(1, `rgba(${PAL.name},0)`);
           ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, rx, 0, 6.283); ctx.fill(); ctx.restore();
         }
       }
@@ -206,11 +206,11 @@
       pts.forEach((p, i) => {
         const at = 1.5 + i * 0.5, up = out3((t - at) / 0.9), a = soft((t - at) / 0.5);
         const y = p.y + (1 - up) * 26;
-        dot(p.x, y, 3, IRIS, a * (0.85 + 0.15 * Math.sin(t * 1.6 + i * 2)), phone ? 30 : 40);
+        dot(p.x, y, 3, PAL.dot, a * (0.85 + 0.15 * Math.sin(t * 1.6 + i * 2)), phone ? 30 : 40);
         // a ring opens as each signal appears
         const ring = (t - at) / 1.2;
         if (ring > 0 && ring < 1) {
-          ctx.strokeStyle = `rgba(${IRIS},${0.6 * (1 - ring)})`; ctx.lineWidth = 1.2;
+          ctx.strokeStyle = `rgba(${PAL.dot},${0.6 * (1 - ring)})`; ctx.lineWidth = 1.2;
           ctx.beginPath(); ctx.arc(p.x, y, 6 + 34 * out3(ring), 0, 6.283); ctx.stroke();
         }
         label(i, soft((t - at - 0.3) / 0.6) * (phone && i === 1 ? 0.9 : 1));
