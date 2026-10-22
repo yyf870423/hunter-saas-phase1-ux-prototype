@@ -8,12 +8,13 @@
   }
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const fine = matchMedia("(hover: hover) and (pointer: fine)");
+  const ui = window.FinesseUI;
   const EASE = "cubic-bezier(.2, .75, .2, 1)";
   const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
   const el = (tag, cls, html) => {
     const n = document.createElement(tag);
     if (cls) n.className = cls;
-    if (html != null) n.innerHTML = html;
+    if (html != null) n.innerHTML = ui.localizeHTML(html);
     return n;
   };
 
@@ -23,7 +24,7 @@
   const statement = copy.querySelector(".f-hero-statement");
   const mark = el("p", "o-mark", "HunterBuddy");
   title.classList.add("o-promise");
-  title.innerHTML = '<span class="o-line">从杂乱的信息里，</span><span class="o-line">找出岗位、人和时机。</span>';
+  title.innerHTML = ui.localizeHTML('<span class="o-line">从杂乱的信息里，</span><span class="o-line">找出岗位、人和时机。</span>');
   title.before(mark);
   statement?.remove();
 
@@ -90,7 +91,7 @@
   const film = el("section", "o-film");
   film.id = "film";
   film.setAttribute("aria-labelledby", "o-film-title");
-  film.innerHTML = `
+  film.innerHTML = ui.localizeHTML(`
     <div class="f-container">
       <header class="o-film-head">
         <p class="o-film-kicker">产品短片 · 两分钟</p>
@@ -107,7 +108,7 @@
             `<li><button type="button" data-t="${t}" aria-pressed="false"><span class="o-stop-dot"></span><span class="o-stop-time">${mmss(t)}</span><span class="o-stop-name">${name}</span></button></li>`,
         ).join("")}</ol>
       </div>
-    </div>`;
+    </div>`);
   hero.after(film);
   const video = film.querySelector("video");
   /* the film shows its cover with no player controls until someone starts it */

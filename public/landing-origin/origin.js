@@ -8,14 +8,14 @@
   if (status) hero.prepend(status);
   document.querySelectorAll(".f-brand img").forEach((img) => (img.src = "assets/boseek-b5-dark.svg"));
   const image = root.querySelector(".f-hero-breath img");
-  image.alt = "冷色天空与辽阔的银蓝色云海";
+  image.alt = ui.text("冷色天空与辽阔的银蓝色云海");
 
   const thought = root.querySelector(".f-trial-thought");
   if (thought) {
     thought.replaceChildren(...["把时间，", "留给真正重要的人。"].map((text) => {
       const line = document.createElement("span");
       line.className = "o-trial-thought-line";
-      line.textContent = text;
+      line.textContent = ui.text(text);
       return line;
     }));
   }

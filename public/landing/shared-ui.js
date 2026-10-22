@@ -1,4 +1,6 @@
 (() => {
+  const text = (value) => window.FinesseLocale?.text(value) ?? value;
+  const localizeHTML = (value) => window.FinesseLocale?.html(value) ?? value;
   const iconPaths = {
     chevronRight: ["m9 18 6-6-6-6"],
     chevronLeft: ["m15 18-6-6 6-6"],
@@ -71,19 +73,19 @@
   }
 
   function iconButton(name, label, attributes = "") {
-    return `<button type="button" class="f-icon-button" aria-label="${escape(label)}" ${attributes}>${icon(name)}<span class="f-tooltip" aria-hidden="true">${escape(label)}</span></button>`;
+    return `<button type="button" class="f-icon-button" aria-label="${escape(text(label))}" ${attributes}>${icon(name)}<span class="f-tooltip" aria-hidden="true">${escape(text(label))}</span></button>`;
   }
 
-  function mountNavigation(header) {
+  function mountNavigation(header, { breakpoint = 800 } = {}) {
     const nav = header.querySelector(".f-nav");
     const toggle = header.querySelector("[data-menu-toggle]");
-    const mobile = matchMedia("(max-width: 800px)");
+    const mobile = matchMedia(`(max-width: ${breakpoint}px)`);
 
     const close = (restoreFocus = false) => {
       nav.hidden = mobile.matches;
       toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", "打开导航");
-      toggle.innerHTML = `${icon("menu")}<span class="f-tooltip" aria-hidden="true">打开导航</span>`;
+      toggle.setAttribute("aria-label", text("打开导航"));
+      toggle.innerHTML = `${icon("menu")}<span class="f-tooltip" aria-hidden="true">${escape(text("打开导航"))}</span>`;
       if (restoreFocus) toggle.focus({ preventScroll: true });
     };
 
@@ -97,8 +99,8 @@
       if (expanded) return close();
       nav.hidden = false;
       toggle.setAttribute("aria-expanded", "true");
-      toggle.setAttribute("aria-label", "关闭导航");
-      toggle.innerHTML = `${icon("close")}<span class="f-tooltip" aria-hidden="true">关闭导航</span>`;
+      toggle.setAttribute("aria-label", text("关闭导航"));
+      toggle.innerHTML = `${icon("close")}<span class="f-tooltip" aria-hidden="true">${escape(text("关闭导航"))}</span>`;
     });
 
     nav.addEventListener("click", (event) => {
@@ -245,8 +247,8 @@
     return {
       open(title, html, source) {
         trigger = source || document.activeElement;
-        dialog.querySelector("#f-dialog-title").textContent = title;
-        dialog.querySelector(".f-dialog-body").innerHTML = html;
+        dialog.querySelector("#f-dialog-title").textContent = text(title);
+        dialog.querySelector(".f-dialog-body").innerHTML = localizeHTML(html);
         if (!dialog.open) dialog.showModal();
         dialog.scrollTop = 0;
         document.documentElement.classList.add("f-dialog-open");
@@ -285,7 +287,7 @@
           getComputedStyle(panel).getPropertyValue("--f-panel-floor"),
         ) || 0;
       variants.forEach((html) => {
-        measurer.innerHTML = html;
+        measurer.innerHTML = localizeHTML(html);
         height = Math.max(height, measurer.getBoundingClientRect().height);
       });
       panel.style.minHeight = `${Math.ceil(height)}px`;
@@ -304,6 +306,8 @@
   }
 
   window.FinesseUI = {
+    text,
+    localizeHTML,
     escape,
     icon,
     brand,

@@ -17,7 +17,7 @@
     const controls = carousel
       ? `<div class="p-carousel-controls" aria-label="研究图片切换" role="group" hidden>${ui.iconButton("chevronLeft", "上一张", `data-carousel-previous aria-controls="${e(id)}-photos"`)}${ui.iconButton("chevronRight", "下一张", `data-carousel-next aria-controls="${e(id)}-photos"`)}</div>`
       : "";
-    return `<section class="p-research${carousel ? " p-carousel" : ""}" ${embedded ? `id="${e(id)}" tabindex="-1"` : ""} data-research-chapters data-presentation="${carousel ? "carousel" : "scroll"}" data-chapter="0" aria-labelledby="${e(id)}-title"${carousel ? ' aria-roledescription="轮播"' : ""}>
+    return ui.localizeHTML(`<section class="p-research${carousel ? " p-carousel" : ""}" ${embedded ? `id="${e(id)}" tabindex="-1"` : ""} data-research-chapters data-presentation="${carousel ? "carousel" : "scroll"}" data-chapter="0" aria-labelledby="${e(id)}-title"${carousel ? ' aria-roledescription="轮播"' : ""}>
       <div class="f-container p-container">
         <header class="p-intro"><${tag} id="${e(id)}-title">${data.title.map((line) => `<span>${e(line)}</span>`).join("")}</${tag}><p>${data.introduction.map(e).join("<br />")}</p></header>
         <div class="p-runway">
@@ -27,7 +27,7 @@
           </div>
         </div>
       </div>
-    </section>`;
+    </section>`);
   }
 
   function mountPhotoErrors(slides) {
@@ -133,7 +133,7 @@
     controls.hidden = false;
     stage.tabIndex = 0;
     stage.setAttribute("role", "group");
-    stage.setAttribute("aria-label", label);
+    stage.setAttribute("aria-label", ui.text(label));
     stage.setAttribute("aria-keyshortcuts", "Space");
     if (photoErrors) mountPhotoErrors(slides);
     select(0);

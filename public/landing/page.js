@@ -17,7 +17,7 @@
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const fine = matchMedia("(hover: hover) and (pointer: fine)");
 
-  root.innerHTML = `
+  root.innerHTML = ui.localizeHTML(`
     <a class="f-skip" href="#main">跳到正文</a>
     <span class="f-header-sentinel" aria-hidden="true"></span>
     <header class="f-header">
@@ -134,7 +134,7 @@
         </div>
       </section>`
       }
-    </main>`;
+    </main>`);
 
   if (trial) trial.mount(root.querySelector("#apply"));
   if (integrated)
@@ -182,7 +182,7 @@
     activeWork = index;
     const work = data.works[index];
     panelAnimation?.cancel();
-    panel.innerHTML = workMarkup(work);
+    panel.innerHTML = ui.localizeHTML(workMarkup(work));
     if (!reduced.matches) {
       panelAnimation = panel.animate(
         [
@@ -194,7 +194,9 @@
     }
   }
 
-  ui.mountNavigation(root.querySelector(".f-header"));
+  ui.mountNavigation(root.querySelector(".f-header"), {
+    breakpoint: window.FinesseLocale?.language === "en" ? 1000 : 800,
+  });
   const workTabs = ui.mountTabs(root.querySelector(".f-tabs"), panel, renderWork);
 
   /* the four tabs step through by themselves (a thin line under the open tab fills as its turn runs out);
