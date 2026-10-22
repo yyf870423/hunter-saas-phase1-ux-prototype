@@ -7,7 +7,7 @@
 
    The website's language, carried over:
    - near-black grounds (#090a0b / #0f1011 / #191a1c) and, for light, a quiet paper grey;
-   - monochrome actions: the primary button is a solid ink (white on dark, near-black on light);
+   - flat, solid actions like the website's buttons, filled with the bo's lake blue;
    - the B5 bo logo's lake blue for accents, links, selection, info and the current-item marks,
      and its coral crescent for small highlights (the live wire in empty states, unread badges);
    - hairline borders instead of shadows, 8px controls, 4px tooltips, pill-shaped chips;
@@ -34,10 +34,11 @@
   --b-radius: 8px;
   --b-radius-panel: 10px;
   --b-on-accent: #ffffff;
-  --b-ink-fill: #0f1011;
-  --b-ink-fill-hover: #2c2c2f;
+  /* the action fill: the bo's lake blue (primary buttons, checked boxes, the current page) */
+  --b-ink-fill: #2f5bb8;
+  --b-ink-fill-hover: #264b9b;
   --b-on-ink: #ffffff;
-  --b-focus: rgba(15, 16, 17, 0.38);
+  --b-focus: rgba(47, 91, 184, 0.45);
   --b-kicker: #2f5bb8;
   --b-coral: #e0694a;
   --b-coral-ink: #b44c32;
@@ -92,10 +93,10 @@
 /* ---------------------------------------------------------------- tokens · dark (the website itself) */
 .s1-app[data-theme="dark"] {
   --b-on-accent: #0f1011;
-  --b-ink-fill: #f5f5f7;
-  --b-ink-fill-hover: #d9d9db;
-  --b-on-ink: #0f1011;
-  --b-focus: rgba(245, 245, 247, 0.42);
+  --b-ink-fill: #3a6bcc;
+  --b-ink-fill-hover: #4272d0;
+  --b-on-ink: #ffffff;
+  --b-focus: rgba(143, 180, 234, 0.5);
   --b-kicker: #8fb4ea;
   --b-coral: #ff9473;
   --b-coral-ink: #ff9f80;
@@ -109,7 +110,7 @@
   --s1-action-fill-hover: var(--b-ink-fill-hover);
   --s1-action-border: var(--b-ink-fill);
   --s1-action-border-hover: var(--b-ink-fill-hover);
-  --s1-action-ink: #0f1011;
+  --s1-action-ink: #ffffff;
   --s1-tag-bg: #17181a;
   --s1-tag-border: #343436;
   --s1-canvas: #090a0b;
@@ -297,21 +298,23 @@
   background: transparent;
 }
 
+/* secondary, text and icon buttons stay outlined and quiet, and take the lake blue on hover */
 .s1-button-secondary:hover,
 .s1-button:not(.s1-button-primary):not(.s1-button-ghost):not(.s1-button-danger):hover:not(:disabled) {
-  background: var(--s1-surface-strong);
-  border-color: color-mix(in srgb, var(--s1-ink) 34%, var(--s1-line));
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 45%, var(--s1-line));
 }
 
 .s1-button-ghost:hover {
-  color: var(--s1-ink);
-  background: var(--s1-surface-strong);
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
 }
 
 .s1-icon-button:hover {
-  color: var(--s1-ink);
-  background: var(--s1-surface-strong);
-  border-color: color-mix(in srgb, var(--s1-ink) 34%, var(--s1-line));
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 45%, var(--s1-line));
 }
 
 .s1-icon-button em {
@@ -483,8 +486,8 @@
 }
 
 .s4-radio.is-checked {
-  background: color-mix(in srgb, var(--s1-ink) 4%, transparent);
-  border-color: color-mix(in srgb, var(--s1-ink) 55%, var(--s1-line));
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 60%, var(--s1-line));
 }
 
 .s4-radio.is-checked > i {
