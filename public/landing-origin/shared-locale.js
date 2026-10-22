@@ -100,6 +100,26 @@
         if (node.hasAttribute(name))
           node.setAttribute(name, text(node.getAttribute(name)));
     }
+    if (language === "en") spaceSentences(root);
+  }
+
+  // Chinese headlines are split into line pieces that sit side by side with no gap (两分钟，|跟着一家公司走一遍。).
+  // In English the pieces are sentences, so put a space between two pieces when the first ends a sentence
+  // and the next starts a word. Between block elements the space has no effect.
+  function spaceSentences(root) {
+    for (const parent of [root, ...root.querySelectorAll("*")]) {
+      const children = [...parent.childNodes];
+      for (let i = 0; i < children.length - 1; i++) {
+        const [before, after] = [children[i], children[i + 1]];
+        if (
+          before.nodeType === Node.ELEMENT_NODE &&
+          after.nodeType === Node.ELEMENT_NODE &&
+          /[.,:;!?]$/.test(before.textContent) &&
+          /^[A-Za-z0-9]/.test(after.textContent)
+        )
+          parent.insertBefore(document.createTextNode(" "), after);
+      }
+    }
   }
 
   function html(source) {
