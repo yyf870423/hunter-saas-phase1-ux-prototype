@@ -1,0 +1,536 @@
+/* 第二版 · 实景大图 — presentation, interaction and motion layer (loaded only by landing/index.html).
+   Photographic motion: the camera pushes in on the hero photo as you scroll, the research chapters
+   become a scroll story beside a pinned photo, and images open like curtains. */
+
+/* ---------- hero: the promise leads, the wordmark stays as the brand line ---------- */
+#homepage.fx-on .f-hero-copy .fx-mark {
+  margin: 0 0 18px;
+  font-family: "Origin Display", Georgia, serif;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--f-deep);
+}
+#homepage.fx-on .f-hero h1.fx-promise {
+  font-family: inherit;
+  font-size: 58px;
+  font-weight: 300;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+#homepage.fx-on .f-hero h1.fx-promise .fx-line {
+  display: block;
+}
+#homepage.fx-on .f-hero-copy .f-coming-soon {
+  margin-top: 18px;
+}
+@media (max-width: 800px) {
+  #homepage.fx-on .f-hero-copy .fx-mark {
+    font-size: 30px;
+  }
+  #homepage.fx-on .f-hero h1.fx-promise {
+    font-size: 36px;
+  }
+}
+
+/* ---------- hero: camera push-in (driven by finesse-motion.js) ---------- */
+#homepage.fx-push .f-hero-depth,
+#homepage.fx-push .f-hero-breath {
+  animation: none !important;
+}
+#homepage.fx-push .f-hero-breath {
+  transform-origin: 66% 80%;
+  will-change: transform;
+}
+#homepage.fx-push .f-hero-copy {
+  will-change: transform, opacity;
+}
+.fx-veil {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  height: 55%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--f-surface) 92%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- research: a scroll story beside a pinned photo ---------- */
+.fx-story {
+  display: none;
+}
+#homepage.fx-story-on .p-runway {
+  display: none;
+}
+#homepage.fx-story-on .fx-story {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 64px;
+  margin-top: 40px;
+}
+.fx-steps {
+  display: flex;
+  flex-direction: column;
+}
+.fx-step {
+  min-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px 0;
+  opacity: 0.32;
+  transition: opacity 0.5s ease;
+}
+.fx-step.is-on {
+  opacity: 1;
+}
+.fx-step .fx-no {
+  color: var(--f-accent-text);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+.fx-step h3 {
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+.fx-step h3 span {
+  display: block;
+}
+.fx-step p {
+  max-width: 420px;
+  color: var(--f-ink);
+  font-size: 16px;
+  line-height: 1.95;
+}
+.fx-photo-col {
+  position: relative;
+}
+.fx-photo {
+  position: sticky;
+  top: calc(var(--f-nav-h) + (100vh - var(--f-nav-h) - min(62vh, 560px)) / 2);
+  height: min(62vh, 560px);
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--f-bg);
+}
+.fx-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.08);
+  transition: opacity 0.9s ease, transform 1.6s cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.fx-photo img.is-on {
+  opacity: 1;
+  transform: scale(1);
+}
+.fx-dots {
+  position: absolute;
+  left: 24px;
+  bottom: 22px;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+}
+.fx-dots i {
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+  transition: background-color 0.4s ease, width 0.4s ease;
+}
+.fx-dots i.is-on {
+  width: 44px;
+  background: #fff;
+}
+
+/* ---------- about: the photo opens like a curtain and drifts ---------- */
+#homepage.fx-on .f-about-image {
+  overflow: hidden;
+}
+#homepage.fx-on .f-about-image img {
+  will-change: transform;
+}
+
+/* ---------- 研究资产: research route map (replaces the flowchart) ---------- */
+.fx-map-on .f-network-map {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.fx-map {
+  width: 100%;
+}
+.fx-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 18px 30px rgba(6, 25, 58, 0.08));
+}
+.fx-ground {
+  fill: #ffffff;
+}
+.fx-contours path {
+  fill: none;
+  stroke: #e3ecf7;
+  stroke-width: 1;
+}
+.fx-road-case {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+.fx-road-line {
+  fill: none;
+  stroke: #d2dcea;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease;
+}
+.fx-road.is-pending .fx-road-line {
+  stroke-dasharray: 0.1 7;
+  stroke-width: 3.5;
+}
+.fx-road-ink {
+  fill: none;
+  stroke: #0064dc;
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.fx-road-ink.is-pending {
+  stroke-dasharray: 0.1 8;
+  stroke-width: 5;
+}
+.fx-road-ink.is-active {
+  opacity: 1;
+}
+.fx-road-tag text {
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.fx-road-label {
+  fill: #8796a8;
+  transition: fill 0.35s ease;
+}
+.fx-road-tag.is-active .fx-road-label {
+  fill: #06193a;
+  font-weight: 500;
+}
+.fx-road-note {
+  fill: #0064dc;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.fx-road-tag.is-active .fx-road-note {
+  opacity: 1;
+}
+.is-compact .fx-road-tag:not(.is-active),
+.is-compact .fx-road-note {
+  display: none;
+}
+.fx-pin-ring {
+  fill: #ffffff;
+  stroke: #b7c5d6;
+  stroke-width: 1.5;
+}
+.fx-pin-dot {
+  fill: #9fb0c4;
+}
+.fx-pin.is-active .fx-pin-ring {
+  stroke: #0064dc;
+}
+.fx-stop {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.fx-pin.is-active .fx-stop {
+  opacity: 1;
+}
+.fx-stop circle {
+  fill: #0064dc;
+}
+.fx-stop text {
+  fill: #ffffff;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.fx-card-plate {
+  fill: rgba(255, 255, 255, 0.92);
+  stroke: rgba(6, 25, 58, 0.06);
+}
+.fx-card-label {
+  fill: #8796a8;
+  font-weight: 500;
+  transition: fill 0.35s ease;
+}
+.fx-pin.is-active .fx-card-label {
+  fill: #06193a;
+}
+.fx-card-detail {
+  fill: #9aa7b6;
+}
+.fx-traveller-halo {
+  fill: rgba(0, 100, 220, 0.16);
+}
+.fx-traveller-dot {
+  fill: #0064dc;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+.fx-route-probe {
+  fill: none;
+  stroke: none;
+}
+
+/* ---------- scroll reveals: hidden until finesse-motion.js animates them in ---------- */
+/* ---------- 产品短片《对焦》: a wide screen, chapters on a lens distance scale ---------- */
+.fx-film {
+  position: relative;
+  padding: 88px 0 72px;
+  background: var(--f-surface);
+}
+.fx-film-head {
+  max-width: 760px;
+  margin: 0 auto 44px;
+  text-align: center;
+}
+.fx-film-kicker {
+  margin: 0 0 14px;
+  color: var(--f-accent-text);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+.fx-film-head h2 {
+  margin: 0;
+  color: var(--f-ink);
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+.fx-film-head h2 span {
+  display: inline-block;
+}
+.fx-film-lead {
+  margin: 22px auto 0;
+  max-width: 660px;
+  color: var(--f-muted);
+  font-size: 16px;
+  line-height: 1.9;
+  text-wrap: pretty;
+}
+.fx-film-frame {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #eef3f9;
+  box-shadow: var(--f-shadow);
+}
+.fx-film-frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #eef3f9;
+}
+.fx-scale {
+  position: relative;
+  margin: 34px 0 0;
+  padding-top: 18px;
+}
+.fx-scale-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background:
+    repeating-linear-gradient(90deg, var(--f-line) 0 1px, transparent 1px calc(100% / 60)) bottom / 100% 6px no-repeat,
+    linear-gradient(var(--f-line), var(--f-line)) bottom / 100% 1px no-repeat;
+}
+.fx-scale-track::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--f-accent);
+  transform: scaleX(var(--p));
+  transform-origin: 0 50%;
+}
+.fx-scale-head {
+  position: absolute;
+  bottom: -5px;
+  left: calc(var(--p) * 100%);
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border: 2px solid var(--f-accent);
+  border-radius: 50%;
+  background: var(--f-surface);
+}
+.fx-scale-marks {
+  position: relative;
+  height: 64px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fx-scale-marks li {
+  position: absolute;
+  top: 0;
+  left: var(--at);
+}
+.fx-scale-marks button {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 10px 0 6px 10px;
+  border: 0;
+  background: none;
+  color: var(--f-muted);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.fx-scale-marks button::before {
+  content: "";
+  position: absolute;
+  top: -18px;
+  left: 0;
+  width: 1px;
+  height: 22px;
+  background: #9fb0c4;
+}
+.fx-mark-time {
+  color: #8796ab;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.fx-mark-name {
+  font-size: 15px;
+  transition: color 0.25s ease;
+}
+.fx-scale-marks button:hover .fx-mark-name,
+.fx-scale-marks button[aria-pressed="true"] .fx-mark-name {
+  color: var(--f-accent-text);
+}
+.fx-scale-marks button[aria-pressed="true"]::before {
+  width: 2px;
+  background: var(--f-accent);
+}
+.fx-scale-marks button:focus-visible {
+  outline: 2px solid var(--f-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+@media (max-width: 1100px) {
+  .fx-mark-name {
+    font-size: 13px;
+  }
+}
+@media (max-width: 900px) {
+  .fx-film {
+    padding: 64px 0 48px;
+  }
+  .fx-film-head h2 {
+    font-size: 34px;
+  }
+  .fx-film-frame {
+    border-radius: 14px;
+  }
+  /* too narrow for a scale: the marks become a two-column list, the track stays as a progress line */
+  .fx-scale-marks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 16px;
+    height: auto;
+  }
+  .fx-scale-marks li {
+    position: static;
+  }
+  /* each mark is centred in its column; an odd last mark takes the whole row */
+  .fx-scale-marks li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .fx-scale-marks button {
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 0;
+    text-align: left;
+  }
+  .fx-scale-marks button::before {
+    display: none;
+  }
+  .fx-mark-time {
+    line-height: 22px;
+  }
+  .fx-mark-name {
+    font-size: 15px;
+  }
+}
+@media (max-width: 560px) {
+  .fx-film-head h2 {
+    font-size: 28px;
+  }
+}
+
+.motion #homepage.fx-on :is(.fx-film-head > *, .fx-film-frame, .fx-scale, .f-work-intro > *, .f-work-demo .f-tabs, .f-work-panel, .f-work-bottom, .p-intro h2 > span,
+  .p-intro > p, .fx-steps, .fx-photo-col, .f-memory h2, .f-memory .f-container > p, .f-network-tabs, .f-network-story,
+  .f-network-figure, .f-network-origin, .f-about-copy > *, .f-about-image, .f-trial-intro > *, .f-trial-content,
+  .f-hero-copy > *):not(.in) {
+  opacity: 0;
+}
+.motion .f-footer :is(.f-footer-top > *, .f-footer-bottom):not(.in) {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-step,
+  .fx-photo img,
+  .fx-dots i {
+    transition: none;
+  }
+}
+
+/* 2026-10-21 · 第五版 rules: a calmer hero, and one size for every section heading with no mid-line wraps */
+#homepage.fx-on .f-hero h1.fx-promise { font-size: clamp(36px, 3.8vw, 52px); }
+#homepage :is(.fx-film-head h2, .f-work-intro h2, .p-intro h2, .f-memory h2, .f-about h2) { font-size: min(46px, calc((min(100vw, 1440px) - 96px) / 21)); }
+#homepage :is(h2 .ln, .p-intro h2 > span, .fx-film-head h2 span) { white-space: nowrap; }
+@media (max-width: 900px) {
+  #homepage :is(.fx-film-head h2, .f-work-intro h2, .p-intro h2, .f-memory h2, .f-about h2) { font-size: min(32px, calc((100vw - 40px) / 12.4)); }
+  #homepage :is(h2 .ln, .p-intro h2 > span, .fx-film-head h2 span) { white-space: normal; }
+}
+@media (max-width: 800px) {
+  #homepage.fx-on .f-hero h1.fx-promise { font-size: min(36px, calc((100vw - 40px) / 10.6)); }
+}
+
+/* 2026-10-21 · top navigation centred in the bar, the trial link stays at the right */
+@media (min-width: 801px) {
+  .f-header-inner { position: relative; }
+  .f-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
+  }
+  .f-header-actions { margin-left: auto; }
+}
+@media (min-width: 801px) and (max-width: 1000px) {
+  .f-nav { gap: 22px; }
+}

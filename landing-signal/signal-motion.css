@@ -1,0 +1,560 @@
+/* 第一版 · 蓝白编辑 — presentation, interaction and motion layer.
+   A live research wall in the hero, scenarios that advance as you scroll, editorial reveals
+   (rules draw, lines rise) and a clearer research carousel. Loaded after shared-signal.css. */
+
+/* ---------- hero: the promise leads, the product name becomes the eyebrow ---------- */
+.s-homepage .f-hero-copy .s-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  color: var(--f-accent-text);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+.s-homepage .f-hero-copy .s-eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+}
+.s-homepage .f-hero h1.s-promise {
+  font-size: 62px;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+}
+.s-homepage .f-hero h1.s-promise .s-line {
+  display: block;
+  width: fit-content;
+}
+.s-homepage .f-hero-copy .f-coming-soon {
+  margin-top: 18px;
+}
+.s-homepage .f-hero-inner {
+  position: relative;
+  z-index: 3;
+}
+
+@media (max-width: 1100px) {
+  .s-homepage .f-hero h1.s-promise {
+    font-size: 52px;
+  }
+}
+@media (min-width: 801px) and (max-height: 700px) {
+  .s-homepage .f-hero h1.s-promise {
+    font-size: 46px;
+  }
+  .s-homepage .f-hero-copy .s-eyebrow {
+    margin-bottom: 12px;
+  }
+}
+@media (max-width: 800px) {
+  .s-homepage .f-hero h1.s-promise {
+    font-size: 36px;
+  }
+  .s-homepage .f-hero-copy .s-eyebrow {
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+}
+@media (max-width: 360px) {
+  .s-homepage .f-hero h1.s-promise {
+    font-size: 30px;
+  }
+}
+
+/* ---------- hero: the research wall ---------- */
+.s-wall {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.s-wall svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.s-wall .s-link {
+  fill: none;
+  stroke: #1d6fe0;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.s-wall .s-anchor {
+  fill: #1d6fe0;
+}
+.s-card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 1px rgba(15, 45, 90, 0.08), 0 10px 24px -12px rgba(15, 45, 90, 0.35);
+  color: #0f1f36;
+  font-size: 13px;
+  line-height: 1.35;
+  white-space: nowrap;
+  will-change: transform;
+  transition: box-shadow 0.45s ease, background-color 0.45s ease;
+}
+.s-card small {
+  display: block;
+  color: #5b6b80;
+  font-size: 11px;
+}
+.s-card .s-ico {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f1fd;
+  color: #1d6fe0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.s-card .s-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 15px;
+}
+.s-card.is-lit {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 0 0 1.5px #1d6fe0, 0 0 0 7px rgba(29, 111, 224, 0.14), 0 14px 30px -12px rgba(15, 45, 90, 0.45);
+}
+@media (max-width: 1000px) {
+  .s-wall {
+    display: none;
+  }
+}
+
+/* ---------- opening: label sits above the heading, a rule draws across ---------- */
+.s-homepage .s-opening-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+.s-homepage .s-opening .s-section-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 0;
+}
+.s-rule {
+  display: block;
+  flex: 1;
+  height: 1px;
+  background: var(--f-line);
+  transform-origin: 0 50%;
+}
+.s-homepage .f-work-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px 64px;
+  align-items: end;
+}
+.s-homepage .f-work-intro > p {
+  margin: 0 0 12px;
+}
+@media (max-width: 900px) {
+  .s-homepage .f-work-intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- scenarios: one continuous light section (no navy band), switched by click ---------- */
+.s-homepage .s-overview {
+  padding: 8px 0 0;
+  background: var(--f-bg);
+  color: var(--f-deep);
+}
+.s-homepage .s-overview-heading p {
+  color: var(--f-deep);
+}
+.s-homepage .s-scenario-tabs {
+  border-color: var(--f-line);
+}
+.s-homepage .s-scenario-tabs .f-tab {
+  color: #5b6b80;
+}
+.s-homepage .s-scenario-tabs .f-tab[aria-selected="true"],
+.s-homepage .s-scenario-tabs .f-tab:hover {
+  color: var(--f-deep);
+}
+.s-homepage .s-scenario-tabs .f-tab::after {
+  background: var(--f-accent-text);
+}
+.s-homepage .s-scenario-tabs .f-tab:focus-visible {
+  outline-color: var(--f-accent-text);
+}
+.s-homepage .s-opening {
+  padding-bottom: 40px;
+}
+
+/* ---------- research carousel: visible controls, a counter and a timer line ---------- */
+.s-homepage .p-carousel-controls .f-icon-button {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--f-deep);
+  box-shadow: 0 0 0 1px rgba(15, 45, 90, 0.08), 0 8px 18px -10px rgba(15, 45, 90, 0.5);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.s-homepage .p-carousel-controls .f-icon-button:is(:hover, :active) {
+  background: #fff;
+  color: var(--f-deep);
+  transform: scale(1.06);
+}
+.s-homepage .p-carousel-controls .f-icon {
+  width: 24px;
+  height: 24px;
+  filter: none;
+}
+.s-homepage .p-carousel-controls {
+  padding-inline: 16px;
+}
+.s-homepage .p-copy h3 {
+  font-size: 38px;
+}
+.s-homepage .p-copy p {
+  font-size: 16px;
+}
+.s-count {
+  position: absolute;
+  left: 72px;
+  bottom: 28px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--f-deep);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+.s-count .s-track {
+  width: 120px;
+  height: 2px;
+  background: rgba(15, 45, 90, 0.14);
+  overflow: hidden;
+}
+.s-count .s-fill {
+  display: block;
+  height: 100%;
+  background: var(--f-deep);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+@media (max-width: 800px) {
+  .s-count {
+    left: 20px;
+    bottom: 16px;
+  }
+}
+
+/* ---------- 研究资产: editorial arc diagram (replaces the flowchart) ---------- */
+.s-arcs-on .f-network-map {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.s-arcs {
+  width: 100%;
+  padding: 8px 0 4px;
+}
+.s-arcs svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.s-arc-base {
+  stroke: #9fb3c8;
+  stroke-width: 1;
+}
+.s-arc-line {
+  fill: none;
+  stroke: #c3d2e3;
+  stroke-width: 1.2;
+  transition: stroke 0.4s ease, opacity 0.4s ease;
+}
+.s-arc.is-pending .s-arc-line,
+.s-arc.is-pending .s-arc-ink {
+  stroke-dasharray: 5 6;
+}
+.s-arc-ink {
+  fill: none;
+  stroke: #0064dc;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.s-arc.is-active .s-arc-ink {
+  opacity: 1;
+}
+.s-arc.is-active.is-pending .s-arc-ink {
+  stroke-width: 2;
+}
+.s-arc-label,
+.s-arc-note,
+.s-node-label,
+.s-node-detail,
+.s-node-num {
+  text-anchor: middle;
+}
+.s-arc-label {
+  fill: #7d8fa5;
+  font-family: Georgia, "Songti SC", serif;
+  transition: fill 0.35s ease;
+}
+.s-arc.is-active .s-arc-label {
+  fill: #06193a;
+}
+.s-arc-note {
+  fill: #0064dc;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.s-arc.is-active .s-arc-note {
+  opacity: 1;
+}
+.s-arc.is-pending.is-active .s-arc-note {
+  fill: #a05a00;
+}
+.is-compact .s-arc:not(.is-active) .s-arc-label,
+.is-compact .s-arc-note {
+  display: none;
+}
+.s-node-dot {
+  fill: #f8fafc;
+  stroke: #7d8fa5;
+  stroke-width: 1.5;
+  transition: fill 0.35s ease, stroke 0.35s ease;
+}
+.s-node-step {
+  fill: #06193a;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.s-node.is-active .s-node-step {
+  opacity: 1;
+}
+.s-node-num {
+  fill: #fff;
+  font-weight: 600;
+}
+.s-node-label {
+  fill: #7d8fa5;
+  font-family: Georgia, "Songti SC", serif;
+  transition: fill 0.35s ease;
+}
+.s-node.is-active .s-node-label {
+  fill: #06193a;
+}
+.s-node-detail {
+  fill: #8a9bb0;
+}
+
+/* ---------- 产品短片《寻人启事》 ---------- */
+.s-film {
+  padding: 72px 0 24px;
+  background: var(--f-bg);
+  color: var(--f-deep);
+}
+.s-film-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 0;
+}
+.s-film-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px 64px;
+  align-items: end;
+  margin: 20px 0 36px;
+}
+.s-film-head h2 {
+  margin: 0;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+.s-film-head h2 span {
+  display: inline-block;
+}
+.s-film-head p {
+  margin: 0 0 8px;
+  color: #4d5d72;
+  font-size: 16px;
+  line-height: 1.85;
+  text-wrap: pretty;
+}
+.s-film-frame {
+  margin: 0;
+  border: 1px solid var(--f-line);
+  background: #f4f6f9;
+  box-shadow: 0 30px 60px -40px rgba(6, 25, 58, 0.45);
+}
+.s-film-frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #f4f6f9;
+}
+.s-chapters {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--f-line);
+}
+.s-chapters button {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  width: 100%;
+  min-height: 72px;
+  padding: 16px 14px 14px 0;
+  border: 0;
+  background: none;
+  color: #5b6b80;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.s-chapters button::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 14px;
+  height: 2px;
+  background: var(--f-accent-text);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.4s cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.s-chapters button:hover,
+.s-chapters button[aria-pressed="true"] {
+  color: var(--f-deep);
+}
+.s-chapters button[aria-pressed="true"]::before {
+  transform: scaleX(1);
+}
+.s-chapters button:focus-visible {
+  outline: 2px solid var(--f-accent-text);
+  outline-offset: -2px;
+}
+.s-ch-no {
+  grid-row: span 2;
+  color: var(--f-accent-text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+}
+.s-ch-name {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.s-ch-time {
+  color: #8a9bb0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 900px) {
+  .s-film {
+    padding-top: 56px;
+  }
+  .s-film-head {
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 28px;
+  }
+  .s-film-head h2 {
+    font-size: 34px;
+  }
+  .s-chapters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .s-film-head h2 {
+    font-size: 28px;
+  }
+  .s-chapters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .s-chapters button {
+    min-height: 64px;
+  }
+}
+
+/* ---------- scroll reveals: hidden until signal-motion.js animates them in ---------- */
+.motion .s-homepage :is(.s-film-label, .s-film-head > *, .s-film-frame, .s-chapters li, .s-opening .s-section-label, .f-work-intro h2, .f-work-intro > p, .s-overview-heading p,
+  .s-scenario-tabs, .s-work-content, .p-intro h2 > span, .p-intro > p, .p-stage, .f-memory h2, .f-memory .f-container > p,
+  .f-network-tabs, .f-network-story, .f-network-figure, .f-network-origin, .s-about-grid > *, .f-trial-intro > *,
+  .f-trial-content):not(.in) {
+  opacity: 0;
+}
+.motion .s-homepage .f-hero-copy > :not(.in) {
+  opacity: 0;
+}
+.motion .f-footer :is(.f-footer-top > *, .f-footer-bottom):not(.in) {
+  opacity: 0;
+}
+.motion .s-homepage .s-rule:not(.in) {
+  transform: scaleX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s-card {
+    transition: none;
+  }
+}
+
+/* 2026-10-21 · 第五版 rules: a calmer hero, and one size for every section heading with no mid-line wraps */
+@media (min-width: 801px) {
+  .s-homepage .f-hero h1.s-promise { font-size: clamp(40px, 3.8vw, 54px); }
+  .s-homepage :is(.s-film-head h2, .f-work-intro h2, .p-intro h2, .f-memory h2, .f-about h2) { font-size: min(40px, calc((min(100vw, 1440px) - 144px) / 25)); line-height: 1.4; }
+  .s-homepage :is(h2 .ln, .p-intro h2 > span, .s-film-head h2 span) { white-space: nowrap; }
+}
+@media (max-width: 800px) {
+  .s-homepage :is(.s-film-head h2, .f-work-intro h2, .p-intro h2, .f-memory h2, .f-about h2) { font-size: min(30px, calc((100vw - 40px) / 12.4)); }
+}
+@media (max-width: 800px) {
+  .s-homepage .f-hero h1.s-promise { font-size: min(36px, calc((100vw - 40px) / 10.6)); }
+  .s-homepage .s-overview-heading p { font-size: min(24px, calc((100vw - 40px) / 14.4)); }
+  .s-chapters li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+/* 2026-10-21 · top navigation centred in the bar, the trial link stays at the right */
+@media (min-width: 801px) {
+  .f-header-inner { position: relative; }
+  .f-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
+  }
+  .f-header-actions { margin-left: auto; }
+}
+@media (min-width: 801px) and (max-width: 1000px) {
+  .f-nav { gap: 22px; }
+}

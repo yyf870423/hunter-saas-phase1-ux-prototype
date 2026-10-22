@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#F7F9FC">
+    <meta name="description" content="HunterBuddy，猎头的 AI 工作伙伴。围绕岗位跨渠道找人，关联人物、公司与专业成果，把关键判断留给你。">
+    <meta name="trial-api" content="disabled">
+    <title>HunterBuddy · 铂寻 Boseek</title>
+    <link rel="stylesheet" href="assets/fonts/noto/index.css">
+    <link rel="stylesheet" href="../landing/shared-ui.css">
+    <link rel="stylesheet" href="../landing/shared-form.css">
+    <link rel="stylesheet" href="shared-superhuman.css">
+    <link rel="stylesheet" href="shared-ledger.css">
+    <link rel="stylesheet" href="reference-system.css">
+    <script defer="" src="../landing/demo-data.js"></script>
+    <script defer="" src="../landing/shared-ui.js"></script>
+    <script defer="" src="../landing/asset-network.js"></script>
+    <script defer="" src="../landing/shared-form.js"></script>
+    <script defer="" src="../landing/vendor/libphonenumber-max.js"></script>
+    <script defer="" src="../landing/trial-form.js"></script>
+    <script defer="" src="../landing/research-story-data.js"></script>
+    <script defer="" src="../landing/research-chapters.js"></script>
+    <script defer="" src="shared-ledger.js"></script>
+    <script defer="" src="shared-superhuman.js"></script>
+    <script defer="" src="page.js"></script>
+  </head>
+  <body class="sh-page">
+    <!-- THESIS: 人与 AI 研究层共处，AI 整理依据，人决定下一步，不做仪表盘截图墙。
+      OWN-WORLD: 原 bo 深蓝与亮蓝，冷白画布，Noto Sans SC 中文与 Inter 英文，透明资料摘录。
+      STORY: 明确猎头定位，阅读四种业务、依据与资产积累，申请 Coming Soon 试用。
+      FIRST VIEWPORT: 通栏摄影右侧人物与 AI 层，左侧 64px 品牌、32px 定位、完整文案与主按钮，两侧资料摘录，下区标题露出。
+      FORM: 用户指定 Superhuman，选择 A；随后明确将传统纸质办公配图改为 AI + 人。seed: user-pinned-superhuman-A。
+      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance -->
+    <div id="homepage" class="sh-homepage sh-static"><a class="f-skip" href="#main">跳到正文</a>
+    <span class="f-header-sentinel" aria-hidden="true"></span>
+    <header class="f-header"><div class="f-container f-header-inner">
+      <a href="#main" aria-label="铂寻 Boseek 首页"><span class="f-brand f-brand-small"><img src="assets/boseek-wordmark.svg" alt="Boseek 铂寻" width="187" height="187"></span></a>
+      <nav class="f-nav" id="f-navigation" aria-label="主导航"><a href="#work">业务场景</a><a href="#research">决策支持</a><a href="#about">关于铂寻</a></nav>
+      <div class="f-header-actions"><a class="f-button" href="#apply">申请试用<svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></a></div>
+    </div></header>
+    <main id="main" tabindex="-1">
+      <section class="sh-hero" aria-labelledby="sh-hero-title">
+        <img class="sh-hero-photo" src="assets/hero-ai-human.webp" width="1600" height="901" alt="AI 协作概念摄影：猎头面向相互关联的数字研究层，审阅信息而非整理纸质文件" fetchpriority="high">
+        <div class="f-container sh-hero-inner"><div class="sh-hero-copy text-ink-charcoal">
+          <h1 class="sh-brand-title" id="sh-hero-title" lang="en">HunterBuddy</h1>
+          <p class="sh-position">猎头的 AI 工作伙伴</p>
+          <p class="sh-hero-description">围绕岗位跨渠道找人，整理身份、经历与匹配依据。</p>
+          <p class="sh-hero-description">关联公司、岗位和专业成果，让研究持续积累，把关键判断留给你。</p>
+          <div class="sh-hero-actions"><a class="f-button" href="#apply">申请试用<svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></a><span class="sh-status">即将上线</span></div>
+        </div></div>
+        <aside class="sh-excerpt sh-excerpt--request" aria-label="岗位要求摘录"><strong><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6Z"></path><path d="M14 2v6h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>岗位要求</strong><p>视觉算法负责人</p></aside>
+        <aside class="sh-excerpt sh-excerpt--evidence" aria-label="AI 研究依据摘录"><strong><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"></path></svg>匹配依据</strong><p>资料来源与待确认条件</p></aside>
+      </section><section class="sh-section sh-work" id="work" tabindex="-1" aria-labelledby="sh-work-title"><div class="f-container">
+      <h2 id="sh-work-title">从找人到找机会，<br>把工作接起来。</h2>
+      <p class="sh-intro">一个岗位、一家目标公司或一位候选人，都可以成为工作的起点。</p>
+      <p class="sh-intro">HunterBuddy 沿着你的目标查找资料、关联人物与公司，把分散的信息整理成有依据的人选、客户线索、人才版图和岗位机会。</p>
+    <div class="sh-static-works" id="sh-work-panel" tabindex="0" style="min-height: 504px;"><details class="sh-static-work" open=""><summary>岗位找人 <svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></summary><div class="sh-work-panel"><div class="sh-work-lead"><h3>给出岗位要求，<br>找到人，也看清为什么。</h3><p>从岗位与客户要求出发，围绕目标公司，在已有候选人、公开履历、论文与专利中跨渠道找人。</p><p>核对身份、合并重复资料，对照岗位留下匹配理由、来源与待确认条件。谁值得联系，由你判断。</p><p class="sh-context">机器人公司 · 视觉算法负责人</p></div><article class="sh-result"><div class="sh-result-heading"><h4>值得进一步了解的人选与匹配依据</h4></div><ul class="sh-result-rows sh-result-people"><li><div><strong>林越</strong><span>工业视觉 · 团队负责人</span></div><div><p>推荐依据：产线视觉与算法团队经历。</p><p class="sh-follow-up">仍需了解：实际管理范围。</p></div></li><li><div><strong>周宁</strong><span>机器人感知 · 技术骨干</span></div><div><p>推荐依据：相关论文与项目经历。</p><p class="sh-follow-up">仍需了解：量产落地经验。</p></div></li><li><div><strong>陈思</strong><span>视觉算法 · 项目负责人</span></div><div><p>推荐依据：跨团队交付经历。</p><p class="sh-follow-up">仍需了解：近期职责与求职意向。</p></div></li></ul><p class="sh-example-note">研究摘录 · 示例数据</p></article></div><div class="sh-static-evidence"><h3>来源与判断</h3><h4>岗位要求</h4><p>负责工业视觉方向，具备项目交付与团队协作经历。未提供的条件保持未知。</p><h4>候选人资料</h4><p>匹配理由对应已有经历与相关成果，资料来源和需要进一步了解的条件分别保留。</p><h3>仍需核实</h3><ul><li>岗位中哪些条件不可妥协？</li><li>人选当前任职与项目职责是否准确？</li><li>本人求职意向及联系许可是否已确认？</li></ul></div></details><details class="sh-static-work"><summary>客户开发 <svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></summary><div class="sh-work-panel"><div class="sh-work-lead"><h3>从公司变化，<br>找到值得跟进的客户机会。</h3><p>结合新业务、新基地和招聘动态，梳理公司业务、相关岗位与关键角色，发现潜在客户需求。</p><p>留下值得关注的原因、负责人线索和沟通切入点。带着背景核实需求，让下一次客户沟通有备而来。</p><p class="sh-context">机器人与智能制造</p></div><article class="sh-result"><div class="sh-result-heading"><h4>星川机器人</h4></div><ul class="sh-result-rows"><li><div><strong>新基地与技术岗位信息同时出现</strong><span>观察到的变化</span></div><div><p>新生产基地的公开信息，与视觉、控制方向的岗位需求同时出现。</p></div></li><li><div><strong>业务扩张出现技术团队需求线索</strong><span>潜在需求</span></div><div><p>招聘优先级、预算与需求有效性，仍需进一步沟通确认。</p></div></li><li><div><strong>从新基地交付计划与岗位需求聊起</strong><span>沟通切入点</span></div><div><p>进一步核实相关负责角色和有效的联系路径，判断是否值得跟进。</p></div></li></ul><p class="sh-example-note">研究摘录 · 示例数据</p></article></div><div class="sh-static-evidence"><h3>来源与判断</h3><h4>生产基地动态</h4><p>新增产线与交付计划可支持业务扩张线索，但不能直接认定招聘委托已经成立。</p><h4>岗位信息</h4><p>视觉算法与运动控制方向的岗位需求，仍需核实优先级、招聘预算、负责人与对外渠道。</p><h3>仍需核实</h3><ul><li>招聘需求是否仍然有效？</li><li>哪位负责人适合进一步沟通？</li><li>现有联系路径是否已获授权？</li></ul></div></details><details class="sh-static-work"><summary>人才梳理 <svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></summary><div class="sh-work-panel"><div class="sh-work-lead"><h3>从一家公司，<br>梳理团队与关键人才。</h3><p>围绕目标公司的团队与关键岗位，关联公开任职、候选人资料以及论文、专利中的人物线索。</p><p>把人物角色、关系依据和未覆盖的岗位放在同一份研究里。已知继续核对，缺口继续补充，让下一轮寻访有方向。</p><p class="sh-context">目标公司 · 团队研究</p></div><article class="sh-result"><div class="sh-result-heading"><h4>星川机器人 · 关键角色</h4></div><table class="sh-roles"><thead><tr><th>团队</th><th>关键岗位</th><th>当前线索</th></tr></thead><tbody><tr><td data-label="团队">视觉团队</td><td data-label="关键岗位">视觉算法负责人</td><td data-label="当前线索">有负责人任职线索，人物身份与当前职责待确认。</td></tr><tr><td data-label="团队">控制团队</td><td data-label="关键岗位">运动控制负责人</td><td data-label="当前线索">有相关技术成果线索，作者或发明人与真实任职的对应关系待核实。</td></tr><tr><td data-label="团队">产品团队</td><td data-label="关键岗位">产品交付负责人</td><td data-label="当前线索">负责人尚未覆盖，保留为下一轮资料补充方向。</td></tr></tbody></table><p class="sh-example-note">研究摘录 · 示例数据</p></article></div><div class="sh-static-evidence"><h3>来源与判断</h3><h4>团队与岗位</h4><p>不同团队按各自公开线索整理，不把合作、共同作者或联系关系当作汇报关系。</p><h4>技术成果</h4><p>论文与专利只支持技术方向与人物发现，需要进一步核验身份和真实任职。</p><h3>仍需核实</h3><ul><li>团队名称与职责是否仍然有效？</li><li>线索人物能否与已有候选人核验为同一人？</li><li>哪些岗位与汇报关系尚没有可靠依据？</li></ul></div></details><details class="sh-static-work"><summary>候选人机会 <svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></summary><div class="sh-work-panel"><div class="sh-work-lead"><h3>从候选人的经历，<br>找到值得讨论的下一站。</h3><p>结合专业方向、项目经历与候选人意向，研究相关公司和岗位，寻找手上岗位之外的机会。</p><p>对照经历、职责与地点，保留匹配依据和待确认条件。哪些机会值得沟通、是否推荐，由你判断。</p><p class="sh-context">候选人 · 新机会研究</p></div><article class="sh-result"><div class="sh-result-heading"><h4>林越 · 工业视觉与团队管理</h4></div><ul class="sh-result-rows"><li><div><strong>算法落地与小团队交付</strong><span>已有经验</span></div><div><p>沿已有项目经历研究相关岗位，保留资料来源与不确定处。</p></div></li><li><div><strong>工业视觉与机器人感知岗位</strong><span>可继续研究的方向</span></div><div><p>从专业方向与已有经历出发，进一步了解公司与岗位要求。</p></div></li><li><div><strong>岗位职责、工作地点与本人意向</strong><span>需要比较的条件</span></div><div><p>缺失条件保留待确认。先讨论方向、核实机会，再决定是否对外推荐。</p></div></li></ul><p class="sh-example-note">研究摘录 · 示例数据</p></article></div><div class="sh-static-evidence"><h3>来源与判断</h3><h4>本人要求</h4><p>人选希望继续工业视觉方向。未提供的薪酬、地点与到岗时间保持未知。</p><h4>市场机会</h4><p>公开岗位线索仅供研究，不意味着公司已接受推荐或人选已同意对外传递资料。</p><h3>仍需核实</h3><ul><li>本人下一步最在意的条件是什么？</li><li>机会的职责与要求是否已核实？</li><li>对外推荐的内容和范围是否得到同意？</li></ul></div></details></div></div></section><section class="sh-section sh-research" id="research" tabindex="-1" aria-labelledby="sh-research-title"><div class="f-container">
+      <div class="sh-research-heading"><h2 id="sh-research-title">看得更清楚，<br>走得更从容。</h2><div><p class="sh-intro">不只看到结果，也看清依据与缺口。</p><p class="sh-intro">HunterBuddy 整理信息，关键判断和对外沟通仍由你掌握。</p></div></div>
+      <div class="sh-research-carousel" data-research-chapters="" data-presentation="carousel" data-chapter="0" aria-roledescription="轮播"><div class="p-stage"><div class="p-photo sh-research-track" id="sh-research-slides"><article class="p-slide sh-research-slide sh-research-layout is-current" data-chapter-slide="0" aria-labelledby="sh-research-chapter-0"><div class="sh-chapter"><h3 id="sh-research-chapter-0">给出结论，<br>也保留依据。</h3><p>候选人的经历、岗位要求和公司变化，与对应来源一起呈现。看清哪里匹配、为什么值得关注，不必只凭一份名单做判断。</p></div><div class="sh-research-case" aria-label="研究依据示意"><h4 class="sh-case-title">资料来源与匹配理由</h4><div class="sh-citation"><h4>岗位要求</h4><p>负责工业视觉方向，具备项目交付与团队协作经历。未提供的条件保持未知。</p></div><div class="sh-citation"><h4>林越 · 工业视觉 · 团队负责人</h4><p>产线视觉与算法团队经历。</p></div><div class="sh-citation"><h4>候选人资料</h4><p>匹配理由对应已有经历与相关成果，资料来源和需要进一步了解的条件分别保留。</p></div><p class="sh-example-note">机器人公司 · 视觉算法负责人 · 示例数据</p></div></article><article class="p-slide sh-research-slide sh-research-layout" data-chapter-slide="1" aria-labelledby="sh-research-chapter-1"><div class="sh-chapter"><h3 id="sh-research-chapter-1">标明缺口，<br>不把推测当事实。</h3><p>身份、任职、管理范围和求职意向，分别标明依据与缺口。暂时没有的信息保持待确认，让你知道还需要问什么。</p></div><div class="sh-research-case" aria-label="研究依据示意"><h4 class="sh-case-title">已有依据与待确认事项</h4><dl class="sh-gaps"><div><dt>实际管理范围</dt><dd>待了解</dd></div><div><dt>身份与当前任职</dt><dd>待核实</dd></div><div><dt>本人求职意向</dt><dd>待确认</dd></div></dl><p class="sh-example-note">机器人公司 · 视觉算法负责人 · 示例数据</p></div></article><article class="p-slide sh-research-slide sh-research-layout" data-chapter-slide="2" aria-labelledby="sh-research-chapter-2"><div class="sh-chapter"><h3 id="sh-research-chapter-2">找谁、何时联系，<br>由你决定。</h3><p>哪些人值得联系、哪些公司值得跟进、是否对外推荐，由你决定。研究结果为判断提供支持，不替你做承诺。</p></div><div class="sh-research-case" aria-label="研究依据示意"><h4 class="sh-case-title">联系时机与推荐判断</h4><ul class="sh-review-questions"><li>实际负责哪些项目与团队？</li><li>当前任职与项目职责是否准确？</li><li>本人求职意向及联系许可是否已确认？</li></ul><p class="sh-example-note">机器人公司 · 视觉算法负责人 · 示例数据</p></div></article></div>
+      </div></div>
+    </div></section><section class="sh-section sh-memory" id="memory" tabindex="-1" aria-labelledby="f-memory-title"><div class="f-container"><h2 id="f-memory-title">做过的研究，<br>不必从头再来。</h2><p class="sh-intro sh-memory-intro">不只是保存五类资料，更把职业经历、招聘需求、人物角色与技术成果连在一起。<br>找信息、找人、找岗位，都能从已有研究继续出发。</p><div class="sh-ledger" data-sh-ledger-active-path="information">
+      
+      <div class="sh-ledger-panel" id="sh-ledger-1-panel" tabindex="0">
+        <div class="sh-ledger-story" aria-live="polite" aria-atomic="true" style="min-height: 0px;"><div class="sh-ledger-story-content" data-sh-ledger-story="information"><ol class="sh-ledger-trail" aria-label="研究路径"><li class="sh-ledger-trail-step"><span>论文与专利</span></li><li class="sh-ledger-trail-step"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>候选人</span></li><li class="sh-ledger-trail-step"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>公司</span></li><li class="sh-ledger-trail-step"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>联系人</span></li></ol>
+      <h3 class="sh-ledger-story-title">一项技术成果，连起人物与组织的线索。</h3>
+      <p class="sh-ledger-story-copy">从论文与专利发现专业人物，再沿职业经历研究公司与相关角色。零散资料因此有了上下文，也有了可以追溯的来由。</p>
+      <p class="sh-ledger-story-check">作者身份、真实任职与联系人职责分别核验，不能把共同作者当作汇报关系。</p>
+      </div><div class="sh-ledger-story-content" data-sh-ledger-story="people"><ol class="sh-ledger-trail" aria-label="研究路径"><li class="sh-ledger-trail-step"><span>岗位</span></li><li class="sh-ledger-trail-step"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>候选人</span></li><li class="sh-ledger-trail-step"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>论文与专利</span></li></ol>
+      <h3 class="sh-ledger-story-title">一个岗位，找到有依据、可审阅的人选。</h3>
+      <p class="sh-ledger-story-copy">岗位要求连接候选人的经历与能力，论文与专利补充专业线索。推荐不只留下姓名，也保留为什么值得继续了解的依据。</p>
+      <p class="sh-ledger-story-check">技术成果不等于量产或管理经验；匹配条件与本人意向仍需确认。</p>
+      </div><div class="sh-ledger-story-content" data-sh-ledger-story="jobs"><ol class="sh-ledger-trail" aria-label="研究路径"><li class="sh-ledger-trail-step"><span>候选人</span></li><li class="sh-ledger-trail-step"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>公司</span></li><li class="sh-ledger-trail-step"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>岗位</span></li></ol>
+      <h3 class="sh-ledger-story-title">一段职业经历，延伸到值得讨论的新机会。</h3>
+      <p class="sh-ledger-story-copy">从候选人的经历与明确意向出发，研究相关公司与岗位需求。已有资产相互参照，让下一次机会研究不必重新开始。</p>
+      <p class="sh-ledger-story-check">公开岗位只是机会线索；需求有效性、本人意向与推荐许可需逐项确认。</p>
+      </div></div>
+        <div class="sh-ledger-evidence">
+          <figure class="sh-ledger-figure" aria-labelledby="sh-ledger-1-caption">
+            <div class="sh-ledger-map">
+              <svg class="sh-ledger-wires" aria-hidden="true" focusable="false" viewBox="0 0 728.484375 582"><g class="sh-ledger-wire-group" data-sh-ledger-wire="demand"><path class="sh-ledger-wire" d="M 596.390625 146 C 596.390625 186 596.390625 186 596.390625 226"></path><circle class="sh-ledger-port sh-ledger-port--from" r="2" cx="596.390625" cy="146"></circle><circle class="sh-ledger-port sh-ledger-port--to" r="2" cx="596.390625" cy="226"></circle></g><g class="sh-ledger-wire-group sh-ledger-wire-group--active" data-sh-ledger-wire="role"><path class="sh-ledger-wire" d="M 704.46875 93 C 724.484375 93 724.484375 93 724.484375 117 L 724.484375 477 C 724.484375 501 724.484375 501 472.3125 501"></path><circle class="sh-ledger-port sh-ledger-port--from" r="2" cx="704.46875" cy="93"></circle><circle class="sh-ledger-port sh-ledger-port--to" r="2" cx="472.3125" cy="501"></circle></g><g class="sh-ledger-wire-group sh-ledger-wire-group--active" data-sh-ledger-wire="experience"><path class="sh-ledger-wire" d="M 488.3125 69 C 389.05 69 339.41875 279 240.15625 279"></path><circle class="sh-ledger-port sh-ledger-port--from" r="2" cx="488.3125" cy="69"></circle><circle class="sh-ledger-port sh-ledger-port--to" r="2" cx="240.15625" cy="279"></circle></g><g class="sh-ledger-wire-group sh-ledger-wire-group--pending" data-sh-ledger-wire="fit"><path class="sh-ledger-wire" d="M 488.3125 303 C 389.05 303 339.41875 303 240.15625 303"></path><circle class="sh-ledger-port sh-ledger-port--from" r="2" cx="488.3125" cy="303"></circle><circle class="sh-ledger-port sh-ledger-port--to" r="2" cx="240.15625" cy="303"></circle></g><g class="sh-ledger-wire-group sh-ledger-wire-group--pending" data-sh-ledger-wire="connection"><path class="sh-ledger-wire" d="M 256.15625 501 C 194.1171875 501 132.078125 396 132.078125 356"></path><circle class="sh-ledger-port sh-ledger-port--from" r="2" cx="256.15625" cy="501"></circle><circle class="sh-ledger-port sh-ledger-port--to" r="2" cx="132.078125" cy="356"></circle></g><g class="sh-ledger-wire-group sh-ledger-wire-group--active" data-sh-ledger-wire="authorship"><path class="sh-ledger-wire" d="M 132.078125 146 C 132.078125 186 132.078125 186 132.078125 226"></path><circle class="sh-ledger-port sh-ledger-port--from" r="2" cx="132.078125" cy="146"></circle><circle class="sh-ledger-port sh-ledger-port--to" r="2" cx="132.078125" cy="226"></circle></g></svg>
+              <ul class="sh-ledger-documents" aria-label="五类核心资产"><li class="sh-ledger-sheet sh-ledger-sheet--active" data-sh-ledger-node="company">
+                  <div class="sh-ledger-sheet-body">
+                    <div class="sh-ledger-sheet-heading"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 22V3h12v19"></path><path d="M16 9h4v13"></path><path d="M8 7h4"></path><path d="M8 11h4"></path><path d="M8 15h4"></path><path d="M8 19h4"></path></svg><h4 class="sh-ledger-sheet-title">公司</h4></div>
+                    <p class="sh-ledger-sheet-detail">产业、组织与变化</p>
+                    <span class="sh-ledger-sheet-status">当前路径</span>
+                  </div>
+                </li><li class="sh-ledger-sheet sh-ledger-sheet--active" data-sh-ledger-node="contact">
+                  <div class="sh-ledger-sheet-body">
+                    <div class="sh-ledger-sheet-heading"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"></path><path d="M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"></path></svg><h4 class="sh-ledger-sheet-title">联系人</h4></div>
+                    <p class="sh-ledger-sheet-detail">角色与联系路径</p>
+                    <span class="sh-ledger-sheet-status">当前路径</span>
+                  </div>
+                </li><li class="sh-ledger-sheet" data-sh-ledger-node="job">
+                  <div class="sh-ledger-sheet-body">
+                    <div class="sh-ledger-sheet-heading"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v14H3Z"></path><path d="M8 7V3h8v4"></path><path d="M3 12a20 20 0 0 0 18 0"></path><path d="M12 11v4"></path></svg><h4 class="sh-ledger-sheet-title">岗位</h4></div>
+                    <p class="sh-ledger-sheet-detail">要求与招聘需求</p>
+                    <span class="sh-ledger-sheet-status">其他资料</span>
+                  </div>
+                </li><li class="sh-ledger-sheet sh-ledger-sheet--active" data-sh-ledger-node="candidate">
+                  <div class="sh-ledger-sheet-body">
+                    <div class="sh-ledger-sheet-heading"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21a6 6 0 0 0-12 0"></path><path d="M10 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"></path><path d="M20 8a3 3 0 0 1-3 3"></path><path d="M18 15a5 5 0 0 1 4 5"></path></svg><h4 class="sh-ledger-sheet-title">候选人</h4></div>
+                    <p class="sh-ledger-sheet-detail">经历、能力与意向</p>
+                    <span class="sh-ledger-sheet-status">当前路径</span>
+                  </div>
+                </li><li class="sh-ledger-sheet sh-ledger-sheet--active sh-ledger-sheet--start" data-sh-ledger-node="research">
+                  <div class="sh-ledger-sheet-body">
+                    <div class="sh-ledger-sheet-heading"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6Z"></path><path d="M14 2v6h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg><h4 class="sh-ledger-sheet-title">论文与专利</h4></div>
+                    <p class="sh-ledger-sheet-detail">专业方向与成果</p>
+                    <span class="sh-ledger-sheet-status">研究起点</span>
+                  </div>
+                </li></ul>
+              <ul class="sh-ledger-map-labels" aria-hidden="true"><li class="sh-ledger-map-label" data-sh-ledger-label="demand" style="--sh-label-x: 596.390625px; --sh-label-y: 186px;">招聘需求</li><li class="sh-ledger-map-label sh-ledger-map-label--active" data-sh-ledger-label="role" style="--sh-label-x: 720.484375px; --sh-label-y: 396px;">任职与职责</li><li class="sh-ledger-map-label sh-ledger-map-label--active" data-sh-ledger-label="experience" style="--sh-label-x: 364.23431396484375px; --sh-label-y: 174.00009155273438px;">职业经历</li><li class="sh-ledger-map-label sh-ledger-map-label--pending" data-sh-ledger-label="fit" style="--sh-label-x: 364.234375px; --sh-label-y: 303px;">匹配依据</li><li class="sh-ledger-map-label sh-ledger-map-label--pending" data-sh-ledger-label="connection" style="--sh-label-x: 173.71432495117188px; --sh-label-y: 447.2671813964844px;">联系路径</li><li class="sh-ledger-map-label sh-ledger-map-label--active" data-sh-ledger-label="authorship" style="--sh-label-x: 132.078125px; --sh-label-y: 186px;">作者 / 发明人</li></ul>
+            </div>
+            <figcaption class="sh-ledger-caption" id="sh-ledger-1-caption"><span>资产关系示意</span><span>虚线为需确认的匹配或联系线索</span></figcaption>
+          </figure>
+          <details class="sh-ledger-relations" id="sh-ledger-1-relations" open="">
+            <summary class="sh-ledger-summary"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>全部六种关系与待核实事项</span></summary>
+            <ol class="sh-ledger-relation-list" aria-label="资产之间的关系"><li class="sh-ledger-relation" data-sh-ledger-edge="demand">
+                <h4 class="sh-ledger-relation-title">招聘需求</h4>
+                <p class="sh-ledger-relation-endpoints"><span>公司</span><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>岗位</span></p>
+                <p class="sh-ledger-relation-note">有效性待核实</p>
+              </li><li class="sh-ledger-relation sh-ledger-relation--active" data-sh-ledger-edge="role">
+                <h4 class="sh-ledger-relation-title">任职与职责</h4>
+                <p class="sh-ledger-relation-endpoints"><span>公司</span><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>联系人</span></p>
+                <p class="sh-ledger-relation-note">当前角色待核实</p>
+              </li><li class="sh-ledger-relation sh-ledger-relation--active" data-sh-ledger-edge="experience">
+                <h4 class="sh-ledger-relation-title">职业经历</h4>
+                <p class="sh-ledger-relation-endpoints"><span>公司</span><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>候选人</span></p>
+                <p class="sh-ledger-relation-note">任职信息待核实</p>
+              </li><li class="sh-ledger-relation" data-sh-ledger-edge="fit">
+                <h4 class="sh-ledger-relation-title">匹配依据</h4>
+                <p class="sh-ledger-relation-endpoints"><span>岗位</span><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>候选人</span></p>
+                <p class="sh-ledger-relation-note">条件与意向待核实</p>
+              </li><li class="sh-ledger-relation" data-sh-ledger-edge="connection">
+                <h4 class="sh-ledger-relation-title">联系路径</h4>
+                <p class="sh-ledger-relation-endpoints"><span>联系人</span><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>候选人</span></p>
+                <p class="sh-ledger-relation-note">关系与许可需确认</p>
+              </li><li class="sh-ledger-relation sh-ledger-relation--active" data-sh-ledger-edge="authorship">
+                <h4 class="sh-ledger-relation-title">作者 / 发明人</h4>
+                <p class="sh-ledger-relation-endpoints"><span>论文与专利</span><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>候选人</span></p>
+                <p class="sh-ledger-relation-note">同名身份需核验</p>
+              </li></ol>
+          </details>
+        </div>
+      </div>
+      <p class="sh-ledger-origin"><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"></path></svg><span>有效资料与来源、关系一起保存，成为下一次研究的起点。</span></p>
+    </div></div></section><section class="sh-section sh-about" id="about" tabindex="-1" aria-labelledby="sh-about-title"><div class="f-container sh-about-copy"><h2 id="sh-about-title">铂寻，<br>为猎头化繁解难</h2><div><p class="sh-intro">铂寻为独立猎头与精品团队打造 HunterBuddy。</p><p class="sh-intro">我们希望 AI 承接繁琐的资料查找与整理，让猎头把更多时间留给理解客户、判断人才和建立信任。</p><p class="sh-intro">工具连接信息，专业判断与人与人的沟通，始终由你掌握。</p></div></div><figure class="sh-about-photo"><img src="assets/about-ai-human.webp" width="1600" height="800" loading="lazy" alt="AI 协作概念摄影：数字研究层在背景提供支持，两位专业人士专注于交流和判断"></figure></section><section class="f-trial" id="apply" tabindex="-1" aria-labelledby="f-trial-title"><div class="f-container"><h2>申请 HunterBuddy 试用</h2><p class="sh-intro">产品正在开发中。留下你的信息，开放试用后我们会与你联系。</p><p class="sh-intro">申请表暂时无法加载，请刷新后重试。</p><noscript><p class="sh-intro">请启用 JavaScript 后申请试用。</p></noscript></div></section></main><footer class="sh-footer" id="footer"><div class="f-container"><div class="sh-footer-top"><div class="sh-footer-brand"><span class="f-brand"><img src="assets/boseek-wordmark-dark.svg" alt="Boseek 铂寻" width="187" height="187" loading="lazy"></span><p>HunterBuddy，猎头的 AI 工作伙伴。</p><p>铂寻为独立猎头与精品团队打造。</p></div><div class="sh-footer-group"><h2>产品</h2><ul><li>产品博客</li><li>产品路线图</li><li>用户社区</li></ul></div><div class="sh-footer-group"><h2>法律</h2><ul><li>隐私政策</li><li>服务条款</li><li>数据处理协议</li></ul></div><div class="sh-footer-contact"><p class="sh-latin">www.boseeksi.com</p><p>联系邮箱：待补充</p></div></div><div class="sh-footer-bottom"><p>© <span data-footer-year="">2026</span> 铂寻 Boseek</p><ul aria-label="网站主体与备案信息"><li>网站主体：北京铂寻智能科技有限公司</li><li>ICP 备案号：待补充</li><li>公安备案号：待补充</li></ul></div></div></footer></div>
+  
+
+
+</body></html>
