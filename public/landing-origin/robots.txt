@@ -1,0 +1,6 @@
+# 铂寻 Boseek · www.boseekai.com
+# 搜索引擎和 AI 公司的爬虫全部放行（见 docs/seo-geo-plan.md 第 2 条）
+User-agent: *
+Allow: /
+
+Sitemap: https://www.boseekai.com/sitemap.xml

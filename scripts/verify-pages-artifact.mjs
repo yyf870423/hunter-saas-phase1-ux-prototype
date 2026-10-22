@@ -123,6 +123,8 @@ const alternatives = {
     "favicon.svg",
     "favicon.ico",
     "apple-touch-icon.png",
+    "robots.txt",
+    "sitemap.xml",
     ...assets,
     "assets/fonts/dm-serif-display.ttf",
     "assets/fonts/dmserifdisplay-OFL.txt",
