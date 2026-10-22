@@ -38,5 +38,17 @@
 - 百度搜索资源平台：`https://www.boseekai.com`，只提供文件和 HTML 标签两种验证，用 HTML 标签。`<meta name="baidu-site-verification" content="codeva-SxHxeGOeZL" />` 已放进首页，b4317e7 部署后验证通过。这行代码要一直保留。
 - Bing：从 Google Search Console 导入 `boseekai.com`，已完成，不需要额外代码。
 
-## 第一阶段：技术基础（待确认）
-见对话中的汇总；确认后在此补记实施清单和结果。
+## 第一阶段：技术基础
+
+分两批做：第一批只改给搜索引擎看的部分，页面外观不变；第二批做英文 `/en/`。
+
+### 第一批（2026-10-23，已验收）
+- `public/landing-origin/robots.txt`：搜索引擎和 AI 爬虫全部放行，写明 sitemap 位置。
+- `public/landing-origin/sitemap.xml`：目前只有中文首页。
+- 首页 `<head>`：新标题和描述、canonical（`https://www.boseekai.com/`）、Open Graph 文字标签（分享图待定）。
+- JSON-LD：Organization、WebSite、WebPage、SoftwareApplication（HunterBuddy）、VideoObject（中文短片）。
+- 产品没有公开价格，Google 富媒体检测会提示缺少 offers，属预期。
+- 上线后：三个平台提交 sitemap；用 Google 富媒体检测工具检查结构化数据。
+
+### 第二批（待做）
+- 英文静态页面 `/en/`、hreflang、语言切换改为 `/` 与 `/en/`、`?lang=en` 301 到 `/en/`、sitemap 加入 `/en/`、英文标题与描述。
