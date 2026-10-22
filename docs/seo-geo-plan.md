@@ -36,7 +36,7 @@
 ### 5. 站长工具验证（2026-10-23）
 - Google Search Console：网域资源 `boseekai.com`，阿里云解析 TXT 记录验证，已通过。这条 TXT 记录要一直保留。
 - 百度搜索资源平台：`https://www.boseekai.com`，只提供文件和 HTML 标签两种验证，用 HTML 标签。`<meta name="baidu-site-verification" content="codeva-SxHxeGOeZL" />` 已放进首页，部署上线后再点“完成验证”。这行代码要一直保留。
-- Bing：待做。
+- Bing：从 Google Search Console 导入 `boseekai.com`，已完成，不需要额外代码。
 
 ## 第一阶段：技术基础（待确认）
 见对话中的汇总；确认后在此补记实施清单和结果。
