@@ -512,7 +512,7 @@ export function Stage1Shell() {
                 >
                   <Icon name={item.icon} />
                   <span>{item.label}</span>
-                  {item.count ? <em>{item.count}</em> : null}
+                  {item.count ? <em data-tone={item.id === "signals" ? "new" : undefined}>{item.count}</em> : null}
                 </button>
               ))}
             </nav>

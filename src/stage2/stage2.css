@@ -461,8 +461,7 @@
 .s2-hunter-reply code {
   padding: 1px 5px;
   color: color-mix(in srgb, var(--s1-accent) 82%, var(--s1-ink));
-  font-family:
-    ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-family: var(--b-mono);
   font-size: 0.88em;
   background: color-mix(in srgb, var(--s1-accent-soft) 60%, var(--s1-canvas));
   border: 1px solid color-mix(in srgb, var(--s1-accent) 12%, var(--s1-line));
@@ -474,8 +473,7 @@
   padding: 12px 14px;
   overflow: auto;
   color: var(--s1-ink);
-  font-family:
-    ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-family: var(--b-mono);
   font-size: 12px;
   line-height: 19px;
   background: var(--s1-canvas);
@@ -3697,7 +3695,7 @@
   background: color-mix(in srgb, var(--s1-accent) 6%, var(--s1-canvas));
 }
 .s2-artifact-spreadsheet.is-csv .s2-artifact-grid td {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--b-mono);
 }
 .s2-artifact-spreadsheet > footer {
   display: flex;

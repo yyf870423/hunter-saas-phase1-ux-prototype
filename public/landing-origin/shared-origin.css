@@ -8,11 +8,31 @@
 
 @font-face {
   font-family: "Origin Chinese";
-  src: url("assets/fonts/noto-serif-sc.ttf") format("truetype");
+  src: url("assets/fonts/noto-serif-sc-subset.woff2") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
+
+/* 正文和界面：Inter（官网只用到 400 / 500 两个字重，只含拉丁字符）+ 系统中文黑体，和产品用同一套 */
+@font-face {
+  font-family: "Boseek Sans";
+  src: url("assets/fonts/inter-400.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+00D7, U+2000-206F, U+20AC, U+2122, U+2190-2199, U+2212, U+2215, U+2248, U+2264-2265, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Boseek Sans";
+  src: url("assets/fonts/inter-500.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+00D7, U+2000-206F, U+20AC, U+2122, U+2190-2199, U+2212, U+2215, U+2248, U+2264-2265, U+FEFF, U+FFFD;
+}
+
 
 :root {
   color-scheme: dark;
@@ -38,7 +58,12 @@
   --o-display:
     "Origin Display", "Origin Chinese", "Songti SC", "Noto Serif SC", Georgia,
     serif;
-  --o-mono: "SFMono-Regular", Consolas, monospace;
+  --f-font:
+    "Boseek Sans", "Helvetica Neue", Helvetica, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+  --o-mono: "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  /* 焦点框：和产品同一种形式（2px 间隙 + 2px 描边），颜色用浅色 */
+  --f-focus-ring: rgb(255 255 255 / 60%);
   --o-iris: #d1c9ff;
   --o-orchid: #dd90d8;
   --o-blue: #90b8f0;
@@ -361,4 +386,36 @@ body::after {
   .o-scenario-tabs .f-tab {
     font-size: 13px;
   }
+}
+
+/* ---------- 2026-10-22 · 风格统一（见 docs/brand-style-unification.md 第 3、4 条） ---------- */
+/* 图标线宽和产品统一为 1.8 */
+.f-icon {
+  stroke-width: 1.8;
+}
+
+/* 主按钮悬停：和产品同一条规则，填充色向背景色靠近一点 */
+.f-login-link:hover,
+.f-button:hover {
+  background: color-mix(in srgb, #ffffff 85%, var(--f-bg));
+  border-color: color-mix(in srgb, #ffffff 85%, var(--f-bg));
+}
+
+/* 焦点框：2px 间隙 + 2px 浅色描边，跟着元素圆角走 */
+button:focus-visible,
+a:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--f-focus-ring);
+  outline-offset: 2px;
+}
+
+.o-scenario-tabs .f-tab:focus-visible {
+  outline: 2px solid var(--f-focus-ring);
+  outline-offset: -4px;
+}
+
+.f-input:focus-visible,
+.f-check-control input:focus-visible {
+  outline: 2px solid var(--f-focus-ring);
+  outline-offset: 2px;
 }

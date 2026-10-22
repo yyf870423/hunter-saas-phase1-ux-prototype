@@ -1188,7 +1188,7 @@
 }
 
 .s5-device-code b {
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--b-mono);
   font-size: 25px;
   letter-spacing: 2px;
 }

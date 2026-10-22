@@ -2141,7 +2141,7 @@
 }
 .ops-model-key-list small {
   color: #7d858e;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--b-mono);
   font-size: 10px;
 }
 .ops-model-form-layout {

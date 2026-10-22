@@ -9,10 +9,12 @@
    - near-black grounds (#090a0b / #0f1011 / #191a1c) and, for light, a quiet paper grey;
    - flat, solid actions like the website's buttons, filled with the bo's lake blue;
    - the B5 bo logo's lake blue for accents, links, selection, info and the current-item marks,
-     and its coral crescent for small highlights (the live wire in empty states, unread badges);
+     and its coral crescent for small highlights (unread badges, new-lead marks);
    - hairline borders instead of shadows, 8px controls, 4px tooltips, pill-shaped chips;
-   - DM Serif Display / Song serif for page titles, a mono kicker above them;
-   - underline tabs, the research-network drawing for empty states, a slow light sweep for loading.
+   - a mono kicker above page titles;
+   - underline tabs, a slow light sweep for loading.
+   2026-10-22 style unification (docs/brand-style-unification.md): Inter + system sans for body and titles,
+   serif only for brand moments, no network drawing in empty states, coral only for unread / new-lead marks.
    ===================================================================================== */
 
 @font-face {
@@ -25,18 +27,46 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2190-2199;
 }
 
+/* body and UI: Inter 400 / 500 / 600 (Latin only), the website's files; Chinese falls through to the system sans */
+@font-face {
+  font-family: "Boseek Sans";
+  src: url("../assets/fonts/inter-400.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+00D7, U+2000-206F, U+20AC, U+2122, U+2190-2199, U+2212, U+2215, U+2248, U+2264-2265, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Boseek Sans";
+  src: url("../assets/fonts/inter-500.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+00D7, U+2000-206F, U+20AC, U+2122, U+2190-2199, U+2212, U+2215, U+2248, U+2264-2265, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Boseek Sans";
+  src: url("../assets/fonts/inter-600.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+00D7, U+2000-206F, U+20AC, U+2122, U+2190-2199, U+2212, U+2215, U+2248, U+2264-2265, U+FEFF, U+FFFD;
+}
+
 /* ---------------------------------------------------------------- tokens · light */
 :root,
 .s1-app {
   --b-display: "Boseek Display", "Songti SC", "Noto Serif CJK SC", "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", serif;
-  --b-sans: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --b-sans: "Boseek Sans", "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
   --b-mono: "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
   --b-radius: 8px;
   --b-radius-panel: 10px;
   --b-on-accent: #ffffff;
   /* the action fill: the bo's lake blue (primary buttons, checked boxes, the current page) */
   --b-ink-fill: #2f5bb8;
-  --b-ink-fill-hover: #264b9b;
+  --b-ink-fill-hover: color-mix(in srgb, var(--b-ink-fill) 85%, var(--s1-canvas));
   --b-on-ink: #ffffff;
   --b-focus: rgba(47, 91, 184, 0.45);
   --b-kicker: #2f5bb8;
@@ -94,7 +124,7 @@
 .s1-app[data-theme="dark"] {
   --b-on-accent: #0f1011;
   --b-ink-fill: #3a6bcc;
-  --b-ink-fill-hover: #4272d0;
+  --b-ink-fill-hover: color-mix(in srgb, var(--b-ink-fill) 85%, var(--s1-canvas));
   --b-on-ink: #ffffff;
   --b-focus: rgba(143, 180, 234, 0.5);
   --b-kicker: #8fb4ea;
@@ -388,11 +418,11 @@
 
 .s1-modal h2,
 .s1-drawer h2 {
-  font-family: var(--b-display);
-  font-size: 21px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  line-height: 1.35;
+  font-family: var(--b-sans);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.4;
 }
 
 .s1-app[data-theme="dark"] .s1-modal,
@@ -433,7 +463,7 @@
   background: #2e2e30;
 }
 
-/* ---------------------------------------------------------------- page titles: the website's serif */
+/* ---------------------------------------------------------------- page titles: sans, hierarchy by weight (serif stays with the website) */
 .s4-page-header h1,
 .s1-dashboard-head h1,
 .s2-page-heading h1,
@@ -446,9 +476,9 @@
 .s5-page-header h1,
 .s3-review-header h1,
 .s1-component-page > header h1 {
-  font-family: var(--b-display);
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  font-family: var(--b-sans);
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .s4-page-header h1,
@@ -456,8 +486,8 @@
 .s2-page-heading h1,
 .s2-periodic-heading h1,
 .s5-settings-titlebar h1 {
-  font-size: 30px;
-  line-height: 40px;
+  font-size: 24px;
+  line-height: 32px;
 }
 
 /* the kicker above a title: the website's mono, letter-spaced, in iris */
@@ -513,58 +543,22 @@
   color: var(--b-on-accent);
 }
 
-/* ---------------------------------------------------------------- empty state: the research network, at rest */
+/* ---------------------------------------------------------------- empty state: icon, title, one line, optional action */
 .s1-empty-state h2 {
-  font-family: var(--b-display);
-  font-size: 21px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  font-family: var(--b-sans);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .s1-empty-state.is-compact h2 {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .s1-empty-mark {
   position: relative;
   display: grid;
   place-items: center;
-}
-
-.s1-empty-net {
-  width: 168px;
-  height: 96px;
-  overflow: visible;
-}
-
-.s1-empty-net .w {
-  stroke: var(--s1-line-strong);
-  stroke-width: 1;
-  stroke-dasharray: 2 4;
-}
-
-.s1-empty-net .w.live {
-  stroke: var(--b-coral);
-  stroke-dasharray: 3 7;
-  stroke-width: 1.4;
-  animation: s1-wire-flow 1.6s linear infinite;
-}
-
-.s1-empty-net .n {
-  fill: var(--s1-surface);
-  stroke: var(--s1-line-strong);
-  stroke-width: 1;
-}
-
-.s1-empty-net .n.on {
-  fill: var(--b-coral);
-  stroke: none;
-}
-
-@keyframes s1-wire-flow {
-  to {
-    stroke-dashoffset: -20;
-  }
 }
 
 .s1-empty-mark > i {
@@ -577,13 +571,6 @@
   background: var(--s1-surface);
   border: 1px solid var(--s1-line-strong);
   border-radius: 50%;
-}
-
-.s1-empty-net + i {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .s1-empty-mark > i svg {
@@ -607,12 +594,6 @@
   .s1-empty-state.is-compact > .s1-empty-mark {
     grid-column: 1;
     grid-row: 1 / 3;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .s1-empty-net .w.live {
-    animation: none;
   }
 }
 
@@ -748,12 +729,12 @@
   letter-spacing: 0.14em;
 }
 
-/* ---------------------------------------------------------------- dashboard headings in the serif */
+/* ---------------------------------------------------------------- dashboard headings */
 .s1-dashboard-section-head h2 {
-  font-family: var(--b-display);
-  font-size: 21px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  font-family: var(--b-sans);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .s1-dashboard-section-head h2 > svg {
@@ -763,23 +744,12 @@
 }
 
 .s1-task-focus-detail h3 {
-  font-family: var(--b-display);
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  font-family: var(--b-sans);
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
-/* ---------------------------------------------------------------- the other empty states get the same network, drawn behind the icon */
-.s4-custom-empty::before,
-.s2-empty::before {
-  content: "";
-  width: 168px;
-  height: 96px;
-  margin-bottom: -72px;
-  background: var(--s1-line-strong);
-  -webkit-mask: var(--b-net) center / contain no-repeat;
-  mask: var(--b-net) center / contain no-repeat;
-}
-
+/* ---------------------------------------------------------------- the other empty states: the same icon in a circle */
 .s4-custom-empty > svg:first-child,
 .s2-empty > svg:first-child {
   position: relative;
@@ -797,14 +767,10 @@
 .s4-custom-empty b,
 .s2-empty h2 {
   margin-top: 16px;
-  font-family: var(--b-display);
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-}
-
-:root {
-  --b-net: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 168 96' fill='none' stroke='black' stroke-width='1'%3E%3Cpath stroke-dasharray='2 4' d='M84 48 33.6 21.8M84 48 24.8 70.9M84 48 137.4 19.4M84 48 143.7 68.5'/%3E%3Ccircle cx='30' cy='20' r='4'/%3E%3Ccircle cx='22' cy='72' r='3'/%3E%3Ccircle cx='140' cy='18' r='3'/%3E%3Ccircle cx='148' cy='70' r='4.5'/%3E%3C/svg%3E");
+  font-family: var(--b-sans);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 /* ---------------------------------------------------------------- the website's palette for categories and identity */
@@ -941,4 +907,31 @@
   width: 2px;
   border-radius: 2px;
   background: var(--s1-accent);
+}
+
+/* ---------------------------------------------------------------- coral: unread and new-lead marks only (docs/brand-style-unification.md §6) */
+.s1-notification-list > button.is-unread > i {
+  background: var(--b-coral);
+}
+
+/* new leads in 洞察中心: a coral count when the nav is open, a coral dot on the icon when it is closed */
+.s1-nav-section nav > button em[data-tone="new"] {
+  color: var(--b-coral-ink);
+  background: color-mix(in srgb, var(--b-coral) 14%, transparent);
+}
+
+.s1-app:not(.nav-expanded) .s1-nav-section nav > button:has(em[data-tone="new"]) {
+  position: relative;
+}
+
+.s1-app:not(.nav-expanded) .s1-nav-section nav > button:has(em[data-tone="new"])::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 6px;
+  height: 6px;
+  background: var(--b-coral);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--s1-nav);
 }
