@@ -482,7 +482,7 @@ export function MappingsListPage() {
                     <Icon name="menu" />
                   </span>
                   <span className="tg-graph-card-icon">
-                    <Icon name="route" />
+                    <Icon name="graph" />
                   </span>
                   <div>
                     <h2>{item.name}</h2>
@@ -568,7 +568,7 @@ export function MappingsListPage() {
           </div>
         ) : state === "normal" || state === "empty" ? (
           <div className="s4-custom-empty">
-            <Icon name="route" />
+            <Icon name="graph" />
             <b>
               {context.q
                 ? "没有匹配的知识图谱"
@@ -661,7 +661,7 @@ export function MappingCreatePage() {
       <section className="tg-create-panel">
         <header>
           <span>
-            <Icon name="route" />
+            <Icon name="graph" />
           </span>
           <div>
             <h2>图谱基本资料</h2>
@@ -1856,7 +1856,7 @@ function GraphDetailPanel({
         >
           <Icon name="close" />
         </button>
-        <Icon name="route" />
+        <Icon name="graph" />
         <h3>选择节点或关系</h3>
         <p>查看关联资产、来源证据、关系所有者和当前图页中的本地信息。</p>
       </aside>
@@ -3224,7 +3224,7 @@ function GraphHistoryTab({ notify, sourcePage }) {
             </article>
             <article>
               <span className="is-layout">
-                <Icon name="route" />
+                <Icon name="dashboard" />
               </span>
               <span>
                 <b>保留用户布局</b>
@@ -3529,7 +3529,7 @@ function GraphContent({
             className={view === "canvas" ? "is-active" : ""}
             onClick={() => changeView("canvas")}
           >
-            <Icon name="route" />
+            <Icon name="graph" />
             画布
           </button>
           <button
@@ -3537,7 +3537,7 @@ function GraphContent({
             className={view === "table" ? "is-active" : ""}
             onClick={() => changeView("table")}
           >
-            <Icon name="database" />
+            <Icon name="table" />
             层级表格
           </button>
         </div>
@@ -4127,7 +4127,7 @@ export function MappingDetailPage() {
   return (
     <div className="s4-detail-page tg-detail-page">
       <DetailHeader
-        icon="route"
+        icon="graph"
         title={graph.name}
         subtitle={graph.description}
         badges={[

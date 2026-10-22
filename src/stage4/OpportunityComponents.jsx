@@ -207,7 +207,7 @@ export function OpportunityFollowupSummary({ opportunity, ownerTaskId = "" }) {
       ["提醒状态", <StatusBadge tone={summary.followupStatus === "待跟进" ? "warning" : "neutral"}>{summary.followupStatus}</StatusBadge>],
       ["最近跟进", summary.lastFollowupAt ? displayDateTime(summary.lastFollowupAt) : "尚无跟进记录"]]} />
     <div className="s4-command-actions">
-      {taskOwned ? <Button icon="route" onClick={() => navigate("/tasks/" + plan.ownerTaskId)}>返回原任务处理</Button> : <>
+      {taskOwned ? <Button icon="task" onClick={() => navigate("/tasks/" + plan.ownerTaskId)}>返回原任务处理</Button> : <>
         {following ? <Button size="sm" icon="calendar" disabled={getOpportunityPermission()} onClick={() => setEditor("schedule")}>{plan ? "修改下次跟进" : "安排下次跟进"}</Button> : null}
         {plan ? <Button size="sm" tone="danger-outline" onClick={() => setEditor("cancel")}>取消安排</Button> : null}
       </>}

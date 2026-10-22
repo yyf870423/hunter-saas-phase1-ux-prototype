@@ -105,7 +105,7 @@ export function OpportunityDetailPage() {
   const company = context.companies.find((item) => item.id === opportunity.companyId && !context.deletedCompanies.includes(item.id));
   const contact = context.contacts.find((item) => item.id === opportunity.contactId && item.companyId === opportunity.companyId && !item.deletedAt);
   const changeTab = (value) => { const next = new URLSearchParams(params); next.set("tab", value); next.delete("followup"); setParams(next); };
-  return <div className="s4-detail-page"><DetailHeader icon="signal" title={opportunity.title} subtitle={summary.company}
+  return <div className="s4-detail-page"><DetailHeader icon="target" title={opportunity.title} subtitle={summary.company}
     badges={[{ label: opportunity.status, tone: opportunity.status === "跟进中" ? "success" : "neutral" }, { label: summary.directions + " 个招聘方向", tone: "info" }]}
     onBack={() => navigate("/opportunities")} onDelete={getOpportunityPermission() ? undefined : () => setRemove(true)}>
     <OpportunityStatusAction opportunity={opportunity} />

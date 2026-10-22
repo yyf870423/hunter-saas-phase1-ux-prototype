@@ -1275,7 +1275,7 @@ export const riskItems = [
 ];
 
 export const operationsNav = [
-  { label: "运营概况", icon: "home", to: "/ops/overview" },
+  { label: "运营概况", icon: "dashboard", to: "/ops/overview" },
   { label: "用户与工作空间", icon: "users", to: "/ops/users-workspaces" },
   { label: "订阅与额度", icon: "creditCard", to: "/ops/subscriptions" },
   { label: "运行与故障", icon: "activity", to: "/ops/tasks", badge: 3 },

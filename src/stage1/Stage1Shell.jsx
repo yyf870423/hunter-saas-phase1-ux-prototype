@@ -262,7 +262,7 @@ function NewMenu({ open, close, onSelect }) {
   return (
     <div className="s1-new-menu" role="menu" ref={ref}>
       {[
-        ["route", "新建任务", "直接说明目标，Hunter 会选择合适的推进方式"],
+        ["task", "新建任务", "直接说明目标，Hunter 会选择合适的推进方式"],
         ["plus", "手动新建资产", "进入对应业务资产创建正式记录"],
       ].map(([icon, title, description]) => (
         <button type="button" key={title} onClick={() => onSelect(title)}>
@@ -789,8 +789,8 @@ export function Stage1Shell() {
       <nav className="s1-mobile-tabs" aria-label="移动端主导航">
         {[
           ["dashboard", "工作台", "home"],
-          ["listChecks", "任务", "tasks"],
-          ["insight", "洞察", "signals"],
+          ["task", "任务", "tasks"],
+          ["signal", "洞察", "signals"],
           ["layers", "业务资产", "assets"],
           ["menu", "更多", "more"],
         ].map(([icon, label, id]) => (

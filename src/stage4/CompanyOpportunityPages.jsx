@@ -414,7 +414,7 @@ function CompanyRecruiting({ company }) {
           {companyOpportunities.map((item) => (
             <EntityLink
               key={item.id}
-              icon="signal"
+              icon="target"
               title={item.title}
               meta={`${item.status} · ${item.positions} 个岗位`}
               onClick={() => navigate(`/opportunities/${item.id}`)}

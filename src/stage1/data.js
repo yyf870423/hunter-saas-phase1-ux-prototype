@@ -8,8 +8,8 @@ export const navSections = [
     label: "核心业务",
     items: [
       { id: "home", label: "工作台", icon: "dashboard", route: "/home" },
-      { id: "tasks", label: "任务", icon: "listChecks", count: 2 },
-      { id: "signals", label: "洞察中心", icon: "insight", count: 3 },
+      { id: "tasks", label: "任务", icon: "task", count: 2 },
+      { id: "signals", label: "洞察中心", icon: "signal", count: 3 },
     ],
   },
   {
@@ -30,8 +30,8 @@ export const navSections = [
   {
     label: "研究资产",
     items: [
-      { id: "papers", label: "论文", icon: "fileText" },
-      { id: "patents", label: "专利", icon: "award" },
+      { id: "papers", label: "论文", icon: "paper" },
+      { id: "patents", label: "专利", icon: "patent" },
     ],
   },
 ];
@@ -76,7 +76,7 @@ export const mainlines = [
   {
     id: "mapping-embodied",
     type: "公司组织梳理",
-    icon: "database",
+    icon: "graph",
     title: "具身智能目标公司组织梳理",
     object: "星澜、拓界、穹顶、灵跃",
     status: "进行中",
@@ -231,7 +231,7 @@ export const searchItems = [
   ...mainlines.map((item) => ({
     id: item.id,
     group: "任务",
-    icon: "route",
+    icon: "task",
     title: item.title,
     meta: `${item.type} · ${item.status}`,
     summary: item.summary,

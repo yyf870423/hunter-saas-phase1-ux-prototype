@@ -1070,7 +1070,7 @@ function ExperienceTab({ candidate }) {
           {candidate.educationHistory.map(([school, degree, period]) => (
             <article key={school}>
               <i>
-                <Icon name="database" />
+                <Icon name="school" />
               </i>
               <span>
                 <b>{school}</b>
@@ -2217,7 +2217,7 @@ function RelationsTab({ processingRecords, onOpenProcessing }) {
       <FieldGroup title="知识图谱">
         <div className="s4-entity-grid">
           <EntityLink
-            icon="route"
+            icon="graph"
             title="VLA 核心候选人关系知识图谱"
             meta="候选人关系 · 3 处引用 · 已自动同步"
             onClick={() =>

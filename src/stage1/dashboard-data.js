@@ -79,7 +79,7 @@ const taskPlanSnapshots = {
     attention: "running",
     steps: businessScenarios["mapping-embodied"].plan,
     completedStepIds: ["scope", "ecosystem", "people"],
-    icon: "database",
+    icon: "graph",
   },
   "career-linhao": {
     attention: "external",
@@ -174,7 +174,7 @@ export const dashboardAssetChanges = [
   {
     id: "change-opportunity",
     type: "招聘机会",
-    icon: "sparkles",
+    icon: "target",
     title: opportunities.find((item) => item.id === "opportunity-xinglan")
       .title,
     detail: "补充需求线索与来源证据",
@@ -184,7 +184,7 @@ export const dashboardAssetChanges = [
   {
     id: "change-graph",
     type: "知识图谱",
-    icon: "database",
+    icon: "graph",
     title: topicGraphs.find((item) => item.id === "mapping-embodied").name,
     detail: "更新 2 条关系，另有 1 条关系待确认",
     time: "昨天 19:06",

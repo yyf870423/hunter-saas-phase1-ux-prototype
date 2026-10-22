@@ -1368,13 +1368,13 @@ export const assetMeta = {
   opportunities: {
     label: "招聘机会",
     singular: "招聘机会",
-    icon: "signal",
+    icon: "target",
     route: "/opportunities",
   },
   mappings: {
     label: "知识图谱",
     singular: "知识图谱",
-    icon: "route",
+    icon: "graph",
     route: "/mappings",
   },
   papers: { label: "论文", singular: "论文", icon: "paper", route: "/papers" },

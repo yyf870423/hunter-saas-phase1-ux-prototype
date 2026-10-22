@@ -1609,7 +1609,7 @@ function CandidatePipeline({ position }) {
             className={view === "board" ? "is-active" : ""}
             onClick={() => setView("board")}
           >
-            <Icon name="database" />
+            <Icon name="kanban" />
             泳道
           </button>
           <button

@@ -62,7 +62,7 @@ export function MappingsListPage() {
             <article key={item.id}>
               <header>
                 <i>
-                  <Icon name="route" />
+                  <Icon name="graph" />
                 </i>
                 <span>
                   <small>知识图谱</small>
@@ -146,7 +146,7 @@ export function MappingsListPage() {
         </div>
       ) : (
         <div className="s4-custom-empty">
-          <Icon name="route" />
+          <Icon name="graph" />
           <b>还没有知识图谱</b>
           <p>说明一个摸排目标，或导入已有的人才地图文件。</p>
           <Button
@@ -596,7 +596,7 @@ function LandscapeGraphTab({ kind }) {
         />
       ) : (
         <div className="s4-graph-placeholder">
-          <Icon name="route" />
+          <Icon name="graph" />
           <b>关系视图将在当前范围内生成</b>
         </div>
       )}
@@ -801,7 +801,7 @@ export function MappingDetailPage() {
   return (
     <div className="s4-detail-page s4-mapping-detail">
       <DetailHeader
-        icon="route"
+        icon="graph"
         title={profile.name}
         subtitle={profile.goal}
         badges={[
@@ -898,7 +898,7 @@ export function MappingCreatePage() {
           {mode === "natural" ? (
             <div className="s4-agent-create-entry">
               <i>
-                <Icon name="route" />
+                <Icon name="graph" />
               </i>
               <h2>说明要摸排的市场或方向</h2>
               <p>
@@ -2023,7 +2023,7 @@ export function PatentDetailPage() {
           description="发明人身份确认后，共同发明关系会更新到候选人和引用该关系的知识图谱。"
         >
           <EntityLink
-            icon="route"
+            icon="graph"
             title="VLA 核心候选人关系知识图谱"
             meta="候选人关系 · 1 位已关联 · 自动同步"
             onClick={() => navigate("/mappings/mapping-candidate-relations")}

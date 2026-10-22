@@ -151,7 +151,7 @@ export function Dashboard() {
         <DashboardSection
           id="dashboard-assets-title"
           title="资产变化"
-          icon="database"
+          icon="layers"
           count={loading ? undefined : assets.length}
           loading={loading}
           className="s1-dashboard-assets"

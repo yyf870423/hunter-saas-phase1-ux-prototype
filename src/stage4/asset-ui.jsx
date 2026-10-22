@@ -2154,7 +2154,7 @@ export function RelationshipAiEmptyState({
   return (
     <div className="s4-relationship-empty">
       <span>
-        <Icon name="route" />
+        <Icon name="graph" />
       </span>
       <h3>{title}</h3>
       <p>{description}</p>

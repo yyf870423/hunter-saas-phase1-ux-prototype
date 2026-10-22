@@ -133,7 +133,7 @@ export function MobileNavigation({
 }) {
   const more = [
     { id: "data", label: "数据管理", icon: "download" },
-    { id: "usage", label: "订阅与用量", icon: "database" },
+    { id: "usage", label: "订阅与用量", icon: "creditCard" },
   ];
   const items =
     mode === "assets"

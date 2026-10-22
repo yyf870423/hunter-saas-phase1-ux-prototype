@@ -145,7 +145,7 @@ test("首页采用任务焦点、洞察卡片和资产时间线，明暗主题�
     expect(headers.map(({ icon }) => icon)).toEqual([
       "task",
       "signal",
-      "database",
+      "layers",
     ]);
     for (const header of headers) {
       expect(header.height).toBeGreaterThanOrEqual(48);

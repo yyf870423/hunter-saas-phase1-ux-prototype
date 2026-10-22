@@ -270,7 +270,7 @@ export function DashboardFeed({ items, onOpen, kind, emptyAction }) {
     return (
       <EmptyState
         compact
-        icon={kind === "insights" ? "signal" : "database"}
+        icon={kind === "insights" ? "signal" : "layers"}
         title={kind === "insights" ? "暂无洞察" : "暂无资产变化"}
         description={
           kind === "insights"
@@ -292,7 +292,7 @@ export function DashboardFeed({ items, onOpen, kind, emptyAction }) {
         >
           <i className="s1-dashboard-feed-icon">
             <Icon
-              name={item.icon || (kind === "insights" ? "signal" : "database")}
+              name={item.icon || (kind === "insights" ? "signal" : "layers")}
             />
           </i>
           <span className="s1-dashboard-feed-content">

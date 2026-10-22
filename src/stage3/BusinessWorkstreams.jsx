@@ -373,7 +373,7 @@ ${createMarkdownTable(["公司", "组织", "关键岗位", "待补充信息"], s
 ${createMarkdownTable(["公司", "关键岗位", "任职人", "核实情况"], roles.map((role) => [role.company, role.title, role.name || "待核实", role.gap || "已定位，任职时间待补充"]))}
 
 已核验部分可以先形成地图。未知任职人、身份冲突和汇报关系缺口保持待核实，不自动合并为正式候选人。`}>
-      {phase < 5 ? <ReviewEntry icon="database" label="打开人才地图批次审核" note="核对组织、关键岗位、任职人及证据；允许保留待核实项。" onOpen={openReview} /> : null}
+      {phase < 5 ? <ReviewEntry icon="graph" label="打开人才地图批次审核" note="核对组织、关键岗位、任职人及证据；允许保留待核实项。" onOpen={openReview} /> : null}
     </HunterReply> : null}
     {saveReview ? <HunterReply markdown={`## 本批次审核已经完成
 
