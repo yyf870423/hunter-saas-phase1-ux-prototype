@@ -33,5 +33,10 @@
 | 11 | 一句话介绍 | 保持“猎头的 AI 工作伙伴”，关键词只放在标题和描述里 |
 | 12 | 首页标题与描述（中文） | 标题：HunterBuddy · 猎头 AI 助手，做人才地图与人才寻访｜铂寻 Boseek；描述：HunterBuddy 是铂寻 Boseek 为独立猎头和资深顾问打造的猎头 AI 助手。从融资新闻、招聘页、简历和论文里找线索，帮你做客户开发、人才地图、人才寻访和人选维护，每个判断都写明来源。目前邀请制试用。 |
 
+### 5. 站长工具验证（2026-10-23）
+- Google Search Console：网域资源 `boseekai.com`，阿里云解析 TXT 记录验证，已通过。这条 TXT 记录要一直保留。
+- 百度搜索资源平台：`https://www.boseekai.com`，只提供文件和 HTML 标签两种验证，用 HTML 标签。`<meta name="baidu-site-verification" content="codeva-SxHxeGOeZL" />` 已放进首页，部署上线后再点“完成验证”。这行代码要一直保留。
+- Bing：待做。
+
 ## 第一阶段：技术基础（待确认）
 见对话中的汇总；确认后在此补记实施清单和结果。
