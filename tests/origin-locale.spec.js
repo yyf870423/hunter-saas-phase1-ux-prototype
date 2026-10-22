@@ -51,7 +51,9 @@ for (const width of [1440, 1024, 801, 390, 320]) {
       await page.emulateMedia({ reducedMotion: "reduce" });
       const errors = [];
       page.on("pageerror", (error) => errors.push(error.message));
-      await page.goto(`./landing-origin/?lang=${language}`);
+      await page.goto(
+        language === "en" ? "./landing-origin/en/" : "./landing-origin/",
+      );
       await expect(page.locator(".f-hero h1")).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
       await expect(page.locator("html")).toHaveAttribute(
@@ -225,7 +227,7 @@ test("English interactions translate all scenes, slides, errors and canonical fo
   page.on("request", (request) => {
     if (request.method() === "POST") posts.push(request.url());
   });
-  await page.goto("./landing-origin/?lang=en");
+  await page.goto("./landing-origin/en/");
   const tabs = page.locator(".f-work-demo > .f-tabs [role=tab]");
   await expect(tabs).toHaveText([
     "Business development",
@@ -332,7 +334,7 @@ test("English interactions translate all scenes, slides, errors and canonical fo
   });
   await expect(page.locator("[data-language-switch]")).toHaveAttribute(
     "href",
-    /lang=zh#assets$/,
+    /\/landing-origin\/#assets$/,
   );
   await page.locator("[data-language-switch]").click();
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");

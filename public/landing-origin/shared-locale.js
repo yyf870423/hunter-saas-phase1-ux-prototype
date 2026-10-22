@@ -1,6 +1,13 @@
 (() => {
-  const language =
-    new URL(location.href).searchParams.get("lang") === "en" ? "en" : "zh";
+  // 英文版有自己的网址 /en/（那一页用 <base href="../"> 共用中文首页的资源）。
+  // 旧的 ?lang=en 链接：服务器会 301 到 /en/；没有服务器跳转时（比如 GitHub Pages 预览），这里补一次。
+  const englishPath = /\/en\/(index\.html)?$/.test(location.pathname);
+  if (!englishPath && new URL(location.href).searchParams.get("lang") === "en") {
+    const english = new URL("en/", new URL("./", location.href));
+    english.hash = location.hash;
+    location.replace(english.href);
+  }
+  const language = englishPath ? "en" : "zh";
   const catalog = new Map(Object.entries(window.OriginEnglishCatalog || {}));
   const missing = new Set();
   const fields = {
@@ -149,9 +156,10 @@
   ])
     if (window[name]) window[name] = localizeData(window[name]);
   if (language === "en") {
-    document.title = "Boseek · HunterBuddy, your AI partner in recruitment";
+    document.title =
+      "HunterBuddy · AI assistant for recruiters: talent mapping and sourcing | Boseek";
     document.querySelector('meta[name="description"]').content =
-      "Connect hiring signals, talent maps and candidate research. HunterBuddy helps recruiters uncover new searches, map the market and build longlists. You make the decisions.";
+      "HunterBuddy by Boseek is an AI assistant for independent recruiters and senior search consultants. It finds leads in funding news, job pages, CVs and papers to help with business development, talent mapping, sourcing and candidate nurturing, with a source for every finding. Early access by invitation.";
     translateDOM(document.querySelector("[data-finesse-footer]"));
   }
 
@@ -171,9 +179,14 @@
     if (!actions || actions.querySelector("[data-language-switch]")) return;
     const target = language === "en" ? "zh" : "en";
     const link = document.createElement("a");
-    const destination = new URL(location.href);
-    destination.searchParams.set("lang", target);
-    link.href = destination.href;
+    // 中文首页和 /en/ 互相切换，保留当前锚点
+    const home = new URL("./", language === "en" ? document.baseURI : location.href);
+    const destination = () => {
+      const url = new URL(target === "en" ? "en/" : "./", home);
+      url.hash = location.hash;
+      return url.href;
+    };
+    link.href = destination();
     link.hreflang = target === "zh" ? "zh-CN" : "en";
     link.lang = link.hreflang;
     link.className = "f-language-switch";
@@ -182,9 +195,7 @@
     link.setAttribute("aria-label", link.title);
     link.innerHTML = `<span>${target === "en" ? "EN" : "中文"}</span>`;
     const syncDestination = () => {
-      const url = new URL(location.href);
-      url.searchParams.set("lang", target);
-      link.href = url.href;
+      link.href = destination();
     };
     addEventListener("hashchange", syncDestination);
     link.addEventListener("click", syncDestination);

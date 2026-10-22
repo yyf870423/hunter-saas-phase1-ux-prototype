@@ -125,6 +125,7 @@ const alternatives = {
     "apple-touch-icon.png",
     "robots.txt",
     "sitemap.xml",
+    "en/index.html",
     ...assets,
     "assets/fonts/dm-serif-display.ttf",
     "assets/fonts/dmserifdisplay-OFL.txt",
