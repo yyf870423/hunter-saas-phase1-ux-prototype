@@ -49,6 +49,10 @@
 - JSON-LD：Organization、WebSite、WebPage、SoftwareApplication（HunterBuddy）、VideoObject（中文短片）。
 - 产品没有公开价格，Google 富媒体检测会提示缺少 offers，属预期。
 - 上线后：三个平台提交 sitemap；用 Google 富媒体检测工具检查结构化数据。
+- 已上线（e3827ce，2026-10-23）：robots.txt 和 sitemap.xml 返回 200、类型正确，不经过首页兜底；首页 head 内容核对无误。线上没有 CDN，首页 `no-cache`。
+- 上线时发现的跳转问题（待修）：
+  - `http://www.boseekai.com/` 用 308 跳到 https。改成 301，百度对 301 的支持最稳。
+  - 不带 www 的 `boseekai.com` 没有解析记录，打不开。需要在阿里云加 A 记录 `@ → 59.110.28.161`（与 www 相同），服务器配好 boseekai.com 的证书，并把 `http(s)://boseekai.com/` 301 到 `https://www.boseekai.com/`。
 
 ### 第二批（待做）
 - 英文静态页面 `/en/`、hreflang、语言切换改为 `/` 与 `/en/`、`?lang=en` 301 到 `/en/`、sitemap 加入 `/en/`、英文标题与描述。
