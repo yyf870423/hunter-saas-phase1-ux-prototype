@@ -27,7 +27,7 @@ window.OriginEnglishCatalog = {
   "下面用星川机器人这一家公司，把四件事走一遍。":
     "See all four in action through one company: Xingchuan Robotics.",
   "做猎头不只是找人：先要发现谁在招，再摸清对方的团队，然后找到合适的人。手上的候选人想动了，还要帮他找下一个机会。":
-    "Business development, talent mapping, sourcing and candidate nurturing. Uncover new searches, map the market and build your longlist. When a candidate is ready to move, help them find the right next role.",
+    "",
   四件事: "Recruiting use cases",
   查看结果和来源: "See results & sources",
   交给你的结果: "What you get",
@@ -69,23 +69,23 @@ window.OriginEnglishCatalog = {
   "一条融资新闻，可能就是下一个岗位。":
     "Spot the hiring opportunity behind the news.",
   "周一早上，HunterBuddy 提醒你：星川机器人刚拿到 B 轮融资，可能要扩招。":
-    "Monday morning. HunterBuddy flags a Series B announcement from Xingchuan Robotics. Expansion could mean new hiring needs.",
+    "Xingchuan Robotics has just raised a Series B. HunterBuddy finds the new role, the hiring manager and a warm introduction.",
   "它先去找有没有具体岗位：官网招聘页上多了视觉算法负责人。找到岗位，再找对口的联系人：负责视觉团队的技术负责人许晴。她的直接联系方式没找到，才去翻你的人脉：你的老客户张远是星川的投资人，能帮你引荐。":
-    "It checks the careers page and finds an opening for Head of Computer Vision. Next comes the hiring manager: Qing Xu, who leads the vision team. Her direct contact details are unavailable, so it checks your network. An existing client, Yuan Zhang, is a Xingchuan investor who may be able to make a warm introduction.",
+    "",
   "每周一 09:00 · 帮你盯着的赛道": "Monday, 09:00 · Your focus sectors",
   "星川机器人 · 可能有新岗位": "Xingchuan Robotics · A hiring signal",
   "找到岗位 · 两处来源": "Opening found · Two sources",
   官网招聘页新增视觉算法负责人: "New opening: Head of Computer Vision",
   "招聘页和融资新闻都能对上。":
-    "The careers page lists the role. The funding news adds context.",
+    "Careers page and funding news agree.",
   对口联系人: "Hiring manager",
   "许晴 · 技术负责人": "Qing Xu · Technical Lead",
   "公开资料能确认她负责视觉团队。 待确认：直接联系方式。":
-    "Public sources confirm she leads the vision team. Still to verify: direct contact details.",
+    "Leads the vision team. Direct contact details to verify.",
   "备用 · 引荐路线": "Backup route · Warm introduction",
   "张远 → 许晴": "Yuan Zhang → Qing Xu",
   "直接联系不上时，你的老客户张远（星川的投资人）能帮你引荐。":
-    "If direct contact is not possible, your client Yuan Zhang, a Xingchuan investor, may make a warm introduction.",
+    "Your client, and a Xingchuan investor.",
   交给你: "Your next step",
   "一个确认过的岗位、一位对口联系人，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD，它就是一个正式岗位。":
     "A documented opening, the hiring manager and a backup introduction. You choose how to open the conversation. Once you have the JD and an agreed mandate, it becomes a live search.",
@@ -99,23 +99,23 @@ window.OriginEnglishCatalog = {
     "Exclusive or not, and on what fee terms?",
   "想摸清一个团队，资料却东一块西一块。": "Map the team, not just the names.",
   "星川要招人，你得先知道这类人都在哪。星川和两家对标公司的团队信息，散在官网、新闻、论文和你的简历库里。":
-    "Before you source for Xingchuan, map the market: which companies and teams the relevant talent sits in. Information about Xingchuan and two peer companies is scattered across websites, news, research papers and your candidate database.",
+    "Map Xingchuan and two peer companies by org structure, then match the people to your candidate database.",
   "它按公司、团队、关键岗位、在职的人一层层排好，把官网上的任职信息、你库里的候选人、论文和专利里的名字对上号。一起写过论文的人，不会被当成上下级。":
-    "HunterBuddy maps the org structure, from companies and departments to key roles and current team members. It cross-checks employment records against your candidate database, papers and patents. Co-authorship does not imply a reporting line.",
+    "",
   "目标公司 · 人才地图": "Target companies · Talent map",
   星川和两家对标公司: "Xingchuan and two peer companies",
   负责人已确认: "Team lead verified",
   "拓界机器人 · 视觉团队": "Tuojie Robotics · Vision team",
   "官网任职和团队页都能对上，就是你库里的林越。":
-    "The company website confirms the role and team, matching Yue Lin in your database.",
+    "Company site and team page agree: Yue Lin, already in your database.",
   在职的人待确认: "Current employment unverified",
   "穹顶智能 · 控制团队": "Qiongding AI · Controls team",
   "从论文作者里找到线索，身份和现在的职位还要核对。":
-    "A research paper suggests a possible team member. Their identity and current role still need verification.",
+    "A lead from paper authors. Identity to verify.",
   空白: "An information gap",
   "星川机器人 · 产品交付": "Xingchuan Robotics · Product delivery",
   "知道有这个关键岗位，还不知道是谁，不等于这个位置空着。":
-    "The role is known, but the person is not. That does not mean the position is vacant.",
+    "The role is known. The person is not, yet.",
   "一张人才地图：谁在什么位置，消息从哪来，哪里还是空白。你手上的 Excel 人才地图也能导进来接着补。":
     "A talent map showing the org structure and reporting lines, who sits where, the supporting sources and the gaps still to fill. Import your Excel talent map to build on what you already know.",
   "团队结构 · 在职 · 论文作者":
@@ -128,20 +128,20 @@ window.OriginEnglishCatalog = {
   "JD 到手，先看你手上已经有谁。":
     "Your next shortlist may already be in reach.",
   "张远引荐之后，许晴发来视觉算法负责人的 JD，只有几行字。合适的人很少，线索也很散。":
-    "Following Yuan Zhang's introduction, Qing Xu sends a brief job description for Head of Computer Vision. It is a niche search, with few obvious candidates and leads spread across sources.",
+    "Qing Xu sends the JD. HunterBuddy starts with your talent map and database, then searches papers, patents and open source.",
   "它不从零开始：先看人才地图里的目标团队、这类人通常从哪些公司出来、你库里谁最接近，再去网上、论文专利和开源社区补齐。简历里的林越、论文里的 Lin Y. 和开源社区的 lin-yue，核对后发现是同一个人。":
-    "HunterBuddy starts with your talent map, target companies and candidate database, then extends the search to the web, papers, patents and open-source communities. It checks the evidence to establish that Yue Lin's CV, papers by Lin Y. and the lin-yue profile belong to the same person.",
+    "",
   "星川机器人 · 视觉算法负责人": "Xingchuan Robotics · Head of Computer Vision",
   值得聊聊的人选: "Longlist · Worth approaching",
   林越: "Yue Lin",
   "工业视觉 · 团队负责人": "Industrial vision · Team lead",
   "做过产线视觉和算法团队，三个地方的资料已合并。":
-    "Industrial machine vision and algorithm team leadership. Three records matched to one person.",
+    "Led industrial vision teams. Three records matched.",
   "实际带多大团队。": "Team size and reporting line.",
   周宁: "Ning Zhou",
   "机器人感知 · 技术骨干": "Robotics perception · Senior engineer",
   "有相关论文和项目经历。": "Relevant publications and project experience.",
-  "有没有做过量产。": "Experience taking work into production.",
+  "有没有做过量产。": "Production experience.",
   陈思: "Si Chen",
   "视觉算法 · 项目负责人": "Computer vision · Project lead",
   "带过跨团队的项目。": "Has led cross-functional projects.",
@@ -157,24 +157,24 @@ window.OriginEnglishCatalog = {
     "Are they open to a move, and are they off-limits?",
   "半年后，林越的团队变了。": "A team changes. A new conversation opens.",
   "上次林越没动。你让 HunterBuddy 每两周看一次重点候选人，这次它发现：拓界机器人的视觉团队并进了新成立的平台部，而林越在现在的岗位上已经做了四年。":
-    "Yue Lin did not move last time, so you made Yue a priority candidate and HunterBuddy checks in every two weeks. Six months later, it flags a change: Tuojie's vision team has joined a new platform division, and Yue has now been in the same role for four years.",
+    "Yue Lin is a priority candidate. HunterBuddy spots a team merger, and four years in the same role.",
   "它不替你下结论，先问你要不要核实。你点头后，它整理林越的最新情况，对照你手上所有在招的岗位和熟悉的公司，看哪些值得聊。":
-    "HunterBuddy asks whether you want to investigate, without assuming Yue wants to leave. With your approval, it updates Yue's profile and checks your active searches and client companies for relevant opportunities.",
+    "",
   "重点候选人 · 林越": "Priority candidate · Yue Lin",
   "林越 · 可以聊的下一站": "Yue Lin · Possible next steps",
   你在招的岗位: "Your active searches",
   "穹顶智能 · 视觉平台负责人": "Qiongding AI · Head of Vision Platform",
   "技术方向和带团队经历都对得上。 待确认：地点和薪资。":
-    "Relevant technical and leadership experience. Still to verify: location and compensation expectations.",
+    "Strong technical and leadership fit. Compensation to verify.",
   人脉里的新机会: "An opportunity in your network",
   "星川机器人 · 新产线视觉团队":
     "Xingchuan Robotics · New production vision team",
   "星川扩张后的新方向，和林越的产线经历相关。 待确认：需求是不是真的。":
-    "A new direction after Xingchuan's expansion fits Yue's production experience. Still to verify: whether the headcount is approved.",
+    "Fits Yue's production experience. Headcount to verify.",
   只是迹象: "A signal, not a conclusion",
   本人意向: "Candidate interest",
   "团队调整不等于想走，愿不愿意看机会，要你去问。":
-    "A team change does not mean someone wants to leave. You need to ask.",
+    "A team change is not a decision to leave. You need to ask.",
   "几个有理有据的机会。打不打这通电话、推不推荐，你说了算。聊完把新简历发给它，资料和匹配都会更新。":
     "Relevant opportunities, with the reasoning behind each. You decide whether to reach out or put the candidate forward. After the conversation, add their latest CV to update the profile and matches.",
   "团队调整 · 在招岗位 · 熟悉的公司":

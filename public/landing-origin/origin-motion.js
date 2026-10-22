@@ -83,6 +83,11 @@
     if (h && !h.previousElementSibling?.classList.contains("o-kicker")) h.before(el("p", "o-kicker", text));
   });
 
+  /* 四件事只留一句引导：另一段在 locale 表里译成了空串，这里把空段落拿掉 */
+  root.querySelectorAll(".f-work-intro > p").forEach((p) => {
+    if (!p.textContent.trim()) p.remove();
+  });
+
   /* ---------------- 产品短片: chapters are waypoints on a course ---------------- */
   const CHAPTERS = [
     [10, "客户开发"],
