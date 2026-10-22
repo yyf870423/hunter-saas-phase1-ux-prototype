@@ -288,7 +288,7 @@ const manualAssetTypes = [
   },
   {
     label: "招聘机会",
-    icon: "sparkles",
+    icon: "target",
     description: "沉淀已经确认的招聘需求",
     route: "/opportunities/new",
   },
@@ -306,7 +306,7 @@ const manualAssetTypes = [
   },
   {
     label: "知识图谱",
-    icon: "database",
+    icon: "graph",
     description: "创建可持续维护的关系图谱",
     route: "/mappings/new",
   },
@@ -581,7 +581,7 @@ export function Stage1Shell() {
                     tip={!expanded ? "其他" : undefined}
                     trigger="always"
                   >
-                    <Icon name="more" />
+                    <Icon name="moreDots" />
                   </TooltipText>
                   <span>其他</span>
                   <Icon
@@ -608,7 +608,7 @@ export function Stage1Shell() {
                   selectNavigation({ id: "data", label: "数据管理" })
                 }
               >
-                <Icon name="download" />
+                <Icon name="database" />
                 <span>数据管理</span>
               </button>
             </nav>
@@ -689,7 +689,7 @@ export function Stage1Shell() {
                       notify("当前没有需要切换的工作空间", "info");
                     }}
                   >
-                    <Icon name="database" />
+                    <Icon name="swap" />
                     <span>
                       <b>切换工作空间</b>
                       <small>当前仅有 1 个工作空间</small>
@@ -788,10 +788,10 @@ export function Stage1Shell() {
 
       <nav className="s1-mobile-tabs" aria-label="移动端主导航">
         {[
-          ["home", "工作台", "home"],
-          ["route", "任务", "tasks"],
-          ["signal", "洞察", "signals"],
-          ["database", "业务资产", "assets"],
+          ["dashboard", "工作台", "home"],
+          ["listChecks", "任务", "tasks"],
+          ["insight", "洞察", "signals"],
+          ["layers", "业务资产", "assets"],
           ["menu", "更多", "more"],
         ].map(([icon, label, id]) => (
           <button

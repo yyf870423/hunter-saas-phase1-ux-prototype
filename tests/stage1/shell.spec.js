@@ -137,7 +137,7 @@ test("新建菜单、用量和账号入口有反馈", async ({ page }) => {
     name: "打开数据管理",
   });
   await expect(
-    dataManagementButton.locator('[data-icon="download"]'),
+    dataManagementButton.locator('[data-icon="database"]'),
   ).toBeVisible();
   await dataManagementButton.click();
   await expect(page).toHaveURL(/#\/data\/imports$/);

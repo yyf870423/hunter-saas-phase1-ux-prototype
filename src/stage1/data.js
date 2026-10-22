@@ -7,16 +7,16 @@ export const navSections = [
   {
     label: "核心业务",
     items: [
-      { id: "home", label: "工作台", icon: "home", route: "/home" },
-      { id: "tasks", label: "任务", icon: "route", count: 2 },
-      { id: "signals", label: "洞察中心", icon: "signal", count: 3 },
+      { id: "home", label: "工作台", icon: "dashboard", route: "/home" },
+      { id: "tasks", label: "任务", icon: "listChecks", count: 2 },
+      { id: "signals", label: "洞察中心", icon: "insight", count: 3 },
     ],
   },
   {
     label: "招聘资产",
     items: [
       { id: "companies", label: "公司", icon: "building" },
-      { id: "opportunities", label: "招聘机会", icon: "sparkles" },
+      { id: "opportunities", label: "招聘机会", icon: "target" },
       { id: "positions", label: "岗位", icon: "briefcase" },
     ],
   },
@@ -24,14 +24,14 @@ export const navSections = [
     label: "人才资产",
     items: [
       { id: "candidates", label: "候选人", icon: "user" },
-      { id: "mappings", label: "知识图谱", icon: "database" },
+      { id: "mappings", label: "知识图谱", icon: "graph" },
     ],
   },
   {
     label: "研究资产",
     items: [
-      { id: "papers", label: "论文", icon: "paper" },
-      { id: "patents", label: "专利", icon: "patent" },
+      { id: "papers", label: "论文", icon: "fileText" },
+      { id: "patents", label: "专利", icon: "award" },
     ],
   },
 ];
