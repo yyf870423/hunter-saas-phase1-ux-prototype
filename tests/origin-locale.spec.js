@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const legal = /北京铂寻智能科技有限公司|京ICP备2026068903号-1/g;
+const legal = /京ICP备2026068903号-1/g;
 
 test("shared landing renders when an older cached UI helper has no locale API", async ({
   page,
@@ -35,9 +35,7 @@ async function untranslated(page) {
       const node = walker.currentNode;
       if (node.parentElement.closest("script,style,[data-language-switch]"))
         continue;
-      const text = node.nodeValue
-        .trim()
-        .replace(/北京铂寻智能科技有限公司|京ICP备2026068903号-1/g, "");
+      const text = node.nodeValue.trim().replace(/京ICP备2026068903号-1/g, "");
       if (/\p{Script=Han}/u.test(text)) missing.add(text);
     }
     return [...missing];
@@ -95,21 +93,62 @@ for (const width of [1440, 1024, 801, 390, 320]) {
       expect
         .soft(header, "Header actions must not overlap navigation or brand")
         .toBe(true);
+      if (language === "en")
+        for (const action of await page.locator(".f-hero-actions a").all()) {
+          const box = await action.boundingBox();
+          expect(box.x).toBeGreaterThanOrEqual(0);
+          expect(box.x + box.width).toBeLessThanOrEqual(width);
+        }
       if (language === "en" && width <= 1000) {
         await page
           .getByRole("button", { name: "Open navigation", exact: true })
           .click();
         await expect(page.locator("#f-navigation")).toBeVisible();
         await expect(page.locator("#f-navigation a")).toHaveText([
-          "Product film",
+          "Product video",
           "Use cases",
           "How it works",
-          "People & connections",
+          "Knowledge network",
           "About Boseek",
         ]);
         await page.keyboard.press("Escape");
         await expect(page.locator("#f-navigation")).toBeHidden();
       }
+      if (language === "en") {
+        await expect(page.locator("#f-about-title")).toHaveText(
+          "Boseek. Clarity for recruiters.",
+        );
+        const singleLine = await page
+          .locator("#f-about-title")
+          .evaluate((el) => {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            return range.getClientRects().length === 1;
+          });
+        expect(singleLine, "About headline stays on one line").toBe(true);
+        await expect(page.locator(".f-trial-submit")).toHaveText("Submit");
+        await expect(page.locator(".f-footer")).toContainText(
+          "Operated by Beijing Boseek Intelligent Technology Co., Ltd.",
+        );
+      }
+      for (const logo of await page.locator(".f-brand img").all()) {
+        await expect(logo).toHaveAttribute(
+          "src",
+          language === "en"
+            ? "assets/boseek-b5-en.svg"
+            : "assets/boseek-b5-dark.svg",
+        );
+        expect(
+          await logo.evaluate(
+            (image) => image.complete && image.naturalWidth > 0,
+          ),
+        ).toBe(true);
+      }
+      if ([1440, 390, 320].includes(width))
+        await page.locator(".f-header").screenshot({
+          path: testInfo.outputPath(`${language}-header-${width}.png`),
+          animations: "disabled",
+        });
       for (const selector of [
         ".f-hero",
         ".f-work",
@@ -185,7 +224,7 @@ test("English interactions translate all scenes, slides, errors and canonical fo
   await expect(tabs).toHaveText([
     "New roles",
     "Team map",
-    "Candidates",
+    "Sourcing",
     "Next move",
   ]);
   for (const tab of await tabs.all()) {
@@ -248,7 +287,7 @@ test("English interactions translate all scenes, slides, errors and canonical fo
   await page.locator("#f-trial-industry").press("Escape");
   await button.click();
   await expect(page.locator("[data-form-status]")).toContainText(
-    "Applications are temporarily unavailable",
+    "We cannot accept applications right now",
   );
   await consent.uncheck();
   await expect(button).toBeDisabled();

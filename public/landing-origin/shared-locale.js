@@ -8,22 +8,23 @@
     公司: "company",
     电话: "phone number",
     邮箱: "email",
-    职位: "job title",
+    职位: "role",
     目前同时在做的岗位数: "number of active searches",
     行业: "industry",
   };
   for (const [zh, en] of Object.entries(fields)) {
-    catalog.set(`请选择${zh}`, `Select ${en}`);
+    catalog.set(`请选择${zh}`, `Select your ${en}`);
     catalog.set(`请填写${zh}`, `Enter your ${en}.`);
     catalog.set(
       `请选择${zh}，选择其他时请补充内容`,
-      `Select ${en}. If you choose Other, add details.`,
+      `Select your ${en}. If you choose Other, add details.`,
     );
     catalog.set(`${zh}内容过长，请精简后再提交`, `Please shorten your ${en}.`);
     catalog.set(`请检查${zh}后重新提交`, `Check your ${en} and submit again.`);
-    catalog.set(`其他${zh}`, `Other ${en}`);
+    catalog.set(`其他${zh}`, `Specify your ${en}`);
   }
   catalog.set("请选择目前同时在做的岗位数", "Select a range");
+  catalog.set("其他职位", "Specify your job title");
 
   function text(value) {
     if (language !== "en" || typeof value !== "string") return value;
@@ -106,13 +107,24 @@
       "FinesseResearchChaptersData",
     ])
       if (window[name]) window[name] = localizeData(window[name]);
-    document.title = "Boseek · HunterBuddy, your AI recruiting partner";
+    document.title = "Boseek · HunterBuddy, your AI partner in recruitment";
     document.querySelector('meta[name="description"]').content =
-      "Connect scattered signals to find people, roles and the right moment. HunterBuddy organizes the research. You make the next move.";
+      "Connect hiring signals, talent maps and candidate research. HunterBuddy helps recruiters find opportunities and build shortlists. You make the decisions.";
     translateDOM(document.querySelector("[data-finesse-footer]"));
   }
 
   function mountSwitch() {
+    if (language === "en") {
+      document.querySelectorAll(".f-brand img").forEach((logo) => {
+        logo.src = "assets/boseek-b5-en.svg";
+        logo.alt = "Boseek";
+        logo.width = 150;
+        logo.height = 48;
+      });
+      const about = document.querySelector("#f-about-title");
+      if (about)
+        about.textContent = `${text("铂寻，")} ${text("为猎头化繁解难")}`;
+    }
     const actions = document.querySelector(".f-header-actions");
     if (!actions || actions.querySelector("[data-language-switch]")) return;
     const target = language === "en" ? "zh" : "en";

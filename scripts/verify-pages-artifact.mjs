@@ -127,6 +127,7 @@ const alternatives = {
     "assets/fonts/inter-variable.ttf",
     "assets/fonts/inter-OFL.txt",
     "assets/boseek-b5-dark.svg",
+    "assets/boseek-b5-en.svg",
     "assets/hunterbuddy-origin.mp4",
     "assets/origin-film-poster.jpg",
   ],

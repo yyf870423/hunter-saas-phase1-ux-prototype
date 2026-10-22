@@ -62,8 +62,8 @@ html:lang(en) .f-hero-description {
 html:lang(en) .f-hero-description br.bd {
   display: block;
 }
-html:lang(en) .f-about-copy h2 .ln {
-  display: block;
+html:lang(en) #homepage .f-about-copy h2 {
+  white-space: nowrap;
 }
 html:lang(en) .f-memory h2 .ph {
   display: inline;
@@ -175,6 +175,9 @@ html:lang(en) .f-footer-meta li {
   html:lang(en) .f-trial-intro h2 {
     font-size: 29px;
   }
+  html:lang(en) #homepage .f-about-copy h2 {
+    font-size: 24px;
+  }
   html:lang(en) .o-scenario-tabs .f-tab,
   html:lang(en) .f-network-split .f-network-tabs .f-tab {
     font-size: 12px;
@@ -205,6 +208,16 @@ html:lang(en) .f-footer-meta li {
   }
   html:lang(en) .f-header-actions {
     gap: 3px;
+  }
+  html:lang(en) #homepage .f-about-copy h2 {
+    font-size: 20px;
+  }
+  html:lang(en) .f-hero-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    max-width: 280px;
+    margin-inline: auto;
   }
   html:lang(en) .f-header .f-brand {
     width: 110px;
