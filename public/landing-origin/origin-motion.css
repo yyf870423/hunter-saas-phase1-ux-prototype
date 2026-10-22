@@ -57,6 +57,39 @@
   object-position: 50% 65%;
   transform: scale(1.12);
 }
+/* moonlight passing over the cloud sea: a soft band sweeps across every 16s, only where the clouds are */
+.o-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(180deg, transparent 42%, #000 70%);
+  mask-image: linear-gradient(180deg, transparent 42%, #000 70%);
+}
+.o-sheen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 70%;
+  background: linear-gradient(100deg, rgba(225, 232, 250, 0) 18%, rgba(225, 232, 250, 0.26) 46%, rgba(240, 244, 255, 0.4) 52%, rgba(225, 232, 250, 0) 82%);
+  transform: translate3d(-110%, 0, 0);
+  animation: o-sheen 16s cubic-bezier(0.45, 0, 0.35, 1) 6s infinite;
+}
+@keyframes o-sheen {
+  0% { transform: translate3d(-110%, 0, 0); }
+  55%, 100% { transform: translate3d(160%, 0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .o-sheen::before {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 /* the three signals and the light on the name (drawn by origin-motion.js) sit between the clouds and the copy */
 .o-signals {
   position: absolute;

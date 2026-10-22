@@ -79,6 +79,10 @@
     const canvas = el("canvas", "o-signals");
     canvas.setAttribute("aria-hidden", "true");
     fly.before(canvas);
+    // a band of moonlight sweeps slowly across the cloud sea, then rests (CSS only, see .o-sheen)
+    const sheen = el("div", "o-sheen");
+    sheen.setAttribute("aria-hidden", "true");
+    canvas.before(sheen);
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const en = window.FinesseLocale?.language === "en";
@@ -224,11 +228,21 @@
         const x = from.x + (to.x - from.x) * k, y = from.y + (to.y - from.y) * k;
         dot(x, y, 2.6, "255,255,255", 1 - soft((climb - 0.7) / 0.3), 30);
       }
-      // afterwards, every few seconds a light travels the course
+      // afterwards, every few seconds a light travels the course; as it passes the middle signal,
+      // a ripple spreads across the cloud sea (the film's pings, seen in perspective)
       const loop = t - 7.5;
       if (loop > 0) {
         const u = (loop % 7) / 2.6;
         if (u < 1) { const q = along(inout(u)); dot(q.x, q.y, 2.2, "255,255,255", Math.sin(Math.PI * u), 22); }
+        const r = ((loop % 7) - 1.3) / 3.2;
+        if (r > 0 && r < 1) {
+          const c = pts[1], rx = (phone ? W * 0.55 : W * 0.42) * out3(r), fadeR = (1 - r) * (1 - r);
+          ctx.lineWidth = 1.2;
+          for (const [k, a] of [[1, 0.34], [0.62, 0.2]]) {
+            ctx.strokeStyle = `rgba(${PAL.dot},${a * fadeR})`;
+            ctx.beginPath(); ctx.ellipse(c.x, c.y, Math.max(1, rx * k), Math.max(1, rx * k * 0.16), 0, 0, 6.283); ctx.stroke();
+          }
+        }
       }
     };
     const tick = (now) => {
