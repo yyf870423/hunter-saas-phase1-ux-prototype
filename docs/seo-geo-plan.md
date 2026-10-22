@@ -42,7 +42,7 @@
 
 分两批做：第一批只改给搜索引擎看的部分，页面外观不变；第二批做英文 `/en/`。
 
-### 第一批（2026-10-23，已验收）
+### 第一批（2026-10-23，已完成）
 - `public/landing-origin/robots.txt`：搜索引擎和 AI 爬虫全部放行，写明 sitemap 位置。
 - `public/landing-origin/sitemap.xml`：目前只有中文首页。
 - 首页 `<head>`：新标题和描述、canonical（`https://www.boseekai.com/`）、Open Graph 文字标签（分享图待定）。
@@ -51,10 +51,8 @@
 - 上线后：三个平台提交 sitemap；用 Google 富媒体检测工具检查结构化数据。
 - 已上线（e3827ce，2026-10-23）：robots.txt 和 sitemap.xml 返回 200、类型正确，不经过首页兜底；首页 head 内容核对无误。线上没有 CDN，首页 `no-cache`。
 - Google 富媒体检测（2026-10-23）：3 个有效项目（组织、软件应用、视频），无错误。组织和软件应用有“非关键问题”：缺少地址细节、联系方式、价格等可选字段，属预期。检测工具没加载短片 mp4，属常见现象，不影响结果。
-- 百度普通收录 API：由用户在自己电脑上用 curl 提交首页（token 不进仓库）。
-- 上线时发现的跳转问题（待修）：
-  - `http://www.boseekai.com/` 用 308 跳到 https。改成 301，百度对 301 的支持最稳。
-  - 不带 www 的 `boseekai.com` 没有解析记录，打不开。需要在阿里云加 A 记录 `@ → 59.110.28.161`（与 www 相同），服务器配好 boseekai.com 的证书，并把 `http(s)://boseekai.com/` 301 到 `https://www.boseekai.com/`。
+- 站点地图与收录提交（2026-10-23）：Google、Bing 提交 sitemap 成功；百度用普通收录 API 提交首页成功（success 1，当日剩余 9）。API 由用户在自己电脑上用 curl 调用，token 不进仓库。
+- 跳转（2026-10-23 已修）：阿里云新增 A 记录 `@ → 59.110.28.161`，证书覆盖 boseekai.com；`http://www.boseekai.com/`、`http(s)://boseekai.com/` 都 301 到 `https://www.boseekai.com/`，保留路径。Google 验证用的 TXT 记录仍在。
 
 ### 第二批（待做）
 - 英文静态页面 `/en/`、hreflang、语言切换改为 `/` 与 `/en/`、`?lang=en` 301 到 `/en/`、sitemap 加入 `/en/`、英文标题与描述。
