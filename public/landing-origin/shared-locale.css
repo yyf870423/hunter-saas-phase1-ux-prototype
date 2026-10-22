@@ -1,3 +1,8 @@
+/* English headings: the DM Serif subset has no ’ ? & — let those fall to Georgia, not to the Chinese serif (whose ’ is full-width) */
+html:lang(en) {
+  --o-display: "Origin Display", Georgia, "Times New Roman", serif;
+}
+
 .f-language-switch {
   display: inline-flex;
   flex: 0 0 36px;
