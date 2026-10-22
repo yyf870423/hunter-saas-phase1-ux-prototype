@@ -911,3 +911,34 @@
   top: 10px;
   bottom: 10px;
 }
+
+/* “其他”面板：论文、专利和侧栏其他条目一样用中性灰图标，不再放进蓝色底块；
+   悬停变深，当前页沿用侧栏的湖蓝竖条作为唯一的蓝色标记 */
+.s1-app .s1-asset-nav-items > button {
+  position: relative;
+  color: var(--s1-nav-ink);
+}
+.s1-app .s1-asset-nav-items > button > i {
+  color: var(--s1-nav-muted);
+  background: transparent;
+}
+.s1-app .s1-asset-nav-items > button:hover,
+.s1-app .s1-asset-nav-items > button[aria-current="page"] {
+  color: var(--s1-nav-ink);
+  background: var(--s1-nav-hover);
+  border-color: var(--s1-line);
+}
+.s1-app .s1-asset-nav-items > button:hover > i,
+.s1-app .s1-asset-nav-items > button[aria-current="page"] > i {
+  color: var(--s1-nav-ink);
+}
+.s1-app .s1-asset-nav-items > button[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--s1-accent);
+}
