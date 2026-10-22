@@ -54,7 +54,7 @@
 - 站点地图与收录提交（2026-10-23）：Google、Bing 提交 sitemap 成功；百度用普通收录 API 提交首页成功（success 1，当日剩余 9）。API 由用户在自己电脑上用 curl 调用，token 不进仓库。
 - 跳转（2026-10-23 已修）：阿里云新增 A 记录 `@ → 59.110.28.161`，证书覆盖 boseekai.com；`http://www.boseekai.com/`、`http(s)://boseekai.com/` 都 301 到 `https://www.boseekai.com/`，保留路径。Google 验证用的 TXT 记录仍在。
 
-### 第二批：英文版 `/en/`（2026-10-23，已验收）
+### 第二批：英文版 `/en/`（2026-10-23，已上线）
 决定：
 - 不按浏览器语言自动跳转，只保留切换按钮。
 - 英文标题：HunterBuddy · AI assistant for recruiters: talent mapping and sourcing | Boseek
@@ -66,3 +66,8 @@
 - `shared-locale.js`：按路径 `/en/` 判断语言；语言切换在 `/` 与 `/en/` 之间跳转并保留锚点；旧的 `?lang=en` 在浏览器端补一次跳转（服务器端由 Codex 配 301）。
 - 中文首页加 hreflang 和 `og:locale:alternate`；sitemap 加入 `/en/` 及语言对应。
 - 维护：改了中文首页 `<head>`（如脚本版本号）或英文静态文案后，运行 `node scripts/build-origin-english.mjs` 重新生成英文页。
+
+上线（1753337，2026-10-23）：
+- `/en/` 返回 200、`no-cache`；`/en` 301 到 `/en/`；`/?lang=en` 301 到 `/en/`，`/?lang=zh` 301 到 `/`；`http://boseekai.com/?lang=en` 经两次 301 到 `/en/`。
+- 线上英文页：标题、canonical、`og:locale`、`<base>` 正确；trial-api 已换成生产值；没有百度验证代码（只在中文首页）。语言切换指向 `/`，站内锚点留在 `/en/`。
+- 待做：百度 API 提交 `/en/`；Google“网址检查”请求编入索引；Bing 提交网址。
