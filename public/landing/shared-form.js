@@ -1,6 +1,7 @@
 (() => {
   const ui = window.FinesseUI;
   if (!ui) return;
+  const t = (value) => ui.text?.(value) ?? value;
   const e = ui.escape;
 
   function feedback(id, help) {
@@ -61,13 +62,13 @@
     menu.id = `${trigger.id}-list`;
     menu.className = "f-select-menu";
     menu.setAttribute("role", "listbox");
-    menu.setAttribute("aria-label", ui.text(label));
+    menu.setAttribute("aria-label", t(label));
     if (multiple) menu.setAttribute("aria-multiselectable", "true");
     menu.hidden = true;
     menu.innerHTML = options
       .map(
         (option, index) =>
-          `<div class="f-select-option" role="option" id="${trigger.id}-option-${index}" aria-selected="false" data-index="${index}"><span>${e(ui.text(option))}</span>${ui.icon("check")}</div>`,
+          `<div class="f-select-option" role="option" id="${trigger.id}-option-${index}" aria-selected="false" data-index="${index}"><span>${e(t(option))}</span>${ui.icon("check")}</div>`,
       )
       .join("");
     document.body.append(menu);
@@ -95,10 +96,10 @@
             .map((option) =>
               option === "其他" && supplement.value.trim()
                 ? supplement.value.trim()
-                : ui.text(option),
+                : t(option),
             )
             .join(window.FinesseLocale?.language === "en" ? ", " : "、")
-        : ui.text(`请选择${label}`);
+        : t(`请选择${label}`);
       trigger.dataset.empty = String(!selected.length);
       trigger.title = selected.length ? caption.textContent : "";
       if (summary) {
@@ -267,7 +268,7 @@
     const visible = visibleControl(control);
     visible.setAttribute("aria-invalid", String(Boolean(message)));
     const error = document.getElementById(`${visible.id}-error`);
-    error.textContent = ui.text(message);
+    error.textContent = t(message);
     error.hidden = !message;
     const help = document.getElementById(`${visible.id}-help`);
     if (help) help.hidden = Boolean(message);

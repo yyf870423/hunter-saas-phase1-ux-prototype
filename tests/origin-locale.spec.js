@@ -1,6 +1,29 @@
 import { test, expect } from "@playwright/test";
 
 const legal = /北京铂寻智能科技有限公司|京ICP备2026068903号-1/g;
+
+test("shared landing renders when an older cached UI helper has no locale API", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.route("**/landing/shared-ui.js?*", async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      response,
+      body: `${await response.text()}\ndelete window.FinesseUI.text; delete window.FinesseUI.localizeHTML;`,
+    });
+  });
+  await page.goto("./landing/");
+  await expect(page.locator(".f-hero h1")).toHaveText(
+    "从杂乱的信息里，找出岗位、人和时机。",
+  );
+  await expect(page.locator(".f-trial-submit")).toBeDisabled();
+  await expect(page.locator(".f-work-demo [role=tab]")).toHaveCount(4);
+  await page.locator("#f-trial-role").click();
+  await expect(page.locator("#f-trial-role-list")).toContainText("独立猎头");
+  expect(errors).toEqual([]);
+});
 async function untranslated(page) {
   return page.evaluate(() => {
     const missing = new Set();

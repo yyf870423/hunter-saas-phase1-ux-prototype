@@ -2,6 +2,8 @@
   const ui = window.FinesseUI;
   const forms = window.FinesseForms;
   if (!ui || !forms) return;
+  const html = ui.localizeHTML || ((value) => value);
+  const t = (value) => ui.text?.(value) ?? value;
 
   const fields = [
     { name: "name", label: "姓名", autocomplete: "name", maxLength: 80 },
@@ -94,7 +96,7 @@
   }
 
   function render() {
-    return ui.localizeHTML(`<section class="f-trial" id="apply" tabindex="-1" aria-labelledby="f-trial-title">
+    return html(`<section class="f-trial" id="apply" tabindex="-1" aria-labelledby="f-trial-title">
       <div class="f-container f-trial-layout">
         <div class="f-trial-intro">
           <h2 id="f-trial-title">申请 HunterBuddy 试用</h2>
@@ -209,7 +211,7 @@
       forms.setError(consent, consentError);
       first ||= consentError ? "acknowledgedPurpose" : null;
       if (first) {
-        status.textContent = ui.text("请检查上方标出的信息，再提交申请。");
+        status.textContent = t("请检查上方标出的信息，再提交申请。");
         status.dataset.tone = "error";
         form.dataset.state = "invalid";
         if (selects[first]) selects[first].focus();
@@ -227,7 +229,7 @@
     }
 
     function message(text, tone = "error") {
-      status.textContent = ui.text(text);
+      status.textContent = t(text);
       status.dataset.tone = tone;
     }
 
@@ -246,7 +248,7 @@
           form.dataset.state = "editing";
           status.textContent = "";
           snapshot = null;
-          label.textContent = ui.text("提交试用申请");
+          label.textContent = t("提交试用申请");
         }
       });
     });
@@ -256,7 +258,7 @@
       if (!busy && !unresolved) {
         snapshot = null;
         status.textContent = "";
-        label.textContent = ui.text("提交试用申请");
+        label.textContent = t("提交试用申请");
       }
     });
     form.addEventListener("reset", () => queueMicrotask(syncSubmitState));
@@ -297,7 +299,7 @@
       syncSubmitState();
       form.setAttribute("aria-busy", "true");
       form.dataset.state = "submitting";
-      label.textContent = ui.text("提交中");
+      label.textContent = t("提交中");
       message("正在提交，请稍候。", "neutral");
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 15000);
@@ -378,7 +380,7 @@
         busy = false;
         syncSubmitState();
         form.removeAttribute("aria-busy");
-        label.textContent = ui.text(
+        label.textContent = t(
           form.dataset.state === "invalid" ? "提交试用申请" : "重试提交",
         );
       }

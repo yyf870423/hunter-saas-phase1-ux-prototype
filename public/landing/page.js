@@ -13,11 +13,12 @@
   if (!ui || !data || !network || !root) return;
   if (root.hasAttribute("data-trial-preview") && !trial) return;
   if (integrated && (!chapters || !research)) return;
+  const html = ui.localizeHTML || ((value) => value);
   const e = ui.escape;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const fine = matchMedia("(hover: hover) and (pointer: fine)");
 
-  root.innerHTML = ui.localizeHTML(`
+  root.innerHTML = html(`
     <a class="f-skip" href="#main">跳到正文</a>
     <span class="f-header-sentinel" aria-hidden="true"></span>
     <header class="f-header">
@@ -182,7 +183,7 @@
     activeWork = index;
     const work = data.works[index];
     panelAnimation?.cancel();
-    panel.innerHTML = ui.localizeHTML(workMarkup(work));
+    panel.innerHTML = html(workMarkup(work));
     if (!reduced.matches) {
       panelAnimation = panel.animate(
         [

@@ -1,6 +1,8 @@
 (() => {
   const ui = window.FinesseUI;
   if (!ui) return;
+  const html = ui.localizeHTML || ((value) => value);
+  const t = (value) => ui.text?.(value) ?? value;
   const e = ui.escape;
   const positions = {
     company: [23, 22],
@@ -69,7 +71,7 @@
     const split = layout === "split";
     const story = `<div class="f-network-story${split ? " f-network-story--split" : ""}" aria-live="polite">${storyMarkup(nodes, network.paths[0], split)}</div>`;
     const labels = new Map(nodes.map((node) => [node.id, node.label]));
-    return ui.localizeHTML(`<div class="f-asset-network${split ? " f-network-split" : ""}">
+    return html(`<div class="f-asset-network${split ? " f-network-split" : ""}">
       <div class="f-tabs f-network-tabs" role="tablist" aria-label="四件事各走一条路">${network.paths.map((path, index) => `<button type="button" class="f-tab" id="f-network-tab-${e(path.id)}" role="tab" aria-selected="${index === 0}" aria-controls="f-network-panel" tabindex="${index === 0 ? 0 : -1}">${e(path.label)}</button>`).join("")}</div>
       <div id="f-network-panel" role="tabpanel" tabindex="0" aria-labelledby="f-network-tab-${e(network.paths[0].id)}">
         ${split ? story : ""}
@@ -77,7 +79,7 @@
           <div class="f-network-map">
             <svg class="f-network-wires" aria-hidden="true">${network.edges.map((edge) => `<path data-wire="${e(edge.id)}" class="${edge.pending ? "is-pending" : ""}" />`).join("")}</svg>
             <ul class="f-network-nodes" aria-label="存下来的五类资料">${nodes.map((node) => `<li class="f-network-node${node.id === "candidate" ? " f-network-center" : ""}" data-node="${e(node.id)}" style="--f-node-x:${positions[node.id][0]}%;--f-node-y:${positions[node.id][1]}%">${ui.icon(node.icon)}<h3>${e(node.label)}</h3><p>${e(node.detail)}</p></li>`).join("")}</ul>
-            <ul class="f-network-relations" aria-label="它们之间的关系">${network.edges.map((edge) => `<li class="f-network-relation" data-edge="${e(edge.id)}"><span class="f-network-sr">${e(labels.get(edge.from))}${e(ui.text("与"))}${e(labels.get(edge.to))}${e(ui.text("："))}</span><span>${e(edge.label)}</span><small>${e(edge.note)}</small></li>`).join("")}</ul>
+            <ul class="f-network-relations" aria-label="它们之间的关系">${network.edges.map((edge) => `<li class="f-network-relation" data-edge="${e(edge.id)}"><span class="f-network-sr">${e(labels.get(edge.from))}${e(t("与"))}${e(labels.get(edge.to))}${e(t("："))}</span><span>${e(edge.label)}</span><small>${e(edge.note)}</small></li>`).join("")}</ul>
           </div>
           <figcaption id="f-network-caption">人和关系示意<span>虚线是还要确认的匹配或引荐</span></figcaption>
         </figure>
@@ -181,12 +183,12 @@
         edgeElements.forEach((edge, id) =>
           edge.classList.toggle("is-active", path.edges.includes(id)),
         );
-        story.innerHTML = ui.localizeHTML(storyMarkup(nodes, path, split));
+        story.innerHTML = html(storyMarkup(nodes, path, split));
       },
     );
     ui.mountStablePanel(
       story,
-      network.paths.map((path) => ui.localizeHTML(storyMarkup(nodes, path, split))),
+      network.paths.map((path) => html(storyMarkup(nodes, path, split))),
     );
     const observer = new ResizeObserver(draw);
     observer.observe(map);
