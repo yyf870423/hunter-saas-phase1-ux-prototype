@@ -1,0 +1,913 @@
+/* =====================================================================================
+   Boseek · 第三版 website language for the HunterBuddy workspace (light and dark)
+   -------------------------------------------------------------------------------------
+   Loaded after every stage stylesheet. It only re-skins the workspace shell (.s1-app) and
+   the components inside it; component types, structure and behaviour stay as they are.
+   The prototype's own landing page and login pages are not touched.
+
+   The website's language, carried over:
+   - near-black grounds (#090a0b / #0f1011 / #191a1c) and, for light, a quiet paper grey;
+   - flat, solid actions like the website's buttons, filled with the bo's lake blue;
+   - the B5 bo logo's lake blue for accents, links, selection, info and the current-item marks,
+     and its coral crescent for small highlights (the live wire in empty states, unread badges);
+   - hairline borders instead of shadows, 8px controls, 4px tooltips, pill-shaped chips;
+   - DM Serif Display / Song serif for page titles, a mono kicker above them;
+   - underline tabs, the research-network drawing for empty states, a slow light sweep for loading.
+   ===================================================================================== */
+
+@font-face {
+  font-family: "Boseek Display";
+  src: url("../assets/fonts/dm-serif-display.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  /* Latin and numerals only: Chinese falls through to the system Song/Noto serif */
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2190-2199;
+}
+
+/* ---------------------------------------------------------------- tokens · light */
+:root,
+.s1-app {
+  --b-display: "Boseek Display", "Songti SC", "Noto Serif CJK SC", "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+  --b-sans: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --b-mono: "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  --b-radius: 8px;
+  --b-radius-panel: 10px;
+  --b-on-accent: #ffffff;
+  /* the action fill: the bo's lake blue (primary buttons, checked boxes, the current page) */
+  --b-ink-fill: #2f5bb8;
+  --b-ink-fill-hover: #264b9b;
+  --b-on-ink: #ffffff;
+  --b-focus: rgba(47, 91, 184, 0.45);
+  --b-kicker: #2f5bb8;
+  --b-coral: #e0694a;
+  --b-coral-ink: #b44c32;
+  --b-badge: #d95b3d;
+  --b-sweep: rgba(255, 255, 255, 0.7);
+
+  --s1-accent: #2f5bb8;
+  --s1-accent-hover: #264b9b;
+  --s1-accent-soft: #edf2fb;
+  --s1-action-fill: var(--b-ink-fill);
+  --s1-action-fill-hover: var(--b-ink-fill-hover);
+  --s1-action-border: var(--b-ink-fill);
+  --s1-action-border-hover: var(--b-ink-fill-hover);
+  --s1-action-ink: #ffffff;
+  --s1-tag-bg: #f2f2f4;
+  --s1-tag-border: #e2e2e6;
+  --s1-canvas: #f5f5f6;
+  --s1-surface: #ffffff;
+  --s1-surface-raised: #ffffff;
+  --s1-surface-strong: #efeff1;
+  --s1-ink: #0f1011;
+  --s1-muted: #5d5d63;
+  --s1-subtle: #85858b;
+  --s1-line: #e6e6e9;
+  --s1-line-strong: #d3d3d8;
+  --s1-nav: #f0f0f2;
+  --s1-nav-ink: #0f1011;
+  --s1-nav-muted: #55555b;
+  --s1-nav-subtle: #8a8a90;
+  --s1-nav-hover: #e6e6ea;
+  --s1-nav-active: #ffffff;
+  --s1-nav-active-ink: #0f1011;
+  --s1-nav-line: #e2e2e6;
+  --s1-nav-badge: #e4e4e8;
+  --s1-nav-avatar: #e3eaf7;
+  --s1-success: #1b7a50;
+  --s1-success-soft: #eaf5ef;
+  --s1-warning: #93650a;
+  --s1-warning-soft: #fbf3e2;
+  --s1-danger: #bf3a30;
+  --s1-danger-soft: #fcecea;
+  --s1-danger-action: #c4342b;
+  --s1-danger-action-hover: #a92b23;
+  --s1-danger-action-soft: #fcecea;
+  --s1-shadow: 0 0 0 1px rgba(15, 16, 17, 0.06), 0 10px 28px -14px rgba(15, 16, 17, 0.2);
+  --s1-shadow-modal: 0 0 0 1px rgba(15, 16, 17, 0.08), 0 28px 56px -20px rgba(15, 16, 17, 0.3);
+  --s1-shadow-tooltip: 0 8px 20px -8px rgba(15, 16, 17, 0.35);
+  --s1-popover-shadow: 0 0 0 1px rgba(15, 16, 17, 0.08), 0 14px 32px -14px rgba(15, 16, 17, 0.24);
+  --s1-control-shadow: none;
+}
+
+/* ---------------------------------------------------------------- tokens · dark (the website itself) */
+.s1-app[data-theme="dark"] {
+  --b-on-accent: #0f1011;
+  --b-ink-fill: #3a6bcc;
+  --b-ink-fill-hover: #4272d0;
+  --b-on-ink: #ffffff;
+  --b-focus: rgba(143, 180, 234, 0.5);
+  --b-kicker: #8fb4ea;
+  --b-coral: #ff9473;
+  --b-coral-ink: #ff9f80;
+  --b-badge: #ff8466;
+  --b-sweep: rgba(255, 255, 255, 0.07);
+
+  --s1-accent: #8fb4ea;
+  --s1-accent-hover: #b3cff4;
+  --s1-accent-soft: #141c2b;
+  --s1-action-fill: var(--b-ink-fill);
+  --s1-action-fill-hover: var(--b-ink-fill-hover);
+  --s1-action-border: var(--b-ink-fill);
+  --s1-action-border-hover: var(--b-ink-fill-hover);
+  --s1-action-ink: #ffffff;
+  --s1-tag-bg: #17181a;
+  --s1-tag-border: #343436;
+  --s1-canvas: #090a0b;
+  --s1-surface: #0f1011;
+  --s1-surface-raised: #191a1c;
+  --s1-surface-strong: #1f2022;
+  --s1-ink: #f5f5f7;
+  --s1-muted: #a9a9ac;
+  --s1-subtle: #8d8d91;
+  --s1-line: #26272a;
+  --s1-line-strong: #3d3e41;
+  --s1-nav: #0c0d0e;
+  --s1-nav-ink: #f5f5f7;
+  --s1-nav-muted: #a9a9ac;
+  --s1-nav-subtle: #77777a;
+  --s1-nav-hover: #18191b;
+  --s1-nav-active: #1f2022;
+  --s1-nav-active-ink: #ffffff;
+  --s1-nav-line: #1e1f21;
+  --s1-nav-badge: #232427;
+  --s1-nav-avatar: #1d2a40;
+  --s1-success: #9de1bc;
+  --s1-success-soft: #12211a;
+  --s1-warning: #e7c27a;
+  --s1-warning-soft: #241e12;
+  --s1-danger: #ffaaa0;
+  --s1-danger-soft: #2a1614;
+  --s1-danger-action: #ff8f84;
+  --s1-danger-action-hover: #ffa79e;
+  --s1-danger-action-soft: #2a1614;
+  --s1-shadow: 0 0 0 1px #2a2b2e;
+  --s1-shadow-modal: 0 0 0 1px #3a3b3e, 0 30px 70px -24px rgba(0, 0, 0, 0.8);
+  --s1-shadow-tooltip: 0 0 0 1px #515154;
+  --s1-popover-shadow: 0 0 0 1px #3a3b3e, 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+  --s1-control-shadow: none;
+}
+
+/* ---------------------------------------------------------------- base */
+.s1-app {
+  font-family: var(--b-sans);
+}
+
+.s1-app ::selection {
+  color: var(--s1-ink);
+  background: color-mix(in srgb, var(--s1-accent) 30%, transparent);
+}
+
+.s1-app button:focus-visible,
+.s1-app a:focus-visible,
+.s1-app[data-theme="dark"] button:focus-visible,
+.s1-app[data-theme="dark"] a:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--s1-canvas),
+    0 0 0 4px var(--b-focus);
+}
+
+.s1-app[data-theme="dark"] .s1-overlay,
+.s1-overlay {
+  background: rgba(9, 10, 11, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.s1-app:not([data-theme="dark"]) .s1-overlay {
+  background: rgba(15, 16, 17, 0.38);
+}
+
+/* ---------------------------------------------------------------- brand (website logo) */
+.s1-brand {
+  gap: 0;
+}
+
+.s1-brand-art {
+  display: block;
+  height: 38px;
+  width: auto;
+}
+
+.s1-brand.is-mark .s1-brand-art {
+  height: 30px;
+}
+
+.s1-brand-art.is-dark,
+.s1-app[data-theme="dark"] .s1-brand-art.is-light {
+  display: none;
+}
+
+.s1-app[data-theme="dark"] .s1-brand-art.is-dark {
+  display: block;
+}
+
+.s1-sidebar-brand {
+  padding: 0 16px;
+}
+
+.nav-collapsed .s1-sidebar-brand {
+  justify-content: center;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------- sidebar */
+.s1-sidebar {
+  border-right-color: var(--s1-nav-line);
+}
+
+.s1-nav-section h2 {
+  font-family: var(--b-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+}
+
+.s1-nav-section nav > button {
+  border-radius: var(--b-radius);
+}
+
+.s1-nav-section nav > button.is-active {
+  box-shadow: inset 0 0 0 1px var(--s1-nav-line);
+}
+
+.s1-app:not([data-theme="dark"]) .s1-nav-section nav > button.is-active {
+  box-shadow:
+    inset 0 0 0 1px #e2e2e6,
+    0 1px 2px rgba(15, 16, 17, 0.04);
+}
+
+.s1-app[data-theme="dark"] .s1-nav-section nav > button.is-active {
+  box-shadow: inset 0 0 0 1px #2e2f32;
+}
+
+.s1-nav-section nav > button em {
+  border-radius: 999px;
+}
+
+.s1-sidebar-toggle {
+  border-radius: var(--b-radius);
+}
+
+/* ---------------------------------------------------------------- top bar */
+.s1-topbar {
+  background: color-mix(in srgb, var(--s1-canvas) 86%, transparent);
+  backdrop-filter: blur(24px);
+}
+
+.s1-search-trigger {
+  border-color: var(--s1-line);
+  border-radius: var(--b-radius);
+  box-shadow: none;
+}
+
+.s1-search-trigger:hover {
+  border-color: var(--s1-line-strong);
+}
+
+.s1-search-trigger kbd {
+  font-family: var(--b-mono);
+  font-size: 11px;
+  border-radius: 4px;
+}
+
+.s1-active-process-entry {
+  color: var(--s1-ink);
+  background: transparent;
+  border-color: var(--s1-line-strong);
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.s1-active-process-entry:hover {
+  border-color: color-mix(in srgb, var(--s1-ink) 40%, var(--s1-line));
+}
+
+/* ---------------------------------------------------------------- buttons */
+.s1-button,
+.s1-icon-button {
+  border-radius: var(--b-radius);
+  box-shadow: none;
+}
+
+.s1-button {
+  font-weight: 500;
+}
+
+.s1-button-secondary,
+.s1-button:not(.s1-button-primary):not(.s1-button-ghost):not(.s1-button-danger) {
+  background: transparent;
+}
+
+/* secondary, text and icon buttons stay outlined and quiet, and take the lake blue on hover */
+.s1-button-secondary:hover,
+.s1-button:not(.s1-button-primary):not(.s1-button-ghost):not(.s1-button-danger):hover:not(:disabled) {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 45%, var(--s1-line));
+}
+
+.s1-button-ghost:hover {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+}
+
+.s1-icon-button:hover {
+  color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 45%, var(--s1-line));
+}
+
+.s1-icon-button em {
+  color: #ffffff;
+  background: var(--b-badge);
+}
+
+.s1-spinner {
+  border-width: 1.5px;
+  border-color: color-mix(in srgb, currentColor 22%, transparent);
+  border-top-color: currentColor;
+}
+
+/* ---------------------------------------------------------------- status chips (the website's pill) */
+.s1-status {
+  border-radius: 999px;
+  font-weight: 500;
+  background: transparent;
+  border-color: var(--s1-line-strong);
+}
+
+.s1-status-info,
+.s1-app[data-theme="dark"] .s1-status-info {
+  color: var(--s1-accent);
+  background: color-mix(in srgb, var(--s1-accent) 9%, transparent);
+  border-color: color-mix(in srgb, var(--s1-accent) 32%, transparent);
+}
+
+.s1-status-success,
+.s1-app[data-theme="dark"] .s1-status-success {
+  color: var(--s1-success);
+  background: color-mix(in srgb, var(--s1-success) 9%, transparent);
+  border-color: color-mix(in srgb, var(--s1-success) 30%, transparent);
+}
+
+.s1-status-warning,
+.s1-app[data-theme="dark"] .s1-status-warning {
+  color: var(--s1-warning);
+  background: color-mix(in srgb, var(--s1-warning) 10%, transparent);
+  border-color: color-mix(in srgb, var(--s1-warning) 32%, transparent);
+}
+
+.s1-status-danger,
+.s1-app[data-theme="dark"] .s1-status-danger {
+  color: var(--s1-danger);
+  background: color-mix(in srgb, var(--s1-danger) 9%, transparent);
+  border-color: color-mix(in srgb, var(--s1-danger) 30%, transparent);
+}
+
+/* ---------------------------------------------------------------- fields */
+.s1-search-field {
+  border-color: var(--s1-line-strong);
+  border-radius: var(--b-radius);
+  box-shadow: none;
+}
+
+.s1-search-field:focus-within {
+  color: var(--s1-ink);
+  border-color: color-mix(in srgb, var(--s1-ink) 55%, var(--s1-line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s1-ink) 9%, transparent);
+}
+
+.s1-app[data-theme="dark"] .s1-search-field {
+  background: var(--s1-surface-raised);
+}
+
+/* ---------------------------------------------------------------- modal, drawer, toast */
+.s1-modal {
+  border-radius: var(--b-radius-panel);
+}
+
+.s1-modal h2,
+.s1-drawer h2 {
+  font-family: var(--b-display);
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+
+.s1-app[data-theme="dark"] .s1-modal,
+.s1-app[data-theme="dark"] .s1-drawer {
+  border-color: #343436;
+}
+
+.s1-app[data-theme="dark"] .s1-modal > footer {
+  background: #141517;
+}
+
+/* toasts sit outside the workspace, so they wear the website's dark tooltip in both themes */
+.s1-toast {
+  color: #f5f5f7;
+  background: #191a1c;
+  border-color: #343436;
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.55);
+}
+
+.s1-toast > svg {
+  color: #9de1bc;
+}
+
+.s1-toast-info > svg {
+  color: #8fb4ea;
+}
+
+.s1-toast-error > svg {
+  color: #ffaaa0;
+}
+
+.s1-toast button {
+  color: #a9a9ac;
+}
+
+.s1-toast button:hover {
+  color: #ffffff;
+  background: #2e2e30;
+}
+
+/* ---------------------------------------------------------------- page titles: the website's serif */
+.s4-page-header h1,
+.s1-dashboard-head h1,
+.s2-page-heading h1,
+.s2-periodic-heading h1,
+.s2-new-work-inner > header h1,
+.s2-workstream-header h1,
+.s2-detail-header h1,
+.s4-detail-title-row h1,
+.s5-settings-titlebar h1,
+.s5-page-header h1,
+.s3-review-header h1,
+.s1-component-page > header h1 {
+  font-family: var(--b-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.s4-page-header h1,
+.s1-dashboard-head h1,
+.s2-page-heading h1,
+.s2-periodic-heading h1,
+.s5-settings-titlebar h1 {
+  font-size: 30px;
+  line-height: 40px;
+}
+
+/* the kicker above a title: the website's mono, letter-spaced, in iris */
+.s4-page-header small,
+.s4-detail-header > .s4-back-button + div > span > small {
+  color: var(--b-kicker);
+  font-family: var(--b-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+}
+
+/* ---------------------------------------------------------------- selection controls: monochrome like the website */
+.s4-checkbox > i {
+  color: var(--b-on-ink);
+  border-radius: 4px;
+}
+
+.s4-checkbox.is-checked > i {
+  background: var(--b-ink-fill);
+  border-color: var(--b-ink-fill);
+}
+
+.s4-radio {
+  border-radius: var(--b-radius);
+}
+
+.s4-radio.is-checked {
+  background: var(--s1-accent-soft);
+  border-color: color-mix(in srgb, var(--s1-accent) 60%, var(--s1-line));
+}
+
+.s4-radio.is-checked > i {
+  border-color: var(--b-ink-fill);
+}
+
+.s4-pagination > div > button:not(.s1-icon-button) {
+  border-radius: var(--b-radius);
+}
+
+.s4-pagination > div > button.is-active {
+  color: var(--b-on-ink);
+  background: var(--b-ink-fill);
+}
+
+/* everything else that sits on an accent fill reads in the right ink for the theme */
+.s1-account-menu > header > i,
+.s2-pagination b,
+.s4-candidate-filter-toggle em,
+.s4-time-presets > button.is-selected,
+.tg-ai-composer button,
+.s5-choice-card > em {
+  color: var(--b-on-accent);
+}
+
+/* ---------------------------------------------------------------- empty state: the research network, at rest */
+.s1-empty-state h2 {
+  font-family: var(--b-display);
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.s1-empty-state.is-compact h2 {
+  font-size: 16px;
+}
+
+.s1-empty-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.s1-empty-net {
+  width: 168px;
+  height: 96px;
+  overflow: visible;
+}
+
+.s1-empty-net .w {
+  stroke: var(--s1-line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.s1-empty-net .w.live {
+  stroke: var(--b-coral);
+  stroke-dasharray: 3 7;
+  stroke-width: 1.4;
+  animation: s1-wire-flow 1.6s linear infinite;
+}
+
+.s1-empty-net .n {
+  fill: var(--s1-surface);
+  stroke: var(--s1-line-strong);
+  stroke-width: 1;
+}
+
+.s1-empty-net .n.on {
+  fill: var(--b-coral);
+  stroke: none;
+}
+
+@keyframes s1-wire-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.s1-empty-mark > i {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  color: var(--s1-ink);
+  font-style: normal;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 50%;
+}
+
+.s1-empty-net + i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.s1-empty-mark > i svg {
+  width: 20px;
+  height: 20px;
+}
+
+.s1-empty-state.is-compact .s1-empty-mark > i {
+  width: 34px;
+  height: 34px;
+  color: var(--s1-muted);
+  background: transparent;
+}
+
+.s1-empty-state.is-compact .s1-empty-mark > i svg {
+  width: 17px;
+  height: 17px;
+}
+
+@media (max-width: 760px) {
+  .s1-empty-state.is-compact > .s1-empty-mark {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s1-empty-net .w.live {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- loading: a slow light sweep, like the website's flowing data */
+.s1-skeleton,
+.s4-list-loading span,
+.s4-list-loading b,
+.s4-list-loading i {
+  background:
+    linear-gradient(100deg, transparent 30%, var(--b-sweep) 50%, transparent 70%) 0 0 / 240% 100% no-repeat,
+    var(--s1-surface-strong);
+  animation: b-sweep 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.s1-app[data-theme="dark"] .s1-skeleton,
+.s1-app[data-theme="dark"] .s4-list-loading span,
+.s1-app[data-theme="dark"] .s4-list-loading b,
+.s1-app[data-theme="dark"] .s4-list-loading i {
+  background:
+    linear-gradient(100deg, transparent 30%, var(--b-sweep) 50%, transparent 70%) 0 0 / 240% 100% no-repeat,
+    #222326;
+}
+
+@keyframes b-sweep {
+  from {
+    background-position: 130% 0, 0 0;
+  }
+  to {
+    background-position: -130% 0, 0 0;
+  }
+}
+
+.s4-list-loading > header {
+  background: var(--s1-canvas);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s1-skeleton,
+  .s4-list-loading span,
+  .s4-list-loading b,
+  .s4-list-loading i {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- tooltips: the website's small dark label, in both themes */
+.s4-floating-tooltip,
+.s4-floating-tooltip.is-dark {
+  color: #f5f5f7;
+  background: #1b1c1f;
+  border: 1px solid #1b1c1f;
+  border-radius: 4px;
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.45);
+}
+
+.s4-floating-tooltip.is-dark {
+  background: #242426;
+  border-color: #515154;
+}
+
+/* ---------------------------------------------------------------- scrollbars */
+.s1-app {
+  scrollbar-color: var(--s1-line-strong) transparent;
+}
+
+/* ---------------------------------------------------------------- tabs: the website's underline tabs, in ink */
+.s1-tabs.app-tabs {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--s1-line);
+  border-radius: 0;
+}
+
+.app-tabs > button,
+.s2-signal-tabs.app-tabs > button {
+  margin-bottom: -1px;
+  font-weight: 400;
+  border-bottom-width: 2px;
+  transition:
+    color 160ms ease,
+    border-color 200ms ease;
+}
+
+.app-tabs > button:hover,
+.s2-signal-tabs.app-tabs > button:hover {
+  color: var(--s1-ink);
+  border-bottom-color: var(--s1-line-strong);
+}
+
+.app-tabs > button.is-active,
+.app-tabs > button[aria-selected="true"],
+.s2-signal-tabs.app-tabs > button.is-active {
+  color: var(--s1-ink);
+  font-weight: 500;
+  border-bottom-color: var(--s1-accent);
+}
+
+.app-tabs > button:focus-visible {
+  outline-color: var(--b-focus);
+}
+
+.app-tabs > button em {
+  border-radius: 999px;
+}
+
+.s3-relationship-view-tabs button:hover {
+  background: transparent;
+}
+
+.s3-relationship-view-tabs button.is-active {
+  color: var(--s1-ink);
+  border-bottom-color: var(--s1-ink);
+}
+
+.s2-module-tabs button.is-active {
+  color: var(--s1-ink);
+  background: var(--s1-surface-strong);
+  border-color: var(--s1-line-strong);
+}
+
+/* ---------------------------------------------------------------- more kickers */
+.s1-dashboard-head small,
+.s1-section-heading small,
+.s2-periodic-heading small,
+.s2-page-heading small,
+.s3-detail-kicker,
+.s4-academic-main > small {
+  color: var(--b-kicker);
+  font-family: var(--b-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+}
+
+/* ---------------------------------------------------------------- dashboard headings in the serif */
+.s1-dashboard-section-head h2 {
+  font-family: var(--b-display);
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.s1-dashboard-section-head h2 > svg {
+  width: 16px;
+  height: 16px;
+  flex-basis: 16px;
+}
+
+.s1-task-focus-detail h3 {
+  font-family: var(--b-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* ---------------------------------------------------------------- the other empty states get the same network, drawn behind the icon */
+.s4-custom-empty::before,
+.s2-empty::before {
+  content: "";
+  width: 168px;
+  height: 96px;
+  margin-bottom: -72px;
+  background: var(--s1-line-strong);
+  -webkit-mask: var(--b-net) center / contain no-repeat;
+  mask: var(--b-net) center / contain no-repeat;
+}
+
+.s4-custom-empty > svg:first-child,
+.s2-empty > svg:first-child {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0;
+  padding: 13px;
+  color: var(--s1-ink);
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.s4-custom-empty b,
+.s2-empty h2 {
+  margin-top: 16px;
+  font-family: var(--b-display);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+:root {
+  --b-net: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 168 96' fill='none' stroke='black' stroke-width='1'%3E%3Cpath stroke-dasharray='2 4' d='M84 48 33.6 21.8M84 48 24.8 70.9M84 48 137.4 19.4M84 48 143.7 68.5'/%3E%3Ccircle cx='30' cy='20' r='4'/%3E%3Ccircle cx='22' cy='72' r='3'/%3E%3Ccircle cx='140' cy='18' r='3'/%3E%3Ccircle cx='148' cy='70' r='4.5'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------------- the website's palette for categories and identity */
+:root,
+.s1-app {
+  --b-cat-iris: #2f5bb8;
+  --b-cat-cyan: #0b7891;
+  --b-cat-blue: #b44c32;
+  --b-cat-orchid: #6d4fb0;
+  --b-cat-amber: #93650a;
+  /* the bo's lake-blue gradient, used for people and for the new-task mark */
+  --b-brand-gradient: linear-gradient(135deg, #2a46a2 0%, #3159b4 34%, #396bca 58%, #4f88d1 84%, #5a95d4 100%);
+}
+
+.s1-app[data-theme="dark"] {
+  --b-cat-iris: #8fb4ea;
+  --b-cat-cyan: #5cc9e0;
+  --b-cat-blue: #ff9f80;
+  --b-cat-orchid: #c3a6f0;
+  --b-cat-amber: #e7c27a;
+  --b-brand-gradient: linear-gradient(135deg, #3554b0 0%, #3e6cc6 45%, #4f88d1 75%, #6aa3de 100%);
+}
+
+.tg-node.is-person .tg-node-kind {
+  color: var(--b-cat-iris);
+  background: color-mix(in srgb, var(--b-cat-iris) 12%, var(--s1-surface));
+}
+
+.tg-node.is-company .tg-node-kind {
+  color: var(--b-cat-cyan);
+  background: color-mix(in srgb, var(--b-cat-cyan) 12%, var(--s1-surface));
+}
+
+.tg-node.is-position .tg-node-kind {
+  color: var(--b-cat-amber);
+  background: color-mix(in srgb, var(--b-cat-amber) 12%, var(--s1-surface));
+}
+
+.tg-node.is-industry .tg-node-kind {
+  color: var(--b-cat-blue);
+  background: color-mix(in srgb, var(--b-cat-blue) 12%, var(--s1-surface));
+}
+
+.tg-create-page {
+  --tg-update: var(--b-cat-cyan);
+}
+
+.s3-relationship-node.is-organization {
+  border-left-color: var(--b-cat-blue);
+}
+
+.s3-relationship-node.is-paper,
+.s3-relationship-node.is-patent {
+  border-left-color: var(--b-cat-orchid);
+}
+
+.s4-tag-violet {
+  color: var(--b-cat-iris);
+  background: color-mix(in srgb, var(--b-cat-iris) 10%, transparent);
+  border-color: color-mix(in srgb, var(--b-cat-iris) 30%, transparent);
+}
+
+.s1-usage-ring .s1-usage-ring-progress {
+  stroke: var(--s1-accent);
+}
+
+/* people: the logo gradient, white initials */
+.s1-account-menu > header > i,
+.s1-profile-entry > i,
+.s5-avatar-editor > i:not(.has-image),
+.s5-avatar-placeholder > i,
+.s1-mobile-account-section > header > i {
+  color: #ffffff;
+  background: var(--b-brand-gradient);
+  box-shadow: none;
+}
+
+/* the new-task mark */
+.s2-new-work-inner > header > span {
+  color: #ffffff;
+  background: var(--b-brand-gradient);
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.s2-new-work-inner > header h1 {
+  font-size: 30px;
+  line-height: 40px;
+}
+
+/* ---------------------------------------------------------------- the current nav item carries a lake-blue mark, like the bo */
+.s1-nav-section nav > button.is-active::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--s1-accent);
+}
+
+.nav-collapsed .s1-nav-section nav > button.is-active::before {
+  top: 10px;
+  bottom: 10px;
+}
