@@ -243,9 +243,6 @@
       const w = holder.clientWidth || 640;
       const k = W / w;
       const compact = w < 560;
-      /* the map's small print grows on larger screens (notes, numbers and details read at 13–14px there) */
-      const t = compact ? 1 : innerWidth >= 1680 ? 1.4 : innerWidth >= 1280 ? 1.3 : 1;
-      const lt = 1 + (t - 1) / 3;
       ({ h: H, at: AT, side: SIDE } = compact ? TALL : WIDE);
       const spot = (id, x, y) => {
         const below = SIDE[id] === "b", left = SIDE[id] === "l";
@@ -274,8 +271,8 @@
         const ink = svgEl("path", edge.pending ? { d, class: "o-line-ink is-pending" } : { d, class: "o-line-ink", pathLength: 1 });
         inkLayer.append(ink);
         const tag = svgEl("g", { class: "o-tag", "stroke-width": (4 * k).toFixed(1) });
-        tag.append(svgEl("text", { "font-size": (12 * k * t).toFixed(1), class: "o-tag-label" }, edge.label));
-        tag.append(svgEl("text", { "font-size": (10.5 * k * t).toFixed(1), class: "o-tag-note" }, edge.note));
+        tag.append(svgEl("text", { "font-size": (12 * k).toFixed(1), class: "o-tag-label" }, edge.label));
+        tag.append(svgEl("text", { "font-size": (10.5 * k).toFixed(1), class: "o-tag-note" }, edge.note));
         tagLayer.append(tag);
         lines.set(edge.id, { ink, tag, edge });
       });
@@ -290,9 +287,9 @@
       Object.entries(AT).forEach(([id, [x, y]]) => {
         const { below, tx, anchor } = spot(id, x, y);
         blocks.push({ x: x - 16 * k, y: y - 16 * k, w: 32 * k, h: 32 * k });
-        blocks.push(textBox(tx, y - (below ? 24 : 16) * k, "00", 10.5 * k * t, anchor, 0.7));
-        blocks.push(textBox(tx, y + (below ? 36 : 6) * k, info.get(id).label, (compact ? 15 : 18) * k * lt, anchor));
-        if (!compact) blocks.push(textBox(tx, y + ((below ? 36 : 6) + 17 * t) * k, info.get(id).detail, 11 * k * t, anchor));
+        blocks.push(textBox(tx, y - (below ? 24 : 16) * k, "00", 10.5 * k, anchor, 0.7));
+        blocks.push(textBox(tx, y + (below ? 36 : 6) * k, info.get(id).label, (compact ? 15 : 18) * k, anchor));
+        if (!compact) blocks.push(textBox(tx, y + (below ? 53 : 23) * k, info.get(id).detail, 11 * k, anchor));
       });
       // each tag sits beside its own line: never on it, and clear of other lines, star names and tags
       const overlap = (a, b, m = 0) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) + m - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) + m - Math.max(a.y, b.y));
@@ -300,11 +297,11 @@
         const [ax, ay] = AT[edge.from], [bx, by] = AT[edge.to];
         return [edge.id, Array.from({ length: 41 }, (_, i) => [ax + ((bx - ax) * i) / 40, ay + ((by - ay) * i) / 40])];
       }));
-      const top = -11 * k * t, bottom = (compact ? 3 : 17) * k * t;
+      const top = -11 * k, bottom = (compact ? 3 : 17) * k;
       [...model.edges].sort((a, b) => Math.hypot(...AT[a.from].map((v, i) => v - AT[a.to][i])) - Math.hypot(...AT[b.from].map((v, i) => v - AT[b.to][i]))).forEach((edge) => {
         const [ax, ay] = AT[edge.from], [bx, by] = AT[edge.to];
         const len = Math.hypot(bx - ax, by - ay), ux = (bx - ax) / len, uy = (by - ay) / len;
-        const w = Math.max(ems(edge.label, 0.6) * 12 * k * t, compact ? 0 : ems(edge.note, 0.56) * 10.5 * k * t), h = bottom - top;
+        const w = Math.max(ems(edge.label, 0.6) * 12 * k, compact ? 0 : ems(edge.note, 0.56) * 10.5 * k), h = bottom - top;
         let best = null;
         [0.5, 0.42, 0.58, 0.34, 0.66, 0.27, 0.73].forEach((t) => [1, -1].forEach((side) => {
           const nx = -uy * side, ny = ux * side;
@@ -323,7 +320,7 @@
         const my = best.cy - (top + bottom) / 2;
         const [label, note] = lines.get(edge.id).tag.children;
         label.setAttribute("x", best.cx.toFixed(1)); label.setAttribute("y", my.toFixed(1));
-        note.setAttribute("x", best.cx.toFixed(1)); note.setAttribute("y", (my + 14 * k * t).toFixed(1));
+        note.setAttribute("x", best.cx.toFixed(1)); note.setAttribute("y", (my + 14 * k).toFixed(1));
       });
       const stars = new Map();
       Object.entries(AT).forEach(([id, [x, y]]) => {
@@ -333,10 +330,10 @@
         g.append(svgEl("circle", { cx: x, cy: y, r: 12 * k, class: "o-star-ring" }));
         g.append(svgEl("circle", { cx: x, cy: y, r: (id === "candidate" ? 5.5 : 3.8) * k, class: "o-star-core" }));
         const { below, tx, anchor } = spot(id, x, y);
-        const num = svgEl("text", { x: tx, y: y - (below ? 24 : 16) * k, "font-size": (10.5 * k * t).toFixed(1), class: "o-star-num", "text-anchor": anchor }, "");
+        const num = svgEl("text", { x: tx, y: y - (below ? 24 : 16) * k, "font-size": (10.5 * k).toFixed(1), class: "o-star-num", "text-anchor": anchor }, "");
         g.append(num);
-        g.append(svgEl("text", { x: tx, y: y + (below ? 36 : 6) * k, "font-size": ((compact ? 15 : 18) * k * lt).toFixed(1), class: "o-star-label", "text-anchor": anchor }, info.get(id).label));
-        if (!compact) g.append(svgEl("text", { x: tx, y: y + ((below ? 36 : 6) + 17 * t) * k, "font-size": (11 * k * t).toFixed(1), class: "o-star-detail", "text-anchor": anchor }, info.get(id).detail));
+        g.append(svgEl("text", { x: tx, y: y + (below ? 36 : 6) * k, "font-size": ((compact ? 15 : 18) * k).toFixed(1), class: "o-star-label", "text-anchor": anchor }, info.get(id).label));
+        if (!compact) g.append(svgEl("text", { x: tx, y: y + (below ? 53 : 23) * k, "font-size": (11 * k).toFixed(1), class: "o-star-detail", "text-anchor": anchor }, info.get(id).detail));
         svg.append(g);
         stars.set(id, { g, num, halo });
       });
