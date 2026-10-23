@@ -10,6 +10,16 @@
   const narrow = matchMedia("(max-width: 900px)");
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
+  /* ---------- smooth scrolling, the way the reference site moves ---------- */
+  if (window.Lenis && !reduced.matches) {
+    window.__lenis = new window.Lenis({
+      duration: 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      anchors: true,
+      autoRaf: true,
+    });
+  }
+
   /* ---------- header ---------- */
   const header = document.querySelector("[data-header]");
   const nav = document.querySelector("#n-nav");
@@ -180,12 +190,17 @@
   syncTheme();
   requestHero();
 
-  /* ---------- 六件事: the text on the left follows the picture passing the middle ---------- */
+  /* ---------- 六件事: the text passing the middle of the screen lights up,
+     and the pinned picture on the right switches to match ---------- */
   const steps = [...document.querySelectorAll("[data-scrolly] .n-step")];
   if (steps.length && "IntersectionObserver" in window) {
     const activate = (step) => {
-      if (step.classList.contains("is-active")) return;
-      steps.forEach((s) => s.classList.toggle("is-active", s === step));
+      const at = steps.indexOf(step);
+      if (at < 0 || step.classList.contains("is-active")) return;
+      steps.forEach((s, i) => {
+        s.classList.toggle("is-active", i === at);
+        s.classList.toggle("is-past", i < at);
+      });
     };
     const watch = new IntersectionObserver(
       (entries) => {
@@ -195,10 +210,42 @@
       },
       { rootMargin: "-50% 0px -50% 0px" },
     );
-    steps.forEach((step) => watch.observe(step.querySelector(".n-figure")));
-    // keyboard users tabbing into a hidden step bring it forward
-    steps.forEach((step) => step.addEventListener("focusin", () => activate(step)));
+    steps.forEach((step) => {
+      watch.observe(step.querySelector(".n-step-text"));
+      step.addEventListener("focusin", () => activate(step));
+    });
   }
+
+  /* ---------- scroll-linked motion ---------- */
+  const film = document.querySelector(".n-film-frame");
+  const photo = document.querySelector(".n-belief-photo");
+  const photoImg = photo?.querySelector("img");
+  let linkFrame = 0;
+  function paintLinked() {
+    linkFrame = 0;
+    if (reduced.matches) return;
+    const vh = innerHeight;
+    if (film) {
+      // grows from 90% to full size as it rises into view
+      const r = film.getBoundingClientRect();
+      const p = clamp((vh - r.top) / (vh * 0.75));
+      film.style.transform = `scale(${(0.9 + 0.1 * p).toFixed(4)})`;
+    }
+    if (photo && photoImg) {
+      const r = photo.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < vh) {
+        const p = clamp((vh - r.top) / (vh + r.height));
+        photo.style.transform = `scale(${(0.94 + 0.06 * clamp(p * 2)).toFixed(4)})`;
+        photoImg.style.transform = `translate3d(0, ${((p - 0.5) * -12).toFixed(2)}%, 0)`;
+      }
+    }
+  }
+  const requestLinked = () => {
+    if (!linkFrame) linkFrame = requestAnimationFrame(paintLinked);
+  };
+  addEventListener("scroll", requestLinked, { passive: true });
+  addEventListener("resize", requestLinked, { passive: true });
+  requestLinked();
 
   /* ---------- film chapters ---------- */
   const video = document.querySelector("[data-film]");
@@ -216,7 +263,9 @@
         video.addEventListener("loadedmetadata", go, { once: true });
         video.load();
       }
-      video.closest("figure")?.scrollIntoView({ behavior: reduced.matches ? "auto" : "smooth", block: "center" });
+      const frame = video.closest("figure");
+      if (frame && window.__lenis) window.__lenis.scrollTo(frame, { offset: -(innerHeight - frame.offsetHeight) / 2 });
+      else frame?.scrollIntoView({ behavior: reduced.matches ? "auto" : "smooth", block: "center" });
     });
   });
 
@@ -410,7 +459,7 @@
   /* ---------- gentle reveals: only for what is still below the fold ---------- */
   if (!reduced.matches && "IntersectionObserver" in window) {
     const items = document.querySelectorAll(
-      ".n-section-head, .n-display, .n-lede, .n-film-frame, .n-belief-head, .n-belief-photo, .n-bounds, .n-wall-panel, .n-faq-list, .f-trial-layout",
+      ".n-section-head, .n-display, .n-lede, .n-belief-head, .n-bounds, .n-wall-panel, .n-faq-list, .f-trial-layout",
     );
     const reveal = new IntersectionObserver(
       (entries) => {

@@ -1431,11 +1431,11 @@ body.n-page::after {
 
 /* ---------- reveals: from a visible resting state, only when motion is allowed ---------- */
 .motion .n-reveal {
-  transition: opacity 1s var(--ease), transform 1s var(--ease);
+  transition: opacity 1.1s var(--ease), transform 1.2s var(--ease);
 }
 .motion .n-reveal.is-waiting {
   opacity: 0;
-  transform: translate3d(0, 24px, 0);
+  transform: translate3d(0, 44px, 0);
 }
 
 /* ---------- responsive ---------- */
@@ -1605,7 +1605,9 @@ body.n-page::after {
 }
 
 
-/* ---------- 六件事：左边文字跟着滚动换，右边的图往上走 ---------- */
+/* ---------- 六件事：参考地平线 Mission / Vision / Value 的滚动
+   左边六段文字照常往上滚，经过屏幕中间的那段亮起；右边的图钉在屏幕中间，跟着换。
+   图只钉在这一块里面，所以不会盖到上面的标题。 ---------- */
 .n-scrolly {
   display: grid;
   gap: 20px;
@@ -1630,92 +1632,122 @@ body.n-page::after {
   font-style: normal;
   letter-spacing: 0;
 }
-.n-step-bar {
-  display: none;
+.n-step-text h3 + .n-pain {
+  margin-top: 8px !important;
+}
+.n-step-text .n-pain + p {
+  margin-top: 12px !important;
+  color: var(--ink-2);
+  font-size: 15.5px;
+  line-height: 1.9;
 }
 
 @media (min-width: 901px) {
   .js .n-scrolly {
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     grid-template-rows: repeat(6, auto);
-    column-gap: clamp(48px, 6vw, 96px);
-    row-gap: 14vh;
-    margin-top: 96px;
-    padding-bottom: 6vh;
+    column-gap: clamp(48px, 6vw, 104px);
+    row-gap: 0;
+    margin-top: 32px;
   }
   .js .n-step {
     display: contents;
   }
-  /* all six texts share the left cell and stay pinned to the middle of the screen;
-     only the one whose picture is passing the middle shows */
   .js .n-step-text {
-    position: sticky;
-    top: 50%;
     grid-column: 1;
-    grid-row: 1 / -1;
-    align-self: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 74vh;
     margin: 0 !important;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(calc(-50% + 18px));
-    transition: opacity 0.45s ease, transform 0.6s var(--ease);
+    opacity: 0.2;
+    transition: opacity 0.6s ease;
   }
   .js .n-step.is-active .n-step-text {
     opacity: 1;
-    pointer-events: auto;
-    transform: translateY(-50%);
-    transition: opacity 0.5s ease 0.1s, transform 0.7s var(--ease) 0.1s;
   }
-  .js .n-step:nth-child(1) .n-figure { grid-row: 1; }
-  .js .n-step:nth-child(2) .n-figure { grid-row: 2; }
-  .js .n-step:nth-child(3) .n-figure { grid-row: 3; }
-  .js .n-step:nth-child(4) .n-figure { grid-row: 4; }
-  .js .n-step:nth-child(5) .n-figure { grid-row: 5; }
-  .js .n-step:nth-child(6) .n-figure { grid-row: 6; }
+  .js .n-step:nth-child(1) .n-step-text { grid-row: 1; }
+  .js .n-step:nth-child(2) .n-step-text { grid-row: 2; }
+  .js .n-step:nth-child(3) .n-step-text { grid-row: 3; }
+  .js .n-step:nth-child(4) .n-step-text { grid-row: 4; }
+  .js .n-step:nth-child(5) .n-step-text { grid-row: 5; }
+  .js .n-step:nth-child(6) .n-step-text { grid-row: 6; }
+  .js .n-step-meta {
+    margin-top: 0 !important;
+  }
+  .js .n-step-text h3 {
+    margin-top: 18px !important;
+    font-size: clamp(30px, 2.8vw, 40px);
+    line-height: 1.3;
+  }
+  .js .n-step-text h3 + .n-pain {
+    margin-top: 14px !important;
+    font-size: 17px;
+    line-height: 1.75;
+  }
+  .js .n-step-text .n-pain + p {
+    margin-top: 20px !important;
+    font-size: 16px;
+  }
+  .js .n-step-text .n-more {
+    margin-top: 0 !important;
+    padding-top: 24px;
+  }
+  /* the six pictures share one spot on the right, pinned to the middle of the screen */
   .js .n-scrolly .n-figure {
     grid-column: 2;
-    height: clamp(420px, 66vh, 620px);
+    grid-row: 1 / -1;
+    align-self: start;
+    position: sticky;
+    top: calc(50vh - min(32vh, 300px));
+    height: min(64vh, 600px);
+    min-height: 0;
     padding: 40px;
     border-radius: 18px;
-    scroll-margin-top: 17vh;
+    opacity: 0;
+    transform: translate3d(0, 56px, 0);
+    transition: opacity 0.55s ease, transform 0.8s var(--ease);
+  }
+  .js .n-step.is-past .n-figure {
+    transform: translate3d(0, -56px, 0);
+  }
+  .js .n-step.is-active .n-figure {
+    opacity: 1;
+    transform: none;
   }
   .js .n-scrolly .n-figure > * {
     zoom: 1.28;
     max-width: 78%;
   }
-  .js .n-step-meta {
-    margin-top: 0 !important;
-  }
-  .js .n-step-text .n-pain {
-    margin-top: 22px !important;
-    font-size: 16px;
-  }
-  .js .n-step-text h3 {
-    margin-top: 12px !important;
-    font-size: clamp(28px, 2.5vw, 36px);
-    line-height: 1.35;
-  }
-  .js .n-step-text h3 + p {
-    margin-top: 18px !important;
-    font-size: 16.5px;
-  }
-  .js .n-step-text .n-more {
-    margin-top: 0 !important;
-    padding-top: 26px;
-  }
-  .js .n-step-bar {
-    display: flex;
-    gap: 6px;
-    margin-top: 36px;
-  }
-  .js .n-step-bar i {
-    width: 22px;
-    height: 2px;
-    border-radius: 2px;
-    background: #d6d6db;
-  }
-  .js .n-step-bar i.is-on {
-    width: 40px;
-    background: var(--iris-ink);
-  }
+}
+
+/* ---------- smooth scrolling (Lenis), like the reference site ---------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+html.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* scroll-linked pieces: the film grows into place, the photo drifts inside its frame,
+   the diagram passing the middle comes forward */
+.motion .n-film-frame,
+.motion .n-belief-photo {
+  will-change: transform;
+}
+.motion .n-belief-photo {
+  position: relative;
+}
+.motion .n-belief-photo img {
+  position: absolute;
+  inset: -8% 0 auto;
+  height: 116%;
+  will-change: transform;
 }
