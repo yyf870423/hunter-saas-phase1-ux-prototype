@@ -84,6 +84,13 @@ const graph = {
         addressLocality: "Beijing",
         addressCountry: "CN",
       },
+      email: "hello@boseekai.com",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "sales",
+        email: "hello@boseekai.com",
+        availableLanguage: ["zh-CN", "en"],
+      },
     },
     {
       "@type": "WebSite",
@@ -346,6 +353,7 @@ ${FAQ.map(
             <div class="f-footer-notes">
               <p>HunterBuddy. Your AI partner in recruitment.</p>
               <p>For independent recruiters and senior search consultants.</p>
+              <p class="o-footer-contact">Contact: <a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>
             </div>
           </div>
           <div class="f-footer-groups">

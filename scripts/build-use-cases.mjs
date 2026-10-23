@@ -17,7 +17,7 @@ const VERSION = {
   footer: "20261021d",
   sharedOrigin: "20261023-uc-b",
   origin: "20261023-faq",
-  motion: "20261023-uc",
+  motion: "20261023-mail",
   locale: "20261023-faq",
   useCase: "20261023-uc",
 };
@@ -314,6 +314,7 @@ ${PAGES.map(
             </span>
             <div class="f-footer-notes">
 ${t.footerNotes.map((note) => `              <p>${text(note)}</p>`).join("\n")}
+              <p class="o-footer-contact">${text(t.contact)}<a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>
             </div>
           </div>
           <div class="f-footer-groups">
