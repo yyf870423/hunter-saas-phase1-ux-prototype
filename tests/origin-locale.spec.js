@@ -217,7 +217,7 @@ for (const width of [1440, 1024, 801, 390, 320]) {
       if (language === "zh")
         await expect(
           page.locator(".f-work-demo > .f-tabs [role=tab]"),
-        ).toHaveText(["客户开发", "人才地图", "职位寻访", "人选维护"]);
+        ).toHaveText(["客户开发", "组织架构", "职位寻访", "人选维护"]);
       await expect(page.locator("meta[name='trial-api']")).toHaveAttribute(
         "content",
         "disabled",
@@ -240,7 +240,7 @@ test("English interactions translate all scenes, slides, errors and canonical fo
   const tabs = page.locator(".f-work-demo > .f-tabs [role=tab]");
   await expect(tabs).toHaveText([
     "Business development",
-    "Talent mapping",
+    "Org mapping",
     "Sourcing",
     "Candidate nurturing",
   ]);

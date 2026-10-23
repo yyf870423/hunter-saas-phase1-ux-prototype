@@ -38,7 +38,7 @@
   const english = document.documentElement.lang === "en";
   const cases = [
     ["business-development", "了解客户开发", "More on business development"],
-    ["talent-mapping", "了解人才地图", "More on talent mapping"],
+    ["talent-mapping", "了解组织架构", "More on org mapping"],
     ["sourcing", "了解职位寻访", "More on sourcing"],
     ["candidate-nurturing", "了解人选维护", "More on candidate nurturing"],
   ];

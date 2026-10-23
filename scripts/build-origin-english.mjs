@@ -20,9 +20,9 @@ const target = resolve(root, "public/landing-origin/en/index.html");
 const SITE = "https://www.boseekai.com/";
 const EN = `${SITE}en/`;
 const TITLE =
-  "HunterBuddy · AI assistant for recruiters: talent mapping and sourcing | Boseek";
+  "HunterBuddy · AI assistant for recruiters: org mapping and sourcing | Boseek";
 const DESCRIPTION =
-  "HunterBuddy by Boseek is an AI assistant for independent recruiters and senior search consultants. It finds leads in funding news, job pages, CVs and papers to help with business development, talent mapping, sourcing and candidate nurturing, with a source for every finding. Early access by invitation.";
+  "HunterBuddy by Boseek is an AI assistant for independent recruiters and senior search consultants. It finds leads in funding news, job pages, CVs and papers to help with business development, org mapping, sourcing and candidate nurturing, with a source for every finding. Early access by invitation.";
 
 // 常见问题：页面上的问答和结构化数据 FAQPage 用同一份文字，改一处两边一起变
 const FAQ = [
@@ -32,7 +32,7 @@ const FAQ = [
   ],
   [
     "How is it different from just using a general-purpose AI like Doubao, DeepSeek or ChatGPT?",
-    "General-purpose AI is good at answering one question at a time, but it doesn’t know your clients, your candidates or your talent maps. When it gives you a list of names, you often still have to check for yourself whether two entries are the same person and where each piece of information came from. HunterBuddy always starts from what you already have: the companies you know, the candidates you’ve worked with, your talent maps and the people who can introduce you. When the same person turns up in different places, the records are checked before they are merged, and every finding shows its source. The work you finish is kept, so the next search goes faster.",
+    "General-purpose AI is good at answering one question at a time, but it doesn’t know your clients and candidates, or which companies you’ve already mapped. When it gives you a list of names, you often still have to check for yourself whether two entries are the same person and where each piece of information came from. HunterBuddy always starts from what you already have: the companies you know, the candidates you’ve worked with, the org charts you’ve mapped and the people who can introduce you. When the same person turns up in different places, the records are checked before they are merged, and every finding shows its source. The work you finish is kept, so the next search goes faster.",
   ],
   [
     "Can it keep an eye on the market and my candidates for me?",
@@ -40,11 +40,11 @@ const FAQ = [
   ],
   [
     "Where do candidates and leads come from?",
-    "From your existing candidates and talent maps, the public web and careers pages, papers and patents, open-source projects, and the CVs and documents you upload. Every lead keeps a note of where it came from. When the same person turns up in different sources, the records are checked before they are merged. It also shows which sources have been searched and where the gaps are, so you can decide what to fill in next.",
+    "From your existing candidates and org charts, the public web and careers pages, papers and patents, open-source projects, and the CVs and documents you upload. Every lead keeps a note of where it came from. When the same person turns up in different sources, the records are checked before they are merged. It also shows which sources have been searched and where the gaps are, so you can decide what to fill in next.",
   ],
   [
-    "Can I bring in my own candidate database and talent maps?",
-    "Yes. Upload CVs one at a time or in bulk, and import talent maps from Excel or similar formats to keep building on them. Everything you bring in goes through the same identity checks and de-duplication, and can be matched against all your live searches in one go.",
+    "Can I bring in my own candidate database and org charts?",
+    "Yes. Upload CVs one at a time or in bulk, and import org charts from Excel or similar formats to keep building on them. Everything you bring in goes through the same identity checks and de-duplication, and can be matched against all your live searches in one go.",
   ],
   [
     "Can I take the match results at face value?",
@@ -118,7 +118,7 @@ const graph = {
       "@id": `${SITE}#hunterbuddy`,
       name: "HunterBuddy",
       description:
-        "Your AI partner in recruitment. HunterBuddy finds leads in funding news, job pages, CVs and papers and maps the relationships between them, helping independent recruiters and senior search consultants with business development, talent mapping, sourcing and candidate nurturing. Every finding comes with its source, and the recruiter decides who to approach and whether to put a candidate forward. Early access by invitation.",
+        "Your AI partner in recruitment. HunterBuddy finds leads in funding news, job pages, CVs and papers and maps the relationships between them, helping independent recruiters and senior search consultants with business development, org mapping, sourcing and candidate nurturing. Every finding comes with its source, and the recruiter decides who to approach and whether to put a candidate forward. Early access by invitation.",
       applicationCategory: "BusinessApplication",
       applicationSubCategory: "AI assistant for recruiters",
       operatingSystem: "Web",
@@ -136,7 +136,7 @@ const graph = {
       "@id": `${EN}#film`,
       name: "HunterBuddy two-minute product video",
       description:
-        "From one funding announcement to a new search, a talent map and a longlist. Six months later, the same research helps a candidate find their next move.",
+        "From one funding announcement to a new search, an org chart and a longlist. Six months later, the same research helps a candidate find their next move.",
       thumbnailUrl: `${SITE}assets/origin-film-poster-en.jpg`,
       contentUrl: `${SITE}assets/hunterbuddy-origin-en.mp4`,
       uploadDate: "2026-10-22T00:00:00+08:00",
@@ -240,13 +240,13 @@ const body = `      <main id="main" class="f-static-fallback">
             <p>A confirmed opening, the hiring manager and a backup route in. Whether to go direct or through an introduction, and what to say, is your call. Once you have the JD and an agreed mandate, it becomes a live search.</p>
           </article>
           <article>
-            <h3>Talent mapping: mapping a team means piecing together scattered information.</h3>
+            <h3>Org mapping: mapping a team means piecing together scattered information.</h3>
             <p>Lay out Xingchuan and two peer companies by org structure, then match each person against your candidate database.</p>
-            <p>A talent map showing the org structure and reporting lines, who holds each role, where each detail comes from and what is still missing. You can also import an existing Excel talent map and keep building on it.</p>
+            <p>An org chart showing departments and reporting lines, who holds each role, where each detail comes from and what is still missing. You can also import an org chart you built in Excel and keep building on it.</p>
           </article>
           <article>
             <h3>Sourcing: the JD is in. Start with the people you already know.</h3>
-            <p>Qing Xu sends over the JD. HunterBuddy checks your talent map and database first, then fills the gaps from papers, patents and open-source communities.</p>
+            <p>Qing Xu sends over the JD. HunterBuddy checks your org charts and database first, then fills the gaps from papers, patents and open-source communities.</p>
             <p>A longlist with the rationale, sources and open questions alongside each candidate. You decide who to approach first.</p>
           </article>
           <article>
@@ -300,7 +300,7 @@ const body = `      <main id="main" class="f-static-fallback">
           <p>Who worked where, who wrote papers with whom, who can introduce you to whom: it all stays connected. When records change, connections and matches update, and anything unconfirmed stays flagged.</p>
           <ul>
             <li>Business development: Company → Role → Contact. Find the opening and reach the hiring manager. If you cannot reach them, ask a mutual contact for an introduction.</li>
-            <li>Talent mapping: Company → Candidate → Papers &amp; patents. Map one company team by team and match current employees to the candidates you already know.</li>
+            <li>Org mapping: Company → Candidate → Papers &amp; patents. Map one company team by team and match current employees to the candidates you already know.</li>
             <li>Sourcing: Role → Candidate → Papers &amp; patents. Start with the target teams, then check their expertise against papers and patents.</li>
             <li>Candidate nurturing: Candidate → Company → Role. When a candidate wants to move, follow their experience and the companies they know, and check your live searches.</li>
           </ul>
@@ -371,7 +371,7 @@ ${FAQ.map(
               <h2 id="f-footer-cases">Use cases</h2>
               <ul>
                 <li><a href="en/use-cases/business-development/">Business development</a></li>
-                <li><a href="en/use-cases/talent-mapping/">Talent mapping</a></li>
+                <li><a href="en/use-cases/talent-mapping/">Org mapping</a></li>
                 <li><a href="en/use-cases/sourcing/">Sourcing</a></li>
                 <li><a href="en/use-cases/candidate-nurturing/">Candidate nurturing</a></li>
               </ul>

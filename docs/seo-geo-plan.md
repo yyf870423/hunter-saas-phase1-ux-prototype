@@ -21,7 +21,7 @@
 | # | 问题 | 答复 |
 |---|---|---|
 | 1 | 目标用户 | 独立猎头和资深顾问为主，猎头公司团队为辅，不专门面向企业 HR |
-| 2 | 品类词 | 主词“猎头 AI 助手 / AI 猎头工具”；次词“人才地图 / 人才寻访工具”。不做“猎头软件 / 猎头系统”“猎头 BD” |
+| 2 | 品类词 | 主词“猎头 AI 助手 / AI 猎头工具”；次词“组织架构梳理 / 人才寻访工具”（2026-10-24 起不再用“人才地图”）。不做“猎头软件 / 猎头系统”“猎头 BD” |
 | 3 | 品牌名 | 公司“铂寻 Boseek”，产品“HunterBuddy”，不另起中文名 |
 | 4 | 对比对象 | 通用 AI（豆包、DeepSeek、ChatGPT）、招聘平台（猎聘、领英、脉脉）、猎头管理系统（CRM、ATS）；只讲各自适合做什么，不贬低 |
 | 5 | 公开的公司信息 | 只公开成立时间和城市：北京，2026 年成立。团队背景、开放时间、价格暂不公开 |
@@ -31,7 +31,7 @@
 | 9 | 分享图 | 新做 1200×630 分享图，不用首屏云海；具体用什么另行商量 |
 | 10 | 站长工具 | 百度、Google、Bing 已由用户注册；网站所有权还没验证，验证文件或代码由用户提供，放进仓库随第一阶段部署 |
 | 11 | 一句话介绍 | 保持“猎头的 AI 工作伙伴”，关键词只放在标题和描述里 |
-| 12 | 首页标题与描述（中文） | 标题：HunterBuddy · 猎头 AI 助手，做人才地图与人才寻访｜铂寻 Boseek；描述：HunterBuddy 是铂寻 Boseek 为独立猎头和资深顾问打造的猎头 AI 助手。从融资新闻、招聘页、简历和论文里找线索，帮你做客户开发、人才地图、人才寻访和人选维护，每个判断都写明来源。目前邀请制试用。 |
+| 12 | 首页标题与描述（中文） | 标题：HunterBuddy · 猎头 AI 助手，梳理组织架构、做人才寻访｜铂寻 Boseek；描述：HunterBuddy 是铂寻 Boseek 为独立猎头和资深顾问打造的猎头 AI 助手。从融资新闻、招聘页、简历和论文里找线索，帮你做客户开发、组织架构梳理、人才寻访和人选维护，每个判断都写明来源。目前邀请制试用。 |
 
 ### 5. 站长工具验证（2026-10-23）
 - Google Search Console：网域资源 `boseekai.com`，阿里云解析 TXT 记录验证，已通过。这条 TXT 记录要一直保留。
@@ -57,8 +57,8 @@
 ### 第二批：英文版 `/en/`（2026-10-23，已上线）
 决定：
 - 不按浏览器语言自动跳转，只保留切换按钮。
-- 英文标题：HunterBuddy · AI assistant for recruiters: talent mapping and sourcing | Boseek
-- 英文描述：HunterBuddy by Boseek is an AI assistant for independent recruiters and senior search consultants. It finds leads in funding news, job pages, CVs and papers to help with business development, talent mapping, sourcing and candidate nurturing, with a source for every finding. Early access by invitation.
+- 英文标题：HunterBuddy · AI assistant for recruiters: org mapping and sourcing | Boseek
+- 英文描述：HunterBuddy by Boseek is an AI assistant for independent recruiters and senior search consultants. It finds leads in funding news, job pages, CVs and papers to help with business development, org mapping, sourcing and candidate nurturing, with a source for every finding. Early access by invitation.
 
 实现：
 - `public/landing-origin/en/index.html` 由 `scripts/build-origin-english.mjs` 生成：用 `<base href="../">` 共用中文首页的样式、脚本和资源；`<head>` 是英文页面信息（canonical `/en/`、hreflang、Open Graph、JSON-LD 含英文短片）；静态正文和页脚是英文，不运行 JavaScript 也能读到。
@@ -76,7 +76,7 @@
 
 ## 第二阶段：内容页面
 
-分两批：第一批首页“常见问题”，第二批四个使用场景页（客户开发、人才地图、职位寻访、人选维护，动手前再逐个问题确认）。
+分两批：第一批首页“常见问题”，第二批四个使用场景页（客户开发、组织架构、职位寻访、人选维护，动手前再逐个问题确认）。
 
 ### 第一批：首页常见问题（2026-10-23，已验收，待部署）
 决定：
@@ -99,7 +99,7 @@
 | 页面 | 网址 | 主要搜索词 |
 |---|---|---|
 | 客户开发 | `/use-cases/business-development/` | 猎头客户开发、猎头怎么找客户（不用“猎头 BD”） |
-| 人才地图 | `/use-cases/talent-mapping/` | 人才地图怎么做、人才地图工具 |
+| 组织架构 | `/use-cases/talent-mapping/` | 组织架构怎么梳理、组织架构梳理工具（网址沿用 talent-mapping，不改） |
 | 职位寻访 | `/use-cases/sourcing/` | 人才寻访、候选人寻访 |
 | 人选维护 | `/use-cases/candidate-nurturing/` | 候选人维护、人选维护 |
 
@@ -127,3 +127,4 @@
 1. 第二阶段：内容页面（先逐个问题确认，再汇总执行）。
 2. 企业邮箱 hello@boseekai.com：Codex 已开通（2026-10-23）。已加到中英文首页和八个场景页的页脚（“联系我们：”，英文 Contact:），首页结构化数据 Organization 加了 email 和 contactPoint（sales）。
 3. 分享图：内容页面之后再做。
+- 统一话术（2026-10-24）：全站“人才地图”改为“组织架构”（活动叫“梳理组织架构 / 组织架构梳理”，产出叫“组织架构图”），英文 talent map / talent mapping 改为 org chart / org mapping。使用场景页网址 `/use-cases/talent-mapping/` 不改，避免重定向和已提交的收录失效。产品短片画面里的“人才地图”字样随视频，不在这次范围。
