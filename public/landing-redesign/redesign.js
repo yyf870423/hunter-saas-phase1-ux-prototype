@@ -190,8 +190,7 @@
   syncTheme();
   requestHero();
 
-  /* ---------- 六件事: the text passing the middle of the screen lights up,
-     and the pinned picture on the right switches to match ---------- */
+  /* ---------- 六件事: the text pinned on the left follows the picture passing the middle ---------- */
   const steps = [...document.querySelectorAll("[data-scrolly] .n-step")];
   if (steps.length && "IntersectionObserver" in window) {
     const activate = (step) => {
@@ -211,9 +210,22 @@
       { rootMargin: "-50% 0px -50% 0px" },
     );
     steps.forEach((step) => {
-      watch.observe(step.querySelector(".n-step-text"));
+      watch.observe(step.querySelector(".n-figure"));
+      // keyboard users tabbing into a step bring it forward
       step.addEventListener("focusin", () => activate(step));
     });
+    // centre each pinned text in the screen by its own height, without shifting it up
+    // (a shift would push the first text over the section heading before it pins)
+    const centre = () => {
+      steps.forEach((step) => {
+        const text = step.querySelector(".n-step-text");
+        const top = Math.max(96, Math.round((innerHeight - text.offsetHeight) / 2));
+        text.style.setProperty("--stick", `${top}px`);
+      });
+    };
+    centre();
+    addEventListener("resize", centre, { passive: true });
+    document.fonts?.ready.then(centre);
   }
 
   /* ---------- scroll-linked motion ---------- */
