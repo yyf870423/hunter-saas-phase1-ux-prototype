@@ -441,6 +441,8 @@
     [".f-network-story", haze(26), () => 120, 1000],
     [".f-network-figure", [{ opacity: 0, transform: "scale(.96)", filter: "blur(10px)" }, { opacity: 1, transform: "none", filter: "blur(0px)" }], () => 220, 1300],
     [".f-network-origin", haze(12), () => 320, 800],
+    [".o-faq-intro h2", haze(30), () => 0, 1100],
+    [".o-faq-list", haze(20), () => 150, 1000],
     [".f-about-copy > *", haze(24), (i) => i * 110, 1000],
     [".f-trial-intro > *", haze(24), (i) => i * 90, 1000],
     [".f-trial-content", haze(36), () => 160, 1100],

@@ -482,7 +482,7 @@
 /* ---------- reveals: hidden until origin-motion.js brings them out of the haze ---------- */
 .motion #homepage :is(.o-film-head > *, .o-film-frame, .o-course, .f-hero-copy > *, .f-work-intro > *, .f-work-demo > .f-tabs, .f-work-panel, .f-work-bottom,
   .p-intro h2 > span, .p-intro > p, .p-stage, .f-memory h2, .f-memory .f-container > p, .f-network-tabs, .f-network-story,
-  .f-network-figure, .f-network-origin, .f-about-copy > *, .f-trial-intro > *, .f-trial-content):not(.in) {
+  .f-network-figure, .f-network-origin, .o-faq-intro h2, .o-faq-list, .f-about-copy > *, .f-trial-intro > *, .f-trial-content):not(.in) {
   opacity: 0;
 }
 .motion .f-footer :is(.f-footer-top > *, .f-footer-bottom):not(.in) {
@@ -685,4 +685,141 @@ html:lang(en) #homepage .f-hero .f-hero-copy h1.o-promise {
 }
 html:lang(en) #homepage .f-hero-description {
   max-width: 740px;
+}
+
+/* 2026-10-23 · 常见问题: after 人和关系, on the base tone. A quiet list with hairlines,
+   questions in the display serif, answers in the sans. Written statically in the page so it reads without
+   JavaScript; origin.js moves it into place, so these rules are not scoped to #homepage. */
+.o-faq {
+  padding-block: 88px;
+  background: #0f1011;
+  color: #f5f5f7;
+  border-top: 1px solid rgb(255 255 255 / 9%);
+}
+.o-faq:focus {
+  outline: none;
+}
+.o-faq-intro {
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+}
+.o-faq-intro h2 {
+  margin: 0;
+  color: #f5f5f7;
+  font-family: var(--o-display);
+  font-size: min(44px, calc((min(100vw, 1440px) - 96px) / 21));
+  font-weight: 400;
+  line-height: 1.42;
+  letter-spacing: 0;
+}
+.o-faq-list {
+  max-width: 860px;
+  margin: 52px auto 0;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+}
+.o-faq details {
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+.o-faq summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.o-faq summary::-webkit-details-marker {
+  display: none;
+}
+.o-faq summary:focus-visible {
+  outline: 2px solid var(--f-focus-ring);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.o-faq summary h3 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: #e3e3e7;
+  font-family: var(--o-display);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.6;
+  text-wrap: pretty;
+  transition: color 0.2s ease;
+}
+.o-faq summary:hover h3,
+.o-faq details[open] summary h3 {
+  color: #ffffff;
+}
+/* a plus that turns into a minus */
+.o-faq-mark {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: #a9a2e0;
+}
+.o-faq-mark::before,
+.o-faq-mark::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 14px;
+  height: 1.5px;
+  margin-top: -0.75px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform 0.25s ease;
+}
+.o-faq-mark::after {
+  transform: rotate(90deg);
+}
+.o-faq details[open] .o-faq-mark::after {
+  transform: rotate(0deg);
+}
+.o-faq details p {
+  max-width: 760px;
+  margin: -6px 0 0;
+  padding: 0 38px 28px 0;
+  color: #a9a9ac;
+  font-size: 15px;
+  line-height: 1.9;
+}
+@media (min-width: 801px) {
+  .o-faq-intro h2 .ln { white-space: nowrap; }
+}
+html:lang(en) .o-faq-intro h2 .ln { white-space: normal; }
+@media (max-width: 800px) {
+  .o-faq {
+    padding-block: 60px;
+  }
+  .o-faq-intro h2 {
+    font-size: min(30px, calc((100vw - 40px) / 12.4));
+    line-height: 1.5;
+  }
+  .o-faq-list {
+    margin-top: 36px;
+  }
+  .o-faq summary {
+    gap: 16px;
+    padding: 20px 0;
+  }
+  .o-faq summary h3 {
+    font-size: 18px;
+  }
+  .o-faq details p {
+    padding-right: 0;
+    font-size: 14px;
+    line-height: 1.85;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .o-faq summary h3,
+  .o-faq-mark::before,
+  .o-faq-mark::after {
+    transition: none;
+  }
 }

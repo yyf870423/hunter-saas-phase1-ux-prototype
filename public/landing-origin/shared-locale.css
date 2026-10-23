@@ -136,7 +136,7 @@ html:lang(en) .f-footer-meta li {
   overflow-wrap: anywhere;
 }
 
-@media (min-width: 801px) and (max-width: 1000px) {
+@media (min-width: 801px) and (max-width: 1120px) {
   html:lang(en) .f-header-inner {
     gap: 12px;
   }

@@ -196,7 +196,8 @@
   }
 
   ui.mountNavigation(root.querySelector(".f-header"), {
-    breakpoint: window.FinesseLocale?.language === "en" ? 1000 : 800,
+    // 第三版（有 FinesseLocale）：导航有六项，中文 900、英文 1120 以下收进菜单，其他版本仍是 800
+    breakpoint: !window.FinesseLocale ? 800 : window.FinesseLocale.language === "en" ? 1120 : 900,
   });
   const workTabs = ui.mountTabs(root.querySelector(".f-tabs"), panel, renderWork);
 

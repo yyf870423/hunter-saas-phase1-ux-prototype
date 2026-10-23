@@ -113,6 +113,80 @@
             "publisher": {
               "@id": "https://www.boseekai.com/#organization"
             }
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://www.boseekai.com/#faq",
+            "inLanguage": "zh-CN",
+            "isPartOf": {
+              "@id": "https://www.boseekai.com/#webpage"
+            },
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "HunterBuddy 适合谁使用？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "独立猎头和资深顾问，尤其是同时在做客户开发和交付、手上有几个难做的职位、库里攒了不少候选人的人。线索散在融资新闻、招聘页、简历库、论文和开源社区里，一个人很难天天盯着、一一读完。做过的功课会存下来，下一件事接着用。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "和直接用豆包、DeepSeek、ChatGPT 这类通用 AI，有什么不同？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "通用 AI 擅长回答单个问题，但它不知道你手上有哪些客户、候选人和人才地图。它给的名单里，人是不是同一个、消息从哪来，往往还得你自己再查一遍。HunterBuddy 每次都从你手上的资源出发：熟悉的公司、做过的候选人、人才地图和能帮你引荐的人。不同地方的同一个人会先核对再合并，每个判断都写着来源。做完的事会存下来，下一次更快。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "它会替我盯着市场和候选人吗？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "可以。你可以让它定期帮你看，比如每周看一次某个赛道有没有新公司拿到融资、目标公司的招聘页有没有变化，或你关注的候选人公开履历有没有更新。只有值得你看的变化才会提醒你，重复的会合并，没有新消息就不打扰你。它不会自己动手，下一步做什么由你决定。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "人选和线索从哪些渠道来？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "已有候选人、人才地图、公开网络与招聘页、论文与专利、开源项目，以及你上传的简历和资料。每条线索都记着来自哪里。散在不同渠道里的同一个人，会先核对再合并。哪些渠道找过了、哪些还是空白，也会标出来，方便你决定下一步去哪里补。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "我手上的候选人库和人才地图能带进来吗？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "可以。简历可以单份或批量上传，Excel 等格式的人才地图可以导入后接着补。带进来的资料同样会核对身份、查重合并，也可以对你所有的在手职位做一次匹配。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "匹配结果可以直接相信吗？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "把它当作带来源的参考，而不是最终结论。每条匹配理由都附上来源，你可以点回去看原始资料。没有可靠来源的信息会标为“待确认”，不会把猜测当成事实。像实际带多大团队、本人想不想动，这类只有聊了才知道的事，HunterBuddy 会明确留给你。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "和猎聘、领英、脉脉这些招聘平台是什么关系？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "它们是发布职位、搜索和联系候选人的渠道，HunterBuddy 不替代它们。HunterBuddy 做的是找人之前和找人过程中的研究：把公开资料和你手上的资源放在一起，核对身份、连起关系、写明来源，帮你判断先找谁、怎么开口。从这些平台下载的简历，也可以上传进来一起核对。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "和猎头管理系统（CRM、ATS）有什么不同？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "猎头管理系统记录客户、职位、候选人和推荐进度，管的是已经在做的事。HunterBuddy 帮你找到下一件值得做的事：从公开资料和你手上的资源里找线索、连关系，给出带来源的判断。两者可以配合着用。在 HunterBuddy 里确认过的人和关系，照样记进你的管理系统。"
+                }
+              }
+            ]
           }
         ]
       }
@@ -138,14 +212,14 @@
       rel="stylesheet"
       href="../landing/research-chapters.css?v=20261021"
     />
-    <link rel="stylesheet" href="shared-origin.css?v=20261022-style" />
+    <link rel="stylesheet" href="shared-origin.css?v=20261023-faq" />
     <link
       rel="stylesheet"
       href="shared-origin-network.css?v=20261021"
     />
-    <link rel="stylesheet" href="origin.css?v=20261022-apply-a" />
-    <link rel="stylesheet" href="origin-motion.css?v=20261022-style" />
-    <link rel="stylesheet" href="shared-locale.css?v=20261022-en-copy" />
+    <link rel="stylesheet" href="origin.css?v=20261023-faq" />
+    <link rel="stylesheet" href="origin-motion.css?v=20261023-faq" />
+    <link rel="stylesheet" href="shared-locale.css?v=20261023-faq" />
     <script>
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.documentElement.classList.add("motion");
@@ -174,16 +248,16 @@
       src="../landing/research-chapters.js?v=20261022-bilingual-a"
     ></script>
     <script defer src="locale-zh.js?v=20261022-review"></script>
-    <script defer src="locale-en.js?v=20261022-en-copy"></script>
+    <script defer src="locale-en.js?v=20261023-faq"></script>
     <script defer src="shared-locale.js?v=20261023-en-path"></script>
-    <script defer src="../landing/page.js?v=20261022-bilingual-a"></script>
+    <script defer src="../landing/page.js?v=20261023-faq"></script>
     <script
       defer
       src="../landing/shared-footer.js?v=20261021"
     ></script>
     <script defer src="shared-origin-network.js?v=20261021"></script>
-    <script defer src="origin.js?v=20261022-bilingual-a"></script>
-    <script defer src="origin-motion.js?v=20261022-en-film"></script>
+    <script defer src="origin.js?v=20261023-faq"></script>
+    <script defer src="origin-motion.js?v=20261023-faq"></script>
   </head>
   <body>
     <div id="homepage" data-trial-preview data-integrated-page data-still-tabs>
@@ -305,6 +379,50 @@
         </section>
       </main>
     </div>
+    <!-- 常见问题：放在 #homepage 外面，页面脚本渲染后由 origin.js 移到“人和关系”之后，不运行 JavaScript 时也能读到。
+         问答改动时，同步改下方 <head> 结构化数据里的 FAQPage。 -->
+    <section class="o-faq" id="faq" tabindex="-1" aria-labelledby="o-faq-title">
+      <div class="f-container">
+        <div class="o-faq-intro">
+          <p class="o-kicker">常见问题</p>
+          <h2 id="o-faq-title"><span class="ln">先把疑问说清楚，</span><br /><span class="ln">再带一件手上的事来试。</span></h2>
+        </div>
+        <div class="o-faq-list">
+          <details>
+            <summary><h3>HunterBuddy 适合谁使用？</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>独立猎头和资深顾问，尤其是同时在做客户开发和交付、手上有几个难做的职位、库里攒了不少候选人的人。线索散在融资新闻、招聘页、简历库、论文和开源社区里，一个人很难天天盯着、一一读完。做过的功课会存下来，下一件事接着用。</p>
+          </details>
+          <details>
+            <summary><h3>和直接用豆包、DeepSeek、ChatGPT 这类通用 AI，有什么不同？</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>通用 AI 擅长回答单个问题，但它不知道你手上有哪些客户、候选人和人才地图。它给的名单里，人是不是同一个、消息从哪来，往往还得你自己再查一遍。HunterBuddy 每次都从你手上的资源出发：熟悉的公司、做过的候选人、人才地图和能帮你引荐的人。不同地方的同一个人会先核对再合并，每个判断都写着来源。做完的事会存下来，下一次更快。</p>
+          </details>
+          <details>
+            <summary><h3>它会替我盯着市场和候选人吗？</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>可以。你可以让它定期帮你看，比如每周看一次某个赛道有没有新公司拿到融资、目标公司的招聘页有没有变化，或你关注的候选人公开履历有没有更新。只有值得你看的变化才会提醒你，重复的会合并，没有新消息就不打扰你。它不会自己动手，下一步做什么由你决定。</p>
+          </details>
+          <details>
+            <summary><h3>人选和线索从哪些渠道来？</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>已有候选人、人才地图、公开网络与招聘页、论文与专利、开源项目，以及你上传的简历和资料。每条线索都记着来自哪里。散在不同渠道里的同一个人，会先核对再合并。哪些渠道找过了、哪些还是空白，也会标出来，方便你决定下一步去哪里补。</p>
+          </details>
+          <details>
+            <summary><h3>我手上的候选人库和人才地图能带进来吗？</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>可以。简历可以单份或批量上传，Excel 等格式的人才地图可以导入后接着补。带进来的资料同样会核对身份、查重合并，也可以对你所有的在手职位做一次匹配。</p>
+          </details>
+          <details>
+            <summary><h3>匹配结果可以直接相信吗？</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>把它当作带来源的参考，而不是最终结论。每条匹配理由都附上来源，你可以点回去看原始资料。没有可靠来源的信息会标为“待确认”，不会把猜测当成事实。像实际带多大团队、本人想不想动，这类只有聊了才知道的事，HunterBuddy 会明确留给你。</p>
+          </details>
+          <details>
+            <summary><h3>和猎聘、领英、脉脉这些招聘平台是什么关系？</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>它们是发布职位、搜索和联系候选人的渠道，HunterBuddy 不替代它们。HunterBuddy 做的是找人之前和找人过程中的研究：把公开资料和你手上的资源放在一起，核对身份、连起关系、写明来源，帮你判断先找谁、怎么开口。从这些平台下载的简历，也可以上传进来一起核对。</p>
+          </details>
+          <details>
+            <summary><h3>和猎头管理系统（CRM、ATS）有什么不同？</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>猎头管理系统记录客户、职位、候选人和推荐进度，管的是已经在做的事。HunterBuddy 帮你找到下一件值得做的事：从公开资料和你手上的资源里找线索、连关系，给出带来源的判断。两者可以配合着用。在 HunterBuddy 里确认过的人和关系，照样记进你的管理系统。</p>
+          </details>
+        </div>
+      </div>
+    </section>
     <footer class="f-footer" id="footer" data-finesse-footer>
       <div class="f-container">
         <div class="f-footer-top">
@@ -325,6 +443,7 @@
                 <li><a href="#work">能做什么</a></li>
                 <li><a href="#research">工作方式</a></li>
                 <li><a href="#assets">人和关系</a></li>
+                <li><a href="#faq">常见问题</a></li>
               </ul>
             </div>
             <div class="f-footer-group" role="group" aria-labelledby="f-footer-legal">

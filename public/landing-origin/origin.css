@@ -621,3 +621,27 @@
 @media (min-width: 801px) and (max-width: 1000px) {
   .f-nav { gap: 22px; }
 }
+/* 2026-10-23 · six links (常见问题 added): between 801 and 900 the Chinese bar folds into the menu, like English does up to 1120 */
+@media (min-width: 801px) and (max-width: 900px) {
+  html:not(:lang(en)) .f-header-inner {
+    gap: 12px;
+  }
+  html:not(:lang(en)) .f-nav {
+    position: absolute;
+    top: var(--f-nav-h);
+    right: 0;
+    left: 0;
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 18px 24px 24px;
+    border-bottom: 1px solid var(--f-line);
+    background: var(--f-soft);
+    transform: none;
+  }
+  html:not(:lang(en)) .f-nav a {
+    width: fit-content;
+    min-height: 44px;
+    font-size: 14px;
+  }
+}

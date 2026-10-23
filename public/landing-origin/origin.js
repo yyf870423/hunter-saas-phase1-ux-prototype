@@ -39,4 +39,33 @@
   if (network && data && window.OriginAssetNetwork) {
     window.OriginAssetNetwork.mount(network, data.assetNetwork);
   }
+
+  // 常见问题：静态写在 #homepage 外面（不运行脚本也能读到），渲染后移到“人和关系”之后
+  const faq = document.getElementById("faq");
+  const assets = root.querySelector("#assets");
+  if (faq && assets) {
+    assets.after(faq);
+    const after = root.querySelector('.f-nav a[href="#assets"]');
+    if (after && !root.querySelector('.f-nav a[href="#faq"]')) {
+      const link = document.createElement("a");
+      link.href = "#faq";
+      link.textContent = ui.text("常见问题");
+      after.after(link);
+      // 共用的导航高亮只认页面脚本渲染时已有的链接，这一项单独跟上
+      const header = root.querySelector(".f-header");
+      let frame = 0;
+      const sync = () => {
+        frame = 0;
+        const top = header?.getBoundingClientRect().height || 72;
+        const probe = Math.min(innerHeight - 2, Math.max(top + 12, Math.floor(innerHeight * 0.22)));
+        const bounds = faq.getBoundingClientRect();
+        if (bounds.top <= probe && bounds.bottom > probe) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      };
+      const queue = () => frame || (frame = requestAnimationFrame(sync));
+      addEventListener("scroll", queue, { passive: true });
+      addEventListener("resize", queue);
+      sync();
+    }
+  }
 })();

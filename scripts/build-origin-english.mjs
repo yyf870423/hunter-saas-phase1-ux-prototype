@@ -24,6 +24,43 @@ const TITLE =
 const DESCRIPTION =
   "HunterBuddy by Boseek is an AI assistant for independent recruiters and senior search consultants. It finds leads in funding news, job pages, CVs and papers to help with business development, talent mapping, sourcing and candidate nurturing, with a source for every finding. Early access by invitation.";
 
+// 常见问题：页面上的问答和结构化数据 FAQPage 用同一份文字，改一处两边一起变
+const FAQ = [
+  [
+    "Who is HunterBuddy for?",
+    "Independent recruiters and senior search consultants, especially those handling both business development and delivery, with a few hard-to-fill roles on their desk and a well-stocked candidate database. Leads are scattered across funding news, careers pages, CV databases, papers and open-source communities, and no one person can watch them all every day. Your research is saved, so the next task picks up where the last one left off.",
+  ],
+  [
+    "How is it different from general AI tools like Doubao, DeepSeek or ChatGPT?",
+    "General AI is good at answering a single question, but it doesn’t know your clients, your candidates or your talent maps. In the lists it gives you, you often still have to check whether two names are the same person and where each detail came from. HunterBuddy always starts from what you already have: the companies you know, the candidates you’ve worked with, your talent maps and the people who can introduce you. The same person found in different places is verified before records are merged, and every finding comes with its source. Finished work is saved, so the next search goes faster.",
+  ],
+  [
+    "Can it keep watch on the market and my candidates?",
+    "Yes. You can ask it to check in regularly, for example weekly: whether a company in a sector you follow has raised funding, whether a target company’s careers page has changed, or whether a candidate you’re tracking has updated their public profile. It only flags changes worth your attention, merges duplicates and stays quiet when there’s nothing new. It never acts on its own. You decide what happens next.",
+  ],
+  [
+    "Where do candidates and leads come from?",
+    "Your existing candidates and talent maps, the public web and careers pages, papers and patents, open-source projects, and any CVs and documents you upload. Every lead records where it came from. When the same person appears in different sources, the records are verified before they are merged. Sources already searched and gaps still open are marked, so you can decide where to look next.",
+  ],
+  [
+    "Can I bring in my candidate database and talent maps?",
+    "Yes. Upload CVs one at a time or in bulk, and import talent maps from Excel and similar formats to keep building on them. Imported records are verified and de-duplicated in the same way, and you can match them against all your live searches at once.",
+  ],
+  [
+    "Can I trust the match results as they are?",
+    "Treat them as sourced references, not final conclusions. Every match comes with its reasons and sources, and you can click through to the original material. Anything without a reliable source is marked as unconfirmed, so guesses are never presented as facts. Things you can only learn by talking to someone, such as the real size of their team or whether they want to move, are clearly left to you.",
+  ],
+  [
+    "How does it relate to recruiting platforms like Liepin, LinkedIn and Maimai?",
+    "They are channels for posting roles and finding and contacting candidates, and HunterBuddy doesn’t replace them. HunterBuddy does the research before and during your search: it puts public information alongside what you already have, verifies identities, maps relationships and records sources, helping you decide whom to approach first and how. CVs downloaded from these platforms can also be uploaded and checked alongside everything else.",
+  ],
+  [
+    "How is it different from a recruitment CRM or ATS?",
+    "A CRM or ATS records your clients, roles, candidates and submissions: it manages the work already in progress. HunterBuddy helps you find the next piece of work worth doing, by finding leads in public information and your own resources, mapping relationships and giving you sourced findings. The two work well together: people and relationships you’ve confirmed in HunterBuddy go into your system as usual.",
+  ],
+];
+const escapeHtml = (value) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
 const org = `${SITE}#organization`;
 const graph = {
   "@context": "https://schema.org",
@@ -99,6 +136,17 @@ const graph = {
       duration: "PT2M14S",
       inLanguage: "en",
       publisher: { "@id": org },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${EN}#faq`,
+      inLanguage: "en",
+      isPartOf: { "@id": `${EN}#webpage` },
+      mainEntity: FAQ.map(([question, answer]) => ({
+        "@type": "Question",
+        name: question,
+        acceptedAnswer: { "@type": "Answer", text: answer },
+      })),
     },
   ],
 };
@@ -271,6 +319,23 @@ const body = `      <main id="main" class="f-static-fallback">
         </section>
       </main>
     </div>
+    <!-- 常见问题：放在 #homepage 外面，页面脚本渲染后由 origin.js 移到“人和关系”之后，不运行 JavaScript 时也能读到。 -->
+    <section class="o-faq" id="faq" tabindex="-1" aria-labelledby="o-faq-title">
+      <div class="f-container">
+        <div class="o-faq-intro">
+          <p class="o-kicker">FAQ</p>
+          <h2 id="o-faq-title"><span class="ln">Get your questions answered.</span><br /><span class="ln">Then try it on real work.</span></h2>
+        </div>
+        <div class="o-faq-list">
+${FAQ.map(
+  ([question, answer]) => `          <details>
+            <summary><h3>${escapeHtml(question)}</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+            <p>${escapeHtml(answer)}</p>
+          </details>`,
+).join("\n")}
+        </div>
+      </div>
+    </section>
     <footer class="f-footer" id="footer" data-finesse-footer>
       <div class="f-container">
         <div class="f-footer-top">
@@ -291,6 +356,7 @@ const body = `      <main id="main" class="f-static-fallback">
                 <li><a href="#work">Use cases</a></li>
                 <li><a href="#research">How it works</a></li>
                 <li><a href="#assets">Knowledge network</a></li>
+                <li><a href="#faq">FAQ</a></li>
               </ul>
             </div>
             <div class="f-footer-group" role="group" aria-labelledby="f-footer-legal">
@@ -333,7 +399,7 @@ en = en.replace(/\s*<meta name="baidu-site-verification"[^>]*>/, "");
 const [mainStart, footerEnd] = cut(en, '      <main id="main" class="f-static-fallback">', "</footer>");
 en = en.slice(0, mainStart) + body + en.slice(footerEnd);
 // 中文首页里中文的页面信息不能带过来
-for (const leftover of ['<html lang="zh-CN"', "猎头 AI 助手", "baidu-site-verification", "f-static-fallback\">\n        <span class=\"f-brand\"><img src=\"assets/boseek-b5-dark.svg"])
+for (const leftover of ['<html lang="zh-CN"', "猎头 AI 助手", "baidu-site-verification", "先把疑问说清楚", "f-static-fallback\">\n        <span class=\"f-brand\"><img src=\"assets/boseek-b5-dark.svg"])
   if (en.includes(leftover)) throw new Error(`unexpected leftover: ${leftover}`);
 
 await mkdir(dirname(target), { recursive: true });

@@ -11,6 +11,7 @@ window.OriginEnglishCatalog = {
   "能做什么 · 四件事": "Four use cases",
   工作方式: "How it works",
   人和关系: "Knowledge network",
+  常见问题: "FAQ",
   关于铂寻: "About Boseek",
   申请试用: "Request a trial",
   看看能做什么: "Explore use cases",

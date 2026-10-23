@@ -101,18 +101,27 @@ for (const width of [1440, 1024, 801, 390, 320]) {
           expect(box.x).toBeGreaterThanOrEqual(0);
           expect(box.x + box.width).toBeLessThanOrEqual(width);
         }
-      if (language === "en" && width <= 1000) {
+      // 导航有六项：英文 1120、中文 900 以下收进菜单
+      if (width <= (language === "en" ? 1120 : 900)) {
         await page
-          .getByRole("button", { name: "Open navigation", exact: true })
+          .getByRole("button", {
+            name: language === "en" ? "Open navigation" : "打开导航",
+            exact: true,
+          })
           .click();
         await expect(page.locator("#f-navigation")).toBeVisible();
-        await expect(page.locator("#f-navigation a")).toHaveText([
-          "Product video",
-          "Use cases",
-          "How it works",
-          "Knowledge network",
-          "About Boseek",
-        ]);
+        await expect(page.locator("#f-navigation a")).toHaveText(
+          language === "en"
+            ? [
+                "Product video",
+                "Use cases",
+                "How it works",
+                "Knowledge network",
+                "FAQ",
+                "About Boseek",
+              ]
+            : ["产品短片", "能做什么", "工作方式", "人和关系", "常见问题", "关于铂寻"],
+        );
         await page.keyboard.press("Escape");
         await expect(page.locator("#f-navigation")).toBeHidden();
       }
@@ -348,3 +357,52 @@ test("English interactions translate all scenes, slides, errors and canonical fo
     })),
   ).toEqual({ local: 0, session: 0 });
 });
+
+for (const language of ["zh", "en"]) {
+  test(`Origin ${language} FAQ sits after the knowledge network and matches its structured data`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(
+      language === "en" ? "./landing-origin/en/" : "./landing-origin/",
+    );
+    const faq = page.locator("#faq");
+    await expect(faq).toBeAttached();
+    expect(
+      await faq.evaluate((section) => [
+        section.parentElement.id,
+        section.previousElementSibling.id,
+        section.nextElementSibling.id,
+      ]),
+    ).toEqual(["main", "assets", "about"]);
+    await expect(faq.locator("details")).toHaveCount(8);
+    const visible = await faq
+      .locator("details")
+      .evaluateAll((items) =>
+        items.map((item) => [
+          item.querySelector("summary h3").textContent,
+          item.querySelector("p").textContent,
+        ]),
+      );
+    const graph = JSON.parse(
+      await page.locator('script[type="application/ld+json"]').textContent(),
+    )["@graph"];
+    const page_ = graph.find((node) => node["@type"] === "FAQPage");
+    expect(page_["@id"]).toMatch(language === "en" ? /\/en\/#faq$/ : /\.com\/#faq$/);
+    expect(
+      page_.mainEntity.map((q) => [q.name, q.acceptedAnswer.text]),
+    ).toEqual(visible);
+    const label = language === "en" ? "FAQ" : "常见问题";
+    await expect(page.locator('.f-footer a[href="#faq"]')).toHaveText(label);
+    await expect(page.locator('.f-nav a[href="#faq"]')).toHaveText(label);
+    await page.locator('.f-nav a[href="#faq"]').click();
+    await expect(faq.locator("h2")).toBeInViewport();
+    await expect(page.locator('.f-nav a[href="#faq"]')).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    if (language === "en") expect(page.url()).toMatch(/\/landing-origin\/en\/#faq$/);
+    await faq.locator("summary").first().click();
+    await expect(faq.locator("details").first()).toHaveAttribute("open", "");
+  });
+}
