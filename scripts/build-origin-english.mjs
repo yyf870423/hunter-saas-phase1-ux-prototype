@@ -28,35 +28,35 @@ const DESCRIPTION =
 const FAQ = [
   [
     "Who is HunterBuddy for?",
-    "Independent recruiters and senior search consultants, especially those handling both business development and delivery, with a few hard-to-fill roles on their desk and a well-stocked candidate database. Leads are scattered across funding news, careers pages, CV databases, papers and open-source communities, and no one person can watch them all every day. Your research is saved, so the next task picks up where the last one left off.",
+    "Independent recruiters and senior search consultants, especially those who handle both business development and delivery, with a few hard-to-fill roles on their desk and a candidate database built up over the years. Leads are scattered across funding news, careers pages, CV databases, papers and open-source communities, too many for one person to watch every day and read in full. The research you’ve done is kept, ready for the next search.",
   ],
   [
-    "How is it different from general AI tools like Doubao, DeepSeek or ChatGPT?",
-    "General AI is good at answering a single question, but it doesn’t know your clients, your candidates or your talent maps. In the lists it gives you, you often still have to check whether two names are the same person and where each detail came from. HunterBuddy always starts from what you already have: the companies you know, the candidates you’ve worked with, your talent maps and the people who can introduce you. The same person found in different places is verified before records are merged, and every finding comes with its source. Finished work is saved, so the next search goes faster.",
+    "How is it different from just using a general-purpose AI like Doubao, DeepSeek or ChatGPT?",
+    "General-purpose AI is good at answering one question at a time, but it doesn’t know your clients, your candidates or your talent maps. When it gives you a list of names, you often still have to check for yourself whether two entries are the same person and where each piece of information came from. HunterBuddy always starts from what you already have: the companies you know, the candidates you’ve worked with, your talent maps and the people who can introduce you. When the same person turns up in different places, the records are checked before they are merged, and every finding shows its source. The work you finish is kept, so the next search goes faster.",
   ],
   [
-    "Can it keep watch on the market and my candidates?",
-    "Yes. You can ask it to check in regularly, for example weekly: whether a company in a sector you follow has raised funding, whether a target company’s careers page has changed, or whether a candidate you’re tracking has updated their public profile. It only flags changes worth your attention, merges duplicates and stays quiet when there’s nothing new. It never acts on its own. You decide what happens next.",
+    "Can it keep an eye on the market and my candidates for me?",
+    "Yes. You can have it check for you regularly, say once a week: whether any new companies in a sector you follow have raised funding, whether a target company’s careers page has changed, or whether a candidate you’re watching has updated their public profile. It only alerts you to changes worth your time, merges duplicates and stays quiet when there’s nothing new. It never acts on its own. What happens next is your call.",
   ],
   [
     "Where do candidates and leads come from?",
-    "Your existing candidates and talent maps, the public web and careers pages, papers and patents, open-source projects, and any CVs and documents you upload. Every lead records where it came from. When the same person appears in different sources, the records are verified before they are merged. Sources already searched and gaps still open are marked, so you can decide where to look next.",
+    "From your existing candidates and talent maps, the public web and careers pages, papers and patents, open-source projects, and the CVs and documents you upload. Every lead keeps a note of where it came from. When the same person turns up in different sources, the records are checked before they are merged. It also shows which sources have been searched and where the gaps are, so you can decide what to fill in next.",
   ],
   [
-    "Can I bring in my candidate database and talent maps?",
-    "Yes. Upload CVs one at a time or in bulk, and import talent maps from Excel and similar formats to keep building on them. Imported records are verified and de-duplicated in the same way, and you can match them against all your live searches at once.",
+    "Can I bring in my own candidate database and talent maps?",
+    "Yes. Upload CVs one at a time or in bulk, and import talent maps from Excel or similar formats to keep building on them. Everything you bring in goes through the same identity checks and de-duplication, and can be matched against all your live searches in one go.",
   ],
   [
-    "Can I trust the match results as they are?",
-    "Treat them as sourced references, not final conclusions. Every match comes with its reasons and sources, and you can click through to the original material. Anything without a reliable source is marked as unconfirmed, so guesses are never presented as facts. Things you can only learn by talking to someone, such as the real size of their team or whether they want to move, are clearly left to you.",
+    "Can I take the match results at face value?",
+    "Treat them as references with sources, not final verdicts. Every reason for a match comes with its source, so you can click through to the original material. Anything without a reliable source is marked as unconfirmed, and guesses are never presented as facts. Some things you only find out by talking to the person, such as how big a team they really lead or whether they’re open to a move. HunterBuddy leaves those clearly to you.",
   ],
   [
-    "How does it relate to recruiting platforms like Liepin, LinkedIn and Maimai?",
-    "They are channels for posting roles and finding and contacting candidates, and HunterBuddy doesn’t replace them. HunterBuddy does the research before and during your search: it puts public information alongside what you already have, verifies identities, maps relationships and records sources, helping you decide whom to approach first and how. CVs downloaded from these platforms can also be uploaded and checked alongside everything else.",
+    "How does it fit with recruiting platforms like Liepin, LinkedIn and Maimai?",
+    "Those are where you post roles, search for candidates and get in touch with them, and HunterBuddy doesn’t replace them. It does the research before and during a search: putting public information alongside what you already have, verifying identities, mapping connections and citing sources, to help you decide who to approach first and what to say. CVs downloaded from these platforms can be uploaded too and checked along with everything else.",
   ],
   [
     "How is it different from a recruitment CRM or ATS?",
-    "A CRM or ATS records your clients, roles, candidates and submissions: it manages the work already in progress. HunterBuddy helps you find the next piece of work worth doing, by finding leads in public information and your own resources, mapping relationships and giving you sourced findings. The two work well together: people and relationships you’ve confirmed in HunterBuddy go into your system as usual.",
+    "A CRM or ATS records your clients, roles and candidates, and where each submission stands. It manages work already under way. HunterBuddy helps you find what’s worth doing next: it looks for leads and connections in public information and your own resources, and gives you findings backed by sources. The two work well together. People and relationships you’ve confirmed in HunterBuddy go into your CRM or ATS as usual.",
   ],
 ];
 const escapeHtml = (value) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -324,7 +324,7 @@ const body = `      <main id="main" class="f-static-fallback">
       <div class="f-container">
         <div class="o-faq-intro">
           <p class="o-kicker">FAQ</p>
-          <h2 id="o-faq-title"><span class="ln">Before you try it,</span><br /><span class="ln">here’s what people ask.</span></h2>
+          <h2 id="o-faq-title"><span class="ln">What people ask</span><br /><span class="ln">before they try it.</span></h2>
         </div>
         <div class="o-faq-list">
 ${FAQ.map(
