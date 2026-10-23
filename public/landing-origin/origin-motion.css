@@ -823,3 +823,11 @@ html:lang(en) .o-faq-intro h2 .ln { white-space: normal; }
     transition: none;
   }
 }
+
+/* 2026-10-23 · the footer gains a third column (使用场景) */
+@media (min-width: 801px) {
+  .f-footer-groups:has(> :nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 144px));
+    gap: 48px;
+  }
+}
