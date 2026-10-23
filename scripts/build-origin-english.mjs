@@ -359,6 +359,15 @@ ${FAQ.map(
                 <li><a href="#faq">FAQ</a></li>
               </ul>
             </div>
+            <div class="f-footer-group" role="group" aria-labelledby="f-footer-cases">
+              <h2 id="f-footer-cases">Use cases</h2>
+              <ul>
+                <li><a href="en/use-cases/business-development/">Business development</a></li>
+                <li><a href="en/use-cases/talent-mapping/">Talent mapping</a></li>
+                <li><a href="en/use-cases/sourcing/">Sourcing</a></li>
+                <li><a href="en/use-cases/candidate-nurturing/">Candidate nurturing</a></li>
+              </ul>
+            </div>
             <div class="f-footer-group" role="group" aria-labelledby="f-footer-legal">
               <h2 id="f-footer-legal">Legal</h2>
               <ul>

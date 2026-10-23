@@ -34,6 +34,30 @@
       tab.replaceChildren(icon, label);
     });
 
+  // 每个场景下面加一个文字链接，进到对应的使用场景页（顺序和四个标签页一致）
+  const english = document.documentElement.lang === "en";
+  const cases = [
+    ["business-development", "了解客户开发", "More on business development"],
+    ["talent-mapping", "了解人才地图", "More on talent mapping"],
+    ["sourcing", "了解职位寻访", "More on sourcing"],
+    ["candidate-nurturing", "了解人选维护", "More on candidate nurturing"],
+  ];
+  const bottom = root.querySelector(".f-work-bottom");
+  const tabs = [...root.querySelectorAll(".f-work-demo > .f-tabs .f-tab")];
+  if (bottom && tabs.length === cases.length) {
+    const more = document.createElement("a");
+    more.className = "f-text-link o-case-link";
+    bottom.prepend(more);
+    const syncCase = () => {
+      const index = Math.max(0, tabs.findIndex((tab) => tab.getAttribute("aria-selected") === "true"));
+      const [slug, zh, en] = cases[index];
+      more.href = `${english ? "en/" : ""}use-cases/${slug}/`;
+      more.innerHTML = `${english ? en : zh}${ui.icon("chevronRight")}`;
+    };
+    new MutationObserver(syncCase).observe(tabs[0].parentElement, { subtree: true, attributeFilter: ["aria-selected"] });
+    syncCase();
+  }
+
   const network = root.querySelector(".f-asset-network");
   const data = window.FinesseHomepageData;
   if (network && data && window.OriginAssetNetwork) {

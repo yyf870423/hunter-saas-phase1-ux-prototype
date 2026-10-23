@@ -831,3 +831,16 @@ html:lang(en) .o-faq-intro h2 .ln { white-space: normal; }
     gap: 48px;
   }
 }
+
+/* 2026-10-23 · under each use case: a link to its own page, beside 查看结果和来源 */
+#homepage .f-work-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 28px;
+}
+@media (max-width: 800px) {
+  #homepage .f-work-bottom {
+    justify-content: flex-start;
+  }
+}
