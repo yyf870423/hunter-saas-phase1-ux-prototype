@@ -74,7 +74,7 @@ window.OriginEnglishCatalog = {
   "它先去找有没有具体岗位：官网招聘页上多了视觉算法负责人。找到岗位，再找对口的联系人：负责视觉团队的技术负责人许晴。她的直接联系方式没找到，才去翻你的人脉：你的老客户张远是星川的投资人，能帮你引荐。":
     "",
   "每周一 09:00 · 帮你盯着的赛道": "Every Monday, 09:00 · Sectors you track",
-  "星川机器人 · 可能有新岗位": "Xingchuan Robotics · Likely hiring",
+  "星川机器人 · 可能有新岗位": "Xingchuan Robotics · Possible new role",
   "找到岗位 · 两处来源": "Opening found · Two sources",
   官网招聘页新增视觉算法负责人: "New on the careers page: Head of Computer Vision",
   "招聘页和融资新闻都能对上。":
@@ -112,8 +112,8 @@ window.OriginEnglishCatalog = {
   在职的人待确认: "Current employment unverified",
   "穹顶智能 · 控制团队": "Qiongding AI · Controls team",
   "从论文作者里找到线索，身份和现在的职位还要核对。":
-    "A lead from a paper’s author list. Identity still to verify.",
-  空白: "An information gap",
+    "A lead from a paper’s author list. Identity and current role still to verify.",
+  空白: "Information gap",
   "星川机器人 · 产品交付": "Xingchuan Robotics · Product delivery",
   "知道有这个关键岗位，还不知道是谁，不等于这个位置空着。":
     "The role is known, but not who holds it.",
@@ -142,7 +142,7 @@ window.OriginEnglishCatalog = {
   周宁: "Ning Zhou",
   "机器人感知 · 技术骨干": "Robotics perception · Senior engineer",
   "有相关论文和项目经历。": "Relevant publications and project experience.",
-  "有没有做过量产。": "Production experience.",
+  "有没有做过量产。": "Mass-production experience.",
   陈思: "Si Chen",
   "视觉算法 · 项目负责人": "Computer vision · Project lead",
   "带过跨团队的项目。": "Has led cross-functional projects.",
@@ -162,16 +162,16 @@ window.OriginEnglishCatalog = {
   "它不替你下结论，先问你要不要核实。你点头后，它整理林越的最新情况，对照你手上所有在招的岗位和熟悉的公司，看哪些值得聊。":
     "",
   "重点候选人 · 林越": "Priority candidate · Yue Lin",
-  "林越 · 可以聊的下一站": "Yue Lin · Possible next steps",
+  "林越 · 可以聊的下一站": "Yue Lin · Possible next moves",
   你在招的岗位: "Your live searches",
   "穹顶智能 · 视觉平台负责人": "Qiongding AI · Head of Vision Platform",
   "技术方向和带团队经历都对得上。 待确认：地点和薪资。":
-    "Strong technical and leadership fit. Salary expectations to confirm.",
+    "A fit on both technical focus and team leadership. Salary expectations to confirm.",
   人脉里的新机会: "An opportunity in your network",
   "星川机器人 · 新产线视觉团队":
-    "Xingchuan Robotics · New production vision team",
+    "Xingchuan Robotics · New production-line vision team",
   "星川扩张后的新方向，和林越的产线经历相关。 待确认：需求是不是真的。":
-    "Fits his production-line experience. Headcount still to confirm.",
+    "Relevant to his production-line experience. Headcount still to confirm.",
   只是迹象: "A signal, not a conclusion",
   本人意向: "Candidate interest",
   "团队调整不等于想走，愿不愿意看机会，要你去问。":

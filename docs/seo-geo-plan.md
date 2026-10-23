@@ -94,7 +94,7 @@
 - 导航变成六项后，中文在 801–900px、英文在 801–1120px 收进菜单按钮，避免和右侧按钮挤在一起（`page.js` 只对第三版生效，其他版本仍是 800px）。
 - 上线后：用 Google 富媒体检测工具检查 FAQPage，百度、Google 重新提交首页和 `/en/`。
 
-### 第二批：四个使用场景页（2026-10-23 确认，中英文八页已完成，待验收）
+### 第二批：四个使用场景页（2026-10-23，中英文八页已完成，文案两轮审校，合进 main 待验收）
 决定：
 | 页面 | 网址 | 主要搜索词 |
 |---|---|---|
@@ -120,6 +120,8 @@
 - 中文标题字体子集补了四页标题里的新字。
 - 测试：`tests/origin-use-cases.spec.js` 检查八页的规范网址、语言对应、结构化数据和页面问答一致、菜单按钮、首页入口。
 - 部署时：`/use-cases/` 和 `/en/use-cases/` 本身不做页面，请 Codex 配 301 分别到 `/#work` 和 `/en/#work`。
+- 文案审校（2026-10-23）：中英文各两轮，英文逐句对照中文。首页“能做什么”卡片里和场景页共用的几处英文一起改：Possible new role、Possible next moves、A fit on both technical focus and team leadership、New production-line vision team、Mass-production experience、Information gap。人才地图卡片中文改为“身份和在职情况还要核对”，和标签“在职情况待核实”对上。
+- 许晴的英文头衔保留 Technical Lead：英文短片里也是这个写法，要改得重新渲染短片。
 
 ## 接下来（2026-10-23 定的顺序）
 1. 第二阶段：内容页面（先逐个问题确认，再汇总执行）。

@@ -172,7 +172,7 @@ export const PAGES = [
         ],
         card: {
           context: "Every Monday, 09:00 · Sectors you track",
-          title: "Xingchuan Robotics · Likely hiring",
+          title: "Xingchuan Robotics · Possible new role",
           caption: "This is what HunterBuddy hands you. Every line cites its source, and anything uncertain is flagged separately.",
           items: [
             ["Opening found · Two sources", "New on the careers page: Head of Computer Vision", "Careers page and funding news agree."],
@@ -267,7 +267,7 @@ export const PAGES = [
           [
             "每个位置都写明来源",
             "谁在什么位置、消息从哪来，都写在旁边。线索来自论文作者、专利发明人的，会标明身份还要核对。",
-            "穹顶智能控制团队里的一位，线索来自论文作者，身份还要核对。",
+            "穹顶智能控制团队里的一位，线索来自论文作者，身份和在职情况还要核对。",
           ],
           [
             "和你库里的候选人对上号",
@@ -286,7 +286,7 @@ export const PAGES = [
           caption: "这是 HunterBuddy 交给你的人才地图的一角。确认过的、待核实的、还是空白的，分开标出来。",
           items: [
             ["负责人已确认", "拓界机器人 · 视觉团队", "官网和团队页都能对上，就是你库里的林越。"],
-            ["在职情况待核实", "穹顶智能 · 控制团队", "线索来自论文作者，身份还要核对。"],
+            ["在职情况待核实", "穹顶智能 · 控制团队", "线索来自论文作者，身份和在职情况还要核对。"],
             ["信息空白", "星川机器人 · 产品交付", "知道有这个岗位，还不知道是谁。"],
           ],
         },
@@ -371,7 +371,7 @@ export const PAGES = [
           [
             "Cites a source for every role",
             "Each role shows who holds it and where that information comes from. Leads from paper author lists or patents are flagged as needing an identity check.",
-            "One name on Qiongding AI’s controls team was found in a paper’s author list. Their identity still needs checking.",
+            "One name on Qiongding AI’s controls team was found in a paper’s author list. Their identity and current role still need checking.",
           ],
           [
             "Matches people to your database",
@@ -390,8 +390,8 @@ export const PAGES = [
           caption: "This is a corner of the talent map HunterBuddy hands you. What’s confirmed, what’s unverified and what’s missing are marked separately.",
           items: [
             ["Team lead verified", "Tuojie Robotics · Vision team", "Company site and team page agree: Yue Lin, already in your database."],
-            ["Current employment unverified", "Qiongding AI · Controls team", "A lead from a paper’s author list. Identity still to verify."],
-            ["An information gap", "Xingchuan Robotics · Product delivery", "The role is known, but not who holds it."],
+            ["Current employment unverified", "Qiongding AI · Controls team", "A lead from a paper’s author list. Identity and current role still to verify."],
+            ["Information gap", "Xingchuan Robotics · Product delivery", "The role is known, but not who holds it."],
           ],
         },
       },
@@ -607,7 +607,7 @@ export const PAGES = [
           caption: "This is the list HunterBuddy hands you. Next to each name: why they fit and what still needs confirming.",
           items: [
             ["Industrial vision · Team lead", "Yue Lin", "Has led production-line vision teams. Three records merged into one. To verify: team size and reporting line."],
-            ["Robotics perception · Senior engineer", "Ning Zhou", "Relevant publications and project experience. To verify: production experience."],
+            ["Robotics perception · Senior engineer", "Ning Zhou", "Relevant publications and project experience. To verify: mass-production experience."],
             ["Computer vision · Project lead", "Si Chen", "Has led cross-functional projects. To verify: current work and openness to a move."],
           ],
         },
@@ -817,11 +817,11 @@ export const PAGES = [
         ],
         card: {
           context: "Priority candidate · Yue Lin",
-          title: "Yue Lin · Possible next steps",
+          title: "Yue Lin · Possible next moves",
           caption: "This is what HunterBuddy hands you: well-founded opportunities, kept apart from what you still need to ask.",
           items: [
-            ["Your live searches", "Qiongding AI · Head of Vision Platform", "Strong technical and leadership fit. Salary expectations to confirm."],
-            ["An opportunity in your network", "Xingchuan Robotics · New production vision team", "Fits his production-line experience. Headcount still to confirm."],
+            ["Your live searches", "Qiongding AI · Head of Vision Platform", "A fit on both technical focus and team leadership. Salary expectations to confirm."],
+            ["An opportunity in your network", "Xingchuan Robotics · New production-line vision team", "Relevant to his production-line experience. Headcount still to confirm."],
             ["A signal, not a conclusion", "Candidate interest", "A team change doesn’t mean he wants to leave. You need to ask."],
           ],
         },
