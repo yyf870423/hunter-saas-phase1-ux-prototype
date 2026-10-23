@@ -48,7 +48,7 @@ const FAQ = [
   ],
   [
     "Can I take the match results at face value?",
-    "Treat them as references with sources, not final verdicts. Every reason for a match comes with its source, so you can click through to the original material. Anything without a reliable source is marked as unconfirmed, and guesses are never presented as facts. Some things you only find out by talking to the person, such as how big a team they really lead or whether they’re open to a move. HunterBuddy leaves those clearly to you.",
+    "Treat them as sourced guidance, not a final verdict. Every reason for a match comes with its source, so you can click through to the original material. Anything without a reliable source is marked as unconfirmed, and guesses are never presented as facts. Some things you only find out by talking to the person, such as how big a team they really lead or whether they’re open to a move. HunterBuddy leaves those explicitly to you.",
   ],
   [
     "How does it fit with recruiting platforms like Liepin, LinkedIn and Maimai?",

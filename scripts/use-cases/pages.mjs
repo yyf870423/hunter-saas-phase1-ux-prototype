@@ -21,7 +21,7 @@ export const PAGES = [
         label: "一般怎么做",
         h2: "猎头客户开发，一般怎么做",
         intro:
-          "独立猎头和资深顾问的新客户，很少来自陌生电话。更多时候，是一直留意几个熟悉的赛道，看到哪家公司在扩张，再顺着人脉找到能拍板的人。大致分五步：",
+          "独立猎头和资深顾问的新客户，很少来自陌生电话。更多时候，靠的是一直留意几个熟悉的赛道，看到哪家公司在扩张，再顺着人脉找到能拍板的人。大致分五步：",
         steps: [
           ["盯住信号", "融资新闻、官网招聘页上的新职位、高管变动、新业务和新工厂，都可能说明一家公司要招人了。"],
           ["判断是不是真的要招", "招聘页上的职位不等于委托。这个职位还在不在招、HC 批没批、为什么现在招，都要先弄清楚。"],
@@ -53,7 +53,7 @@ export const PAGES = [
           [
             "把消息对上",
             "它把融资新闻和公司官网的招聘页放在一起看，确认说的是同一家公司、同一件事。每条结论都写着出处，你可以点回去看原文。",
-            "星川官网招聘页新增了视觉算法负责人，招聘页和融资新闻两处来源都能对上。",
+            "星川官网招聘页新增了视觉算法负责人一职，招聘页和融资新闻两处来源都能对上。",
           ],
           [
             "找到用人经理",
@@ -112,35 +112,35 @@ export const PAGES = [
     },
     en: {
       name: "Business development",
-      teaser: "From a funding round to a new role and the hiring manager.",
-      title: "Business development for recruiters: from a funding round to a mandate | HunterBuddy",
+      teaser: "Start from a funding round and find the new role and its hiring manager.",
+      title: "Recruiter business development: from funding news to the hiring manager | HunterBuddy",
       ogTitle: "Business development for recruiters · HunterBuddy",
       description:
-        "How do recruiters win new clients? HunterBuddy keeps watch on the sectors you follow, spots growing companies in funding news and on careers pages, and finds the new role, the hiring manager and a warm introduction, with a source for every lead. Who to contact, and how, is up to you.",
+        "How do recruiters find new clients? HunterBuddy keeps watch on the sectors you follow, spots growing companies in funding news and on careers pages, and finds the new role, the hiring manager and a route to a warm introduction, with a source for every lead. Who to contact, and what to say, is up to you.",
       kicker: "Use case · Business development",
       h1: ["A funding round", "could be your next mandate."],
       lead:
-        "New business often starts with a small piece of news. HunterBuddy keeps watch on the sectors you follow and, starting from a single funding announcement, finds the new role, the hiring manager and a warm introduction, with a source for every lead. Who to contact, and what to say, is up to you.",
+        "New business often starts with a piece of news that’s easy to miss. HunterBuddy keeps watch on the sectors you follow. From a single funding announcement, it finds the new role, the hiring manager and a route to a warm introduction, with a source for every lead. Who to contact, and what to say, is up to you.",
       method: {
         label: "The usual approach",
-        h2: "How recruiters approach business development",
+        h2: "How business development usually works",
         intro:
-          "Independent recruiters and senior search consultants rarely win new clients through cold calls. More often, they keep a close eye on a few familiar sectors, notice which companies are growing, and work their network to reach the person who makes the call. It takes roughly five steps:",
+          "Independent recruiters and senior search consultants rarely win new clients through cold calls. More often, they keep a close eye on a few familiar sectors, notice which companies are growing, and work their network to reach the decision-maker. Broadly, it comes down to five steps:",
         steps: [
           ["Watch for signals", "Funding news, new roles on a careers page, leadership changes, new business lines and new plants can all mean a company is about to hire."],
           ["Check the role is real", "A job posting is not a mandate. Find out whether the role is still open, whether the headcount is approved and why they are hiring now."],
           ["Find the hiring manager", "Work out who leads the team, who makes the decision, and which part of the process HR owns."],
-          ["Find a way in", "Go direct, or ask for an introduction. Which of your clients, investors or former colleagues knows them well enough to put you in touch?"],
-          ["Do your homework first", "Learn what the company does and who the team needs before you reach out. It earns you a far better hearing than a mass-mailed CV."],
+          ["Find a way in", "Go direct, or ask for an introduction. Among your clients, the investors you know and your former colleagues, who knows the hiring manager well enough to put you in touch?"],
+          ["Do your homework first", "Learn what the company does and who the team needs before you reach out. You’ll be taken more seriously than if you mass-mail CVs."],
         ],
       },
       hard: {
         label: "Where it gets hard",
         h2: "The hard part isn’t the call. It’s knowing who to call.",
         items: [
-          ["Signals are scattered", "Funding news is in the media, roles are on careers pages, people moves are on LinkedIn and Maimai. No one can check them all every day."],
-          ["Details don’t match", "The same company goes by different names in different places, and the same person has different titles on different platforms. Checking takes time."],
-          ["Timing slips away", "By the time you notice a company is hiring, another recruiter may already be talking to them."],
+          ["Signals are scattered", "Funding news is in the media, roles are on careers pages, people moves are on LinkedIn and Maimai. It’s hard for one person to check them all every day."],
+          ["Details don’t match", "The same company goes by different names in different places, and the same person has different titles on different platforms. Matching them up takes a lot of time."],
+          ["The moment is easy to miss", "By the time you notice a company is hiring, another recruiter may already be talking to them."],
           ["Research gets lost", "The companies and people you looked into last time are scattered across notes and spreadsheets, so next time you start from scratch."],
         ],
       },
@@ -151,22 +151,22 @@ export const PAGES = [
         steps: [
           [
             "Checks your sectors every week",
-            "Tell it which sectors and companies you follow, and have it check for you regularly, say every Monday at 9 a.m. When a company raises funding, posts a new role or changes leaders, it lets you know. Duplicates are merged, and it stays quiet when there’s nothing new.",
+            "Tell it which sectors and companies you follow, and have it check for you regularly, say every Monday at 9 a.m. When a company raises funding, posts a new role or has a change of leadership, it lets you know. Duplicates are merged, and it stays quiet when there’s nothing new.",
             "This Monday, it flags that Xingchuan Robotics has just raised a Series B.",
           ],
           [
-            "Matches up the news",
-            "It reads the funding news alongside the company’s careers page to confirm they describe the same company and the same move. Every finding cites its source, so you can click through to the original.",
-            "Xingchuan’s careers page has a new opening for Head of Computer Vision, and the careers page and the funding news agree.",
+            "Cross-checks the sources",
+            "It reads the funding news alongside the company’s careers page to confirm they describe the same company and the same development. Every finding cites its source, so you can click through to the original.",
+            "Xingchuan’s careers page has a new opening for Head of Computer Vision, and it matches the funding news.",
           ],
           [
             "Finds the hiring manager",
-            "It identifies who leads the team from public information. Anything without a reliable source is marked as unconfirmed, and guesses are never presented as facts.",
-            "The hiring manager is Qing Xu, Technical Lead, who leads the vision team. Direct contact details are not yet confirmed.",
+            "It uses public information to identify who leads the team. Anything without a reliable source is marked as unconfirmed, and guesses are never presented as facts.",
+            "The hiring manager is Qing Xu, the Technical Lead in charge of the vision team. Her direct contact details are not yet confirmed.",
           ],
           [
             "Finds an introduction in your network",
-            "It checks your clients and contacts to see who knows them, and lists the route along with the reasons.",
+            "It checks your clients and contacts for anyone who knows the hiring manager, and lists that route along with the reasons.",
             "Yuan Zhang is your client and a Xingchuan investor. You could ask him for an introduction.",
           ],
         ],
@@ -185,10 +185,10 @@ export const PAGES = [
         label: "What you get",
         h2: "What you get, and what’s yours to confirm",
         paras: [
-          "A confirmed opening, the hiring manager and a backup route in. Whether to go direct or through an introduction, and what to say, is your call. Once you have the JD and an agreed mandate, it becomes a live search.",
-          "The companies, roles and people you looked into are all kept, ready for talent mapping and sourcing next.",
+          "A confirmed opening, the hiring manager and a backup route in. Whether to go direct or through an introduction, and what to say, is your call. Only once you have the JD and an agreed mandate does it become a live search.",
+          "Every company, role and person you looked into is saved, ready for the talent mapping and sourcing that come next.",
         ],
-        confirmTitle: "Still for you to confirm",
+        confirmTitle: "For you to confirm",
         confirm: [
           "Is the role live, and is the headcount approved?",
           "Contact Qing Xu directly, or ask Yuan Zhang for an introduction?",
@@ -201,11 +201,11 @@ export const PAGES = [
         items: [
           [
             "Where can recruiters find business development leads?",
-            "Funding news, company websites and careers pages, leadership and team changes, news of new business lines and plants, and your own clients and network. HunterBuddy puts them side by side, and every lead keeps a note of where it came from.",
+            "Funding news, company websites and careers pages, leadership and team changes, news of new business lines and plants, and your own clients and network. HunterBuddy puts them side by side and notes where each lead came from.",
           ],
           [
             "If a role is on the careers page, can I pitch for the mandate?",
-            "Not necessarily. A job posting is only a lead. First confirm that the role is really open, that the headcount is approved and who makes the decision. HunterBuddy lists what still needs confirming, and confirming it comes down to your conversations.",
+            "Not necessarily. A job posting is only a lead. First confirm whether the role is really open, whether the headcount is approved and who makes the decision. HunterBuddy lists what still needs confirming, and you confirm it by talking to people.",
           ],
           [
             "Will it contact clients for me?",
@@ -213,7 +213,7 @@ export const PAGES = [
           ],
           [
             "How often does it check my sectors?",
-            "As often as you like, say once a week. It only alerts you to changes worth your time, merges duplicates and stays quiet when there’s nothing new.",
+            "You decide, for example once a week. It only alerts you to changes worth your time, merges duplicates and stays quiet when there’s nothing new.",
           ],
         ],
       },
@@ -262,11 +262,11 @@ export const PAGES = [
           [
             "按组织架构排好",
             "告诉它要看哪些公司和团队，它从公开资料里找出部门和汇报线，把人放到对应的位置上。",
-            "星川机器人和两家对标公司，拓界机器人和穹顶智能，按团队一层层排开。",
+            "星川机器人，以及拓界机器人、穹顶智能两家对标公司，按团队一层层排开。",
           ],
           [
             "每个位置都写明来源",
-            "谁在什么位置、消息从哪来，都写在旁边。来自论文作者、专利这类线索的，会标出还要核对身份。",
+            "谁在什么位置、消息从哪来，都写在旁边。线索来自论文作者、专利发明人的，会标明身份还要核对。",
             "穹顶智能控制团队里的一位，线索来自论文作者，身份还要核对。",
           ],
           [
@@ -326,36 +326,36 @@ export const PAGES = [
     },
     en: {
       name: "Talent mapping",
-      teaser: "Map target teams by org structure and match them to your candidates.",
+      teaser: "Map target teams by org structure and match the people to your candidates.",
       title: "Talent mapping: how to map a team by org structure | HunterBuddy",
       ogTitle: "Talent mapping for recruiters · HunterBuddy",
       description:
-        "How do you build a talent map? HunterBuddy lays out target and peer companies by org structure, shows who holds each role, where each detail comes from and what is still missing, and matches people to your candidate database. Existing Excel talent maps can be imported too.",
+        "How do you build a talent map? HunterBuddy lays out target and peer companies by org structure, shows who holds each role, where each detail comes from and what is still missing, and matches people to your candidate database. You can also import existing Excel talent maps and keep building on them.",
       kicker: "Use case · Talent mapping",
       h1: ["Mapping a team means", "piecing together scattered information."],
       lead:
-        "A talent map lays out a company’s teams by org structure: who holds each role, who they report to and where each detail came from. HunterBuddy pieces together information from scattered sources, matches people to your candidate database and clearly marks the gaps.",
+        "A talent map lays out a company’s teams by org structure, level by level: who holds each role, who they report to and where each detail comes from. HunterBuddy pieces together information from scattered sources, matches people to your candidate database and clearly marks the gaps.",
       method: {
         label: "The usual approach",
         h2: "How to build a talent map",
         intro:
-          "Talent mapping is a core recruiting skill. You do it when a mandate comes in, and you do it to get to know a sector. It usually takes these steps:",
+          "Talent mapping is a core recruiting skill. You do it when a mandate comes in, and between mandates you do it to get to know a sector. It usually goes like this:",
         steps: [
-          ["Set the scope", "Choose the target and peer companies, and the functions and levels to cover. Make the scope too wide and the map is never finished."],
+          ["Set the scope", "Choose the target and peer companies, and the functions and levels to cover. Make the scope too wide and the map will never be finished."],
           ["Build the structure", "Piece together teams and reporting lines from company websites, team pages, press releases and careers pages."],
-          ["Fill in the names", "Who holds each role, how long they have been in it and where they were before. Public profiles, paper authors and patent inventors are all leads."],
-          ["Verify", "The same person may appear under different names and titles. Confirm that it is the same person, and that they are still there."],
-          ["Mark the gaps", "Where you know a role exists but not who holds it, flag it so you can fill it in later."],
+          ["Fill in the names", "Work out who holds each role, how long they’ve been in it and where they were before. Public profiles, paper author lists and patent filings are all leads."],
+          ["Verify", "The same person may appear under different names and titles in different places. Confirm the records really are one person, and that they still work there."],
+          ["Mark the gaps", "Where you know a role exists but not who holds it, flag it separately so you can fill in the name later."],
         ],
       },
       hard: {
         label: "Where it gets hard",
-        h2: "The hard part isn’t finding information. It’s fitting it together.",
+        h2: "The hard part isn’t finding information. It’s getting the pieces to fit.",
         items: [
           ["Information is scattered", "Team pages, press releases, papers, careers pages and social platforms each hold only a small piece."],
-          ["Same names, different titles", "Different people share a name, and one person is written differently in different places. Merge the wrong records and the whole map goes wrong with them."],
+          ["Same names, different titles", "People who share a name get mistaken for one person, and one person’s name and title appear differently in different places. Merge the wrong records and the whole map is thrown off."],
           ["Maps go stale", "Reorganizations and people moving on mean a map from six months ago may already be out of date."],
-          ["Disconnected from your database", "Whether someone on the map is already a candidate in your database often has to be checked one by one."],
+          ["Disconnected from your database", "You often have to check by hand, one by one, whether someone on the map is already in your database."],
         ],
       },
       how: {
@@ -365,29 +365,29 @@ export const PAGES = [
         steps: [
           [
             "Lays out the org structure",
-            "Tell it which companies and teams to cover. It finds teams and reporting lines in public information and places people in their roles.",
-            "Xingchuan Robotics and two peers, Tuojie Robotics and Qiongding AI, laid out team by team.",
+            "Tell it which companies and teams to cover. It finds teams and reporting lines in public information and puts each person in the right spot on the map.",
+            "Xingchuan Robotics and two peers, Tuojie Robotics and Qiongding AI, are laid out team by team, level by level.",
           ],
           [
             "Cites a source for every role",
-            "Each role shows who holds it and where that came from. Leads from paper authors or patents are flagged for identity checks.",
-            "One person on Qiongding AI’s controls team comes from a paper’s author list. Identity still to verify.",
+            "Each role shows who holds it and where that information comes from. Leads from paper author lists or patents are flagged as needing an identity check.",
+            "One name on Qiongding AI’s controls team was found in a paper’s author list. Their identity still needs checking.",
           ],
           [
             "Matches people to your database",
             "It checks the people on the map against your CV database and merges records only after verifying identity, never just because the names match.",
-            "The head of Tuojie Robotics’ vision team is confirmed by the company site and team page: it’s Yue Lin, already in your database.",
+            "The company site and team page both confirm that the head of Tuojie Robotics’ vision team is Yue Lin, who is already in your database.",
           ],
           [
             "Marks the gaps",
-            "Roles you know exist but can’t yet fill are flagged separately, so you can decide where to look next.",
+            "Where you know a role exists but not yet who holds it, it’s flagged separately, so you can decide where to look next.",
             "Xingchuan Robotics, product delivery: the role is known, but not who holds it.",
           ],
         ],
         card: {
           context: "Target companies · Talent map",
           title: "Xingchuan and two peer companies",
-          caption: "A corner of the talent map HunterBuddy hands you. Confirmed, unverified and missing are marked separately.",
+          caption: "This is a corner of the talent map HunterBuddy hands you. What’s confirmed, what’s unverified and what’s missing are marked separately.",
           items: [
             ["Team lead verified", "Tuojie Robotics · Vision team", "Company site and team page agree: Yue Lin, already in your database."],
             ["Current employment unverified", "Qiongding AI · Controls team", "A lead from a paper’s author list. Identity still to verify."],
@@ -402,13 +402,13 @@ export const PAGES = [
           "A talent map showing the org structure and reporting lines, who holds each role, where each detail comes from and what is still missing. You can also import an existing Excel talent map and keep building on it.",
           "With the people on the map matched to your candidate database, your next search can start right from the map.",
         ],
-        confirmTitle: "Still for you to confirm",
+        confirmTitle: "For you to confirm",
         confirm: [
           "Are the team names and reporting lines still accurate?",
           "Are these the same people as the candidates in your database?",
           "Which information gaps are worth filling next?",
         ],
-        note: "Co-authoring a paper doesn’t mean a reporting line. HunterBuddy keeps what it infers apart from what is confirmed, and leaves the final call to you.",
+        note: "Co-authoring a paper doesn’t mean one reports to the other. HunterBuddy keeps what it infers apart from what is confirmed, and leaves the final call to you.",
       },
       faq: {
         h2: ["What people ask", "about talent mapping."],
@@ -419,15 +419,15 @@ export const PAGES = [
           ],
           [
             "I already have talent maps in Excel. Can I keep using them?",
-            "Yes. Import talent maps from Excel or similar formats and keep building on them. Imported records go through the same identity checks and de-duplication.",
+            "Yes. You can import talent maps in Excel and other formats and keep building on them. Imported records go through the same identity checks and de-duplication.",
           ],
           [
             "How often should a talent map be updated?",
-            "There’s no fixed rule. Reorganizations and people moving on both make a map go stale. You can have HunterBuddy check for you regularly, such as changes to a target company’s careers page or updates to the public profiles of people you follow, and it alerts you when something is worth a look.",
+            "There’s no fixed rule. Reorganizations and people moving on both make a map go stale. You can have HunterBuddy check regularly for things like changes to a target company’s careers page or updates to the public profiles of people you follow, and alert you when something is worth a look.",
           ],
           [
             "Can people found in papers and patents go straight onto the map?",
-            "They can go on as leads, but their identity needs checking first. Co-authoring a paper doesn’t mean a reporting line. HunterBuddy marks what is still unverified.",
+            "They can go on as leads, but their identity needs checking first. Co-authoring a paper doesn’t mean one reports to the other. HunterBuddy marks what is still unverified.",
           ],
         ],
       },
@@ -445,7 +445,7 @@ export const PAGES = [
       kicker: "使用场景 · 人才寻访",
       h1: ["JD 到手，", "先看你手上已经有谁。"],
       lead:
-        "做职位寻访，合适的人很多时候早就在你手上，只是一时想不起来、搜不出来。HunterBuddy 先从你的人才地图和简历库里找，再去公开资料里补齐，每位人选的匹配理由和来源都写在旁边。",
+        "做人才寻访，合适的人很多时候早就在你手上，只是一时想不起来、搜不出来。HunterBuddy 先从你的人才地图和简历库里找，再去公开资料里补齐，每位人选的匹配理由和来源都写在旁边。",
       method: {
         label: "一般怎么做",
         h2: "人才寻访，一般怎么做",
@@ -470,7 +470,7 @@ export const PAGES = [
       },
       how: {
         label: "怎么帮你",
-        h2: "HunterBuddy 怎么帮你做职位寻访",
+        h2: "HunterBuddy 怎么帮你做人才寻访",
         intro: "接着星川机器人的例子：许晴发来了视觉算法负责人的 JD。",
         steps: [
           [
@@ -544,24 +544,24 @@ export const PAGES = [
     },
     en: {
       name: "Sourcing",
-      teaser: "When the JD lands, start with the people you already know.",
-      title: "Candidate sourcing: when the JD lands, start with who you know | HunterBuddy",
+      teaser: "When the JD lands, start with the people you already know, then fill the gaps.",
+      title: "Candidate sourcing: start with who you already know | HunterBuddy",
       ogTitle: "Candidate sourcing · HunterBuddy",
       description:
         "How can you source candidates faster? HunterBuddy checks your talent maps and CV database first, then fills the gaps from papers, patents and open-source communities, giving you a longlist with the reasons, sources and open questions for each candidate. Who to approach first is your call.",
       kicker: "Use case · Sourcing",
       h1: ["The JD is in.", "Start with the people you already know."],
       lead:
-        "Often the right person is already in your database. You just can’t recall them, or your search doesn’t surface them. HunterBuddy starts with your talent maps and CV database, then fills the gaps from public sources, with the reasons for each match and the sources alongside.",
+        "Often the right person is already in your database. You just can’t think of them at the moment, or your search doesn’t bring them up. HunterBuddy starts with your talent maps and CV database, then fills the gaps from public sources. Every candidate comes with the reasons for the match and the sources.",
       method: {
         label: "The usual approach",
         h2: "How candidate sourcing usually works",
         intro: "When a new search comes in, experienced recruiters usually work like this:",
         steps: [
           ["Understand the JD", "Talk it through with the hiring manager: which requirements are must-haves, which are nice-to-haves, and what the team is really missing."],
-          ["Pick target companies and teams", "Which companies and teams the right people are most likely to come from, and which companies are off-limits."],
+          ["Pick target companies and teams", "Work out which companies and teams the right people are most likely to come from, and which companies are off-limits."],
           ["Start with who you already have", "Go through your talent maps and CV database, and put past research to work first."],
-          ["Then search further", "The public web, careers pages, papers, patents and open-source communities fill in the people your database is missing."],
+          ["Then look further afield", "Use the public web, careers pages, papers, patents and open-source communities to find the people your database is missing."],
           ["Build the longlist", "Rank by fit, note why each person fits and what still needs confirming, then decide who to approach first."],
         ],
       },
@@ -570,9 +570,9 @@ export const PAGES = [
         h2: "The hard part isn’t finding people. It’s knowing they’re the right ones.",
         items: [
           ["Your own resources sit unused", "The right person is in your CV database, but the search doesn’t surface them, or you’ve forgotten them."],
-          ["CVs fall out of date", "On a CV from two years ago, the role and the projects may have long since changed."],
+          ["CVs fall out of date", "A CV from two years ago may no longer reflect someone’s current role or projects."],
           ["The same person, several times", "Your database, recruiting platforms and papers each hold a version. Without merging them, you end up contacting the same person twice."],
-          ["Looking good on paper isn’t enough", "Strong papers don’t prove production or leadership experience."],
+          ["Looking good on paper isn’t enough", "Strong papers don’t prove mass-production or leadership experience."],
         ],
       },
       how: {
@@ -582,29 +582,29 @@ export const PAGES = [
         steps: [
           [
             "Checks what you already have",
-            "It searches your talent maps and CV database first, so past research is put to work and you never start from zero.",
+            "It searches your talent maps and CV database first, so past research is put to work and you don’t start from zero.",
             "Qing Xu sends the JD. HunterBuddy finds Yue Lin on the talent map you built earlier.",
           ],
           [
             "Fills the gaps from public sources",
-            "When your database falls short, it looks in papers, patents and open-source communities, and every lead keeps a note of where it came from.",
+            "When your database falls short, it looks in papers, patents and open-source communities, and notes where each lead came from.",
             "Papers in robotics perception turn up Ning Zhou.",
           ],
           [
-            "Verifies and merges the same person",
-            "When the same person turns up in different sources, their identity is checked before the records are merged, so no one appears twice.",
+            "Verifies and merges duplicates",
+            "When the same person turns up in different sources, it checks their identity before merging the records, so no one appears twice.",
             "Yue Lin has records in your CV database, on a team page and in a paper. The three are merged into one.",
           ],
           [
             "Spells out the fit and the open questions",
             "Every candidate comes with the reasons for the match and the sources, and anything uncertain is listed separately.",
-            "Si Chen has led cross-functional projects. Current work and openness to a move still need confirming.",
+            "Si Chen has led cross-functional projects. Their current work and openness to a move still need confirming.",
           ],
         ],
         card: {
           context: "Xingchuan Robotics · Head of Computer Vision",
           title: "Longlist · Worth approaching",
-          caption: "This is the list HunterBuddy hands you, with why each person fits and what still needs confirming alongside.",
+          caption: "This is the list HunterBuddy hands you. Next to each name: why they fit and what still needs confirming.",
           items: [
             ["Industrial vision · Team lead", "Yue Lin", "Has led production-line vision teams. Three records merged into one. To verify: team size and reporting line."],
             ["Robotics perception · Senior engineer", "Ning Zhou", "Relevant publications and project experience. To verify: production experience."],
@@ -617,22 +617,22 @@ export const PAGES = [
         h2: "What you get, and what’s yours to confirm",
         paras: [
           "A longlist with the rationale, sources and open questions alongside each candidate. You decide who to approach first.",
-          "CVs downloaded from recruiting platforms can be uploaded and checked along with everything else. After a conversation, send HunterBuddy the new CV and the profile and matches will update, ready for your next search.",
+          "CVs downloaded from recruiting platforms can be uploaded and checked along with everything else. After a conversation, send HunterBuddy the new CV. The profile and matches will update, ready for your next search.",
         ],
-        confirmTitle: "Still for you to confirm",
+        confirmTitle: "For you to confirm",
         confirm: [
           "Which JD requirements are must-haves, and which are nice-to-haves?",
-          "Have their current role and project responsibilities been verified?",
+          "Are their current role and projects still accurate?",
           "Are they open to a move? Is their company on your off-limits list?",
         ],
-        note: "Strong papers don’t prove production or leadership experience. Whether someone is open to a move is yours to ask.",
+        note: "Strong papers don’t prove mass-production or leadership experience. You need to ask whether someone is open to a move.",
       },
       faq: {
         h2: ["What people ask", "about sourcing."],
         items: [
           [
-            "Where can candidates be sourced from?",
-            "Your existing candidates and talent maps, the public web and careers pages, papers and patents, open-source projects, and the CVs and documents you upload. Every lead keeps a note of where it came from, and sources already searched and gaps still open are marked.",
+            "Where can recruiters source candidates from?",
+            "Your existing candidates and talent maps, the public web and careers pages, papers and patents, open-source projects, and the CVs and documents you upload. HunterBuddy notes where each lead came from, and marks which channels have been searched and which haven’t yet.",
           ],
           [
             "Will it contact candidates for me?",
@@ -640,11 +640,11 @@ export const PAGES = [
           ],
           [
             "How is it different from searching on a recruiting platform?",
-            "Recruiting platforms are where you search for and contact candidates, and HunterBuddy doesn’t replace them. It does the research before and during a search: putting your own resources to work first, then checking identities and citing sources across public information. CVs downloaded from these platforms can be uploaded and checked too.",
+            "Recruiting platforms are where you search for and contact candidates, and HunterBuddy doesn’t replace them. It does the research before and during a search: putting your own resources to work first, then bringing public information together to check identities and cite sources. CVs downloaded from these platforms can be uploaded and checked too.",
           ],
           [
             "Can I take the match results at face value?",
-            "Treat them as references with sources, not final verdicts. Anything without a reliable source is marked as unconfirmed. Some things you only find out by talking to the person, such as how big a team they really lead or whether they’re open to a move. Those are left clearly to you.",
+            "Treat them as sourced guidance, not a final verdict. Anything without a reliable source is marked as unconfirmed. Some things you only find out by talking to the person, such as how big a team they really lead or whether they’re open to a move. HunterBuddy leaves those explicitly to you.",
           ],
         ],
       },
@@ -666,7 +666,7 @@ export const PAGES = [
       method: {
         label: "一般怎么做",
         h2: "候选人维护，一般怎么做",
-        intro: "人选维护是猎头的长期功课。今天不想动的人，半年后可能就是你的下一个成功推荐。通常要做这几件事：",
+        intro: "候选人维护是猎头的长期功课。今天不想动的人，半年后可能就是你的下一个成功推荐。通常要做这几件事：",
         steps: [
           ["分出重点人选", "不是每个人都要常联系。先挑出你最看重、最可能合作的一批。"],
           ["留意变化", "团队调整、换了负责人、在岗满几年、公开履历更新，这些都可能是该聊一聊的时候。"],
@@ -687,7 +687,7 @@ export const PAGES = [
       },
       how: {
         label: "怎么帮你",
-        h2: "HunterBuddy 怎么帮你做人选维护",
+        h2: "HunterBuddy 怎么帮你做候选人维护",
         intro: "半年后，回到星川机器人的故事：林越是你的重点人选。",
         steps: [
           [
@@ -758,14 +758,14 @@ export const PAGES = [
     en: {
       name: "Candidate nurturing",
       teaser: "When a priority candidate’s situation changes, check your live searches.",
-      title: "Candidate nurturing: when a priority candidate’s situation changes | HunterBuddy",
+      title: "Candidate nurturing: spot changes, check your live searches | HunterBuddy",
       ogTitle: "Candidate nurturing · HunterBuddy",
       description:
-        "How do you get back in touch with candidates at the right moment? HunterBuddy watches for changes to your priority candidates’ public profiles and teams, checks them against your live searches and openings in your network, and suggests well-founded next steps. Whether to call, and whether to put them forward, is up to you.",
+        "How do you nurture candidate relationships? HunterBuddy watches for changes to your priority candidates’ public profiles and teams, checks them against your live searches and openings in your network, and suggests well-founded next moves. Whether to call, and whether to put them forward, is up to you.",
       kicker: "Use case · Candidate nurturing",
       h1: ["Six months on,", "Yue Lin’s team has changed."],
       lead:
-        "Strong candidate relationships come from showing up at the right moment. HunterBuddy watches for changes to your priority candidates, checks them against your live searches and openings in your network, and suggests well-founded next steps. Whether to make the call is up to you.",
+        "Strong candidate relationships come from showing up at the right moment. HunterBuddy watches for changes affecting your priority candidates, checks them against your live searches and openings in your network, and suggests well-founded next moves. Whether to make the call is up to you.",
       method: {
         label: "The usual approach",
         h2: "How candidate nurturing usually works",
@@ -775,7 +775,7 @@ export const PAGES = [
           ["Pick your priority candidates", "Not everyone needs regular contact. Start with the people you value most and are most likely to work with."],
           ["Watch for changes", "A reorganization, a new manager, several years in the same role, an updated public profile: any of these can be the moment to talk."],
           ["Check your live searches", "When something changes, see whether you have a suitable role, or whether a new opening has come up in your network."],
-          ["Understand the motivation", "A team change doesn’t mean someone wants to leave. Find out what really matters to them this time."],
+          ["Understand their motivation", "A team change doesn’t mean someone wants to leave. Find out what really matters to them this time."],
           ["Keep the record current", "After the conversation, note what has changed so it’s there next time."],
         ],
       },
@@ -784,9 +784,9 @@ export const PAGES = [
         h2: "The hard part isn’t staying in touch. It’s knowing when to get in touch.",
         items: [
           ["Too many people to follow", "Your database keeps growing, and so does your list of priority candidates. Keeping an eye on each one is hard."],
-          ["Changes go unnoticed", "Signals like team changes and time in role are scattered across public information. Unless you go looking, you won’t know."],
-          ["Roles and people don’t meet", "You have a role on your desk but can’t think who in your database would fit."],
-          ["Records go stale", "A CV from two years ago may be a long way from where they are now."],
+          ["Changes go unnoticed", "Signals like team changes and time in role are scattered across public sources. Unless you go looking, you won’t know."],
+          ["Roles and people don’t connect", "You have a role on your desk but can’t think who in your database would fit."],
+          ["Records go stale", "A CV from two years ago may be a long way from where the candidate is now."],
         ],
       },
       how: {
@@ -795,23 +795,23 @@ export const PAGES = [
         intro: "Six months later, back to the Xingchuan Robotics story: Yue Lin is one of your priority candidates.",
         steps: [
           [
-            "Watches your priority candidates",
+            "Watches for changes",
             "You can have it check regularly on the candidates you follow: whether their public profile has been updated or their team has changed. It only alerts you to changes worth your time.",
             "It notices that Yue Lin’s team has moved into a new platform division, and that he is now four years into his role.",
           ],
           [
             "Checks your live searches",
-            "When something changes, it puts the person alongside your live searches to see whether the direction and experience fit, and spells out why.",
-            "Qiongding AI, Head of Vision Platform: a strong technical and leadership fit. Salary expectations to confirm.",
+            "When something changes, it puts the person alongside your live searches to see whether their focus and experience fit, and spells out the reasoning either way.",
+            "Qiongding AI, Head of Vision Platform: a fit on both technical focus and team leadership. Salary expectations to confirm.",
           ],
           [
             "Finds openings in your network",
-            "It also looks for relevant new openings among the clients you know.",
-            "Xingchuan Robotics’ new production vision team fits his production-line experience. Headcount still to confirm.",
+            "It also looks for relevant new openings among clients you know well.",
+            "Xingchuan Robotics’ new production-line vision team is relevant to his production-line experience. Headcount still to confirm.",
           ],
           [
             "Keeps signals apart from conclusions",
-            "A team change doesn’t mean someone wants to leave. It lays out the signals and the reasons. Asking what they actually want is up to you.",
+            "A team change doesn’t mean someone wants to leave. HunterBuddy lays out the signals and the reasons. Asking what they actually want is up to you.",
             "Whether Yue Lin wants to move is still unknown. You need to ask.",
           ],
         ],
@@ -831,12 +831,12 @@ export const PAGES = [
         h2: "What you get, and what’s yours to confirm",
         paras: [
           "A few well-founded opportunities. Whether to make the call, and whether to put him forward, is up to you.",
-          "After you talk, send HunterBuddy his new CV and the profile and matches will update, ready for next time.",
+          "After you talk, send HunterBuddy his new CV. His profile and matches will update, ready for next time.",
         ],
-        confirmTitle: "Still for you to confirm",
+        confirmTitle: "For you to confirm",
         confirm: [
           "What is really driving him to look this time?",
-          "Have the responsibilities and requirements been verified?",
+          "Have the responsibilities and requirements of these roles been verified?",
           "Has he reviewed the candidate report and agreed to be submitted?",
         ],
         note: "HunterBuddy never contacts candidates for you, and never puts anyone forward on your behalf.",
@@ -846,19 +846,19 @@ export const PAGES = [
         items: [
           [
             "How often should I keep in touch with candidates?",
-            "There’s no fixed rule. Showing up at the right moment matters more than regular check-ins. A team change, a new manager or several years in the same role are often good reasons to talk, and HunterBuddy alerts you when changes like these appear.",
+            "There’s no fixed rule. Showing up at the right moment matters more than regular check-ins. A team change, a new manager or several years in the same role are often good reasons to talk, and HunterBuddy alerts you when it spots changes like these.",
           ],
           [
             "How does it know a candidate’s situation has changed?",
-            "It looks at public information, such as updates to public profiles, reorganizations at their company and changes to careers pages. You can have it check regularly. It only alerts you to changes worth your time, and stays quiet when there’s nothing new.",
+            "It looks at public information, such as profile updates, reorganizations at the candidate’s company and changes to its careers page. You can have it check regularly. It only alerts you to changes worth your time, and stays quiet when there’s nothing new.",
           ],
           [
             "Does a change mean they want to move?",
-            "No. A team change doesn’t mean someone wants to leave. HunterBuddy lays out the signals and the reasons. Whether they’re open to a move, and what really drives them, is yours to ask.",
+            "No. A team change doesn’t mean someone wants to leave. HunterBuddy lays out the signals and the reasons. You need to ask whether they’re open to a move and what really drives them.",
           ],
           [
-            "How do I update a candidate after we talk?",
-            "Send HunterBuddy their new CV and the profile and matches will update. You can also bring in your candidate database and talent maps, which go through the same identity checks and de-duplication.",
+            "How do I update a candidate’s record after we talk?",
+            "Send HunterBuddy their new CV. Their profile and matches will update. You can also bring in your candidate database and talent maps, which go through the same identity checks and de-duplication.",
           ],
         ],
       },

@@ -66,7 +66,7 @@ export const COMMON = {
     apply: "Request a trial",
     menuOpen: "Open navigation",
     menuClose: "Close navigation",
-    seeHow: "See how it works",
+    seeHow: "See how it helps",
     example: "Xingchuan Robotics",
     faqKicker: "FAQ",
     fourKicker: "Four use cases",
