@@ -377,7 +377,7 @@
     window.FinesseTrial.mount(section);
     const kicker = document.createElement("p");
     kicker.className = "n-kicker";
-    kicker.textContent = "06 · 申请试用";
+    kicker.textContent = "05 · 申请试用";
     section.querySelector(".f-trial-intro")?.prepend(kicker);
     section.querySelectorAll('a[href="#work"]').forEach((a) => a.setAttribute("href", "#capabilities"));
   }
@@ -390,7 +390,7 @@
   /* ---------- gentle reveals: only for what is still below the fold ---------- */
   if (!reduced.matches && "IntersectionObserver" in window) {
     const items = document.querySelectorAll(
-      ".n-section-head, .n-display, .n-lede, .n-chips, .n-film-frame, .n-spread-title, .n-card, .n-belief-head, .n-belief-photo, .n-bounds, .n-wall-panel, .n-faq-list, .f-trial-layout",
+      ".n-section-head, .n-display, .n-lede, .n-film-frame, .n-spread-title, .n-card, .n-belief-head, .n-belief-photo, .n-bounds, .n-wall-panel, .n-faq-list, .f-trial-layout",
     );
     const reveal = new IntersectionObserver(
       (entries) => {
