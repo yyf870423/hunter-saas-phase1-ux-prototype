@@ -324,7 +324,7 @@ const body = `      <main id="main" class="f-static-fallback">
       <div class="f-container">
         <div class="o-faq-intro">
           <p class="o-kicker">FAQ</p>
-          <h2 id="o-faq-title"><span class="ln">Get your questions answered.</span><br /><span class="ln">Then try it on real work.</span></h2>
+          <h2 id="o-faq-title"><span class="ln">Before you try it,</span><br /><span class="ln">here’s what people ask.</span></h2>
         </div>
         <div class="o-faq-list">
 ${FAQ.map(
@@ -399,7 +399,7 @@ en = en.replace(/\s*<meta name="baidu-site-verification"[^>]*>/, "");
 const [mainStart, footerEnd] = cut(en, '      <main id="main" class="f-static-fallback">', "</footer>");
 en = en.slice(0, mainStart) + body + en.slice(footerEnd);
 // 中文首页里中文的页面信息不能带过来
-for (const leftover of ['<html lang="zh-CN"', "猎头 AI 助手", "baidu-site-verification", "先把疑问说清楚", "f-static-fallback\">\n        <span class=\"f-brand\"><img src=\"assets/boseek-b5-dark.svg"])
+for (const leftover of ['<html lang="zh-CN"', "猎头 AI 助手", "baidu-site-verification", "大家常问这些", "f-static-fallback\">\n        <span class=\"f-brand\"><img src=\"assets/boseek-b5-dark.svg"])
   if (en.includes(leftover)) throw new Error(`unexpected leftover: ${leftover}`);
 
 await mkdir(dirname(target), { recursive: true });
