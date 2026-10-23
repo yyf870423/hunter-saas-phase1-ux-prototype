@@ -216,38 +216,95 @@
   const wallSection = wall?.closest("section");
   const tiles = [];
 
+  // a mosaic in the spirit of Horizon's "上场与世界交手": bands of different heights,
+  // each band packed with tiles of different widths, some split into two smaller ones,
+  // so no edge lines up with the band above or below
+  const pictures = [];
+  for (let v = 1; v <= 3; v += 1) {
+    for (let i = 0; i < industries.length; i += 1) {
+      // step by four through the fields so neighbours are never the same field
+      const [key, label] = industries[(i * 4 + v * 2) % industries.length];
+      pictures.push({ src: `assets/wall/${key}-${v}.webp`, label });
+    }
+  }
+  const SINGLE = [0.62, 0.78, 1.0, 1.32, 0.7, 1.12, 0.9, 1.5];
+  const PAIR = [1.25, 1.6, 1.4, 1.8];
+
+  function seeded(seed) {
+    return () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function makeTile(n) {
+    const pic = pictures[n % pictures.length];
+    const tile = document.createElement("div");
+    tile.className = "n-tile";
+    const img = document.createElement("img");
+    img.alt = "";
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.src = pic.src;
+    img.addEventListener("error", () => tile.classList.add("is-empty"), { once: true });
+    const name = document.createElement("b");
+    name.textContent = pic.label;
+    tile.append(img, name);
+    tiles.push(tile);
+    return tile;
+  }
+
   function layoutWall() {
     if (!wall) return;
     const w = wall.clientWidth || innerWidth;
-    const cols = w < 640 ? 3 : w < 1000 ? 6 : 9;
-    const rows = w < 640 ? 7 : w < 1000 ? 5 : 4;
-    if (wall.dataset.cols === String(cols)) return;
-    wall.dataset.cols = String(cols);
-    wall.style.setProperty("--cols", String(cols));
+    const h = wall.clientHeight || 760;
+    const mode = w < 640 ? "phone" : w < 1000 ? "tablet" : "desk";
+    const stamp = `${mode}:${Math.round(w / 80)}:${Math.round(h / 80)}`;
+    if (wall.dataset.stamp === stamp) return;
+    wall.dataset.stamp = stamp;
     wall.textContent = "";
     tiles.length = 0;
-    for (let r = 0; r < rows; r += 1) {
-      for (let c = 0; c < cols; c += 1) {
-        // the first three rows shift by three so a field never sits on top of itself,
-        // later rows step through the fields in a different order so repeats don't read as a pattern
-        const index = r < 3 ? (c + r * 3 + (r % 2)) % 9 : (c * 4 + 2 + r) % 9;
-        const [key, label] = industries[index];
-        const variant = r < 3 ? r + 1 : ((c + r) % 3) + 1;
-        const tile = document.createElement("div");
-        tile.className = "n-tile";
-        const img = document.createElement("img");
-        img.alt = "";
-        img.loading = "lazy";
-        img.decoding = "async";
-        img.src = `assets/wall/${key}-${variant}.webp`;
-        img.addEventListener("error", () => tile.classList.add("is-empty"), { once: true });
-        const name = document.createElement("b");
-        name.textContent = label;
-        tile.append(img, name);
-        wall.append(tile);
-        tiles.push(tile);
+    const bands = {
+      desk: [0.27, 0.4, 0.33],
+      tablet: [0.22, 0.3, 0.24, 0.24],
+      phone: [0.15, 0.2, 0.14, 0.18, 0.15, 0.18],
+    }[mode];
+    const rand = seeded(mode === "desk" ? 11 : mode === "tablet" ? 5 : 3);
+    let n = mode === "desk" ? 0 : 4;
+    bands.forEach((share, b) => {
+      const bandH = share * h;
+      const band = document.createElement("div");
+      band.className = "n-band";
+      band.style.flexGrow = String(share);
+      let used = 0;
+      let lastPair = b % 2 === 0;
+      while (used < w * 0.97) {
+        // split a tile into two stacked ones now and then, never twice in a row
+        const pair = bandH > 150 && !lastPair && rand() < 0.5;
+        lastPair = pair;
+        const ratio = pair ? PAIR[Math.floor(rand() * PAIR.length)] : SINGLE[Math.floor(rand() * SINGLE.length)];
+        const width = ratio * (pair ? bandH / 2 : bandH);
+        let item;
+        if (pair) {
+          item = document.createElement("div");
+          item.className = "n-pair";
+          const split = 0.4 + rand() * 0.2;
+          const top = makeTile(n++);
+          const bottom = makeTile(n++);
+          top.style.flexGrow = String(split);
+          bottom.style.flexGrow = String(1 - split);
+          item.append(top, bottom);
+        } else {
+          item = makeTile(n++);
+        }
+        item.style.flexGrow = String(width.toFixed(1));
+        band.append(item);
+        used += width;
       }
-    }
+      wall.append(band);
+    });
   }
 
   const lit = new Map();
@@ -259,7 +316,15 @@
 
   if (wall) {
     layoutWall();
-    addEventListener("resize", layoutWall, { passive: true });
+    let resizing = 0;
+    addEventListener(
+      "resize",
+      () => {
+        clearTimeout(resizing);
+        resizing = setTimeout(layoutWall, 150);
+      },
+      { passive: true },
+    );
     let ambient = 0;
     let hasMouse = false;
     const stopAmbient = () => {
