@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f1011" />
+    <!-- 改版草稿：只用于预览，不收录 -->
+    <meta name="robots" content="noindex" />
+    <title>HunterBuddy · 猎头 AI 助手，做人才地图与人才寻访｜铂寻 Boseek</title>
+    <meta
+      name="description"
+      content="HunterBuddy 是铂寻 Boseek 为独立猎头和资深顾问打造的猎头 AI 助手。人岗匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，费时间的事交给它，你把心力留给识人和读懂客户。"
+    />
+    <link rel="icon" href="../landing-origin/favicon.ico" sizes="any" />
+    <link rel="icon" href="../landing-origin/favicon.svg?v=20261022-bo" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../landing-origin/apple-touch-icon.png?v=20261022-bo" />
+    <meta name="trial-api" content="disabled" />
+    <link rel="stylesheet" href="../landing/shared-ui.css?v=20261021" />
+    <link rel="stylesheet" href="../landing/shared-form.css?v=20261021" />
+    <link rel="stylesheet" href="../landing/trial-page.css?v=20261021" />
+    <link rel="stylesheet" href="redesign.css?v=1" />
+    <script>
+      document.documentElement.classList.add("js");
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");
+    </script>
+    <script defer src="../landing/shared-ui.js?v=20261022-bilingual-a"></script>
+    <script defer src="../landing/shared-form.js?v=20261022-bilingual-a"></script>
+    <script defer src="../landing/vendor/libphonenumber-max.js?v=20261021"></script>
+    <script defer src="../landing/trial-form.js?v=20261022-bilingual-a"></script>
+    <script defer src="redesign.js?v=1"></script>
+  </head>
+  <body class="n-page">
+    <a class="n-skip" href="#main">跳到正文</a>
+
+    <header class="n-header is-top" data-header>
+      <div class="n-wrap n-header-inner">
+        <a class="n-brand" href="#top" aria-label="铂寻 Boseek 首页">
+          <img src="../landing-origin/assets/boseek-b5-dark.svg" alt="Boseek 铂寻" width="150" height="54" />
+        </a>
+        <nav class="n-nav" id="n-nav" aria-label="主导航">
+          <a href="#film">产品短片</a>
+          <a href="#capabilities">能做什么</a>
+          <a href="#belief">我们相信</a>
+          <a href="#industries">深耕赛道</a>
+          <a href="#faq">常见问题</a>
+        </nav>
+        <div class="n-header-actions">
+          <a class="n-lang" href="../landing-origin/en/" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English">EN</a>
+          <a class="n-btn n-btn-light n-btn-sm" href="#apply">申请试用</a>
+          <button class="n-menu" type="button" aria-controls="n-nav" aria-expanded="false" aria-label="打开导航" data-menu hidden>
+            <span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <!-- 第一张：云海 -->
+      <section class="n-hero" id="top" aria-labelledby="n-hero-title">
+        <div class="n-sky" aria-hidden="true">
+          <div class="n-layer n-layer-base"><img src="../landing-origin/assets/hero-research.webp" alt="" width="2000" height="1126" fetchpriority="high" /></div>
+          <div class="n-layer n-layer-mist n-mist-a"><img src="assets/mist-band.webp" alt="" loading="eager" onerror="this.parentNode.remove()" /></div>
+          <div class="n-layer n-layer-front"><img src="../landing-origin/assets/hero-research.webp" alt="" /></div>
+          <div class="n-layer n-layer-mist n-mist-b"><img src="assets/mist-wisps.webp" alt="" loading="eager" onerror="this.parentNode.remove()" /></div>
+          <div class="n-sky-fade"></div>
+        </div>
+        <div class="n-wrap n-hero-copy" data-hero-copy>
+          <p class="n-status"><span aria-hidden="true"></span>正在开发中，邀请制试用申请已开放</p>
+          <h1 class="n-mark" id="n-hero-title">HunterBuddy</h1>
+          <p class="n-role">猎头的 AI 工作伙伴</p>
+          <p class="n-promise">
+            <span>我们懂你独自赶路的消耗。</span>
+            <span>同行的路上，你可以把力气留给更重要的事。</span>
+          </p>
+          <div class="n-actions">
+            <a class="n-btn n-btn-light" href="#apply">申请试用</a>
+            <a class="n-link n-link-light" href="#capabilities">看看它能做什么</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第二张：一句话说清 -->
+      <section class="n-intro n-dark" id="intro" aria-labelledby="n-intro-title">
+        <div class="n-wrap">
+          <p class="n-kicker">HunterBuddy 能做什么</p>
+          <h2 class="n-display" id="n-intro-title">
+            <span>费时间的事，交给它。</span>
+            <span>你的心力，留给识人和读懂客户。</span>
+          </h2>
+          <p class="n-lede">
+            人岗智能匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，HunterBuddy 都能帮你搞定。你专注判断真正有价值的机会。
+          </p>
+          <ul class="n-chips" aria-label="六件事">
+            <li><a href="#match"><i>01</i>人岗匹配</a></li>
+            <li><a href="#sourcing"><i>02</i>自动寻访</a></li>
+            <li><a href="#identity"><i>03</i>定位真实姓名</a></li>
+            <li><a href="#bd"><i>04</i>BD 客户研判</a></li>
+            <li><a href="#network"><i>05</i>简历库更新</a></li>
+            <li><a href="#mapping"><i>06</i>组织架构梳理</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 产品短片 -->
+      <section class="n-film n-dark" id="film" tabindex="-1" aria-labelledby="n-film-title">
+        <div class="n-wrap">
+          <div class="n-section-head">
+            <p class="n-kicker">01 · 产品短片</p>
+            <h2 class="n-h2" id="n-film-title">两分钟，跟着一家公司走一遍。</h2>
+            <p class="n-sub">一条融资新闻，到一个新职位、一张人才地图、一份长名单。半年后，同样的功课又帮一位人选找到下一站。建议打开声音。</p>
+          </div>
+          <figure class="n-film-frame">
+            <video
+              data-film
+              controls
+              preload="none"
+              playsinline
+              poster="../landing-origin/assets/origin-film-poster.jpg"
+              src="../landing-origin/assets/hunterbuddy-origin.mp4"
+              aria-label="HunterBuddy 两分钟产品短片"
+            ></video>
+          </figure>
+          <ol class="n-chapters" aria-label="短片章节">
+            <li><button type="button" data-seek="10"><i>00:10</i>客户开发</button></li>
+            <li><button type="button" data-seek="36.5"><i>00:36</i>人才地图</button></li>
+            <li><button type="button" data-seek="61"><i>01:01</i>职位寻访</button></li>
+            <li><button type="button" data-seek="89"><i>01:29</i>人选维护</button></li>
+            <li><button type="button" data-seek="112"><i>01:52</i>人和关系都存下来了</button></li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 由深入浅 -->
+      <div class="n-dawn" aria-hidden="true">
+        <div class="n-dawn-mist"><img src="assets/mist-wisps.webp" alt="" loading="lazy" onerror="this.parentNode.remove()" /></div>
+      </div>
+
+      <!-- 第三～五张：六件事 -->
+      <section class="n-light n-caps" id="capabilities" tabindex="-1" aria-labelledby="n-caps-title">
+        <div class="n-wrap">
+          <div class="n-section-head n-section-head-wide">
+            <p class="n-kicker">02 · 能做什么</p>
+            <h2 class="n-h2" id="n-caps-title">六件最耗人的事，<br />HunterBuddy 替你扛下来。</h2>
+            <p class="n-sub">每一件都写着来源，拿不准的单独标出来。最后联系谁、怎么开口，还是你说了算。</p>
+          </div>
+
+          <div class="n-spread" aria-labelledby="n-spread-1">
+            <h3 class="n-spread-title" id="n-spread-1"><i>找人</i>从几行 JD，到一份靠谱的名单</h3>
+            <div class="n-cards">
+              <article class="n-card" id="match">
+                <div class="n-figure" aria-hidden="true">
+                  <div class="fig-match">
+                    <div class="fig-jd">
+                      <span class="fig-label">岗位 JD</span>
+                      <b>视觉算法负责人</b>
+                      <div class="fig-tags"><em>核心技能</em><em>行业背景</em><em>硬性门槛</em></div>
+                    </div>
+                    <ul class="fig-rows">
+                      <li><span>人选 A</span><s style="--w: 88%"></s><u>亮点</u></li>
+                      <li><span>人选 B</span><s style="--w: 74%"></s><u>亮点</u></li>
+                      <li><span>人选 C</span><s style="--w: 61%"></s><u class="is-risk">风险</u></li>
+                    </ul>
+                  </div>
+                </div>
+                <p class="n-card-index">01</p>
+                <p class="n-pain">JD 只有寥寥几行，库里却攒着几千份简历，一份份比对到深夜。</p>
+                <h4>智能人岗匹配</h4>
+                <p>把岗位 JD 拆开，提炼核心技能、行业背景和硬性门槛，再用结构化检索、全文召回和语义匹配一起找人。每位人选都附上匹配分、亮点、潜在风险和推荐理由，省去反复比对。反过来，也能为一份简历找到合适的岗位。</p>
+                <a class="n-more" href="../landing-origin/use-cases/sourcing/">了解职位寻访</a>
+              </article>
+
+              <article class="n-card" id="sourcing">
+                <div class="n-figure" aria-hidden="true">
+                  <div class="fig-funnel">
+                    <ul class="fig-sources">
+                      <li>公开信息</li>
+                      <li>专利论文</li>
+                      <li>代码痕迹</li>
+                      <li>你的简历库</li>
+                    </ul>
+                    <svg class="fig-lines" viewBox="0 0 120 160" preserveAspectRatio="none">
+                      <path d="M0 20 C60 20 60 80 120 80" /><path d="M0 60 C60 60 60 80 120 80" /><path d="M0 100 C60 100 60 80 120 80" /><path d="M0 140 C60 140 60 80 120 80" />
+                    </svg>
+                    <ol class="fig-priority">
+                      <li><i>1</i>先联系</li>
+                      <li><i>2</i>值得聊</li>
+                      <li><i>3</i>再看看</li>
+                    </ol>
+                  </div>
+                </div>
+                <p class="n-card-index">02</p>
+                <p class="n-pain">人选散在招聘平台、论文、代码仓库和自己的简历库里，翻一遍就是一整天。</p>
+                <h4>读懂你的需求，自动寻访</h4>
+                <p>整合公开信息、专利论文、代码痕迹，以及你多年沉淀的简历库，把人选收拢到一起，排好优先级。检索比对的事交给它，你安心把精力留给识人沟通。</p>
+                <a class="n-more" href="../landing-origin/use-cases/sourcing/">了解职位寻访</a>
+              </article>
+            </div>
+          </div>
+
+          <div class="n-spread" aria-labelledby="n-spread-2">
+            <h3 class="n-spread-title" id="n-spread-2"><i>看清</i>人到底是谁，客户值不值得跟</h3>
+            <div class="n-cards">
+              <article class="n-card" id="identity">
+                <div class="n-figure" aria-hidden="true">
+                  <div class="fig-identity">
+                    <ul class="fig-aliases">
+                      <li>花名 · 阿越</li>
+                      <li>论文 · Lin Y.</li>
+                      <li>开源 · lin-yue</li>
+                    </ul>
+                    <div class="fig-arrow"></div>
+                    <div class="fig-person">
+                      <b>林越</b>
+                      <span>工业视觉 · 团队负责人</span>
+                      <em>三处来源交叉验证 · 已排除同名</em>
+                    </div>
+                  </div>
+                </div>
+                <p class="n-card-index">03</p>
+                <p class="n-pain">手上只有一个花名、一个 ID，人到底是谁，往往要猜上半天。</p>
+                <h4>还原花名背后的真实姓名</h4>
+                <p>即便只有花名、化名或昵称，HunterBuddy 也会用多个来源交叉验证、排除同名，还原候选人的真实姓名和身份，再沿着履历和关系线索找到相关人选，推荐合适的触达路径。拿不准的地方，会标出来等你确认。</p>
+                <a class="n-more" href="../landing-origin/use-cases/talent-mapping/">了解人才地图</a>
+              </article>
+
+              <article class="n-card" id="bd">
+                <div class="n-figure" aria-hidden="true">
+                  <div class="fig-bd">
+                    <ul class="fig-signals">
+                      <li>行业前景</li><li>融资动态</li><li>创始团队</li><li>岗位信号</li><li>业务信号</li>
+                    </ul>
+                    <ul class="fig-verdicts">
+                      <li><span>真实需求</span><b class="is-ok">有依据</b></li>
+                      <li><span>付费潜力</span><b class="is-ok">有依据</b></li>
+                      <li><span>合作风险</span><b class="is-wait">待确认</b></li>
+                    </ul>
+                  </div>
+                </div>
+                <p class="n-card-index">04</p>
+                <p class="n-pain">有些客户看起来岗位不少，真正往下跟，才发现需求、预算或决策链还没准备好。</p>
+                <h4>BD 客户研判，先看清再出发</h4>
+                <p>HunterBuddy 整理行业前景、融资动态、创始团队、岗位和业务信号，帮你判断真实需求、付费潜力和合作风险，再理清决策链和优先级，为下一步接洽提供参考。少做无用奔波，把精力留给值得的机会。</p>
+                <a class="n-more" href="../landing-origin/use-cases/business-development/">了解客户开发</a>
+              </article>
+            </div>
+          </div>
+
+          <div class="n-spread" aria-labelledby="n-spread-3">
+            <h3 class="n-spread-title" id="n-spread-3"><i>沉淀</i>认识的人、摸过的团队，都不白费</h3>
+            <div class="n-cards">
+              <article class="n-card" id="network">
+                <div class="n-figure" aria-hidden="true">
+                  <ol class="fig-timeline">
+                    <li><i>2024</i><b>收到简历</b><span>视觉算法 · 高级工程师</span></li>
+                    <li><i>2025</i><b>换了团队</b><span>并入新平台部</span></li>
+                    <li><i>2026</i><b>承担新职责</b><span>带起一支新团队</span><em>已更新</em></li>
+                  </ol>
+                </div>
+                <p class="n-card-index">05</p>
+                <p class="n-pain">当年聊过的人，换了工作、换了赛道，你的简历库却还停在两年前。</p>
+                <h4>守住你的人脉资产</h4>
+                <p>你认识的每一个人，都是长期的财富。人选换工作、换赛道、承担新职责，信息会悄悄更新。不用你费力记录维护，你的人才库跟着时间一起生长。</p>
+                <a class="n-more" href="../landing-origin/use-cases/candidate-nurturing/">了解人选维护</a>
+              </article>
+
+              <article class="n-card" id="mapping">
+                <div class="n-figure" aria-hidden="true">
+                  <div class="fig-org">
+                    <div class="fig-node fig-node-top">技术负责人</div>
+                    <svg class="fig-org-lines" viewBox="0 0 300 60" preserveAspectRatio="none">
+                      <path d="M150 0 C150 30 50 30 50 60" /><path d="M150 0 L150 60" /><path d="M150 0 C150 30 250 30 250 60" />
+                    </svg>
+                    <div class="fig-org-row">
+                      <div class="fig-node">视觉团队</div>
+                      <div class="fig-node">控制团队</div>
+                      <div class="fig-node is-gap">产品交付 · 待补</div>
+                    </div>
+                  </div>
+                </div>
+                <p class="n-card-index">06</p>
+                <p class="n-pain">做一次 Mapping，要对着官网、新闻和名片一点点拼，画完的图还存着好几个版本。</p>
+                <h4>组织架构梳理，轻松做 Mapping</h4>
+                <p>自动汇总人员、部门、岗位和汇报关系，一键生成架构图，省去反复核对、画图、维护多个版本的麻烦。搭配多维度视图，团队脉络一目了然，人才盘点和招聘 Mapping 都更轻松。</p>
+                <a class="n-more" href="../landing-origin/use-cases/talent-mapping/">了解人才地图</a>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第六张：我们相信 -->
+      <section class="n-light n-belief" id="belief" tabindex="-1" aria-labelledby="n-belief-title">
+        <div class="n-wrap">
+          <div class="n-belief-head">
+            <p class="n-kicker">03 · 我们相信</p>
+            <h2 class="n-h2" id="n-belief-title">猎头的价值，<br />无法被算法替代。</h2>
+            <div class="n-belief-copy">
+              <p>信息可以自动抓取，但一个人的期待、顾虑和野心，没有办法被提取。</p>
+              <p>客户的隐性诉求、人选没说出口的选择偏好，只能靠面对面的沟通去感知。</p>
+            </div>
+          </div>
+          <figure class="n-belief-photo">
+            <img src="../landing-origin/assets/human-conversation.webp" alt="一位猎头和一位人选面对面交谈" width="1916" height="821" loading="lazy" />
+          </figure>
+          <div class="n-bounds">
+            <h3>所以，HunterBuddy 有自己的边界</h3>
+            <ol>
+              <li><i>01</i>所有信息都标注来源，拿不准的地方，不会包装成确定的结论。</li>
+              <li><i>02</i>它只做信息的整理者，不做人才的评判者。</li>
+              <li><i>03</i>它不替你做任何商务决定。</li>
+            </ol>
+            <p class="n-bounds-close">安静站在你的身后，陪你赶路，<br />而不是站在你和人选、客户中间。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第七张：深耕各行赛道 -->
+      <section class="n-light n-industries" id="industries" tabindex="-1" aria-labelledby="n-industries-title">
+        <div class="n-wall" data-wall aria-hidden="true"></div>
+        <div class="n-wall-panel">
+          <p class="n-kicker">04 · 深耕赛道</p>
+          <h2 class="n-h2" id="n-industries-title">深耕各行赛道</h2>
+          <p class="n-sub">与你并肩，奔赴每一场人才相逢。</p>
+          <ul class="n-industry-list">
+            <li>互联网</li><li>人工智能</li><li>具身智能</li><li>云计算</li><li>医药</li><li>核聚变</li><li>半导体</li><li>能源与稀有资源</li><li>新型储能</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="n-light n-faq" id="faq" tabindex="-1" aria-labelledby="n-faq-title">
+        <div class="n-wrap n-faq-layout">
+          <div class="n-section-head">
+            <p class="n-kicker">05 · 常见问题</p>
+            <h2 class="n-h2" id="n-faq-title">试用之前，<br />大家常问这些。</h2>
+            <p class="n-sub">还有别的想问，写信到 <a href="mailto:hello@boseekai.com">hello@boseekai.com</a>。</p>
+          </div>
+          <div class="n-faq-list">
+            <details>
+              <summary><span>HunterBuddy 适合谁使用？</span><i aria-hidden="true"></i></summary>
+              <p>独立猎头和资深顾问，尤其是同时在做客户开发和交付、手上有几个难做的职位、库里攒了不少候选人的人。线索散在融资新闻、招聘页、简历库、论文和开源社区里，一个人很难天天盯着、一一读完。做过的功课会存下来，下一件事接着用。</p>
+            </details>
+            <details>
+              <summary><span>和直接用豆包、DeepSeek、ChatGPT 这类通用 AI，有什么不同？</span><i aria-hidden="true"></i></summary>
+              <p>通用 AI 擅长回答单个问题，但它不知道你手上有哪些客户、候选人和人才地图。它给的名单里，人是不是同一个、消息从哪来，往往还得你自己再查一遍。HunterBuddy 每次都从你手上的资源出发：熟悉的公司、做过的候选人、人才地图和能帮你引荐的人。不同地方的同一个人会先核对再合并，每个判断都写着来源。做完的事会存下来，下一次更快。</p>
+            </details>
+            <details>
+              <summary><span>它会替我盯着市场和候选人吗？</span><i aria-hidden="true"></i></summary>
+              <p>可以。你可以让它定期帮你看，比如每周看一次某个赛道有没有新公司拿到融资、目标公司的招聘页有没有变化，或你关注的候选人公开履历有没有更新。只有值得你看的变化才会提醒你，重复的会合并，没有新消息就不打扰你。它不会自己动手，下一步做什么由你决定。</p>
+            </details>
+            <details>
+              <summary><span>人选和线索从哪些渠道来？</span><i aria-hidden="true"></i></summary>
+              <p>已有候选人、人才地图、公开网络与招聘页、论文与专利、开源项目，以及你上传的简历和资料。每条线索都记着来自哪里。散在不同渠道里的同一个人，会先核对再合并。哪些渠道找过了、哪些还是空白，也会标出来，方便你决定下一步去哪里补。</p>
+            </details>
+            <details>
+              <summary><span>我手上的候选人库和人才地图能带进来吗？</span><i aria-hidden="true"></i></summary>
+              <p>可以。简历可以单份或批量上传，Excel 等格式的人才地图可以导入后接着补。带进来的资料同样会核对身份、查重合并，也可以对你所有的在手职位做一次匹配。</p>
+            </details>
+            <details>
+              <summary><span>匹配结果可以直接相信吗？</span><i aria-hidden="true"></i></summary>
+              <p>把它当作带来源的参考，而不是最终结论。每条匹配理由都附上来源，你可以点回去看原始资料。没有可靠来源的信息会标为“待确认”，不会把猜测当成事实。像实际带多大团队、本人想不想动，这类只有聊了才知道的事，HunterBuddy 会明确留给你。</p>
+            </details>
+            <details>
+              <summary><span>和猎聘、领英、脉脉这些招聘平台是什么关系？</span><i aria-hidden="true"></i></summary>
+              <p>它们是发布职位、搜索和联系候选人的渠道，HunterBuddy 不替代它们。HunterBuddy 做的是找人之前和找人过程中的研究：把公开资料和你手上的资源放在一起，核对身份、连起关系、写明来源，帮你判断先找谁、怎么开口。从这些平台下载的简历，也可以上传进来一起核对。</p>
+            </details>
+            <details>
+              <summary><span>和猎头管理系统（CRM、ATS）有什么不同？</span><i aria-hidden="true"></i></summary>
+              <p>猎头管理系统记录客户、职位、候选人和推荐进度，管的是已经在做的事。HunterBuddy 帮你找到下一件值得做的事：从公开资料和你手上的资源里找线索、连关系，给出带来源的判断。两者可以配合着用。在 HunterBuddy 里确认过的人和关系，照样记进你的管理系统。</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <div class="n-light n-apply" data-apply></div>
+    </main>
+
+    <footer class="n-footer" id="footer">
+      <div class="n-wrap">
+        <div class="n-footer-top">
+          <div class="n-footer-brand">
+            <img src="../landing-origin/assets/boseek-b5.svg" alt="Boseek 铂寻" width="150" height="54" loading="lazy" />
+            <p>HunterBuddy，猎头的 AI 工作伙伴。</p>
+            <p>铂寻为独立猎头和资深顾问打造。</p>
+            <p class="n-footer-mail">联系我们：<a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>
+          </div>
+          <div class="n-footer-groups">
+            <div>
+              <h2>产品</h2>
+              <ul>
+                <li><a href="#film">产品短片</a></li>
+                <li><a href="#capabilities">能做什么</a></li>
+                <li><a href="#belief">我们相信</a></li>
+                <li><a href="#industries">深耕赛道</a></li>
+                <li><a href="#faq">常见问题</a></li>
+              </ul>
+            </div>
+            <div>
+              <h2>使用场景</h2>
+              <ul>
+                <li><a href="../landing-origin/use-cases/business-development/">客户开发</a></li>
+                <li><a href="../landing-origin/use-cases/talent-mapping/">人才地图</a></li>
+                <li><a href="../landing-origin/use-cases/sourcing/">职位寻访</a></li>
+                <li><a href="../landing-origin/use-cases/candidate-nurturing/">人选维护</a></li>
+              </ul>
+            </div>
+            <div>
+              <h2>法律</h2>
+              <ul>
+                <li>隐私政策</li>
+                <li>服务条款</li>
+                <li>数据处理协议</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <ul class="n-footer-meta" aria-label="版权、网站主体与备案信息">
+          <li>&copy; <span data-footer-year>2026</span> 铂寻 Boseek</li>
+          <li>网站域名：www.boseekai.com</li>
+          <li>网站主体：北京铂寻智能科技有限公司</li>
+          <li><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备2026068903号-1</a></li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>
