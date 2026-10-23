@@ -448,6 +448,18 @@
     kicker.className = "n-kicker";
     kicker.textContent = "05 · 申请试用";
     section.querySelector(".f-trial-intro")?.prepend(kicker);
+    // break after the comma, the same as the live site
+    const thought = section.querySelector(".f-trial-thought");
+    if (thought) {
+      thought.replaceChildren(
+        ...["把时间，", "留给真正重要的人。"].map((text) => {
+          const line = document.createElement("span");
+          line.className = "n-thought-line";
+          line.textContent = text;
+          return line;
+        }),
+      );
+    }
     section.querySelectorAll('a[href="#work"]').forEach((a) => a.setAttribute("href", "#capabilities"));
   }
 

@@ -591,20 +591,24 @@ body.n-page::after {
 /* ---------- 由深入浅 ---------- */
 .n-dawn {
   position: relative;
-  height: clamp(200px, 34vh, 340px);
+  height: 46vh;
+  min-height: 260px;
   overflow: hidden;
-  /* eased so it reads as a slow daybreak rather than a band */
+  /* night turns to day over about one screen: this band carries the dark half,
+     the top of the next section carries the light half behind its heading */
   background: linear-gradient(
     180deg,
-    var(--night) 0%,
-    #141517 14%,
-    #222326 28%,
-    #3d3e43 42%,
-    #66676d 55%,
-    #9a9ba0 68%,
-    #c9c9cd 80%,
-    #e7e7ea 91%,
-    var(--paper) 100%
+    #0f1011 0%,
+    #171819 10%,
+    #232425 20%,
+    #313233 30%,
+    #414142 40%,
+    #515152 50%,
+    #616162 60%,
+    #717172 70%,
+    #818182 80%,
+    #909091 90%,
+    #9e9e9f 100%
   );
 }
 /* the same mist as the hero, thinning out as the day comes up */
@@ -635,7 +639,15 @@ body.n-page::after {
 
 /* 第三～五张：六件事 */
 .n-caps {
-  padding-block: 0 120px;
+  padding-block: 8vh 120px;
+  background: linear-gradient(180deg, #9e9e9f 0.0vh, #b2b2b3 7.0vh, #c4c4c5 14.0vh, #d3d3d4 21.0vh, #dfe0e1 28.0vh, #e9e9ea 35.0vh, #f0f0f1 42.0vh, #f4f4f5 49.0vh, #f5f5f6 56.0vh, var(--paper) 100%);
+}
+/* the heading sits where the day is still coming up, so its small type is a shade darker */
+.n-caps .n-section-head .n-kicker {
+  color: #3f348f;
+}
+.n-caps .n-section-head .n-sub {
+  color: var(--ink-2);
 }
 .n-section-head-wide {
   max-width: 820px;
@@ -1336,7 +1348,7 @@ body.n-page::after {
 .n-apply .f-trial-intro h2 {
   max-width: none;
   color: var(--ink);
-  font-size: clamp(30px, 3vw, 40px);
+  font-size: clamp(28px, 2.4vw, 34px);
   font-weight: 500;
   line-height: 1.4;
 }
@@ -1750,4 +1762,8 @@ html.lenis.lenis-smooth {
   inset: -8% 0 auto;
   height: 116%;
   will-change: transform;
+}
+
+.n-thought-line {
+  display: block;
 }
