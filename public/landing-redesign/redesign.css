@@ -1603,3 +1603,18 @@ body.n-page::after {
     font-size: 21px;
   }
 }
+
+/* the two cards in a row share their row lines, so titles and text line up side by side
+   even when one pain line runs longer at some widths */
+@supports (grid-template-rows: subgrid) {
+  .n-card {
+    display: grid;
+    grid-row: span 6;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+    align-content: start;
+  }
+  .n-more {
+    align-self: end;
+  }
+}
