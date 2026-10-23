@@ -94,7 +94,7 @@
 - 导航变成六项后，中文在 801–900px、英文在 801–1120px 收进菜单按钮，避免和右侧按钮挤在一起（`page.js` 只对第三版生效，其他版本仍是 800px）。
 - 上线后：用 Google 富媒体检测工具检查 FAQPage，百度、Google 重新提交首页和 `/en/`。
 
-### 第二批：四个使用场景页（2026-10-23 确认，制作中）
+### 第二批：四个使用场景页（2026-10-23 确认，中英文八页已完成，待验收）
 决定：
 | 页面 | 网址 | 主要搜索词 |
 |---|---|---|
@@ -111,6 +111,15 @@
 - 申请试用：按钮回首页的申请表单（`/#apply`，英文 `/en/#apply`）。
 - 结构化数据：WebPage、面包屑、本页 FAQPage。sitemap 加 8 个网址。
 - 做法：先写中文客户开发一页给用户看文字和样式，定下来再写其余三页和英文。全部做完后，和首页常见问题一起交给 Codex 部署（首页常见问题已合进 main，暂不单独发布）。
+
+实现：
+- `scripts/build-use-cases.mjs` 生成八个页面：`public/landing-origin/use-cases/<slug>/index.html` 和 `en/use-cases/<slug>/index.html`。正文在 `scripts/use-cases/pages.mjs`（中英文一一对应），导航、页脚等共用文字在 `scripts/use-cases/content.mjs`。改了文案或样式版本号后运行 `node scripts/build-use-cases.mjs`。
+- 页面是静态的，不运行 JavaScript 也能完整阅读。`use-case.css` 是页面自己的样式，页头、页脚、按钮、结果卡片和常见问题沿用首页样式。`use-case.js` 只管菜单按钮和页脚年份（中文 900px、英文 1120px 以下收进菜单）。
+- 首页入口：`origin.js` 在“能做什么”每个场景下面加“了解客户开发”这类链接（英文 More on business development），中英文首页页脚加“使用场景”一栏。
+- sitemap 加入八个网址及语言对应，共 10 个网址。
+- 中文标题字体子集补了四页标题里的新字。
+- 测试：`tests/origin-use-cases.spec.js` 检查八页的规范网址、语言对应、结构化数据和页面问答一致、菜单按钮、首页入口。
+- 部署时：`/use-cases/` 和 `/en/use-cases/` 本身不做页面，请 Codex 配 301 分别到 `/#work` 和 `/en/#work`。
 
 ## 接下来（2026-10-23 定的顺序）
 1. 第二阶段：内容页面（先逐个问题确认，再汇总执行）。

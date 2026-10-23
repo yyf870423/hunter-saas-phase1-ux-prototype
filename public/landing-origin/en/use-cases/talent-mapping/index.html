@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f1011" />
+    <title>Talent mapping: how to map a team by org structure | HunterBuddy</title>
+    <meta name="description" content="How do you build a talent map? HunterBuddy lays out target and peer companies by org structure, shows who holds each role, where each detail comes from and what is still missing, and matches people to your candidate database. Existing Excel talent maps can be imported too." />
+    <link rel="canonical" href="https://www.boseekai.com/en/use-cases/talent-mapping/" />
+    <link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/talent-mapping/" />
+    <link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/talent-mapping/" />
+    <link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/talent-mapping/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Boseek" />
+    <meta property="og:title" content="Talent mapping for recruiters · HunterBuddy" />
+    <meta property="og:description" content="How do you build a talent map? HunterBuddy lays out target and peer companies by org structure, shows who holds each role, where each detail comes from and what is still missing, and matches people to your candidate database. Existing Excel talent maps can be imported too." />
+    <meta property="og:url" content="https://www.boseekai.com/en/use-cases/talent-mapping/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="zh_CN" />
+    <meta name="twitter:card" content="summary" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebPage",
+            "@id": "https://www.boseekai.com/en/use-cases/talent-mapping/#webpage",
+            "url": "https://www.boseekai.com/en/use-cases/talent-mapping/",
+            "name": "Talent mapping: how to map a team by org structure | HunterBuddy",
+            "description": "How do you build a talent map? HunterBuddy lays out target and peer companies by org structure, shows who holds each role, where each detail comes from and what is still missing, and matches people to your candidate database. Existing Excel talent maps can be imported too.",
+            "inLanguage": "en",
+            "isPartOf": {
+              "@id": "https://www.boseekai.com/#website"
+            },
+            "about": {
+              "@id": "https://www.boseekai.com/#hunterbuddy"
+            },
+            "publisher": {
+              "@id": "https://www.boseekai.com/#organization"
+            },
+            "breadcrumb": {
+              "@id": "https://www.boseekai.com/en/use-cases/talent-mapping/#breadcrumb"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://www.boseekai.com/en/use-cases/talent-mapping/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Boseek",
+                "item": "https://www.boseekai.com/en/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Talent mapping",
+                "item": "https://www.boseekai.com/en/use-cases/talent-mapping/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://www.boseekai.com/en/use-cases/talent-mapping/#faq",
+            "inLanguage": "en",
+            "isPartOf": {
+              "@id": "https://www.boseekai.com/en/use-cases/talent-mapping/#webpage"
+            },
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What goes into a talent map?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The org structure and reporting lines of the target companies and teams, who holds each role, how long they have been in it and where they were before, plus the source of each detail and where the gaps are."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "I already have talent maps in Excel. Can I keep using them?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Import talent maps from Excel or similar formats and keep building on them. Imported records go through the same identity checks and de-duplication."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How often should a talent map be updated?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "There’s no fixed rule. Reorganizations and people moving on both make a map go stale. You can have HunterBuddy check for you regularly, such as changes to a target company’s careers page or updates to the public profiles of people you follow, and it alerts you when something is worth a look."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can people found in papers and patents go straight onto the map?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "They can go on as leads, but their identity needs checking first. Co-authoring a paper doesn’t mean a reporting line. HunterBuddy marks what is still unverified."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <link rel="icon" href="../../../favicon.ico" sizes="any" />
+    <link rel="icon" href="../../../favicon.svg?v=20261022-bo" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../../../apple-touch-icon.png?v=20261022-bo" />
+    <!-- 这一页没有表单，申请试用回首页。保留这一行是为了和其他页面一致，部署检查要求每个页面都有 -->
+    <meta name="trial-api" content="disabled" />
+    <link rel="stylesheet" href="../../../../landing/shared-ui.css?v=20261021" />
+    <link rel="stylesheet" href="../../../../landing/page.css?v=20261021" />
+    <link rel="stylesheet" href="../../../../landing/shared-footer.css?v=20261021d" />
+    <link rel="stylesheet" href="../../../shared-origin.css?v=20261023-uc-b" />
+    <link rel="stylesheet" href="../../../origin.css?v=20261023-faq" />
+    <link rel="stylesheet" href="../../../origin-motion.css?v=20261023-uc" />
+    <link rel="stylesheet" href="../../../shared-locale.css?v=20261023-faq" />
+    <link rel="stylesheet" href="../../../use-case.css?v=20261023-uc" />
+    <script defer src="../../../use-case.js?v=20261023-uc"></script>
+  </head>
+  <body class="u-page">
+    <a class="f-skip" href="#main">Skip to content</a>
+    <header class="f-header">
+      <div class="f-container f-header-inner">
+        <a href="../../../en/" aria-label="Boseek home"><span class="f-brand"><img src="../../../assets/boseek-b5-en.svg" alt="Boseek" width="150" height="48" /></span></a>
+        <nav class="f-nav" id="f-navigation" aria-label="Main navigation">
+          <a href="../../../en/#film">Product video</a>
+          <a href="../../../en/#work" aria-current="true">Use cases</a>
+          <a href="../../../en/#research">How it works</a>
+          <a href="../../../en/#assets">Knowledge network</a>
+          <a href="../../../en/#faq">FAQ</a>
+          <a href="../../../en/#about">About Boseek</a>
+        </nav>
+        <div class="f-header-actions">
+          <a class="f-language-switch" href="../../../use-cases/talent-mapping/" hreflang="zh-CN" lang="zh-CN" title="切换到中文" aria-label="切换到中文"><span>中文</span></a>
+          <a class="f-login-link" href="../../../en/#apply">Request a trial</a>
+          <button type="button" class="f-icon-button" aria-label="Open navigation" data-menu-toggle data-label-open="Open navigation" data-label-close="Close navigation" aria-controls="f-navigation" aria-expanded="false" hidden><svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h16" /></svg><span class="f-tooltip" aria-hidden="true">Open navigation</span></button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section class="u-hero" aria-labelledby="u-title">
+        <div class="f-container">
+          <div class="u-col">
+            <nav class="u-crumbs" aria-label="Breadcrumb">
+              <a href="../../../en/">Home</a><span aria-hidden="true">/</span><a href="../../../en/#work">Use cases</a><span aria-hidden="true">/</span><span aria-current="page">Talent mapping</span>
+            </nav>
+            <p class="o-kicker">Use case · Talent mapping</p>
+            <h1 id="u-title"><span class="ln">Mapping a team means</span><br /><span class="ln">piecing together scattered information.</span></h1>
+            <p class="u-lead">A talent map lays out a company’s teams by org structure: who holds each role, who they report to and where each detail came from. HunterBuddy pieces together information from scattered sources, matches people to your candidate database and clearly marks the gaps.</p>
+            <div class="u-actions">
+              <a class="f-button" href="../../../en/#apply">Request a trial<svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></a>
+              <a class="f-text-link" href="#how">See how it works<svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="u-paper">
+        <section class="u-section" id="method" aria-labelledby="u-method-title">
+          <div class="f-container"><div class="u-col">
+            <p class="u-label">The usual approach</p>
+            <h2 id="u-method-title">How to build a talent map</h2>
+            <p class="u-intro">Talent mapping is a core recruiting skill. You do it when a mandate comes in, and you do it to get to know a sector. It usually takes these steps:</p>
+            <ol class="u-steps">
+            <li>
+              <h3>Set the scope</h3>
+              <p>Choose the target and peer companies, and the functions and levels to cover. Make the scope too wide and the map is never finished.</p>
+            </li>
+            <li>
+              <h3>Build the structure</h3>
+              <p>Piece together teams and reporting lines from company websites, team pages, press releases and careers pages.</p>
+            </li>
+            <li>
+              <h3>Fill in the names</h3>
+              <p>Who holds each role, how long they have been in it and where they were before. Public profiles, paper authors and patent inventors are all leads.</p>
+            </li>
+            <li>
+              <h3>Verify</h3>
+              <p>The same person may appear under different names and titles. Confirm that it is the same person, and that they are still there.</p>
+            </li>
+            <li>
+              <h3>Mark the gaps</h3>
+              <p>Where you know a role exists but not who holds it, flag it so you can fill it in later.</p>
+            </li>
+            </ol>
+          </div></div>
+        </section>
+
+        <section class="u-section" id="hard" aria-labelledby="u-hard-title">
+          <div class="f-container"><div class="u-col">
+            <p class="u-label">Where it gets hard</p>
+            <h2 id="u-hard-title">The hard part isn’t finding information. It’s fitting it together.</h2>
+            <ul class="u-cards">
+              <li>
+                <h3>Information is scattered</h3>
+                <p>Team pages, press releases, papers, careers pages and social platforms each hold only a small piece.</p>
+              </li>
+              <li>
+                <h3>Same names, different titles</h3>
+                <p>One person is written differently in different places. Merge the wrong records and the whole map goes wrong with them.</p>
+              </li>
+              <li>
+                <h3>Maps go stale</h3>
+                <p>Reorganizations and people moving on mean a map from six months ago may already be out of date.</p>
+              </li>
+              <li>
+                <h3>Separate from your database</h3>
+                <p>Whether someone on the map is already a candidate in your database often has to be checked one by one.</p>
+              </li>
+            </ul>
+          </div></div>
+        </section>
+
+        <section class="u-section" id="how" tabindex="-1" aria-labelledby="u-how-title">
+          <div class="f-container"><div class="u-col">
+            <p class="u-label">How HunterBuddy helps</p>
+            <h2 id="u-how-title">How HunterBuddy helps with talent mapping</h2>
+            <p class="u-intro">Back to Xingchuan Robotics: mapping Xingchuan and two peer companies.</p>
+            <ol class="u-steps">
+            <li>
+              <h3>Lays out the org structure</h3>
+              <p>Tell it which companies and teams to cover. It finds teams and reporting lines in public information and places people in their roles.</p>
+              <p class="u-example"><span>Xingchuan Robotics</span>Xingchuan Robotics and two peers, Tuojie Robotics and Qiongding AI, laid out team by team.</p>
+            </li>
+            <li>
+              <h3>Cites a source for every role</h3>
+              <p>Who holds each role, and where that came from, sit side by side. Leads from paper authors or patents are flagged for identity checks.</p>
+              <p class="u-example"><span>Xingchuan Robotics</span>One person on Qiongding AI’s controls team comes from a paper’s author list. Identity still to verify.</p>
+            </li>
+            <li>
+              <h3>Matches people to your database</h3>
+              <p>It checks the people on the map against your CV database and merges records only after verifying identity, never just because the names match.</p>
+              <p class="u-example"><span>Xingchuan Robotics</span>The head of Tuojie Robotics’ vision team is confirmed by the company site and team page: it’s Yue Lin, already in your database.</p>
+            </li>
+            <li>
+              <h3>Marks the gaps</h3>
+              <p>Roles you know exist but can’t yet fill are flagged separately, so you can decide where to look next.</p>
+              <p class="u-example"><span>Xingchuan Robotics</span>Xingchuan Robotics, product delivery: the role is known, but not who holds it.</p>
+            </li>
+            </ol>
+          </div></div>
+          <div class="f-container">
+            <figure class="u-demo" aria-labelledby="u-demo-title">
+              <figcaption class="u-demo-lead">
+                <p class="u-demo-context">Target companies · Talent map</p>
+                <h3 id="u-demo-title">Xingchuan and two peer companies</h3>
+                <p>A corner of the talent map HunterBuddy hands you. Confirmed, unverified and missing are marked separately.</p>
+              </figcaption>
+              <ul class="f-result-list">
+                <li><small>Team lead verified</small><strong>Tuojie Robotics · Vision team</strong><p>Company site and team page agree: Yue Lin, already in your database.</p></li>
+                <li><small>Current employment unverified</small><strong>Qiongding AI · Controls team</strong><p>A lead from a paper’s author list. Identity still to verify.</p></li>
+                <li><small>An information gap</small><strong>Xingchuan Robotics · Product delivery</strong><p>The role is known, but not who holds it.</p></li>
+              </ul>
+            </figure>
+          </div>
+        </section>
+
+        <section class="u-section" id="result" aria-labelledby="u-result-title">
+          <div class="f-container"><div class="u-col">
+            <p class="u-label">What you get</p>
+            <h2 id="u-result-title">What you get, and what’s yours to confirm</h2>
+            <p class="u-intro">A talent map showing the org structure and reporting lines, who holds each role, where each detail comes from and what is still missing. You can also import an existing Excel talent map and keep building on it.</p>
+            <p class="u-intro">With the people on the map matched to your candidate database, your next search can start right from the map.</p>
+            <h3 class="u-confirm-title">Still for you to confirm</h3>
+            <ul class="u-confirm">
+              <li>Are the team names and reporting lines still accurate?</li>
+              <li>Are these the same people as the candidates in your database?</li>
+              <li>Which information gaps are worth filling next?</li>
+            </ul>
+            <p class="u-note">Co-authoring a paper doesn’t mean a reporting line. HunterBuddy keeps what it infers apart from what is confirmed, and leaves the final call to you.</p>
+          </div></div>
+        </section>
+      </div>
+
+      <section class="o-faq u-faq" id="faq" tabindex="-1" aria-labelledby="o-faq-title">
+        <div class="f-container">
+          <div class="o-faq-intro">
+            <p class="o-kicker">FAQ</p>
+            <h2 id="o-faq-title"><span class="ln">What people ask</span><br /><span class="ln">about talent mapping.</span></h2>
+          </div>
+          <div class="o-faq-list">
+            <details>
+              <summary><h3>What goes into a talent map?</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+              <p>The org structure and reporting lines of the target companies and teams, who holds each role, how long they have been in it and where they were before, plus the source of each detail and where the gaps are.</p>
+            </details>
+            <details>
+              <summary><h3>I already have talent maps in Excel. Can I keep using them?</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+              <p>Yes. Import talent maps from Excel or similar formats and keep building on them. Imported records go through the same identity checks and de-duplication.</p>
+            </details>
+            <details>
+              <summary><h3>How often should a talent map be updated?</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+              <p>There’s no fixed rule. Reorganizations and people moving on both make a map go stale. You can have HunterBuddy check for you regularly, such as changes to a target company’s careers page or updates to the public profiles of people you follow, and it alerts you when something is worth a look.</p>
+            </details>
+            <details>
+              <summary><h3>Can people found in papers and patents go straight onto the map?</h3><span class="o-faq-mark" aria-hidden="true"></span></summary>
+              <p>They can go on as leads, but their identity needs checking first. Co-authoring a paper doesn’t mean a reporting line. HunterBuddy marks what is still unverified.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="u-next" aria-labelledby="u-next-title">
+        <div class="f-container">
+          <div class="u-next-head">
+            <p class="o-kicker">Four use cases</p>
+            <h2 id="u-next-title"><span class="ln">Follow one company</span><br /><span class="ln">through all four.</span></h2>
+          </div>
+          <ol class="u-four">
+            <li>
+              <a href="../../../en/use-cases/business-development/">
+                <span class="u-four-index">01</span>
+                <strong>Business development</strong>
+                <span class="u-four-line">From a funding round to a new role and the hiring manager.</span>
+              </a>
+            </li>
+            <li class="is-current">
+              <a href="../../../en/use-cases/talent-mapping/" aria-current="page">
+                <span class="u-four-index">02 · You are here</span>
+                <strong>Talent mapping</strong>
+                <span class="u-four-line">Map target teams by org structure and match them to your candidates.</span>
+              </a>
+            </li>
+            <li class="is-next">
+              <a href="../../../en/use-cases/sourcing/">
+                <span class="u-four-index">03 · Next</span>
+                <strong>Sourcing</strong>
+                <span class="u-four-line">When the JD lands, start with the people you already know.</span>
+              </a>
+            </li>
+            <li>
+              <a href="../../../en/use-cases/candidate-nurturing/">
+                <span class="u-four-index">04</span>
+                <strong>Candidate nurturing</strong>
+                <span class="u-four-line">When a priority candidate’s situation changes, check your live searches.</span>
+              </a>
+            </li>
+          </ol>
+          <div class="u-trial">
+            <div>
+              <h2>Request a HunterBuddy trial</h2>
+              <p>Trial access is by invitation. Leave your details and we will review each application, then contact you when your access is ready.</p>
+            </div>
+            <a class="f-button" href="../../../en/#apply">Request a trial<svg class="f-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="f-footer" id="footer" data-finesse-footer>
+      <div class="f-container">
+        <div class="f-footer-top">
+          <div class="f-footer-brand">
+            <span class="f-brand">
+              <img src="../../../assets/boseek-b5-en.svg" alt="Boseek" width="150" height="48" loading="lazy" />
+            </span>
+            <div class="f-footer-notes">
+              <p>HunterBuddy. Your AI partner in recruitment.</p>
+              <p>For independent recruiters and senior search consultants.</p>
+            </div>
+          </div>
+          <div class="f-footer-groups">
+            <div class="f-footer-group" role="group" aria-labelledby="f-footer-product">
+              <h2 id="f-footer-product">Product</h2>
+              <ul>
+                <li><a href="../../../en/#film">Product video</a></li>
+                <li><a href="../../../en/#work">Use cases</a></li>
+                <li><a href="../../../en/#research">How it works</a></li>
+                <li><a href="../../../en/#assets">Knowledge network</a></li>
+                <li><a href="../../../en/#faq">FAQ</a></li>
+              </ul>
+            </div>
+            <div class="f-footer-group" role="group" aria-labelledby="f-footer-cases">
+              <h2 id="f-footer-cases">Use cases</h2>
+              <ul>
+                <li><a href="../../../en/use-cases/business-development/">Business development</a></li>
+                <li><a href="../../../en/use-cases/talent-mapping/" aria-current="page">Talent mapping</a></li>
+                <li><a href="../../../en/use-cases/sourcing/">Sourcing</a></li>
+                <li><a href="../../../en/use-cases/candidate-nurturing/">Candidate nurturing</a></li>
+              </ul>
+            </div>
+            <div class="f-footer-group" role="group" aria-labelledby="f-footer-legal">
+              <h2 id="f-footer-legal">Legal</h2>
+              <ul>
+                <li>Privacy policy</li>
+                <li>Terms of service</li>
+                <li>Data processing agreement</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="f-footer-bottom">
+          <ul class="f-footer-meta" aria-label="Copyright, operator &amp; registration">
+            <li>&copy; <span data-footer-year>2026</span> Boseek</li>
+            <li>www.boseekai.com</li>
+            <li>Operated by Beijing Boseek Intelligent Technology Co., Ltd.</li>
+            <li>
+              <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备2026068903号-1</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

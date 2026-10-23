@@ -1,11 +1,13 @@
 // 生成官网的使用场景页：public/landing-origin/use-cases/<slug>/index.html（中文）
 // 和 public/landing-origin/en/use-cases/<slug>/index.html（英文）。
-// 文案都在 scripts/use-cases/content.mjs，页面上的常见问题和结构化数据 FAQPage 用同一份文字。
+// 正文在 scripts/use-cases/pages.mjs，导航、页脚等共用文字在 scripts/use-cases/content.mjs。
+// 页面上的常见问题和结构化数据 FAQPage 用同一份文字。
 // 改了文案或样式版本号后运行：node scripts/build-use-cases.mjs
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { PAGES, COMMON } from "./use-cases/content.mjs";
+import { COMMON } from "./use-cases/content.mjs";
+import { PAGES } from "./use-cases/pages.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://www.boseekai.com/";
@@ -13,7 +15,7 @@ const VERSION = {
   sharedUi: "20261021",
   page: "20261021",
   footer: "20261021d",
-  sharedOrigin: "20261023-uc",
+  sharedOrigin: "20261023-uc-b",
   origin: "20261023-faq",
   motion: "20261023-uc",
   locale: "20261023-faq",

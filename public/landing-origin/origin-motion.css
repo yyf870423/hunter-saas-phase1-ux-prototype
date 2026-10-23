@@ -830,6 +830,10 @@ html:lang(en) .o-faq-intro h2 .ln { white-space: normal; }
     grid-template-columns: repeat(3, minmax(0, 144px));
     gap: 48px;
   }
+  html:lang(en) .f-footer-groups:has(> :nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 176px));
+    gap: 40px;
+  }
 }
 
 /* 2026-10-23 · under each use case: a link to its own page, beside 查看结果和来源 */
