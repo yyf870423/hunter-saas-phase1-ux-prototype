@@ -1569,7 +1569,7 @@ body.n-page::after {
 }
 
 /* Chinese headings break at punctuation and spaces, not inside a phrase */
-.n-page :is(.n-h2, .n-display, .n-spread-title, .n-card h4, .n-bounds h3, .n-bounds-close, .n-promise, .n-faq summary span, .f-trial-intro h2) {
+.n-page :is(.n-h2, .n-display, .n-spread-title, .n-card h4, .n-bounds h3, .n-bounds li, .n-bounds-close, .n-promise, .n-faq summary span, .f-trial-intro h2) {
   word-break: keep-all;
   overflow-wrap: anywhere;
 }

@@ -228,9 +228,11 @@
     tiles.length = 0;
     for (let r = 0; r < rows; r += 1) {
       for (let c = 0; c < cols; c += 1) {
-        // shift each row by three so the same field never sits on top of itself
-        const [key, label] = industries[(c + r * 3 + (r % 2 ? 1 : 0)) % industries.length];
-        const variant = (r % 3) + 1;
+        // the first three rows shift by three so a field never sits on top of itself,
+        // later rows step through the fields in a different order so repeats don't read as a pattern
+        const index = r < 3 ? (c + r * 3 + (r % 2)) % 9 : (c * 4 + 2 + r) % 9;
+        const [key, label] = industries[index];
+        const variant = r < 3 ? r + 1 : ((c + r) % 3) + 1;
         const tile = document.createElement("div");
         tile.className = "n-tile";
         const img = document.createElement("img");
@@ -258,37 +260,42 @@
   if (wall) {
     layoutWall();
     addEventListener("resize", layoutWall, { passive: true });
+    let ambient = 0;
+    let hasMouse = false;
+    const stopAmbient = () => {
+      clearInterval(ambient);
+      ambient = 0;
+    };
     wall.addEventListener("pointerover", (event) => {
       const tile = event.target.closest(".n-tile");
-      if (tile && event.pointerType === "mouse") light(tile);
+      if (!tile || event.pointerType === "touch") return;
+      // a mouse is here: hand the wall over to the pointer
+      hasMouse = true;
+      stopAmbient();
+      light(tile);
     });
     wall.addEventListener("pointerout", (event) => {
       const tile = event.target.closest(".n-tile");
-      if (!tile || event.pointerType !== "mouse" || tile.contains(event.relatedTarget)) return;
+      if (!tile || event.pointerType === "touch" || tile.contains(event.relatedTarget)) return;
       // CSS waits a beat before the slow fade back to grey
       tile.classList.remove("is-lit");
     });
     // a tap lights a tile for a while
     wall.addEventListener("pointerdown", (event) => {
       const tile = event.target.closest(".n-tile");
-      if (tile && event.pointerType !== "mouse") light(tile, 2200);
+      if (tile && event.pointerType === "touch") light(tile, 2200);
     });
 
     // without a mouse, a few tiles take turns lighting up while the wall is on screen
-    let ambient = 0;
     const tick = () => {
       if (!tiles.length) return;
       const tile = tiles[Math.floor(Math.random() * tiles.length)];
       if (!tile.classList.contains("is-lit")) light(tile, 1400);
     };
     const startAmbient = () => {
-      if (ambient || fine.matches || reduced.matches) return;
+      if (ambient || hasMouse || fine.matches || reduced.matches) return;
       ambient = setInterval(tick, 900);
       tick();
-    };
-    const stopAmbient = () => {
-      clearInterval(ambient);
-      ambient = 0;
     };
     if ("IntersectionObserver" in window && wallSection) {
       new IntersectionObserver(([entry]) => (entry.isIntersecting ? startAmbient() : stopAmbient()), {
