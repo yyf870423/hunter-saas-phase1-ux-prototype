@@ -16,7 +16,7 @@ export const PAGES = [
       kicker: "使用场景 · 猎头客户开发",
       h1: ["一条融资新闻，", "可能就是下一个职位委托。"],
       lead:
-        "客户开发常常从一条不起眼的消息开始。HunterBuddy 帮你盯着关注的赛道，从融资新闻和招聘页里找到新职位、用人经理和引荐路线，每条线索都写明来源。联系谁、怎么开口，由你决定。",
+        "客户开发常常从一条不起眼的消息开始。HunterBuddy 帮你盯着关注的赛道，从一条融资新闻出发，找到新职位、用人经理和引荐路线，每条线索都写明来源。联系谁、怎么开口，由你决定。",
       method: {
         label: "一般怎么做",
         h2: "猎头客户开发，一般怎么做",
@@ -25,7 +25,7 @@ export const PAGES = [
         steps: [
           ["盯住信号", "融资新闻、官网招聘页上的新职位、高管变动、新业务和新工厂，都可能说明一家公司要招人了。"],
           ["判断是不是真的要招", "招聘页上的职位不等于委托。这个职位还在不在招、HC 批没批、为什么现在招，都要先弄清楚。"],
-          ["找到用人经理", "谁负责这个团队、谁说了算，HR 在流程里管哪一段。"],
+          ["找到用人经理", "弄清谁负责这个团队、谁说了算，HR 在流程里管哪一段。"],
           ["找到引荐路线", "直接联系，还是请人引荐。你的老客户、投资人、前同事里，谁和他说得上话。"],
           ["带着功课去聊", "先了解这家公司在做什么、团队缺什么人，再开口。比群发一份简历更容易被认真对待。"],
         ],
@@ -113,25 +113,25 @@ export const PAGES = [
     en: {
       name: "Business development",
       teaser: "From a funding round to a new role and the hiring manager.",
-      title: "Business development for recruiters: from a funding round to a new mandate | HunterBuddy",
+      title: "Business development for recruiters: from a funding round to a mandate | HunterBuddy",
       ogTitle: "Business development for recruiters · HunterBuddy",
       description:
         "How do recruiters win new clients? HunterBuddy keeps watch on the sectors you follow, spots growing companies in funding news and on careers pages, and finds the new role, the hiring manager and a warm introduction, with a source for every lead. Who to contact, and how, is up to you.",
       kicker: "Use case · Business development",
       h1: ["A funding round", "could be your next mandate."],
       lead:
-        "New business often starts with a small piece of news. HunterBuddy keeps watch on the sectors you follow, and finds the new role, the hiring manager and a warm introduction in funding news and on careers pages, with a source for every lead. Who to contact, and how to open, is up to you.",
+        "New business often starts with a small piece of news. HunterBuddy keeps watch on the sectors you follow and, starting from a single funding announcement, finds the new role, the hiring manager and a warm introduction, with a source for every lead. Who to contact, and what to say, is up to you.",
       method: {
         label: "The usual approach",
-        h2: "How recruiters do business development",
+        h2: "How recruiters approach business development",
         intro:
           "Independent recruiters and senior search consultants rarely win new clients through cold calls. More often, they keep a close eye on a few familiar sectors, notice which companies are growing, and work their network to reach the person who makes the call. It takes roughly five steps:",
         steps: [
           ["Watch for signals", "Funding news, new roles on a careers page, leadership changes, new business lines and new plants can all mean a company is about to hire."],
-          ["Check the need is real", "A job posting is not a mandate. Find out whether the role is still open, whether the headcount is approved and why they are hiring now."],
-          ["Find the hiring manager", "Who leads the team, who makes the decision, and which part of the process HR owns."],
+          ["Check the role is real", "A job posting is not a mandate. Find out whether the role is still open, whether the headcount is approved and why they are hiring now."],
+          ["Find the hiring manager", "Work out who leads the team, who makes the decision, and which part of the process HR owns."],
           ["Find a way in", "Go direct, or ask for an introduction. Which of your clients, investors or former colleagues knows them well enough to put you in touch?"],
-          ["Do your homework first", "Learn what the company does and who the team is missing before you reach out. You’ll be taken far more seriously than with a mass-mailed CV."],
+          ["Do your homework first", "Learn what the company does and who the team needs before you reach out. It earns you a far better hearing than a mass-mailed CV."],
         ],
       },
       hard: {
@@ -173,7 +173,7 @@ export const PAGES = [
         card: {
           context: "Every Monday, 09:00 · Sectors you track",
           title: "Xingchuan Robotics · Likely hiring",
-          caption: "This is what HunterBuddy hands you. Every line cites its source, and anything uncertain is flagged on its own.",
+          caption: "This is what HunterBuddy hands you. Every line cites its source, and anything uncertain is flagged separately.",
           items: [
             ["Opening found · Two sources", "New on the careers page: Head of Computer Vision", "Careers page and funding news agree."],
             ["Hiring manager", "Qing Xu · Technical Lead", "Leads the vision team. Direct contact details not yet confirmed."],
@@ -249,7 +249,7 @@ export const PAGES = [
         h2: "难的不是找资料，是把资料拼对",
         items: [
           ["资料东一块西一块", "团队页、新闻稿、论文、招聘页、社交平台，每处只有一小块。"],
-          ["同名同姓、头衔不一", "一个人在不同地方的写法不一样，合错了，整张图都会跟着错。"],
+          ["同名同姓、头衔不一", "重名的人容易被当成同一个，同一个人在不同地方的写法又不一样。合错了，整张图都会跟着错。"],
           ["过时得快", "部门调整、人员流动，半年前做的图可能已经不准了。"],
           ["和候选人库是两张皮", "图上的人是不是你库里的某位候选人，往往要一个个手动对。"],
         ],
@@ -353,9 +353,9 @@ export const PAGES = [
         h2: "The hard part isn’t finding information. It’s fitting it together.",
         items: [
           ["Information is scattered", "Team pages, press releases, papers, careers pages and social platforms each hold only a small piece."],
-          ["Same names, different titles", "One person is written differently in different places. Merge the wrong records and the whole map goes wrong with them."],
+          ["Same names, different titles", "Different people share a name, and one person is written differently in different places. Merge the wrong records and the whole map goes wrong with them."],
           ["Maps go stale", "Reorganizations and people moving on mean a map from six months ago may already be out of date."],
-          ["Separate from your database", "Whether someone on the map is already a candidate in your database often has to be checked one by one."],
+          ["Disconnected from your database", "Whether someone on the map is already a candidate in your database often has to be checked one by one."],
         ],
       },
       how: {
@@ -370,7 +370,7 @@ export const PAGES = [
           ],
           [
             "Cites a source for every role",
-            "Who holds each role, and where that came from, sit side by side. Leads from paper authors or patents are flagged for identity checks.",
+            "Each role shows who holds it and where that came from. Leads from paper authors or patents are flagged for identity checks.",
             "One person on Qiongding AI’s controls team comes from a paper’s author list. Identity still to verify.",
           ],
           [
@@ -445,7 +445,7 @@ export const PAGES = [
       kicker: "使用场景 · 人才寻访",
       h1: ["JD 到手，", "先看你手上已经有谁。"],
       lead:
-        "职位寻访最费时间的，往往不是找不到人，而是不知道手上已经有谁。HunterBuddy 先从你的人才地图和简历库里找，再去公开资料里补齐，每位人选的匹配理由和来源都写在旁边。",
+        "做职位寻访，合适的人很多时候早就在你手上，只是一时想不起来、搜不出来。HunterBuddy 先从你的人才地图和简历库里找，再去公开资料里补齐，每位人选的匹配理由和来源都写在旁边。",
       method: {
         label: "一般怎么做",
         h2: "人才寻访，一般怎么做",
@@ -552,7 +552,7 @@ export const PAGES = [
       kicker: "Use case · Sourcing",
       h1: ["The JD is in.", "Start with the people you already know."],
       lead:
-        "The slowest part of sourcing is often not finding people, but not knowing who you already have. HunterBuddy starts with your talent maps and CV database, then fills the gaps from public sources, with the reasons for each match and the sources alongside.",
+        "Often the right person is already in your database. You just can’t recall them, or your search doesn’t surface them. HunterBuddy starts with your talent maps and CV database, then fills the gaps from public sources, with the reasons for each match and the sources alongside.",
       method: {
         label: "The usual approach",
         h2: "How candidate sourcing usually works",
@@ -572,7 +572,7 @@ export const PAGES = [
           ["Your own resources sit unused", "The right person is in your CV database, but the search doesn’t surface them, or you’ve forgotten them."],
           ["CVs fall out of date", "On a CV from two years ago, the role and the projects may have long since changed."],
           ["The same person, several times", "Your database, recruiting platforms and papers each hold a version. Without merging them, you end up contacting the same person twice."],
-          ["Paper alone can’t tell you", "Strong papers don’t prove production or leadership experience."],
+          ["Looking good on paper isn’t enough", "Strong papers don’t prove production or leadership experience."],
         ],
       },
       how: {
@@ -679,7 +679,7 @@ export const PAGES = [
         label: "难在哪里",
         h2: "难的不是保持联系，是知道什么时候该联系",
         items: [
-          ["人太多，顾不过来", "库里几千份简历，重点人选也有上百位，很难一个个盯着。"],
+          ["人太多，顾不过来", "库里的简历越攒越多，重点人选也不少，很难一个个盯着。"],
           ["变化看不到", "团队调整、在岗年限这类信号散在公开资料里，不主动去查就不知道。"],
           ["机会和人对不上", "手上有职位，却想不起库里谁合适。"],
           ["资料越放越旧", "两年前的简历，和他现在的情况可能已经差得很远。"],
@@ -783,7 +783,7 @@ export const PAGES = [
         label: "Where it gets hard",
         h2: "The hard part isn’t staying in touch. It’s knowing when to get in touch.",
         items: [
-          ["Too many people to follow", "Thousands of CVs, and even your priority candidates run into the hundreds. Following each one is hard."],
+          ["Too many people to follow", "Your database keeps growing, and so does your list of priority candidates. Keeping an eye on each one is hard."],
           ["Changes go unnoticed", "Signals like team changes and time in role are scattered across public information. Unless you go looking, you won’t know."],
           ["Roles and people don’t meet", "You have a role on your desk but can’t think who in your database would fit."],
           ["Records go stale", "A CV from two years ago may be a long way from where they are now."],
@@ -796,7 +796,7 @@ export const PAGES = [
         steps: [
           [
             "Watches your priority candidates",
-            "You can have it check on the candidates you follow regularly: whether their public profile has been updated or their team has changed. It only alerts you to changes worth your time.",
+            "You can have it check regularly on the candidates you follow: whether their public profile has been updated or their team has changed. It only alerts you to changes worth your time.",
             "It notices that Yue Lin’s team has moved into a new platform division, and that he is now four years into his role.",
           ],
           [
@@ -811,7 +811,7 @@ export const PAGES = [
           ],
           [
             "Keeps signals apart from conclusions",
-            "A team change doesn’t mean someone wants to leave. It lays out the signals and the reasons, and asking about intentions is up to you.",
+            "A team change doesn’t mean someone wants to leave. It lays out the signals and the reasons. Asking what they actually want is up to you.",
             "Whether Yue Lin wants to move is still unknown. You need to ask.",
           ],
         ],
