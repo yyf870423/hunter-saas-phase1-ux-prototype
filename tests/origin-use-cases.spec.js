@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const cases = [
   ["business-development", "客户开发", "Business development"],
-  ["talent-mapping", "人才地图", "Talent mapping"],
+  ["talent-mapping", "组织架构", "Org mapping"],
   ["sourcing", "职位寻访", "Sourcing"],
   ["candidate-nurturing", "人选维护", "Candidate nurturing"],
 ];

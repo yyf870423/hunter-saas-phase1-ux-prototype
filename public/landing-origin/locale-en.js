@@ -36,8 +36,8 @@ window.OriginEnglishCatalog = {
   "产品短片 · 两分钟": "A two-minute overview",
   "两分钟，": "Two minutes.",
   "跟着一家公司走一遍。": "One company, start to finish.",
-  "从一条融资新闻出发，看 HunterBuddy 怎么帮你拿到职位、做出人才地图、寻访到人选，半年后再帮人选找到下一个机会。建议打开声音。":
-    "From one funding announcement to a new search, a talent map and a longlist. Six months later, the same research helps a candidate find their next move. Watch with sound.",
+  "从一条融资新闻出发，看 HunterBuddy 怎么帮你拿到职位、理清组织架构、寻访到人选，半年后再帮人选找到下一个机会。建议打开声音。":
+    "From one funding announcement to a new search, an org chart and a longlist. Six months later, the same research helps a candidate find their next move. Watch with sound.",
   "HunterBuddy 两分钟产品短片": "HunterBuddy two-minute product video",
   短片章节: "Video chapters",
   人和关系都存下来了: "Every person and connection, saved",
@@ -64,7 +64,7 @@ window.OriginEnglishCatalog = {
   "工具负责连接信息，专业判断与人与人的沟通，始终由你掌握。":
     "We connect the information. You bring the judgment, the relationships and the human touch.",
   发现新岗位: "Business development",
-  摸清团队: "Talent mapping",
+  摸清团队: "Org mapping",
   为岗位找人: "Sourcing",
   为人选找机会: "Candidate nurturing",
   "一条融资新闻，可能就是下一个岗位。":
@@ -103,7 +103,7 @@ window.OriginEnglishCatalog = {
     "Lay out Xingchuan and two peer companies by org structure, then match each person against your candidate database.",
   "它按公司、团队、关键岗位、在职的人一层层排好，把官网上的任职信息、你库里的候选人、论文和专利里的名字对上号。一起写过论文的人，不会被当成上下级。":
     "",
-  "目标公司 · 人才地图": "Target companies · Talent map",
+  "目标公司 · 人才地图": "Target companies · Org chart",
   星川和两家对标公司: "Xingchuan and two peer companies",
   负责人已确认: "Team lead verified",
   "拓界机器人 · 视觉团队": "Tuojie Robotics · Vision team",
@@ -118,7 +118,7 @@ window.OriginEnglishCatalog = {
   "知道有这个关键岗位，还不知道是谁，不等于这个位置空着。":
     "The role is known, but not who holds it.",
   "一张人才地图：谁在什么位置，消息从哪来，哪里还是空白。你手上的 Excel 人才地图也能导进来接着补。":
-    "A talent map showing the org structure and reporting lines, who holds each role, where each detail comes from and what is still missing. You can also import an existing Excel talent map and keep building on it.",
+    "An org chart showing departments and reporting lines, who holds each role, where each detail comes from and what is still missing. You can also import an org chart you built in Excel and keep building on it.",
   "团队结构 · 在职 · 论文作者":
     "Org structure · Current roles · Co-authors",
   "团队名字和分工还对吗？":
@@ -129,7 +129,7 @@ window.OriginEnglishCatalog = {
   "JD 到手，先看你手上已经有谁。":
     "The JD is in. Start with the people you already know.",
   "张远引荐之后，许晴发来视觉算法负责人的 JD，只有几行字。合适的人很少，线索也很散。":
-    "Qing Xu sends over the JD. HunterBuddy checks your talent map and database first, then fills the gaps from papers, patents and open-source communities.",
+    "Qing Xu sends over the JD. HunterBuddy checks your org charts and database first, then fills the gaps from papers, patents and open-source communities.",
   "它不从零开始：先看人才地图里的目标团队、这类人通常从哪些公司出来、你库里谁最接近，再去网上、论文专利和开源社区补齐。简历里的林越、论文里的 Lin Y. 和开源社区的 lin-yue，核对后发现是同一个人。":
     "",
   "星川机器人 · 视觉算法负责人": "Xingchuan Robotics · Head of Computer Vision",
@@ -150,7 +150,7 @@ window.OriginEnglishCatalog = {
   "几位值得聊聊的人选。为什么合适、消息从哪来、哪里还不清楚，都写在旁边。先联系谁，你来判断。":
     "A longlist with the rationale, sources and open questions alongside each candidate. You decide who to approach first.",
   "人才地图 · 跳槽去向 · 同公司 · 一起写过论文":
-    "Talent map · Talent flows · Former colleagues · Co-authors",
+    "Org chart · Talent flows · Former colleagues · Co-authors",
   "JD 里哪些条件不能让步？": "Which JD requirements are must-haves, and which are nice-to-haves?",
   "人选现在的职位和负责的项目准确吗？":
     "Have their current role and project responsibilities been verified?",
@@ -391,7 +391,7 @@ window.OriginEnglishCatalog = {
     "Operated by Beijing Boseek Intelligent Technology Co., Ltd.",
   "版权、网站主体与备案信息": "Copyright, operator & registration",
   "客户开发": "Business development",
-  "人才地图": "Talent mapping",
+  "组织架构": "Org mapping",
   "职位寻访": "Sourcing",
   "人选维护": "Candidate nurturing",
 };

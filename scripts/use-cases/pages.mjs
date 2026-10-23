@@ -1,7 +1,7 @@
-// 四个使用场景页的正文（中英文一一对应）。顺序就是星川机器人故事的顺序：客户开发 → 人才地图 → 职位寻访 → 人选维护。
+// 四个使用场景页的正文（中英文一一对应）。顺序就是星川机器人故事的顺序：客户开发 → 组织架构 → 职位寻访 → 人选维护。
 // 每页：title / description（搜索结果里显示）、h1 和 lead（首屏）、method（一般怎么做）、hard（难在哪里）、
 // how（HunterBuddy 怎么帮你，每步一句例子，最后一张深色结果卡片）、result（你会拿到什么、还要你确认）、faq（本页常见问题）。
-// 英文按“信达雅”译，用词和首页英文版一致（talent map、live searches、unconfirmed 等）。
+// 英文按“信达雅”译，用词和首页英文版一致（org chart、live searches、unconfirmed 等）。
 
 export const PAGES = [
   {
@@ -82,7 +82,7 @@ export const PAGES = [
         h2: "你会拿到什么，哪些要你确认",
         paras: [
           "一个确认过的职位、一位用人经理，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD、谈妥委托，它才是你手上的正式职位。",
-          "这次查过的公司、职位和人都会存下来。接下来做人才地图、找候选人，可以接着用。",
+          "这次查过的公司、职位和人都会存下来。接下来梳理组织架构、找候选人，可以接着用。",
         ],
         confirmTitle: "还要你确认",
         confirm: ["这个职位真的在招吗？HC 批下来了吗？", "直接联系许晴，还是请张远引荐？", "做不做独家、服务费怎么谈？"],
@@ -186,7 +186,7 @@ export const PAGES = [
         h2: "What you get, and what’s yours to confirm",
         paras: [
           "A confirmed opening, the hiring manager and a backup route in. Whether to go direct or through an introduction, and what to say, is your call. Only once you have the JD and an agreed mandate does it become a live search.",
-          "Every company, role and person you looked into is saved, ready for the talent mapping and sourcing that come next.",
+          "Every company, role and person you looked into is saved, ready for the org mapping and sourcing that come next.",
         ],
         confirmTitle: "For you to confirm",
         confirm: [
@@ -222,20 +222,20 @@ export const PAGES = [
   {
     slug: "talent-mapping",
     zh: {
-      name: "人才地图",
-      teaser: "把目标团队按组织架构排好，和你的候选人对上号。",
-      title: "人才地图怎么做：把目标团队按组织架构排好｜HunterBuddy",
-      ogTitle: "人才地图 · HunterBuddy",
+      name: "组织架构",
+      teaser: "把目标团队的组织架构理清楚，和你的候选人对上号。",
+      title: "组织架构怎么梳理：把目标团队一层层排清楚｜HunterBuddy",
+      ogTitle: "组织架构梳理 · HunterBuddy",
       description:
-        "人才地图怎么做？HunterBuddy 帮猎头把目标公司和对标公司按组织架构排好，标出谁在什么位置、消息从哪来、哪里还是空白，再和你库里的候选人对上号。Excel 人才地图也能导进来接着补。",
-      kicker: "使用场景 · 人才地图",
+        "目标公司的组织架构怎么梳理？HunterBuddy 帮猎头把目标公司和对标公司的部门、汇报线一层层排好，标出谁在什么位置、消息从哪来、哪里还是空白，再和你库里的候选人对上号。用 Excel 做的组织架构图也能导进来接着补。",
+      kicker: "使用场景 · 组织架构",
       h1: ["想摸清一个团队，", "资料却东一块西一块。"],
       lead:
-        "做人才地图，是把一家公司的团队按组织架构一层层排出来：谁在什么位置、向谁汇报、消息从哪来。HunterBuddy 帮你把散在各处的资料拼起来，和你库里的候选人对上号，空白的地方标得清清楚楚。",
+        "梳理组织架构，是把一家公司的团队一层层排出来：谁在什么位置、向谁汇报、消息从哪来。HunterBuddy 帮你把散在各处的资料拼起来，和你库里的候选人对上号，空白的地方标得清清楚楚。",
       method: {
         label: "一般怎么做",
-        h2: "人才地图怎么做",
-        intro: "人才地图（Mapping）是猎头的基本功。接了委托要做，平时为了熟悉一个赛道也要做。通常是这样几步：",
+        h2: "组织架构怎么梳理",
+        intro: "梳理组织架构（Mapping）是猎头的基本功。接了委托要做，平时为了熟悉一个赛道也要做。通常是这样几步：",
         steps: [
           ["定范围", "先定下目标公司和对标公司，以及要看的部门和职级。范围定得太大，图永远画不完。"],
           ["搭架构", "从官网、团队页、新闻稿、招聘页里，拼出部门和汇报线。"],
@@ -256,7 +256,7 @@ export const PAGES = [
       },
       how: {
         label: "怎么帮你",
-        h2: "HunterBuddy 怎么帮你做人才地图",
+        h2: "HunterBuddy 怎么帮你梳理组织架构",
         intro: "还是用星川机器人的例子：把星川和两家对标公司排出来。",
         steps: [
           [
@@ -281,9 +281,9 @@ export const PAGES = [
           ],
         ],
         card: {
-          context: "目标公司 · 人才地图",
+          context: "目标公司 · 组织架构",
           title: "星川和两家对标公司",
-          caption: "这是 HunterBuddy 交给你的人才地图的一角。确认过的、待核实的、还是空白的，分开标出来。",
+          caption: "这是 HunterBuddy 交给你的组织架构图的一角。确认过的、待核实的、还是空白的，分开标出来。",
           items: [
             ["负责人已确认", "拓界机器人 · 视觉团队", "官网和团队页都能对上，就是你库里的林越。"],
             ["在职情况待核实", "穹顶智能 · 控制团队", "线索来自论文作者，身份和在职情况还要核对。"],
@@ -295,7 +295,7 @@ export const PAGES = [
         label: "你会拿到什么",
         h2: "你会拿到什么，哪些要你确认",
         paras: [
-          "一张人才地图：组织架构和汇报线、谁在什么位置、消息从哪来、哪里还是空白。你手上的 Excel 人才地图也能导进来接着补。",
+          "一张组织架构图：部门和汇报线、谁在什么位置、消息从哪来、哪里还是空白。你手上用 Excel 做的组织架构图也能导进来接着补。",
           "图上的人和你库里的候选人对上了号，接下来做职位寻访，可以直接从这张图出发。",
         ],
         confirmTitle: "还要你确认",
@@ -303,45 +303,45 @@ export const PAGES = [
         note: "一起写过论文，不等于有汇报关系。HunterBuddy 会把推断和确认分开写，最后由你判断。",
       },
       faq: {
-        h2: ["关于人才地图，", "大家常问这些。"],
+        h2: ["关于组织架构梳理，", "大家常问这些。"],
         items: [
           [
-            "人才地图一般包括哪些内容？",
-            "目标公司和团队的组织架构、汇报线，每个位置上是谁、在这个岗位多久、之前在哪里，以及每条信息的来源和哪里还是空白。",
+            "组织架构图一般包括哪些内容？",
+            "目标公司和团队的部门、汇报线，每个位置上是谁、在这个岗位多久、之前在哪里，以及每条信息的来源和哪里还是空白。",
           ],
           [
-            "已经有 Excel 做的人才地图，能接着用吗？",
-            "可以。Excel 等格式的人才地图可以导入后接着补。带进来的资料同样会核对身份、查重合并。",
+            "已经有 Excel 做的组织架构图，能接着用吗？",
+            "可以。Excel 等格式的组织架构图可以导入后接着补。带进来的资料同样会核对身份、查重合并。",
           ],
           [
-            "人才地图多久要更新一次？",
+            "组织架构图多久要更新一次？",
             "没有固定的标准，部门调整和人员流动都会让图变旧。你可以让 HunterBuddy 定期帮你看，比如目标公司招聘页的变化、你关注的人公开履历的更新，有值得看的变化再提醒你。",
           ],
           [
-            "论文和专利里的人，能直接放进人才地图吗？",
+            "论文和专利里的人，能直接放进组织架构图吗？",
             "可以作为线索放进去，但要先核对身份。一起写过论文，不等于有汇报关系。HunterBuddy 会标出哪些还待核实。",
           ],
         ],
       },
     },
     en: {
-      name: "Talent mapping",
-      teaser: "Map target teams by org structure and match the people to your candidates.",
-      title: "Talent mapping: how to map a team by org structure | HunterBuddy",
-      ogTitle: "Talent mapping for recruiters · HunterBuddy",
+      name: "Org mapping",
+      teaser: "Chart target teams by org structure and match the people to your candidates.",
+      title: "Org mapping: how to chart a team’s structure | HunterBuddy",
+      ogTitle: "Org mapping for recruiters · HunterBuddy",
       description:
-        "How do you build a talent map? HunterBuddy lays out target and peer companies by org structure, shows who holds each role, where each detail comes from and what is still missing, and matches people to your candidate database. You can also import existing Excel talent maps and keep building on them.",
-      kicker: "Use case · Talent mapping",
+        "How do you map a target company’s org structure? HunterBuddy lays out target and peer companies by department and reporting line, shows who holds each role, where each detail comes from and what is still missing, and matches people to your candidate database. You can also import org charts you built in Excel and keep building on them.",
+      kicker: "Use case · Org mapping",
       h1: ["Mapping a team means", "piecing together scattered information."],
       lead:
-        "A talent map lays out a company’s teams by org structure, level by level: who holds each role, who they report to and where each detail comes from. HunterBuddy pieces together information from scattered sources, matches people to your candidate database and clearly marks the gaps.",
+        "Org mapping lays out a company’s teams level by level: who holds each role, who they report to and where each detail comes from. HunterBuddy pieces together information from scattered sources, matches people to your candidate database and clearly marks the gaps.",
       method: {
         label: "The usual approach",
-        h2: "How to build a talent map",
+        h2: "How to map an org structure",
         intro:
-          "Talent mapping is a core recruiting skill. You do it when a mandate comes in, and between mandates you do it to get to know a sector. It usually goes like this:",
+          "Org mapping is a core recruiting skill. You do it when a mandate comes in, and between mandates you do it to get to know a sector. It usually goes like this:",
         steps: [
-          ["Set the scope", "Choose the target and peer companies, and the functions and levels to cover. Make the scope too wide and the map will never be finished."],
+          ["Set the scope", "Choose the target and peer companies, and the functions and levels to cover. Make the scope too wide and the chart will never be finished."],
           ["Build the structure", "Piece together teams and reporting lines from company websites, team pages, press releases and careers pages."],
           ["Fill in the names", "Work out who holds each role, how long they’ve been in it and where they were before. Public profiles, paper author lists and patent filings are all leads."],
           ["Verify", "The same person may appear under different names and titles in different places. Confirm the records really are one person, and that they still work there."],
@@ -353,19 +353,19 @@ export const PAGES = [
         h2: "The hard part isn’t finding information. It’s getting the pieces to fit.",
         items: [
           ["Information is scattered", "Team pages, press releases, papers, careers pages and social platforms each hold only a small piece."],
-          ["Same names, different titles", "People who share a name get mistaken for one person, and one person’s name and title appear differently in different places. Merge the wrong records and the whole map is thrown off."],
-          ["Maps go stale", "Reorganizations and people moving on mean a map from six months ago may already be out of date."],
-          ["Disconnected from your database", "You often have to check by hand, one by one, whether someone on the map is already in your database."],
+          ["Same names, different titles", "People who share a name get mistaken for one person, and one person’s name and title appear differently in different places. Merge the wrong records and the whole chart is thrown off."],
+          ["Charts go stale", "Reorganizations and people moving on mean a chart from six months ago may already be out of date."],
+          ["Disconnected from your database", "You often have to check by hand, one by one, whether someone on the chart is already in your database."],
         ],
       },
       how: {
         label: "How HunterBuddy helps",
-        h2: "How HunterBuddy helps with talent mapping",
+        h2: "How HunterBuddy helps with org mapping",
         intro: "Back to Xingchuan Robotics: mapping Xingchuan and two peer companies.",
         steps: [
           [
             "Lays out the org structure",
-            "Tell it which companies and teams to cover. It finds teams and reporting lines in public information and puts each person in the right spot on the map.",
+            "Tell it which companies and teams to cover. It finds teams and reporting lines in public information and puts each person in the right spot on the chart.",
             "Xingchuan Robotics and two peers, Tuojie Robotics and Qiongding AI, are laid out team by team, level by level.",
           ],
           [
@@ -375,7 +375,7 @@ export const PAGES = [
           ],
           [
             "Matches people to your database",
-            "It checks the people on the map against your CV database and merges records only after verifying identity, never just because the names match.",
+            "It checks the people on the chart against your CV database and merges records only after verifying identity, never just because the names match.",
             "The company site and team page both confirm that the head of Tuojie Robotics’ vision team is Yue Lin, who is already in your database.",
           ],
           [
@@ -385,9 +385,9 @@ export const PAGES = [
           ],
         ],
         card: {
-          context: "Target companies · Talent map",
+          context: "Target companies · Org chart",
           title: "Xingchuan and two peer companies",
-          caption: "This is a corner of the talent map HunterBuddy hands you. What’s confirmed, what’s unverified and what’s missing are marked separately.",
+          caption: "This is a corner of the org chart HunterBuddy hands you. What’s confirmed, what’s unverified and what’s missing are marked separately.",
           items: [
             ["Team lead verified", "Tuojie Robotics · Vision team", "Company site and team page agree: Yue Lin, already in your database."],
             ["Current employment unverified", "Qiongding AI · Controls team", "A lead from a paper’s author list. Identity and current role still to verify."],
@@ -399,8 +399,8 @@ export const PAGES = [
         label: "What you get",
         h2: "What you get, and what’s yours to confirm",
         paras: [
-          "A talent map showing the org structure and reporting lines, who holds each role, where each detail comes from and what is still missing. You can also import an existing Excel talent map and keep building on it.",
-          "With the people on the map matched to your candidate database, your next search can start right from the map.",
+          "An org chart showing departments and reporting lines, who holds each role, where each detail comes from and what is still missing. You can also import an org chart you built in Excel and keep building on it.",
+          "With the people on the chart matched to your candidate database, your next search can start right from the chart.",
         ],
         confirmTitle: "For you to confirm",
         confirm: [
@@ -411,22 +411,22 @@ export const PAGES = [
         note: "Co-authoring a paper doesn’t mean one reports to the other. HunterBuddy keeps what it infers apart from what is confirmed, and leaves the final call to you.",
       },
       faq: {
-        h2: ["What people ask", "about talent mapping."],
+        h2: ["What people ask", "about org mapping."],
         items: [
           [
-            "What goes into a talent map?",
-            "The org structure and reporting lines of the target companies and teams, who holds each role, how long they have been in it and where they were before, plus the source of each detail and where the gaps are.",
+            "What goes into an org chart?",
+            "The departments and reporting lines of the target companies and teams, who holds each role, how long they have been in it and where they were before, plus the source of each detail and where the gaps are.",
           ],
           [
-            "I already have talent maps in Excel. Can I keep using them?",
-            "Yes. You can import talent maps in Excel and other formats and keep building on them. Imported records go through the same identity checks and de-duplication.",
+            "I already have org charts in Excel. Can I keep using them?",
+            "Yes. You can import org charts in Excel and other formats and keep building on them. Imported records go through the same identity checks and de-duplication.",
           ],
           [
-            "How often should a talent map be updated?",
-            "There’s no fixed rule. Reorganizations and people moving on both make a map go stale. You can have HunterBuddy check regularly for things like changes to a target company’s careers page or updates to the public profiles of people you follow, and alert you when something is worth a look.",
+            "How often should an org chart be updated?",
+            "There’s no fixed rule. Reorganizations and people moving on both make a chart go stale. You can have HunterBuddy check regularly for things like changes to a target company’s careers page or updates to the public profiles of people you follow, and alert you when something is worth a look.",
           ],
           [
-            "Can people found in papers and patents go straight onto the map?",
+            "Can people found in papers and patents go straight onto the chart?",
             "They can go on as leads, but their identity needs checking first. Co-authoring a paper doesn’t mean one reports to the other. HunterBuddy marks what is still unverified.",
           ],
         ],
@@ -441,11 +441,11 @@ export const PAGES = [
       title: "人才寻访：JD 到手，先从你已有的人里找｜HunterBuddy",
       ogTitle: "人才寻访 · HunterBuddy",
       description:
-        "候选人寻访怎么做更快？HunterBuddy 先查你的人才地图和简历库，再去论文、专利和开源社区补齐，给出带匹配理由和来源的目标人选名单，哪里还不清楚也写在旁边。先联系谁，由你判断。",
+        "候选人寻访怎么做更快？HunterBuddy 先查你梳理过的组织架构和简历库，再去论文、专利和开源社区补齐，给出带匹配理由和来源的目标人选名单，哪里还不清楚也写在旁边。先联系谁，由你判断。",
       kicker: "使用场景 · 人才寻访",
       h1: ["JD 到手，", "先看你手上已经有谁。"],
       lead:
-        "做人才寻访，合适的人很多时候早就在你手上，只是一时想不起来、搜不出来。HunterBuddy 先从你的人才地图和简历库里找，再去公开资料里补齐，每位人选的匹配理由和来源都写在旁边。",
+        "做人才寻访，合适的人很多时候早就在你手上，只是一时想不起来、搜不出来。HunterBuddy 先从你梳理过的组织架构和简历库里找，再去公开资料里补齐，每位人选的匹配理由和来源都写在旁边。",
       method: {
         label: "一般怎么做",
         h2: "人才寻访，一般怎么做",
@@ -453,7 +453,7 @@ export const PAGES = [
         steps: [
           ["读懂 JD", "和用人经理聊清楚，哪些是硬性要求（Must），哪些是加分项（Prefer），团队现在真正缺什么。"],
           ["定目标公司和团队", "合适的人最可能来自哪些公司、哪些团队，哪些公司不能碰（Off-limits）。"],
-          ["先看手上已经有谁", "翻一遍人才地图和简历库，做过的功课先用上。"],
+          ["先看手上已经有谁", "翻一遍组织架构图和简历库，做过的功课先用上。"],
           ["再去外面找", "公开网络、招聘页、论文、专利、开源社区，补上库里没有的人。"],
           ["排出长名单", "按匹配程度排好，写下为什么合适、还有哪些要确认，再决定先联系谁。"],
         ],
@@ -475,8 +475,8 @@ export const PAGES = [
         steps: [
           [
             "先查你已经有的",
-            "它先查人才地图和你的简历库，做过的功课先用上，不从零开始。",
-            "许晴发来 JD。HunterBuddy 先在之前做的人才地图里找到了林越。",
+            "它先查组织架构图和你的简历库，做过的功课先用上，不从零开始。",
+            "许晴发来 JD。HunterBuddy 先在之前梳理的组织架构里找到了林越。",
           ],
           [
             "再去公开资料里补齐",
@@ -525,7 +525,7 @@ export const PAGES = [
         items: [
           [
             "候选人寻访可以从哪些渠道找人？",
-            "已有候选人、人才地图、公开网络与招聘页、论文与专利、开源项目，以及你上传的简历和资料。每条线索都记着来自哪里，哪些渠道找过了、哪些还是空白，也会标出来。",
+            "已有候选人、梳理过的组织架构、公开网络与招聘页、论文与专利、开源项目，以及你上传的简历和资料。每条线索都记着来自哪里，哪些渠道找过了、哪些还是空白，也会标出来。",
           ],
           [
             "它会替我联系候选人吗？",
@@ -548,11 +548,11 @@ export const PAGES = [
       title: "Candidate sourcing: start with who you already know | HunterBuddy",
       ogTitle: "Candidate sourcing · HunterBuddy",
       description:
-        "How can you source candidates faster? HunterBuddy checks your talent maps and CV database first, then fills the gaps from papers, patents and open-source communities, giving you a longlist with the reasons, sources and open questions for each candidate. Who to approach first is your call.",
+        "How can you source candidates faster? HunterBuddy checks your org charts and CV database first, then fills the gaps from papers, patents and open-source communities, giving you a longlist with the reasons, sources and open questions for each candidate. Who to approach first is your call.",
       kicker: "Use case · Sourcing",
       h1: ["The JD is in.", "Start with the people you already know."],
       lead:
-        "Often the right person is already in your database. You just can’t think of them at the moment, or your search doesn’t bring them up. HunterBuddy starts with your talent maps and CV database, then fills the gaps from public sources. Every candidate comes with the reasons for the match and the sources.",
+        "Often the right person is already in your database. You just can’t think of them at the moment, or your search doesn’t bring them up. HunterBuddy starts with your org charts and CV database, then fills the gaps from public sources. Every candidate comes with the reasons for the match and the sources.",
       method: {
         label: "The usual approach",
         h2: "How candidate sourcing usually works",
@@ -560,7 +560,7 @@ export const PAGES = [
         steps: [
           ["Understand the JD", "Talk it through with the hiring manager: which requirements are must-haves, which are nice-to-haves, and what the team is really missing."],
           ["Pick target companies and teams", "Work out which companies and teams the right people are most likely to come from, and which companies are off-limits."],
-          ["Start with who you already have", "Go through your talent maps and CV database, and put past research to work first."],
+          ["Start with who you already have", "Go through your org charts and CV database, and put past research to work first."],
           ["Then look further afield", "Use the public web, careers pages, papers, patents and open-source communities to find the people your database is missing."],
           ["Build the longlist", "Rank by fit, note why each person fits and what still needs confirming, then decide who to approach first."],
         ],
@@ -582,8 +582,8 @@ export const PAGES = [
         steps: [
           [
             "Checks what you already have",
-            "It searches your talent maps and CV database first, so past research is put to work and you don’t start from zero.",
-            "Qing Xu sends the JD. HunterBuddy finds Yue Lin on the talent map you built earlier.",
+            "It searches your org charts and CV database first, so past research is put to work and you don’t start from zero.",
+            "Qing Xu sends the JD. HunterBuddy finds Yue Lin on the org chart you built earlier.",
           ],
           [
             "Fills the gaps from public sources",
@@ -632,7 +632,7 @@ export const PAGES = [
         items: [
           [
             "Where can recruiters source candidates from?",
-            "Your existing candidates and talent maps, the public web and careers pages, papers and patents, open-source projects, and the CVs and documents you upload. HunterBuddy notes where each lead came from, and marks which channels have been searched and which haven’t yet.",
+            "Your existing candidates and org charts, the public web and careers pages, papers and patents, open-source projects, and the CVs and documents you upload. HunterBuddy notes where each lead came from, and marks which channels have been searched and which haven’t yet.",
           ],
           [
             "Will it contact candidates for me?",
@@ -750,7 +750,7 @@ export const PAGES = [
           ],
           [
             "聊完的新情况怎么更新？",
-            "聊完把新简历发给它，资料和匹配都会更新。你也可以把候选人库和人才地图带进来，同样会核对身份、查重合并。",
+            "聊完把新简历发给它，资料和匹配都会更新。你也可以把候选人库和组织架构图带进来，同样会核对身份、查重合并。",
           ],
         ],
       },
@@ -858,7 +858,7 @@ export const PAGES = [
           ],
           [
             "How do I update a candidate’s record after we talk?",
-            "Send HunterBuddy their new CV. Their profile and matches will update. You can also bring in your candidate database and talent maps, which go through the same identity checks and de-duplication.",
+            "Send HunterBuddy their new CV. Their profile and matches will update. You can also bring in your candidate database and org charts, which go through the same identity checks and de-duplication.",
           ],
         ],
       },

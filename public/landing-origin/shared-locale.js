@@ -157,9 +157,9 @@
     if (window[name]) window[name] = localizeData(window[name]);
   if (language === "en") {
     document.title =
-      "HunterBuddy · AI assistant for recruiters: talent mapping and sourcing | Boseek";
+      "HunterBuddy · AI assistant for recruiters: org mapping and sourcing | Boseek";
     document.querySelector('meta[name="description"]').content =
-      "HunterBuddy by Boseek is an AI assistant for independent recruiters and senior search consultants. It finds leads in funding news, job pages, CVs and papers to help with business development, talent mapping, sourcing and candidate nurturing, with a source for every finding. Early access by invitation.";
+      "HunterBuddy by Boseek is an AI assistant for independent recruiters and senior search consultants. It finds leads in funding news, job pages, CVs and papers to help with business development, org mapping, sourcing and candidate nurturing, with a source for every finding. Early access by invitation.";
     translateDOM(document.querySelector("[data-finesse-footer]"));
   }
 

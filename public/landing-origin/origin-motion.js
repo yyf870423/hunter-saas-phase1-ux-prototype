@@ -91,7 +91,7 @@
   /* ---------------- 产品短片: chapters are waypoints on a course ---------------- */
   const CHAPTERS = [
     [10, "客户开发"],
-    [36.5, "人才地图"],
+    [36.5, "组织架构"],
     [61, "职位寻访"],
     [89.5, "人选维护"],
     [112, "人和关系都存下来了"],
@@ -110,7 +110,7 @@
       <header class="o-film-head">
         <p class="o-film-kicker">产品短片 · 两分钟</p>
         <h2 id="o-film-title"><span class="ln">两分钟，</span><span class="ln">跟着一家公司走一遍。</span></h2>
-        <p class="o-film-lead">从一条融资新闻出发，看 HunterBuddy 怎么帮你拿到职位、做出人才地图、寻访到人选，半年后再帮人选找到下一个机会。建议打开声音。</p>
+        <p class="o-film-lead">从一条融资新闻出发，看 HunterBuddy 怎么帮你拿到职位、理清组织架构、寻访到人选，半年后再帮人选找到下一个机会。建议打开声音。</p>
       </header>
       <figure class="o-film-frame">
         <video data-film src="assets/${filmFile}.mp4?v=${filmVersion}" poster="assets/${posterFile}.jpg?v=${filmVersion}" controls playsinline preload="metadata" aria-label="HunterBuddy 两分钟产品短片"></video>
