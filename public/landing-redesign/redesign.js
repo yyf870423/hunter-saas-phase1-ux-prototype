@@ -180,6 +180,26 @@
   syncTheme();
   requestHero();
 
+  /* ---------- 六件事: the text on the left follows the picture passing the middle ---------- */
+  const steps = [...document.querySelectorAll("[data-scrolly] .n-step")];
+  if (steps.length && "IntersectionObserver" in window) {
+    const activate = (step) => {
+      if (step.classList.contains("is-active")) return;
+      steps.forEach((s) => s.classList.toggle("is-active", s === step));
+    };
+    const watch = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) activate(entry.target.closest(".n-step"));
+        });
+      },
+      { rootMargin: "-50% 0px -50% 0px" },
+    );
+    steps.forEach((step) => watch.observe(step.querySelector(".n-figure")));
+    // keyboard users tabbing into a hidden step bring it forward
+    steps.forEach((step) => step.addEventListener("focusin", () => activate(step)));
+  }
+
   /* ---------- film chapters ---------- */
   const video = document.querySelector("[data-film]");
   document.querySelectorAll("[data-seek]").forEach((button) => {
@@ -390,7 +410,7 @@
   /* ---------- gentle reveals: only for what is still below the fold ---------- */
   if (!reduced.matches && "IntersectionObserver" in window) {
     const items = document.querySelectorAll(
-      ".n-section-head, .n-display, .n-lede, .n-film-frame, .n-spread-title, .n-card, .n-belief-head, .n-belief-photo, .n-bounds, .n-wall-panel, .n-faq-list, .f-trial-layout",
+      ".n-section-head, .n-display, .n-lede, .n-film-frame, .n-belief-head, .n-belief-photo, .n-bounds, .n-wall-panel, .n-faq-list, .f-trial-layout",
     );
     const reveal = new IntersectionObserver(
       (entries) => {
