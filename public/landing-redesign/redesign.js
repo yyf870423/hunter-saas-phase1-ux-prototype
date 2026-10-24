@@ -190,9 +190,9 @@
   syncTheme();
   requestHero();
 
-  /* ---------- 六件事: the text pinned on the left follows the picture passing the middle ---------- */
+  /* ---------- 六件事: each text scrolls with its picture; the pair passing the middle lights up ---------- */
   const steps = [...document.querySelectorAll("[data-scrolly] .n-step")];
-  if (steps.length && "IntersectionObserver" in window) {
+  if (steps.length) {
     const activate = (step) => {
       const at = steps.indexOf(step);
       if (at < 0 || step.classList.contains("is-active")) return;
@@ -201,31 +201,32 @@
         s.classList.toggle("is-past", i < at);
       });
     };
-    const watch = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) activate(entry.target.closest(".n-step"));
-        });
-      },
-      { rootMargin: "-50% 0px -50% 0px" },
-    );
-    steps.forEach((step) => {
-      watch.observe(step.querySelector(".n-figure"));
-      // keyboard users tabbing into a step bring it forward
-      step.addEventListener("focusin", () => activate(step));
-    });
-    // centre each pinned text in the screen by its own height, without shifting it up
-    // (a shift would push the first text over the section heading before it pins)
-    const centre = () => {
+    // the pair whose picture is closest to the middle of the screen is the lit one
+    // (measured on every scroll, so a fast scroll or a jump never skips a step)
+    let stepFrame = 0;
+    const pick = () => {
+      stepFrame = 0;
+      const mid = innerHeight / 2;
+      let best = steps[0];
+      let gap = Infinity;
       steps.forEach((step) => {
-        const text = step.querySelector(".n-step-text");
-        const top = Math.max(96, Math.round((innerHeight - text.offsetHeight) / 2));
-        text.style.setProperty("--stick", `${top}px`);
+        const r = step.querySelector(".n-figure").getBoundingClientRect();
+        const d = Math.abs((r.top + r.bottom) / 2 - mid);
+        if (d < gap) {
+          gap = d;
+          best = step;
+        }
       });
+      activate(best);
     };
-    centre();
-    addEventListener("resize", centre, { passive: true });
-    document.fonts?.ready.then(centre);
+    const requestPick = () => {
+      if (!stepFrame) stepFrame = requestAnimationFrame(pick);
+    };
+    addEventListener("scroll", requestPick, { passive: true });
+    addEventListener("resize", requestPick, { passive: true });
+    requestPick();
+    // keyboard users tabbing into a step bring it forward
+    steps.forEach((step) => step.addEventListener("focusin", () => activate(step)));
   }
 
   /* ---------- scroll-linked motion ---------- */
