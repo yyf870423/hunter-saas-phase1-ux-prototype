@@ -38,9 +38,9 @@ want &= available
 added = sorted(want - have)
 options = subset.Options()
 options.flavor = "woff2"
-options.layout_features = ["*"]
-options.name_IDs = ["*"]
 options.notdef_outline = True
+options.hinting = False
+options.desubroutinize = True
 subsetter = subset.Subsetter(options)
 subsetter.populate(unicodes=sorted(want))
 subsetter.subset(font)

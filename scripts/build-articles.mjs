@@ -492,7 +492,12 @@ function check(a) {
   const all = JSON.stringify(a);
   if (all.includes("；")) problems.push("中文分号");
   for (const word of ["猎头 BD", "猎头BD", "猎头软件", "猎头系统", "演示数据", "背调", "据统计", "研究表明"])
-    if (all.includes(word) && !(word === "猎头软件" && a.slug === HUB) && !(word === "猎头系统" && a.slug === "ai-tools-compared"))
+    if (
+      all.includes(word) &&
+      !(word === "猎头软件" && a.slug === HUB) &&
+      !(word === "猎头系统" && a.slug === "ai-tools-compared") &&
+      !(word === "背调" && a.slug === "same-name-candidates") // 只用来划边界：“不做背调”
+    )
       problems.push(`用了“${word}”`);
   if (a.slug !== "ai-tools-compared")
     for (const name of ["豆包", "DeepSeek", "ChatGPT", "猎聘", "领英", "脉脉", "BOSS直聘"])
