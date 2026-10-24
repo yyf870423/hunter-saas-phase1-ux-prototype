@@ -17,7 +17,7 @@ import { PUBLISHED, checkArticle, loadArticles } from "./build-articles.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://www.boseekai.com/";
 const OUT = resolve(root, "public/landing-redesign");
-const V = { redesign: "20", subpage: "20261025-a", subpageJs: "20261025-a" };
+const V = { redesign: "21", subpage: "20261025-a", subpageJs: "20261025-a" };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 

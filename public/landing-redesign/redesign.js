@@ -227,6 +227,33 @@
     addEventListener("resize", centre, { passive: true });
     document.fonts?.ready.then(centre);
 
+    // each picture is a small scene drawn at about 440px wide; scale it to fill its dark panel
+    // (up to 1.18x), and down when a short screen makes the panel shorter than the scene
+    const wide = matchMedia("(min-width: 901px)");
+    const fit = () => {
+      steps.forEach((step) => {
+        const fig = step.querySelector(".n-figure");
+        const scene = fig.firstElementChild;
+        if (!scene) return;
+        if (!wide.matches) {
+          scene.style.zoom = "";
+          scene.style.width = "";
+          return;
+        }
+        const cs = getComputedStyle(fig);
+        const aw = fig.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const ah = fig.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        const w = Math.min(440, Math.max(340, aw));
+        scene.style.zoom = "1";
+        scene.style.width = `${w}px`;
+        const z = Math.min(1.18, aw / w, ah / scene.offsetHeight);
+        scene.style.zoom = z.toFixed(3);
+      });
+    };
+    fit();
+    addEventListener("resize", fit, { passive: true });
+    document.fonts?.ready.then(fit);
+
     // pictures fade in as they rise towards the middle of the screen and fade out as they leave it,
     // so only the picture of the current step is fully clear; the step whose picture is nearest
     // the middle is the active one (measured on every scroll, so a fast scroll never skips a step)
@@ -335,65 +362,110 @@
   });
 
   /* ---------- 深耕各行赛道: the photo wall ---------- */
-  // one picture per field and no field twice: the wall uses each of these exactly once.
-  // They fill the columns top to bottom, left to right, in this order, which keeps
-  // look-alike scenes (the four single lab-coat portraits) out of each other's way
-  const pictures = [
-    ["internet-1", "互联网"],
-    ["quantum", "量子计算"],
-    ["ev", "新能源汽车"],
-    ["fusion-2", "核聚变"],
-    ["meddevice", "医疗器械"],
-    ["semi-2", "半导体"],
-    ["lowalt", "低空经济"],
-    ["cloud-1", "云计算"],
-    ["materials", "新材料"],
-    ["embodied-1", "具身智能"],
-    ["space", "商业航天"],
-    ["resources-2", "能源与稀有资源"],
-    ["pharma-1", "医药"],
-    ["electronics", "消费电子"],
-    ["storage-2", "新型储能"],
-    ["ai-2", "人工智能"],
-    ["autonomous", "自动驾驶"],
-    ["synbio", "合成生物"],
-  ].map(([file, label]) => ({ src: `assets/wall/${file}.webp`, label }));
+  // one picture per field and no field twice: every layout below uses each of these exactly once
+  const LABELS = {
+    "internet-1": "互联网",
+    "ai-2": "人工智能",
+    "embodied-1": "具身智能",
+    "cloud-1": "云计算",
+    "pharma-1": "医药",
+    "fusion-2": "核聚变",
+    "semi-2": "半导体",
+    "resources-2": "能源与稀有资源",
+    "storage-2": "新型储能",
+    "ev": "新能源汽车",
+    "quantum": "量子计算",
+    "space": "商业航天",
+    "synbio": "合成生物",
+    "autonomous": "自动驾驶",
+    "materials": "新材料",
+    "lowalt": "低空经济",
+    "meddevice": "医疗器械",
+    "electronics": "消费电子",
+  };
   const wall = document.querySelector("[data-wall]");
   const wallSection = wall?.closest("section");
   const tiles = [];
 
-  // a loose, staggered wall: columns of different widths, each pushed up by a different amount,
-  // with tiles of different heights, so the edges step past each other instead of lining up in rows
-  const PLANS = {
-    desk: { counts: [3, 3, 3, 3, 3, 3], widths: [1.0, 1.34, 0.9, 1.2, 1.02, 1.3], shifts: [0.1, 0.02, 0.15, 0.05, 0.12, 0.0] },
-    tablet: { counts: [4, 4, 3, 4, 3], widths: [1.1, 0.92, 1.26, 1.0, 1.16], shifts: [0.06, 0.14, 0.0, 0.1, 0.03] },
-    phone: { counts: [6, 6, 6], widths: [1.0, 1.22, 0.94], shifts: [0.05, 0.0, 0.1] },
+  // a mosaic with no gaps that steps both ways: the tiles touch, but no edge runs across the wall,
+  // tiles meet in T's (never four at one point), and look-alike scenes never touch.
+  // Each tile is [left, top, right, bottom] as shares of the wall, then its picture.
+  // (made with a gravity fill: each tile sits on the lowest stretch, heights sometimes level with a
+  // neighbour so the next tile bridges both, like brickwork; the panel sits over the middle)
+  const LAYOUTS = {
+    desk: [
+      [0.0, 0.0, 0.2556, 0.3821, "space"],
+      [0.7935, 0.0, 1.0, 0.328, "materials"],
+      [0.2556, 0.0, 0.4712, 0.3821, "storage-2"],
+      [0.6078, 0.0, 0.7935, 0.2606, "fusion-2"],
+      [0.4712, 0.0, 0.6078, 0.2606, "semi-2"],
+      [0.6525, 0.2606, 0.7935, 0.5408, "meddevice"],
+      [0.4712, 0.2606, 0.6525, 0.4755, "internet-1"],
+      [0.7935, 0.328, 1.0, 0.5408, "lowalt"],
+      [0.3009, 0.3821, 0.4712, 0.6719, "pharma-1"],
+      [0.0, 0.3821, 0.1344, 0.771, "ev"],
+      [0.1344, 0.3821, 0.3009, 0.6719, "cloud-1"],
+      [0.4712, 0.4755, 0.6525, 0.6719, "autonomous"],
+      [0.8631, 0.5408, 1.0, 1.0, "quantum"],
+      [0.6525, 0.5408, 0.8631, 1.0, "ai-2"],
+      [0.1344, 0.6719, 0.3471, 1.0, "resources-2"],
+      [0.3471, 0.6719, 0.5014, 1.0, "electronics"],
+      [0.5014, 0.6719, 0.6525, 1.0, "synbio"],
+      [0.0, 0.771, 0.1344, 1.0, "embodied-1"],
+    ],
+    tablet: [
+      [0.7661, 0.0, 1.0, 0.3115, "embodied-1"],
+      [0.0, 0.0, 0.3312, 0.2082, "cloud-1"],
+      [0.3312, 0.0, 0.5852, 0.2082, "quantum"],
+      [0.5852, 0.0, 0.7661, 0.3115, "resources-2"],
+      [0.2549, 0.2082, 0.5852, 0.4112, "autonomous"],
+      [0.0, 0.2082, 0.2549, 0.4112, "materials"],
+      [0.8347, 0.3115, 1.0, 0.5451, "ev"],
+      [0.5852, 0.3115, 0.8347, 0.5451, "ai-2"],
+      [0.4069, 0.4112, 0.5852, 0.5451, "meddevice"],
+      [0.0, 0.4112, 0.1907, 0.5988, "electronics"],
+      [0.1907, 0.4112, 0.4069, 0.6716, "internet-1"],
+      [0.7093, 0.5451, 1.0, 0.8206, "synbio"],
+      [0.4069, 0.5451, 0.7093, 0.8206, "storage-2"],
+      [0.0, 0.5988, 0.1907, 1.0, "lowalt"],
+      [0.1907, 0.6716, 0.4069, 1.0, "pharma-1"],
+      [0.4069, 0.8206, 0.6295, 1.0, "semi-2"],
+      [0.6295, 0.8206, 0.803, 1.0, "fusion-2"],
+      [0.803, 0.8206, 1.0, 1.0, "space"],
+    ],
+    phone: [
+      [0.0, 0.0, 0.2877, 0.1413, "semi-2"],
+      [0.6891, 0.0, 1.0, 0.2256, "quantum"],
+      [0.2877, 0.0, 0.6891, 0.1413, "lowalt"],
+      [0.0, 0.1413, 0.4103, 0.3149, "cloud-1"],
+      [0.4103, 0.1413, 0.6891, 0.3149, "electronics"],
+      [0.6891, 0.2256, 1.0, 0.383, "internet-1"],
+      [0.0, 0.3149, 0.278, 0.4625, "pharma-1"],
+      [0.278, 0.3149, 0.6891, 0.5207, "storage-2"],
+      [0.6891, 0.383, 1.0, 0.5207, "synbio"],
+      [0.0, 0.4625, 0.278, 0.6121, "autonomous"],
+      [0.278, 0.5207, 0.5501, 0.6851, "meddevice"],
+      [0.5501, 0.5207, 1.0, 0.6851, "ai-2"],
+      [0.0, 0.6121, 0.278, 0.7552, "materials"],
+      [0.278, 0.6851, 0.7136, 0.8368, "resources-2"],
+      [0.7136, 0.6851, 1.0, 0.8368, "embodied-1"],
+      [0.0, 0.7552, 0.278, 1.0, "fusion-2"],
+      [0.278, 0.8368, 0.5783, 1.0, "space"],
+      [0.5783, 0.8368, 1.0, 1.0, "ev"],
+    ],
   };
-  const HEIGHTS = [0.8, 1.18, 0.95, 1.36, 0.88, 1.08, 1.26, 0.92];
-  // and each tile is pulled in a little from one side or the other, so the gaps between columns step too
-  const INSETS = [0, 9, 0, 15, 5, 0, 12, 7];
 
-  function seeded(seed) {
-    return () => {
-      seed = (seed + 0x6d2b79f5) | 0;
-      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-
-  function makeTile(n) {
-    const pic = pictures[n];
+  function makeTile(file) {
     const tile = document.createElement("div");
     tile.className = "n-tile";
     const img = document.createElement("img");
     img.alt = "";
     img.loading = "lazy";
     img.decoding = "async";
-    img.src = pic.src;
+    img.src = `assets/wall/${file}.webp`;
     img.addEventListener("error", () => tile.classList.add("is-empty"), { once: true });
     const name = document.createElement("b");
-    name.textContent = pic.label;
+    name.textContent = LABELS[file];
     tile.append(img, name);
     tiles.push(tile);
     return tile;
@@ -404,30 +476,22 @@
     const w = wall.clientWidth || innerWidth;
     const h = wall.clientHeight || 760;
     const mode = w < 640 ? "phone" : w < 1000 ? "tablet" : "desk";
-    const stamp = `${mode}:${Math.round(w / 80)}:${Math.round(h / 80)}`;
-    if (wall.dataset.stamp === stamp) return;
-    wall.dataset.stamp = stamp;
-    wall.textContent = "";
-    tiles.length = 0;
-    const plan = PLANS[mode];
-    const rand = seeded(mode === "desk" ? 7 : mode === "tablet" ? 5 : 3);
-    const reach = Math.max(...plan.shifts) + 0.06;
-    let n = 0;
-    plan.counts.forEach((count, c) => {
-      const col = document.createElement("div");
-      col.className = "n-col";
-      col.style.flexGrow = String(plan.widths[c]);
-      col.style.height = `${Math.round(h * (1 + reach))}px`;
-      col.style.transform = `translateY(${Math.round(-plan.shifts[c] * h)}px)`;
-      const end = Math.min(n + count, pictures.length);
-      while (n < end) {
-        const tile = makeTile(n++);
-        tile.style.flexGrow = String(HEIGHTS[Math.floor(rand() * HEIGHTS.length)]);
-        const inset = INSETS[Math.floor(rand() * INSETS.length)];
-        if (inset) tile.style[rand() < 0.5 ? "marginLeft" : "marginRight"] = `${inset}%`;
-        col.append(tile);
-      }
-      wall.append(col);
+    const plan = LAYOUTS[mode];
+    if (wall.dataset.mode !== mode) {
+      wall.dataset.mode = mode;
+      wall.textContent = "";
+      tiles.length = 0;
+      plan.forEach((t) => wall.append(makeTile(t[4])));
+    }
+    // whole pixels, worked out from the shared edges, so neighbours meet exactly with no seam
+    plan.forEach(([l, t, r, b], i) => {
+      const x0 = Math.round(l * w);
+      const y0 = Math.round(t * h);
+      const s = tiles[i].style;
+      s.left = `${x0}px`;
+      s.top = `${y0}px`;
+      s.width = `${Math.round(r * w) - x0}px`;
+      s.height = `${Math.round(b * h) - y0}px`;
     });
   }
 

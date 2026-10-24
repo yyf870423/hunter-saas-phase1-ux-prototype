@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../landing/shared-form.css?v=20261021" />
     <link rel="stylesheet" href="../landing/trial-page.css?v=20261021" />
     <link rel="preload" href="assets/fonts/alimama-shuheiti-bold-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="redesign.css?v=20" />
+    <link rel="stylesheet" href="redesign.css?v=21" />
     <script>
       document.documentElement.classList.add("js");
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");
@@ -29,7 +29,7 @@
     <script defer src="../landing/vendor/libphonenumber-max.js?v=20261021"></script>
     <script defer src="../landing/trial-form.js?v=20261022-bilingual-a"></script>
     <script defer src="vendor/lenis-1.3.4.min.js"></script>
-    <script defer src="redesign.js?v=18"></script>
+    <script defer src="redesign.js?v=19"></script>
   </head>
   <body class="n-page">
     <a class="n-skip" href="#main">跳到正文</a>
@@ -123,17 +123,28 @@
           <div class="n-scrolly" data-scrolly>
             <article class="n-card n-step is-active" aria-labelledby="n-step-match">
               <div class="n-figure" id="match" aria-hidden="true">
-                <div class="fig-match">
-                  <div class="fig-jd">
-                    <span class="fig-label">岗位 JD</span>
-                    <b>视觉算法负责人</b>
-                    <div class="fig-tags"><em>核心技能</em><em>行业背景</em><em>硬性门槛</em></div>
+                <div class="fx fx-match">
+                  <div class="fx-card fx-jd">
+                    <div class="fx-head"><span class="fx-cap">岗位 JD</span><span class="fx-cap fx-hi">拆成三项</span></div>
+                    <b class="fx-title">视觉算法负责人</b>
+                    <div class="fx-jd-body">
+                      <div class="fx-text"><i style="--w: 96%"></i><i class="is-hit" style="--w: 74%"></i><i style="--w: 88%"></i><i class="is-hit" style="--w: 58%"></i><i style="--w: 82%"></i><i class="is-hit" style="--w: 66%"></i></div>
+                      <dl class="fx-facets">
+                        <div><dt>核心技能</dt><dd>视觉算法 · 量产落地</dd></div>
+                        <div><dt>行业背景</dt><dd>机器人 / 智能硬件</dd></div>
+                        <div><dt>硬性门槛</dt><dd>带过 10 人以上团队</dd></div>
+                      </dl>
+                    </div>
                   </div>
-                  <ul class="fig-rows">
-                    <li><span>人选 A</span><s style="--w: 88%"></s><u>亮点</u></li>
-                    <li><span>人选 B</span><s style="--w: 74%"></s><u>亮点</u></li>
-                    <li><span>人选 C</span><s style="--w: 61%"></s><u class="is-risk">风险</u></li>
-                  </ul>
+                  <p class="fx-pipe"><span>结构化检索</span><span>全文召回</span><span>语义匹配</span></p>
+                  <div class="fx-card fx-results">
+                    <div class="fx-head"><span class="fx-cap">匹配结果</span><span class="fx-cap">按匹配分排序</span></div>
+                    <ul class="fx-rank">
+                      <li class="is-top"><i class="fx-av">A</i><b>人选 A</b><s style="--w: 92%"></s><em>92</em><u>亮点</u><p>推荐理由 · 三项要求都对上，带过量产项目</p></li>
+                      <li><i class="fx-av">B</i><b>人选 B</b><s style="--w: 85%"></s><em>85</em><u>亮点</u></li>
+                      <li><i class="fx-av">C</i><b>人选 C</b><s style="--w: 71%"></s><em>71</em><u class="is-risk">风险</u></li>
+                    </ul>
+                  </div>
                 </div>
               </div>
               <div class="n-step-text">
@@ -147,21 +158,29 @@
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-sourcing">
               <div class="n-figure" id="sourcing" aria-hidden="true">
-                <div class="fig-funnel">
-                  <ul class="fig-sources">
-                    <li>公开信息</li>
-                    <li>专利论文</li>
-                    <li>代码痕迹</li>
-                    <li>你的简历库</li>
-                  </ul>
-                  <svg class="fig-lines" viewBox="0 0 120 160" preserveAspectRatio="none">
-                    <path d="M0 20 C60 20 60 80 120 80" /><path d="M0 60 C60 60 60 80 120 80" /><path d="M0 100 C60 100 60 80 120 80" /><path d="M0 140 C60 140 60 80 120 80" />
-                  </svg>
-                  <ol class="fig-priority">
-                    <li><i>1</i>先联系</li>
-                    <li><i>2</i>值得聊</li>
-                    <li><i>3</i>再看看</li>
-                  </ol>
+                <div class="fx fx-source">
+                  <p class="fx-need"><span class="fx-cap">读懂需求</span><b>视觉算法负责人 · 机器人方向</b></p>
+                  <div class="fx-flow">
+                    <ul class="fx-srcs">
+                      <li><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4M8 1.8c2 2 2 10.4 0 12.4M8 1.8c-2 2-2 10.4 0 12.4"/></svg>公开信息</li>
+                      <li><svg viewBox="0 0 16 16"><path d="M4 1.8h5.5L12.5 5v9.2H4z"/><path d="M9.3 1.8V5h3.2M6 8h4.5M6 10.6h4.5"/></svg>专利论文</li>
+                      <li><svg viewBox="0 0 16 16"><path d="M5.6 4.4 2 8l3.6 3.6M10.4 4.4 14 8l-3.6 3.6M9 3 7 13"/></svg>代码痕迹</li>
+                      <li class="is-own"><svg viewBox="0 0 16 16"><path d="M2 4.2h4.2l1.4 1.6H14v7.4H2z"/></svg>你的简历库</li>
+                    </ul>
+                    <svg class="fx-merge" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 12.5 C55 12.5 45 50 100 50" /><path d="M0 37.5 C55 37.5 45 50 100 50" /><path d="M0 62.5 C55 62.5 45 50 100 50" /><path d="M0 87.5 C55 87.5 45 50 100 50" /></svg>
+                    <div class="fx-card fx-queue">
+                      <span class="fx-cap">合并去重 · 排好优先级</span>
+                      <ol>
+                        <li><span>先联系</span><span class="fx-avs"><i class="fx-av">林</i><i class="fx-av">周</i></span></li>
+                        <li><span>值得聊</span><span class="fx-avs"><i class="fx-av">陈</i><i class="fx-av">许</i><i class="fx-av">宋</i></span></li>
+                        <li><span>再看看</span><span class="fx-avs"><i class="fx-av">何</i><i class="fx-av">唐</i><i class="fx-av">吴</i><i class="fx-av">郑</i></span></li>
+                      </ol>
+                    </div>
+                  </div>
+                  <div class="fx-card fx-merged">
+                    <div class="fx-who"><i class="fx-av fx-av-lg">陈</i><div><b>陈屿</b><span>视觉算法 · 机器人感知</span></div><em class="fx-ok">先联系</em></div>
+                    <p class="fx-from"><span class="fx-cap">三处来源合成一份</span><span class="fx-tags"><em>专利论文</em><em>代码痕迹</em><em>你的简历库</em></span></p>
+                  </div>
                 </div>
               </div>
               <div class="n-step-text">
@@ -175,17 +194,25 @@
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-identity">
               <div class="n-figure" id="identity" aria-hidden="true">
-                <div class="fig-identity">
-                  <ul class="fig-aliases">
-                    <li>花名 · 阿越</li>
-                    <li>论文 · Lin Y.</li>
-                    <li>开源 · lin-yue</li>
+                <div class="fx fx-id">
+                  <ul class="fx-aliases">
+                    <li><small>社区</small>花名 · 阿越</li>
+                    <li><small>论文</small>Lin Y.</li>
+                    <li><small>代码仓库</small>lin-yue</li>
                   </ul>
-                  <div class="fig-arrow"></div>
-                  <div class="fig-person">
-                    <b>林越</b>
-                    <span>工业视觉 · 团队负责人</span>
-                    <em>三处来源交叉验证 · 已排除同名</em>
+                  <svg class="fx-converge" viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M50 0 C50 18 150 12 150 30" /><path d="M150 0 L150 30" /><path d="M250 0 C250 18 150 12 150 30" /></svg>
+                  <div class="fx-id-stack">
+                    <div class="fx-card fx-ghost"><span>林越 · 电商运营</span><em>同名 · 已排除</em></div>
+                    <div class="fx-card fx-person">
+                      <div class="fx-who"><i class="fx-av fx-av-lg">林</i><div><b>林越</b><span>工业视觉 · 团队负责人</span></div><em class="fx-ok">已核实</em></div>
+                      <ul class="fx-checks">
+                        <li>三处来源对得上</li>
+                        <li>履历时间线吻合</li>
+                        <li>同名两位，已排除</li>
+                        <li class="is-wait">现任职级<em>待你确认</em></li>
+                      </ul>
+                      <p class="fx-route"><span class="fx-cap">触达路径</span><span>前同事引荐</span></p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -200,15 +227,20 @@
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-bd">
               <div class="n-figure" id="bd" aria-hidden="true">
-                <div class="fig-bd">
-                  <ul class="fig-signals">
+                <div class="fx fx-bd">
+                  <ul class="fx-signals">
                     <li>行业前景</li><li>融资动态</li><li>创始团队</li><li>岗位信号</li><li>业务信号</li>
                   </ul>
-                  <ul class="fig-verdicts">
-                    <li><span>真实需求</span><b class="is-ok">有依据</b></li>
-                    <li><span>付费潜力</span><b class="is-ok">有依据</b></li>
-                    <li><span>合作风险</span><b class="is-wait">待确认</b></li>
-                  </ul>
+                  <span class="fx-stem"></span>
+                  <div class="fx-card fx-verdict">
+                    <div class="fx-head"><span class="fx-cap">客户研判</span><em class="fx-ok">优先级 · 高</em></div>
+                    <ul class="fx-meters">
+                      <li><span>真实需求</span><i style="--n: 4"></i><b>有依据</b></li>
+                      <li><span>付费潜力</span><i style="--n: 3"></i><b>有依据</b></li>
+                      <li class="is-wait"><span>合作风险</span><i style="--n: 2"></i><b>待确认</b></li>
+                    </ul>
+                    <div class="fx-chain"><span class="fx-cap">决策链</span><ol><li>创始人</li><li>技术 VP</li><li class="is-wait">用人经理</li></ol></div>
+                  </div>
                 </div>
               </div>
               <div class="n-step-text">
@@ -222,11 +254,26 @@
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-network">
               <div class="n-figure" id="network" aria-hidden="true">
-                <ol class="fig-timeline">
-                  <li><i>2024</i><b>收到简历</b><span>视觉算法 · 高级工程师</span></li>
-                  <li><i>2025</i><b>换了团队</b><span>并入新平台部</span></li>
-                  <li><i>2026</i><b>承担新职责</b><span>带起一支新团队</span><em>已更新</em></li>
-                </ol>
+                <div class="fx fx-net">
+                  <div class="fx-sky">
+                    <svg viewBox="0 0 400 150">
+                      <g class="fx-links"><path d="M38 96 92 52 156 84 214 38 276 70 340 34 372 92" /><path d="M92 52 120 118 156 84 206 120 276 70 310 124 372 92" /><path d="M214 38 206 120M38 96 120 118M340 34 310 124M156 84 60 30" /></g>
+                      <g class="fx-dots"><circle cx="38" cy="96" r="3" /><circle cx="60" cy="30" r="2.5" /><circle cx="120" cy="118" r="2.5" /><circle cx="156" cy="84" r="3" /><circle cx="206" cy="120" r="2.5" /><circle cx="276" cy="70" r="3" /><circle cx="310" cy="124" r="2.5" /><circle cx="372" cy="92" r="3" /></g>
+                      <g class="fx-lit"><circle cx="92" cy="52" r="4" /><circle cx="214" cy="38" r="4" /><circle cx="340" cy="34" r="4" /></g>
+                    </svg>
+                    <span class="fx-ping" style="left: 23%; top: 34.7%">换了团队</span>
+                    <span class="fx-ping" style="left: 53.5%; top: 25.3%">换了赛道</span>
+                    <span class="fx-ping" style="left: 85%; top: 22.7%">新的职责</span>
+                  </div>
+                  <div class="fx-card fx-profile">
+                    <div class="fx-who"><i class="fx-av">周</i><div><b>周宁</b><span>视觉算法 · 团队负责人</span></div><em class="fx-ok">已更新</em></div>
+                    <ol class="fx-tl">
+                      <li><i>2024</i><b>收到简历</b><span>视觉算法 · 高级工程师</span></li>
+                      <li><i>2025</i><b>换了团队</b><span>并入新平台部</span></li>
+                      <li class="is-now"><i>2026</i><b>承担新职责</b><span>带起一支新团队</span></li>
+                    </ol>
+                  </div>
+                </div>
               </div>
               <div class="n-step-text">
                 <p class="n-step-meta"><i>沉淀</i><span>05 / 06</span></p>
@@ -239,16 +286,20 @@
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-mapping">
               <div class="n-figure" id="mapping" aria-hidden="true">
-                <div class="fig-org">
-                  <div class="fig-node fig-node-top">技术负责人</div>
-                  <svg class="fig-org-lines" viewBox="0 0 300 60" preserveAspectRatio="none">
-                    <path d="M150 0 C150 30 50 30 50 60" /><path d="M150 0 L150 60" /><path d="M150 0 C150 30 250 30 250 60" />
-                  </svg>
-                  <div class="fig-org-row">
-                    <div class="fig-node">视觉团队</div>
-                    <div class="fig-node">控制团队</div>
-                    <div class="fig-node is-gap">产品交付 · 待补</div>
+                <div class="fx fx-org">
+                  <p class="fx-tabs"><span class="is-on">按部门</span><span>按汇报线</span><span>按项目</span></p>
+                  <div class="fx-tree">
+                    <div class="fx-node fx-top"><b>创始人</b></div>
+                    <span class="fx-trunk"></span>
+                    <div class="fx-node fx-root"><i class="fx-av">韩</i><div><b>技术负责人</b><span>韩征 · 2019 年加入</span></div></div>
+                    <svg class="fx-branches" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M150 0 L150 16 M50 40 L50 24 Q50 16 58 16 L242 16 Q250 16 250 24 L250 40 M150 16 L150 40" /></svg>
+                    <div class="fx-kids">
+                      <div class="fx-node"><b>视觉团队</b><span class="fx-avs"><i class="fx-av">林</i><i class="fx-av">周</i><i class="fx-av fx-more">+4</i></span></div>
+                      <div class="fx-node"><b>控制团队</b><span class="fx-avs"><i class="fx-av">许</i><i class="fx-av fx-more">+2</i></span></div>
+                      <div class="fx-node is-gap"><b>产品交付</b><em>负责人待补</em></div>
+                    </div>
                   </div>
+                  <p class="fx-src">来源 · 官网 · 新闻 · 公开演讲</p>
                 </div>
               </div>
               <div class="n-step-text">
