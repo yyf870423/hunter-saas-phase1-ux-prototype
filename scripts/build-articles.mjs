@@ -45,7 +45,7 @@ const UI = {
   published: "发布于",
   author: "铂寻 Boseek",
   readCase: "了解",
-  footerArticles: "文章",
+  footerArticles: "实务文章",
 };
 
 export async function loadArticles() {

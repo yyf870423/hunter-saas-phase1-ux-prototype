@@ -118,7 +118,7 @@ ${PAGES.map((p) => `                <li><a href="${up}use-cases/${p.slug}/"${cur
               </ul>
             </div>
             <div>
-              <h2>文章</h2>
+              <h2>实务文章</h2>
               <ul>
 ${FOOTER_ARTICLES.map(([slug, label]) => `                <li><a href="${up}articles/${slug}/"${cur(`a:${slug}`)}>${text(label)}</a></li>`).join("\n")}
                 <li><a href="${up}articles/"${cur("list")}>全部文章 &gt;&gt;</a></li>
