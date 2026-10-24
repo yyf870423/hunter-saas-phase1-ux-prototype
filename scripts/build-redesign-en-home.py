@@ -112,9 +112,9 @@ def r(old, new): R.append((old, new))
 r('<html lang="zh-CN">', '<html lang="en">')
 r('<!-- 改版草稿：只用于预览，不收录 -->', '<!-- Redesign draft: preview only, not indexed -->')
 r('<title>HunterBuddy · 猎头 AI 助手，梳理组织架构、做人才寻访｜铂寻 Boseek</title>',
-  '<title>HunterBuddy · AI assistant for headhunters: org charts, sourcing and job matching | Boseek</title>')
+  '<title>HunterBuddy · AI assistant for headhunters: org charts and sourcing | Boseek</title>')
 r('content="HunterBuddy 是铂寻 Boseek 为独立猎头和资深顾问打造的猎头 AI 助手。人岗匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，费时间的事交给它，你把心力留给识人和读懂客户。"',
-  'content="HunterBuddy by Boseek is an AI assistant for independent headhunters and senior search consultants. It takes on job matching, sourcing, identity checks, client research, CV updates and org charts, so you can focus on people and clients."')
+  'content="HunterBuddy by Boseek is an AI assistant for independent headhunters and senior search consultants. It helps with job matching, sourcing, identity checks, client research, CV database updates and org charts, so you can focus on people and clients."')
 r('<script defer src="../../landing/shared-ui.js',
   '<script defer src="../../landing-origin/locale-en.js?v=20261024-org"></script>\n    <script defer src="../trial-locale-en.js?v=1"></script>\n    <script defer src="../../landing/shared-ui.js')
 
@@ -137,7 +137,7 @@ r('aria-label="打开导航"', 'aria-label="Open navigation"')
 # ---------- hero ----------
 r('<span aria-hidden="true"></span>正在开发中，邀请制试用申请已开放', '<span aria-hidden="true"></span>In development. Applications for the invitation-only trial are open.')
 r('<p class="n-role">猎头的 AI 工作伙伴</p>', '<p class="n-role">The AI partner for headhunters</p>')
-r('<span>我们懂你独自赶路的消耗。</span>', '<span>We know what the road takes out of you when you travel alone.</span>')
+r('<span>我们懂你独自赶路的消耗。</span>', '<span>We know how draining the road can be when you travel alone.</span>')
 r('<span>同行的路上，你可以把力气留给更重要的事。</span>', '<span>Travel together, and save your strength for what matters more.</span>')
 r('>看看它能做什么</a>', '>See what it can do</a>')
 
@@ -146,9 +146,9 @@ r('<p class="n-kicker">HunterBuddy 能做什么</p>', '<p class="n-kicker">What 
 r('<span>费时间的事，交给它。</span>', '<span>Leave the legwork to it.</span>')
 r('<span>你的心力，留给识人和读懂客户。</span>', '<span>Save your energy for reading people and understanding clients.</span>')
 r('人岗智能匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，HunterBuddy 都能帮你搞定。你专注判断真正有价值的机会。',
-  'Job matching, automated sourcing, finding the real name behind an alias, client research for business development, keeping your CV database current, mapping org charts: HunterBuddy takes care of all of it, so you can focus on judging which opportunities are truly worth it.')
-r('poster="../assets/film-poster.jpg?v=6"', 'poster="../assets/film-poster-en.jpg?v=1"')
-r('src="../assets/hunterbuddy-film.mp4?v=6"', 'src="../assets/hunterbuddy-film-en.mp4?v=1"')
+  'Job matching, automated sourcing, finding the real name behind an alias, client research for business development, keeping your CV database current, mapping org charts: HunterBuddy helps you get all of it done, so you can focus on judging which opportunities are truly worth it.')
+r('poster="../assets/film-poster.jpg?v=6"', 'poster="../assets/film-poster-en.jpg?v=2"')
+r('src="../assets/hunterbuddy-film.mp4?v=6"', 'src="../assets/hunterbuddy-film-en.mp4?v=2"')
 r('aria-label="HunterBuddy 产品短片"', 'aria-label="HunterBuddy product film"')
 
 # ---------- six capabilities: heading ----------
@@ -173,12 +173,12 @@ r('<b>人选 B</b>', '<b>Candidate B</b>')
 r('<b>人选 C</b>', '<b>Candidate C</b>')
 r('<u>亮点</u>', '<u>Strength</u>')
 r('<u class="is-risk">风险</u>', '<u class="is-risk">Risk</u>')
-r('<p>推荐理由 · 三项要求都对上，带过量产项目</p>', '<p>Why · Meets all three, has shipped at scale</p>')
+r('<p>推荐理由 · 三项要求都对上，带过量产项目</p>', '<p>Why · Meets all three, has led mass production</p>')
 # 01 text
 r('JD 只有寥寥几行，库里却攒着几千份简历，一份份比对到深夜。', 'The JD runs to a few lines, your database holds thousands of CVs, and you compare them one by one late into the night.')
-r('<h3 id="n-step-match">智能人岗匹配</h3>', '<h3 id="n-step-match">Smart job matching</h3>')
+r('<h3 id="n-step-match">智能人岗匹配</h3>', '<h3 id="n-step-match">Job matching</h3>')
 r('把岗位 JD 拆开，提炼核心技能、行业背景和硬性门槛，再用结构化检索、全文召回和语义匹配一起找人。每位人选都附上匹配分、亮点、潜在风险和推荐理由，省去反复比对。反过来，也能为一份简历找到合适的岗位。',
-  'It breaks the JD down into core skills, industry background and must-haves, then searches with structured filters, full-text recall and semantic matching together. Every candidate comes with a match score, strengths, possible risks and the reasons for recommending them, so you stop comparing the same CVs over and over. It works the other way too: give it a CV and it finds the roles that fit.')
+  'It breaks the JD down into core skills, industry background and must-haves, then searches with structured search, full-text recall and semantic matching together. Every candidate comes with a match score, strengths, possible risks and the reasons for recommending them, so you stop comparing the same CVs over and over. It works the other way too: give it a CV and it finds the roles that fit.')
 r('>了解人岗匹配</a>', '>More on job matching</a>')
 
 # 02 sourcing — scene
@@ -194,11 +194,11 @@ r('<li><span>再看看</span>', '<li><span>Keep in view</span>')
 for zh, en in [("林", "L"), ("周", "Z"), ("陈", "C"), ("许", "X"), ("宋", "S"), ("何", "H"), ("唐", "T"), ("吴", "W"), ("郑", "Z"), ("韩", "H")]:
     r(f'<i class="fx-av">{zh}</i>', f'<i class="fx-av">{en}</i>')
     r(f'<i class="fx-av fx-av-lg">{zh}</i>', f'<i class="fx-av fx-av-lg">{en}</i>') if zh in "陈林" else None
-r('<b>陈屿</b><span>视觉算法 · 机器人感知</span></div><em class="fx-ok">先联系</em>', '<b>Yu Chen</b><span>Vision · robot perception</span></div><em class="fx-ok">Contact first</em>')
+r('<b>陈屿</b><span>视觉算法 · 机器人感知</span></div><em class="fx-ok">先联系</em>', '<b>Yu Chen</b><span>Vision · robotics perception</span></div><em class="fx-ok">Contact first</em>')
 r('<span class="fx-cap">三处来源合成一份</span><span class="fx-tags"><em>专利论文</em><em>代码痕迹</em><em>你的简历库</em></span>',
   '<span class="fx-cap">3 sources, 1 profile</span><span class="fx-tags"><em>Papers</em><em>Code</em><em>Your CVs</em></span>')
 # 02 text
-r('人选散在招聘平台、论文、代码仓库和自己的简历库里，翻一遍就是一整天。', 'Candidates are scattered across job boards, papers, code repositories and your own CV database. Going through them all takes a whole day.')
+r('人选散在招聘平台、论文、代码仓库和自己的简历库里，翻一遍就是一整天。', 'Candidates are scattered across recruiting platforms, papers, code repositories and your own CV database. Going through them all takes a whole day.')
 r('<h3 id="n-step-sourcing">读懂你的需求，自动寻访</h3>', '<h3 id="n-step-sourcing">It reads your brief and sources for you</h3>')
 r('整合公开信息、专利论文、代码痕迹，以及你多年沉淀的简历库，把人选收拢到一起，排好优先级。检索比对的事交给它，你安心把精力留给识人沟通。',
   'It brings together public information, patents and papers, code footprints and the CV database you have built over the years, gathers the candidates in one place and puts them in order of priority. Leave the searching and comparing to it, and keep your energy for judging people and talking to them.')
@@ -209,17 +209,17 @@ r('<li><small>社区</small>花名 · 阿越</li>', '<li><small>Forum</small>Ali
 r('<li><small>论文</small>Lin Y.</li>', '<li><small>Paper</small>Lin Y.</li>')
 r('<li><small>代码仓库</small>lin-yue</li>', '<li><small>Repo</small>lin-yue</li>')
 r('<span>林越 · 电商运营</span><em>同名 · 已排除</em>', '<span>Yue Lin · E-commerce ops</span><em>Namesake · ruled out</em>')
-r('<b>林越</b><span>工业视觉 · 团队负责人</span></div><em class="fx-ok">已核实</em>', '<b>Yue Lin</b><span>Machine vision · Team lead</span></div><em class="fx-ok">Verified</em>')
+r('<b>林越</b><span>工业视觉 · 团队负责人</span></div><em class="fx-ok">已核实</em>', '<b>Yue Lin</b><span>Industrial vision · Team lead</span></div><em class="fx-ok">Verified</em>')
 r('<li>三处来源对得上</li>', '<li>Three sources agree</li>')
 r('<li>履历时间线吻合</li>', '<li>Career timeline matches</li>')
 r('<li>同名两位，已排除</li>', '<li>Two namesakes ruled out</li>')
 r('<li class="is-wait">现任职级<em>待你确认</em></li>', '<li class="is-wait">Current level<em>To confirm</em></li>')
 r('<span class="fx-cap">触达路径</span><span>前同事引荐</span>', '<span class="fx-cap">Way in</span><span>Intro through an ex-teammate</span>')
 # 03 text
-r('手上只有一个花名、一个 ID，人到底是谁，往往要猜上半天。', 'All you have is an alias or a user ID. Working out who the person really is can take hours of guesswork.')
-r('<h3 id="n-step-identity">还原花名背后的真实姓名</h3>', '<h3 id="n-step-identity">Find the real name behind the alias</h3>')
+r('手上只有一个花名、一个 ID，人到底是谁，往往要猜上半天。', 'All you have is a workplace alias or a user ID. Working out who the person really is can take hours of guesswork.')
+r('<h3 id="n-step-identity">还原花名背后的真实姓名</h3>', '<h3 id="n-step-identity">Find the real name behind an alias</h3>')
 r('即便只有花名、化名或昵称，HunterBuddy 也会用多个来源交叉验证、排除同名，还原候选人的真实姓名和身份，再沿着履历和关系线索找到相关人选，推荐合适的触达路径。拿不准的地方，会标出来等你确认。',
-  'Even with only an alias, a pen name or a nickname, HunterBuddy cross-checks several sources, rules out namesakes and establishes the candidate’s real name and identity. It then follows their career and connections to related candidates and suggests the right way to reach them. Anything it isn’t sure of is flagged for you to confirm.')
+  'Even with only an alias, a pen name or a nickname, HunterBuddy cross-checks several sources, rules out namesakes and establishes the candidate’s real name and identity. It then follows their career and connections to related candidates and suggests a suitable way to reach them. Anything it isn’t sure of is flagged for you to confirm.')
 r('>了解身份核实</a>', '>More on identity checks</a>')
 
 # 04 client research — scene
@@ -230,10 +230,10 @@ r('<li><span>付费潜力</span><i style="--n: 3"></i><b>有依据</b></li>', '<
 r('<li class="is-wait"><span>合作风险</span><i style="--n: 2"></i><b>待确认</b></li>', '<li class="is-wait"><span>Risk</span><i style="--n: 2"></i><b>To confirm</b></li>')
 r('<span class="fx-cap">决策链</span><ol><li>创始人</li><li>技术 VP</li><li class="is-wait">用人经理</li></ol>', '<span class="fx-cap">Decision chain</span><ol><li>Founder</li><li>Tech VP</li><li class="is-wait">Hiring manager</li></ol>')
 # 04 text
-r('有的客户岗位不少，跟下去才发现需求、预算或决策链还没准备好。', 'Some clients have plenty of openings, and only after weeks of follow-up do you find that the need, the budget or the decision chain isn’t ready.')
+r('有的客户岗位不少，跟下去才发现需求、预算或决策链还没准备好。', 'Some clients have plenty of openings, and only once you follow up do you find that the need, the budget or the decision chain isn’t ready.')
 r('<h3 id="n-step-bd">BD 客户研判，先看清再出发</h3>', '<h3 id="n-step-bd">Client research for BD: know before you go</h3>')
 r('HunterBuddy 整理行业前景、融资动态、创始团队、岗位和业务信号，帮你判断真实需求、付费潜力和合作风险，再理清决策链和优先级，为下一步接洽提供参考。少做无用奔波，把精力留给值得的机会。',
-  'HunterBuddy pulls together the industry outlook, funding news, the founding team, and hiring and business signals, helping you judge the real need, the ability to pay and the risk to the relationship. It then lays out the decision chain and priorities to inform your next approach. Fewer wasted trips, and more energy for the opportunities that deserve it.')
+  'HunterBuddy pulls together the industry outlook, funding news, the founding team, and hiring and business signals, helping you judge the real need, the ability to pay and the risk in working with them. It then lays out the decision chain and priorities to inform your next approach. Fewer wasted trips, and more energy for the opportunities that deserve it.')
 r('>了解客户开发</a>', '>More on business development</a>')
 
 # 05 network — scene
@@ -307,13 +307,13 @@ FAQ = [
   "Yes. Upload CVs one at a time or in bulk, and import org charts from Excel or similar formats to keep building on them. Everything you bring in goes through the same identity checks and de-duplication, and can be matched against all your live searches in one go."),
  ("匹配结果可以直接相信吗？", "Can I take the match results at face value?",
   "把它当作带来源的参考，而不是最终结论。每条匹配理由都附上来源，你可以点回去看原始资料。没有可靠来源的信息会标为“待确认”，不会把猜测当成事实。像实际带多大团队、本人想不想动，这类只有聊了才知道的事，HunterBuddy 会明确留给你。",
-  "Treat them as sourced guidance, not a final verdict. Every reason for a match comes with its source, so you can click through to the original material. Anything without a reliable source is marked “to confirm”, and guesses are never presented as facts. Some things you only find out by talking to the person, such as how big a team they really lead or whether they’re open to a move. HunterBuddy leaves those explicitly to you."),
+  "Treat them as sourced guidance, not a final verdict. Every reason for a match comes with its source, so you can click through to the original material. Anything without a reliable source is marked “To confirm”, and guesses are never presented as facts. Some things you only find out by talking to the person, such as how big a team they really lead or whether they’re open to a move. HunterBuddy leaves those explicitly to you."),
  ("和猎聘、领英、脉脉这些招聘平台是什么关系？", "How does it fit with recruiting platforms like Liepin, LinkedIn and Maimai?",
   "它们是发布职位、搜索和联系候选人的渠道，HunterBuddy 不替代它们。HunterBuddy 做的是找人之前和找人过程中的研究：把公开资料和你手上的资源放在一起，核对身份、连起关系、写明来源，帮你判断先找谁、怎么开口。从这些平台下载的简历，也可以上传进来一起核对。",
   "Those are where you post roles, search for candidates and get in touch with them, and HunterBuddy doesn’t replace them. It does the research before and during a search: putting public information alongside what you already have, verifying identities, mapping connections and citing sources, to help you decide who to approach first and what to say. CVs downloaded from these platforms can be uploaded too and checked along with everything else."),
  ("和猎头管理系统（CRM、ATS）有什么不同？", "How is it different from a recruitment CRM or ATS?",
   "猎头管理系统记录客户、职位、候选人和推荐进度，管的是已经在做的事。HunterBuddy 帮你找到下一件值得做的事：从公开资料和你手上的资源里找线索、连关系，给出带来源的判断。两者可以配合着用。在 HunterBuddy 里确认过的人和关系，照样记进你的管理系统。",
-  "A CRM or ATS records your clients, roles and candidates, and where each submission stands. It manages work already under way. HunterBuddy helps you find what’s worth doing next: it looks for leads and connections in public information and your own resources, and gives you findings backed by sources. The two work well together. People and relationships you’ve confirmed in HunterBuddy go into your CRM or ATS as usual."),
+  "A CRM or ATS records your clients, roles and candidates, and where each submission stands. It manages work already under way. HunterBuddy helps you find what’s worth doing next: it looks for leads and connections in public information and your own resources, and gives you findings backed by sources. The two can be used together. People and relationships you’ve confirmed in HunterBuddy go into your CRM or ATS as usual."),
 ]
 for qz, qe, az, ae in FAQ:
     r(f'<span>{qz}</span>', f'<span>{qe}</span>')

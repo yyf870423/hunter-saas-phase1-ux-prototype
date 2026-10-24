@@ -174,6 +174,17 @@
 - 测试：`tests/origin-articles.spec.js` 检查每篇的规范网址、结构化数据和问答一致、目录和小标题一致、相关阅读的链接都能打开、没有中文分号，列表页、首页页脚入口（导航里没有）和 sitemap。
 - 部署时：`/articles/` 是真实页面，不需要额外跳转。
 
+### 英文站（2026-10-25，用户要求“做对应的英文站和英文视频，注意翻译的信达雅”）
+
+- 改版首页的英文版 `landing-redesign/en/`（由 `scripts/build-redesign-en-home.py` 从中文页生成），九个使用场景都有英文版 `landing-redesign/en/use-cases/<slug>/`（正文 `scripts/articles-en/`），列表页 `/en/use-cases/`。
+- 术语、人名（拼音、名在前）、写法统一在 `docs/en-glossary.md`。翻译完成后由一位没参与翻译的审校逐句对照中文复核，按意见改定。
+- 中英文页面互相带 hreflang（zh-CN、en、x-default 指中文），语言切换直达对应的那一页。
+- 英文短片 `hunterbuddy-film-en.mp4`：屏幕文字全部英文，时长与中文相同（2 分 22 秒），英文封面。
+- 两个首页已写好正式站用的 SEO 头部（canonical、Open Graph、JSON-LD，常见问题的结构化数据取自页面本身；百度验证只在中文首页），预览期仍带 noindex。
+- 上线用的 sitemap：`landing-redesign/sitemap.xml`，22 个网址（两个首页、两个列表页、18 个使用场景页），中英文成对。
+- 上线时英文也要配 301：`/en/use-cases/talent-mapping/` → `/en/use-cases/org-chart/`，`/en/use-cases/sourcing/` → `/en/use-cases/finding-candidates/`，`/en/use-cases/candidate-nurturing/` → `/en/use-cases/talent-pool/`；去掉 `/use-cases/` → `/#work`、`/en/use-cases/` → `/en/#work` 两条（现在是真实页面）。
+- 上线提示词：`docs/codex-launch-redesign.md`。
+
 ### 合并：“使用场景”和“文章”合成一套（2026-10-25，用户决定）
 用户看完觉得四个使用场景页和八篇文章内容高度重复，决定把文章并到“使用场景”下，去掉“文章”和原来的使用场景页。实测措辞重合不高（单篇和对应场景页 6 字连续重合最多约 11%），但主题两两重叠：组织架构 ↔ 组织架构图怎么画，职位寻访 ↔ 猎头怎么找人、人岗匹配怎么做，人选维护 ↔ 人才库怎么建。
 

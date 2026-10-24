@@ -15,6 +15,7 @@ This guide is shared by the English homepage (`public/landing-redesign/en/`), th
 - Sentence case for headings ("Find the real name behind an alias"), not Title Case.
 - Prefer periods and colons. Use the em dash rarely, at most one per paragraph. Do not use semicolons in headings.
 - Numbers: write one to nine in words in prose, and use digits on cards and labels ("10+", "Series B").
+- Curly apostrophes and quotes (’ “ ”) on the website. A quoted label keeps its own capital and the sentence’s period stays outside: marked “To confirm”.
 - The stance never changes: HunterBuddy gathers and sources, and **you decide**. It never contacts anyone, judges people or makes business decisions for you.
 
 ## Product and company
@@ -38,11 +39,13 @@ This guide is shared by the English homepage (`public/landing-redesign/en/`), th
 |---|---|---|
 | 智能人岗匹配 / 人岗匹配 | job matching | Job matching |
 | 自动寻访 / 职位寻访 | automated sourcing / sourcing | Sourcing |
-| 还原花名背后的真实姓名 / 定位真实姓名 / 身份核实 | finding the real name behind an alias / identity checks | Identity checks |
+| 还原花名背后的真实姓名 / 定位真实姓名 / 身份核实 | finding the real name behind an alias / identity checks (in prose, where “professional identity” is clear) | Real names (film chapter, cover); Identity checks (links) |
 | BD 客户研判 | client research for business development (BD) | Client research |
 | 客户开发 | business development (BD) | Business development |
-| 守住你的人脉资产 / 人才库 / 简历库更新 | keeping your network current / talent pool / CV database | Talent pool |
+| 守住你的人脉资产 / 人才库 | keeping your network current / talent pool | Talent pool |
+| 简历库更新 | keeping your CV database current (film chapter and cover: “CV updates”) | CV updates |
 | 组织架构梳理 / 组织架构图 / Mapping | org charts / talent mapping | Org charts |
+| 智能人岗匹配 | job matching (no “smart”) | Job matching |
 
 Other recurring terms:
 
@@ -70,10 +73,19 @@ Other recurring terms:
 | 结构化检索 · 全文召回 · 语义匹配 | structured search · full-text recall · semantic matching |
 | 核心技能 · 行业背景 · 硬性门槛 | core skills · industry background · must-haves |
 | 匹配分 · 亮点 · 潜在风险 · 推荐理由 | match score · strengths · possible risks · why we recommend them |
-| 真实需求 · 付费潜力 · 合作风险 | real need · ability to pay · risk to the relationship |
+| 真实需求 · 付费潜力 · 合作风险 | real need · ability to pay · the risk in working with them (cards: “Risk”) |
 | 人才盘点 | talent review |
 | 猎头管理系统（CRM、ATS） | recruitment CRM or ATS |
 | 背调 | background check (allowed only in the same-name-candidates article) |
+| 视觉算法负责人 | Head of Computer Vision (film, where space is tight: Head of Vision) |
+| 技术负责人 | Technical Lead for a team’s tech lead (film: Tech Lead); Head of Technology for the company’s top tech role under the founder |
+| 工业视觉 · 机器视觉 | industrial vision · machine vision (different terms, keep them apart) |
+| 机器人感知 | robotics perception |
+| 量产 / 做过量产 | mass production / has led mass production (film may say “shipped at scale”) |
+| 招聘平台 | recruiting platforms (“job platforms” only where space is tight) |
+| 已确认 · 较有把握 · 待核实 · 空白 | Confirmed · Fairly sure · To verify · Gap |
+| 示意 (captions) | Illustrative: |
+| 两处来源 / 三处来源 (on cards) | 2 sources / 3 sources |
 
 ## States and labels (the product's own words)
 
@@ -102,6 +114,8 @@ All examples are illustrative. Use pinyin in Western order (given name, then fam
 | 陈思 | Si Chen |
 | 韩征 | Zheng Han |
 | 星川机器人 | Xingchuan Robotics |
+| 穹顶智能 | Qiongding AI |
+| 张远 | Yuan Zhang |
 | 拓界机器人 | Tuojie Robotics |
 
 Platforms, in the ai-tools-compared article only: 豆包 Doubao, DeepSeek, ChatGPT, 猎聘 Liepin, 领英 LinkedIn, 脉脉 Maimai, BOSS直聘 BOSS Zhipin. Describe what each is good for, and never belittle one.

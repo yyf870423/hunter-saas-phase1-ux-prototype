@@ -5,7 +5,7 @@ export default {
   description:
     "General AI like ChatGPT, platforms like LinkedIn and Liepin, a CRM or ATS, and an AI assistant like HunterBuddy: what each is for, and how to combine them.",
   kicker: "Headhunting in practice · Tools compared",
-  h1: ["General AI, job platforms, CRM and AI", "assistants for headhunters: what is each for?"],
+  h1: ["General AI, job platforms, CRM", "and AI assistants for headhunters:", "what is each for?"],
   answer:
     "Each of the four kinds of tool covers its own stage, and they work best in combination. General-purpose AI assistants are good for writing, reading material and explaining unfamiliar ideas, recruiting platforms for posting roles and finding and contacting candidates, and a recruitment CRM or ATS for recording clients, roles and where each submission stands. An AI assistant for headhunters does the research before and during a search, matching public information with what you already have and naming the source of every finding.",
   teaser: "General AI, recruiting platforms, CRM and an AI assistant for headhunters: each has its own stage.",

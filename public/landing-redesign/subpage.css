@@ -476,3 +476,16 @@
     transition: none;
   }
 }
+
+/* English titles on phones: the desktop line breaks leave stubs ("CRM" alone), so let the lines run together and balance */
+@media (max-width: 800px) {
+  :lang(en) .s-hero h1 br {
+    display: none;
+  }
+  :lang(en) .s-hero h1 .ln + br + .ln::before {
+    content: " ";
+  }
+  :lang(en) .s-hero h1 {
+    text-wrap: balance;
+  }
+}
