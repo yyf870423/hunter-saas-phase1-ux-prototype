@@ -6,7 +6,7 @@
 
 ## 提示词
 
-请把仓库 `main` 分支里的改版官网（中英文）发布到正式站 https://www.boseekai.com ，替换现在线上的版本。改版内容已经由用户验收，**不要改任何文案、样式和脚本逻辑**，只做上线需要的路径、头部、跳转、站点地图和服务器配置。做完按文末清单逐项验证，并把结果回报给我。
+请把仓库 `main` 分支（提交 `88677b5` 或之后）里的改版官网（中英文）发布到正式站 https://www.boseekai.com ，替换现在线上的版本。改版内容已经由用户验收，**不要改任何文案、样式和脚本逻辑**，只做上线需要的路径、头部、跳转、站点地图和服务器配置。做完按文末清单逐项验证，并把结果回报给我。
 
 ### 1. 上线什么
 
@@ -33,7 +33,16 @@
 - `landing/`（线上已有 `/landing/`，改版放在站点根目录后这些相对路径会自然落到 `/landing/…`，不用改）：`shared-ui.css`、`shared-form.css`、`trial-page.css`、`shared-ui.js`、`shared-form.js`、`trial-form.js`、`vendor/libphonenumber-max.js`。
 - `landing-origin/`（**要处理**）：`favicon.ico`、`favicon.svg`、`apple-touch-icon.png`、`locale-en.js`、`assets/boseek-b5-dark.svg`、`assets/boseek-b5.svg`、`assets/boseek-b5-en.svg`、`assets/hero-research.webp`、`assets/human-conversation.webp`、`assets/fonts/inter-400.woff2`、`assets/fonts/inter-500.woff2`。
 
-建议的做法：发布目录以 `landing-redesign/` 为根，把上面 `landing-origin/` 的 11 个文件复制到发布目录里同样的相对位置（根目录和 `assets/` 下，没有重名；改版自己的英文表单文件特意叫 `trial-locale-en.js`，不会和 `locale-en.js` 冲突），然后在**发布产物**里把 `../landing-origin/`、`../../landing-origin/`、`../../../landing-origin/` 换成对应层级的 `./`、`../`、`../../`（也就是指向站点根目录）。CSS 里引用的 Inter 字体（`redesign.css` 里 `../landing-origin/assets/fonts/…`）同样处理。不要改仓库里的源文件，只改发布产物；如果你更习惯别的布局，只要所有引用都能 200 返回、页面的结构化数据里 `https://www.boseekai.com/assets/…` 的网址（短片和封面）有效即可。
+建议的做法：发布目录以 `landing-redesign/` 为根，把上面 `landing-origin/` 的 11 个文件复制到发布目录里同样的相对位置（根目录和 `assets/` 下，没有重名；改版自己的英文表单文件特意叫 `trial-locale-en.js`，不会和 `locale-en.js` 冲突），然后在**发布产物**里把指向 `landing-origin/` 的相对路径改成指向站点根目录，规则是去掉一个 `../` 和 `landing-origin/`。仓库里一共有四种写法：
+
+| 出现在 | 原写法 | 改成 |
+|---|---|---|
+| `/index.html`、`redesign.css`（Inter 字体） | `../landing-origin/` | （空，即同级） |
+| `/en/index.html`、`/use-cases/index.html` | `../../landing-origin/` | `../` |
+| `/use-cases/<slug>/`、`/en/use-cases/index.html` | `../../../landing-origin/` | `../../` |
+| `/en/use-cases/<slug>/` | `../../../../landing-origin/` | `../../../` |
+
+`../landing/` 这类写法不用改，放到根目录后会落到 `/landing/…`。不要改仓库里的源文件，只改发布产物。如果你更习惯别的布局，只要所有引用都能 200 返回、页面结构化数据里 `https://www.boseekai.com/assets/…` 的网址（短片和封面）有效即可。
 
 ### 2. 头部要改的地方
 
