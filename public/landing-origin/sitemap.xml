@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.boseekai.com/</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/" />
@@ -16,7 +16,7 @@
   </url>
   <url>
     <loc>https://www.boseekai.com/use-cases/business-development/</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/business-development/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/business-development/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/business-development/" />
@@ -30,7 +30,7 @@
   </url>
   <url>
     <loc>https://www.boseekai.com/use-cases/talent-mapping/</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/talent-mapping/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/talent-mapping/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/talent-mapping/" />
@@ -44,7 +44,7 @@
   </url>
   <url>
     <loc>https://www.boseekai.com/use-cases/sourcing/</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/sourcing/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/sourcing/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/sourcing/" />
@@ -58,7 +58,7 @@
   </url>
   <url>
     <loc>https://www.boseekai.com/use-cases/candidate-nurturing/</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/candidate-nurturing/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/candidate-nurturing/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/candidate-nurturing/" />
@@ -69,5 +69,41 @@
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/candidate-nurturing/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/candidate-nurturing/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/candidate-nurturing/" />
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/org-chart/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/talent-pool/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/headhunter-consultant/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/job-matching/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/ai-assistant-for-headhunters/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/finding-candidates/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/ai-tools-compared/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/articles/same-name-candidates/</loc>
+    <lastmod>2026-10-25</lastmod>
   </url>
 </urlset>
