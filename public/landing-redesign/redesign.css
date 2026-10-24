@@ -1675,22 +1675,15 @@ body.n-page::after {
   .js .n-step {
     display: contents;
   }
-  /* each text sits beside its own picture and scrolls up with it, so it never rides over the
-     section heading; the pair passing the middle of the screen lights up, the others stay dim */
+  /* each text sits beside its own picture and moves exactly as the picture does (plain scrolling,
+     no pinning, no switching), so it never rides over the section heading */
   .js .n-step-text {
     grid-column: 1;
     align-self: center;
     margin: 0 !important;
-    opacity: 0.26;
-    transform: translate3d(0, 24px, 0);
-    transition: opacity 0.5s ease, transform 0.7s var(--ease);
-  }
-  .js .n-step.is-past .n-step-text {
-    transform: none;
-  }
-  .js .n-step.is-active .n-step-text {
-    opacity: 1;
-    transform: none;
+    /* redesign.js sets --lit from how close the text is to the middle of the screen,
+       so the text brightens and dims as it scrolls, the way the reference site does */
+    opacity: var(--lit, 1);
   }
   .js .n-step:nth-child(1) .n-step-text { grid-row: 1; }
   .js .n-step:nth-child(2) .n-step-text { grid-row: 2; }

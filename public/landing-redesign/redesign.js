@@ -216,6 +216,10 @@
           gap = d;
           best = step;
         }
+        // brightness follows the scroll: full in the middle of the screen, fading towards the edges
+        const t = step.querySelector(".n-step-text").getBoundingClientRect();
+        const k = clamp(1 - (Math.abs((t.top + t.bottom) / 2 - mid) - innerHeight * 0.12) / (innerHeight * 0.3));
+        step.style.setProperty("--lit", (0.28 + 0.72 * k * k * (3 - 2 * k)).toFixed(3));
       });
       activate(best);
     };
