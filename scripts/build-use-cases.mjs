@@ -8,9 +8,6 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COMMON } from "./use-cases/content.mjs";
 import { PAGES } from "./use-cases/pages.mjs";
-import { footerArticlesGroup, loadArticles } from "./build-articles.mjs";
-
-const ARTICLES = await loadArticles(); // 中文页的“延伸阅读”和页脚“文章”一栏用
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://www.boseekai.com/";
@@ -103,16 +100,6 @@ function page(lang, entry) {
     lang === "en"
       ? `<img src="${up}assets/boseek-b5-en.svg" alt="Boseek" width="150" height="48"`
       : `<img src="${up}assets/boseek-b5-dark.svg" alt="Boseek 铂寻" width="150" height="54"`;
-
-  // 中文页：和这一页对应的文章（文章只有中文）
-  const readingList = lang === "zh" ? ARTICLES.filter((a) => a.useCase === entry.slug) : [];
-  const reading = readingList.length
-    ? `
-            <h3 class="u-confirm-title">延伸阅读</h3>
-            <ul class="u-reading">
-${readingList.map((a) => `              <li><a href="${up}articles/${a.slug}/">${text(a.title.replace(/｜HunterBuddy$/, ""))}</a></li>`).join("\n")}
-            </ul>`
-    : "";
 
   const steps = (items) =>
     items
@@ -266,7 +253,7 @@ ${c.result.paras.map((para) => `            <p class="u-intro">${text(para)}</p>
             <ul class="u-confirm">
 ${c.result.confirm.map((item) => `              <li>${text(item)}</li>`).join("\n")}
             </ul>
-            <p class="u-note">${text(c.result.note)}</p>${reading}
+            <p class="u-note">${text(c.result.note)}</p>
           </div></div>
         </section>
       </div>
@@ -343,7 +330,7 @@ ${footerProduct}
 ${footerCases}
               </ul>
             </div>
-${lang === "zh" ? footerArticlesGroup(up, ARTICLES) + "\n" : ""}            <div class="f-footer-group" role="group" aria-labelledby="f-footer-legal">
+            <div class="f-footer-group" role="group" aria-labelledby="f-footer-legal">
               <h2 id="f-footer-legal">${text(t.footerLegal)}</h2>
               <ul>
 ${t.legal.map((item) => `                <li>${text(item)}</li>`).join("\n")}

@@ -1,19 +1,19 @@
-# 官网 SEO 文章
+# 使用场景里的实务文章
 
-每篇一个文件 `<slug>.mjs`，`export default {...}`。改完运行：
+2026-10-25 起“使用场景”和“文章”合成一套，页面在改版首页下：`public/landing-redesign/use-cases/<slug>/`（加上列表页 `use-cases/`）。
+八篇的正文在这里，每篇一个文件 `<slug>.mjs`，`export default {...}`。第九篇“客户开发”来自 `scripts/use-cases/pages.mjs` 的中文稿，在构建脚本里改写成同一格式。改完运行：
 
 ```sh
-node scripts/build-articles.mjs        # 生成 public/landing-origin/articles/… 和文章列表，写出标题用字
-python3 scripts/subset-origin-chinese.py # 标题里出现新字时，补全思源宋体子集
-node scripts/build-use-cases.mjs       # 场景页的“延伸阅读”和页脚“文章”一栏跟着文章走
+node scripts/build-articles.mjs        # 只做规矩检查
+node scripts/build-redesign-pages.mjs  # 生成九篇和列表页（会先检查，再写）
 ```
 
-新增文章还要：在 `public/landing-origin/sitemap.xml` 加网址，在 `scripts/verify-pages-artifact.mjs` 的 landing-origin 清单里加文件，在 `tests/origin-articles.spec.js` 的列表里加 slug。
+新增一篇还要：在 `scripts/build-redesign-pages.mjs` 的 ORDER（和需要的话 FOOTER）里加上 slug，在 `tests/redesign-use-cases.spec.js` 的列表里加 slug，上线时在 sitemap 里加网址。
 
 ## 字段
 | 字段 | 说明 |
 |---|---|
-| `slug`、`order` | 网址 `/articles/<slug>/` 和列表顺序 |
+| `slug`、`order` | 网址 `/use-cases/<slug>/`（列表顺序由构建脚本里的 ORDER 决定） |
 | `name` | 面包屑、相关阅读、页脚里的短名，16 字以内 |
 | `title` | `<title>`，含主攻词，以“｜HunterBuddy”结尾，40 字以内 |
 | `description` | 搜索结果摘要，80–120 字 |
@@ -21,7 +21,7 @@ node scripts/build-use-cases.mjs       # 场景页的“延伸阅读”和页脚
 | `answer` | 首屏第一段，直接回答标题的问题，2–3 句，能被单独引用 |
 | `teaser` | 文章列表里的一句话 |
 | `keywords` | 主攻词和长尾词，只用于检查，不上页面 |
-| `useCase` | 对应的使用场景页 slug，没有就 `null` |
+| `useCase` | 旧字段（原来对应的使用场景页），合并后不再使用 |
 | `related` | 2–3 篇相关文章的 slug（总领文章 `ai-assistant-for-headhunters` 会自动加上） |
 | `sections` | 4–6 节，`{ h2: "问句？", body: [...] }` |
 | `faq` | 3–4 条 `[问题, 回答]`，页面和结构化数据 FAQPage 用同一份 |

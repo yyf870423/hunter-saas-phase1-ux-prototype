@@ -1439,8 +1439,8 @@ body.n-page::after {
 }
 .n-footer-groups {
   display: grid;
-  grid-template-columns: repeat(4, max-content);
-  gap: 32px 48px;
+  grid-template-columns: repeat(3, max-content);
+  gap: 32px 56px;
 }
 .n-footer-groups a {
   white-space: nowrap;

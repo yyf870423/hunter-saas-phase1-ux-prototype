@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../landing/shared-form.css?v=20261021" />
     <link rel="stylesheet" href="../landing/trial-page.css?v=20261021" />
     <link rel="preload" href="assets/fonts/alimama-shuheiti-bold-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="redesign.css?v=18" />
+    <link rel="stylesheet" href="redesign.css?v=19" />
     <script>
       document.documentElement.classList.add("js");
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");
@@ -141,7 +141,7 @@
                 <p class="n-pain">JD 只有寥寥几行，库里却攒着几千份简历，一份份比对到深夜。</p>
                 <h3 id="n-step-match">智能人岗匹配</h3>
                 <p>把岗位 JD 拆开，提炼核心技能、行业背景和硬性门槛，再用结构化检索、全文召回和语义匹配一起找人。每位人选都附上匹配分、亮点、潜在风险和推荐理由，省去反复比对。反过来，也能为一份简历找到合适的岗位。</p>
-                <a class="n-more" href="use-cases/sourcing/">了解职位寻访</a>
+                <a class="n-more" href="use-cases/job-matching/">了解人岗匹配</a>
                 <span class="n-step-bar" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i></span>
               </div>
             </article>
@@ -169,7 +169,7 @@
                 <p class="n-pain">人选散在招聘平台、论文、代码仓库和自己的简历库里，翻一遍就是一整天。</p>
                 <h3 id="n-step-sourcing">读懂你的需求，自动寻访</h3>
                 <p>整合公开信息、专利论文、代码痕迹，以及你多年沉淀的简历库，把人选收拢到一起，排好优先级。检索比对的事交给它，你安心把精力留给识人沟通。</p>
-                <a class="n-more" href="use-cases/sourcing/">了解职位寻访</a>
+                <a class="n-more" href="use-cases/finding-candidates/">了解猎头怎么找人</a>
                 <span class="n-step-bar" aria-hidden="true"><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i></span>
               </div>
             </article>
@@ -194,7 +194,7 @@
                 <p class="n-pain">手上只有一个花名、一个 ID，人到底是谁，往往要猜上半天。</p>
                 <h3 id="n-step-identity">还原花名背后的真实姓名</h3>
                 <p>即便只有花名、化名或昵称，HunterBuddy 也会用多个来源交叉验证、排除同名，还原候选人的真实姓名和身份，再沿着履历和关系线索找到相关人选，推荐合适的触达路径。拿不准的地方，会标出来等你确认。</p>
-                <a class="n-more" href="use-cases/talent-mapping/">了解组织架构</a>
+                <a class="n-more" href="use-cases/same-name-candidates/">了解身份核实</a>
                 <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i></span>
               </div>
             </article>
@@ -233,7 +233,7 @@
                 <p class="n-pain">当年聊过的人，换了工作、换了赛道，你的简历库却还停在两年前。</p>
                 <h3 id="n-step-network">守住你的人脉资产</h3>
                 <p>你认识的每一个人，都是长期的财富。人选换工作、换赛道、承担新职责，信息会悄悄更新。不用你费力记录维护，你的人才库跟着时间一起生长。</p>
-                <a class="n-more" href="use-cases/candidate-nurturing/">了解人选维护</a>
+                <a class="n-more" href="use-cases/talent-pool/">了解人才库管理</a>
                 <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i></span>
               </div>
             </article>
@@ -256,7 +256,7 @@
                 <p class="n-pain">做 Mapping 要对着官网和新闻一点点拼，画完的图还存着好几个版本。</p>
                 <h3 id="n-step-mapping">组织架构梳理，轻松做 Mapping</h3>
                 <p>自动汇总人员、部门、岗位和汇报关系，一键生成架构图，省去反复核对、画图、维护多个版本的麻烦。搭配多维度视图，团队脉络一目了然，人才盘点和招聘 Mapping 都更轻松。</p>
-                <a class="n-more" href="use-cases/talent-mapping/">了解组织架构</a>
+                <a class="n-more" href="use-cases/org-chart/">了解组织架构图</a>
                 <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i></span>
               </div>
             </article>
@@ -374,20 +374,11 @@
               <h2>使用场景</h2>
               <ul>
                 <li><a href="use-cases/business-development/">客户开发</a></li>
-                <li><a href="use-cases/talent-mapping/">组织架构</a></li>
-                <li><a href="use-cases/sourcing/">职位寻访</a></li>
-                <li><a href="use-cases/candidate-nurturing/">人选维护</a></li>
-              </ul>
-            </div>
-            <div>
-              <h2>实务文章</h2>
-              <ul>
-                <li><a href="articles/ai-assistant-for-headhunters/">猎头 AI 助手</a></li>
-                <li><a href="articles/org-chart/">组织架构图</a></li>
-                <li><a href="articles/job-matching/">人岗匹配</a></li>
-                <li><a href="articles/finding-candidates/">猎头怎么找人</a></li>
-                <li><a href="articles/talent-pool/">人才库管理</a></li>
-                <li><a href="articles/">全部文章 &gt;&gt;</a></li>
+                <li><a href="use-cases/org-chart/">组织架构图</a></li>
+                <li><a href="use-cases/finding-candidates/">猎头怎么找人</a></li>
+                <li><a href="use-cases/job-matching/">人岗匹配</a></li>
+                <li><a href="use-cases/talent-pool/">人才库管理</a></li>
+                <li><a href="use-cases/">全部 &gt;&gt;</a></li>
               </ul>
             </div>
             <div>

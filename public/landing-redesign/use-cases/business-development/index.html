@@ -29,9 +29,6 @@
             "isPartOf": {
               "@id": "https://www.boseekai.com/#website"
             },
-            "about": {
-              "@id": "https://www.boseekai.com/#hunterbuddy"
-            },
             "publisher": {
               "@id": "https://www.boseekai.com/#organization"
             },
@@ -52,10 +49,37 @@
               {
                 "@type": "ListItem",
                 "position": 2,
+                "name": "使用场景",
+                "item": "https://www.boseekai.com/use-cases/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
                 "name": "客户开发",
                 "item": "https://www.boseekai.com/use-cases/business-development/"
               }
             ]
+          },
+          {
+            "@type": "Article",
+            "@id": "https://www.boseekai.com/use-cases/business-development/#article",
+            "headline": "猎头客户开发：从一条融资新闻找到新职位和用人经理",
+            "description": "猎头怎么找客户？HunterBuddy 帮你盯着关注的赛道，从融资新闻和招聘页里发现正在扩张的公司，找到新职位、用人经理和引荐路线，每条线索都写明来源。联系谁、怎么开口，由你决定。",
+            "inLanguage": "zh-CN",
+            "datePublished": "2026-10-25",
+            "dateModified": "2026-10-25",
+            "mainEntityOfPage": {
+              "@id": "https://www.boseekai.com/use-cases/business-development/#webpage"
+            },
+            "author": {
+              "@id": "https://www.boseekai.com/#organization"
+            },
+            "publisher": {
+              "@id": "https://www.boseekai.com/#organization"
+            },
+            "about": {
+              "@id": "https://www.boseekai.com/#hunterbuddy"
+            }
           },
           {
             "@type": "FAQPage",
@@ -107,7 +131,8 @@
     <link rel="apple-touch-icon" href="../../../landing-origin/apple-touch-icon.png?v=20261022-bo" />
     <!-- 这一页没有表单，申请试用回首页。保留这一行是为了和其他页面一致 -->
     <meta name="trial-api" content="disabled" />
-    <link rel="stylesheet" href="../../redesign.css?v=18" />
+    <link rel="stylesheet" href="../../../landing/shared-ui.css?v=20261021" />
+    <link rel="stylesheet" href="../../redesign.css?v=19" />
     <link rel="stylesheet" href="../../subpage.css?v=20261025-a" />
     <script defer src="../../subpage.js?v=20261025-a"></script>
   </head>
@@ -137,23 +162,38 @@
     </header>
 
     <main id="main" tabindex="-1">
+      <article>
       <section class="n-dark s-hero" aria-labelledby="s-title">
         <div class="n-wrap"><div class="s-col">
           <nav class="s-crumbs" aria-label="当前位置">
-            <a href="../../">首页</a><span aria-hidden="true">/</span><a href="../../#capabilities">能做什么</a><span aria-hidden="true">/</span><span aria-current="page">客户开发</span>
+            <a href="../../">首页</a><span aria-hidden="true">/</span><a href="../../use-cases/">使用场景</a><span aria-hidden="true">/</span><span aria-current="page">客户开发</span>
           </nav>
           <p class="n-kicker">使用场景 · 猎头客户开发</p>
           <h1 id="s-title"><span class="ln">一条融资新闻，</span><br /><span class="ln">可能就是下一个职位委托。</span></h1>
-          <p class="s-lead">客户开发常常从一条不起眼的消息开始。HunterBuddy 帮你盯着关注的赛道，从一条融资新闻出发，找到新职位、用人经理和引荐路线，每条线索都写明来源。联系谁、怎么开口，由你决定。</p>
-          <div class="s-actions"><a class="n-btn n-btn-light" href="../../#apply">申请试用</a><a class="n-link n-link-light" href="#how">看看怎么做</a></div>
+          <p class="s-lead">新客户常常藏在一条不起眼的消息里。HunterBuddy 帮你盯着关注的赛道，从融资新闻出发，找到新职位、可能的用人经理和引荐路线，判断值不值得跟，每条线索都写明来源。联系谁、怎么开口，由你决定。</p>
+          <p class="s-meta">铂寻 Boseek<span aria-hidden="true">·</span>更新于 <time datetime="2026-10-25">2026-10-25</time></p>
         </div></div>
       </section>
 
       <div class="n-light s-paper">
-        <section class="s-section" id="method" aria-labelledby="method-t">
+        <nav class="s-toc-wrap" aria-labelledby="s-toc-title">
           <div class="n-wrap"><div class="s-col">
-            <p class="s-label">一般怎么做</p>
-            <h2 id="method-t">猎头客户开发，一般怎么做</h2>
+            <div class="s-toc">
+              <p class="s-label" id="s-toc-title">本文目录</p>
+              <ol>
+                <li><a href="#s1">猎头客户开发，一般怎么做？</a></li>
+                <li><a href="#s2">难的不是打电话，是知道该打给谁</a></li>
+                <li><a href="#s3">HunterBuddy 怎么帮你做客户开发？</a></li>
+                <li><a href="#s4">你会拿到什么，哪些要你确认？</a></li>
+              </ol>
+            </div>
+          </div></div>
+        </nav>
+
+        <section class="s-section" id="s1" aria-labelledby="s1-t">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label">01</p>
+            <h2 id="s1-t">猎头客户开发，一般怎么做？</h2>
             <p class="s-p">独立猎头和资深顾问的新客户，很少来自陌生电话。更多时候，靠的是一直留意几个熟悉的赛道，看到哪家公司在扩张，再顺着人脉找到能拍板的人。大致分五步：</p>
             <ol class="s-steps">
               <li>
@@ -180,14 +220,14 @@
           </div></div>
         </section>
 
-        <section class="s-section" id="hard" aria-labelledby="hard-t">
+        <section class="s-section" id="s2" aria-labelledby="s2-t">
           <div class="n-wrap"><div class="s-col">
-            <p class="s-label">难在哪里</p>
-            <h2 id="hard-t">难的不是打电话，是知道该打给谁</h2>
+            <p class="s-label">02</p>
+            <h2 id="s2-t">难的不是打电话，是知道该打给谁</h2>
             <ul class="s-cards">
               <li>
                 <h3>信号太散</h3>
-                <p>融资新闻在媒体上，职位在招聘页，人事变动在领英和脉脉上，一个人很难每天都看一遍。</p>
+                <p>融资新闻在媒体上，职位在招聘页，人事变动在职业社交平台上，一个人很难每天都看一遍。</p>
               </li>
               <li>
                 <h3>消息对不上</h3>
@@ -205,10 +245,10 @@
           </div></div>
         </section>
 
-        <section class="s-section" id="how" aria-labelledby="how-t">
+        <section class="s-section" id="s3" aria-labelledby="s3-t">
           <div class="n-wrap"><div class="s-col">
-            <p class="s-label">怎么帮你</p>
-            <h2 id="how-t">HunterBuddy 怎么帮你做客户开发</h2>
+            <p class="s-label">03</p>
+            <h2 id="s3-t">HunterBuddy 怎么帮你做客户开发？</h2>
             <p class="s-p">还是用首页里星川机器人的例子，一步步看。</p>
             <ol class="s-steps">
               <li>
@@ -222,9 +262,14 @@
                 <p class="s-example"><span>星川机器人</span>星川官网招聘页新增了视觉算法负责人一职，招聘页和融资新闻两处来源都能对上。</p>
               </li>
               <li>
+                <h3>BD 客户研判：值不值得跟</h3>
+                <p>它把融资动态、创始团队、岗位和业务信号放在一起，看需求是不是真的、付不付得起猎头费、合作上有没有风险，再理清决策链和优先级。有依据的写明来源，没依据的标为待确认。</p>
+                <p class="s-example"><span>星川机器人</span>真实需求、付费潜力都有依据：刚拿到 B 轮，招聘页上了新职位。合作风险待确认：以前和猎头合作过没有、谁拍板，还不清楚。</p>
+              </li>
+              <li>
                 <h3>找到用人经理</h3>
                 <p>它从公开资料里找出负责这个团队的人。没有可靠来源的信息会标为“待确认”，不会把猜测当成事实。</p>
-                <p class="s-example"><span>星川机器人</span>用人经理是技术负责人许晴，负责视觉团队，直接联系方式还待确认。</p>
+                <p class="s-example"><span>星川机器人</span>负责视觉团队的是技术负责人许晴，很可能就是这个职位的用人经理，直接联系方式待确认。</p>
               </li>
               <li>
                 <h3>从你的人脉里找引荐</h3>
@@ -240,26 +285,37 @@
               </figcaption>
               <ul>
                 <li><small>找到职位 · 两处来源</small><strong>官网招聘页新增视觉算法负责人</strong><p>招聘页和融资新闻都能对上。</p></li>
-                <li><small>用人经理</small><strong>许晴 · 技术负责人</strong><p>负责视觉团队，直接联系方式待确认。</p></li>
+                <li><small>研判 · 有依据</small><strong>真实需求、付费潜力</strong><p>刚拿到 B 轮，招聘页上了新职位。合作风险待确认。</p></li>
+                <li><small>可能的用人经理</small><strong>许晴 · 技术负责人</strong><p>负责视觉团队，直接联系方式待确认。</p></li>
                 <li><small>备用 · 引荐路线</small><strong>张远 → 许晴</strong><p>你的老客户，也是星川的投资人。</p></li>
               </ul>
             </figure>
           </div></div>
         </section>
 
-        <section class="s-section" id="result" aria-labelledby="result-t">
+        <section class="s-section" id="s4" aria-labelledby="s4-t">
           <div class="n-wrap"><div class="s-col">
-            <p class="s-label">你会拿到什么</p>
-            <h2 id="result-t">你会拿到什么，哪些要你确认</h2>
-            <p class="s-p">一个确认过的职位、一位用人经理，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD、谈妥委托，它才是你手上的正式职位。</p>
+            <p class="s-label">04</p>
+            <h2 id="s4-t">你会拿到什么，哪些要你确认？</h2>
+            <p class="s-p">一条两处来源对得上的职位线索、一位很可能的用人经理，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD、谈妥委托，它才是你手上的正式职位。</p>
             <p class="s-p">这次查过的公司、职位和人都会存下来。接下来梳理组织架构、找候选人，可以接着用。</p>
-            <h3 class="s-confirm-title">还要你确认</h3>
-            <ul class="s-confirm">
+            <ul class="s-list">
               <li>这个职位真的在招吗？HC 批下来了吗？</li>
               <li>直接联系许晴，还是请张远引荐？</li>
               <li>做不做独家、服务费怎么谈？</li>
             </ul>
             <p class="s-note">HunterBuddy 不会替你联系任何人，也不会替你做承诺。</p>
+          </div></div>
+        </section>
+
+        <section class="s-section s-related-wrap" aria-labelledby="s-related-title">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label" id="s-related-title">相关阅读</p>
+            <ul class="s-related">
+              <li><a href="../../use-cases/org-chart/"><span class="s-related-kind">使用场景</span><strong>公司组织架构图怎么画</strong><span class="s-related-line">怎么画组织架构图，以及怎么从公开信息还原目标公司。</span></a></li>
+              <li><a href="../../use-cases/finding-candidates/"><span class="s-related-kind">使用场景</span><strong>猎头怎么找人</strong><span class="s-related-line">从简历库到论文和代码，找人的渠道和搜索方法。</span></a></li>
+              <li><a href="../../use-cases/ai-assistant-for-headhunters/"><span class="s-related-kind">使用场景</span><strong>猎头 AI 助手是什么</strong><span class="s-related-line">猎头 AI 助手能做什么、不能做什么，怎么挑。</span></a></li>
+            </ul>
           </div></div>
         </section>
       </div>
@@ -290,43 +346,7 @@
           </div>
         </div>
       </section>
-
-      <section class="n-dark s-four-wrap" aria-labelledby="s-four-title">
-        <div class="n-wrap">
-          <p class="n-kicker">四件事</p>
-          <h2 class="n-h2" id="s-four-title"><span class="ln">以星川机器人为例，</span><br /><span class="ln">把四件事走一遍。</span></h2>
-          <ol class="s-four">
-            <li class="is-current">
-              <a href="../../use-cases/business-development/" aria-current="page">
-                <span class="s-four-index">01 · 你在这里</span>
-                <strong>客户开发</strong>
-                <span class="s-four-line">从一条融资新闻，找到新职位和用人经理。</span>
-              </a>
-            </li>
-            <li class="is-next">
-              <a href="../../use-cases/talent-mapping/">
-                <span class="s-four-index">02 · 下一步</span>
-                <strong>组织架构</strong>
-                <span class="s-four-line">把目标团队的组织架构理清楚，和你的候选人对上号。</span>
-              </a>
-            </li>
-            <li>
-              <a href="../../use-cases/sourcing/">
-                <span class="s-four-index">03</span>
-                <strong>职位寻访</strong>
-                <span class="s-four-line">JD 到手，先看你手上已经有谁，再去补齐。</span>
-              </a>
-            </li>
-            <li>
-              <a href="../../use-cases/candidate-nurturing/">
-                <span class="s-four-index">04</span>
-                <strong>人选维护</strong>
-                <span class="s-four-line">重点人选有了变化，对照你的在手职位。</span>
-              </a>
-            </li>
-          </ol>
-        </div>
-      </section>
+      </article>
 
       <section class="n-dark s-trial" aria-labelledby="s-trial-title">
         <div class="n-wrap s-trial-inner">
@@ -363,20 +383,11 @@
               <h2>使用场景</h2>
               <ul>
                 <li><a href="../../use-cases/business-development/" aria-current="page">客户开发</a></li>
-                <li><a href="../../use-cases/talent-mapping/">组织架构</a></li>
-                <li><a href="../../use-cases/sourcing/">职位寻访</a></li>
-                <li><a href="../../use-cases/candidate-nurturing/">人选维护</a></li>
-              </ul>
-            </div>
-            <div>
-              <h2>实务文章</h2>
-              <ul>
-                <li><a href="../../articles/ai-assistant-for-headhunters/">猎头 AI 助手</a></li>
-                <li><a href="../../articles/org-chart/">组织架构图</a></li>
-                <li><a href="../../articles/job-matching/">人岗匹配</a></li>
-                <li><a href="../../articles/finding-candidates/">猎头怎么找人</a></li>
-                <li><a href="../../articles/talent-pool/">人才库管理</a></li>
-                <li><a href="../../articles/">全部文章 &gt;&gt;</a></li>
+                <li><a href="../../use-cases/org-chart/">组织架构图</a></li>
+                <li><a href="../../use-cases/finding-candidates/">猎头怎么找人</a></li>
+                <li><a href="../../use-cases/job-matching/">人岗匹配</a></li>
+                <li><a href="../../use-cases/talent-pool/">人才库管理</a></li>
+                <li><a href="../../use-cases/">全部 &gt;&gt;</a></li>
               </ul>
             </div>
             <div>

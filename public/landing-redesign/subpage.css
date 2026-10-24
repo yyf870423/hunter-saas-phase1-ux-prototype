@@ -63,14 +63,6 @@
   color: var(--on-night-muted);
   font-size: 13px;
 }
-.s-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 28px;
-  margin-top: 36px;
-}
-
 /* ---------- reading body (light) ---------- */
 .s-paper {
   padding-bottom: 24px;
@@ -272,42 +264,6 @@
   line-height: 1.7;
 }
 
-/* what you confirm yourself: open boxes, because they are still to do */
-.s-confirm-title {
-  margin-top: 36px !important;
-  font-size: 17px;
-  font-weight: 500;
-}
-.s-confirm {
-  display: grid;
-  gap: 10px;
-  margin-top: 14px !important;
-}
-.s-confirm li {
-  position: relative;
-  padding: 14px 16px 14px 46px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--card);
-  font-size: 15px;
-  line-height: 1.7;
-}
-.s-confirm li::before {
-  content: "";
-  position: absolute;
-  top: 18px;
-  left: 16px;
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid var(--iris-ink);
-  border-radius: 3px;
-}
-.s-reading {
-  display: grid;
-  gap: 10px;
-  margin-top: 14px !important;
-}
-.s-reading a,
 .s-toc a {
   color: var(--ink);
   text-decoration: underline;
@@ -315,7 +271,6 @@
   text-underline-offset: 4px;
   transition: text-decoration-color 0.2s ease;
 }
-.s-reading a:hover,
 .s-toc a:hover {
   text-decoration-color: var(--iris-ink);
 }
@@ -441,52 +396,6 @@
   overflow-wrap: anywhere;
 }
 
-/* 四件事 on the use-case pages */
-.s-four-wrap {
-  padding-block: 96px;
-}
-.s-four {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 40px !important;
-}
-.s-four a {
-  display: grid;
-  gap: 8px;
-  height: 100%;
-  padding: 22px 20px;
-  border: 1px solid var(--night-line);
-  border-radius: 12px;
-  background: var(--night-raised);
-  transition: border-color 0.2s ease;
-}
-.s-four a:hover {
-  border-color: rgb(209 201 255 / 40%);
-}
-.s-four-index {
-  color: var(--on-night-muted);
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-}
-.s-four .is-current .s-four-index,
-.s-four .is-next .s-four-index {
-  color: var(--iris-hi);
-}
-.s-four .is-current a {
-  border-color: rgb(209 201 255 / 45%);
-}
-.s-four strong {
-  font-size: 18px;
-  font-weight: 500;
-}
-.s-four-line {
-  color: var(--on-night-muted);
-  font-size: 14px;
-  line-height: 1.7;
-}
-
 /* closing band: 申请试用 */
 .s-trial {
   padding-block: 72px;
@@ -514,11 +423,6 @@
   color: var(--ink);
 }
 
-@media (max-width: 1000px) {
-  .s-four {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
 @media (max-width: 800px) {
   .s-hero {
     padding-block: calc(var(--nav-h) + 40px) 64px;
@@ -545,7 +449,6 @@
   }
   .s-cards,
   .s-index,
-  .s-four,
   .s-demo {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -553,8 +456,7 @@
     gap: 22px;
     padding: 26px 20px;
   }
-  .s-faq,
-  .s-four-wrap {
+  .s-faq {
     padding-block: 64px;
   }
   .s-trial h2 {
@@ -570,9 +472,7 @@
   .s-crumbs a,
   .s-related a,
   .s-index a,
-  .s-four a,
-  .s-toc a,
-  .s-reading a {
+  .s-toc a {
     transition: none;
   }
 }

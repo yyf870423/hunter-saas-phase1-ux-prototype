@@ -1,22 +1,23 @@
-// 改版首页（public/landing-redesign/）配套的子页面，用改版首页的头部、页脚和字体：
-//   landing-redesign/use-cases/<slug>/index.html   四个使用场景页（中文）
-//   landing-redesign/articles/<slug>/index.html    八篇文章和文章列表页（中文）
-// 正文和正式版（landing-origin）共用：场景页来自 scripts/use-cases/pages.mjs，文章来自 scripts/articles/*.mjs。
-// 页面样式在 landing-redesign/subpage.css（只放子页面自己的部分，头部、页脚、按钮、常见问题沿用 redesign.css），
-// 交互在 landing-redesign/subpage.js（头部随滚动隐藏、菜单、浏览器顶栏颜色）。
+// 改版首页（public/landing-redesign/）配套的“使用场景”页面，用改版首页的头部、页脚和字体：
+//   landing-redesign/use-cases/index.html          使用场景列表
+//   landing-redesign/use-cases/<slug>/index.html   九篇：客户开发（由原来的客户开发场景页改写成同一格式）和八篇实务文章
+// 2026-10-25 起“使用场景”和“文章”合并：原来四个场景页里组织架构、职位寻访、人选维护三页和文章内容重复，去掉，
+// 线上旧网址由主站 301 到对应的新页面（见 docs/seo-geo-plan.md）。客户开发没有对应文章，保留在原网址。
+// 正文：八篇在 scripts/articles/*.mjs，客户开发来自 scripts/use-cases/pages.mjs 的中文稿（这里做了几处更正）。
+// 页面样式在 landing-redesign/subpage.css，交互在 landing-redesign/subpage.js。
 // 改版首页还在预览阶段，所以和首页一样带 noindex。上主站时去掉 noindex，并把 ../landing-origin/ 的资源路径换成主站路径。
 // 运行：node scripts/build-redesign-pages.mjs
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COMMON } from "./use-cases/content.mjs";
 import { PAGES } from "./use-cases/pages.mjs";
-import { FOOTER_ARTICLES, PUBLISHED, loadArticles } from "./build-articles.mjs";
+import { PUBLISHED, checkArticle, loadArticles } from "./build-articles.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://www.boseekai.com/";
 const OUT = resolve(root, "public/landing-redesign");
-const V = { redesign: "18", subpage: "20261025-a", subpageJs: "20261025-a" };
+const V = { redesign: "19", subpage: "20261025-a", subpageJs: "20261025-a" };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 
@@ -28,14 +29,34 @@ const NAV = [
   ["常见问题", "faq"],
 ];
 const LIST = {
-  name: "文章",
-  title: "猎头实务文章：组织架构、人才库、人岗匹配与猎头 AI 助手｜HunterBuddy",
+  name: "使用场景",
+  title: "使用场景：猎头客户开发、组织架构图、找人、人岗匹配与人才库｜HunterBuddy",
   description:
-    "写给独立猎头和资深顾问的实务文章：公司组织架构图怎么画、人才库怎么建、人岗匹配怎么做、猎头怎么找人、同名候选人怎么区分，以及猎头能用 AI 助手做哪些事。",
-  kicker: "猎头实务",
-  h1: "猎头实务文章",
-  lead: "从客户开发、组织架构到找人、匹配和人选维护，把猎头每天最花时间的几件事讲清楚：一般怎么做、难在哪里、哪些可以交给 AI，哪些还得你自己来。",
+    "写给独立猎头和资深顾问的使用场景：猎头怎么找客户、公司组织架构图怎么画、猎头怎么找人、人岗匹配怎么做、同名候选人怎么区分、人才库怎么建，以及猎头能用 AI 助手做哪些事。",
+  kicker: "使用场景",
+  h1: "使用场景",
+  lead: "从客户开发、组织架构到找人、匹配和人选维护，把猎头每天最花时间的几件事讲清楚：一般怎么做、难在哪里、HunterBuddy 能帮什么，哪些还得你自己来。",
 };
+// 列表和页脚的顺序：按一个职位从客户开发走到人选维护，再是几篇通用的
+const ORDER = [
+  "business-development",
+  "org-chart",
+  "finding-candidates",
+  "job-matching",
+  "same-name-candidates",
+  "talent-pool",
+  "headhunter-consultant",
+  "ai-assistant-for-headhunters",
+  "ai-tools-compared",
+];
+// 页脚“使用场景”一栏：五篇主要的（链接文字用各篇的主攻词），最后一行“全部 >>”
+const FOOTER = [
+  ["business-development", "客户开发"],
+  ["org-chart", "组织架构图"],
+  ["finding-candidates", "猎头怎么找人"],
+  ["job-matching", "人岗匹配"],
+  ["talent-pool", "人才库管理"],
+];
 
 const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const text = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -74,6 +95,7 @@ ${indent(JSON.stringify(graph, null, 2), "      ")}
     <link rel="apple-touch-icon" href="${lo}apple-touch-icon.png?v=20261022-bo" />
     <!-- 这一页没有表单，申请试用回首页。保留这一行是为了和其他页面一致 -->
     <meta name="trial-api" content="disabled" />
+    <link rel="stylesheet" href="${up}../landing/shared-ui.css?v=20261021" />
     <link rel="stylesheet" href="${up}redesign.css?v=${V.redesign}" />
     <link rel="stylesheet" href="${up}subpage.css?v=${V.subpage}" />
     <script defer src="${up}subpage.js?v=${V.subpageJs}"></script>
@@ -101,7 +123,7 @@ ${NAV.map(([label, hash]) => `          <a href="${up}#${hash}">${text(label)}</
 `;
 }
 
-// the footer: the same four groups as the redesigned homepage (产品 / 使用场景 / 文章 / 法律)
+// the footer: the same three groups as the redesigned homepage (产品 / 使用场景 / 法律)
 export function redesignFooterGroups(up, here = null) {
   const cur = (key) => (key === here ? ' aria-current="page"' : "");
   return `          <div class="n-footer-groups">
@@ -114,14 +136,8 @@ ${NAV.map(([label, hash]) => `                <li><a href="${up}#${hash}">${text
             <div>
               <h2>使用场景</h2>
               <ul>
-${PAGES.map((p) => `                <li><a href="${up}use-cases/${p.slug}/"${cur(`uc:${p.slug}`)}>${text(p.zh.name)}</a></li>`).join("\n")}
-              </ul>
-            </div>
-            <div>
-              <h2>实务文章</h2>
-              <ul>
-${FOOTER_ARTICLES.map(([slug, label]) => `                <li><a href="${up}articles/${slug}/"${cur(`a:${slug}`)}>${text(label)}</a></li>`).join("\n")}
-                <li><a href="${up}articles/"${cur("list")}>全部文章 &gt;&gt;</a></li>
+${FOOTER.map(([slug, label]) => `                <li><a href="${up}use-cases/${slug}/"${cur(slug)}>${text(label)}</a></li>`).join("\n")}
+                <li><a href="${up}use-cases/"${cur("list")}>全部 &gt;&gt;</a></li>
               </ul>
             </div>
             <div>
@@ -233,7 +249,7 @@ ${d.items.map(([small, strong, body]) => `    <li><small>${text(small)}</small><
 function block(item) {
   if (typeof item === "string") return `<p class="s-p">${text(item)}</p>`;
   if (item.list) return `<ul class="s-list">\n${item.list.map((li) => `  <li>${text(li)}</li>`).join("\n")}\n</ul>`;
-  if (item.steps) return steps(item.steps);
+  if (item.steps) return steps(item.steps, T.example);
   if (item.cards) return cards(item.cards);
   if (item.note) return `<p class="s-note">${text(item.note)}</p>`;
   if (item.demo) return demo(item.demo);
@@ -247,40 +263,39 @@ ${indent(body, "            ")}
           </div></div>
         </section>`;
 
-/* ---------- article ---------- */
-function articlePage(a, articles) {
+/* ---------- one 使用场景 page (all nine share the format) ---------- */
+function page(a, items) {
   const up = "../../";
-  const self = `${SITE}articles/${a.slug}/`;
-  const useCase = a.useCase ? PAGES.find((p) => p.slug === a.useCase) : null;
+  const self = `${SITE}use-cases/${a.slug}/`;
   const related = [...new Set([...(a.related || []), ...(a.slug === HUB ? [] : [HUB])])]
     .filter((s) => s !== a.slug)
-    .map((s) => articles.find((x) => x.slug === s));
+    .map((s) => {
+      const r = items.find((x) => x.slug === s);
+      if (!r) throw new Error(`${a.slug}: related ${s} not found`);
+      return r;
+    });
   const graph = {
     "@context": "https://schema.org",
     "@graph": [
       { "@type": "WebPage", "@id": `${self}#webpage`, url: self, name: a.title, description: a.description, inLanguage: "zh-CN", isPartOf: { "@id": `${SITE}#website` }, publisher: { "@id": `${SITE}#organization` }, breadcrumb: { "@id": `${self}#breadcrumb` } },
       { "@type": "BreadcrumbList", "@id": `${self}#breadcrumb`, itemListElement: [
         { "@type": "ListItem", position: 1, name: T.homeName, item: SITE },
-        { "@type": "ListItem", position: 2, name: "文章", item: `${SITE}articles/` },
+        { "@type": "ListItem", position: 2, name: LIST.name, item: `${SITE}use-cases/` },
         { "@type": "ListItem", position: 3, name: a.name, item: self },
       ] },
-      { "@type": "Article", "@id": `${self}#article`, headline: a.title.replace(/｜HunterBuddy$/, ""), description: a.description, inLanguage: "zh-CN", datePublished: PUBLISHED, dateModified: PUBLISHED, mainEntityOfPage: { "@id": `${self}#webpage` }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#hunterbuddy` } },
+      { "@type": "Article", "@id": `${self}#article`, headline: a.title.replace(/｜HunterBuddy$/, ""), description: a.description, inLanguage: "zh-CN", datePublished: a.published || PUBLISHED, dateModified: PUBLISHED, mainEntityOfPage: { "@id": `${self}#webpage` }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#hunterbuddy` } },
       { "@type": "FAQPage", "@id": `${self}#faq`, inLanguage: "zh-CN", isPartOf: { "@id": `${self}#webpage` }, mainEntity: a.faq.map(([q, ans]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: ans } })) },
     ],
   };
-  const relatedItems = [
-    ...(useCase ? [[`${up}use-cases/${useCase.slug}/`, "使用场景", useCase.zh.name, useCase.zh.teaser]] : []),
-    ...related.map((r) => [`${up}articles/${r.slug}/`, "文章", r.name, r.teaser]),
-  ];
   return `${head({ title: a.title, description: a.description, canonical: self, graph, ogType: "article", up })}
     <main id="main" tabindex="-1">
       <article>
 ${hero({
-  crumbs: `<a href="${up}">首页</a><span aria-hidden="true">/</span><a href="${up}articles/">文章</a><span aria-hidden="true">/</span><span aria-current="page">${text(a.name)}</span>`,
+  crumbs: `<a href="${up}">首页</a><span aria-hidden="true">/</span><a href="${up}use-cases/">${LIST.name}</a><span aria-hidden="true">/</span><span aria-current="page">${text(a.name)}</span>`,
   kicker: a.kicker,
   h1: lines(a.h1),
   lead: a.answer,
-  meta: `<p class="s-meta">铂寻 Boseek<span aria-hidden="true">·</span>发布于 <time datetime="${PUBLISHED}">${PUBLISHED}</time></p>`,
+  meta: `<p class="s-meta">铂寻 Boseek<span aria-hidden="true">·</span>更新于 <time datetime="${PUBLISHED}">${PUBLISHED}</time></p>`,
 })}
 
       <div class="n-light s-paper">
@@ -301,7 +316,7 @@ ${a.sections.map((s, i) => section(`s${i + 1}`, String(i + 1).padStart(2, "0"), 
           <div class="n-wrap"><div class="s-col">
             <p class="s-label" id="s-related-title">相关阅读</p>
             <ul class="s-related">
-${relatedItems.map(([href, kind, name, line]) => `              <li><a href="${href}"><span class="s-related-kind">${kind}</span><strong>${text(name)}</strong><span class="s-related-line">${text(line)}</span></a></li>`).join("\n")}
+${related.map((r) => `              <li><a href="${up}use-cases/${r.slug}/"><span class="s-related-kind">${LIST.name}</span><strong>${text(r.name)}</strong><span class="s-related-line">${text(r.teaser)}</span></a></li>`).join("\n")}
             </ul>
           </div></div>
         </section>
@@ -313,12 +328,12 @@ ${faq(a.faq, a.faqTitle)}
 ${trial(up)}
     </main>
 
-${foot(up, `a:${a.slug}`)}`;
+${foot(up, a.slug)}`;
 }
 
-function listPage(articles) {
+function listPage(items) {
   const up = "../";
-  const self = `${SITE}articles/`;
+  const self = `${SITE}use-cases/`;
   const graph = {
     "@context": "https://schema.org",
     "@graph": [
@@ -327,7 +342,7 @@ function listPage(articles) {
         { "@type": "ListItem", position: 1, name: T.homeName, item: SITE },
         { "@type": "ListItem", position: 2, name: LIST.name, item: self },
       ] },
-      { "@type": "ItemList", "@id": `${self}#list`, itemListElement: articles.map((a, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE}articles/${a.slug}/`, name: a.title.replace(/｜HunterBuddy$/, "") })) },
+      { "@type": "ItemList", "@id": `${self}#list`, itemListElement: items.map((a, i) => ({ "@type": "ListItem", position: i + 1, url: `${self}${a.slug}/`, name: a.title.replace(/｜HunterBuddy$/, "") })) },
     ],
   };
   return `${head({ title: LIST.title, description: LIST.description, canonical: self, graph, ogType: "website", up })}
@@ -343,7 +358,7 @@ ${hero({
         <section class="s-section s-index-wrap" aria-label="${LIST.name}">
           <div class="n-wrap">
             <ol class="s-index">
-${articles
+${items
   .map(
     (a, i) => `              <li>
                 <a href="${a.slug}/">
@@ -366,89 +381,83 @@ ${trial(up)}
 ${foot(up, "list")}`;
 }
 
-/* ---------- use-case page ---------- */
-function useCasePage(entry, articles) {
-  const up = "../../";
-  const c = entry.zh;
-  const self = `${SITE}use-cases/${entry.slug}/`;
-  const index = PAGES.indexOf(entry);
-  const next = PAGES[(index + 1) % PAGES.length];
-  const reading = articles.filter((a) => a.useCase === entry.slug);
-  const graph = {
-    "@context": "https://schema.org",
-    "@graph": [
-      { "@type": "WebPage", "@id": `${self}#webpage`, url: self, name: c.title, description: c.description, inLanguage: "zh-CN", isPartOf: { "@id": `${SITE}#website` }, about: { "@id": `${SITE}#hunterbuddy` }, publisher: { "@id": `${SITE}#organization` }, breadcrumb: { "@id": `${self}#breadcrumb` } },
-      { "@type": "BreadcrumbList", "@id": `${self}#breadcrumb`, itemListElement: [
-        { "@type": "ListItem", position: 1, name: T.homeName, item: SITE },
-        { "@type": "ListItem", position: 2, name: c.name, item: self },
-      ] },
-      { "@type": "FAQPage", "@id": `${self}#faq`, inLanguage: "zh-CN", isPartOf: { "@id": `${self}#webpage` }, mainEntity: c.faq.items.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
+/* ---------- 客户开发: the old use-case page, rewritten into the same format, with a few corrections ---------- */
+function businessDevelopment() {
+  const c = PAGES.find((p) => p.slug === "business-development").zh;
+  const how = c.how.steps.map((step) =>
+    step[0] === "找到用人经理"
+      ? [step[0], step[1], "负责视觉团队的是技术负责人许晴，很可能就是这个职位的用人经理，直接联系方式待确认。"]
+      : step,
+  );
+  // BD 客户研判 (on the homepage) gets its own step after the two sources are matched
+  how.splice(2, 0, [
+    "BD 客户研判：值不值得跟",
+    "它把融资动态、创始团队、岗位和业务信号放在一起，看需求是不是真的、付不付得起猎头费、合作上有没有风险，再理清决策链和优先级。有依据的写明来源，没依据的标为待确认。",
+    "真实需求、付费潜力都有依据：刚拿到 B 轮，招聘页上了新职位。合作风险待确认：以前和猎头合作过没有、谁拍板，还不清楚。",
+  ]);
+  const card = {
+    ...c.how.card,
+    items: [
+      c.how.card.items[0],
+      ["研判 · 有依据", "真实需求、付费潜力", "刚拿到 B 轮，招聘页上了新职位。合作风险待确认。"],
+      ["可能的用人经理", "许晴 · 技术负责人", "负责视觉团队，直接联系方式待确认。"],
+      c.how.card.items[2],
     ],
   };
-  const resultBody = [
-    ...c.result.paras.map((p) => `<p class="s-p">${text(p)}</p>`),
-    `<h3 class="s-confirm-title">${text(c.result.confirmTitle)}</h3>`,
-    `<ul class="s-confirm">\n${c.result.confirm.map((x) => `  <li>${text(x)}</li>`).join("\n")}\n</ul>`,
-    `<p class="s-note">${text(c.result.note)}</p>`,
-    ...(reading.length
-      ? [
-          `<h3 class="s-confirm-title">延伸阅读</h3>`,
-          `<ul class="s-reading">\n${reading.map((a) => `  <li><a href="${up}articles/${a.slug}/">${text(a.title.replace(/｜HunterBuddy$/, ""))}</a></li>`).join("\n")}\n</ul>`,
-        ]
-      : []),
-  ].join("\n");
-  return `${head({ title: c.title, description: c.description, canonical: self, graph, ogType: "article", up })}
-    <main id="main" tabindex="-1">
-${hero({
-  crumbs: `<a href="${up}">首页</a><span aria-hidden="true">/</span><a href="${up}#capabilities">能做什么</a><span aria-hidden="true">/</span><span aria-current="page">${text(c.name)}</span>`,
-  kicker: c.kicker,
-  h1: lines(c.h1),
-  lead: c.lead,
-  meta: `<div class="s-actions"><a class="n-btn n-btn-light" href="${up}#apply">申请试用</a><a class="n-link n-link-light" href="#how">${text(T.seeHow)}</a></div>`,
-})}
-
-      <div class="n-light s-paper">
-${section("method", c.method.label, c.method.h2, [`<p class="s-p">${text(c.method.intro)}</p>`, steps(c.method.steps, T.example)].join("\n"))}
-
-${section("hard", c.hard.label, c.hard.h2, cards(c.hard.items))}
-
-${section("how", c.how.label, c.how.h2, [`<p class="s-p">${text(c.how.intro)}</p>`, steps(c.how.steps, T.example), demo(c.how.card)].join("\n"))}
-
-${section("result", c.result.label, c.result.h2, resultBody)}
-      </div>
-
-${faq(c.faq.items, c.faq.h2)}
-
-      <section class="n-dark s-four-wrap" aria-labelledby="s-four-title">
-        <div class="n-wrap">
-          <p class="n-kicker">${text(T.fourKicker)}</p>
-          <h2 class="n-h2" id="s-four-title">${lines(T.fourTitle)}</h2>
-          <ol class="s-four">
-${PAGES.map(
-  (p, i) => `            <li${p === entry ? ' class="is-current"' : p === next ? ' class="is-next"' : ""}>
-              <a href="${up}use-cases/${p.slug}/"${p === entry ? ' aria-current="page"' : ""}>
-                <span class="s-four-index">${String(i + 1).padStart(2, "0")}${p === entry ? ` · ${text(T.here)}` : p === next ? ` · ${text(T.nextUp)}` : ""}</span>
-                <strong>${text(p.zh.name)}</strong>
-                <span class="s-four-line">${text(p.zh.teaser)}</span>
-              </a>
-            </li>`,
-).join("\n")}
-          </ol>
-        </div>
-      </section>
-
-${trial(up)}
-    </main>
-
-${foot(up, `uc:${entry.slug}`)}`;
+  return {
+    slug: "business-development",
+    name: c.name,
+    title: c.title,
+    description: c.description,
+    kicker: "使用场景 · 猎头客户开发",
+    h1: c.h1,
+    answer:
+      "新客户常常藏在一条不起眼的消息里。HunterBuddy 帮你盯着关注的赛道，从融资新闻出发，找到新职位、可能的用人经理和引荐路线，判断值不值得跟，每条线索都写明来源。联系谁、怎么开口，由你决定。",
+    teaser: c.teaser,
+    related: ["org-chart", "finding-candidates", "ai-assistant-for-headhunters"],
+    sections: [
+      { h2: "猎头客户开发，一般怎么做？", body: [c.method.intro, { steps: c.method.steps }] },
+      // 平台名只在工具对比那一篇里出现
+      { h2: "难的不是打电话，是知道该打给谁", body: [{ cards: c.hard.items.map(([t, b]) => [t, b.replace("领英和脉脉上", "职业社交平台上")]) }] },
+      { h2: "HunterBuddy 怎么帮你做客户开发？", body: [c.how.intro, { steps: how }, { demo: card }] },
+      {
+        h2: "你会拿到什么，哪些要你确认？",
+        body: [
+          "一条两处来源对得上的职位线索、一位很可能的用人经理，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD、谈妥委托，它才是你手上的正式职位。",
+          c.result.paras[1],
+          { list: c.result.confirm },
+          { note: c.result.note },
+        ],
+      },
+    ],
+    faq: c.faq.items,
+    faqTitle: c.faq.h2,
+  };
 }
 
 /* ---------- write ---------- */
 const articles = await loadArticles();
-const out = [];
-for (const a of articles) out.push([`articles/${a.slug}/index.html`, articlePage(a, articles)]);
-out.push(["articles/index.html", listPage(articles)]);
-for (const p of PAGES) out.push([`use-cases/${p.slug}/index.html`, useCasePage(p, articles)]);
+const all = [businessDevelopment(), ...articles];
+const items = ORDER.map((slug) => {
+  const it = all.find((a) => a.slug === slug);
+  if (!it) throw new Error(`missing ${slug}`);
+  return it;
+});
+if (items.length !== all.length) throw new Error("ORDER does not list every page");
+let failed = false;
+for (const a of items) {
+  const problems = checkArticle(a);
+  if (problems.length) {
+    failed = true;
+    console.error(`${a.slug}: ${problems.join("，")}`);
+  }
+}
+if (failed) process.exit(1);
+// the old, separate pages are gone: 文章 (merged in here) and the three use-case pages the articles replace
+await rm(resolve(OUT, "articles"), { recursive: true, force: true });
+for (const old of ["talent-mapping", "sourcing", "candidate-nurturing"])
+  await rm(resolve(OUT, "use-cases", old), { recursive: true, force: true });
+const out = [["use-cases/index.html", listPage(items)], ...items.map((a) => [`use-cases/${a.slug}/index.html`, page(a, items)])];
 for (const [path, html] of out) {
   if (html.includes("；")) throw new Error(`${path}: 不用中文分号`);
   const target = resolve(OUT, path);
