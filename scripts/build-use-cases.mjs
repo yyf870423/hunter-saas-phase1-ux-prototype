@@ -20,7 +20,7 @@ const VERSION = {
   footer: "20261021d",
   sharedOrigin: "20261025-art",
   origin: "20261023-faq",
-  motion: "20261023-mail",
+  motion: "20261025-foot",
   locale: "20261023-faq",
   useCase: "20261025-art",
 };

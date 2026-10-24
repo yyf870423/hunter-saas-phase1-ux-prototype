@@ -1414,7 +1414,7 @@ body.n-page::after {
 }
 .n-footer-top {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 48px;
 }
 .n-footer-brand img {
@@ -1439,8 +1439,11 @@ body.n-page::after {
 }
 .n-footer-groups {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(4, max-content);
+  gap: 32px 48px;
+}
+.n-footer-groups a {
+  white-space: nowrap;
 }
 .n-footer-groups h2 {
   font-size: 13px;
