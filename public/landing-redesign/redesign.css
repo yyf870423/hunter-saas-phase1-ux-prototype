@@ -1189,21 +1189,16 @@ body.n-page::after {
   position: absolute;
   inset: 0;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: flex-start;
+  gap: 8px;
+  overflow: hidden;
   background: var(--paper);
 }
-.n-band {
-  display: flex;
-  flex: 1 1 0;
-  gap: 3px;
-  min-height: 0;
-}
-.n-pair {
+.n-col {
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
-  gap: 3px;
+  gap: 8px;
   min-width: 0;
 }
 .n-tile {
@@ -1212,6 +1207,7 @@ body.n-page::after {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  border-radius: 4px;
   background: #dcdce0;
 }
 .n-tile img {

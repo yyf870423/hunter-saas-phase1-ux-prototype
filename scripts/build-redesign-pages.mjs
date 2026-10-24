@@ -17,7 +17,7 @@ import { PUBLISHED, checkArticle, loadArticles } from "./build-articles.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://www.boseekai.com/";
 const OUT = resolve(root, "public/landing-redesign");
-const V = { redesign: "19", subpage: "20261025-a", subpageJs: "20261025-a" };
+const V = { redesign: "20", subpage: "20261025-a", subpageJs: "20261025-a" };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 
@@ -55,7 +55,6 @@ const FOOTER = [
   ["org-chart", "组织架构图"],
   ["finding-candidates", "猎头怎么找人"],
   ["job-matching", "人岗匹配"],
-  ["talent-pool", "人才库管理"],
 ];
 
 const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

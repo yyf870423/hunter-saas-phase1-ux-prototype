@@ -335,37 +335,43 @@
   });
 
   /* ---------- 深耕各行赛道: the photo wall ---------- */
-  // one picture per field and no field twice: the wall uses each of these exactly once
-  // (the order keeps look-alike scenes apart)
+  // one picture per field and no field twice: the wall uses each of these exactly once.
+  // They fill the columns top to bottom, left to right, in this order, which keeps
+  // look-alike scenes (the four single lab-coat portraits) out of each other's way
   const pictures = [
     ["internet-1", "互联网"],
-    ["fusion-2", "核聚变"],
-    ["ev", "新能源汽车"],
-    ["pharma-1", "医药"],
     ["quantum", "量子计算"],
-    ["resources-2", "能源与稀有资源"],
+    ["ev", "新能源汽车"],
+    ["fusion-2", "核聚变"],
+    ["meddevice", "医疗器械"],
+    ["semi-2", "半导体"],
+    ["lowalt", "低空经济"],
+    ["cloud-1", "云计算"],
+    ["materials", "新材料"],
     ["embodied-1", "具身智能"],
     ["space", "商业航天"],
-    ["cloud-1", "云计算"],
-    ["synbio", "合成生物"],
-    ["autonomous", "自动驾驶"],
-    ["semi-2", "半导体"],
-    ["materials", "新材料"],
-    ["ai-2", "人工智能"],
-    ["lowalt", "低空经济"],
-    ["storage-2", "新型储能"],
-    ["meddevice", "医疗器械"],
+    ["resources-2", "能源与稀有资源"],
+    ["pharma-1", "医药"],
     ["electronics", "消费电子"],
+    ["storage-2", "新型储能"],
+    ["ai-2", "人工智能"],
+    ["autonomous", "自动驾驶"],
+    ["synbio", "合成生物"],
   ].map(([file, label]) => ({ src: `assets/wall/${file}.webp`, label }));
   const wall = document.querySelector("[data-wall]");
   const wallSection = wall?.closest("section");
   const tiles = [];
 
-  // a mosaic in the spirit of Horizon's "上场与世界交手": bands of different heights,
-  // each band holding a set number of pictures in tiles of different widths, some split into two
-  // smaller ones, so no edge lines up with the band above or below and every picture shows once
-  const SINGLE = [0.62, 0.78, 1.0, 1.32, 0.7, 1.12, 0.9, 1.5];
-  const PAIR = [1.25, 1.6, 1.4, 1.8];
+  // a loose, staggered wall: columns of different widths, each pushed up by a different amount,
+  // with tiles of different heights, so the edges step past each other instead of lining up in rows
+  const PLANS = {
+    desk: { counts: [3, 3, 3, 3, 3, 3], widths: [1.0, 1.34, 0.9, 1.2, 1.02, 1.3], shifts: [0.1, 0.02, 0.15, 0.05, 0.12, 0.0] },
+    tablet: { counts: [4, 4, 3, 4, 3], widths: [1.1, 0.92, 1.26, 1.0, 1.16], shifts: [0.06, 0.14, 0.0, 0.1, 0.03] },
+    phone: { counts: [6, 6, 6], widths: [1.0, 1.22, 0.94], shifts: [0.05, 0.0, 0.1] },
+  };
+  const HEIGHTS = [0.8, 1.18, 0.95, 1.36, 0.88, 1.08, 1.26, 0.92];
+  // and each tile is pulled in a little from one side or the other, so the gaps between columns step too
+  const INSETS = [0, 9, 0, 15, 5, 0, 12, 7];
 
   function seeded(seed) {
     return () => {
@@ -403,44 +409,25 @@
     wall.dataset.stamp = stamp;
     wall.textContent = "";
     tiles.length = 0;
-    // [height share, pictures in the band]; the counts add up to the number of pictures
-    const bands = {
-      desk: [[0.27, 6], [0.4, 6], [0.33, 6]],
-      tablet: [[0.22, 4], [0.3, 5], [0.24, 4], [0.24, 5]],
-      phone: [[0.15, 3], [0.2, 3], [0.14, 3], [0.18, 3], [0.15, 3], [0.18, 3]],
-    }[mode];
-    const rand = seeded(mode === "desk" ? 11 : mode === "tablet" ? 5 : 3);
+    const plan = PLANS[mode];
+    const rand = seeded(mode === "desk" ? 7 : mode === "tablet" ? 5 : 3);
+    const reach = Math.max(...plan.shifts) + 0.06;
     let n = 0;
-    bands.forEach(([share, count], b) => {
-      const bandH = share * h;
-      const band = document.createElement("div");
-      band.className = "n-band";
-      band.style.flexGrow = String(share);
+    plan.counts.forEach((count, c) => {
+      const col = document.createElement("div");
+      col.className = "n-col";
+      col.style.flexGrow = String(plan.widths[c]);
+      col.style.height = `${Math.round(h * (1 + reach))}px`;
+      col.style.transform = `translateY(${Math.round(-plan.shifts[c] * h)}px)`;
       const end = Math.min(n + count, pictures.length);
-      let lastPair = b % 2 === 0;
       while (n < end) {
-        // split a tile into two stacked ones now and then, never twice in a row
-        const pair = bandH > 150 && !lastPair && end - n >= 2 && rand() < 0.5;
-        lastPair = pair;
-        const ratio = pair ? PAIR[Math.floor(rand() * PAIR.length)] : SINGLE[Math.floor(rand() * SINGLE.length)];
-        const width = ratio * (pair ? bandH / 2 : bandH);
-        let item;
-        if (pair) {
-          item = document.createElement("div");
-          item.className = "n-pair";
-          const split = 0.4 + rand() * 0.2;
-          const top = makeTile(n++);
-          const bottom = makeTile(n++);
-          top.style.flexGrow = String(split);
-          bottom.style.flexGrow = String(1 - split);
-          item.append(top, bottom);
-        } else {
-          item = makeTile(n++);
-        }
-        item.style.flexGrow = String(width.toFixed(1));
-        band.append(item);
+        const tile = makeTile(n++);
+        tile.style.flexGrow = String(HEIGHTS[Math.floor(rand() * HEIGHTS.length)]);
+        const inset = INSETS[Math.floor(rand() * INSETS.length)];
+        if (inset) tile.style[rand() < 0.5 ? "marginLeft" : "marginRight"] = `${inset}%`;
+        col.append(tile);
       }
-      wall.append(band);
+      wall.append(col);
     });
   }
 
