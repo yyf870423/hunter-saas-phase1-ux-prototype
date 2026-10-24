@@ -226,6 +226,35 @@
     centre();
     addEventListener("resize", centre, { passive: true });
     document.fonts?.ready.then(centre);
+
+    // pictures fade in as they rise towards the middle of the screen and fade out as they leave it,
+    // so only the picture of the current step is fully clear; the step whose picture is nearest
+    // the middle is the active one (measured on every scroll, so a fast scroll never skips a step)
+    let figFrame = 0;
+    const paintFigures = () => {
+      figFrame = 0;
+      const mid = innerHeight / 2;
+      let best = null;
+      let gap = Infinity;
+      steps.forEach((step) => {
+        const fig = step.querySelector(".n-figure");
+        const r = fig.getBoundingClientRect();
+        const d = Math.abs((r.top + r.bottom) / 2 - mid);
+        if (d < gap) {
+          gap = d;
+          best = step;
+        }
+        const k = clamp(1 - (d - innerHeight * 0.06) / (innerHeight * 0.42));
+        fig.style.setProperty("--vis", (0.12 + 0.88 * k * k * (3 - 2 * k)).toFixed(3));
+      });
+      if (best && gap < innerHeight * 0.5) activate(best);
+    };
+    const requestFigures = () => {
+      if (!figFrame) figFrame = requestAnimationFrame(paintFigures);
+    };
+    addEventListener("scroll", requestFigures, { passive: true });
+    addEventListener("resize", requestFigures, { passive: true });
+    requestFigures();
   }
 
   /* ---------- scroll-linked motion ---------- */
