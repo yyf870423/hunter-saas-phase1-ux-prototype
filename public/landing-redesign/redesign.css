@@ -1306,9 +1306,6 @@ body.n-page::after {
 .n-faq-list {
   border-top: 1px solid var(--line);
 }
-.n-faq-more {
-  margin-top: 22px !important;
-}
 .n-faq details {
   border-bottom: 1px solid var(--line);
 }

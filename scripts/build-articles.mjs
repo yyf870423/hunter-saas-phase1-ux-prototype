@@ -135,10 +135,21 @@ ${t.nav.map(([label, hash]) => `          <a href="${up}#${hash}">${text(label)}
 }
 
 // the footer: the same four groups everywhere on the Chinese site (产品 / 使用场景 / 文章 / 法律)
+// 页脚“文章”一栏：五篇主要文章，最后一行是“全部文章 >>”
+export const FOOTER_ARTICLES = [
+  ["ai-assistant-for-headhunters", "猎头 AI 助手"],
+  ["org-chart", "组织架构图怎么画"],
+  ["job-matching", "人岗匹配怎么做"],
+  ["finding-candidates", "猎头怎么找人"],
+  ["talent-pool", "人才库怎么建"],
+];
 export function footerArticlesGroup(prefix, articles, current = null) {
-  const hub = articles.find((a) => a.slug === HUB);
-  const items = [[`${prefix}articles/`, UI.allArticles, current === "list"]];
-  if (hub) items.push([`${prefix}articles/${hub.slug}/`, hub.name, current === hub.slug]);
+  const items = FOOTER_ARTICLES.filter(([slug]) => articles.some((a) => a.slug === slug)).map(([slug, label]) => [
+    `${prefix}articles/${slug}/`,
+    label,
+    current === slug,
+  ]);
+  items.push([`${prefix}articles/`, `${UI.allArticles} >>`, current === "list"]);
   return `            <div class="f-footer-group" role="group" aria-labelledby="f-footer-articles">
               <h2 id="f-footer-articles">${text(UI.footerArticles)}</h2>
               <ul>

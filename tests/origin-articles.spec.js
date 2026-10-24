@@ -12,6 +12,9 @@ const articles = [
   "same-name-candidates",
 ];
 
+// the five main articles listed in the footer, above “全部文章 >>”
+const inFooter = ["ai-assistant-for-headhunters", "org-chart", "job-matching", "finding-candidates", "talent-pool"];
+
 for (const slug of articles) {
   test(`Article ${slug} reads without scripts and matches its structured data`, async ({ page }) => {
     const errors = [];
@@ -45,7 +48,7 @@ for (const slug of articles) {
     }
     const html = await page.content();
     expect(html).not.toContain("；");
-    await expect(page.locator(".f-footer [aria-current=page]")).toHaveCount(slug === "ai-assistant-for-headhunters" ? 1 : 0);
+    await expect(page.locator(".f-footer [aria-current=page]")).toHaveCount(inFooter.includes(slug) ? 1 : 0);
     expect(errors).toEqual([]);
   });
 }
@@ -63,7 +66,10 @@ test("The homepage reaches the articles from the footer, not the top navigation"
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("./landing-origin/");
   await expect(page.locator('#f-navigation a[href*="articles"]')).toHaveCount(0);
-  await expect(page.locator('.f-footer a[href="articles/"]')).toHaveText("全部文章");
+  await expect(page.locator('.f-footer a[href="articles/"]')).toHaveText("全部文章 >>");
+  expect(
+    await page.locator('.f-footer a[href^="articles/"]').evaluateAll((links) => links.map((a) => a.getAttribute("href"))),
+  ).toEqual([...inFooter.map((slug) => `articles/${slug}/`), "articles/"]);
   await page.locator('.f-footer a[href="articles/"]').click();
   await expect(page).toHaveURL(/\/landing-origin\/articles\/$/);
 });
