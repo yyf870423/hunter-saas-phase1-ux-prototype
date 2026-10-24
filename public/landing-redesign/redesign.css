@@ -1436,6 +1436,9 @@ body.n-page::after {
   border-radius: 999px;
   font-size: 10.5px;
 }
+.fx-chain li.is-wait:lang(en)::after {
+  content: "To confirm";
+}
 
 /* 05 人脉资产：人脉里有人动了，信息跟着更新 */
 .fx-sky {
@@ -2393,4 +2396,25 @@ html.lenis.lenis-smooth {
 
 .n-thought-line {
   display: block;
+}
+
+/* the English page: its logo has no 铂寻 line, so it is set smaller to keep the word the same size as in the Chinese lockup */
+:lang(en) .n-brand img,
+:lang(en) .n-footer-brand img {
+  height: 39px;
+}
+@media (max-width: 800px) {
+  :lang(en) .n-brand img,
+  :lang(en) .n-footer-brand img {
+    height: 34px;
+  }
+}
+/* English type: the Chinese tagline's wide tracking reads as gaps in Latin, and headings break more evenly when balanced */
+:lang(en) .n-role {
+  font-size: 16px;
+  letter-spacing: 0.06em;
+}
+:lang(en) .n-step-text h3,
+:lang(en) .n-card h3 {
+  text-wrap: balance;
 }

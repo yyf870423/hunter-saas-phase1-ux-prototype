@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f1011" />
+    <!-- Redesign draft: preview only, not indexed (remove this line at launch) -->
+    <meta name="robots" content="noindex" />
+    <title>Same-name candidates: identity checks and where to stop | HunterBuddy</title>
+    <meta name="description" content="Tell same-name candidates apart: cross-check employers, dates, cities and public records, flag what’s unconfirmed, and know where to stop. A HunterBuddy guide." />
+    <link rel="canonical" href="https://www.boseekai.com/en/use-cases/same-name-candidates/" />
+    <link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
+    <link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/same-name-candidates/" />
+    <link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Boseek" />
+    <meta property="og:title" content="Same-name candidates: identity checks and where to stop" />
+    <meta property="og:description" content="Tell same-name candidates apart: cross-check employers, dates, cities and public records, flag what’s unconfirmed, and know where to stop. A HunterBuddy guide." />
+    <meta property="og:url" content="https://www.boseekai.com/en/use-cases/same-name-candidates/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="zh_CN" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebPage",
+            "@id": "https://www.boseekai.com/en/use-cases/same-name-candidates/#webpage",
+            "url": "https://www.boseekai.com/en/use-cases/same-name-candidates/",
+            "name": "Same-name candidates: identity checks and where to stop | HunterBuddy",
+            "description": "Tell same-name candidates apart: cross-check employers, dates, cities and public records, flag what’s unconfirmed, and know where to stop. A HunterBuddy guide.",
+            "inLanguage": "en",
+            "isPartOf": {
+              "@id": "https://www.boseekai.com/#website"
+            },
+            "publisher": {
+              "@id": "https://www.boseekai.com/#organization"
+            },
+            "breadcrumb": {
+              "@id": "https://www.boseekai.com/en/use-cases/same-name-candidates/#breadcrumb"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://www.boseekai.com/en/use-cases/same-name-candidates/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Boseek",
+                "item": "https://www.boseekai.com/en/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Use cases",
+                "item": "https://www.boseekai.com/en/use-cases/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Candidates with the same name",
+                "item": "https://www.boseekai.com/en/use-cases/same-name-candidates/"
+              }
+            ]
+          },
+          {
+            "@type": "Article",
+            "@id": "https://www.boseekai.com/en/use-cases/same-name-candidates/#article",
+            "headline": "Same-name candidates: identity checks and where to stop",
+            "description": "Tell same-name candidates apart: cross-check employers, dates, cities and public records, flag what’s unconfirmed, and know where to stop. A HunterBuddy guide.",
+            "inLanguage": "en",
+            "datePublished": "2026-10-25",
+            "dateModified": "2026-10-25",
+            "mainEntityOfPage": {
+              "@id": "https://www.boseekai.com/en/use-cases/same-name-candidates/#webpage"
+            },
+            "author": {
+              "@id": "https://www.boseekai.com/#organization"
+            },
+            "publisher": {
+              "@id": "https://www.boseekai.com/#organization"
+            },
+            "about": {
+              "@id": "https://www.boseekai.com/#hunterbuddy"
+            }
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://www.boseekai.com/en/use-cases/same-name-candidates/#faq",
+            "inLanguage": "en",
+            "isPartOf": {
+              "@id": "https://www.boseekai.com/en/use-cases/same-name-candidates/#webpage"
+            },
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How do you tell apart candidates with the same name?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Compare employers, dates, cities and fields side by side, along with public professional records such as papers, code and talks. Treat them as the same person only when at least two independent sources agree and the timeline holds together. If something conflicts or the evidence is thin, don’t merge yet. Flag it as unconfirmed."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What information does a candidate identity check cover?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Professional identity: which companies someone has worked at, start and end dates, which city, what field, and the papers, patents, open-source projects and public talks under their name. The information comes from the CV the candidate gave you and from public professional settings. Personal information such as ID documents, phone numbers and home addresses is outside the scope of the check."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How do you flag it when you’re not sure it’s the same person?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Use levels such as Confirmed, Fairly sure, To confirm and Ruled out, and for each one note the sources it rests on, what’s still missing and when you checked. Anything unconfirmed is only a lead: don’t merge the records, and keep it out of recommendations. Update the label once it’s confirmed."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "If you can’t verify a candidate’s identity, can you just ask them?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, and it’s often the best way. In your first contact, politely confirm their experience, such as which company they were at and what they worked on. You can also ask a mutual contact you trust who knows them. If they don’t reply, leave it unconfirmed and respect their choice."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <link rel="icon" href="../../../../landing-origin/favicon.ico" sizes="any" />
+    <link rel="icon" href="../../../../landing-origin/favicon.svg?v=20261022-bo" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../../../../landing-origin/apple-touch-icon.png?v=20261022-bo" />
+    <!-- No form on this page (Request a trial goes to the homepage). Kept for consistency with the other pages -->
+    <meta name="trial-api" content="disabled" />
+    <link rel="stylesheet" href="../../../../landing/shared-ui.css?v=20261021" />
+    <link rel="stylesheet" href="../../../redesign.css?v=22" />
+    <link rel="stylesheet" href="../../../subpage.css?v=20261025-a" />
+    <script defer src="../../../subpage.js?v=20261025-en"></script>
+  </head>
+  <body class="n-page s-page">
+    <a class="n-skip" href="#main">Skip to content</a>
+
+    <header class="n-header is-top" data-header>
+      <div class="n-wrap n-header-inner">
+        <a class="n-brand" href="../../" aria-label="Boseek home">
+          <img src="../../../../landing-origin/assets/boseek-b5-en.svg" alt="Boseek" width="150" height="48" />
+        </a>
+        <nav class="n-nav" id="n-nav" aria-label="Main navigation">
+          <a href="../../#film">Product film</a>
+          <a href="../../#capabilities">What it does</a>
+          <a href="../../#belief">What we believe</a>
+          <a href="../../#industries">Sectors</a>
+          <a href="../../#faq">FAQ</a>
+        </nav>
+        <div class="n-header-actions">
+          <a class="n-lang" href="../../../use-cases/same-name-candidates/" hreflang="zh-CN" lang="zh-CN" title="切换到中文" aria-label="切换到中文">中文</a>
+          <a class="n-btn n-btn-light n-btn-sm" href="../../#apply">Request a trial</a>
+          <button class="n-menu" type="button" aria-controls="n-nav" aria-expanded="false" aria-label="Open navigation" data-menu hidden>
+            <span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <article>
+      <section class="n-dark s-hero" aria-labelledby="s-title">
+        <div class="n-wrap"><div class="s-col">
+          <nav class="s-crumbs" aria-label="Breadcrumb">
+            <a href="../../">Home</a><span aria-hidden="true">/</span><a href="../../use-cases/">Use cases</a><span aria-hidden="true">/</span><span aria-current="page">Candidates with the same name</span>
+          </nav>
+          <p class="n-kicker">Headhunting in practice · Identity checks</p>
+          <h1 id="s-title"><span class="ln">How to tell same-name candidates apart</span><br /><span class="ln">Identity checks, and where to stop</span></h1>
+          <p class="s-lead">You can’t tell same-name candidates apart by the name alone: cross-check their employers, dates, cities and fields, along with public professional records such as papers, code and talks, and treat them as one person only when several independent sources agree. Where the evidence is thin or conflicting, flag it as unconfirmed, then ask the candidate or a trusted mutual contact. Throughout, you use only public professional information, and you don’t run a background check.</p>
+          <p class="s-meta">Boseek<span aria-hidden="true">·</span>Updated <time datetime="2026-10-25">2026-10-25</time></p>
+        </div></div>
+      </section>
+
+      <div class="n-light s-paper">
+        <nav class="s-toc-wrap" aria-labelledby="s-toc-title">
+          <div class="n-wrap"><div class="s-col">
+            <div class="s-toc">
+              <p class="s-label" id="s-toc-title">In this article</p>
+              <ol>
+                <li><a href="#s1">Why are same-name candidates so easy to mix up?</a></li>
+                <li><a href="#s2">What do you compare in a candidate identity check?</a></li>
+                <li><a href="#s3">How do you cross-check, and when is it really a match?</a></li>
+                <li><a href="#s4">When you’re not sure, how do you flag it and confirm it?</a></li>
+                <li><a href="#s5">How does HunterBuddy help you tell same-name candidates apart?</a></li>
+                <li><a href="#s6">How far should a candidate identity check go?</a></li>
+              </ol>
+            </div>
+          </div></div>
+        </nav>
+
+        <section class="s-section" id="s1" aria-labelledby="s1-t">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label">01</p>
+            <h2 id="s1-t">Why are same-name candidates so easy to mix up?</h2>
+            <p class="s-p">A name is the least reliable piece of identity there is. Chinese names are short and drawn from a fairly small pool of common family names, so two people with the same common name in the same industry and the same city is nothing unusual. It works the other way, too: one person’s name can be written completely differently in different places. The CV gives the name in Chinese characters, a paper uses abbreviated pinyin (the standard romanization), an open-source community shows an English username, and the company’s own page uses their English name.</p>
+            <ul class="s-cards">
+              <li>
+                <h3>Same name, different people</h3>
+                <p>Two people share a name and their records get merged. You end up judging one person by another’s experience, or even contacting the wrong person.</p>
+              </li>
+              <li>
+                <h3>Same person, different names</h3>
+                <p>One person’s name is written differently in several places, and nobody spots that it’s the same person. They appear twice on your list and get contacted twice.</p>
+              </li>
+            </ul>
+            <p class="s-p">Take an example. A paper’s author listed as “Lin Y.” could be the Yue Lin in your database, or another researcher with the family name Lin and a given name starting with Y. Merging on an initial alone is a big risk. Both mistakes hurt. Getting someone’s experience wrong in a recommendation costs you with the client. Contacting the wrong person, or the same person twice, costs you with the candidate.</p>
+          </div></div>
+        </section>
+
+        <section class="s-section" id="s2" aria-labelledby="s2-t">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label">02</p>
+            <h2 id="s2-t">What do you compare in a candidate identity check?</h2>
+            <p class="s-p">What a headhunter checks is professional identity: whether the records in front of you describe the same person, and whether that person really did this work at these companies. The main things you can compare are these:</p>
+            <ul class="s-list">
+              <li>Employers: a full name, a short name, an English name, a subsidiary or the name before an acquisition may all point to the same company.</li>
+              <li>Dates: the start and end dates at each company, and whether they line up with the years of papers, patents and projects.</li>
+              <li>City: where they work, and whether any move between cities has a plausible reason.</li>
+              <li>Field: whether the work follows one consistent thread, or a completely unrelated stint suddenly appears.</li>
+              <li>Papers, code and talks: the affiliation on a paper, co-authors, the company named in an open-source project, the title on a conference program.</li>
+            </ul>
+            <p class="s-p">No single item is enough. A big company may have two people with the same name working in the same field, and being in the same city proves little. Only when several items line up and support each other is the case convincing. Wherever one doesn’t match, it’s worth stopping for a second look.</p>
+            <p class="s-note">All of this comes only from the CV the candidate gave you and from professional settings such as company websites, team pages, papers, patents, open-source projects, conference programs and published news coverage.</p>
+          </div></div>
+        </section>
+
+        <section class="s-section" id="s3" aria-labelledby="s3-t">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label">03</p>
+            <h2 id="s3-t">How do you cross-check, and when is it really a match?</h2>
+            <ol class="s-steps">
+              <li>
+                <h3>Pick an anchor</h3>
+                <p>Take the record you’re most sure of as your baseline, such as the CV the candidate sent you, or the team page on the company’s website.</p>
+              </li>
+              <li>
+                <h3>Compare item by item</h3>
+                <p>Compare each other source with the anchor: company, dates, city, field, co-authors. Note what matches, what doesn’t and what isn’t mentioned, each separately.</p>
+              </li>
+              <li>
+                <h3>Check that the timeline holds</h3>
+                <p>No one should be full-time at two companies at once, and changes in the affiliation on someone’s papers should roughly match when they changed jobs.</p>
+              </li>
+              <li>
+                <h3>Count independent sources only</h3>
+                <p>An article reposted many times still counts as one source. You’re on fairly solid ground only when at least two independent sources agree.</p>
+              </li>
+              <li>
+                <h3>If anything conflicts, don’t merge yet</h3>
+                <p>Even if most things match, one clear conflict is enough to keep the records apart until you’ve worked it out.</p>
+              </li>
+            </ol>
+            <p class="s-p">In checking consistency, the most useful clues are often the small ones: the same co-author turning up across several papers, the employer on an open-source project page matching the CV, the title on a conference program matching the team page. Details like these rarely all line up by chance. Conversely, if someone’s CV is industrial vision all the way through, but a paper under the same name lists a hospital imaging department, it’s worth asking whether these are two people.</p>
+          </div></div>
+        </section>
+
+        <section class="s-section" id="s4" aria-labelledby="s4-t">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label">04</p>
+            <h2 id="s4-t">When you’re not sure, how do you flag it and confirm it?</h2>
+            <p class="s-p">A check doesn’t only come out as yes or no. Write down how confident you are, so the next time you or a colleague looks, it’s clear how far the information can be relied on. You can use four levels:</p>
+            <ul class="s-cards">
+              <li>
+                <h3>Confirmed</h3>
+                <p>Several independent sources agree, or the candidate has confirmed it. You can merge the records into one person.</p>
+              </li>
+              <li>
+                <h3>Fairly sure</h3>
+                <p>The main details match, but one key piece of evidence is missing, for instance the dates haven’t been matched up yet. Don’t merge yet, and note what’s missing.</p>
+              </li>
+              <li>
+                <h3>To confirm</h3>
+                <p>Only the name matches, or there’s only one source, or something conflicts. Treat it as a lead only, and keep it out of any recommendation.</p>
+              </li>
+              <li>
+                <h3>Ruled out</h3>
+                <p>Clearly not a match. Record why, so the two aren’t taken for the same person again later.</p>
+              </li>
+            </ul>
+            <p class="s-p">Next to each judgment, note what it rests on: which sources, what each one said, what’s still unconfirmed, and when you checked. Don’t write unconfirmed information as if it were certain, and don’t merge someone still unconfirmed just to get a list out faster.</p>
+            <p class="s-p">If you really can’t confirm it, the most direct way is to ask the candidate. In your first message you can mention it naturally: “I understand you worked on computer vision at [company]. Have I got that right?” They’ll tell you, and they’ll see you’ve done your homework. You can also ask a mutual contact you trust, who knows them, to help confirm. If the candidate doesn’t reply, leave it unconfirmed, and don’t go looking for other ways to find out.</p>
+          </div></div>
+        </section>
+
+        <section class="s-section" id="s5" aria-labelledby="s5-t">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label">05</p>
+            <h2 id="s5-t">How does HunterBuddy help you tell same-name candidates apart?</h2>
+            <p class="s-p">The method isn’t hard. The volume is. Everyone on a longlist may be scattered across your CV database, team pages, papers, patents and open-source projects, and checking record by record takes a long time. HunterBuddy, the AI partner for headhunters, takes over the cross-checking and leaves the judgment to you. Here’s the example our homepage uses throughout: Xingchuan Robotics is hiring a Head of Computer Vision, and say Yue Lin has one record each in your CV database, on a team page and in a paper.</p>
+            <ul class="s-list">
+              <li>When the same person is scattered across different sources, it checks their identity before merging. It won’t treat two records as one person just because the names match.</li>
+              <li>Leads that come from paper authors or patent inventors are flagged as still needing an identity check.</li>
+              <li>Anything without a reliable source is flagged for you to confirm. Inferences are kept apart from confirmed facts, and every conclusion names its source.</li>
+              <li>CVs you upload and org charts you import go through the same identity checks, and are de-duplicated and merged.</li>
+              <li>Once identities are clear, it suggests a suitable way in, such as who could introduce you.</li>
+            </ul>
+            <figure class="s-demo">
+              <figcaption>
+                <p class="s-demo-context">Xingchuan Robotics · Head of Computer Vision</p>
+                <h3>Yue Lin · Identity check</h3>
+                <p>Illustrative: the check results HunterBuddy hands you. What matches, what’s ruled out and what still needs confirming are kept apart.</p>
+              </figcaption>
+              <ul>
+                <li><small>Merged · 3 sources</small><strong>CV database · Team page · Paper</strong><p>Company, dates and field all match. Merged into one person.</p></li>
+                <li><small>Ruled out · Namesake</small><strong>Another person with the same name</strong><p>Neither city nor field matches. Not merged.</p></li>
+                <li><small>To confirm</small><strong>Team size and reporting line</strong><p>No reliable public source. You’ll need to ask.</p></li>
+              </ul>
+            </figure>
+            <p class="s-p">Whether these records belong to the candidate in your database, and whether to merge them, is yours to confirm. Who to contact and how to open the conversation is your decision too. It won’t contact candidates for you. HunterBuddy is currently in development, with an invitation-only trial.</p>
+          </div></div>
+        </section>
+
+        <section class="s-section" id="s6" aria-labelledby="s6-t">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label">06</p>
+            <h2 id="s6-t">How far should a candidate identity check go?</h2>
+            <p class="s-p">A headhunter’s identity check has one purpose: to confirm that the person you’re about to contact and recommend is the same person who did this work in their professional life. That’s as far as it needs to go. There’s no need to dig further, and you shouldn’t.</p>
+            <ul class="s-list">
+              <li>No background checks. A background check is a separate process that happens after the candidate authorizes it, and it isn’t part of finding people.</li>
+              <li>No looking up personal information such as ID numbers, phone numbers or home addresses, and no asking around about family or private life.</li>
+              <li>No doxxing: no piecing together scattered private details to track someone down.</li>
+              <li>Use only what the person has made public in professional settings, plus what the candidate has given you.</li>
+              <li>If someone keeps something private, or doesn’t reply, that’s their right. Respect the choice.</li>
+            </ul>
+            <p class="s-p">Some people use different names in different settings, or don’t say who they are on their open-source accounts, and that may be deliberate. Where public information lines up, you can use it. Where it doesn’t, ask politely in a professional setting instead of going around them to find out. Holding these lines is a mark of respect for the candidate, and it protects your own reputation too.</p>
+          </div></div>
+        </section>
+
+        <section class="s-section s-related-wrap" aria-labelledby="s-related-title">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label" id="s-related-title">Related reading</p>
+            <ul class="s-related">
+              <li><a href="../../use-cases/finding-candidates/"><span class="s-related-kind">Use cases</span><strong>How headhunters find candidates</strong><span class="s-related-line">From your CV database to papers and code: where to find candidates and how to search.</span></a></li>
+              <li><a href="../../use-cases/ai-assistant-for-headhunters/"><span class="s-related-kind">Use cases</span><strong>AI assistant for headhunters</strong><span class="s-related-line">What an AI assistant for headhunters can and can’t do, and how to choose one.</span></a></li>
+              <li><a href="../../use-cases/talent-pool/"><span class="s-related-kind">Use cases</span><strong>Building and updating talent pools</strong><span class="s-related-line">What to record, how to tag, how to de-duplicate, and how to keep it current.</span></a></li>
+            </ul>
+          </div></div>
+        </section>
+      </div>
+
+      <section class="n-light n-faq s-faq" id="faq" tabindex="-1" aria-labelledby="s-faq-title">
+        <div class="n-wrap n-faq-layout">
+          <div class="n-section-head">
+            <p class="n-kicker">FAQ</p>
+            <h2 class="n-h2" id="s-faq-title"><span class="ln">What people ask</span><br /><span class="ln">about this.</span></h2>
+          </div>
+          <div class="n-faq-list">
+            <details>
+              <summary><h3>How do you tell apart candidates with the same name?</h3><i aria-hidden="true"></i></summary>
+              <p>Compare employers, dates, cities and fields side by side, along with public professional records such as papers, code and talks. Treat them as the same person only when at least two independent sources agree and the timeline holds together. If something conflicts or the evidence is thin, don’t merge yet. Flag it as unconfirmed.</p>
+            </details>
+            <details>
+              <summary><h3>What information does a candidate identity check cover?</h3><i aria-hidden="true"></i></summary>
+              <p>Professional identity: which companies someone has worked at, start and end dates, which city, what field, and the papers, patents, open-source projects and public talks under their name. The information comes from the CV the candidate gave you and from public professional settings. Personal information such as ID documents, phone numbers and home addresses is outside the scope of the check.</p>
+            </details>
+            <details>
+              <summary><h3>How do you flag it when you’re not sure it’s the same person?</h3><i aria-hidden="true"></i></summary>
+              <p>Use levels such as Confirmed, Fairly sure, To confirm and Ruled out, and for each one note the sources it rests on, what’s still missing and when you checked. Anything unconfirmed is only a lead: don’t merge the records, and keep it out of recommendations. Update the label once it’s confirmed.</p>
+            </details>
+            <details>
+              <summary><h3>If you can’t verify a candidate’s identity, can you just ask them?</h3><i aria-hidden="true"></i></summary>
+              <p>Yes, and it’s often the best way. In your first contact, politely confirm their experience, such as which company they were at and what they worked on. You can also ask a mutual contact you trust who knows them. If they don’t reply, leave it unconfirmed and respect their choice.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+      </article>
+
+      <section class="n-dark s-trial" aria-labelledby="s-trial-title">
+        <div class="n-wrap s-trial-inner">
+          <div>
+            <h2 id="s-trial-title">Request a HunterBuddy trial</h2>
+            <p>Trial access is by invitation. Leave your details and we will review each application, then contact you when your access is ready.</p>
+          </div>
+          <a class="n-btn n-btn-light" href="../../#apply">Request a trial</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="n-footer" id="footer">
+      <div class="n-wrap">
+        <div class="n-footer-top">
+          <div class="n-footer-brand">
+            <img src="../../../assets/boseek-b5-en-light.svg" alt="Boseek" width="150" height="46" loading="lazy" />
+            <p>HunterBuddy, the AI partner for headhunters.</p>
+            <p>Built by Boseek for independent headhunters and senior search consultants.</p>
+            <p class="n-footer-mail">Contact: <a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>
+          </div>
+          <div class="n-footer-groups">
+            <div>
+              <h2>Product</h2>
+              <ul>
+                <li><a href="../../#film">Product film</a></li>
+                <li><a href="../../#capabilities">What it does</a></li>
+                <li><a href="../../#belief">What we believe</a></li>
+                <li><a href="../../#industries">Sectors</a></li>
+                <li><a href="../../#faq">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h2>Use cases</h2>
+              <ul>
+                <li><a href="../../use-cases/business-development/">Business development</a></li>
+                <li><a href="../../use-cases/org-chart/">Org charts</a></li>
+                <li><a href="../../use-cases/finding-candidates/">Finding candidates</a></li>
+                <li><a href="../../use-cases/job-matching/">Job matching</a></li>
+                <li><a href="../../use-cases/">All &gt;&gt;</a></li>
+              </ul>
+            </div>
+            <div>
+              <h2>Legal</h2>
+              <ul>
+                <li>Privacy policy</li>
+                <li>Terms of service</li>
+                <li>Data processing agreement</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <ul class="n-footer-meta" aria-label="Copyright, operator and registration">
+          <li>&copy; <span data-footer-year>2026</span> Boseek</li>
+          <li>www.boseekai.com</li>
+          <li>Operated by Beijing Boseek Intelligent Technology Co., Ltd.</li>
+          <li><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备2026068903号-1</a></li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>

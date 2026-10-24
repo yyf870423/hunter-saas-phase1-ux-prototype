@@ -18,6 +18,33 @@ export async function loadArticles() {
   return list.sort((a, b) => a.order - b.order);
 }
 
+// the English pages: scripts/articles-en/<slug>.mjs, one per use-case page (business-development included),
+// translated from the Chinese ones (terms in docs/en-glossary.md)
+export async function loadArticlesEn() {
+  const dir = resolve(root, "scripts/articles-en");
+  const files = (await readdir(dir)).filter((f) => f.endsWith(".mjs"));
+  const list = [];
+  for (const file of files) list.push((await import(pathToFileURL(resolve(dir, file)).href)).default);
+  return list;
+}
+
+export function checkArticleEn(a) {
+  const problems = [];
+  const all = JSON.stringify(a);
+  if (/[\u4e00-\u9fff]/.test(all)) problems.push("Chinese characters");
+  if (all.includes("；")) problems.push("Chinese semicolon");
+  for (const word of ["seamless", "revolutionary", "game-changer", "cutting-edge", "unlock", "empower"])
+    if (all.toLowerCase().includes(word)) problems.push(`filler word "${word}"`);
+  if (/background check/i.test(all) && a.slug !== "same-name-candidates") problems.push(`"background check" only in same-name-candidates`);
+  if (a.slug !== "ai-tools-compared")
+    for (const name of ["Doubao", "DeepSeek", "ChatGPT", "Liepin", "LinkedIn", "Maimai", "BOSS Zhipin"])
+      if (all.includes(name)) problems.push(`platform "${name}" only in ai-tools-compared`);
+  if (!/ \| HunterBuddy$/.test(a.title)) problems.push('title must end with " | HunterBuddy"');
+  if (a.description.length < 120 || a.description.length > 170) problems.push(`description is ${a.description.length} characters`);
+  if (a.faq.length < 3) problems.push("fewer than 3 FAQs");
+  return problems;
+}
+
 export function checkArticle(a) {
   const problems = [];
   const all = JSON.stringify(a);
@@ -38,7 +65,7 @@ export function checkArticle(a) {
   return problems;
 }
 
-const isMain = import.meta.url === pathToFileURL(process.argv[1]).href;
+const isMain = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {
   let failed = false;
   for (const a of await loadArticles()) {

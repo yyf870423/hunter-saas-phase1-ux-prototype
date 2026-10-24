@@ -5,10 +5,15 @@
 // 没有脚本时，页面内容照样完整可读。
 (() => {
   const root = document.documentElement;
+  // files next to this script (the English page lives one folder down, so page-relative paths would miss them)
+  const HERE = new URL(".", document.currentScript?.src || location.href);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const fine = matchMedia("(hover: hover) and (pointer: fine)");
   const narrow = matchMedia("(max-width: 900px)");
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  // the English page (en/index.html) shares this script; its few strings live here
+  const EN = root.lang === "en";
+  const say = (zh, en) => (EN ? en : zh);
 
   /* ---------- smooth scrolling, the way the reference site moves ---------- */
   if (window.Lenis && !reduced.matches) {
@@ -50,7 +55,7 @@
   function setMenu(open) {
     menuOpen = open;
     menu.setAttribute("aria-expanded", String(open));
-    menu.setAttribute("aria-label", open ? "关闭导航" : "打开导航");
+    menu.setAttribute("aria-label", open ? say("关闭导航", "Close navigation") : say("打开导航", "Open navigation"));
     header.classList.toggle("is-open", open);
     nav.hidden = narrow.matches && !open;
     syncHeader();
@@ -324,7 +329,7 @@
     const cover = document.createElement("button");
     cover.type = "button";
     cover.className = "n-film-cover";
-    cover.setAttribute("aria-label", "播放 HunterBuddy 产品短片，2 分 22 秒");
+    cover.setAttribute("aria-label", say("播放 HunterBuddy 产品短片，2 分 22 秒", "Play the HunterBuddy product film, 2 min 22 s"));
     video.controls = false;
     frame.appendChild(cover);
     const reveal = () => {
@@ -382,7 +387,28 @@
     "lowalt": "低空经济",
     "meddevice": "医疗器械",
     "electronics": "消费电子",
+  };  // the same fields in English, for the English page
+  const LABELS_EN = {
+    "internet-1": "Internet",
+    "ai-2": "Artificial intelligence",
+    "embodied-1": "Embodied AI",
+    "cloud-1": "Cloud computing",
+    "pharma-1": "Pharmaceuticals",
+    "fusion-2": "Nuclear fusion",
+    "semi-2": "Semiconductors",
+    "resources-2": "Energy and rare resources",
+    "storage-2": "New energy storage",
+    "ev": "Electric vehicles",
+    "quantum": "Quantum computing",
+    "space": "Commercial space",
+    "synbio": "Synthetic biology",
+    "autonomous": "Autonomous driving",
+    "materials": "New materials",
+    "lowalt": "Low-altitude economy",
+    "meddevice": "Medical devices",
+    "electronics": "Consumer electronics",
   };
+
   const wall = document.querySelector("[data-wall]");
   const wallSection = wall?.closest("section");
   const tiles = [];
@@ -462,10 +488,10 @@
     img.alt = "";
     img.loading = "lazy";
     img.decoding = "async";
-    img.src = `assets/wall/${file}.webp`;
+    img.src = new URL(`assets/wall/${file}.webp`, HERE).href;
     img.addEventListener("error", () => tile.classList.add("is-empty"), { once: true });
     const name = document.createElement("b");
-    name.textContent = LABELS[file];
+    name.textContent = (EN ? LABELS_EN : LABELS)[file];
     tile.append(img, name);
     tiles.push(tile);
     return tile;
@@ -565,13 +591,13 @@
     window.FinesseTrial.mount(section);
     const kicker = document.createElement("p");
     kicker.className = "n-kicker";
-    kicker.textContent = "05 · 申请试用";
+    kicker.textContent = say("05 · 申请试用", "05 · Request a trial");
     section.querySelector(".f-trial-intro")?.prepend(kicker);
     // break after the comma, the same as the live site
     const thought = section.querySelector(".f-trial-thought");
     if (thought) {
       thought.replaceChildren(
-        ...["把时间，", "留给真正重要的人。"].map((text) => {
+        ...(EN ? ["Make time", "for the people who matter."] : ["把时间，", "留给真正重要的人。"]).map((text) => {
           const line = document.createElement("span");
           line.className = "n-thought-line";
           line.textContent = text;
