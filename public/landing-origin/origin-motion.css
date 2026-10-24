@@ -704,6 +704,9 @@ html:lang(en) #homepage .f-hero-description {
   margin: 0 auto;
   text-align: center;
 }
+.o-faq-more {
+  margin: 18px 0 0;
+}
 .o-faq-intro h2 {
   margin: 0;
   color: #f5f5f7;

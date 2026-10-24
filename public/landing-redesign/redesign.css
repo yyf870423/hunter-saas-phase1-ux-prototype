@@ -1306,6 +1306,9 @@ body.n-page::after {
 .n-faq-list {
   border-top: 1px solid var(--line);
 }
+.n-faq-more {
+  margin-top: 22px !important;
+}
 .n-faq details {
   border-bottom: 1px solid var(--line);
 }
@@ -1439,7 +1442,7 @@ body.n-page::after {
 }
 .n-footer-groups {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 32px;
 }
 .n-footer-groups h2 {
