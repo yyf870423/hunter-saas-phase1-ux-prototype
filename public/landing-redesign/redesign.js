@@ -190,9 +190,9 @@
   syncTheme();
   requestHero();
 
-  /* ---------- 六件事: each text scrolls with its picture; the pair passing the middle lights up ---------- */
+  /* ---------- 六件事: the text pinned on the left follows the picture passing the middle ---------- */
   const steps = [...document.querySelectorAll("[data-scrolly] .n-step")];
-  if (steps.length) {
+  if (steps.length && "IntersectionObserver" in window) {
     const activate = (step) => {
       const at = steps.indexOf(step);
       if (at < 0 || step.classList.contains("is-active")) return;
@@ -201,36 +201,31 @@
         s.classList.toggle("is-past", i < at);
       });
     };
-    // the pair whose picture is closest to the middle of the screen is the lit one
-    // (measured on every scroll, so a fast scroll or a jump never skips a step)
-    let stepFrame = 0;
-    const pick = () => {
-      stepFrame = 0;
-      const mid = innerHeight / 2;
-      let best = steps[0];
-      let gap = Infinity;
+    const watch = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) activate(entry.target.closest(".n-step"));
+        });
+      },
+      { rootMargin: "-50% 0px -50% 0px" },
+    );
+    steps.forEach((step) => {
+      watch.observe(step.querySelector(".n-figure"));
+      // keyboard users tabbing into a step bring it forward
+      step.addEventListener("focusin", () => activate(step));
+    });
+    // centre each pinned text in the screen by its own height, without shifting it up
+    // (a shift would push the first text over the section heading before it pins)
+    const centre = () => {
       steps.forEach((step) => {
-        const r = step.querySelector(".n-figure").getBoundingClientRect();
-        const d = Math.abs((r.top + r.bottom) / 2 - mid);
-        if (d < gap) {
-          gap = d;
-          best = step;
-        }
-        // brightness follows the scroll: full in the middle of the screen, fading towards the edges
-        const t = step.querySelector(".n-step-text").getBoundingClientRect();
-        const k = clamp(1 - (Math.abs((t.top + t.bottom) / 2 - mid) - innerHeight * 0.12) / (innerHeight * 0.3));
-        step.style.setProperty("--lit", (0.28 + 0.72 * k * k * (3 - 2 * k)).toFixed(3));
+        const text = step.querySelector(".n-step-text");
+        const top = Math.max(96, Math.round((innerHeight - text.offsetHeight) / 2));
+        text.style.setProperty("--stick", `${top}px`);
       });
-      activate(best);
     };
-    const requestPick = () => {
-      if (!stepFrame) stepFrame = requestAnimationFrame(pick);
-    };
-    addEventListener("scroll", requestPick, { passive: true });
-    addEventListener("resize", requestPick, { passive: true });
-    requestPick();
-    // keyboard users tabbing into a step bring it forward
-    steps.forEach((step) => step.addEventListener("focusin", () => activate(step)));
+    centre();
+    addEventListener("resize", centre, { passive: true });
+    document.fonts?.ready.then(centre);
   }
 
   /* ---------- scroll-linked motion ---------- */

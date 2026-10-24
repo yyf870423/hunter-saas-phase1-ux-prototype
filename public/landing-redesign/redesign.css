@@ -18,6 +18,14 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2190-2199, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+@font-face {
+  /* 首屏 HunterBuddy 字标专用：阿里妈妈数黑体 Bold，只保留基本拉丁字符 */
+  font-family: "HB Wordmark";
+  src: url("assets/fonts/alimama-shuheiti-bold-latin.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   /* night (第三版) */
   --night: #0f1011;
@@ -437,10 +445,11 @@ body.n-page::after {
 }
 .n-mark {
   padding: 0 0.04em 0.08em;
-  font-size: max(64px, min(150px, 10vw, 15.5vh));
-  font-weight: 500;
+  font-family: "HB Wordmark", var(--sans);
+  font-size: max(60px, min(140px, 9.3vw, 14.4vh));
+  font-weight: 700;
   line-height: 1.02;
-  letter-spacing: -0.035em;
+  letter-spacing: 0;
   color: #ffffff;
   background: linear-gradient(180deg, #ffffff 30%, #d8d0ff 100%);
   -webkit-background-clip: text;
@@ -1520,7 +1529,7 @@ body.n-page::after {
     display: none;
   }
   .n-mark {
-    font-size: min(76px, calc((100vw - 32px) / 6.4));
+    font-size: min(71px, calc((100vw - 32px) / 6.9));
   }
   .n-role {
     font-size: 13px;
@@ -1634,7 +1643,7 @@ body.n-page::after {
 }
 
 
-/* ---------- 六件事：左边文字和右边的图一起往上滚，经过屏幕中间的那一段亮起 ---------- */
+/* ---------- 六件事：左边文字钉在屏幕中间跟着换，右边的图往上走 ---------- */
 .n-scrolly {
   display: grid;
   gap: 20px;
@@ -1675,22 +1684,32 @@ body.n-page::after {
   .js .n-step {
     display: contents;
   }
-  /* each text sits beside its own picture and moves exactly as the picture does (plain scrolling,
-     no pinning, no switching), so it never rides over the section heading */
+  /* all six texts share the left cell and stay pinned in the middle of the screen
+     (redesign.js sets --stick so each one is centred without being shifted up,
+     which is what used to push the first one over the section heading);
+     only the one whose picture is passing the middle shows, and the old one is
+     gone before the new one comes in, so two texts never sit on top of each other */
   .js .n-step-text {
+    position: sticky;
+    top: var(--stick, 24vh);
     grid-column: 1;
-    align-self: center;
+    grid-row: 1 / -1;
+    align-self: start;
     margin: 0 !important;
-    /* redesign.js sets --lit from how close the text is to the middle of the screen,
-       so the text brightens and dims as it scrolls, the way the reference site does */
-    opacity: var(--lit, 1);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, 16px, 0);
+    transition: opacity 0.2s ease, transform 0.3s ease;
   }
-  .js .n-step:nth-child(1) .n-step-text { grid-row: 1; }
-  .js .n-step:nth-child(2) .n-step-text { grid-row: 2; }
-  .js .n-step:nth-child(3) .n-step-text { grid-row: 3; }
-  .js .n-step:nth-child(4) .n-step-text { grid-row: 4; }
-  .js .n-step:nth-child(5) .n-step-text { grid-row: 5; }
-  .js .n-step:nth-child(6) .n-step-text { grid-row: 6; }
+  .js .n-step.is-past .n-step-text {
+    transform: translate3d(0, -16px, 0);
+  }
+  .js .n-step.is-active .n-step-text {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    transition: opacity 0.45s ease 0.2s, transform 0.6s var(--ease) 0.2s;
+  }
   .js .n-step:nth-child(1) .n-figure { grid-row: 1; }
   .js .n-step:nth-child(2) .n-figure { grid-row: 2; }
   .js .n-step:nth-child(3) .n-figure { grid-row: 3; }
