@@ -557,6 +557,23 @@ body.n-page::after {
   height: 100%;
   object-fit: cover;
 }
+.n-film-frame {
+  position: relative;
+}
+/* the cover image has its own play button; the whole cover starts the film */
+.n-film-cover {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.n-film-cover:focus-visible {
+  outline: 2px solid var(--iris-hi);
+  outline-offset: -4px;
+}
 .n-chapters {
   display: flex;
   flex-wrap: wrap;

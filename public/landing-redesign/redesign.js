@@ -259,8 +259,32 @@
   addEventListener("resize", requestLinked, { passive: true });
   requestLinked();
 
-  /* ---------- film chapters ---------- */
+  /* ---------- film cover ---------- */
+  // the poster is the film's cover and carries its own play button, so the browser's controls stay hidden
+  // until playback starts (without JavaScript the video keeps its controls)
   const video = document.querySelector("[data-film]");
+  if (video) {
+    const frame = video.closest("figure");
+    const cover = document.createElement("button");
+    cover.type = "button";
+    cover.className = "n-film-cover";
+    cover.setAttribute("aria-label", "播放 HunterBuddy 产品短片，2 分 22 秒");
+    video.controls = false;
+    frame.appendChild(cover);
+    const reveal = () => {
+      if (!cover.isConnected) return;
+      cover.remove();
+      video.controls = true;
+    };
+    cover.addEventListener("click", () => {
+      reveal();
+      video.focus({ preventScroll: true });
+      video.play().catch(() => {});
+    });
+    video.addEventListener("play", reveal);
+  }
+
+  /* ---------- film chapters ---------- */
   document.querySelectorAll("[data-seek]").forEach((button) => {
     button.addEventListener("click", () => {
       if (!video) return;
