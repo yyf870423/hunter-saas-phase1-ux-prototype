@@ -8,6 +8,8 @@
 
 请把仓库 `main` 分支（提交 `63c98c9` 或之后）里的改版官网（中英文）发布到正式站 https://www.boseekai.com ，替换现在线上的版本。改版内容已经由用户验收，**不要改任何文案、样式和脚本逻辑**，只做上线需要的路径、头部、跳转、站点地图和服务器配置。做完按文末清单逐项验证，并把结果回报给我。
 
+如果你之前已经按这份说明上线过一版（例如提交 `2be613d`），这次是更新：用新提交重新生成发布产物（同样去掉 noindex、同样改写 `landing-origin/` 路径），第 3、4 条的跳转和服务器配置已经配好的就保持不变，然后重新跑第 5 条验证。这次更新的内容：中英文短片章节标题加了停顿、片长变为 2 分 32 秒；英文版“BD client research”用词；手机窄屏场景图不再被裁；使用场景页新增文章配图和完整的机构信息（结构化数据）。
+
 ### 1. 上线什么
 
 源目录：`public/landing-redesign/`（GitHub Pages 预览：https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/landing-redesign/ ）。
@@ -26,7 +28,7 @@
 9 个 slug：`business-development`、`org-chart`、`finding-candidates`、`job-matching`、`same-name-candidates`、`talent-pool`、`headhunter-consultant`、`ai-assistant-for-headhunters`、`ai-tools-compared`。
 
 页面用到的改版自带文件（都在 `public/landing-redesign/` 下，按相对路径引用）：
-`redesign.css`、`redesign.js`、`subpage.css`、`subpage.js`、`trial-locale-en.js`、`vendor/lenis-1.3.4.min.js`、`assets/`（整个目录：`fonts/`、`wall/` 18 张照片、`mist-*.webp`、`film-poster.jpg`、`film-poster-en.jpg`、`hunterbuddy-film.mp4`、`hunterbuddy-film-en.mp4`、`boseek-b5-en-light.svg`）。
+`redesign.css`、`redesign.js`、`subpage.css`、`subpage.js`、`trial-locale-en.js`、`vendor/lenis-1.3.4.min.js`、`assets/`（整个目录：`fonts/`、`wall/` 18 张照片、`use-cases/` 18 张文章配图（中文 9 张、`en/` 下英文 9 张）、`mist-*.webp`、`film-poster.jpg`、`film-poster-en.jpg`、`hunterbuddy-film.mp4`、`hunterbuddy-film-en.mp4`、`boseek-b5-en-light.svg`）。
 
 页面还引用了两个目录里的文件，用的是相对路径 `../landing-origin/…` 和 `../landing/…`（子页面按层级多几个 `../`，见下表）：
 
@@ -49,7 +51,7 @@
 改版页面现在带着预览期的 `<meta name="robots" content="noindex" />`（每个页面一行，共 22 个页面），**上线时全部去掉**。其他头部信息已经按正式站写好，不要再改：
 
 - 两个首页的 `<!-- seo -->…<!-- /seo -->` 里有 canonical、hreflang、Open Graph、JSON-LD（Organization、WebSite、WebPage、SoftwareApplication、VideoObject、FAQPage）。中文首页带百度验证 `<meta name="baidu-site-verification" content="codeva-SxHxeGOeZL" />`，**必须保留**（英文首页不加）。JSON-LD 里短片和封面的网址是 `https://www.boseekai.com/assets/hunterbuddy-film.mp4`、`…/assets/film-poster.jpg`（英文：`hunterbuddy-film-en.mp4`、`film-poster-en.jpg`），按第 1 条的布局正好有效；如果你换了布局，就同步改这四个网址。
-- 18 个使用场景页和 2 个列表页已有 canonical（`https://www.boseekai.com/use-cases/<slug>/`、`/en/use-cases/<slug>/`）、三条 hreflang、Open Graph 和 JSON-LD。
+- 18 个使用场景页和 2 个列表页已有 canonical（`https://www.boseekai.com/use-cases/<slug>/`、`/en/use-cases/<slug>/`）、三条 hreflang、Open Graph 和 JSON-LD。使用场景页的 `og:image` 和 Article 的 `image` 指向 `https://www.boseekai.com/assets/use-cases/<slug>.jpg`（英文 `…/assets/use-cases/en/<slug>.jpg`），按第 1 条的布局正好有效。
 - `<meta name="trial-api" content="disabled" />`：和现在线上一样处理。两个首页有试用申请表单，换成生产接口的值（你上次上线时的做法）；使用场景页没有表单，保持 `disabled` 或按你们的惯例。
 
 ### 3. 跳转（301）
@@ -77,7 +79,7 @@
 
 - HTML 继续 `Cache-Control: no-cache`。其他静态文件都带 `?v=` 版本号，可以长缓存。
 - `.mp4` 要支持 Range 请求（`Accept-Ranges: bytes`，带 Range 时返回 206），`Content-Type: video/mp4`，否则 iPhone 上的 Safari 播不了短片。`.woff2` 是 `font/woff2`，`.webp` 是 `image/webp`，`.svg` 是 `image/svg+xml`。
-- 两个短片各约 27 MB。
+- 两个短片各约 29 MB。
 - 旧的 `landing-origin/` 目录留在仓库里作为回退版本，不要删。回退方法：发布目录切回上一版（请在上线前确认能一步切回）。
 - 保留阿里云 DNS 里 Google 验证用的 TXT 记录。
 
@@ -87,10 +89,11 @@
 2. 已发布的 HTML 里没有 `noindex`：对 22 个页面 `curl -s … | grep -c noindex` 都是 0。
 3. 首页：canonical 是 `https://www.boseekai.com/`，有百度验证 meta；英文首页 canonical 是 `/en/`。
 4. 页面引用的所有文件（CSS、JS、字体、图片、短片、封面）都返回 200，浏览器控制台没有 404 和脚本错误（中文、英文首页各打开一次，滚到底）。
-5. 短片：`curl -I -H "Range: bytes=0-1" https://www.boseekai.com/assets/hunterbuddy-film.mp4` 返回 206；中英文首页点封面能播放（中文 2 分 22 秒，英文同长）。
+5. 短片：`curl -I -H "Range: bytes=0-1" https://www.boseekai.com/assets/hunterbuddy-film.mp4` 返回 206；中英文首页点封面能播放（中英文都是 2 分 32 秒）。
 6. 语言切换：中文首页右上角 “EN” 到 `/en/`，英文页 “中文” 回来；任意一个使用场景页切换语言，落到同一篇的另一种语言。
 7. 试用申请表单在中英文首页都能显示，提交走生产接口（只确认能提交，按你们平时的方式测）。
-8. 结构化数据：用 Google 富媒体检测工具测 `/`、`/en/`、`/use-cases/org-chart/`、`/en/use-cases/org-chart/`，无错误（缺少价格、地址细节这类“非关键问题”属预期）。
+8. 结构化数据：用 Google 富媒体检测工具测 `/`、`/en/`、`/use-cases/org-chart/`、`/en/use-cases/org-chart/`，无错误；使用场景页的“文章”应能读到作者（铂寻 Boseek / Boseek）和配图。缺少价格、地址细节这类“非关键问题”属预期；FAQ 不再出现在检测结果里也属正常（Google 已停止支持 FAQ 富媒体结果）。
+9. 文章配图：`curl -I https://www.boseekai.com/assets/use-cases/org-chart.jpg` 和 `…/assets/use-cases/en/org-chart.jpg` 返回 200、`Content-Type: image/jpeg`。
 
 ### 6. 提交收录
 

@@ -60,7 +60,7 @@ def seo_block(html, key):
          "applicationSubCategory": L["app_sub"], "operatingSystem": "Web", "url": SITE, "inLanguage": ["zh-CN", "en"],
          "audience": {"@type": "BusinessAudience", "audienceType": L["audience"]}, "publisher": {"@id": f"{SITE}#organization"}, "creator": {"@id": f"{SITE}#organization"}},
         {"@type": "VideoObject", "@id": f"{home}#film", "name": L["film"][0], "description": L["film"][1], "thumbnailUrl": SITE + L["film"][2], "contentUrl": SITE + L["film"][3],
-         "uploadDate": "2026-10-25T00:00:00+08:00", "duration": "PT2M22S", "inLanguage": L["lang"], "publisher": {"@id": f"{SITE}#organization"}},
+         "uploadDate": "2026-10-25T00:00:00+08:00", "duration": "PT2M33S", "inLanguage": L["lang"], "publisher": {"@id": f"{SITE}#organization"}},
         {"@type": "FAQPage", "@id": f"{home}#faq", "inLanguage": L["lang"], "isPartOf": {"@id": f"{home}#webpage"},
          "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]},
     ]
@@ -147,8 +147,8 @@ r('<span>费时间的事，交给它。</span>', '<span>Leave the legwork to it.
 r('<span>你的心力，留给识人和读懂客户。</span>', '<span>Save your energy for reading people and understanding clients.</span>')
 r('人岗智能匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，HunterBuddy 都能帮你搞定。你专注判断真正有价值的机会。',
   'Job matching, automated sourcing, finding the real name behind an alias, BD client research, keeping your CV database current, mapping org charts: HunterBuddy helps you get all of it done, so you can focus on judging which opportunities are truly worth it.')
-r('poster="../assets/film-poster.jpg?v=6"', 'poster="../assets/film-poster-en.jpg?v=3"')
-r('src="../assets/hunterbuddy-film.mp4?v=6"', 'src="../assets/hunterbuddy-film-en.mp4?v=3"')
+r('poster="../assets/film-poster.jpg?v=7"', 'poster="../assets/film-poster-en.jpg?v=4"')
+r('src="../assets/hunterbuddy-film.mp4?v=7"', 'src="../assets/hunterbuddy-film-en.mp4?v=4"')
 r('aria-label="HunterBuddy 产品短片"', 'aria-label="HunterBuddy product film"')
 
 # ---------- six capabilities: heading ----------

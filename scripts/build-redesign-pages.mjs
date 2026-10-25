@@ -18,6 +18,12 @@ import { PUBLISHED, checkArticle, checkArticleEn, loadArticles, loadArticlesEn }
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://www.boseekai.com/";
+// the publisher and author of every article: the same organisation the homepages describe, so each page names it in full
+// (named in the page's own language: the English pages carry no Chinese)
+const orgOf = (L) => ({
+  "@type": "Organization", "@id": `${SITE}#organization`, name: L.siteName, ...(L.key === "zh" ? { alternateName: ["铂寻", "Boseek"] } : {}), url: SITE,
+  logo: { "@type": "ImageObject", url: `${SITE}apple-touch-icon.png`, width: 180, height: 180 },
+});
 const OUT = resolve(root, "public/landing-redesign");
 const V = { redesign: "23", subpage: "20261025-en", subpageJs: "20261025-en" };
 const HUB = "ai-assistant-for-headhunters";
@@ -171,7 +177,7 @@ const lines = (parts) => parts.map((p) => `<span class="ln">${text(p)}</span>`).
 /* ---------- head, header, footer ---------- */
 // home: the way back to this language's homepage (its #anchors, its use-cases/); base: the way to landing-redesign/ (shared files)
 // path: the page's own path under the language root, e.g. "use-cases/org-chart/" (the switch and hreflang go to the same path)
-function head(L, { title, description, path, graph, ogType, home, base }) {
+function head(L, { title, description, path, graph, ogType, home, base, image }) {
   const lo = `${base}../landing-origin/`;
   const O = other(L);
   const self = `${L.site}${path}`;
@@ -197,7 +203,12 @@ function head(L, { title, description, path, graph, ogType, home, base }) {
     <meta property="og:url" content="${self}" />
     <meta property="og:locale" content="${L.ogLocale}" />
     <meta property="og:locale:alternate" content="${O.ogLocale}" />
-    <script type="application/ld+json">
+${image ? `    <meta property="og:image" content="${image}" />
+    <meta property="og:image:width" content="1600" />
+    <meta property="og:image:height" content="900" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="${image}" />
+` : ""}    <script type="application/ld+json">
 ${indent(JSON.stringify(graph, null, 2), "      ")}
     </script>
     <link rel="icon" href="${lo}favicon.ico" sizes="any" />
@@ -382,20 +393,23 @@ function page(L, a, items) {
       if (!r) throw new Error(`${a.slug}: related ${s} not found`);
       return r;
     });
+  // the article's own picture: its capability scene from the homepage beside its headline (scripts/og-images/compose.py)
+  const image = `${SITE}assets/use-cases/${L.key === "en" ? "en/" : ""}${a.slug}.jpg`;
   const graph = {
     "@context": "https://schema.org",
     "@graph": [
+      orgOf(L),
       { "@type": "WebPage", "@id": `${self}#webpage`, url: self, name: a.title, description: a.description, inLanguage: L.lang, isPartOf: { "@id": `${SITE}#website` }, publisher: { "@id": `${SITE}#organization` }, breadcrumb: { "@id": `${self}#breadcrumb` } },
       { "@type": "BreadcrumbList", "@id": `${self}#breadcrumb`, itemListElement: [
         { "@type": "ListItem", position: 1, name: L.homeName, item: L.site },
         { "@type": "ListItem", position: 2, name: L.list.name, item: `${L.site}use-cases/` },
         { "@type": "ListItem", position: 3, name: a.name, item: self },
       ] },
-      { "@type": "Article", "@id": `${self}#article`, headline: a.title.replace(L.titleSuffix, ""), description: a.description, inLanguage: L.lang, datePublished: a.published || PUBLISHED, dateModified: PUBLISHED, mainEntityOfPage: { "@id": `${self}#webpage` }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#hunterbuddy` } },
+      { "@type": "Article", "@id": `${self}#article`, headline: a.title.replace(L.titleSuffix, ""), description: a.description, inLanguage: L.lang, datePublished: a.published || PUBLISHED, dateModified: PUBLISHED, mainEntityOfPage: { "@id": `${self}#webpage` }, image: { "@type": "ImageObject", url: image, width: 1600, height: 900 }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#hunterbuddy` } },
       { "@type": "FAQPage", "@id": `${self}#faq`, inLanguage: L.lang, isPartOf: { "@id": `${self}#webpage` }, mainEntity: a.faq.map(([q, ans]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: ans } })) },
     ],
   };
-  return `${head(L, { title: a.title, description: a.description, path, graph, ogType: "article", home, base })}
+  return `${head(L, { title: a.title, description: a.description, path, graph, ogType: "article", home, base, image })}
     <main id="main" tabindex="-1">
       <article>
 ${hero(L, {
