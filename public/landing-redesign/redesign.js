@@ -243,6 +243,12 @@
         if (!wide.matches) {
           scene.style.zoom = "";
           scene.style.width = "";
+          // on a narrow phone a scene whose longest line will not wrap (the English ones especially) is
+          // scaled down to the panel rather than cut off at its edge
+          const ps = getComputedStyle(fig);
+          const room = fig.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight);
+          const need = Math.max(scene.offsetWidth, scene.scrollWidth);
+          if (need > room + 0.5) scene.style.zoom = Math.max(0.66, room / need).toFixed(3);
           return;
         }
         const cs = getComputedStyle(fig);

@@ -1405,8 +1405,9 @@ body.n-page::after {
 }
 .fx-chain {
   display: flex;
+  flex-wrap: wrap; /* on a narrow phone the chain drops under its label instead of pushing the card past the frame */
   align-items: center;
-  gap: 12px;
+  gap: 6px 12px;
   margin-top: 12px;
 }
 .fx-chain ol {

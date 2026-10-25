@@ -40,7 +40,7 @@ This guide is shared by the English homepage (`public/landing-redesign/en/`), th
 | 智能人岗匹配 / 人岗匹配 | job matching | Job matching |
 | 自动寻访 / 职位寻访 | automated sourcing / sourcing | Sourcing |
 | 还原花名背后的真实姓名 / 定位真实姓名 / 身份核实 | finding the real name behind an alias / identity checks (in prose, where “professional identity” is clear) | Real names (film chapter, cover); Identity checks (links) |
-| BD 客户研判 | client research for business development (BD) | Client research |
+| BD 客户研判 / 客户开发研判 | BD client research (always with “BD”, never plain “client research”) | BD client research |
 | 客户开发 | business development (BD) | Business development |
 | 守住你的人脉资产 / 人才库 | keeping your network current / talent pool | Talent pool |
 | 简历库更新 | keeping your CV database current (film chapter and cover: “CV updates”) | CV updates |

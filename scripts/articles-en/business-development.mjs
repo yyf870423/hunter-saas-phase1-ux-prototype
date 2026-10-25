@@ -17,6 +17,7 @@ export default {
     "how do headhunters find clients",
     "recruitment business development",
     "how to find hiring managers",
+    "BD client research",
     "client research for business development",
   ],
   related: ["org-chart", "finding-candidates", "ai-assistant-for-headhunters"],
@@ -93,7 +94,7 @@ export default {
               "Xingchuan’s careers page has added a Head of Computer Vision role, and both sources line up: the careers page and the funding news.",
             ],
             [
-              "Client research: is it worth pursuing?",
+              "BD client research: is it worth pursuing?",
               "It puts the funding news, the founding team, the open roles and other business signals side by side to judge whether the need is real, whether they can afford a search fee and whether working together carries any risk, then maps out the decision chain and priorities. Whatever is backed by a source names it. Whatever is not is marked “To confirm”.",
               "Real need and ability to pay are both backed by sources: a fresh Series B and a new role on the careers page. Risk to the relationship is still to confirm: whether they have worked with headhunters before, and who signs off, is not yet clear.",
             ],
@@ -116,7 +117,7 @@ export default {
             caption: "This is what HunterBuddy hands you. Every line names its source, and anything uncertain is flagged separately.",
             items: [
               ["Role found · 2 sources", "New on the careers page: Head of Computer Vision", "The careers page and the funding news agree."],
-              ["Client research · Sourced", "Real need, ability to pay", "A fresh Series B and a new role on the careers page. Risk to the relationship: to confirm."],
+              ["BD client research · Sourced", "Real need, ability to pay", "A fresh Series B and a new role on the careers page. Risk to the relationship: to confirm."],
               ["Possible hiring manager", "Qing Xu · Technical Lead", "Leads the vision team. Direct contact details to confirm."],
               ["Backup · Route to an introduction", "Yuan Zhang → Qing Xu", "A long-standing client of yours, and a Xingchuan investor."],
             ],

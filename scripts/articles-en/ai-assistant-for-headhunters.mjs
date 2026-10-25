@@ -7,7 +7,7 @@ export default {
   kicker: "Headhunting in practice · AI assistants",
   h1: ["What is an AI assistant", "for headhunters, and what can it do?"],
   answer:
-    "An AI assistant for headhunters is an AI partner built to do a headhunter’s research. It looks for leads in funding news, careers pages, papers and patents, open-source communities and your own CV database, matches people to companies, names the source of every finding and flags anything uncertain on its own. You can hand it client research, org charts, job matching, sourcing, identity checks and keeping your network current, while who to contact, who to put forward and how to negotiate remain the headhunter’s decisions.",
+    "An AI assistant for headhunters is an AI partner built to do a headhunter’s research. It looks for leads in funding news, careers pages, papers and patents, open-source communities and your own CV database, matches people to companies, names the source of every finding and flags anything uncertain on its own. You can hand it BD client research, org charts, job matching, sourcing, identity checks and keeping your network current, while who to contact, who to put forward and how to negotiate remain the headhunter’s decisions.",
   teaser: "What an AI assistant for headhunters can and can’t do, and how to choose one.",
   keywords: [
     "AI assistant for headhunters",
@@ -34,7 +34,7 @@ export default {
         "Follow a piece of business from start to finish, and the stages best handed to AI are the ones that mean looking in many places, reading a lot of material and checking things over and over. From finding a client to keeping up with candidates, there are roughly six:",
         {
           list: [
-            "Client research for business development (BD): spot companies that are expanding from funding news, careers pages and business moves, and judge whether the need is real and who to approach.",
+            "BD client research: spot companies that are expanding from funding news, careers pages and business moves, and judge whether the need is real and who to approach.",
             "Org charts: lay out the departments and reporting lines of target companies and their peers, level by level, and mark where the gaps are.",
             "Job matching: break the job description (JD) into must-haves and nice-to-haves, and for each candidate set out why they match and what still needs confirming.",
             "Sourcing: search your CV database and org charts first, then fill the gaps from public information, papers and patents, and open-source communities.",
@@ -159,7 +159,7 @@ export default {
     ],
     [
       "What kinds of AI recruiting agents are there, and which suit headhunters?",
-      "AI tools and agents with “recruiting” in the name fall roughly into two groups, by who uses them. One serves in-house HR, helping post roles, screen CVs and schedule interviews. The other serves headhunters, helping with client research, org charts, sourcing and keeping your network current. When choosing, headhunters should look at three things: whether it can use their own CV database, whether every finding has a source, and whether it flags anything uncertain separately. HunterBuddy belongs to the second group and is currently offered as an invitation-only trial.",
+      "AI tools and agents with “recruiting” in the name fall roughly into two groups, by who uses them. One serves in-house HR, helping post roles, screen CVs and schedule interviews. The other serves headhunters, helping with BD client research, org charts, sourcing and keeping your network current. When choosing, headhunters should look at three things: whether it can use their own CV database, whether every finding has a source, and whether it flags anything uncertain separately. HunterBuddy belongs to the second group and is currently offered as an invitation-only trial.",
     ],
     [
       "Will AI replace search consultants?",

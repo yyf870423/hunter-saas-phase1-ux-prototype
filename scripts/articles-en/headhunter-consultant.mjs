@@ -137,7 +137,7 @@ export default {
         "Broadly, AI can help a good deal with looking things up, reading material, checking information and keeping track of changes. Take HunterBuddy, the AI partner for headhunters. It’s still in development and offered as an invitation-only trial, and it can take on these six jobs:",
         {
           list: [
-            "Client research for business development (BD): it watches the sectors you follow, spots expanding companies in funding news and on careers pages, and finds new roles, hiring managers and routes to an introduction.",
+            "BD client research: it watches the sectors you follow, spots expanding companies in funding news and on careers pages, and finds new roles, hiring managers and routes to an introduction.",
             "Org charts: it lays out the departments and reporting lines of target companies and their peers, noting where each piece of information came from and which positions are still blank.",
             "Job matching: it checks a JD against your CV database and public information, and for each candidate sets out why they match, the sources and what still needs confirming.",
             "Automated sourcing: it looks for people in public information, patents and papers, code footprints (public code and repositories) and your CV database, and checks several records of the same person before merging them.",

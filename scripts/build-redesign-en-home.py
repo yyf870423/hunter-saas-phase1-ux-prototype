@@ -35,9 +35,9 @@ LANGS = {
     ),
     "en": dict(
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
-        app="The AI partner for headhunters. HunterBuddy helps independent headhunters and senior search consultants with job matching, sourcing, identity checks, client research, CV updates and org charts, and names the source of every finding. Who to contact and whom to put forward is always the headhunter’s call. Invitation-only trial.",
+        app="The AI partner for headhunters. HunterBuddy helps independent headhunters and senior search consultants with job matching, sourcing, identity checks, BD client research, CV updates and org charts, and names the source of every finding. Who to contact and whom to put forward is always the headhunter’s call. Invitation-only trial.",
         app_sub="AI assistant for headhunters", audience="Independent headhunters and senior search consultants",
-        film=("HunterBuddy product film", "From one role in a sea of people, follow HunterBuddy through six jobs: client research, org mapping, automated sourcing, job matching, finding the real name, and keeping CVs current.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4"),
+        film=("HunterBuddy product film", "From one role in a sea of people, follow HunterBuddy through six jobs: BD client research, org mapping, automated sourcing, job matching, finding the real name, and keeping CVs current.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4"),
     ),
 }
 
@@ -114,7 +114,7 @@ r('<!-- 改版草稿：只用于预览，不收录 -->', '<!-- Redesign draft: p
 r('<title>HunterBuddy · 猎头 AI 助手，梳理组织架构、做人才寻访｜铂寻 Boseek</title>',
   '<title>HunterBuddy · AI assistant for headhunters: org charts and sourcing | Boseek</title>')
 r('content="HunterBuddy 是铂寻 Boseek 为独立猎头和资深顾问打造的猎头 AI 助手。人岗匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，费时间的事交给它，你把心力留给识人和读懂客户。"',
-  'content="HunterBuddy by Boseek is an AI assistant for independent headhunters and senior search consultants. It helps with job matching, sourcing, identity checks, client research, CV database updates and org charts, so you can focus on people and clients."')
+  'content="HunterBuddy by Boseek is an AI assistant for independent headhunters and senior search consultants. It helps with job matching, sourcing, identity checks, BD client research, CV database updates and org charts, so you can focus on people and clients."')
 r('<script defer src="../../landing/shared-ui.js',
   '<script defer src="../../landing-origin/locale-en.js?v=20261024-org"></script>\n    <script defer src="../trial-locale-en.js?v=1"></script>\n    <script defer src="../../landing/shared-ui.js')
 
@@ -146,9 +146,9 @@ r('<p class="n-kicker">HunterBuddy 能做什么</p>', '<p class="n-kicker">What 
 r('<span>费时间的事，交给它。</span>', '<span>Leave the legwork to it.</span>')
 r('<span>你的心力，留给识人和读懂客户。</span>', '<span>Save your energy for reading people and understanding clients.</span>')
 r('人岗智能匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，HunterBuddy 都能帮你搞定。你专注判断真正有价值的机会。',
-  'Job matching, automated sourcing, finding the real name behind an alias, client research for business development, keeping your CV database current, mapping org charts: HunterBuddy helps you get all of it done, so you can focus on judging which opportunities are truly worth it.')
-r('poster="../assets/film-poster.jpg?v=6"', 'poster="../assets/film-poster-en.jpg?v=2"')
-r('src="../assets/hunterbuddy-film.mp4?v=6"', 'src="../assets/hunterbuddy-film-en.mp4?v=2"')
+  'Job matching, automated sourcing, finding the real name behind an alias, BD client research, keeping your CV database current, mapping org charts: HunterBuddy helps you get all of it done, so you can focus on judging which opportunities are truly worth it.')
+r('poster="../assets/film-poster.jpg?v=6"', 'poster="../assets/film-poster-en.jpg?v=3"')
+r('src="../assets/hunterbuddy-film.mp4?v=6"', 'src="../assets/hunterbuddy-film-en.mp4?v=3"')
 r('aria-label="HunterBuddy 产品短片"', 'aria-label="HunterBuddy product film"')
 
 # ---------- six capabilities: heading ----------
@@ -224,14 +224,14 @@ r('>了解身份核实</a>', '>More on identity checks</a>')
 
 # 04 client research — scene
 r('<li>行业前景</li><li>融资动态</li><li>创始团队</li><li>岗位信号</li><li>业务信号</li>', '<li>Industry outlook</li><li>Funding news</li><li>Founding team</li><li>Hiring signals</li><li>Business signals</li>')
-r('<span class="fx-cap">客户研判</span><em class="fx-ok">优先级 · 高</em>', '<span class="fx-cap">Client research</span><em class="fx-ok">Priority · High</em>')
+r('<span class="fx-cap">客户研判</span><em class="fx-ok">优先级 · 高</em>', '<span class="fx-cap">BD client research</span><em class="fx-ok">Priority · High</em>')
 r('<li><span>真实需求</span><i style="--n: 4"></i><b>有依据</b></li>', '<li><span>Real need</span><i style="--n: 4"></i><b>Sourced</b></li>')
 r('<li><span>付费潜力</span><i style="--n: 3"></i><b>有依据</b></li>', '<li><span>Ability to pay</span><i style="--n: 3"></i><b>Sourced</b></li>')
 r('<li class="is-wait"><span>合作风险</span><i style="--n: 2"></i><b>待确认</b></li>', '<li class="is-wait"><span>Risk</span><i style="--n: 2"></i><b>To confirm</b></li>')
 r('<span class="fx-cap">决策链</span><ol><li>创始人</li><li>技术 VP</li><li class="is-wait">用人经理</li></ol>', '<span class="fx-cap">Decision chain</span><ol><li>Founder</li><li>Tech VP</li><li class="is-wait">Hiring manager</li></ol>')
 # 04 text
 r('有的客户岗位不少，跟下去才发现需求、预算或决策链还没准备好。', 'Some clients have plenty of openings, and only once you follow up do you find that the need, the budget or the decision chain isn’t ready.')
-r('<h3 id="n-step-bd">BD 客户研判，先看清再出发</h3>', '<h3 id="n-step-bd">Client research for BD: know before you go</h3>')
+r('<h3 id="n-step-bd">BD 客户研判，先看清再出发</h3>', '<h3 id="n-step-bd">BD client research: know before you go</h3>')
 r('HunterBuddy 整理行业前景、融资动态、创始团队、岗位和业务信号，帮你判断真实需求、付费潜力和合作风险，再理清决策链和优先级，为下一步接洽提供参考。少做无用奔波，把精力留给值得的机会。',
   'HunterBuddy pulls together the industry outlook, funding news, the founding team, and hiring and business signals, helping you judge the real need, the ability to pay and the risk in working with them. It then lays out the decision chain and priorities to inform your next approach. Fewer wasted trips, and more energy for the opportunities that deserve it.')
 r('>了解客户开发</a>', '>More on business development</a>')
