@@ -127,7 +127,7 @@ r('aria-label="主导航"', 'aria-label="Main navigation"')
 r('<a href="#film">产品短片</a>', '<a href="#film">Product video</a>')
 r('<a href="#capabilities">能做什么</a>', '<a href="#capabilities">What it does</a>')
 r('<a href="#belief">产品边界</a>', '<a href="#belief">Boundaries</a>')
-r('<a href="#industries">深耕赛道</a>', '<a href="#industries">Sectors</a>')
+r('<a href="#industries">行业赛道</a>', '<a href="#industries">Sectors</a>')
 r('<a href="#faq">常见问题</a>', '<a href="#faq">FAQ</a>')
 r('<a class="n-lang" href="en/" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English">EN</a>',
   '<a class="n-lang" href="../" hreflang="zh-CN" lang="zh-CN" title="切换到中文" aria-label="切换到中文">中文</a>')
@@ -279,7 +279,7 @@ r('<li><i>03</i>它不替你做任何商务决定。</li>', '<li><i>03</i>It mak
 r('安静站在你的身后，陪你赶路，<br />而不是站在你和人选、客户中间。', 'It stands quietly behind you and keeps you company on the road,<br />never between you and your candidates or clients.')
 
 # ---------- sectors ----------
-r('<p class="n-kicker">03 · 深耕赛道</p>', '<p class="n-kicker">03 · Sectors</p>')
+r('<p class="n-kicker">03 · 行业赛道</p>', '<p class="n-kicker">03 · Sectors</p>')
 r('<h2 class="n-h2" id="n-industries-title">深耕各行赛道</h2>', '<h2 class="n-h2" id="n-industries-title">Deep in every sector</h2>')
 r('<p class="n-sub">与你并肩，奔赴每一场人才相逢。</p>', '<p class="n-sub">Side by side with you, on the road to every great hire.</p>')
 r('<li>互联网</li><li>人工智能</li><li>具身智能</li><li>云计算</li><li>医药</li><li>核聚变</li><li>半导体</li><li>能源与稀有资源</li><li>新型储能</li>',

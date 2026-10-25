@@ -62,7 +62,7 @@ const LOCALES = {
       ["产品短片", "film"],
       ["能做什么", "capabilities"],
       ["产品边界", "belief"],
-      ["深耕赛道", "industries"],
+      ["行业赛道", "industries"],
       ["常见问题", "faq"],
     ],
     apply: "申请试用",
