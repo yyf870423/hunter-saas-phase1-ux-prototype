@@ -6,7 +6,7 @@
 
 ## 提示词
 
-请把仓库 `main` 分支（提交 `88677b5` 或之后）里的改版官网（中英文）发布到正式站 https://www.boseekai.com ，替换现在线上的版本。改版内容已经由用户验收，**不要改任何文案、样式和脚本逻辑**，只做上线需要的路径、头部、跳转、站点地图和服务器配置。做完按文末清单逐项验证，并把结果回报给我。
+请把仓库 `main` 分支（提交 `2be613d` 或之后）里的改版官网（中英文）发布到正式站 https://www.boseekai.com ，替换现在线上的版本。改版内容已经由用户验收，**不要改任何文案、样式和脚本逻辑**，只做上线需要的路径、头部、跳转、站点地图和服务器配置。做完按文末清单逐项验证，并把结果回报给我。
 
 ### 1. 上线什么
 
@@ -28,7 +28,7 @@
 页面用到的改版自带文件（都在 `public/landing-redesign/` 下，按相对路径引用）：
 `redesign.css`、`redesign.js`、`subpage.css`、`subpage.js`、`trial-locale-en.js`、`vendor/lenis-1.3.4.min.js`、`assets/`（整个目录：`fonts/`、`wall/` 18 张照片、`mist-*.webp`、`film-poster.jpg`、`film-poster-en.jpg`、`hunterbuddy-film.mp4`、`hunterbuddy-film-en.mp4`、`boseek-b5-en-light.svg`）。
 
-页面还引用了两个目录里的文件，用的是相对路径 `../landing-origin/…` 和 `../landing/…`（子页面是 `../../`、`../../../` 开头）：
+页面还引用了两个目录里的文件，用的是相对路径 `../landing-origin/…` 和 `../landing/…`（子页面按层级多几个 `../`，见下表）：
 
 - `landing/`（线上已有 `/landing/`，改版放在站点根目录后这些相对路径会自然落到 `/landing/…`，不用改）：`shared-ui.css`、`shared-form.css`、`trial-page.css`、`shared-ui.js`、`shared-form.js`、`trial-form.js`、`vendor/libphonenumber-max.js`。
 - `landing-origin/`（**要处理**）：`favicon.ico`、`favicon.svg`、`apple-touch-icon.png`、`locale-en.js`、`assets/boseek-b5-dark.svg`、`assets/boseek-b5.svg`、`assets/boseek-b5-en.svg`、`assets/hero-research.webp`、`assets/human-conversation.webp`、`assets/fonts/inter-400.woff2`、`assets/fonts/inter-500.woff2`。
