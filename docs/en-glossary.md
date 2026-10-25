@@ -99,10 +99,9 @@ Other recurring terms:
 | 已更新 | Updated | "updated" |
 | 待补 | To fill / Missing | "still missing" |
 | 先联系 · 值得聊 · 再看看 | Contact first · Worth a call · Keep in view | |
-| 产品边界 (nav) | Boundaries | |
+| 产品边界 (nav and section kicker) | Boundaries | |
 | 产品短片 | product video (nav: Product video; never “film”) | |
 | 找人 · 看清 · 沉淀 (step tags) | Find · Know · Keep | |
-| 知止有度 (section kicker) | Knowing where to stop | |
 
 ## People and companies in the examples
 

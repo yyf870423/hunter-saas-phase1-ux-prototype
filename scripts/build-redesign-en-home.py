@@ -267,7 +267,7 @@ r('自动汇总人员、部门、岗位和汇报关系，一键生成架构图�
 r('>了解组织架构图</a>', '>More on org charts</a>')
 
 # ---------- what we believe ----------
-r('<p class="n-kicker">02 · 知止有度</p>', '<p class="n-kicker">02 · Knowing where to stop</p>')
+r('<p class="n-kicker">02 · 产品边界</p>', '<p class="n-kicker">02 · Boundaries</p>')
 r('猎头的价值，<br />无法被算法替代。', 'What a headhunter brings,<br />no algorithm can replace.')
 r('<p>信息可以自动抓取，但一个人的期待、顾虑和抱负，没有办法被提取。</p>', '<p>Information can be gathered automatically. A person’s hopes, doubts and ambitions cannot be extracted.</p>')
 r('<p>客户的隐性诉求、人选没说出口的选择偏好，只能靠面对面的沟通去感知。</p>', '<p>A client’s unspoken needs and a candidate’s unvoiced preferences can only be sensed face to face.</p>')
