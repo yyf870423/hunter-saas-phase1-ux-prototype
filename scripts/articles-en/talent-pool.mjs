@@ -114,7 +114,7 @@ export default {
     {
       h2: "How can HunterBuddy help manage your CV database?",
       body: [
-        "HunterBuddy is an AI assistant for headhunters, built by Boseek for independent headhunters and senior search consultants, and keeping your CV database current is one of the things it does. To show how, here’s the Xingchuan Robotics story from our homepage and product film, in which Yue Lin is the candidate.",
+        "HunterBuddy is an AI assistant for headhunters, built by Boseek for independent headhunters and senior search consultants, and keeping your CV database current is one of the things it does. To show how, here’s the Xingchuan Robotics story from our homepage and product video, in which Yue Lin is the candidate.",
         {
           list: [
             "Upload CVs one at a time or in bulk. Everything you bring in goes through identity checks and is de-duplicated and merged, and can also be matched against all your live searches.",

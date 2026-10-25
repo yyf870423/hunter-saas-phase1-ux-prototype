@@ -37,7 +37,7 @@ LANGS = {
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
         app="The AI partner for headhunters. HunterBuddy helps independent headhunters and senior search consultants with job matching, sourcing, identity checks, BD client research, CV updates and org charts, and names the source of every finding. Who to contact and whom to put forward is always the headhunter’s call. Invitation-only trial.",
         app_sub="AI assistant for headhunters", audience="Independent headhunters and senior search consultants",
-        film=("HunterBuddy product film", "From one role in a sea of people, follow HunterBuddy through six jobs: BD client research, org mapping, automated sourcing, job matching, finding the real name, and keeping CVs current.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4"),
+        film=("HunterBuddy product video", "From one role in a sea of people, follow HunterBuddy through six jobs: BD client research, org mapping, automated sourcing, job matching, finding the real name, and keeping CVs current.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4"),
     ),
 }
 
@@ -111,8 +111,8 @@ def r(old, new): R.append((old, new))
 # ---------- head ----------
 r('<html lang="zh-CN">', '<html lang="en">')
 r('<!-- 改版草稿：只用于预览，不收录 -->', '<!-- Redesign draft: preview only, not indexed -->')
-r('<title>HunterBuddy · 猎头 AI 助手，梳理组织架构、做人才寻访｜铂寻 Boseek</title>',
-  '<title>HunterBuddy · AI assistant for headhunters: org charts and sourcing | Boseek</title>')
+r('<title>HunterBuddy · 猎头 AI 助手：人岗匹配、人才寻访、组织架构梳理｜铂寻 Boseek</title>',
+  '<title>HunterBuddy · AI assistant for headhunters: matching, sourcing, org charts | Boseek</title>')
 r('content="HunterBuddy 是铂寻 Boseek 为独立猎头和资深顾问打造的猎头 AI 助手。人岗匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，费时间的事交给它，你把心力留给识人和读懂客户。"',
   'content="HunterBuddy by Boseek is an AI assistant for independent headhunters and senior search consultants. It helps with job matching, sourcing, identity checks, BD client research, CV database updates and org charts, so you can focus on people and clients."')
 r('<script defer src="../../landing/shared-ui.js',
@@ -124,7 +124,7 @@ r('aria-label="铂寻 Boseek 首页"', 'aria-label="Boseek home"')
 r('<img src="../../landing-origin/assets/boseek-b5-dark.svg" alt="Boseek 铂寻" width="150" height="54" />',
   '<img src="../../landing-origin/assets/boseek-b5-en.svg" alt="Boseek" width="150" height="48" />')
 r('aria-label="主导航"', 'aria-label="Main navigation"')
-r('<a href="#film">产品短片</a>', '<a href="#film">Product film</a>')
+r('<a href="#film">产品短片</a>', '<a href="#film">Product video</a>')
 r('<a href="#capabilities">能做什么</a>', '<a href="#capabilities">What it does</a>')
 r('<a href="#belief">产品边界</a>', '<a href="#belief">Boundaries</a>')
 r('<a href="#industries">深耕赛道</a>', '<a href="#industries">Sectors</a>')
@@ -147,9 +147,9 @@ r('<span>费时间的事，交给它。</span>', '<span>Leave the legwork to it.
 r('<span>你的心力，留给识人和读懂客户。</span>', '<span>Save your energy for reading people and understanding clients.</span>')
 r('人岗智能匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新、组织架构梳理，HunterBuddy 都能帮你搞定。你专注判断真正有价值的机会。',
   'Job matching, automated sourcing, finding the real name behind an alias, BD client research, keeping your CV database current, mapping org charts: HunterBuddy helps you get all of it done, so you can focus on judging which opportunities are truly worth it.')
-r('poster="../assets/film-poster.jpg?v=8"', 'poster="../assets/film-poster-en.jpg?v=5"')
+r('poster="../assets/film-poster.jpg?v=9"', 'poster="../assets/film-poster-en.jpg?v=6"')
 r('src="../assets/hunterbuddy-film.mp4?v=8"', 'src="../assets/hunterbuddy-film-en.mp4?v=5"')
-r('aria-label="HunterBuddy 产品短片"', 'aria-label="HunterBuddy product film"')
+r('aria-label="HunterBuddy 产品短片"', 'aria-label="HunterBuddy product video"')
 
 # ---------- six capabilities: heading ----------
 r('<p class="n-kicker">01 · 能做什么</p>', '<p class="n-kicker">01 · What it does</p>')
@@ -157,7 +157,7 @@ r('六件最耗人的事，<br />HunterBuddy 替你扛下来。', 'Six jobs that
 r('每一件都写着来源，拿不准的单独标出来。最后联系谁、怎么开口，还是你说了算。',
   'Every finding names its source, and anything uncertain is flagged on its own. Who to contact, and how to open the conversation, is still your call.')
 r('<i>找人</i>', '<i>Find</i>')
-r('<i>看清</i>', '<i>Assess</i>')
+r('<i>看清</i>', '<i>Know</i>')   # not "Assess": HunterBuddy never judges people
 r('<i>沉淀</i>', '<i>Keep</i>')
 
 # 01 job matching — scene

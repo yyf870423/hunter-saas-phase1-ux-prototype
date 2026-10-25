@@ -125,7 +125,7 @@ export default {
     {
       h2: "How can HunterBuddy help you map a target company with AI?",
       body: [
-        "HunterBuddy is an AI assistant for headhunters, built by Boseek for independent headhunters and senior search consultants. Here is the example from our homepage and product film: say you want to map Xingchuan Robotics alongside two peer companies, Tuojie Robotics and Qiongding AI.",
+        "HunterBuddy is an AI assistant for headhunters, built by Boseek for independent headhunters and senior search consultants. Here is the example from our homepage and product video: say you want to map Xingchuan Robotics alongside two peer companies, Tuojie Robotics and Qiongding AI.",
         {
           list: [
             "Tell it which companies and teams to look at. It finds departments and reporting lines in public information, puts people in the right positions and notes where each piece of information came from.",

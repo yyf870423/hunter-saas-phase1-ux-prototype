@@ -335,7 +335,7 @@
     const cover = document.createElement("button");
     cover.type = "button";
     cover.className = "n-film-cover";
-    cover.setAttribute("aria-label", say("播放 HunterBuddy 产品短片，2 分 22 秒", "Play the HunterBuddy product film, 2 min 22 s"));
+    cover.setAttribute("aria-label", say("播放 HunterBuddy 产品短片，2 分 32 秒", "Play the HunterBuddy product video, 2 min 32 s"));
     video.controls = false;
     frame.appendChild(cover);
     const reveal = () => {

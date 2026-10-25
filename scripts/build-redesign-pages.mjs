@@ -118,7 +118,7 @@ const LOCALES = {
     footLogo: { src: "assets/boseek-b5-en-light.svg", alt: "Boseek", w: 150, h: 46 },
     navLabel: "Main navigation",
     nav: [
-      ["Product film", "film"],
+      ["Product video", "film"],
       ["What it does", "capabilities"],
       ["Boundaries", "belief"],
       ["Sectors", "industries"],
