@@ -99,6 +99,7 @@ Other recurring terms:
 | 已更新 | Updated | "updated" |
 | 待补 | To fill / Missing | "still missing" |
 | 先联系 · 值得聊 · 再看看 | Contact first · Worth a call · Keep in view | |
+| 核心能力 (nav and section kicker) | Capabilities | |
 | 产品边界 (nav and section kicker) | Boundaries | |
 | 行业赛道 (nav and section kicker) | Sectors | |
 | 产品短片 | product video (nav: Product video; never “film”) | |

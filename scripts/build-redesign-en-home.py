@@ -125,7 +125,7 @@ r('<img src="../../landing-origin/assets/boseek-b5-dark.svg" alt="Boseek 铂寻"
   '<img src="../../landing-origin/assets/boseek-b5-en.svg" alt="Boseek" width="150" height="48" />')
 r('aria-label="主导航"', 'aria-label="Main navigation"')
 r('<a href="#film">产品短片</a>', '<a href="#film">Product video</a>')
-r('<a href="#capabilities">能做什么</a>', '<a href="#capabilities">What it does</a>')
+r('<a href="#capabilities">核心能力</a>', '<a href="#capabilities">Capabilities</a>')
 r('<a href="#belief">产品边界</a>', '<a href="#belief">Boundaries</a>')
 r('<a href="#industries">行业赛道</a>', '<a href="#industries">Sectors</a>')
 r('<a href="#faq">常见问题</a>', '<a href="#faq">FAQ</a>')
@@ -152,7 +152,7 @@ r('src="../assets/hunterbuddy-film.mp4?v=8"', 'src="../assets/hunterbuddy-film-e
 r('aria-label="HunterBuddy 产品短片"', 'aria-label="HunterBuddy product video"')
 
 # ---------- six capabilities: heading ----------
-r('<p class="n-kicker">01 · 能做什么</p>', '<p class="n-kicker">01 · What it does</p>')
+r('<p class="n-kicker">01 · 核心能力</p>', '<p class="n-kicker">01 · Capabilities</p>')
 r('六件最耗人的事，<br />HunterBuddy 替你扛下来。', 'Six jobs that wear you down.<br />HunterBuddy takes them on.')
 r('每一件都写着来源，拿不准的单独标出来。最后联系谁、怎么开口，还是你说了算。',
   'Every finding names its source, and anything uncertain is flagged on its own. Who to contact, and how to open the conversation, is still your call.')

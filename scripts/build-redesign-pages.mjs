@@ -60,7 +60,7 @@ const LOCALES = {
     navLabel: "主导航",
     nav: [
       ["产品短片", "film"],
-      ["能做什么", "capabilities"],
+      ["核心能力", "capabilities"],
       ["产品边界", "belief"],
       ["行业赛道", "industries"],
       ["常见问题", "faq"],
@@ -119,7 +119,7 @@ const LOCALES = {
     navLabel: "Main navigation",
     nav: [
       ["Product video", "film"],
-      ["What it does", "capabilities"],
+      ["Capabilities", "capabilities"],
       ["Boundaries", "belief"],
       ["Sectors", "industries"],
       ["FAQ", "faq"],
