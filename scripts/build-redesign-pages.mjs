@@ -61,7 +61,7 @@ const LOCALES = {
     nav: [
       ["产品短片", "film"],
       ["能做什么", "capabilities"],
-      ["我们相信", "belief"],
+      ["产品边界", "belief"],
       ["深耕赛道", "industries"],
       ["常见问题", "faq"],
     ],
@@ -120,7 +120,7 @@ const LOCALES = {
     nav: [
       ["Product film", "film"],
       ["What it does", "capabilities"],
-      ["What we believe", "belief"],
+      ["Boundaries", "belief"],
       ["Sectors", "industries"],
       ["FAQ", "faq"],
     ],

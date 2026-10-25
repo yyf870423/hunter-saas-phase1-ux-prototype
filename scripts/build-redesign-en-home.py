@@ -126,7 +126,7 @@ r('<img src="../../landing-origin/assets/boseek-b5-dark.svg" alt="Boseek 铂寻"
 r('aria-label="主导航"', 'aria-label="Main navigation"')
 r('<a href="#film">产品短片</a>', '<a href="#film">Product film</a>')
 r('<a href="#capabilities">能做什么</a>', '<a href="#capabilities">What it does</a>')
-r('<a href="#belief">我们相信</a>', '<a href="#belief">What we believe</a>')
+r('<a href="#belief">产品边界</a>', '<a href="#belief">Boundaries</a>')
 r('<a href="#industries">深耕赛道</a>', '<a href="#industries">Sectors</a>')
 r('<a href="#faq">常见问题</a>', '<a href="#faq">FAQ</a>')
 r('<a class="n-lang" href="en/" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English">EN</a>',
@@ -267,7 +267,7 @@ r('自动汇总人员、部门、岗位和汇报关系，一键生成架构图�
 r('>了解组织架构图</a>', '>More on org charts</a>')
 
 # ---------- what we believe ----------
-r('<p class="n-kicker">02 · 我们相信</p>', '<p class="n-kicker">02 · What we believe</p>')
+r('<p class="n-kicker">02 · 知止有度</p>', '<p class="n-kicker">02 · Knowing where to stop</p>')
 r('猎头的价值，<br />无法被算法替代。', 'What a headhunter brings,<br />no algorithm can replace.')
 r('<p>信息可以自动抓取，但一个人的期待、顾虑和抱负，没有办法被提取。</p>', '<p>Information can be gathered automatically. A person’s hopes, doubts and ambitions cannot be extracted.</p>')
 r('<p>客户的隐性诉求、人选没说出口的选择偏好，只能靠面对面的沟通去感知。</p>', '<p>A client’s unspoken needs and a candidate’s unvoiced preferences can only be sensed face to face.</p>')

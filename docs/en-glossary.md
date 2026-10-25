@@ -99,6 +99,8 @@ Other recurring terms:
 | 已更新 | Updated | "updated" |
 | 待补 | To fill / Missing | "still missing" |
 | 先联系 · 值得聊 · 再看看 | Contact first · Worth a call · Keep in view | |
+| 产品边界 (nav) | Boundaries | |
+| 知止有度 (section kicker) | Knowing where to stop | |
 
 ## People and companies in the examples
 
