@@ -163,13 +163,13 @@ export default {
         {
           list: [
             "No background checks. A background check is a separate process that happens after the candidate authorizes it, and it isn’t part of finding people.",
-            "No looking up personal information such as ID numbers, phone numbers or home addresses, and no asking around about family or private life.",
-            "No doxxing: no piecing together scattered private details to track someone down.",
+            "No looking up personal information unrelated to work, such as ID numbers or home addresses.",
+            "Identities are matched only from information made public in professional settings, never from private details.",
             "Use only what the person has made public in professional settings, plus what the candidate has given you.",
             "If someone keeps something private, or doesn’t reply, that’s their right. Respect the choice.",
           ],
         },
-        "Some people use different names in different settings, or don’t say who they are on their open-source accounts, and that may be deliberate. Where public information lines up, you can use it. Where it doesn’t, ask politely in a professional setting instead of going around them to find out. Holding these lines is a mark of respect for the candidate, and it protects your own reputation too.",
+        "Some people use different names in different settings, such as a work alias, an English name or an online ID. Where public professional information lines up, you can match them to the same person. Where it doesn’t, flag it as unconfirmed. Holding these lines is a mark of respect for the candidate, and it protects your own reputation too.",
       ],
     },
   ],
@@ -180,7 +180,7 @@ export default {
     ],
     [
       "What information does a candidate identity check cover?",
-      "Professional identity: which companies someone has worked at, start and end dates, which city, what field, and the papers, patents, open-source projects and public talks under their name. The information comes from the CV the candidate gave you and from public professional settings. Personal information such as ID documents, phone numbers and home addresses is outside the scope of the check.",
+      "Professional identity: which companies someone has worked at, start and end dates, which city, what field, and the papers, patents, open-source projects and public talks under their name. The information comes from the CV the candidate gave you and from public professional settings. Personal information such as ID documents and home addresses is outside the scope of the check.",
     ],
     [
       "How do you flag it when you’re not sure it’s the same person?",
