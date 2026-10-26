@@ -614,6 +614,17 @@
       );
     }
     section.querySelectorAll('a[href="#work"]').forEach((a) => a.setAttribute("href", "#capabilities"));
+    // the privacy policy, linked right where the applicant agrees to how their details are used (opens in a new tab,
+    // so nothing typed into the form is lost)
+    const purpose = section.querySelector(".f-form-consent .f-check-label > span:last-child");
+    if (purpose) {
+      const policy = document.createElement("a");
+      policy.href = "privacy/";
+      policy.target = "_blank";
+      policy.rel = "noopener";
+      policy.textContent = say("《隐私政策》", "Privacy policy");
+      purpose.append(say("详见", " See our "), policy, say("。", "."));
+    }
   }
 
   /* ---------- footer year ---------- */

@@ -3,6 +3,8 @@
 //   landing-redesign/use-cases/<slug>/index.html      九篇（中文）：客户开发（由原来的客户开发场景页改写成同一格式）和八篇实务文章
 //   landing-redesign/en/use-cases/index.html          Use cases（英文列表）
 //   landing-redesign/en/use-cases/<slug>/index.html   九篇英文，和中文一一对应（scripts/articles-en/，术语见 docs/en-glossary.md）
+//   landing-redesign/{privacy,terms,dpa}/index.html     法律页面：隐私政策、服务条款、数据处理协议（scripts/legal/zh.mjs）
+//   landing-redesign/en/{privacy,terms,dpa}/index.html  英文对应稿（scripts/legal/en.mjs），中文为准
 // 2026-10-25 起“使用场景”和“文章”合并：原来四个场景页里组织架构、职位寻访、人选维护三页和文章内容重复，去掉，
 // 线上旧网址由主站 301 到对应的新页面（见 docs/seo-geo-plan.md）。客户开发没有对应文章，保留在原网址。
 // 正文：中文八篇在 scripts/articles/*.mjs，客户开发来自 scripts/use-cases/pages.mjs 的中文稿（这里做了几处更正）；英文九篇在 scripts/articles-en/*.mjs。
@@ -15,6 +17,8 @@ import { fileURLToPath } from "node:url";
 import { COMMON } from "./use-cases/content.mjs";
 import { PAGES } from "./use-cases/pages.mjs";
 import { PUBLISHED, checkArticle, checkArticleEn, loadArticles, loadArticlesEn } from "./build-articles.mjs";
+import { LEGAL_ZH, UPDATED as LEGAL_UPDATED, EFFECTIVE as LEGAL_EFFECTIVE } from "./legal/zh.mjs";
+import { LEGAL_EN } from "./legal/en.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://www.boseekai.com/";
@@ -25,7 +29,7 @@ const orgOf = (L) => ({
   logo: { "@type": "ImageObject", url: `${SITE}apple-touch-icon.png`, width: 180, height: 180 },
 });
 const OUT = resolve(root, "public/landing-redesign");
-const V = { redesign: "23", subpage: "20261025-en", subpageJs: "20261025-en" };
+const V = { redesign: "25", subpage: "20261026-legal3", subpageJs: "20261025-en" };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 
@@ -88,7 +92,9 @@ const LOCALES = {
     ],
     all: "全部 &gt;&gt;",
     groups: ["产品", "使用场景", "法律"],
-    legal: T.legal,
+    // 页脚“法律”一栏，链到三个法律页面
+    legal: [["privacy", "隐私政策"], ["terms", "服务条款"], ["dpa", "数据处理协议"]],
+    legalPage: { kicker: "法律", keys: "要点", updated: "更新日期", effective: "生效日期", others: "其他法律文件", byline: "铂寻 Boseek", tableLabel: "表格" },
     footNotes: ["HunterBuddy，猎头的 AI 工作伙伴。", "铂寻为独立猎头和资深顾问打造。"],
     contact: "联系我们：",
     metaLabel: "版权、网站主体与备案信息",
@@ -146,7 +152,8 @@ const LOCALES = {
     ],
     all: "All &gt;&gt;",
     groups: ["Product", "Use cases", "Legal"],
-    legal: COMMON.en.legal,
+    legal: [["privacy", "Privacy policy"], ["terms", "Terms of service"], ["dpa", "Data processing agreement"]],
+    legalPage: { kicker: "Legal", keys: "Key points", updated: "Updated", effective: "Effective", others: "Other legal documents", byline: "Boseek", tableLabel: "Table" },
     footNotes: ["HunterBuddy, the AI partner for headhunters.", "Built by Boseek for independent headhunters and senior search consultants."],
     contact: "Contact: ",
     metaLabel: "Copyright, operator and registration",
@@ -264,7 +271,7 @@ ${L.footerCases.map(([slug, label]) => `                <li><a href="${home}use-
             <div>
               <h2>${L.groups[2]}</h2>
               <ul>
-${L.legal.map((item) => `                <li>${text(item)}</li>`).join("\n")}
+${L.legal.map(([slug, label]) => `                <li><a href="${home}${slug}/"${cur(slug)}>${text(label)}</a></li>`).join("\n")}
               </ul>
             </div>
           </div>`;
@@ -505,6 +512,119 @@ ${trial(L, home)}
 ${foot(L, home, base, "list")}`;
 }
 
+/* ---------- the three legal pages (隐私政策 / 服务条款 / 数据处理协议) ---------- */
+// **bold** in the source marks clauses the reader must notice; everything else is escaped text
+const rich = (v) => text(v).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+function legalBlock(item, L) {
+  if (typeof item === "string") return `<p class="s-p">${rich(item)}</p>`;
+  if (item.h3) return `<h3 class="s-h3">${text(item.h3)}</h3>`;
+  if (item.list) return `<ul class="s-list">\n${item.list.map((li) => `  <li>${rich(li)}</li>`).join("\n")}\n</ul>`;
+  if (item.table) {
+    const { head, rows } = item.table;
+    return `<div class="s-table-wrap">
+  <table class="s-table">
+    <thead><tr>${head.map((h) => `<th scope="col">${text(h)}</th>`).join("")}</tr></thead>
+    <tbody>
+${rows.map((r) => `      <tr>${r.map((c, i) => `<td data-label="${esc(head[i])}">${rich(c)}</td>`).join("")}</tr>`).join("\n")}
+    </tbody>
+  </table>
+</div>`;
+  }
+  if (item.note) return `<p class="s-note">${rich(item.note)}</p>`;
+  throw new Error(`unknown legal block ${JSON.stringify(item).slice(0, 60)}`);
+}
+function legalPage(L, d, all) {
+  const home = "../";
+  const base = `${home}${L.key === "en" ? "../" : ""}`;
+  const path = `${d.slug}/`;
+  const self = `${L.site}${path}`;
+  const P = L.legalPage;
+  const graph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      orgOf(L),
+      { "@type": "WebPage", "@id": `${self}#webpage`, url: self, name: d.title, description: d.description, inLanguage: L.lang, datePublished: LEGAL_EFFECTIVE, dateModified: LEGAL_UPDATED, isPartOf: { "@id": `${SITE}#website` }, publisher: { "@id": `${SITE}#organization` }, breadcrumb: { "@id": `${self}#breadcrumb` } },
+      { "@type": "BreadcrumbList", "@id": `${self}#breadcrumb`, itemListElement: [
+        { "@type": "ListItem", position: 1, name: L.homeName, item: L.site },
+        { "@type": "ListItem", position: 2, name: d.name, item: self },
+      ] },
+    ],
+  };
+  const others = all.filter((x) => x.slug !== d.slug);
+  return `${head(L, { title: d.title, description: d.description, path, graph, ogType: "website", home, base })}
+    <main id="main" tabindex="-1">
+      <article class="s-legal">
+${hero(L, {
+  crumbs: `<a href="${home}">${L.home}</a><span aria-hidden="true">/</span><span aria-current="page">${text(d.name)}</span>`,
+  kicker: P.kicker,
+  h1: text(d.name),
+  lead: d.lead,
+  meta: `<p class="s-meta">${P.byline}<span aria-hidden="true">·</span>${P.updated} <time datetime="${LEGAL_UPDATED}">${LEGAL_UPDATED}</time><span aria-hidden="true">·</span>${P.effective} <time datetime="${LEGAL_EFFECTIVE}">${LEGAL_EFFECTIVE}</time></p>`,
+})}
+
+      <div class="n-light s-paper">
+        <section class="s-keys-wrap" aria-labelledby="s-keys-title">
+          <div class="n-wrap"><div class="s-col">
+            <div class="s-keys">
+              <p class="s-label" id="s-keys-title">${P.keys}</p>
+              <ul class="s-list">
+${d.keys.map((k) => `                <li>${rich(k)}</li>`).join("\n")}
+              </ul>
+            </div>
+          </div></div>
+        </section>
+
+        <nav class="s-toc-wrap" aria-labelledby="s-toc-title">
+          <div class="n-wrap"><div class="s-col">
+            <div class="s-toc">
+              <p class="s-label" id="s-toc-title">${L.toc}</p>
+              <ol>
+${d.sections.map((s, i) => `                <li><a href="#s${i + 1}">${text(s.h2)}</a></li>`).join("\n")}
+              </ol>
+            </div>
+          </div></div>
+        </nav>
+
+${d.sections.map((s, i) => section(`s${i + 1}`, String(i + 1).padStart(2, "0"), s.h2, s.body.map((b) => legalBlock(b, L)).join("\n"))).join("\n\n")}
+
+        <section class="s-section s-related-wrap" aria-labelledby="s-related-title">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label" id="s-related-title">${P.others}</p>
+            <ul class="s-related">
+${others.map((o) => `              <li><a href="${home}${o.slug}/"><span class="s-related-kind">${P.kicker}</span><strong>${text(o.name)}</strong><span class="s-related-line">${text(o.description)}</span></a></li>`).join("\n")}
+            </ul>
+          </div></div>
+        </section>
+      </div>
+      </article>
+    </main>
+
+${foot(L, home, base, d.slug)}`;
+}
+// the two languages must line up section by section, and the bold markers must pair up
+function checkLegal(zh, en) {
+  const problems = [];
+  if (zh.length !== en.length) problems.push("中英文法律页面数量不同");
+  zh.forEach((z, i) => {
+    const e = en[i];
+    if (!e || e.slug !== z.slug) return problems.push(`${z.slug}: 英文缺少对应页面`);
+    if (z.sections.length !== e.sections.length) problems.push(`${z.slug}: 中文 ${z.sections.length} 节，英文 ${e.sections.length} 节`);
+    if (z.keys.length !== e.keys.length) problems.push(`${z.slug}: 要点条数不同`);
+    z.sections.forEach((s, j) => {
+      const t = e.sections[j];
+      if (!t) return;
+      const shape = (body) => body.map((b) => (typeof b === "string" ? "p" : b.h3 ? "h3" : b.list ? `list${b.list.length}` : b.table ? `table${b.table.rows.length}x${b.table.head.length}` : "note")).join(",");
+      if (shape(s.body) !== shape(t.body)) problems.push(`${z.slug} 第 ${j + 1} 节：中英文段落结构不同（${shape(s.body)} / ${shape(t.body)}）`);
+    });
+    for (const doc of [z, e]) {
+      const all = JSON.stringify(doc);
+      if ((all.match(/\*\*/g) || []).length % 2) problems.push(`${doc.slug}: 加粗标记 ** 没有成对`);
+      if (!all.includes("privacy@boseekai.com") && doc.slug !== "terms") problems.push(`${doc.slug}: 没有写个人信息联系邮箱`);
+    }
+  });
+  return problems;
+}
+
 /* ---------- 客户开发: the old use-case page, rewritten into the same format, with a few corrections ---------- */
 function businessDevelopment() {
   const c = PAGES.find((p) => p.slug === "business-development").zh;
@@ -592,6 +712,11 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       }
     }
   }
+  const legalProblems = checkLegal(LEGAL_ZH, LEGAL_EN);
+  if (legalProblems.length) {
+    failed = true;
+    console.error(legalProblems.join("\n"));
+  }
   if (failed) process.exit(1);
   // the old, separate pages are gone: 文章 (merged in here) and the three use-case pages the articles replace
   await rm(resolve(OUT, "articles"), { recursive: true, force: true });
@@ -600,6 +725,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const out = sets.flatMap(([L, items]) => [
     [`${L.dir}use-cases/index.html`, listPage(L, items)],
     ...items.map((a) => [`${L.dir}use-cases/${a.slug}/index.html`, page(L, a, items)]),
+    ...(L.key === "zh" ? LEGAL_ZH : LEGAL_EN).map((d, _, all) => [`${L.dir}${d.slug}/index.html`, legalPage(L, d, all)]),
   ]);
   // the sitemap for the site once this redesign is live (www.boseekai.com): both homepages, both lists and all eighteen
   // pages, each with its language pair. It sits here, unused, until launch, when it replaces landing-origin/sitemap.xml.
@@ -607,7 +733,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     ["zh-CN", "en", "x-default"]
       .map((lang) => `    <xhtml:link rel="alternate" hreflang="${lang}" href="${(lang === "en" ? LOCALES.en : LOCALES.zh).site}${path}" />`)
       .join("\n");
-  const paths = ["", "use-cases/", ...ORDER.map((slug) => `use-cases/${slug}/`)];
+  const paths = ["", "use-cases/", ...ORDER.map((slug) => `use-cases/${slug}/`), ...LEGAL_ZH.map((d) => `${d.slug}/`)];
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${paths

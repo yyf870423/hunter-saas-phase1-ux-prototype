@@ -2424,3 +2424,14 @@ html.lenis.lenis-smooth {
 .f-select-menu {
   overscroll-behavior: contain;
 }
+
+/* trial form: the privacy policy link inside the consent line */
+.f-form-consent a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgb(91 79 192 / 45%);
+  text-underline-offset: 3px;
+}
+.f-form-consent a:hover {
+  text-decoration-color: currentColor;
+}
