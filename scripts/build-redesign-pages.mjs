@@ -29,7 +29,7 @@ const orgOf = (L) => ({
   logo: { "@type": "ImageObject", url: `${SITE}apple-touch-icon.png`, width: 180, height: 180 },
 });
 const OUT = resolve(root, "public/landing-redesign");
-const V = { redesign: "26", subpage: "20261026-legal3", subpageJs: "20261025-en" };
+const V = { redesign: "27", subpage: "20261026-legal3", subpageJs: "20261025-en" };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 

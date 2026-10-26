@@ -703,7 +703,7 @@ body.n-page::after {
   font-size: 12px;
 }
 
-/* ---------- 由深入浅：日出 ---------- */
+/* ---------- 由深入浅 ---------- */
 .n-dawn {
   position: relative;
   height: 46vh;
@@ -714,16 +714,16 @@ body.n-page::after {
   background: linear-gradient(
     180deg,
     #0f1011 0%,
-    #15152a 10%,
-    #1f1d3d 20%,
-    #2d2a50 30%,
-    #403862 40%,
-    #554571 50%,
-    #6d557c 60%,
-    #86647f 70%,
-    #9f7682 80%,
-    #b78a86 90%,
-    #cb9e8f 100%
+    #171819 10%,
+    #232425 20%,
+    #313233 30%,
+    #414142 40%,
+    #515152 50%,
+    #616162 60%,
+    #717172 70%,
+    #818182 80%,
+    #909091 90%,
+    #9e9e9f 100%
   );
 }
 /* the same mist as the hero, thinning out as the day comes up */
@@ -755,7 +755,7 @@ body.n-page::after {
 /* 第三～五张：六件事 */
 .n-caps {
   padding-block: 8vh 120px;
-  background: linear-gradient(180deg, #cb9e8f 0vh, #d8b2a4 7vh, #e3c5b9 14vh, #ebd5cc 21vh, #f0e2dc 28vh, #f3eae7 35vh, #f4f0ef 42vh, #f5f3f3 49vh, #f5f5f6 56vh, var(--paper) 100%);
+  background: linear-gradient(180deg, #9e9e9f 0.0vh, #b2b2b3 7.0vh, #c4c4c5 14.0vh, #d3d3d4 21.0vh, #dfe0e1 28.0vh, #e9e9ea 35.0vh, #f0f0f1 42.0vh, #f4f4f5 49.0vh, #f5f5f6 56.0vh, var(--paper) 100%);
 }
 /* the heading sits where the day is still coming up, so its small type is a shade darker */
 .n-caps .n-section-head .n-kicker {
