@@ -24,7 +24,7 @@ for (const slug of pages) {
     await expect(page.locator("meta[name=trial-api]")).toHaveAttribute("content", "disabled");
     await expect(page.locator("h1")).toHaveCount(1);
     const graph = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())["@graph"];
-    expect(graph.map((node) => node["@type"])).toEqual(["WebPage", "BreadcrumbList", "Article", "FAQPage"]);
+    expect(graph.map((node) => node["@type"])).toEqual(["Organization", "WebPage", "BreadcrumbList", "Article", "FAQPage"]);
     const crumbs = graph.find((node) => node["@type"] === "BreadcrumbList").itemListElement;
     expect(crumbs[1].item).toBe("https://www.boseekai.com/use-cases/");
     await expect(page.locator(".s-crumbs [aria-current=page]")).toHaveText(crumbs[2].name);
@@ -86,7 +86,7 @@ for (const slug of pages) {
     await expect(page.locator("meta[name=trial-api]")).toHaveAttribute("content", "disabled");
     await expect(page.locator("h1")).toHaveCount(1);
     const graph = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())["@graph"];
-    expect(graph.map((node) => node["@type"])).toEqual(["WebPage", "BreadcrumbList", "Article", "FAQPage"]);
+    expect(graph.map((node) => node["@type"])).toEqual(["Organization", "WebPage", "BreadcrumbList", "Article", "FAQPage"]);
     expect(graph.every((node) => !node.inLanguage || node.inLanguage === "en")).toBeTruthy();
     const crumbs = graph.find((node) => node["@type"] === "BreadcrumbList").itemListElement;
     expect(crumbs[1].item).toBe("https://www.boseekai.com/en/use-cases/");

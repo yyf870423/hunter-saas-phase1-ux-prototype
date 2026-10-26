@@ -22,6 +22,8 @@
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       anchors: true,
       autoRaf: true,
+      // the trial form's dropdown lists scroll on their own; leave the wheel to them
+      prevent: (node) => node.classList?.contains("f-select-menu"),
     });
   }
 

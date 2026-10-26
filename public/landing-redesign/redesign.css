@@ -2419,3 +2419,8 @@ html.lenis.lenis-smooth {
 :lang(en) .n-card h3 {
   text-wrap: balance;
 }
+
+/* trial form dropdowns: once a list reaches its end, don't hand the scroll on to the page */
+.f-select-menu {
+  overscroll-behavior: contain;
+}
