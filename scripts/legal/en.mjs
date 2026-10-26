@@ -76,7 +76,7 @@ const privacy = {
     {
       h2: "How AI handles your information",
       body: [
-        "HunterBuddy uses large language models to understand your requests, parse files, search and organize public information, compare identities, calculate matches, and draft summaries, reports, interview materials and emails.",
+        "HunterBuddy uses large language models to understand your requests, parse files, search and organize public information, compare and resolve identities, calculate matches, and draft summaries, reports, interview materials and emails.",
         {
           list: [
             "**Models in China only.** To carry out the tasks you start, we send the necessary content to large-model providers in mainland China, and never to models outside China.",
@@ -208,14 +208,14 @@ const privacy = {
             "Emails the headhunter confirms and sends from their own mailbox, and the replies to them.",
           ],
         },
+        "HunterBuddy matches up the records in these sources that belong to the same person, including matching aliases, nicknames, English names and online IDs to real names, to work out that person\u2019s professional identity. It relies only on information made public in a professional context and on material the headhunter provides. Anything that does not match up is marked to be confirmed and left for the headhunter to check.",
         { h3: "What we do not do" },
         {
           list: [
             "**We do not sign in to or operate recruiting or social platforms that require a login**, such as Liepin, Maimai, BOSS Zhipin or LinkedIn, and we do not get around websites’ access restrictions.",
-            "We do not collect private information unrelated to work, such as ID numbers, home addresses, family members, health or religious beliefs, and we do not piece scattered private details together to track a person down.",
+            "We do not collect private information unrelated to work, such as ID numbers, home addresses, family members, health or religious beliefs.",
             "We never contact you by ourselves. Whether and how to contact you is the headhunter’s own decision.",
             "Inferences, such as a possible colleague relationship or a career move, are marked as inferred or to be confirmed and are never treated as facts.",
-            "The only structured contact details kept are mobile numbers and emails. Contact details HunterBuddy finds are saved only after the headhunter confirms them.",
           ],
         },
         { h3: "Who is responsible" },
@@ -304,7 +304,7 @@ const terms = {
     {
       h2: "What the service does",
       body: [
-        "HunterBuddy is an AI work tool for headhunters and recruiters, for recruiting work. Its main uses are: analyzing roles, finding people in your own material and in public information, bringing records of the same person together and removing duplicates, matching candidates to roles, mapping company org charts, assessing potential clients, keeping a talent pool current, and drafting reports, interview materials and emails.",
+        "HunterBuddy is an AI work tool for headhunters and recruiters, for recruiting work. Its main uses are: analyzing roles, finding people in your own material and in public information, bringing records of the same person from different sources together, working out the real name behind an alias and removing duplicates, matching candidates to roles, mapping company org charts, assessing potential clients, keeping a talent pool current, and drafting reports, interview materials and emails.",
         "**HunterBuddy never contacts anyone for you.** Who to contact, who to put forward and how to talk to them is your decision. Once you connect a sending mailbox, no email leaves your mailbox until you confirm its recipients, subject, body and attachments.",
         "**HunterBuddy does not sign in to or operate recruiting or social platforms that require a login.** You can upload resumes you have lawfully obtained from those platforms yourself.",
         "The service is in an invitation-only trial and some features are still being built. **The features, quota and scope actually offered in the service are what apply.** We may change, add or retire features, and will tell you in advance of changes that significantly affect you.",
@@ -525,7 +525,7 @@ const dpa = {
         {
           list: [
             "Find people in your material and in public information for your tasks.",
-            "Bring records of the same person together, check for and merge duplicates, and complete records.",
+            "Bring records of the same person from different sources together, including matching aliases, nicknames, English names and online IDs to real names, check for and merge duplicates, and complete records.",
             "Match candidates to roles, score the match and explain why.",
             "Map org charts, relationships between people and introduction paths.",
             "Draft summaries, reports, interview materials and emails, and translate.",
@@ -547,7 +547,7 @@ const dpa = {
     {
       h2: "Methods",
       body: [
-        "Processing consists of collecting, storing, parsing (resumes, files, images and audio), analyzing and comparing (bringing identities together, checking duplicates, matching, mapping relationships), generating, sending emails once you confirm them, exporting and deleting.",
+        "Processing consists of collecting, storing, parsing (resumes, files, images and audio), analyzing and comparing (bringing identities together and resolving them, checking duplicates, matching, mapping relationships), generating, sending emails once you confirm them, exporting and deleting.",
         "When looking up public information, we access only public web pages, papers, patents and open-source projects that can be read without signing in, limit how often we access them, do not get around access restrictions and do not disrupt websites. **We never sign in to or operate recruiting or social platforms that require a login.**",
         "Automated processing such as identity judgments and matching follows the authorization mode you choose, keeps its evidence and can be undone.",
       ],
@@ -559,7 +559,7 @@ const dpa = {
           table: {
             head: ["Category", "What it includes"],
             rows: [
-              ["Identity", "Name, aliases and names in other languages, avatar"],
+              ["Identity", "Name, aliases and nicknames, names in other languages, online IDs, avatar"],
               ["Career", "Current and past companies, departments, titles, levels and dates, work and project history, skills, industry"],
               ["Education", "Schools, fields of study, degrees and dates"],
               ["Public work", "Papers, patents, open-source projects, and co-author and co-inventor relationships"],
