@@ -31,12 +31,15 @@ LANGS = {
         home=SITE, lang="zh-CN", og="zh_CN", og_alt="en_US", site_name="铂寻 Boseek", title_cut="｜铂寻 Boseek", baidu=True,
         app="猎头的 AI 工作伙伴。HunterBuddy 帮独立猎头和资深顾问做人岗匹配、自动寻访、定位真实姓名、BD 客户研判、简历库更新和组织架构梳理，每个判断都写明来源。联系谁、推不推荐，由猎头决定。目前邀请制试用。",
         app_sub="猎头 AI 助手", audience="独立猎头和资深猎头顾问",
+        # the share card (1200×630, the film's last scene): what Feishu, LinkedIn and the like show when the link is pasted
+        share="assets/share-card.jpg",
         film=("HunterBuddy 产品短片", "从人海里的一个职位出发，跟着 HunterBuddy 走完六件事：BD 客户研判、组织架构梳理、自动寻访、人岗智能匹配、定位真实姓名、简历库更新。", "assets/film-poster.jpg", "assets/hunterbuddy-film.mp4"),
     ),
     "en": dict(
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
         app="The AI partner for headhunters. HunterBuddy helps independent headhunters and senior search consultants with job matching, sourcing, identity checks, BD client research, CV updates and org charts, and names the source of every finding. Who to contact and whom to put forward is always the headhunter’s call. Invitation-only trial.",
         app_sub="AI assistant for headhunters", audience="Independent headhunters and senior search consultants",
+        share="assets/share-card-en.jpg",
         film=("HunterBuddy product video", "From one role in a sea of people, follow HunterBuddy through six jobs: BD client research, org mapping, automated sourcing, job matching, finding the real name, and keeping CVs current.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4"),
     ),
 }
@@ -78,9 +81,9 @@ def seo_block(html, key):
         f'<meta property="og:title" content="{q(og_title)}" />',
         f'<meta property="og:description" content="{q(unesc(desc))}" />',
         f'<meta property="og:url" content="{home}" />',
-        f'<meta property="og:image" content="{SITE}{L["film"][2]}" />',
-        '<meta property="og:image:width" content="1600" />',
-        '<meta property="og:image:height" content="900" />',
+        f'<meta property="og:image" content="{SITE}{L["share"]}" />',
+        '<meta property="og:image:width" content="1200" />',
+        '<meta property="og:image:height" content="630" />',
         f'<meta property="og:locale" content="{L["og"]}" />',
         f'<meta property="og:locale:alternate" content="{L["og_alt"]}" />',
         '<meta name="twitter:card" content="summary_large_image" />',

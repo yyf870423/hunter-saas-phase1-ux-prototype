@@ -12,6 +12,7 @@
 // 改版首页还在预览阶段，所以和首页一样带 noindex。上主站时去掉 noindex，并把 ../landing-origin/ 的资源路径换成主站路径。
 // 运行：node scripts/build-redesign-pages.mjs
 import { mkdir, rm, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COMMON } from "./use-cases/content.mjs";
@@ -30,6 +31,17 @@ const orgOf = (L) => ({
 });
 const OUT = resolve(root, "public/landing-redesign");
 const V = { redesign: "27", subpage: "20261026-legal3", subpageJs: "20261025-en" };
+// the share card shown when a link is pasted into Feishu, LinkedIn and the like (1200×630, the film's last scene);
+// the articles keep their own pictures, the lists and the legal pages use the share card
+const shareOf = (L) => ({ image: `${SITE}assets/${L.key === "zh" ? "share-card.jpg" : "share-card-en.jpg"}`, imageSize: [1200, 630] });
+// the legal pages are shared with the homepage's card (decided 2026-10-27): its og:title and og:description, read from
+// the homepages themselves (run scripts/build-redesign-en-home.py first after changing the Chinese homepage's head)
+const ogOf = (file) => {
+  const html = readFileSync(resolve(OUT, file), "utf8");
+  const get = (p) => html.match(new RegExp(`<meta property="${p}" content="([^"]*)"`))[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+  return { title: get("og:title"), description: get("og:description") };
+};
+const HOME_OG = { zh: ogOf("index.html"), en: ogOf("en/index.html") };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 
@@ -184,7 +196,7 @@ const lines = (parts) => parts.map((p) => `<span class="ln">${text(p)}</span>`).
 /* ---------- head, header, footer ---------- */
 // home: the way back to this language's homepage (its #anchors, its use-cases/); base: the way to landing-redesign/ (shared files)
 // path: the page's own path under the language root, e.g. "use-cases/org-chart/" (the switch and hreflang go to the same path)
-function head(L, { title, description, path, graph, ogType, home, base, image }) {
+function head(L, { title, description, path, graph, ogType, home, base, image, imageSize = [1600, 900], ogTitle, ogDescription }) {
   const lo = `${base}../landing-origin/`;
   const O = other(L);
   const self = `${L.site}${path}`;
@@ -205,14 +217,14 @@ function head(L, { title, description, path, graph, ogType, home, base, image })
     <link rel="alternate" hreflang="x-default" href="${x(LOCALES.zh)}" />
     <meta property="og:type" content="${ogType}" />
     <meta property="og:site_name" content="${L.siteName}" />
-    <meta property="og:title" content="${esc(title.replace(L.titleSuffix, ""))}" />
-    <meta property="og:description" content="${esc(description)}" />
+    <meta property="og:title" content="${esc(ogTitle ?? title.replace(L.titleSuffix, ""))}" />
+    <meta property="og:description" content="${esc(ogDescription ?? description)}" />
     <meta property="og:url" content="${self}" />
     <meta property="og:locale" content="${L.ogLocale}" />
     <meta property="og:locale:alternate" content="${O.ogLocale}" />
 ${image ? `    <meta property="og:image" content="${image}" />
-    <meta property="og:image:width" content="1600" />
-    <meta property="og:image:height" content="900" />
+    <meta property="og:image:width" content="${imageSize[0]}" />
+    <meta property="og:image:height" content="${imageSize[1]}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="${image}" />
 ` : ""}    <script type="application/ld+json">
@@ -476,7 +488,7 @@ function listPage(L, items) {
       { "@type": "ItemList", "@id": `${self}#list`, itemListElement: items.map((a, i) => ({ "@type": "ListItem", position: i + 1, url: `${self}${a.slug}/`, name: a.title.replace(L.titleSuffix, "") })) },
     ],
   };
-  return `${head(L, { title: L.list.title, description: L.list.description, path, graph, ogType: "website", home, base })}
+  return `${head(L, { title: L.list.title, description: L.list.description, path, graph, ogType: "website", home, base, ...shareOf(L) })}
     <main id="main" tabindex="-1">
 ${hero(L, {
   crumbs: `<a href="${home}">${L.home}</a><span aria-hidden="true">/</span><span aria-current="page">${L.list.name}</span>`,
@@ -551,7 +563,7 @@ function legalPage(L, d, all) {
     ],
   };
   const others = all.filter((x) => x.slug !== d.slug);
-  return `${head(L, { title: d.title, description: d.description, path, graph, ogType: "website", home, base })}
+  return `${head(L, { title: d.title, description: d.description, path, graph, ogType: "website", home, base, ...shareOf(L), ogTitle: HOME_OG[L.key].title, ogDescription: HOME_OG[L.key].description })}
     <main id="main" tabindex="-1">
       <article class="s-legal">
 ${hero(L, {

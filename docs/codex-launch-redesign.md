@@ -32,7 +32,7 @@
 9 个 slug：`business-development`、`org-chart`、`finding-candidates`、`job-matching`、`same-name-candidates`、`talent-pool`、`headhunter-consultant`、`ai-assistant-for-headhunters`、`ai-tools-compared`。
 
 页面用到的改版自带文件（都在 `public/landing-redesign/` 下，按相对路径引用）：
-`redesign.css`、`redesign.js`、`subpage.css`、`subpage.js`、`trial-locale-en.js`、`vendor/lenis-1.3.4.min.js`、`assets/`（整个目录：`fonts/`、`wall/` 18 张照片、`use-cases/` 18 张文章配图（中文 9 张、`en/` 下英文 9 张）、`mist-*.webp`、`film-poster.jpg`、`film-poster-en.jpg`、`hunterbuddy-film.mp4`、`hunterbuddy-film-en.mp4`、`boseek-b5-en-light.svg`）。
+`redesign.css`、`redesign.js`、`subpage.css`、`subpage.js`、`trial-locale-en.js`、`vendor/lenis-1.3.4.min.js`、`assets/`（整个目录：`fonts/`、`wall/` 18 张照片、`use-cases/` 18 张文章配图（中文 9 张、`en/` 下英文 9 张）、`mist-*.webp`、`film-poster.jpg`、`film-poster-en.jpg`、`share-card.jpg`、`share-card-en.jpg`（分享卡片图）、`hunterbuddy-film.mp4`、`hunterbuddy-film-en.mp4`、`boseek-b5-en-light.svg`）。
 
 页面还引用了两个目录里的文件，用的是相对路径 `../landing-origin/…` 和 `../landing/…`（子页面按层级多几个 `../`，见下表）：
 
@@ -101,6 +101,7 @@
 9. 文章配图：`curl -I https://www.boseekai.com/assets/use-cases/org-chart.jpg` 和 `…/assets/use-cases/en/org-chart.jpg` 返回 200、`Content-Type: image/jpeg`。
 10. 法律页：页脚“法律”一栏在中英文首页和任意使用场景页都能点进三个页面；首页试用表单同意文字后的《隐私政策》链接在新标签页打开 `/privacy/`（英文 `/en/privacy/`）；法律页的表格在手机宽度下变成卡片、没有横向滚动；语言切换落到同一份文件的另一种语言。
 11. 首屏破晓：中英文首页各打开一次（手机宽度再开一次），首屏先是夜色，约 5 秒内亮起来，右侧地平线有暖色光，文字始终清晰；`document.querySelector('.n-sky').classList.contains('is-ready')` 为 true（说明图片的 `onload` 没被拦截）；用浏览器模拟“减少动态效果”打开时直接是天亮后的画面；控制台无错误。引用的是 `redesign.css?v=27`、`redesign.js?v=27`。
+12. 分享卡片：`https://www.boseekai.com/assets/share-card.jpg` 和 `…/share-card-en.jpg` 返回 200、`Content-Type: image/jpeg`；首页、两个列表页和 6 个法律页的 `og:image` 指向它们（宽 1200、高 630），法律页的 `og:title`、`og:description` 和对应语言的首页相同；使用场景文章仍用各自的配图。`public/og-test/` 是只给 GitHub 预览用的测试页，不发布到正式站。
 
 ### 6. 提交收录
 
