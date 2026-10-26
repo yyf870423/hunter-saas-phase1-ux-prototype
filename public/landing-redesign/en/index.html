@@ -219,7 +219,7 @@
     <link rel="stylesheet" href="../../landing/shared-form.css?v=20261021" />
     <link rel="stylesheet" href="../../landing/trial-page.css?v=20261021" />
     <link rel="preload" href="../assets/fonts/alimama-shuheiti-bold-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="../redesign.css?v=25" />
+    <link rel="stylesheet" href="../redesign.css?v=26" />
     <script>
       document.documentElement.classList.add("js");
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");
@@ -231,7 +231,7 @@
     <script defer src="../../landing/vendor/libphonenumber-max.js?v=20261021"></script>
     <script defer src="../../landing/trial-form.js?v=20261022-bilingual-a"></script>
     <script defer src="../vendor/lenis-1.3.4.min.js"></script>
-    <script defer src="../redesign.js?v=25"></script>
+    <script defer src="../redesign.js?v=26"></script>
   </head>
   <body class="n-page">
     <a class="n-skip" href="#main">Skip to content</a>
@@ -262,11 +262,13 @@
       <!-- 第一张：云海 -->
       <section class="n-hero" id="top" aria-labelledby="n-hero-title">
         <div class="n-sky" aria-hidden="true">
-          <div class="n-layer n-layer-base"><img src="../../landing-origin/assets/hero-research.webp" alt="" width="2000" height="1126" fetchpriority="high" /></div>
+          <div class="n-layer n-layer-base"><img src="../../landing-origin/assets/hero-research.webp" alt="" width="2000" height="1126" fetchpriority="high" onload="this.closest('.n-sky').classList.add('is-ready')" onerror="this.closest('.n-sky').classList.add('is-ready')" /></div>
           <div class="n-layer n-layer-mist n-mist-a"><img src="../assets/mist-band.webp" alt="" loading="eager" onerror="this.parentNode.remove()" /></div>
           <div class="n-layer n-layer-front"><img src="../../landing-origin/assets/hero-research.webp" alt="" /></div>
           <div class="n-layer n-layer-mist n-mist-b"><img src="../assets/mist-wisps.webp" alt="" loading="eager" onerror="this.parentNode.remove()" /></div>
+          <div class="n-break"><i class="n-break-sky"></i><i class="n-break-glow"></i><i class="n-break-rim"></i><i class="n-break-scrim"></i></div>
           <div class="n-sky-fade"></div>
+          <div class="n-night"></div>
         </div>
         <div class="n-wrap n-hero-copy" data-hero-copy>
           <p class="n-status"><span aria-hidden="true"></span>In development. Applications for the invitation-only trial are open.</p>

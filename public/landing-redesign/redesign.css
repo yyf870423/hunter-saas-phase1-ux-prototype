@@ -350,6 +350,11 @@ body.n-page::after {
 .n-layer-base img {
   object-position: 50% 62%;
 }
+/* the photo a touch crisper than the file, so the cloud sea reads white rather than grey */
+.n-layer-base img,
+.n-layer-front img {
+  filter: contrast(1.06) saturate(1.1) brightness(1.04);
+}
 .n-layer-front {
   -webkit-mask-image: linear-gradient(180deg, transparent 40%, #000 74%);
   mask-image: linear-gradient(180deg, transparent 40%, #000 74%);
@@ -378,20 +383,102 @@ body.n-page::after {
 .n-mist-a {
   inset: auto -4% 0;
   height: 62%;
-  opacity: 0.55;
+  opacity: 0.4;
 }
 .n-mist-b {
-  opacity: 0.32;
-  /* keep the upper sky clean; the wisps gather toward the cloud sea */
-  -webkit-mask-image: linear-gradient(180deg, rgb(0 0 0 / 15%) 0%, rgb(0 0 0 / 45%) 38%, #000 68%);
-  mask-image: linear-gradient(180deg, rgb(0 0 0 / 15%) 0%, rgb(0 0 0 / 45%) 38%, #000 68%);
+  opacity: 0.22;
+  /* the wisps stay down in the cloud sea; over the sky they read as grey streaks */
+  -webkit-mask-image: linear-gradient(180deg, transparent 42%, #000 72%);
+  mask-image: linear-gradient(180deg, transparent 42%, #000 72%);
 }
 .n-sky-fade {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgb(15 16 17 / 55%) 0%, rgb(15 16 17 / 0%) 26%),
-    linear-gradient(180deg, rgb(15 16 17 / 0%) 62%, var(--night) 100%);
+    linear-gradient(180deg, rgb(15 16 17 / 45%) 0%, rgb(15 16 17 / 0%) 22%),
+    linear-gradient(180deg, rgb(15 16 17 / 0%) 74%, var(--night) 100%);
+}
+
+/* daybreak: the page opens on night and the sky lightens in about four seconds, the way the film ends.
+   Without motion (or without the .motion class) it simply shows the daybreak. The animation waits
+   for the photo (.is-ready, set by the photo's onload) so it never plays over an empty sky. */
+.n-break {
+  position: absolute;
+  inset: -4% -1%;
+  will-change: transform;
+}
+.n-break > i,
+.n-night {
+  position: absolute;
+  inset: 0;
+}
+/* sky colour: violet-blue overhead, pink then peach toward the horizon; a tint, not a brightening */
+.n-break-sky {
+  background: linear-gradient(180deg, rgb(26 20 70 / 30%) 0%, rgb(70 52 130 / 22%) 30%, rgb(170 110 170 / 22%) 46%, rgb(240 150 120 / 26%) 54%, rgb(240 150 120 / 10%) 60%, rgb(240 150 120 / 0%) 70%);
+}
+/* the sun about to come up, on the right, clear of the words */
+.n-break-glow {
+  background:
+    radial-gradient(15% 4.2% at 88% 56.6%, rgb(255 222 180 / 72%) 0%, rgb(255 190 140 / 30%) 50%, transparent 100%),
+    radial-gradient(30% 9% at 84% 56%, rgb(255 160 104 / 60%) 0%, rgb(250 140 120 / 26%) 45%, transparent 80%),
+    radial-gradient(75% 10% at 70% 56%, rgb(250 150 140 / 26%) 0%, transparent 75%),
+    radial-gradient(40% 30% at 86% 50%, rgb(200 130 190 / 22%) 0%, transparent 75%);
+}
+/* warm light on the cloud tops near the sun */
+.n-break-rim {
+  mix-blend-mode: overlay;
+  background: radial-gradient(60% 30% at 84% 62%, rgb(255 160 100 / 75%) 0%, rgb(240 130 140 / 30%) 50%, transparent 80%);
+}
+/* a faint shade behind the words so they stay easy to read once the sky is light */
+.n-break-scrim {
+  background: radial-gradient(34% 24% at 50% 56%, rgb(10 10 28 / 30%) 0%, rgb(10 10 28 / 12%) 55%, transparent 80%);
+}
+.n-night {
+  background: #04060c;
+  opacity: 0;
+}
+/* portrait screens: the horizon sits lower and the sun against the right edge */
+@media (max-aspect-ratio: 4/5) {
+  .n-break-sky {
+    background: linear-gradient(180deg, rgb(26 20 70 / 30%) 0%, rgb(70 52 130 / 22%) 34%, rgb(170 110 170 / 20%) 52%, rgb(240 150 120 / 24%) 61%, rgb(240 150 120 / 8%) 66%, rgb(240 150 120 / 0%) 74%);
+  }
+  .n-break-glow {
+    background:
+      radial-gradient(34% 3.4% at 88% 62.6%, rgb(255 222 180 / 72%) 0%, rgb(255 190 140 / 30%) 50%, transparent 100%),
+      radial-gradient(70% 7% at 82% 62.4%, rgb(255 160 104 / 58%) 0%, rgb(250 140 120 / 24%) 45%, transparent 80%),
+      radial-gradient(130% 8% at 60% 62.6%, rgb(250 150 140 / 24%) 0%, transparent 75%),
+      radial-gradient(80% 20% at 86% 58%, rgb(200 130 190 / 20%) 0%, transparent 75%);
+  }
+  .n-break-rim {
+    background: radial-gradient(90% 22% at 82% 68%, rgb(255 160 100 / 70%) 0%, rgb(240 130 140 / 28%) 50%, transparent 80%);
+  }
+}
+.motion .n-night {
+  animation: n-night-out 3.8s 0.3s cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+.motion .n-break-sky {
+  animation: n-break-in 3.4s 0.8s cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+.motion .n-break-glow {
+  animation: n-break-rise 3.8s 0.6s cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+.motion .n-break-rim {
+  animation: n-break-in 3.2s 1.3s ease-in-out both;
+}
+.motion .n-sky:not(.is-ready) :is(.n-night, .n-break > i) {
+  animation-play-state: paused;
+}
+@keyframes n-night-out {
+  from { opacity: 0.66; }
+  to { opacity: 0; }
+}
+@keyframes n-break-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes n-break-rise {
+  from { opacity: 0; transform: translate3d(0, 4%, 0); }
+  to { opacity: 1; transform: none; }
 }
 .motion .n-layer-base img {
   animation: n-drift-back 46s ease-in-out infinite alternate;
@@ -462,12 +549,14 @@ body.n-page::after {
   color: #c9c3ef;
   font-size: 15px;
   letter-spacing: 0.32em;
+  text-shadow: 0 1px 14px rgb(12 10 40 / 55%);
 }
 .n-promise {
   display: grid;
   gap: 4px;
   margin-top: clamp(26px, 4vh, 40px) !important;
   color: #ececf0;
+  text-shadow: 0 1px 14px rgb(12 10 40 / 55%);
   font-size: clamp(19px, 1.7vw, 24px);
   line-height: 1.75;
   text-shadow: 0 1px 16px rgb(0 0 0 / 55%);
@@ -614,7 +703,7 @@ body.n-page::after {
   font-size: 12px;
 }
 
-/* ---------- 由深入浅 ---------- */
+/* ---------- 由深入浅：日出 ---------- */
 .n-dawn {
   position: relative;
   height: 46vh;
@@ -625,16 +714,16 @@ body.n-page::after {
   background: linear-gradient(
     180deg,
     #0f1011 0%,
-    #171819 10%,
-    #232425 20%,
-    #313233 30%,
-    #414142 40%,
-    #515152 50%,
-    #616162 60%,
-    #717172 70%,
-    #818182 80%,
-    #909091 90%,
-    #9e9e9f 100%
+    #15152a 10%,
+    #1f1d3d 20%,
+    #2d2a50 30%,
+    #403862 40%,
+    #554571 50%,
+    #6d557c 60%,
+    #86647f 70%,
+    #9f7682 80%,
+    #b78a86 90%,
+    #cb9e8f 100%
   );
 }
 /* the same mist as the hero, thinning out as the day comes up */
@@ -666,7 +755,7 @@ body.n-page::after {
 /* 第三～五张：六件事 */
 .n-caps {
   padding-block: 8vh 120px;
-  background: linear-gradient(180deg, #9e9e9f 0.0vh, #b2b2b3 7.0vh, #c4c4c5 14.0vh, #d3d3d4 21.0vh, #dfe0e1 28.0vh, #e9e9ea 35.0vh, #f0f0f1 42.0vh, #f4f4f5 49.0vh, #f5f5f6 56.0vh, var(--paper) 100%);
+  background: linear-gradient(180deg, #cb9e8f 0vh, #d8b2a4 7vh, #e3c5b9 14vh, #ebd5cc 21vh, #f0e2dc 28vh, #f3eae7 35vh, #f4f0ef 42vh, #f5f3f3 49vh, #f5f5f6 56vh, var(--paper) 100%);
 }
 /* the heading sits where the day is still coming up, so its small type is a shade darker */
 .n-caps .n-section-head .n-kicker {

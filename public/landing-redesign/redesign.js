@@ -1,6 +1,7 @@
 // 官网改版草稿的交互：
 // 头部在首屏透明，往下滚隐藏，往上滚时带着深色底出现。
 // 云海随滚动和指针分层移动，雾气用镜像拼接无缝平移。
+// 首屏打开时是夜里，四秒左右天亮起来（样式里的 .n-break 和 .n-night），等云海图片到了再开始。
 // 照片墙平时是灰的，鼠标经过时点亮，离开后停一下再慢慢暗下去，触屏上自己轮流亮起。
 // 没有脚本时，页面内容照样完整可读。
 (() => {
@@ -122,10 +123,14 @@
 
   const layers = [
     { el: document.querySelector(".n-layer-base"), scroll: 0.12, px: 6, py: 4 },
+    // the daybreak colour rides with the far sky so the sun stays on the horizon
+    { el: document.querySelector(".n-break"), scroll: 0.12, px: 6, py: 4 },
     { el: document.querySelector(".n-mist-a"), scroll: 0.3, px: 18, py: 8 },
     { el: document.querySelector(".n-layer-front"), scroll: 0.42, px: 26, py: 12 },
     { el: document.querySelector(".n-mist-b"), scroll: 0.55, px: 34, py: 14 },
   ];
+  // the daybreak waits for the photo (its onload marks the sky ready); never let it wait forever
+  setTimeout(() => document.querySelector(".n-sky")?.classList.add("is-ready"), 2500);
   const heroCopy = document.querySelector("[data-hero-copy]");
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
   let heroVisible = true;
