@@ -1,6 +1,7 @@
 // Legal pages (English): the privacy policy, terms of service and data processing agreement, a faithful translation of
-// ./zh.mjs. Section count and order must match the Chinese; the Chinese version prevails. No Chinese characters here
-// (the English pages carry none). **bold** marks the clauses the reader must notice, as in the Chinese.
+// ./zh.mjs. Section count and paragraph structure must match the Chinese; the Chinese version prevails. No Chinese
+// characters here (the English pages carry none). **bold** marks the clauses the reader must notice, as in the Chinese.
+// "China" in data-location statements means mainland China (excluding Hong Kong, Macao and Taiwan), as in the Chinese.
 export const UPDATED = "2026-10-26";
 export const EFFECTIVE = "2026-10-26";
 
@@ -15,8 +16,8 @@ const privacy = {
     "**The website uses no cookies and no analytics, advertising or tracking code.** When you browse it, our server only keeps access logs, for security and troubleshooting.",
     "**When you request a trial**, we collect the name, company, phone number, email, role, number of active searches and industry you enter, and use them only to review your request and contact you when trial access opens.",
     "**You decide how the candidates, contacts and other people you keep in HunterBuddy are used.** We process that information for you under the Data processing agreement and use it for nothing else.",
-    "**All personal information is stored and processed in mainland China. It never leaves China, is never used to train AI models and is never sold.**",
-    "AI results show their sources and how reliable they are. Who to contact and who to put forward is your decision.",
+    "**We store and process personal information in mainland China. We never provide it outside China, never use it to train AI models and never sell it.**",
+    "AI results show their sources and how reliable they are (verified, inferred, to be confirmed). Who to contact and who to put forward is your decision.",
     "You can access, copy, correct and delete your information and close your account. Email privacy@boseekai.com and we will reply within 15 working days.",
   ],
   sections: [
@@ -25,12 +26,12 @@ const privacy = {
       body: [
         "The personal information handler is Beijing Boseek Intelligent Technology Co., Ltd. For anything about personal information, contact privacy@boseekai.com.",
         "This policy covers the website (the Chinese and English pages of www.boseekai.com), trial requests, and the HunterBuddy service, including accounts, workspaces and the features in them.",
-        "HunterBuddy is in an invitation-only trial and some features are still being built. This policy describes the processing we provide now and are preparing to provide. **What the service actually offers is what applies.** When a change in features changes how we process information, we update this policy first (see section 12).",
+        "**When each part applies**: the parts of this policy about the website and trial requests apply from the effective date. The parts about the HunterBuddy service apply from the day HunterBuddy is formally opened to you. Before it opens, we will check this policy line by line against the features actually launched, and update the policy first wherever anything differs, before opening the service.",
         { h3: "We act in two different capacities" },
         {
           list: [
-            "For information about website visitors, trial applicants and HunterBuddy users themselves, **we are the personal information handler** and follow this policy.",
-            "For the information you keep and process in your workspace about candidates, client contacts, paper authors, patent inventors, email correspondents and other people (“other people’s information in your workspace”), **you are the personal information handler and we process it on your behalf**, under the Data processing agreement. Section 9 is written for the people that information is about.",
+            "For information about website visitors, trial applicants, HunterBuddy users themselves and people who make requests to us, **we are the personal information handler** and follow this policy.",
+            "For the information you keep and process in your workspace about candidates, client contacts, paper authors, patent inventors, email correspondents and other people (“other people’s information in your workspace”), **you are the personal information handler and we process it on your behalf**, under the Data processing agreement. For the search sources and methods we choose, the refusal list and our security measures, we bear a personal information handler’s responsibility as the law requires. Section 9 is written for the people that information is about.",
           ],
         },
         "This policy is made under the Personal Information Protection Law of the People’s Republic of China, the Cybersecurity Law, the Data Security Law, the Regulations on Network Data Security Management, the Interim Measures for the Management of Generative AI Services, the Measures for Labeling AI-Generated Synthetic Content and other laws and regulations.",
@@ -54,12 +55,13 @@ const privacy = {
               ["Connecting a sending mailbox", "Mailbox address, mailbox password or client authorization code, mail server settings", "To send emails from your mailbox after you confirm each one, and to read the replies and attachments to those emails", "Optional"],
               ["Subscription and payment", "Plan, amount, order time and status, the payment result returned by the payment channel, auto-renewal setting", "To complete purchases, manage your subscription and quota and keep transaction records as the law requires", "Required to buy"],
               ["Support and diagnostics", "Problem descriptions, feedback and diagnostic packages you choose to send", "To answer you and find and fix the problem", "Optional"],
+              ["Making a request to us", "Name, contact details, professional details that confirm it is you (such as company and title), your request and how it was handled", "To handle your request. If you expressly refuse, to stop collecting your information from public sources", "Required to make a request"],
             ],
           },
         },
         "**We do not collect your ID number, bank card number, biometric data, location tracks or other sensitive personal information**, and we never read files on your computer that you have not chosen to upload. We do not extract voiceprints from audio or run face recognition on photos. Payment is completed with Alipay or WeChat Pay, and we never see your card number or payment password.",
         { h3: "About the sending mailbox" },
-        "Connecting a sending mailbox is optional. **No email is sent until you confirm its recipients, subject, body and attachments**, and automatic mode cannot skip this step. So that you can see replies, we regularly read the replies and attachments in the same conversation as those emails, and nothing else in your mailbox. The mailbox password or authorization code is stored encrypted, is never shown to anyone, and is deleted as soon as you disconnect the mailbox.",
+        "Connecting a sending mailbox is optional. **No email is sent until you confirm its recipients, subject, body and attachments**, and automatic mode cannot skip this step. So that you can see replies, we check your mailbox regularly, and keep and process only the replies and attachments in the same conversation as those emails. Other emails are neither kept nor processed. The mailbox password or authorization code is stored encrypted, is never shown to anyone, and is deleted as soon as you disconnect the mailbox. If your mailbox provider or a recipient is outside China, emails travel abroad through that provider, which is your decision and your responsibility.",
         { h3: "Any other purpose needs your consent first" },
         "If we want to use information for a purpose this policy does not describe, or the purpose, method or type of information changes, we will tell you first and ask for your consent again.",
       ],
@@ -79,35 +81,45 @@ const privacy = {
           list: [
             "**Models in China only.** To carry out the tasks you start, we send the necessary content to large-model providers in mainland China, and never to models outside China.",
             "**Never used for training.** We do not use what you type, upload or generate, or other people’s information in your workspace, to train or fine-tune any model, and our agreements require the model providers not to either.",
-            "**Results are labeled.** Content generated or inferred by AI is marked with labels such as AI-generated, Inferred or To be confirmed, together with the sources it relies on, and is shown apart from verified facts. Exported files are marked too. Section 7 of the Terms of service describes the labels.",
+            "**Results are labeled.** Content generated or inferred by AI is marked with labels such as AI-generated, Inferred or To be confirmed, together with the sources it relies on, and is shown apart from verified facts. Generated reports, interview materials and other files are marked too. Section 7 of the Terms of service describes the labels.",
             "**You make the decisions.** Match scores, identity judgments and career-move alerts are for your reference only. HunterBuddy never contacts anyone by itself, and never puts forward, hires or rejects a candidate by itself.",
           ],
         },
         { h3: "Automated processing" },
-        "Within the authorization you give, HunterBuddy carries out some processing automatically, for example linking two records of the same person when the evidence is strong, or scoring and ranking candidates against a role. All of it keeps its evidence, and you can review, undo or correct it. In settings you can switch to Analyze only or Confirm before acting, and turn off automatic steps such as matching right after saving. A person who considers that automated processing significantly affects their rights may ask us to explain it, and may refuse a decision made solely by automated means (see section 10).",
+        "Within the authorization you give, HunterBuddy carries out some processing automatically, for example linking two records of the same person when the evidence is strong, or scoring and ranking candidates against a role. All of it keeps its evidence, and you can review, undo or correct it. In settings you can switch to Analyze only or Confirm before acting, and turn off automatic steps such as matching right after saving. Where the results concern candidates or other individuals, those individuals may ask the headhunter who keeps their information to explain, and may refuse decisions made solely by automated means that significantly affect their rights. We help the headhunter explain the basis of the processing. If you have questions about automated processing that concerns you, contact us as described in section 10.",
       ],
     },
     {
-      h2: "Processors, sharing, transfers and disclosure",
+      h2: "Processors, third parties and sharing",
       body: [
-        "To provide the service, we engage the following types of service providers to process the information they need. Our agreements require them to process it only as we instruct and for the agreed purpose, to keep it secure and to use it for nothing else, and we supervise them.",
+        "To provide the service, we engage the following service providers, all in mainland China, to process the information they need. Our agreements require them to process it only as we instruct and for the agreed purpose, to keep it secure and to use it for nothing else, and we supervise them.",
         {
           table: {
-            head: ["Provider", "Information processed", "Purpose"],
+            head: ["Processor", "Information processed", "Purpose"],
             rows: [
-              ["Cloud provider (in China)", "The data needed to store and run the service", "Servers, databases, file storage and backups"],
-              ["Large-model provider (in China)", "The input and excerpts needed for a task", "Understanding, parsing, analyzing, generating and translating content"],
-              ["Public search service (in China)", "Search terms, such as a role, a company or a person’s name", "Searching public web pages, papers, patents and open-source projects for your tasks"],
-              ["SMS provider", "Mobile number, verification code", "Sending sign-in codes"],
-              ["WeChat Open Platform (Tencent)", "WeChat account identifier", "Signing in with WeChat"],
+              ["Cloud provider", "The data needed to store and run the service", "Servers, databases, file storage and backups"],
+              ["Large-model provider", "The input and excerpts needed for a task", "Understanding, parsing, analyzing, generating and translating content"],
+              ["Public search service", "Search terms, such as a role, a company or a person’s name", "Searching public web pages, papers, patents and open-source projects for your tasks"],
+              ["SMS provider", "Mobile number, verification code, reminder text", "Sending sign-in codes and necessary reminders"],
               ["Email delivery service", "Contact email, notification summaries (never candidates, contacts, email bodies or other business content)", "Sending account security, subscription and service notifications"],
               ["Feishu (Beijing Feishu Technology Co., Ltd.)", "What you enter in a trial request", "Recording and reviewing trial requests"],
             ],
           },
         },
-        "When you pay, you complete the payment on the Alipay or WeChat Pay page, and the payment institution handles the payment information under its own rules. We send it only the order number, plan name and amount. Once you connect a sending mailbox, emails are sent and received through the mailbox provider you chose.",
+        { h3: "Third-party services you use directly" },
+        {
+          table: {
+            head: ["Third party", "Information processed", "Purpose"],
+            rows: [
+              ["WeChat sign-in (Shenzhen Tencent Computer Systems Co., Ltd.)", "The account identifier, nickname and avatar you authorize in WeChat", "Signing in with WeChat"],
+              ["Alipay (Alipay (China) Network Technology Co., Ltd.)", "Order number, plan name, amount, and the payment information you give Alipay", "Completing payment"],
+              ["WeChat Pay (Tenpay Payment Technology Co., Ltd.)", "Order number, plan name, amount, and the payment information you give WeChat Pay", "Completing payment"],
+            ],
+          },
+        },
+        "These third parties are independent personal information handlers. They handle the information you give them under their own privacy policies, which you can find, with their contact details, on their official websites. We send payment institutions only the order number, plan name and amount needed to complete payment. Once you connect a sending mailbox, emails are sent and received through the mailbox provider you chose.",
         { h3: "Sharing" },
-        "**Unless a law or administrative regulation requires otherwise, we do not provide your personal information to any third party, and we never sell it.** If we ever need to provide it to another personal information handler, we will first tell you the recipient’s name and contact details, the purpose, the method and the types of information, and obtain your separate consent.",
+        "**Apart from the cases listed above, your separate consent, or what laws or administrative regulations require, we do not provide your personal information to any third party, and we never sell it.** If we ever need to provide it to another personal information handler, we will first tell you the recipient’s name and contact details, the purpose, the method and the types of information, and obtain your separate consent.",
         "**Each workspace is isolated.** We never give one user’s workspace data to another user or use it in another user’s tasks.",
         { h3: "Transfers" },
         "If personal information has to be transferred because of a merger, division, dissolution or bankruptcy, we will tell you the recipient’s name and contact details and require the recipient to keep to this policy. A recipient that changes the original purpose or method of processing must ask for your consent again.",
@@ -130,27 +142,33 @@ const privacy = {
     {
       h2: "Where information is stored and for how long",
       body: [
-        "**The personal information we collect and generate is stored in the People’s Republic of China and is not provided outside China.** If that ever becomes necessary, we will first tell you the overseas recipient’s name and contact details, the purpose, method and types of information, and how to exercise your rights against it, obtain your separate consent, and complete the procedures the law requires.",
+        "**The servers where we store personal information, and the models and search services we use, are all in mainland China (excluding Hong Kong, Macao and Taiwan), and we do not provide personal information outside China.** If you connect a mailbox outside China or send email to mailboxes outside China, the emails travel through the mail providers concerned, which is your decision and your responsibility. If we ever need to provide information outside China, we will first tell you the overseas recipient’s name and contact details, the purpose, method and types of information, and how to exercise your rights against it, obtain your separate consent, and complete the procedures the law requires.",
         "We keep personal information only for the shortest time needed for its purpose, then delete or anonymize it. If a retention period set by law or administrative regulation has not ended, or deletion is technically difficult, we only store and protect the information and do not otherwise process it.",
         {
           table: {
             head: ["Information", "How long we keep it"],
             rows: [
               ["Website access logs", "6 months, then deleted"],
-              ["Trial requests", "If a trial is opened, kept as account information. Otherwise deleted 12 months after submission. You can ask us to delete it at any time"],
-              ["Account information", "While the account exists. Deleted or anonymized within 15 working days after the account is closed"],
+              ["Trial requests", "12 months from submission, for review, trial follow-up and statistics, then deleted. You can ask us to delete it at any time"],
+              ["Account information", "While the account exists. If you ask to close your account, we close it within 15 working days of verifying your identity and delete or anonymize the information"],
+              ["Sign-in session records", "6 months"],
               ["Workspace content", "While the account exists. What you delete goes to the recycle bin and is permanently deleted after 30 days, or earlier if you delete it permanently"],
+              ["Task, run and usage records", "While the account exists, and deleted with the workspace or when the account is closed. Records needed for billing are kept for the period accounting rules require"],
               ["Deleted workspaces", "A 30-day recovery period after you request deletion, then permanently deleted"],
               ["Export files", "Available to download for 7 days after they are generated, then deleted"],
-              ["Mailbox password or authorization code", "Deleted as soon as you disconnect the mailbox"],
+              ["Sending mailbox address, server settings and authorization code", "Deleted as soon as you disconnect the mailbox"],
               ["Diagnostic packages", "Deleted within 30 days after the problem is resolved"],
-              ["Security logs and operation audit records", "The shortest period security and compliance require, and at least 6 months"],
+              ["Support and feedback records", "Deleted 12 months after the matter is resolved"],
+              ["Records of requests from individuals", "3 years. The refusal list is kept until the person withdraws their refusal"],
+              ["Records of providing generated content without explicit labels", "6 months"],
+              ["Security logs", "6 months"],
+              ["Operations audit records and records of personal information processing", "3 years"],
               ["Order and payment records", "The period required by accounting, tax and other laws"],
-              ["Backups", "Overwritten on a rolling backup cycle and cleared automatically at the end of each cycle"],
+              ["Backups", "Overwritten on a rolling backup cycle, at most 30 days"],
             ],
           },
         },
-        "If your subscription ends or your account is suspended, your data stays and you can still view and export it. If we stop operating HunterBuddy, we will announce it 30 days in advance and delete or anonymize personal information once the service stops.",
+        "If your subscription ends, your data stays and you can still view and export it. If your account is suspended for breaching the Terms of service, you cannot sign in while it is suspended, but you can email us to ask for an export of your data, which we provide within 15 working days, unless the law provides otherwise or unlawful content is involved. If we stop operating HunterBuddy, we will announce it and notify you 30 days in advance, and delete or anonymize personal information once the service stops.",
       ],
     },
     {
@@ -161,7 +179,7 @@ const privacy = {
             "The whole site uses HTTPS encryption.",
             "Each workspace is isolated. When data is written, the system checks permissions and workspace boundaries.",
             "Mailbox authorization codes, keys and other credentials are stored encrypted and never shown in the interface.",
-            "**Operations staff cannot see your business content**, including candidates, roles, companies, contacts, files, conversations and AI output. They see only what they need to handle accounts, trials, subscriptions and faults. Staff do not access your business content unless you send a diagnostic package, you give explicit permission, or it is necessary to handle a complaint or illegal content as the law requires.",
+            "**Operations staff cannot see your business content**, including candidates, roles, companies, contacts, files, conversations and AI output. They see only what they need to handle accounts, trials, subscriptions and faults. Diagnostic packages contain only run information such as versions and error codes, never business content. Only when handling a complaint, a report or unlawful content as the law requires, with a manager’s approval and an audit record, may staff view the content directly related to that matter.",
             "Important actions such as approving trials, suspending accounts, adjusting quota and opening diagnostic packages leave audit records that cannot be changed.",
             "Staff get only the access they need, are bound by confidentiality, and receive security and personal information protection training.",
           ],
@@ -174,7 +192,7 @@ const privacy = {
     {
       h2: "Minors",
       body: [
-        "HunterBuddy is a work tool for professional headhunters and recruiters and **is not intended for anyone under 18**, and we do not knowingly collect minors’ personal information. If we find we have collected personal information of a child under 14 without a guardian’s consent, we will delete it as soon as possible.",
+        "HunterBuddy is a work tool for professional headhunters and recruiters and **is not intended for anyone under 18**, and we do not actively collect minors’ personal information. If we find we have collected personal information of a child under 14 without a guardian’s consent, we will delete it as soon as possible.",
         "Please do not keep personal information about children under 14 in HunterBuddy.",
       ],
     },
@@ -201,10 +219,10 @@ const privacy = {
           ],
         },
         { h3: "Who is responsible" },
-        "The headhunter who keeps your information is its personal information handler. They are responsible for having a lawful basis and for answering your requests. Boseek processes it on the headhunter’s instructions, keeps it secure as the law requires, and helps the headhunter respond to you.",
+        "The headhunter who keeps your information is its personal information handler. They are responsible for having a lawful basis and for answering your requests. Boseek processes it on the headhunter’s instructions. For the search sources and methods we choose, the refusal list and our security measures, we are also responsible as the law requires, and we help the headhunter respond to you.",
         { h3: "What you can do" },
-        "You can contact the headhunter who keeps your information and ask to access, correct or delete it, or refuse their processing of information you have made public. You can also email privacy@boseekai.com with your name, information that proves who you are, and your request. Once we have verified it, we will pass it to the users concerned and help them handle it within 15 working days, pausing the processing of that information first where needed, and tell you the outcome.",
-        "If you expressly refuse our processing of information you have made public, we will record your request and **from then on stop automatically collecting or completing your information from public sources for any user**.",
+        "You can contact the headhunter who keeps your information and ask to access, correct or delete it, or refuse their processing of information you have made public. You can also email privacy@boseekai.com with your name, contact details and your request. We usually ask you to confirm by replying from your own email address or phone number, and we do not need an ID document. Once verified, the system automatically checks across workspaces, and within 15 working days we pass your request on to the users who keep your information and help them handle it, pausing the processing of that information first where needed, and then tell you the outcome. The check is done by the system, and no staff member looks at workspace content.",
+        "If you expressly refuse our processing of information you have made public, we will put you on a refusal list, keeping only what is needed to identify you, and **from then on stop automatically collecting or completing your information from public sources for any user**.",
       ],
     },
     {
@@ -216,14 +234,15 @@ const privacy = {
             "**Portability**: where the legal conditions are met, we provide a way to transfer your personal information to another handler you name.",
             "**Correct and complete**: edit it in account settings, or contact us.",
             "**Delete**: you can delete content in the service. It goes to the recycle bin and is permanently deleted after 30 days, or earlier if you delete it permanently. You can also ask us to delete your information when the purpose has been achieved, we stop providing the service, you withdraw consent, or we process it unlawfully or in breach of our agreement.",
-            "**Withdraw consent**: withdrawal does not affect processing already carried out on the basis of your consent. Some features may stop working afterwards.",
+            "**Withdraw consent**: for example by disconnecting your sending mailbox, unlinking WeChat, turning off optional notifications, or emailing us. Withdrawal does not affect processing already carried out on the basis of your consent. Some features may stop working afterwards.",
             "**Restrict or refuse processing**: you can ask us to restrict or refuse the processing of your personal information, unless laws or administrative regulations provide otherwise.",
-            "**Explanations and automated decisions**: see section 4.",
-            "**Close your account**: email privacy@boseekai.com. Once we have verified your identity, we close the account within 15 working days and delete or anonymize your personal information, unless the law provides otherwise. **A closed account cannot be restored, so export anything you want to keep first.**",
+            "**Explanations**: you can ask us to explain this policy and our processing rules. For automated processing that concerns you, you can ask us to explain its basis and main rules, and you may refuse decisions made solely by automated means that significantly affect your rights.",
+            "**Close your account**: email privacy@boseekai.com. Within 15 working days of verifying your identity, we close the account and delete or anonymize your personal information, unless the law provides otherwise. **A closed account cannot be restored, so export anything you want to keep first.**",
+            "**Rights of close relatives**: when a person has died, their close relatives may, for their own lawful and legitimate interests, access, copy, correct or delete the deceased’s personal information, unless the deceased arranged otherwise.",
           ],
         },
         { h3: "How to make a request" },
-        "Email privacy@boseekai.com. To protect your information we may first verify your identity, then we reply within 15 working days. There is normally no charge. For transfer requests that are clearly excessive in number or scope, we may charge the necessary cost. If we cannot meet a request, we will tell you why.",
+        "Email privacy@boseekai.com. To protect your information we may first verify your identity, usually through the phone number or email linked to your account, then we reply within 15 working days. There is normally no charge. For transfer requests that are clearly excessive in number or scope, we may charge the necessary cost. If we cannot meet a request, we will tell you why.",
         "If you believe our processing has harmed your rights, you can complain to us, complain to or report to the cyberspace, public security, market regulation or other authorities, or bring a lawsuit in a people’s court.",
       ],
     },
@@ -236,7 +255,7 @@ const privacy = {
     {
       h2: "How this policy is updated",
       body: [
-        "We may update this policy when laws change or features change. The new version is published on this page with its update date and effective date. **For significant changes, such as a change in purpose, method, types of information, types of service providers or where information is stored,** we will tell you clearly before they take effect, by in-app notice, email or a notice on the website, and ask for your consent again where that is required.",
+        "We may update this policy when laws change or features change. The new version is published on this page with its update date and effective date. **For significant changes, such as a change in purpose, method, types of information, types of service providers or where information is stored,** we will tell you clearly at least 7 days before they take effect, by in-app notice, email or a notice on the website, and ask for your consent again where that is required.",
         "Earlier versions are available on request by email.",
       ],
     },
@@ -262,14 +281,14 @@ const terms = {
   name: "Terms of service",
   title: "Terms of service | HunterBuddy",
   description:
-    "The terms for using HunterBuddy: what the service does, accounts, trials, subscriptions and auto-renewal, your responsibility for candidates’ information, labeling and checking AI-generated content, limits of liability, complaints and disputes.",
-  lead: "These terms are the agreement between you and Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) for using HunterBuddy. Please read them carefully, especially the clauses in bold that exclude or limit liability or deal with disputes. By signing up, signing in or using HunterBuddy, you confirm that you have read and agree to these terms, the Privacy policy and the Data processing agreement.",
+    "The terms for using HunterBuddy: what the service does, accounts, trials, subscriptions and auto-renewal, credit validity, your responsibility for candidates’ information, labeling and checking AI-generated content, limits of liability, complaints and disputes.",
+  lead: "These terms are the agreement between you and Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) for using HunterBuddy. Please read them carefully, especially the clauses in bold that exclude or limit liability or deal with disputes. When you tick to accept these terms on signing up, they take effect together with the Data processing agreement, which forms part of them. The Privacy policy explains how we handle your personal information, and you confirm it separately when you sign up.",
   keys: [
     "HunterBuddy is an AI work tool for headhunters, currently in an invitation-only trial.",
     "**It never contacts anyone, and never puts candidates forward or makes business decisions, for you.** No email is sent until you confirm it.",
     "**You decide how candidates’ and other people’s information is used, and you are responsible for doing so lawfully.**",
     "**AI results can be wrong, so check them before you rely on them.** We mark what is AI-generated, inferred or to be confirmed.",
-    "Subscriptions renew automatically by default. You can turn renewal off at any time, and we remind you at least 5 days before each renewal.",
+    "You choose whether to turn on auto-renewal. Once on, you can turn it off at any time, and we remind you at least 5 days before each renewal.",
     "**Top-ups and separately purchased credits are valid for 12 months from the day they are credited. Anything unused by then is withdrawn and not refunded.**",
     "The law of the People’s Republic of China applies, and disputes go to the people’s court where Boseek is domiciled.",
   ],
@@ -277,7 +296,7 @@ const terms = {
     {
       h2: "Scope of these terms",
       body: [
-        "These terms apply to your use of HunterBuddy, including the web service, accounts, workspaces and their features. The Privacy policy, the Data processing agreement and the rules we publish in the service form part of these terms.",
+        "These terms apply to your use of HunterBuddy, including the web service, accounts, workspaces and their features. The Data processing agreement and the rules we publish in the service form part of these terms. The Privacy policy separately explains how we handle your personal information.",
         "**You must be at least 18 and have full civil capacity.** If you use HunterBuddy for an organization, you must be authorized by it, and these terms bind that organization too.",
         "We use bold type to draw your attention to clauses that exclude or limit liability or otherwise significantly affect you. If anything is unclear, contact us before you agree and we will explain it.",
       ],
@@ -324,10 +343,10 @@ const terms = {
           list: [
             "Prices, plan contents and quota are those shown on the purchase page, and the price at the time of your order is recorded in the order.",
             "We currently accept Alipay and WeChat Pay. A failed payment is never treated as paid.",
-            "**Auto-renewal: auto-renewal is on by default when you first subscribe and when you change plans, and this is shown clearly before you pay. You can turn it off in settings at any time. The current period is unaffected and you will not be charged again when it ends. We remind you by in-app notice and email at least 5 days before each automatic renewal.** To change the payment method used for renewal, turn auto-renewal off and subscribe again when the period ends.",
+            "**Auto-renewal: when you first subscribe and when you change plans, the payment page clearly shows the auto-renewal option and you choose whether to turn it on. Once it is on, you can turn it off in settings at any time. The current period is unaffected and you will not be charged again when it ends. We remind you by in-app notice and by SMS or email at least 5 days before each automatic renewal.** Turning on auto-renewal requires a verified mobile number or email. To change the payment method used for renewal, turn auto-renewal off and subscribe again when the period ends.",
             "An upgrade takes effect as soon as you confirm payment, and any remaining quota carries over.",
             "When your quota is used up, you cannot start new paid tasks, but you can still view and export your data. Time spent waiting for outside replies does not use quota.",
-            "**Top-ups and separately purchased credits are valid for 12 months: money added to your account, and credits bought separately from a plan, are valid for 12 months from the day they are credited. Whatever is left unused when they expire lapses and is withdrawn. It can no longer be used and is not refunded.** We show the validity period clearly before you buy. Usage comes out of your plan\u2019s quota for the current period first, then out of separately purchased credits, earliest expiry first. The expiry date of each purchase is shown on the Subscription and usage page, and we remind you by in-app notice and email 30 days and 7 days before it. Free or compensation credits are valid for the period stated when they are granted, or 12 months if none is stated.",
+            "**Top-ups and separately purchased credits are valid for 12 months: money added to your account, and credits bought separately from a plan, are valid for 12 months from the day they are credited. Whatever is left unused when they expire lapses and is withdrawn. It can no longer be used and is not refunded.** We show the validity period clearly before you buy. Usage comes out of your plan’s quota for the current period first, then out of separately purchased credits, earliest expiry first. The expiry date of each purchase is shown on the Subscription and usage page, and we remind you by in-app notice and email 30 days and 7 days before it. Free or compensation credits are valid for the period stated when they are granted, or 12 months if none is stated.",
             "When a subscription ends, new paid operations such as the Agent stop working, your data stays, and you can view and export it.",
             "**Refunds: once a subscription has started, fees paid are generally not refundable, unless the law provides otherwise.** If you cannot use the service normally because of us, we will, at your choice, extend your subscription by the time affected or refund the unused period pro rata.",
             "If you need an invoice, contact us.",
@@ -354,8 +373,8 @@ const terms = {
         {
           list: [
             "Treat candidates unlawfully or unreasonably differently on grounds such as ethnicity, race, sex, religious belief, disability, health, marital or childbearing status, household registration or age.",
-            "Carry out background checks without the person’s consent, or follow or locate a particular person, or pry into private life unrelated to work.",
-            "Sell or unlawfully provide personal information, or use it for fraud or harassment, or to send commercial emails people have not agreed to receive.",
+            "Carry out background checks without the person’s consent, or pry into or track a particular person’s private life and whereabouts unrelated to work.",
+            "Sell or unlawfully provide personal information, use it for fraud or harassment, or send emails containing commercial advertising without the recipient’s express consent.",
             "Upload or generate unlawful content, or content that infringes others’ intellectual property, trade secrets, reputation, privacy or other lawful rights.",
             "Harvest data from the service with crawlers or scripts, reverse engineer, crack or interfere with the service, or get around quota or security measures.",
             "Use the service or its output to build a product that competes with HunterBuddy, or to train other models.",
@@ -377,11 +396,11 @@ const terms = {
             "**In generated files**: reports, interview materials and other files HunterBuddy generates state that they were generated by HunterBuddy with AI, and carry an implicit label in their metadata.",
           ],
         },
-        "We do not provide generated content with the labels removed. **When you publish generated content or give it to others, you must say that it was generated by AI, and you must not delete, alter, forge or hide the labels.**",
+        "**Email drafts** are edited and confirmed by you one by one and sent in your name from your mailbox, and no explicit label is added to their body automatically. **When you send, publish or provide AI-generated content to others, you must state and label it as the law requires and bear responsibility for its use, and you must not delete, alter, forge or hide the labels we add.** As the law requires, we keep records of providing content without explicit labels for at least 6 months.",
         { h3: "Rights in content" },
         "To the extent the law allows, what you input and the results generated for you belong to you and are yours to use. You authorize us to process them as far as needed to provide the service. **We never use them to train models.** Generated content may resemble other people’s content, so take care not to infringe anyone’s rights when you use it.",
         { h3: "Unlawful content" },
-        "If we find unlawful content, we stop generating it, stop transmitting it, remove it, and report it to the authorities as the law requires.",
+        "For unlawful content we find or receive reports about, we stop generating it, stop transmitting it, remove it, and report it to the authorities as the law requires.",
       ],
     },
     {
@@ -392,7 +411,7 @@ const terms = {
           list: [
             "**Your data is yours.** You can view and export it at any time. What you delete goes to the recycle bin and is permanently deleted after 30 days.",
             "Deleting a workspace: after you request deletion there is a 30-day recovery period, during which you can contact us to restore it. After that it is permanently deleted and cannot be restored.",
-            "If the service ends, we give you at least 30 days to export your data, then delete it.",
+            "If we stop providing the service, we give you at least 30 days to export your data, then delete it. If your service is suspended or ended because you breached these terms, you can email us within 30 days to ask for an export of your data, except for unlawful content.",
           ],
         },
       ],
@@ -410,10 +429,10 @@ const terms = {
         {
           list: [
             "Maintenance and upgrades may require the service to pause. We will give notice in advance where we can.",
-            "If the service is interrupted for reasons we are not responsible for, such as force majeure, telecom or third-party failures or cyberattacks, we will restore it as soon as possible.",
+            "If the service is interrupted for reasons we are not responsible for, such as force majeure, failures of the public telecom network or cyberattacks, we will restore it as soon as possible.",
             "If you break these terms, we may limit or end the service. Except in an emergency, we will tell you first and give you a chance to put things right.",
             "You can stop using the service and close your account at any time.",
-            "If we decide to stop providing HunterBuddy, we will announce it 30 days in advance, refund fees paid for any unused period, and give you time to export your data.",
+            "If we decide to stop providing HunterBuddy, we will announce it and notify you 30 days in advance, refund fees paid for any unused period, and give you time to export your data.",
           ],
         },
       ],
@@ -423,7 +442,7 @@ const terms = {
       body: [
         "**HunterBuddy is provided as it is. We do our best to keep the service stable and its results grounded in evidence, but we do not guarantee that you will find the right candidate, fill a role or reach your business goals, or that public sources are complete, accurate or current.**",
         "**Disputes and claims arising from your processing of other people’s personal information, your emails or your use of generated content in breach of the law or these terms are your responsibility. If we incur liability or losses because of them, you must compensate us.**",
-        "**To the extent the law allows, our liability to you is limited to the fees you actually paid for HunterBuddy in the 12 months before the loss occurred. During a free trial, it is limited to the minimum the law allows. We are not liable for indirect losses or loss of expected profits.**",
+        "**To the extent the law allows, our liability to you is limited to the fees you actually paid for HunterBuddy in the 12 months before the loss occurred, and to no less than RMB 100. We are not liable for indirect losses or loss of expected profits.**",
         "**These limits do not apply to property losses caused by our intent or gross negligence, or to personal injury, and they do not exclude the rights you have as a consumer under the law.**",
       ],
     },
@@ -471,10 +490,10 @@ const dpa = {
   lead: "This agreement sets out the rights and obligations of you, the HunterBuddy user, and Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) when you entrust us with processing other people’s personal information in your workspace. It forms part of the Terms of service and takes effect when you accept them.",
   keys: [
     "You decide the purpose and method of processing. **You are the personal information handler and Boseek processes on your behalf.**",
-    "We process only on your instructions and only to provide HunterBuddy to you. **Nothing is used for training, nothing leaves China, and nothing is given to other users.**",
-    "Every type of sub-processor we use is listed here, and we tell you 15 days before adding or changing one.",
+    "We process only on your instructions and only to provide HunterBuddy to you. **Nothing is used for training, nothing is provided outside China, and nothing is given to other users.**",
+    "Every type of sub-processor we use is listed here, and we tell you 15 days before adding or changing a type.",
     "If a security incident happens, we notify you within 24 hours of confirming it.",
-    "When the agreement ends, we delete the entrusted personal information and keep none of it.",
+    "When the agreement ends, we delete the entrusted personal information and keep none of it, unless the law provides otherwise.",
   ],
   sections: [
     {
@@ -492,6 +511,7 @@ const dpa = {
           list: [
             "**You decide the purpose and method of processing**, for example which role to search for, what material to upload, whom to keep and whether to make contact. You are the personal information handler of the entrusted personal information.",
             "**Boseek processes it on your behalf**, as this agreement and your instructions provide, and never beyond the agreed purpose, method and scope.",
+            "For the search sources and methods we choose, the refusal list and our security measures, we bear a personal information handler’s responsibility as the law requires.",
             "Your instructions are the actions and settings you make through the service, such as starting tasks, confirming what is saved, setting recurring plans and authorization modes, and anything both sides agree in writing.",
             "If we believe an instruction breaks the law, we will tell you and may pause carrying it out.",
           ],
@@ -514,14 +534,14 @@ const dpa = {
             "Store, export and delete records.",
           ],
         },
-        "**We never process this information for our own purposes, use it for marketing, profiling or model training, or use it in other users’ tasks.** To keep the service running securely and count usage, we process only de-identified run information that contains no business content.",
+        "**We never process this information for our own purposes: not for marketing, not for profiling of our own, not for model training and not in other users’ tasks.** To keep the service running securely and count usage, we process only de-identified run information that contains no business content.",
       ],
     },
     {
       h2: "Duration",
       body: [
         "From when you start using HunterBuddy until this agreement ends, plus the deletion period in section 11.",
-        "What you delete goes to the recycle bin and is permanently deleted after 30 days, together with its files. At that point that person’s personal information is also cleared from version history and task records, leaving only a note that the record was deleted.",
+        "What you delete goes to the recycle bin and is permanently deleted after 30 days, together with its files. At that point that person’s personal information is also cleared or anonymized in record versions, task conversations and run records, leaving only a note that the record was deleted. Copies in backups are cleared on the backup cycle within 30 days.",
       ],
     },
     {
@@ -544,7 +564,7 @@ const dpa = {
               ["Education", "Schools, fields of study, degrees and dates"],
               ["Public work", "Papers, patents, open-source projects, and co-author and co-inventor relationships"],
               ["Contact details", "Mobile numbers, emails, links to public profiles"],
-              ["Basic details", "City, and where the material includes them, year of birth and sex"],
+              ["Basic details", "City, year of birth, sex"],
               ["Job search", "Job-seeking status, preferred location, salary expectation, availability"],
               ["Your work records", "Notes, assessments, communication records, interview arrangements and feedback, emails, match scores and reasons, stage in a role’s process"],
               ["Relationships", "Colleague, reporting, collaboration and other relationships, and introduction paths"],
@@ -577,12 +597,12 @@ const dpa = {
           list: [
             "Process as this agreement and your instructions provide, and never beyond the agreed purpose, method and scope.",
             "**Never use it to train or fine-tune any model.**",
-            "**Store and process it in the People’s Republic of China, and never provide it outside China.**",
+            "**Store and process it in mainland China (excluding Hong Kong, Macao and Taiwan), and never provide it outside China.**",
             "**Never provide it to other users or third parties, and never sell it**, unless laws or administrative regulations require otherwise.",
-            "Keep workspaces isolated. Operations staff cannot see your business content unless you send a diagnostic package, you give explicit permission, or it is necessary to handle a complaint or illegal content as the law requires.",
+            "Keep workspaces isolated. Operations staff cannot see your business content. Only when handling a complaint, a report or unlawful content as the law requires, with a manager’s approval and an audit record, may they view the content directly related to that matter.",
             "Protect the information with encryption, access control, auditing and other technical and organizational measures. Everyone with access is bound by confidentiality.",
             "Help you meet your personal information protection obligations, including answering individuals’ requests, carrying out impact assessments and handling security incidents.",
-            "Pass on to you, and help with, any request an individual makes to us directly. Where a person expressly refuses processing of information they have made public, record it and from then on stop automatically collecting or completing their information from public sources for any user.",
+            "When an individual makes a request to us directly, the system checks across workspaces automatically, and we pass the request on to you and help you handle it, without any staff member looking at workspace content. Where a person expressly refuses processing of information they have made public, we put them on the refusal list and from then on stop automatically collecting or completing their information from public sources for any user.",
             "Accept your supervision. You can ask us to explain our processing, and we will provide the compliance information you need.",
             "Where the authorities lawfully require access to the data, notify you first where the law allows.",
           ],
@@ -604,7 +624,7 @@ const dpa = {
           },
         },
         "We will publish any new or changed type of provider on this page and tell you 15 days before it takes effect. If you do not agree, you can stop using the service, export your data and close your account before then.",
-        "Once you connect a sending mailbox, emails are sent and received through the mailbox provider you chose. That is not sub-processing by us.",
+        "Once you connect a sending mailbox, emails are sent and received through the mailbox provider you chose. That is not sub-processing by us. If the mailbox provider or a recipient is outside China, the emails travel abroad accordingly, which is your decision and your responsibility.",
       ],
     },
     {
@@ -616,8 +636,8 @@ const dpa = {
     {
       h2: "Deletion when the agreement ends",
       body: [
-        "This agreement ends when the Terms of service end, when you close your account or when you delete your workspace. Before then you can export your data. If we decide to stop providing the service, we will tell you 30 days in advance.",
-        "**When the agreement ends, we delete the entrusted personal information and keep none of it.** For a deleted workspace, deletion follows the 30-day recovery period. For a closed account, deletion happens within 15 working days. Copies in backups are cleared on the rolling backup cycle. If a retention period set by law or administrative regulation has not ended, or deletion is technically difficult, we only store and protect the information and do not otherwise process it.",
+        "This agreement ends when the Terms of service end, when you close your account or when you delete your workspace. Before then you can export your data. If we decide to stop providing the service, we will announce it and notify you 30 days in advance.",
+        "**When the agreement ends, we delete the entrusted personal information and keep none of it.** For a deleted workspace, deletion follows the 30-day recovery period. For a closed account, deletion happens within 15 working days of verifying your identity. Copies in backups are cleared on the backup cycle within 30 days. If a retention period set by law or administrative regulation has not ended, or deletion is technically difficult, we only store and protect the information and do not otherwise process it.",
       ],
     },
     {
@@ -632,6 +652,7 @@ const dpa = {
         {
           list: [
             "Where this agreement and the Terms of service differ on personal information protection, this agreement prevails.",
+            "Changes to this agreement follow the section on changes in the Terms of service. Changes to the types of service providers are notified 15 days in advance under section 9 of this agreement.",
             "Organizations that need a separately signed written data processing agreement can contact us.",
             "This agreement exists in Chinese and English. If they differ, the Chinese version prevails.",
             "Contact us: privacy@boseekai.com.",
