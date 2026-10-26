@@ -148,10 +148,10 @@ const privacy = {
           table: {
             head: ["Information", "How long we keep it"],
             rows: [
-              ["Website access logs", "6 months, then deleted"],
+              ["Website access logs", "At least 6 months, then deleted at the end of the log rotation cycle"],
               ["Trial requests", "12 months from submission, for review, trial follow-up and statistics, then deleted. You can ask us to delete it at any time"],
               ["Account information", "While the account exists. If you ask to close your account, we close it within 15 working days of verifying your identity and delete or anonymize the information"],
-              ["Sign-in session records", "6 months"],
+              ["Sign-in session records", "At least 6 months, then deleted at the end of the log rotation cycle"],
               ["Workspace content", "While the account exists. What you delete goes to the recycle bin and is permanently deleted after 30 days, or earlier if you delete it permanently"],
               ["Task, run and usage records", "While the account exists, and deleted with the workspace or when the account is closed. Records needed for billing are kept for the period accounting rules require"],
               ["Deleted workspaces", "A 30-day recovery period after you request deletion, then permanently deleted"],
@@ -161,7 +161,7 @@ const privacy = {
               ["Support and feedback records", "Deleted 12 months after the matter is resolved"],
               ["Records of requests from individuals", "3 years. The refusal list is kept until the person withdraws their refusal"],
               ["Records of providing generated content without explicit labels", "6 months"],
-              ["Security logs", "6 months"],
+              ["Security logs", "At least 6 months, then deleted at the end of the log rotation cycle"],
               ["Operations audit records and records of personal information processing", "3 years"],
               ["Order and payment records", "The period required by accounting, tax and other laws"],
               ["Backups", "Overwritten on a rolling backup cycle, at most 30 days"],
