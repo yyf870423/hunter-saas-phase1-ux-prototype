@@ -411,6 +411,12 @@
   background: var(--s1-surface-raised);
 }
 
+/* filter selects and date pickers sit next to the search field, so they share its 8px corner */
+.s4-select > button,
+.s4-date-picker > button {
+  border-radius: var(--b-radius);
+}
+
 /* ---------------------------------------------------------------- modal, drawer, toast */
 .s1-modal {
   border-radius: var(--b-radius-panel);

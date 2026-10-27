@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
-import { expectNoHorizontalOverflow, trackConsoleErrors } from "../stage1/helpers";
+import { expectNoHorizontalOverflow, themeColor, trackConsoleErrors } from "../stage1/helpers";
 test.use({ actionTimeout: 8000 });
 
 const output = "artifacts/opportunity-lifecycle/spacing";
@@ -56,8 +56,8 @@ for (const [device, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 
     const picker = page.locator(".s4-date-picker-panel");
     await expect(picker).toHaveCSS("width", "320px");
     const confirm = picker.getByRole("button", { name: "确定", exact: true });
-    await expect(confirm).toHaveCSS("background-color", "rgb(0, 112, 247)");
-    await expect(confirm).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(confirm).toHaveCSS("background-color", await themeColor(page, "--s1-action-fill"));
+    await expect(confirm).toHaveCSS("color", await themeColor(page, "--s1-action-ink", "color"));
     await shot(page, `after-${device}-datetime`);
     await picker.getByRole("textbox", { name: "小时", exact: true }).fill("29");
     await expect(confirm).toBeDisabled();

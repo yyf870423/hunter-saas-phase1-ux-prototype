@@ -23,7 +23,8 @@ import {
 import { CandidateReviewWorkspace, InspectionPanel } from "./ReviewWorkspace";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
-import { dialogueActor } from "../stage4/pipeline-relations";
+import { dialogueActor, stageNameById } from "../stage4/pipeline-relations";
+import { sourcingCandidates } from "./recruiting-review-data";
 import { draftMarkdown, parsePipelineMessage, replyToDraft, resultMarkdown } from "./pipeline-dialogue";
 
 const defaultPrompt =
@@ -182,6 +183,8 @@ export function AutomationWorkspace() {
   );
   // A pending batch of stage moves waiting for 是 / 否 / per-person changes (06 §7.5).
   const [pipelineDraft, setPipelineDraft] = useState(null);
+  // A batch “加入岗位储备” said in the conversation waits for 是 / 否 too (02 §7.14: list first, then confirm).
+  const [reserveDraft, setReserveDraft] = useState(null);
   const [attachments, setAttachments] = useState([]);
   const [userDecisions, setUserDecisions] = useState([]);
   const [planAdjusted, setPlanAdjusted] = useState(
@@ -345,10 +348,10 @@ export function AutomationWorkspace() {
     setContactStage("scope");
   };
 
-  const applyCandidateReview = (selected, text) => {
+  const applyCandidateReview = (selected, text, summary) => {
     try {
       const result = runOpportunityCommand("recruiting.legacy-review", { positionId: "position-vla", taskId: "position-vla", reviewIds: selected, authMode, expectedVersion: reviewPositionVersion });
-      completeDecision(text, `已应用审核决定：${result.candidateIds.length} 位候选人已加入或保留在岗位流程，岗位人才梳理同步更新为 v${result.talentMapVersion}。已有推进阶段不会回退；未选择的人选继续保留在本轮审核结果中，尚未对外联系。\n\n[查看岗位储备](#/positions/position-vla?tab=pipeline) · [查看人才梳理](#/positions/position-vla?tab=talent-map)`);
+      completeDecision(text, `已应用审核决定：${summary || `${result.candidateIds.length} 位候选人已加入或保留在岗位流程`}，岗位人才梳理同步更新为 v${result.talentMapVersion}。已有推进阶段不会回退；未选择的人选继续保留在本轮审核结果中，尚未对外联系。\n\n[查看岗位储备](#/positions/position-vla?tab=pipeline) · [查看人才梳理](#/positions/position-vla?tab=talent-map)`);
     } catch (error) { notify(error.message, "danger"); }
   };
 
@@ -414,6 +417,20 @@ export function AutomationWorkspace() {
     const attachmentText = files.length
       ? `；附带 ${files.map((file) => file.name).join("、")}`
       : "";
+    if (reserveDraft) {
+      if (/^(是|是的|好|确认|可以|执行)[。！!，, ]*$/.test(text.trim())) {
+        setReserveDraft(null);
+        applyCandidateReview(reserveDraft.ids, text, reserveDraft.summary);
+        setComposer("");
+        return;
+      }
+      if (/^(否|不用|取消|算了)[。！!，, ]*$/.test(text.trim())) {
+        setReserveDraft(null);
+        reply(text, "好的，这次不加入，审核结果保持原样。");
+        return;
+      }
+      setReserveDraft(null);
+    }
     if (!files.length && handlePipelineMessage(text)) return;
     if (phase < 4) {
       setUserDecisions((items) => [
@@ -428,8 +445,23 @@ export function AutomationWorkspace() {
       setPlanAdjusted(true);
       setLatestPlanRequirement(`${text}${attachmentText}`);
     } else if (/85|八十五/.test(text)) {
+      // List who would be added and who already has a stage before writing anything.
       const omitted = /赵星羽/.test(text);
-      applyCandidateReview(candidates.filter((person) => person.score >= 85 && (!omitted || person.name !== "赵星羽")).map((person) => person.id), `${text}${attachmentText}`);
+      const people = candidates.filter((person) => person.score >= 85 && (!omitted || person.name !== "赵星羽"));
+      const position = opportunityState.positions.find((item) => item.id === "position-vla");
+      const lines = people.map((person) => {
+        const assetId = sourcingCandidates.find((item) => item.reviewId === person.id)?.id;
+        const stage = position?.pipeline.find((entry) => entry.candidateId === assetId)?.stage;
+        return `- ${person.name} · ${person.score} 分 · ${stage ? `已在${stageNameById[stage] || stage}，保持原阶段` : "加入储备"}`;
+      });
+      const kept = lines.filter((line) => line.includes("保持原阶段")).length;
+      const exclusion = omitted ? "未选择赵星羽，" : "";
+      setReserveDraft({
+        ids: people.map((person) => person.id),
+        summary: `${exclusion}${people.length} 位候选人已加入岗位储备或保留原阶段（${kept} 位已在流程中，阶段不变）`,
+      });
+      reply(`${text}${attachmentText}`, `将把 85 分以上的 ${people.length} 位候选人加入「${position?.name || "具身智能 VLA 算法负责人"}」的岗位储备${omitted ? "（未选择赵星羽）" : ""}：\n\n${lines.join("\n")}\n\n已在流程中的人不会退回储备。是否执行？请回复“是”“否”，或调整名单。`);
+      return;
     } else if (contactStage === "waiting") {
       setUserDecisions((items) => [
         ...items,

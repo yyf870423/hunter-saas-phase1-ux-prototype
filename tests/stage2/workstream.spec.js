@@ -138,7 +138,7 @@ test("大型候选人审核支持筛选、详情和结构化决定", async ({ pa
   await page.getByRole("button", { name: "加入岗位储备" }).click();
   await expect(page.getByText(/已应用审核决定/)).toBeVisible();
   await expect(
-    page.getByText(/下一步可以继续指定需要联系的人选/),
+    page.getByText(/下一步可以直接告诉我需要给哪些候选人发邮件/),
   ).toBeVisible();
   await expect(page.getByText("已从当前检查点继续")).toBeVisible();
 });
@@ -168,11 +168,19 @@ test("自然语言筛选与审核工作区使用同一入储备语义", async ({
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
   await input.fill("将 85 分以上的人加入岗位储备，但不要选择赵星羽");
   await input.press("Enter");
+  // A batch said in the conversation is listed first and written only after “是” (02 §7.14).
+  const draft = page.locator(".s2-decision-thread").last();
+  await expect(draft).toContainText("将把 85 分以上的 4 位候选人加入「具身智能 VLA 算法负责人」的岗位储备（未选择赵星羽）");
+  await expect(draft).toContainText("林昊 · 94 分 · 已在一面，保持原阶段");
+  await expect(draft).toContainText("顾言川 · 86 分 · 加入储备");
+  await expect(page.getByText(/已应用审核决定/)).toHaveCount(0);
+  await input.fill("是");
+  await input.press("Enter");
   await expect(
-    page.getByText(/未选择赵星羽，4 位候选人已加入岗位储备/),
+    page.getByText(/未选择赵星羽，4 位候选人已加入岗位储备或保留原阶段/),
   ).toBeVisible();
   await expect(
-    page.getByText(/下一步可以继续指定需要联系的人选/),
+    page.getByText(/下一步可以直接告诉我需要给哪些候选人发邮件/),
   ).toBeVisible();
 });
 

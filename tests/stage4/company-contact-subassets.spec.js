@@ -2,7 +2,9 @@ import { mkdir } from "node:fs/promises";
 import { test, expect } from "@playwright/test";
 import { candidates } from "../../src/stage4/data.js";
 import {
+  downloadName,
   expectNoHorizontalOverflow,
+  recordDownloadNames,
   trackConsoleErrors,
 } from "../stage1/helpers";
 
@@ -228,6 +230,7 @@ test("文件可校验、上传、预览和下载，刷新后仍在所属联系�
   page,
 }) => {
   const check = trackConsoleErrors(page);
+  await recordDownloadNames(page);
   await page.goto(`${contact}?tab=files`);
   await page.getByRole("button", { name: "上传文件" }).click();
   await page
@@ -256,7 +259,7 @@ test("文件可校验、上传、预览和下载，刷新后仍在所属联系�
   await page.getByRole("dialog").getByRole("button", { name: "关闭" }).click();
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "下载", exact: true }).click();
-  expect((await download).suggestedFilename()).toBe("客户沟通.txt");
+  expect(await downloadName(page, await download)).toBe("客户沟通.txt");
   await page
     .locator(".s4-detail-header")
     .getByRole("button", { name: "删除", exact: true })

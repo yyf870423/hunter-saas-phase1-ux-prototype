@@ -20,8 +20,9 @@ for (const [width, height] of [
       if (response.status() >= 400) failed.push(response.url());
     });
     await page.goto("./landing/");
+    // Hero copy as approved in the 2026-10-21 website update (第五版通俗文案).
     await expect(page.locator(".f-hero h1")).toHaveText(
-      "给我一个难岗位，把该找的人找出来。",
+      "从杂乱的信息里，找出岗位、人和时机。",
     );
     await expect(page.locator("meta[name='trial-api']")).toHaveAttribute(
       "content",
@@ -30,15 +31,17 @@ for (const [width, height] of [
     const navigation = page.locator("#f-navigation");
     await expect(
       navigation.getByRole("link", { includeHidden: true }),
-    ).toHaveText(["业务场景", "决策支持", "关于铂寻"]);
+    ).toHaveText(["产品短片", "能做什么", "工作方式", "人和关系", "关于铂寻"]);
     await expect(
       page
         .locator(".f-hero")
-        .getByRole("link", { name: "查看场景", exact: true }),
+        .getByRole("link", { name: "看看能做什么", exact: true }),
     ).toHaveAttribute("href", "#work");
+    // Some images belong to layouts this version hides (the legacy carousel), so scroll and decode them
+    // directly instead of waiting for them to become visible.
     for (const image of await page.locator("img").all()) {
-      await image.scrollIntoViewIfNeeded();
-      await image.evaluate((el) => el.decode());
+      await image.evaluate((el) => el.scrollIntoView({ block: "center" }));
+      await image.evaluate((el) => el.decode().catch(() => {}));
     }
     await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
     await page.evaluate(() => document.fonts.ready);
@@ -65,8 +68,8 @@ for (const [width, height] of [
       });
     }
     for (const [name, anchor] of [
-      ["业务场景", "work"],
-      ["决策支持", "research"],
+      ["能做什么", "work"],
+      ["工作方式", "research"],
     ]) {
       if (width < 760 && !(await navigation.isVisible()))
         await page
@@ -132,18 +135,15 @@ for (const [width, height] of [
       }
     }
 
+    // 第五版 (2026-10-21): “四件事” tabs switch on click; the relationship map follows the same four.
     for (const tab of await page
-      .getByRole("tablist", { name: "猎头业务场景" })
+      .getByRole("tablist", { name: "四件事", exact: true })
       .getByRole("tab")
       .all()) {
       await tab.click();
       await expect(tab).toHaveAttribute("aria-selected", "true");
-      await page.getByRole("button", { name: "查看研究依据" }).click();
-      await expect(page.getByRole("dialog")).toBeVisible();
-      await page.keyboard.press("Escape");
-      await expect(page.getByRole("dialog")).toBeHidden();
     }
-    for (const name of ["找信息", "找人", "找岗位"]) {
+    for (const name of ["发现新岗位", "摸清团队", "为岗位找人", "为人选找机会"]) {
       const tab = page
         .locator(".f-memory")
         .getByRole("tab", { name, exact: true });
@@ -151,6 +151,7 @@ for (const [width, height] of [
       await expect(tab).toHaveAttribute("aria-selected", "true");
       await expect(page.locator(".f-memory .f-network-node")).toHaveCount(5);
     }
+    // Without motion “工作方式” falls back to the three-photo carousel with previous / next buttons.
     await page.locator("#research").scrollIntoViewIfNeeded();
     await page.getByRole("button", { name: "下一张", exact: true }).click();
     await expect(page.locator("#research")).toHaveAttribute(
@@ -252,16 +253,19 @@ test("landing retains readable fallback when scripts are disabled", async ({
   }
 });
 
-test("research carousel advances automatically after five seconds", async ({
+test("research photo story follows the step being read on desktop", async ({
   page,
 }) => {
+  // With motion, 第二版实景大图 shows a scroll story instead of the timed carousel: the photo and dot follow
+  // the step in view.
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("./landing/#research");
-  await page.locator(".p-stage").scrollIntoViewIfNeeded();
-  await page.mouse.move(5, 80);
-  await expect(page.locator("#research")).toHaveAttribute("data-chapter", "0");
-  await expect(page.locator("#research")).toHaveAttribute("data-chapter", "1", {
-    timeout: 7500,
-  });
+  await page.goto("./landing/");
+  const steps = page.locator("#research .fx-step");
+  const photos = page.locator("#research .fx-photo img");
+  for (const index of [1, 2, 0]) {
+    await steps.nth(index).evaluate((node) => node.scrollIntoView({ block: "center" }));
+    await expect(steps.nth(index)).toHaveClass(/is-on/);
+    await expect(photos.nth(index)).toHaveClass(/is-on/);
+  }
 });

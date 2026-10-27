@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 import {
+  downloadName,
   expectNoHorizontalOverflow,
+  recordDownloadNames,
   trackConsoleErrors,
 } from "../stage1/helpers";
 
@@ -195,6 +197,7 @@ test("直接核验任务详情支持补充资料、恢复和结果回流", async
 });
 
 test("推荐报告资产 AI 处理按对话过程保留每次生成的文件", async ({ page }) => {
+  await recordDownloadNames(page);
   await page.goto("#/positions/position-vla?tab=matching&report=linhao");
   await expect(page.getByText("工作上下文", { exact: true })).toHaveCount(0);
   await expect(page.getByText(/推荐报告-v1\.md/)).toBeVisible();
@@ -232,7 +235,7 @@ test("推荐报告资产 AI 处理按对话过程保留每次生成的文件", a
   const downloadStarted = page.waitForEvent("download");
   await preview.getByRole("button", { name: "下载", exact: true }).click();
   const download = await downloadStarted;
-  expect(download.suggestedFilename()).toMatch(/推荐报告-v2\.md$/);
+  expect(await downloadName(page, download)).toMatch(/推荐报告-v2\.md$/);
   await preview.getByRole("button", { name: "关闭文件预览" }).click();
   await expect(preview).toHaveCount(0);
 

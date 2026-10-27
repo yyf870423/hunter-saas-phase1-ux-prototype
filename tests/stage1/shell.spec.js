@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { expectNoHorizontalOverflow, trackConsoleErrors } from "./helpers";
+import { expectNoHorizontalOverflow, themeColor, trackConsoleErrors } from "./helpers";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("#/home");
@@ -111,12 +111,16 @@ test("主题切换即时生效并记忆", async ({ page }) => {
   const activeNavigation = page
     .locator(".s1-nav-section nav > button.is-active")
     .first();
-  await expect(sidebar).toHaveCSS("background-color", "rgb(246, 248, 251)");
-  await expect(activeNavigation).toHaveCSS("color", "rgb(11, 79, 163)");
+  // Colours come from the theme tokens (docs/brand-style-unification.md), not one hard-coded palette.
+  const light = { nav: await themeColor(page, "--s1-nav"), ink: await themeColor(page, "--s1-nav-active-ink", "color") };
+  await expect(sidebar).toHaveCSS("background-color", light.nav);
+  await expect(activeNavigation).toHaveCSS("color", light.ink);
   await page.getByRole("button", { name: "切换深色模式" }).click();
   await expect(page.locator(".s1-app")).toHaveAttribute("data-theme", "dark");
-  await expect(sidebar).toHaveCSS("background-color", "rgb(17, 24, 34)");
-  await expect(activeNavigation).toHaveCSS("color", "rgb(255, 255, 255)");
+  const dark = { nav: await themeColor(page, "--s1-nav"), ink: await themeColor(page, "--s1-nav-active-ink", "color") };
+  expect(dark.nav).not.toBe(light.nav);
+  await expect(sidebar).toHaveCSS("background-color", dark.nav);
+  await expect(activeNavigation).toHaveCSS("color", dark.ink);
   await page.reload();
   await expect(page.locator(".s1-app")).toHaveAttribute("data-theme", "dark");
   await page.getByRole("button", { name: "切换亮色模式" }).click();

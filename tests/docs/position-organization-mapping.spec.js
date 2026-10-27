@@ -210,25 +210,32 @@ test("公司组织增量保存保留人工修改与其他公司图页", async ({
   await expect(
     page.getByRole("heading", { name: "人才地图已更新", exact: true }),
   ).toBeVisible();
-  const result = await page.evaluate(async () => {
-    const { getTopicGraphSnapshot, saveGraphPages, publishOrganizationMap } =
-      await import(
-        new URL("src/stage4/topic-graph-store.js", location.href).href
-      );
-    const { organizationScope } = await import(
-      new URL("src/stage3/organization-mapping-data.js", location.href).href
-    );
-    const graph = getTopicGraphSnapshot().find(
-      (item) => item.id === "mapping-embodied",
-    );
-    const pages = structuredClone(graph.pages);
-    pages[0].nodes[0].label = "星澜机器人（人工核实）";
-    saveGraphPages(graph.id, pages);
-    return publishOrganizationMap(
-      {},
-      organizationScope.filter((company) => company.id === "xinglan"),
-    );
-  });
+  // The store logic runs in the test process: importing source modules by URL in the page only works on
+  // the dev server, not on the built preview this suite runs against.
+  const saved = new Map();
+  globalThis.localStorage = {
+    getItem: (key) => (saved.has(key) ? saved.get(key) : null),
+    setItem: (key, value) => saved.set(key, String(value)),
+    removeItem: (key) => saved.delete(key),
+  };
+  const { getTopicGraphSnapshot, saveGraphPages, publishOrganizationMap } =
+    await import("../../src/stage4/topic-graph-store.js");
+  const { organizationScope } = await import(
+    "../../src/stage3/organization-mapping-data.js"
+  );
+  // The completed task above saved the four companies' pages; do the same in this process.
+  publishOrganizationMap({}, organizationScope);
+  const graph = getTopicGraphSnapshot().find(
+    (item) => item.id === "mapping-embodied",
+  );
+  const pages = structuredClone(graph.pages);
+  pages[0].nodes[0].label = "星澜机器人（人工核实）";
+  saveGraphPages(graph.id, pages);
+  const result = publishOrganizationMap(
+    {},
+    organizationScope.filter((company) => company.id === "xinglan"),
+  );
+  delete globalThis.localStorage;
   expect(result.pages).toHaveLength(4);
   expect(result.pages.find((item) => item.userEdited).nodes[0].label).toBe(
     "星澜机器人（人工核实）",
@@ -317,6 +324,7 @@ test("岗位储备写入失败时人才梳理不部分保存，选择可重试",
 test("人才梳理支持无匹配与岗位内刷新，不偷偷创建任务", async ({ page }) => {
   await page.goto("#/tasks/position-vla?state=review");
   await replyToAsset(page, "将 85 分以上的人加入岗位储备");
+  await replyToAsset(page, "是");
   await page.getByRole("link", { name: "查看人才梳理", exact: true }).click();
   await page
     .getByRole("textbox", { name: "搜索重点人才", exact: true })

@@ -710,10 +710,11 @@ test("相关资产和运营页体现知识图谱决策", async ({ page }) => {
   const cases = [
     ["#/candidates/candidate-linhao?tab=relations", "学术成果"],
     ["#/candidates/candidate-linhao?tab=contact-path", "可执行联系路径"],
-    ["#/positions/position-vla?tab=talent-map", "重点人才"],
+    // The position talent map is filled by reviewed sourcing results; before a review it says so.
+    ["#/positions/position-vla?tab=talent-map", "暂无已审核的目标人选"],
     ["#/companies/company-xinglan?tab=mappings", "公司关系与人才流动"],
     ["#/patents/patent-manipulation", "关系同步"],
-    ["#/tasks/mapping-embodied", "具身智能 VLA 人才摸排"],
+    ["#/tasks/mapping-embodied", "具身智能目标公司组织梳理"],
     // Graph relation changes stay in the graph review, not in the insight center (design review topic 14).
     ["#/mappings/mapping-company-relations?tab=reviews", "陈松从小鹏汽车加入星澜机器人"],
     ["#/ops/tasks?view=background", "图谱后台运行"],

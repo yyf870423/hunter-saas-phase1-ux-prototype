@@ -2,6 +2,7 @@ import { selectTopReviewCandidates } from "../review-helpers";
 import { expect, test } from "@playwright/test";
 import {
   expectNoHorizontalOverflow,
+  themeColor,
   trackConsoleErrors,
 } from "../stage1/helpers";
 
@@ -12,7 +13,7 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
     .locator(".s4-row-actions .s1-table-delete-button")
     .first();
   await expect(tableDeleteButton).toBeVisible();
-  await expect(tableDeleteButton).toHaveCSS("color", "rgb(196, 43, 51)");
+  await expect(tableDeleteButton).toHaveCSS("color", await themeColor(page, "--s1-danger-action", "color"));
   for (const heading of [
     "姓名",
     "公司",
@@ -1198,9 +1199,10 @@ test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
   await expect(page.getByRole("tooltip")).toContainText(
     "面向多任务机器人的操作策略训练方法",
   );
+  // Tooltips are the website's small dark label in both themes (src/theme/origin-theme.css).
   await expect(page.getByRole("tooltip")).toHaveCSS(
     "background-color",
-    "rgba(255, 255, 255, 0.98)",
+    "rgb(27, 28, 31)",
   );
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "专利类型", exact: true }).click();
@@ -1225,9 +1227,11 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
     await page.goto(route);
     await expect(page.locator("[title]")).toHaveCount(0);
     await expect(page.locator("svg > title")).toHaveCount(0);
-    await expect(page.locator('[role="tablist"]:not(.app-tabs)')).toHaveCount(
-      0,
-    );
+    // Horizontal tabs must use the shared Tabs component; the workbench task preview is a vertical
+    // master-detail list (aria-orientation="vertical"), which is not a tab bar.
+    await expect(
+      page.locator('[role="tablist"]:not(.app-tabs):not([aria-orientation="vertical"])'),
+    ).toHaveCount(0);
     await expect(
       page.locator('.app-tabs button:not([role="tab"])'),
     ).toHaveCount(0);
@@ -1273,10 +1277,12 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
   await expect(page.getByRole("tooltip")).toHaveCount(0);
   await page.locator(".s4-tag-overflow").first().hover();
   await expect(page.getByRole("tooltip")).toBeVisible();
-  await expect(page.getByRole("tooltip")).toHaveCSS("border-radius", "6px");
+  // 4px tooltips per the website language (src/theme/origin-theme.css).
+  await expect(page.getByRole("tooltip")).toHaveCSS("border-radius", "4px");
+  // The dark label has a border the colour of its fill (#1b1c1f), so it reads as one solid shape.
   await expect(page.getByRole("tooltip")).toHaveCSS(
     "border-left-color",
-    "rgb(229, 231, 235)",
+    "rgb(27, 28, 31)",
   );
 
   await page.goto("#/tasks");
@@ -1293,10 +1299,11 @@ test("Tooltip 只服务截断文本和隐藏标签且 Tab 使用统一组件", a
       fontWeight: Number(style.fontWeight),
     };
   });
-  expect(activeTabStyle.borderBottomWidth).toBe("3px");
-  expect(activeTabStyle.borderBottomColor).not.toBe("rgba(0, 0, 0, 0)");
+  // Underline tabs (src/theme/origin-theme.css): 2px accent line, no fill, the active tab one weight up.
+  expect(activeTabStyle.borderBottomWidth).toBe("2px");
+  expect(activeTabStyle.borderBottomColor).toBe(await themeColor(page, "--s1-accent", "border-bottom-color"));
   expect(activeTabStyle.backgroundColor).toBe("rgba(0, 0, 0, 0)");
-  expect(activeTabStyle.fontWeight).toBeGreaterThanOrEqual(700);
+  expect(activeTabStyle.fontWeight).toBeGreaterThanOrEqual(500);
 
   await page.goto("#/signals");
   const signalFeedBox = await page.locator(".s2-signal-feed").boundingBox();

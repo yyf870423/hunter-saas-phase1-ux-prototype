@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import * as XLSX from "xlsx";
 import JSZip from "jszip";
-import { expectNoHorizontalOverflow, trackConsoleErrors } from "../stage1/helpers";
+import { downloadName, expectNoHorizontalOverflow, recordDownloadNames, trackConsoleErrors } from "../stage1/helpers";
 import { confirmClientOpportunity } from "../stage3/client-helpers";
 import { createOpportunitySeed } from "../../src/stage4/opportunity-seed.js";
 test.use({ actionTimeout: 10000 });
@@ -504,6 +504,7 @@ async function taskFileFixtures() {
 test("真实 TXT、DOCX、PDF、表格、截图和链接均保留来源与可审核输入", async ({ page }) => {
   test.setTimeout(100000);
   const errors = trackConsoleErrors(page);
+  await recordDownloadNames(page);
   const fixtures = await taskFileFixtures();
   for (const fixture of fixtures) {
     const prompt = "公司：星澜机器人\n机会名称：" + fixture.name + "独立需求\n招聘需求摘要：本次" + fixture.name + "确认的新研发需求\n需求依据：客户文字确认；附件作为补充来源";
@@ -518,7 +519,7 @@ test("真实 TXT、DOCX、PDF、表格、截图和链接均保留来源与可审
     await expect(heading(page, fixture.name)).toBeVisible();
     const download = page.waitForEvent("download");
     await page.getByRole("dialog").last().getByRole("button", { name: "下载", exact: true }).click();
-    expect((await download).suggestedFilename()).toBe(fixture.name);
+    expect(await downloadName(page, await download)).toBe(fixture.name);
     await page.getByRole("dialog").last().getByRole("button", { name: "关闭", exact: true }).last().click();
     await replyToAsset(page, "是");
     await expect(page.getByRole("link", { name: "查看招聘机会", exact: true })).toBeVisible();

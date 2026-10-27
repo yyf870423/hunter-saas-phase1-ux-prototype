@@ -93,13 +93,16 @@ test("周期性任务支持查看、运行、暂停和自然语言调整", async
     page.getByRole("heading", { name: "每周发现具身智能创业公司与招聘机会" }),
   ).toBeVisible();
   await expect(page.getByText("任务要求")).toBeVisible();
+  // This task already has a round running, so “立即运行” returns to that round instead of starting a
+  // second one (02 §7.13); the run list still has exactly one running round for it.
   await page.getByRole("button", { name: "立即运行" }).click();
-  await expect(page).toHaveURL(/#\/tasks\/periodic\?view=runs&run=/);
+  await expect(page).toHaveURL(/#\/tasks\/periodic\?view=runs&run=run-startups-active/);
   await expect(page.getByText("当前执行进度", { exact: true })).toBeVisible();
   await expect(
     page
       .locator(".s2-periodic-list > button")
-      .filter({ hasText: "运行不到 1 分钟" }),
+      .filter({ hasText: "每周发现具身智能创业公司与招聘机会" })
+      .filter({ hasText: "正在运行" }),
   ).toHaveCount(1);
   await page.goto("#/tasks/periodic");
   await page.getByRole("button", { name: "调整任务" }).click();
@@ -130,7 +133,8 @@ test("周期性任务在移动端可以查看配置与运行记录", async ({ pa
     page.getByRole("complementary").getByText("两位候选人的身份合并结论冲突"),
   ).toBeVisible();
   await page.getByRole("button", { name: "返回运行记录" }).click();
-  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(5);
+  // Runs in the last week, including the “邮箱” round added on 2026-10-27.
+  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(6);
 
   await page.goto("#/home");
   await page.getByRole("button", { name: "打开通知" }).click();
@@ -138,7 +142,7 @@ test("周期性任务在移动端可以查看配置与运行记录", async ({ pa
     .getByRole("button", { name: /两位候选人的身份合并结论冲突/ })
     .click();
   await expect(
-    page.getByText("2 项身份冲突需要一起确认", { exact: true }),
+    page.getByText("确认当前两份候选人资料的身份关系", { exact: true }),
   ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });

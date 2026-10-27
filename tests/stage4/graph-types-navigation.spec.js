@@ -13,6 +13,7 @@ import {
 } from "../../src/stage1/asset-navigation-store";
 import {
   expectNoHorizontalOverflow,
+  themeColor,
   trackConsoleErrors,
 } from "../stage1/helpers";
 
@@ -706,7 +707,7 @@ test("默认桌面导航免滚动，子项层级及用户菜单用量符合公�
   });
   await expect(selected).toHaveCSS("font-size", "13px");
   await expect(normal).toHaveCSS("font-size", "13px");
-  await expect(selected).toHaveCSS("color", "rgb(11, 79, 163)");
+  await expect(selected).toHaveCSS("color", await themeColor(page, "--s1-nav-active-ink", "color"));
   await expect(normal).toHaveCSS(
     "color",
     await page
@@ -740,7 +741,8 @@ test("默认桌面导航免滚动，子项层级及用户菜单用量符合公�
   ).toBeVisible();
   const usage = page.getByRole("dialog", { name: "Credits 用量", exact: true });
   await expect(usage.locator("dt")).toHaveText(["可用余额", "本月套餐已用", "刷新日期", "存储"]);
-  await expect(usage.locator("dd")).toHaveText(["64%", "2026-08-31"]);
+  // Pricing doc 2026-09-28: one Credits balance, this month's plan share, refresh date and storage.
+  await expect(usage.locator("dd")).toHaveText(["12,000 Credits", "64%", "2026-09-01", "8.2 / 30 GB"]);
   await expect(usage.getByText("本月任务")).toHaveCount(0);
   await page.screenshot({
     path: "artifacts/graph-types/after/usage-summary.png",
@@ -801,7 +803,7 @@ test("窄屏和深色的类型筛选、新建、编辑、设置截图", async ({
   await formType(editor(page)).click();
   await expect(page.locator(".s4-select-panel")).toHaveCSS(
     "background-color",
-    "rgb(26, 26, 26)",
+    await themeColor(page, "--s1-surface-raised"),
   );
   await page.screenshot({
     path: "artifacts/graph-types/after/dark-type-editor.png",

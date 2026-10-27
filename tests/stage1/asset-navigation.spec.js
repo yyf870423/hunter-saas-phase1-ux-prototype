@@ -6,7 +6,7 @@ import {
   defaultVisibleAssetIds,
   normalizeAssetNavigation,
 } from "../../src/stage1/asset-navigation-store";
-import { expectNoHorizontalOverflow, trackConsoleErrors } from "./helpers";
+import { expectNoHorizontalOverflow, themeColor, trackConsoleErrors } from "./helpers";
 
 test.use({ reducedMotion: "reduce" });
 
@@ -304,7 +304,7 @@ test("桌面收起、展开、低高度和深色其他侧向浮层截图", async
   await page.getByRole("button", { name: "切换深色模式" }).click();
   await nav(page).getByRole("button", { name: "其他", exact: true }).click();
   await assertSidePanel(page);
-  await expect(other(page)).toHaveCSS("background-color", "rgb(17, 17, 17)");
+  await expect(other(page)).toHaveCSS("background-color", await themeColor(page, "--s1-surface"));
   await page.screenshot({
     path: "artifacts/asset-navigation/after/desktop-other-dark.png",
     fullPage: true,
