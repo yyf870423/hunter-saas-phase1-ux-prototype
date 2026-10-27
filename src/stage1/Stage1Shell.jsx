@@ -655,7 +655,7 @@ export function Stage1Shell() {
                   <button
                     type="button"
                     role="menuitem"
-                    aria-label={`查看 Agent 用量，已用 ${agentUsage.usedPercent}%，${agentUsage.expiresOn} 到期`}
+                    aria-label={`查看 Credits 用量，余额 ${agentUsage.balance.toLocaleString("zh-CN")}，本月套餐已用 ${agentUsage.usedPercent}%`}
                     onClick={() => {
                       setAccountOpen(false);
                       setUsageOpen(true);
@@ -663,8 +663,8 @@ export function Stage1Shell() {
                   >
                     <Icon name="activity" />
                     <span>
-                      <b>Agent 用量 · 已用 {agentUsage.usedPercent}%</b>
-                      <small>{agentUsage.expiresOn} 到期</small>
+                      <b>Credits 余额 {agentUsage.balance.toLocaleString("zh-CN")}</b>
+                      <small>本月套餐已用 {agentUsage.usedPercent}% · {agentUsage.refreshOn} 刷新</small>
                     </span>
                   </button>
                   <button
@@ -846,7 +846,7 @@ export function Stage1Shell() {
       <Modal
         open={usageOpen}
         close={() => setUsageOpen(false)}
-        title="Agent 用量"
+        title="Credits 用量"
         size="sm"
         footer={
           <>
@@ -866,12 +866,22 @@ export function Stage1Shell() {
         <div className="s1-usage-detail">
           <dl>
             <div>
-              <dt>已用量</dt>
+              <dt>可用余额</dt>
+              <dd>{agentUsage.balance.toLocaleString("zh-CN")} Credits</dd>
+            </div>
+            <div>
+              <dt>本月套餐已用</dt>
               <dd>{agentUsage.usedPercent}%</dd>
             </div>
             <div>
-              <dt>到期日期</dt>
-              <dd>{agentUsage.expiresOn}</dd>
+              <dt>刷新日期</dt>
+              <dd>{agentUsage.refreshOn}</dd>
+            </div>
+            <div>
+              <dt>存储</dt>
+              <dd>
+                {agentUsage.storageUsedGb} / {agentUsage.storageLimitGb} GB
+              </dd>
             </div>
           </dl>
         </div>

@@ -507,7 +507,7 @@ function RecoveryModal({ task, close, initialAction }) {
     window.setTimeout(() => {
       setRunning(false);
       notify(
-        action === "refund" ? "重复扣减额度已退还" : "恢复操作已提交并记录审计",
+        action === "refund" ? "重复扣减的 Credits 已冲正" : "恢复操作已提交并记录审计",
       );
       close();
     }, 700);
@@ -558,7 +558,7 @@ function RecoveryModal({ task, close, initialAction }) {
                 "重新分配执行资源",
                 "保留检查点并切换到健康的执行单元",
               ],
-              ["refund", "退还重复额度", "退还由系统重试产生的重复消耗"],
+              ["refund", "冲正重复扣减", "把系统重试重复扣减的 Credits 原路冲正"],
             ].map(([value, label, note]) => (
               <button
                 type="button"

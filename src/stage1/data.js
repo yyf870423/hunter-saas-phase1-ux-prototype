@@ -1,6 +1,15 @@
+// Credits usage (pricing doc 2026-09-28): one balance is shown; plan Credits refresh monthly and are used
+// before purchased Credits. Numbers are examples.
 export const agentUsage = {
-  usedPercent: 64,
+  usedPercent: 64, // share of this month's plan Credits already used
+  planCredits: 25000,
+  planUsed: 16000,
+  purchasedLeft: 3000,
+  balance: 12000, // 25,000 − 16,000 + 3,000
+  refreshOn: "2026-09-01",
   expiresOn: "2026-08-31",
+  storageUsedGb: 8.2,
+  storageLimitGb: 30,
 };
 
 export const navSections = [

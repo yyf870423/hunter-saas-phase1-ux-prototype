@@ -59,7 +59,7 @@ const workspaceColumns = [
   },
   {
     key: "quota",
-    label: "用量",
+    label: "Credits 已用",
     width: 140,
     render: (row) => (
       <span className="ops-usage-cell">
@@ -305,7 +305,7 @@ function TrialModal({ item, close }) {
   const notify = useToast();
   const [action, setAction] = useState("approve");
   const [days, setDays] = useState("21");
-  const [quota, setQuota] = useState("3000");
+  const [quota, setQuota] = useState("1000");
   const [concurrency, setConcurrency] = useState("2");
   const [reason, setReason] = useState("");
   const [sendStandardNotice, setSendStandardNotice] = useState(true);
@@ -395,7 +395,7 @@ function TrialModal({ item, close }) {
               <FormField label="试用期限（天）" required>
                 <TextInput value={days} onChange={setDays} />
               </FormField>
-              <FormField label="初始 Agent 用量" required>
+              <FormField label="体验 Credits（一次性）" required>
                 <TextInput value={quota} onChange={setQuota} />
               </FormField>
               <FormField label="并发上限" required>
@@ -734,7 +734,7 @@ const subscriptionColumns = [
   },
   { key: "renewal", label: "续订方式", width: 150 },
   { key: "period", label: "当前周期", width: 210 },
-  { key: "quota", label: "用量", width: 100 },
+  { key: "quota", label: "Credits 已用", width: 110 },
   {
     key: "payment",
     label: "支付状态",
@@ -767,7 +767,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
               ["当前周期", subscription.period],
               ["续订方式", subscription.renewal],
               ["支付状态", subscription.payment],
-              ["运行用量", subscription.quota],
+              ["本月套餐 Credits 已用", subscription.quota],
               ["到期时间", subscription.expiresAt],
             ]}
           />
@@ -776,7 +776,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
           tone="info"
           icon="info"
           title="例外权益调整"
-          description="仅用于系统故障补偿、延长试用，或经审批临时增加 Agent 用量、并发和存储。正常套餐升降级应通过订阅流程完成。"
+          description="仅用于系统故障补偿、延长试用，或经审批临时增加 Credits、并发和存储。正常套餐升降级应通过订阅流程完成。"
         />
         <OpsSection title="最近调整记录">
           <div className="ops-compact-table">
@@ -815,7 +815,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
 
 function AdjustmentModal({ subscription, close }) {
   const notify = useToast();
-  const [type, setType] = useState("Agent 用量");
+  const [type, setType] = useState("Credits");
   const [value, setValue] = useState("5");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
@@ -859,7 +859,7 @@ function AdjustmentModal({ subscription, close }) {
             label="调整类型"
             value={type}
             onChange={setType}
-            options={["Agent 用量", "试用期限", "并发上限", "存储额度"]}
+            options={["Credits", "试用期限", "并发上限", "存储额度"]}
           />
         </FormField>
         <FormField label="增加数量" required>
@@ -879,8 +879,8 @@ function AdjustmentModal({ subscription, close }) {
         </FormField>
         <div className="ops-impact-preview">
           <b>调整影响</b>
-          <span>当前 Agent 用量：50 次</span>
-          <span>调整后 Agent 用量：55 次</span>
+          <span>当前 Credits 余额：12,000</span>
+          <span>调整后 Credits 余额：12,600</span>
           <span>影响周期：当前订阅周期</span>
           <span>本操作将记录操作者、原因和调整前后值。</span>
         </div>
@@ -1047,7 +1047,7 @@ export function SubscriptionsPage() {
                     {
                       label: "权益类型",
                       options: [
-                        "Agent 用量",
+                        "Credits",
                         "试用期限",
                         "并发上限",
                         "存储额度",

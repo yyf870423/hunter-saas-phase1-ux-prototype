@@ -95,7 +95,7 @@ test("用户端套餐和运营端订单使用同一产品目录", () => {
     order.plan.startsWith(subscriptionPlans.professional.name),
   );
   const basicOrders = orders.filter((order) =>
-    order.plan.startsWith(subscriptionPlans.basic.name),
+    order.plan.startsWith(subscriptionPlans.personal.name),
   );
   expect(professionalOrders.every((order) => order.amount === "¥ 399.00")).toBe(
     true,

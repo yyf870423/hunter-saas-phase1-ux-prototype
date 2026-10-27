@@ -76,7 +76,7 @@ function buildPlan(scenario, phase, paused, planAdjusted) {
       status = "waiting-user";
       statusDetail =
         step.externalAt === phase
-          ? "正在等待外部结果，等待期间不持续消耗 Agent 用量。"
+          ? "正在等待外部结果，等待期间不持续消耗 Credits。"
           : "需要用户审核、授权或补充信息后继续。";
     } else if (phase === step.doneAt - 1) status = "running";
     if (paused && status === "running") {
@@ -498,7 +498,7 @@ function CareerTimeline({
           <ExternalWaitState
             title="等待林昊补充反馈"
             description="Hunter 没有代替你联系候选人。你已记录今天 10:14 完成首次联系，并询问是否愿意了解北京的团队负责人岗位。"
-            meta="最近记录：今天 10:14 · 建议提醒：2 个工作日后 · 等待期间不消耗 Agent 用量"
+            meta="最近记录：今天 10:14 · 建议提醒：2 个工作日后 · 等待期间不消耗 Credits"
             onAddResult={() =>
               notify("请在下方输入回复内容，或上传新简历和补充文件", "info")
             }
@@ -781,7 +781,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
           result:
             nextPhase === 6
               ? "已收到新的候选人信息。我会先展示档案变化与合并结果，再只重做受影响岗位的匹配。"
-              : "已记录本次人工跟进，当前任务进入等待外部；等待期间不持续消耗 Agent 用量。",
+              : "已记录本次人工跟进，当前任务进入等待外部；等待期间不持续消耗 Credits。",
         },
       ]);
       setPhase(nextPhase);

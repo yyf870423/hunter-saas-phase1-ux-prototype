@@ -12,15 +12,16 @@ test("桌面账户菜单中的设置与用量可以进入对应设置页", async
   await expect(page).toHaveURL(/#\/settings\/profile$/);
 
   await page.getByRole("button", { name: "打开用户菜单" }).click();
-  await page.getByRole("menuitem", { name: /查看 Agent 用量/ }).click();
+  await page.getByRole("menuitem", { name: /查看 Credits 用量/ }).click();
   await page.getByRole("button", { name: "查看订阅与用量" }).click();
   await expect(page).toHaveURL(/#\/settings\/subscription$/);
   const usage = page.locator(".s5-usage-card");
-  await expect(usage.locator(".s5-usage-breakdown > span").filter({ hasText: "Agent 用量" }).locator("em")).toHaveText("64%");
+  await expect(usage.locator(".s5-usage-breakdown > span").filter({ hasText: "本月套餐 Credits" }).locator("em")).toHaveText("64%");
   await expect(usage.locator(".s5-metric-donut b")).toHaveText("64%");
   await expect(usage).not.toContainText("次");
   await expect(page.getByText("公开网络搜索", { exact: true })).toHaveCount(0);
-  await expect(usage).toContainText("8.2 / 20 GB");
+  await expect(usage).toContainText("8.2 / 30 GB");
+  await expect(usage).toContainText("12,000");
   await page.screenshot({ path: "artifacts/opportunity-lifecycle/spacing/quick-subscription-after.png", animations: "disabled" });
   await page.setViewportSize({ width: 390, height: 844 });
   await expectNoHorizontalOverflow(page);
@@ -179,7 +180,10 @@ test("订阅与数据覆盖支付、无订阅、到期和危险操作", async ({
   );
   await expect(page.getByRole("button", { name: /下载收据/ })).toHaveCount(0);
   await page.getByRole("button", { name: "更换套餐" }).click();
-  await page.getByRole("radio", { name: /专业版年付/ }).click();
+  // Pricing doc 2026-09-28: tiers with monthly Credits and base storage; the team tier comes in phase 2.
+  await expect(page.getByRole("radio", { name: /团队版/ })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: /个人版.*10,000 Credits.*5 GB/ })).toBeVisible();
+  await page.getByRole("radio", { name: /个人版/ }).click();
   await page.getByRole("radio", { name: /微信支付/ }).click();
   await page.getByRole("button", { name: "确认并支付" }).click();
   await expect(page.getByText("套餐已更新")).toBeVisible();
@@ -192,6 +196,13 @@ test("订阅与数据覆盖支付、无订阅、到期和危险操作", async ({
 
   await page.goto("#/settings/subscription?state=limited");
   await expect(page.getByText(/业务数据仍可查看和导出/)).toBeVisible();
+  await expect(page.getByText(/正在运行的那一轮已经跑完并保存/)).toBeVisible();
+
+  await page.goto("#/settings/subscription");
+  await page.getByRole("button", { name: "购买", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "购买 Credits 包" })).toContainText("不自动续购");
+  await page.getByRole("button", { name: "确认并支付" }).click();
+  await expect(page.getByText("Credits 已加到可用余额")).toBeVisible();
 
   await page.goto("#/settings/data-privacy");
   await expect(page.getByText("隐私边界")).toHaveCount(0);

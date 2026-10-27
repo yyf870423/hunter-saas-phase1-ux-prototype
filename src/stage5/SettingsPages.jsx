@@ -2,9 +2,12 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
+  addOns,
   formatCny,
+  formatCredits,
   subscriptionPlanChoices,
   subscriptionPlans,
+  trialGrant,
 } from "../shared/productCatalog";
 import { FormField, SelectMenu, TextInput } from "../stage4/asset-ui";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
@@ -1243,6 +1246,7 @@ export function SubscriptionSettingsPage() {
   const [renewModal, setRenewModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("专业版");
   const [paymentMethod, setPaymentMethod] = useState("支付宝");
+  const [addOnModal, setAddOnModal] = useState(null);
   const [autoRenew, setAutoRenew] = useState(true);
   const [saving, setSaving] = useState(false);
   const commit = (message, close) => {
@@ -1261,8 +1265,9 @@ export function SubscriptionSettingsPage() {
       />
       {limited ? (
         <InlineNotice tone="warning" icon="warning">
-          订阅已于 2026 年 8 月 20 日到期。Agent
-          和付费功能已暂停，业务数据仍可查看和导出。
+          订阅已于 2026 年 8 月 20 日到期。不能再发起新的 Agent
+          运行：到期时正在运行的那一轮已经跑完并保存，周期任务已暂停、续订后自动恢复；已购买的 Credits
+          不清零，业务数据仍可查看和导出。
           <button type="button" onClick={() => setPlanModal(true)}>
             恢复订阅
           </button>
@@ -1277,7 +1282,7 @@ export function SubscriptionSettingsPage() {
             <small>当前订阅 · 试用中</small>
             <h2>试用剩余 18 天</h2>
             <p>
-              试用到 2026 年 9 月 21 日。试用额度已用 35%，存储已用 120 MB（示意；试用额度和存储的具体数量待定）。到期前 5 天和到期当天会发邮件提醒；到期没订阅时，和订阅到期一样：付费功能受限，数据可以查看和导出。
+              试用到 2026 年 9 月 21 日。体验 Credits 已用 350 / {formatCredits(trialGrant.credits)}，存储已用 120 MB / {trialGrant.storageGb} GB（数字为示例）。体验 Credits 一次性发放、用完即停，高价外部数据默认关闭。到期前 5 天和到期当天会发邮件提醒；到期没订阅时，和订阅到期一样：不能发起新的 Agent 运行，数据可以查看和导出。
             </p>
           </span>
           <Button tone="primary" onClick={() => setPlanModal(true)}>
@@ -1308,7 +1313,10 @@ export function SubscriptionSettingsPage() {
               <span>
                 <small>当前套餐</small>
                 <h2>{limited ? "专业版 · 已到期" : "专业版"}</h2>
-                <p>适合独立猎头持续经营客户、岗位、人才和版图。</p>
+                <p>
+                  每月 {formatCredits(subscriptionPlans.professional.monthlyCredits)} Credits，基础空间{" "}
+                  {subscriptionPlans.professional.storageGb} GB（示例）。按实际用到的模型、工具、付费数据和计算折算扣减，不按 Agent 次数计费。
+                </p>
               </span>
               <dl>
                 <div>
@@ -1336,40 +1344,74 @@ export function SubscriptionSettingsPage() {
               </div>
             </div>
             <div className="s5-usage-card">
-              <MetricDonut value={agentUsage.usedPercent} label={`${agentUsage.usedPercent}%`} caption="本月已使用" />
+              <MetricDonut value={agentUsage.usedPercent} label={`${agentUsage.usedPercent}%`} caption="本月套餐 Credits 已用" />
               <div className="s5-usage-breakdown">
                 <span>
                   <i style={{ "--usage": `${agentUsage.usedPercent}%` }} />
-                  <b>Agent 用量</b>
+                  <b>本月套餐 Credits</b>
                   <em>{agentUsage.usedPercent}%</em>
                 </span>
                 <span>
-                  <i style={{ "--usage": "41%" }} />
-                  <b>数据处理</b>
-                  <em>8.2 / 20 GB</em>
+                  <i style={{ "--usage": "0%" }} />
+                  <b>可用余额（含购买的 {formatCredits(agentUsage.purchasedLeft)}）</b>
+                  <em>{formatCredits(agentUsage.balance)}</em>
+                </span>
+                <span>
+                  <i style={{ "--usage": `${Math.round((agentUsage.storageUsedGb / agentUsage.storageLimitGb) * 100)}%` }} />
+                  <b>存储</b>
+                  <em>
+                    {agentUsage.storageUsedGb} / {agentUsage.storageLimitGb} GB
+                  </em>
                 </span>
               </div>
             </div>
           </section>
           <SettingsSection
-            title="额度预警"
-            description="达到用量边界前提前通知，避免运行中的任务意外停止。"
+            title="单独加购"
+            description="Credits 和存储分开买，不用为了一项不够就升级整个套餐（价格为示例）。"
           >
             <div className="s5-setting-list">
               <SettingRow
-                title="使用达到 70%"
-                description="站内通知和邮件提醒"
-                action={<Toggle label="70% 用量提醒" checked />}
+                icon="activity"
+                title={`Credits 包：${formatCredits(addOns.creditsPack.credits)} Credits / ¥${addOns.creditsPack.price}`}
+                description="一次性购买，加到同一个可用余额；先用套餐 Credits，再用购买的。不会自动续购。"
+                action={
+                  <Button size="sm" onClick={() => setAddOnModal("credits")}>
+                    购买
+                  </Button>
+                }
               />
               <SettingRow
-                title="使用达到 90%"
-                description="站内通知和邮件提醒"
-                action={<Toggle label="90% 用量提醒" checked disabled />}
+                icon="database"
+                title={`存储扩容：+${addOns.storage.gb} GB / ¥${addOns.storage.monthlyPrice} 每月`}
+                description="按月续费，可以买多个、随时关闭续费；关闭后用到当期结束。只加空间，不加 Credits。"
+                action={
+                  <Button size="sm" onClick={() => setAddOnModal("storage")}>
+                    添加扩容
+                  </Button>
+                }
+              />
+            </div>
+          </SettingsSection>
+          <SettingsSection
+            title="用量提醒"
+            description="余额或空间不够时，运行中的任务在下一步可能超支或写不进去之前暂停，不会产生负余额或超额账单。"
+          >
+            <div className="s5-setting-list">
+              <SettingRow
+                title="本月套餐 Credits 用到 70% / 90%"
+                description="站内通知"
+                action={<Toggle label="Credits 用量提醒" checked />}
               />
               <SettingRow
-                title="额度耗尽"
-                description="必须通知，并停止创建新的付费任务"
-                action={<Toggle label="额度耗尽提醒" checked disabled />}
+                title="Credits 用完"
+                description="站内通知和邮件，必须通知；需要 Credits 的新运行不能开始，运行中的任务暂停"
+                action={<Toggle label="Credits 用完提醒" checked disabled />}
+              />
+              <SettingRow
+                title="存储用到 90% / 用满"
+                description="站内通知和邮件，必须通知（用到 70% 只发站内）；用满后暂停需要写入的步骤"
+                action={<Toggle label="存储提醒" checked disabled />}
               />
             </div>
           </SettingsSection>
@@ -1421,7 +1463,7 @@ export function SubscriptionSettingsPage() {
         open={planModal}
         close={() => setPlanModal(false)}
         title={limited ? "恢复订阅" : "更换套餐"}
-        description="新套餐在确认支付后立即生效，剩余额度会自动结转。"
+        description="升级立即生效：当前 Credits 余额保留，再加上新套餐整月的 Credits；基础空间换成新套餐的，不叠加旧套餐的。降级在下个账期生效。"
         size="lg"
         footer={
           <ModalActions
@@ -1433,7 +1475,7 @@ export function SubscriptionSettingsPage() {
         }
       >
         <div className="s5-plan-choices" role="radiogroup">
-          {subscriptionPlanChoices.map(({ title, price, description }) => (
+          {subscriptionPlanChoices.map(({ title, price, description, disabled }) => (
             <ChoiceCard
               key={title}
               title={title}
@@ -1441,6 +1483,7 @@ export function SubscriptionSettingsPage() {
               selected={selectedPlan === title}
               onClick={() => setSelectedPlan(title)}
               icon="creditCard"
+              disabled={disabled}
             />
           ))}
         </div>
@@ -1498,7 +1541,35 @@ export function SubscriptionSettingsPage() {
           tone={autoRenew ? "warning" : "info"}
           icon={autoRenew ? "warning" : "info"}
         >
-          到期后 Agent 和付费功能会暂停，业务数据仍可查看和导出。
+          到期后不能发起新的 Agent 运行：到期时正在运行的那一轮会跑完并保存，周期任务暂停、续订后自动恢复；已购买的
+          Credits 不清零，业务数据仍可查看和导出。
+        </InlineNotice>
+      </Modal>
+      <Modal
+        open={Boolean(addOnModal)}
+        close={() => setAddOnModal(null)}
+        title={addOnModal === "storage" ? "添加存储扩容" : "购买 Credits 包"}
+        description={
+          addOnModal === "storage"
+            ? `+${addOns.storage.gb} GB，每月 ¥${addOns.storage.monthlyPrice}（示例），和订阅同一账期续费，可以随时关闭续费。`
+            : `${formatCredits(addOns.creditsPack.credits)} Credits，¥${addOns.creditsPack.price}（示例），一次性购买，不自动续购。`
+        }
+        size="sm"
+        footer={
+          <ModalActions
+            cancel={() => setAddOnModal(null)}
+            confirmText="确认并支付"
+            loading={saving}
+            confirm={() =>
+              commit(addOnModal === "storage" ? "存储扩容已生效" : "Credits 已加到可用余额", () => setAddOnModal(null))
+            }
+          />
+        }
+      >
+        <InlineNotice>
+          {addOnModal === "storage"
+            ? "扩容只增加空间，不增加 Credits；升级套餐时要选择保留几个扩容。"
+            : "购买的 Credits 和套餐 Credits 合并显示一个余额，先用套餐的；有效期 12 个月（见服务条款）。"}
         </InlineNotice>
       </Modal>
     </PageState>

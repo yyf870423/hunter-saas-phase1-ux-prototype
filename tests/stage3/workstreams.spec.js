@@ -181,7 +181,7 @@ test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ pa
   await input.fill("已经联系，暂时还没有回复。");
   await input.press("Enter");
   await expect(page.getByText("等待林昊补充反馈")).toBeVisible();
-  await expect(page.getByText(/不消耗 Agent 用量/)).toBeVisible();
+  await expect(page.getByText(/不消耗 Credits/)).toBeVisible();
 });
 
 test("候选人求职新简历只触发受影响岗位重匹配", async ({ page }) => {

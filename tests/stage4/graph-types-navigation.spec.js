@@ -726,20 +726,20 @@ test("默认桌面导航免滚动，子项层级及用户菜单用量符合公�
   await page.getByRole("button", { name: "打开用户菜单", exact: true }).click();
   const menu = page.getByRole("menu", { name: "用户菜单", exact: true });
   await expect(
-    menu.getByRole("menuitem", { name: /查看 Agent 用量/ }),
+    menu.getByRole("menuitem", { name: /查看 Credits 用量/ }),
   ).toBeVisible();
   await expect(menu).toBeInViewport();
   await page.screenshot({
     path: "artifacts/graph-types/after/account-usage-menu.png",
     animations: "disabled",
   });
-  await menu.getByRole("menuitem", { name: /查看 Agent 用量/ }).click();
+  await menu.getByRole("menuitem", { name: /查看 Credits 用量/ }).click();
   await expect(menu).toHaveCount(0);
   await expect(
-    page.getByRole("dialog", { name: "Agent 用量", exact: true }),
+    page.getByRole("dialog", { name: "Credits 用量", exact: true }),
   ).toBeVisible();
-  const usage = page.getByRole("dialog", { name: "Agent 用量", exact: true });
-  await expect(usage.locator("dt")).toHaveText(["已用量", "到期日期"]);
+  const usage = page.getByRole("dialog", { name: "Credits 用量", exact: true });
+  await expect(usage.locator("dt")).toHaveText(["可用余额", "本月套餐已用", "刷新日期", "存储"]);
   await expect(usage.locator("dd")).toHaveText(["64%", "2026-08-31"]);
   await expect(usage.getByText("本月任务")).toHaveCount(0);
   await page.screenshot({
