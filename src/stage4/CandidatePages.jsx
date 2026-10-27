@@ -41,6 +41,8 @@ import {
   TooltipText,
   useToast,
 } from "./asset-ui";
+import { pendingGroup, resolveUpdates } from "./pending-updates";
+import { addHandled } from "../stage2/signal-handling";
 import {
   AssetAiProcessBanner,
   AssetAiProcessDrawer,
@@ -696,6 +698,8 @@ function ProfileTab({
 }) {
   const navigate = useNavigate();
   const [editSection, setEditSection] = useState(null);
+  // Pending updates found by tasks stay in the candidate's own review (design review topic 14).
+  const pending = pendingGroup(candidate?.id === "candidate-linhao" || !candidate?.id ? "candidate-linhao" : candidate.id);
   return (
     <div className="s4-detail-stack">
       <AssetAiProcessBanner
@@ -715,22 +719,30 @@ function ProfileTab({
         onSecondary={onStopAi}
         secondaryLabel={aiState === "running" ? "停止" : undefined}
       />
+      {pending?.open.length || hasIdentityIssue ? (
       <section className="s4-candidate-review-strip">
+        {pending?.open.length ? (
         <article className="is-warning">
           <i>
             <Icon name="warning" />
           </i>
           <span>
-            <b>7 项资料变化等待审核</b>
-            <p>新简历带来工作经历、教育经历、论文、专利和技能变化。</p>
+            <b>{pending.open.length} 项资料变化等待审核</b>
+            <p>
+              {pending.assetId === "candidate-linhao"
+                ? "新简历带来工作经历、教育经历、论文、专利和技能变化。"
+                : pending.open.map((item) => `${item.field}：${item.before} → ${item.after}`).join("；")}
+            </p>
+            <small className="s4-pending-strip-source">来自：{pending.foundBy.label}</small>
           </span>
           <Button
             size="sm"
-            onClick={() => navigate("/reviews/fields/candidate-linhao")}
+            onClick={() => navigate(`/reviews/fields/${pending.assetId}`)}
           >
             审核资料变化
           </Button>
         </article>
+        ) : null}
         {hasIdentityIssue ? (
           <article className="is-danger">
             <i>
@@ -749,6 +761,7 @@ function ProfileTab({
           </article>
         ) : null}
       </section>
+      ) : null}
       <FieldGroup
         title="职业概览"
         action={
@@ -3189,75 +3202,54 @@ export function IdentityMergeReviewPage() {
   );
 }
 
+// Field-change review for any asset (design review topic 14): items found by tasks, user uploads or
+// asset AI wait here until the hunter accepts or rejects them one by one. Nothing expires; rejected
+// items are not raised again unless the evidence changes. If the change is also an insight, accepting
+// it here marks that insight as handled (“确认过的资料变动”).
 export function FieldChangeReviewPage() {
+  const { candidateId: assetId = "candidate-linhao" } = useParams();
   const navigate = useNavigate();
   const notify = useToast();
+  const group = pendingGroup(assetId) || pendingGroup("candidate-linhao");
+  const changes = group.items.filter((item) => item.status === "pending");
   const [accepted, setAccepted] = useState(
-    new Set(["work", "education", "paper", "patent", "skill", "team"]),
+    () => new Set(changes.filter((item) => !item.defaultRejected).map((item) => item.id)),
   );
   const [evidence, setEvidence] = useState(null);
-  const changes = [
-    {
-      id: "work",
-      field: "工作经历",
-      before: "拓界机器人 · 机器人学习负责人；负责操作策略平台和真机部署。",
-      after:
-        "拓界机器人 · 机器人学习负责人；管理 14 人团队，负责 VLA、多任务操作策略、真机数据闭环和跨团队交付。",
-      source: "新简历第 1-2 页",
-      evidence:
-        "工作经历段落明确补充团队规模、汇报对象、职责范围和 2025 年交付成果。",
-    },
-    {
-      id: "education",
-      field: "教育经历",
-      before: "浙江大学 · 自动化 · 本科",
-      after: "上海交通大学 · 控制科学与工程 · 硕士（2010-2013）",
-      source: "新简历第 3 页",
-      evidence: "教育经历区块提供学校、专业、学历和起止时间。",
-    },
-    {
-      id: "paper",
-      field: "论文成果",
-      before: "已关联 1 篇论文",
-      after: "新增 2 篇 VLA 与机器人操作论文，其中 1 篇为第一作者",
-      source: "新简历第 5 页、OpenAlex",
-      evidence:
-        "标题、作者顺序和机构一致；作者身份已通过工作经历和公开主页交叉核实。",
-    },
-    {
-      id: "patent",
-      field: "专利成果",
-      before: "未记录",
-      after: "机器人训练数据的自动筛选与回流系统 · 第一发明人",
-      source: "新简历第 6 页、国家知识产权公开信息",
-      evidence: "专利标题、申请人、发明人顺序和申请号均可核验。",
-    },
-    {
-      id: "skill",
-      field: "关键技能",
-      before: "VLA、强化学习、真机部署",
-      after: "VLA、强化学习、真机部署、数据闭环",
-      source: "项目作品集第 6 页",
-      evidence:
-        "项目说明写明持续使用离线数据回流、困难样本筛选和真机评测闭环。",
-    },
-    {
-      id: "team",
-      field: "团队规模",
-      before: "未记录",
-      after: "14 人",
-      source: "新简历工作经历",
-      evidence: "拓界机器人经历中写明直接管理 14 人算法团队。",
-    },
-    {
-      id: "location",
-      field: "意向地点",
-      before: "上海",
-      after: "上海、北京",
-      source: "邮件回复",
-      evidence: "候选人回复：上海优先，核心团队在北京时可以进一步沟通。",
-    },
-  ];
+  const assetLabel = group.assetType === "companies" ? "公司资料" : "候选人档案";
+  const apply = () => {
+    const decisions = Object.fromEntries(
+      changes.map((item) => [item.id, accepted.has(item.id) ? "accepted" : "rejected"]),
+    );
+    if (!resolveUpdates(group.assetId, decisions)) {
+      notify("保存失败，请重试", "error");
+      return;
+    }
+    if (group.insightId && accepted.size)
+      addHandled(group.insightId, {
+        kind: "update",
+        text: `更新了${group.assetName}的资料`,
+        route: `/reviews/fields/${group.assetId}`,
+      });
+    notify(`字段变化已写入${assetLabel}`);
+    navigate(group.assetRoute);
+  };
+  if (!changes.length)
+    return (
+      <div className="s4-review-workspace">
+        <header className="s4-review-header">
+          <button type="button" onClick={() => navigate(group.assetRoute)}>
+            <Icon name="chevronLeft" />
+            返回
+          </button>
+          <span>
+            <small>字段变化审核</small>
+            <h1>{group.assetName} · 没有待审核的资料变化</h1>
+            <p>已经采纳的写入了正式资料；不采纳的保留在变化记录里，证据没变时不会再提出。</p>
+          </span>
+        </header>
+      </div>
+    );
   return (
     <div className="s4-review-workspace">
       <header className="s4-review-header">
@@ -3267,8 +3259,16 @@ export function FieldChangeReviewPage() {
         </button>
         <span>
           <small>字段变化审核</small>
-          <h1>林昊 · 7 项资料建议</h1>
-          <p>每项变化保留来源；未选择的建议不会写入正式档案。</p>
+          <h1>
+            {group.assetName} · {changes.length} 项资料建议
+          </h1>
+          <p>
+            来自
+            <button type="button" className="s4-review-found-by" onClick={() => navigate(group.foundBy.route)}>
+              {group.foundBy.label}
+            </button>
+            。每项变化保留来源；不采用的不会写入正式资料，证据没变时不会再提出；不处理就一直留在这里。
+          </p>
         </span>
       </header>
       <div className="s4-field-change-table">
@@ -3317,15 +3317,11 @@ export function FieldChangeReviewPage() {
         </span>
         <div>
           <Button onClick={() => navigate(-1)}>取消</Button>
-          <Button
-            tone="primary"
-            disabled={!accepted.size}
-            onClick={() => {
-              notify("字段变化已写入候选人档案");
-              navigate("/candidates/candidate-linhao");
-            }}
-          >
-            应用变化
+          <Button onClick={() => setAccepted(new Set(changes.map((item) => item.id)))}>
+            全部采用
+          </Button>
+          <Button tone="primary" onClick={apply}>
+            {accepted.size ? "应用变化" : "全部不采纳"}
           </Button>
         </div>
       </footer>

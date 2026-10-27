@@ -741,52 +741,42 @@ export const workItems = [
 ];
 
 export const signals = [
+  // Mailbox finding (design review topic 14, rule 7): a client's new request goes to the insight center;
+  // replies to emails sent from Hunter go back to the original task instead.
   {
-    id: "signal-graph-sync",
+    id: "signal-mail-xinglan",
     kind: "洞察",
-    type: "关系变化",
-    title: "星澜机器人组织与人才流动关系发生变化",
-    object: "星澜机器人组织知识图谱",
-    priority: "需要确认",
+    type: "客户需求",
+    title: "陈雨来信：星澜机器人想再加 2 个数据平台岗位",
+    object: "星澜机器人 · 陈雨",
+    priority: "影响进行中的任务",
     status: "未处理",
     tone: "warning",
-    time: "9 月 1 日 08:52",
-    evidence: 5,
+    time: "今天 09:31",
+    evidence: 1,
     summary:
-      "2 条可靠变化已自动同步，另有 1 条人物流动关系证据不足：周明远的任职变化两份证据存在时间差。",
-    sources: [
-      "候选人最新简历",
-      "公司公开资料",
-      "论文作者机构",
-      "用户补充",
-      "历史组织图",
-    ],
-    changes: [
-      "王奕已加入 VLA 算法组",
-      "林昊的学术合作关系新增 2 条",
-      "周明远的任职变化仍待确认",
-    ],
+      "陈雨在新邮件里说下个季度要补 2 个数据平台岗位，问下周能否先推荐几位；这不是对 Hunter 发出邮件的回复，所以没有回到原任务。",
+    sources: ["邮件：关于数据平台岗位（陈雨，今天 09:12）"],
+    changes: ["新增需求：数据平台负责人 1 人、数据平台工程师 1 人", "期望：下周先看几位候选人"],
+    affects: {
+      title: "星澜机器人招聘合作",
+      route: "/tasks/client-xinglan",
+    },
     sourceTask: {
-      title: "每月更新机器人行业知识图谱",
-      round: "9 月 1 日 08:30 那一轮",
-      runId: "run-graph-sept",
-      route: "/tasks/periodic?view=runs&run=run-graph-sept",
-      status: "可继续",
+      title: "邮箱：读取 shenlan@qq.com 的邮件",
+      round: "今天 09:30 那一轮",
+      runId: "run-mailbox-0903",
+      route: "/tasks/periodic?view=runs&run=run-mailbox-0903",
+      status: "已完成",
       tone: "success",
     },
     handled: [],
     history: [
       {
-        time: "9 月 1 日 08:52",
+        time: "今天 09:31",
         title: "写入洞察中心",
-        detail: "两条可靠关系已同步，一条人物流动关系需要人工判断。",
+        detail: "客户在新邮件里提了新需求，原邮件已保存并链接。",
         tone: "warning",
-      },
-      {
-        time: "9 月 1 日 08:45",
-        title: "合并 2 个新增来源",
-        detail: "候选人最新简历与公司公开资料对任职时间存在差异。",
-        tone: "info",
       },
     ],
   },
@@ -884,15 +874,25 @@ export const signals = [
     type: "候选人动向",
     title: "陈松加入星澜机器人，任自动驾驶技术经理",
     object: "陈松 · 自动驾驶技术经理",
-    priority: "资料变化",
+    priority: "影响进行中的任务",
     status: "未处理",
     tone: "warning",
     time: "8 月 28 日 17:20",
     evidence: 2,
     summary:
-      "公开主页显示已从原公司离职并加入星澜机器人；和候选人库里陈松的资料对比，公司和职位都有变化。",
+      "公开主页显示已从小鹏汽车离职并加入星澜机器人。他正在“具身智能 VLA 算法负责人”的推荐阶段，换工作可能影响推荐。",
     sources: ["个人公开主页", "行业活动报名信息"],
-    changes: ["公司：原公司 → 星澜机器人", "职位：感知算法专家 → 自动驾驶技术经理"],
+    changes: ["当前公司：小鹏汽车 → 星澜机器人", "当前职位：自动驾驶感知算法专家 → 自动驾驶技术经理"],
+    // Both an insight (affects a running task) and a data change: the change waits in 陈松's own review,
+    // and the two records link to each other (design review topic 14, rule 5).
+    affects: {
+      title: "具身智能 VLA 算法负责人（陈松在推荐阶段）",
+      route: "/tasks/position-vla",
+    },
+    relatedUpdate: {
+      assetId: "candidate-chensong",
+      route: "/reviews/fields/candidate-chensong",
+    },
     sourceTask: {
       title: "每两周核验收藏夹“重点候选人”的公开变化",
       round: "8 月 28 日 17:00 那一轮",
@@ -906,7 +906,7 @@ export const signals = [
       {
         time: "8 月 28 日 17:20",
         title: "写入洞察中心",
-        detail: "资料变化有两个来源支持，更新资料需要猎头确认。",
+        detail: "影响进行中的推荐；资料变化另放在陈松的待审核里，两边互相链接。",
         tone: "warning",
       },
       {

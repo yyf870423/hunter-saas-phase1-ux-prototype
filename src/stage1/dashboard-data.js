@@ -119,7 +119,7 @@ export const dashboardTasks = Object.entries(taskPlanSnapshots).map(
 
 const dashboardInsightIds = [
   "signal-verifying",
-  "signal-graph-sync",
+  "signal-mail-xinglan",
   "signal-cloudchip",
   "signal-tuoji",
   "signal-chensong",

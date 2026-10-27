@@ -111,16 +111,16 @@ export const mainlines = [
 
 export const signals = [
   {
-    id: "signal-graph-sync",
+    id: "signal-mail-xinglan",
     kind: "洞察",
-    type: "关系变化",
-    title: "机器人行业知识图谱有 1 条人才流动关系待确认",
-    object: "机器人行业知识图谱",
+    type: "客户需求",
+    title: "陈雨来信：星澜机器人想再加 2 个数据平台岗位",
+    object: "星澜机器人 · 陈雨",
     status: "未处理",
-    next: "来源：每月更新机器人行业知识图谱",
+    next: "来源：邮箱：读取 shenlan@qq.com 的邮件",
     tone: "warning",
-    evidence: 3,
-    time: "今天 09:18",
+    evidence: 1,
+    time: "今天 09:31",
   },
   {
     id: "signal-cloudchip",

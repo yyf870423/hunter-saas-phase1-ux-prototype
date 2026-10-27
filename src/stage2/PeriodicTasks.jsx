@@ -22,6 +22,7 @@ import {
 } from "./automation-ui";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { signals as seedSignals } from "./data";
+import { pendingGroup, resolveUpdates, roundUpdates } from "../stage4/pending-updates";
 import {
   addHandled,
   classifyHandling,
@@ -185,6 +186,20 @@ const periodicRuns = [
     memory: "覆盖水位已更新至今天 09:00。",
   },
   {
+    id: "run-mailbox-0903",
+    taskId: "periodic-mailbox",
+    task: "邮箱：读取 shenlan@qq.com 的邮件",
+    startedAt: "今天 09:30",
+    startedAtDate: "2026-09-03",
+    duration: "1 分 12 秒",
+    status: "已完成",
+    tone: "success",
+    summary: "读取 14 封新邮件：保存 3 封工作相关的，其余 11 封读完就丢，只记邮件编号。",
+    scope: "收件箱 · 上次读到 09:00 之后",
+    result: "1 封客户新需求写入洞察中心；1 封回复回到原任务；1 份简历放进建档等你确认",
+    memory: "读取位置推进到 09:30；不会重复读取同一封邮件。",
+  },
+  {
     id: "run-graph-sept",
     taskId: "periodic-graph-refresh",
     task: "每月更新机器人行业知识图谱",
@@ -193,9 +208,9 @@ const periodicRuns = [
     duration: "22 分 05 秒",
     status: "已完成",
     tone: "success",
-    summary: "发现 3 条关系变化：2 条证据充分已同步，1 条人物流动关系证据不足，写入洞察中心。",
+    summary: "发现 3 条关系变化：2 条来自已确认的资产资料，已同步；1 条人才流动来自公开资料，放进图谱“更新与审核”等你确认，不进洞察中心。",
     scope: "12 张知识图谱 · 214 个正式节点",
-    result: "同步 2 条关系；1 条洞察待你处理",
+    result: "同步 2 条关系；1 条关系变化待审核",
     memory: "成功水位已推进至 9 月 1 日。",
   },
   {
@@ -223,7 +238,7 @@ const periodicRuns = [
     tone: "warning",
     summary: "已核验 111 位候选人，17 位的公开来源暂不可用。",
     scope: "重点候选人收藏夹 · 128 人",
-    result: "产生 2 条洞察；失败来源可在下轮增量重试",
+    result: "2 条写入洞察中心；陈松、赵星羽的资料变化放进各自的待审核；失败来源可在下轮增量重试",
     memory: "只推进已成功对象的水位，失败对象保留原水位。",
   },
   {
@@ -622,6 +637,13 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
     if (!onUpdate(run.id, { followUps: next })) return;
     if (option.value === "yes") {
       addHandled(message.quote, message.marker);
+      // Confirming here also confirms the linked item in the asset's own review (topic 14, rule 5).
+      const related = seedSignals.find((item) => item.id === message.quote)?.relatedUpdate;
+      if (message.kind === "update" && related)
+        resolveUpdates(
+          related.assetId,
+          Object.fromEntries((pendingGroup(related.assetId)?.open || []).map((item) => [item.id, "accepted"])),
+        );
       notify(
         message.kind === "outbound" ? "邮件已从你的邮箱发出，这条洞察已标记“已处理”" : "资料已更新，这条洞察已标记“已处理”",
         "success",
@@ -663,6 +685,7 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
           />
           {rounds.map((round) => {
             const findings = roundFindings(round.id);
+            const updates = roundUpdates(round.id);
             const roundFollowUps = round.followUps || [];
             const roundWaiting = round.status === "等待用户" && !round.decision;
             return (
@@ -689,7 +712,7 @@ ${round.summary}
                 />
                 {findings.length ? (
                   <div className="s2-run-findings">
-                    <h4>本轮发现</h4>
+                    <h4>本轮写入洞察中心的发现</h4>
                     <ol>
                       {findings.map((signal) => (
                         <li key={signal.id} id={`finding-${signal.id}`}>
@@ -715,6 +738,26 @@ ${round.summary}
                               onClick={() => navigate(`/signals?signal=${signal.id}`)}
                             >
                               在洞察中心查看
+                            </Button>
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : null}
+                {updates.length ? (
+                  <div className="s2-run-findings is-updates">
+                    <h4>本轮发现的资料更新（放在各资产的待审核里，不进洞察中心）</h4>
+                    <ol>
+                      {updates.map((update) => (
+                        <li key={update.id}>
+                          <span>
+                            <b>{update.title}</b>
+                            <small>{update.status}</small>
+                          </span>
+                          <span className="s2-run-finding-actions">
+                            <Button size="sm" tone="ghost" onClick={() => navigate(update.route)}>
+                              去审核
                             </Button>
                           </span>
                         </li>

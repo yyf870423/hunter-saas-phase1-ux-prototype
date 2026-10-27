@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { dashboardItemLimit, getDashboardData } from "./dashboard-data";
@@ -12,6 +12,7 @@ import {
   TaskFocusBoard,
 } from "./DashboardWidgets";
 import { Button, useToast } from "./ui";
+import { pendingSummary } from "../stage4/pending-updates";
 import { getOpportunityActions, mergeLifecycleTasks, useOpportunityState } from "../stage4/opportunity-store";
 
 function getTodayLabel() {
@@ -60,6 +61,7 @@ export function Dashboard() {
       detail: task.kind === "recruiting" ? "候选人审核与岗位流程" : "输入、草稿和正式结果保持关联" } }));
   const tasks = [...dynamicTasks, ...baseTasks.filter((task) => !lifecycle.tasks.some((item) => item.id === task.id))];
   const followupActions = getOpportunityActions(lifecycle);
+  const pendingUpdates = pendingSummary();
   const startTask = (prompt) => {
     try {
       sessionStorage.setItem("hunter-new-work-signal", prompt);
@@ -181,6 +183,23 @@ export function Dashboard() {
           loading={loading}
           className="s1-dashboard-assets"
         >
+          {!loading && assets.length && pendingUpdates.length ? (
+            // Data changes found by tasks wait in each asset's review (design review topic 14).
+            <p className="s1-dashboard-pending">
+              <Icon name="warning" />
+              <span>
+                {pendingUpdates.reduce((total, item) => total + item.count, 0)} 个资产有更新待审核：
+                {pendingUpdates.map((item, index) => (
+                  <Fragment key={item.type}>
+                    {index ? "、" : ""}
+                    <button type="button" onClick={() => navigate(item.route)}>
+                      {item.label} {item.count}
+                    </button>
+                  </Fragment>
+                ))}
+              </span>
+            </p>
+          ) : null}
           {loading ? (
             <DashboardListSkeleton rows={10} />
           ) : (

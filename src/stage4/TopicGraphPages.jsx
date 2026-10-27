@@ -2959,6 +2959,15 @@ function GraphReviewWorkspace({ pages, reviewItems, onLocate, onResolve }) {
           <h3>AI 建议</h3>
           <p>{selected.suggestion}</p>
         </section>
+        {selected.foundBy ? (
+          <section>
+            <h3>发现于</h3>
+            <p>
+              <a href={`#${selected.foundBy.route}`}>{selected.foundBy.label}</a>
+              。关系变化只在这里审核，不进洞察中心。
+            </p>
+          </section>
+        ) : null}
         <section>
           <h3>节点与候选资产对比</h3>
           <dl>
@@ -2984,7 +2993,9 @@ function GraphReviewWorkspace({ pages, reviewItems, onLocate, onResolve }) {
                   ? "王奕 · 上海 · 机器人学习研究员"
                   : selected.id === "review-import"
                     ? "何静 · 杭州 · 强化学习算法"
-                    : "暂无明确资产"}
+                    : selected.id === "review-chensong-flow"
+                      ? "陈松 · 候选人（资料更新在候选人里单独审核）"
+                      : "暂无明确资产"}
               </dd>
             </div>
           </dl>

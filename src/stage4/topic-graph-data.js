@@ -21,7 +21,7 @@ export const topicGraphs = [
     pageCount: 1,
     nodeCount: 6,
     linkedAssets: 6,
-    pending: 1,
+    pending: 2,
     related: "6 家公司 · 1 个岗位",
     updatedAt: "今天 10:48",
   },
@@ -1162,6 +1162,23 @@ export const initialGraphPages = [
 ];
 
 export const graphReviewItems = [
+  // Found by the monthly graph update; graph relation changes stay in the graph review and do not become
+  // insights (design review topic 14). 陈松's own data change is reviewed separately in his candidate record.
+  {
+    id: "review-chensong-flow",
+    pageId: "ecosystem",
+    nodeId: "eco-xinglan",
+    type: "人才流动",
+    title: "陈松从小鹏汽车加入星澜机器人",
+    status: "待确认",
+    summary: "公开主页和星澜机器人官网团队页显示陈松 8 月加入，任自动驾驶技术经理。",
+    suggestion: "确认后在本图新增“小鹏汽车 → 星澜机器人”人才流动关系（陈松）；陈松的候选人资料更新在候选人里单独审核。",
+    evidence: ["陈松公开主页 · 2026-08", "星澜机器人官网团队页 · 2026-08"],
+    foundBy: {
+      label: "每月更新机器人行业知识图谱 · 9 月 1 日那一轮",
+      route: "/tasks/periodic?view=runs&run=run-graph-sept",
+    },
+  },
   {
     id: "review-wang",
     pageId: "organization",

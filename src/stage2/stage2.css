@@ -5875,3 +5875,34 @@
   font-size: 13px;
   line-height: 1.6;
 }
+
+/* Insight → affected task and related asset update (design review topic 14) */
+.s2-signal-links {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--s1-line);
+  border-radius: 10px;
+  background: var(--s1-canvas);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.s2-signal-links p {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+.s2-signal-links small {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-signal-links a {
+  color: var(--s1-accent);
+}
+@media (max-width: 640px) {
+  .s2-signal-links p {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}

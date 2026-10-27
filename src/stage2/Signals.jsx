@@ -9,6 +9,7 @@ import {
   useToast,
 } from "../stage1/ui";
 import { signals as initialSignals } from "./data";
+import { pendingGroup, pendingUpdatesEvent } from "../stage4/pending-updates";
 import {
   markerText,
   processRoute,
@@ -54,6 +55,35 @@ function SourceTask({ task }) {
       <p>
         这条洞察报告在 {task.round}。点下方“处理”会回到这段对话、定位到报告它的位置，并在输入框里引用它；不会新建任务。
       </p>
+    </section>
+  );
+}
+
+// An insight that affects a running task names it (design review topic 14, rule 3);
+// when it is also a data change, the change waits in the asset's own review and both link (rule 5).
+function AffectsAndUpdates({ signal }) {
+  if (!signal.affects && !signal.relatedUpdate) return null;
+  const group = signal.relatedUpdate ? pendingGroup(signal.relatedUpdate.assetId) : null;
+  return (
+    <section className="s2-signal-links">
+      {signal.affects ? (
+        <p>
+          <small>影响的任务</small>
+          <a href={`#${signal.affects.route}`}>{signal.affects.title}</a>
+        </p>
+      ) : null}
+      {group ? (
+        <p>
+          <small>相关资料更新</small>
+          <span>
+            {group.items.map((item) => `${item.field} ${item.before} → ${item.after}`).join("；")}
+            {" · "}
+            <b>{group.open.length ? `${group.open.length} 项待审核` : "已审核"}</b>
+            {" · "}
+            <a href={`#${signal.relatedUpdate.route}`}>在{group.assetName}的待审核里查看</a>
+          </span>
+        </p>
+      ) : null}
     </section>
   );
 }
@@ -143,7 +173,11 @@ export function SignalsPage() {
   useEffect(() => {
     const refresh = () => setVersion((value) => value + 1);
     window.addEventListener("hunter-signal-handling", refresh);
-    return () => window.removeEventListener("hunter-signal-handling", refresh);
+    window.addEventListener(pendingUpdatesEvent, refresh);
+    return () => {
+      window.removeEventListener("hunter-signal-handling", refresh);
+      window.removeEventListener(pendingUpdatesEvent, refresh);
+    };
   }, []);
   const signals = useMemo(
     () =>
@@ -286,6 +320,8 @@ export function SignalsPage() {
                       name={
                         signal.type === "候选人动向"
                           ? "user"
+                          : signal.type === "客户需求"
+                            ? "mail"
                           : signal.type === "关系变化"
                             ? "route"
                             : signal.type === "公司变化"
@@ -406,6 +442,7 @@ export function SignalsPage() {
                 ))}
               </div>
             </section>
+            <AffectsAndUpdates signal={selected} />
             <SourceTask task={selected.sourceTask} />
             <HandledResults
               signal={selected}

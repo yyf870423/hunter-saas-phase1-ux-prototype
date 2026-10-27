@@ -65,6 +65,7 @@ import {
 import { summarizePosition, useOpportunityState } from "./opportunity-store";
 import { summarizeOpportunity } from "./opportunity-domain";
 import { assessmentLevels, assessmentTone, companyAssessment, companyDeleteImpact } from "./company-assessment";
+import { pendingGroup } from "./pending-updates";
 
 const companyProfileData = (item) => ({
   ...(item?.id === "company-xinglan" ? companyDetail : {
@@ -1021,6 +1022,8 @@ function CompanySectionEditor({ section, data, close, onSave }) {
 
 export function CompanyDetailPage() {
   const { companyId } = useParams();
+  // Data changes found by tasks wait in the company's own review (design review topic 14).
+  const pendingCompany = pendingGroup(companyId);
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
@@ -1213,6 +1216,19 @@ export function CompanyDetailPage() {
             updateQuery({ tab: "profile", ai: "complete", panel: null });
             notify(`已确认 ${selected.length} 项建议，公司资料更新为 v4`);
           }}
+        />
+      ) : null}
+      {tab === "profile" && !isDraft && pendingCompany?.open.length ? (
+        <StateBanner
+          tone="warning"
+          icon="warning"
+          title={`${pendingCompany.open.length} 项资料变化等待审核`}
+          description={`${pendingCompany.open.map((change) => `${change.field}：${change.before} → ${change.after}`).join("；")}。来自：${pendingCompany.foundBy.label}。不审核不会写入。`}
+          action={
+            <Button size="sm" onClick={() => navigate(`/reviews/fields/${companyId}`)}>
+              审核资料变化
+            </Button>
+          }
         />
       ) : null}
       {tab === "profile" && !(aiState === "review" && aiPanel === "review") ? (

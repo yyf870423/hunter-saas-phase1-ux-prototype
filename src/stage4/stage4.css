@@ -15074,3 +15074,65 @@
   font-size: 12px;
   line-height: 18px;
 }
+
+/* “有待审核更新” quick filter on asset lists (design review topic 14) */
+.s4-pending-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--s1-muted);
+}
+.s4-pending-filter > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 8px;
+  background: var(--s1-surface);
+  color: var(--s1-ink);
+  font: inherit;
+  cursor: pointer;
+}
+.s4-pending-filter > button svg {
+  width: 15px;
+  height: 15px;
+  color: var(--s1-warning);
+}
+.s4-pending-filter > button em {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--s1-warning-soft);
+  color: var(--s1-warning);
+  font-style: normal;
+  font-weight: 600;
+  text-align: center;
+}
+.s4-pending-filter > button.is-active {
+  border-color: var(--s1-accent);
+  background: var(--s1-accent-soft);
+  color: var(--s1-accent);
+}
+.s4-pending-strip-source {
+  display: block;
+  margin-top: 2px;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s4-review-found-by {
+  margin: 0 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--s1-accent);
+  font: inherit;
+  cursor: pointer;
+}
+.s4-review-found-by:hover {
+  text-decoration: underline;
+}

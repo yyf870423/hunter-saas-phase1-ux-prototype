@@ -38,6 +38,7 @@ import { runOpportunityCommand, summarizePosition, useOpportunityState } from ".
 import { summarizeOpportunity } from "./opportunity-domain";
 import { companyDeleteImpact } from "./company-assessment";
 import { displayDateTime } from "./OpportunityComponents";
+import { pendingAssetIds, pendingUpdatesEvent } from "./pending-updates";
 
 const educationTones = {
   博士: "violet",
@@ -444,9 +445,30 @@ export function AssetListPage({ type }) {
     filterValues,
     type,
   ]);
-  const pages = Math.max(1, Math.ceil(filtered.length / 6));
-  const sortedRows = type === "opportunities" ? [...filtered].sort((a, b) => sort === "名称" ? a.title.localeCompare(b.title, "zh-CN") :
-    sort === "下次跟进" ? (a.followup?.dueAt || "9999").localeCompare(b.followup?.dueAt || "9999") : b.updatedAt.localeCompare(a.updatedAt)) : filtered;
+  // “有待审核更新” quick filter (design review topic 14): ?pending=1, also linked from the workbench.
+  const pendingOnly = ["candidates", "companies"].includes(type) && searchParams.get("pending") === "1";
+  const [pendingVersion, setPendingVersion] = useState(0);
+  useEffect(() => {
+    const refresh = () => setPendingVersion((value) => value + 1);
+    window.addEventListener(pendingUpdatesEvent, refresh);
+    return () => window.removeEventListener(pendingUpdatesEvent, refresh);
+  }, []);
+  const pendingIds = useMemo(
+    () => (["candidates", "companies"].includes(type) ? pendingAssetIds(type) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [type, pendingVersion],
+  );
+  const listed = pendingOnly ? filtered.filter((row) => pendingIds.includes(row.id)) : filtered;
+  const togglePending = () => {
+    const next = new URLSearchParams(searchParams);
+    if (pendingOnly) next.delete("pending");
+    else next.set("pending", "1");
+    setSearchParams(next, { replace: true });
+    controller.setPage(1);
+  };
+  const pages = Math.max(1, Math.ceil(listed.length / 6));
+  const sortedRows = type === "opportunities" ? [...listed].sort((a, b) => sort === "名称" ? a.title.localeCompare(b.title, "zh-CN") :
+    sort === "下次跟进" ? (a.followup?.dueAt || "9999").localeCompare(b.followup?.dueAt || "9999") : b.updatedAt.localeCompare(a.updatedAt)) : listed;
   const currentPage = Math.min(controller.page, pages);
   const filteredRows = sortedRows.slice((currentPage - 1) * 6, currentPage * 6);
   useEffect(
@@ -468,7 +490,7 @@ export function AssetListPage({ type }) {
       <AssetPageHeader
         title={config.title}
         description={config.description}
-        count={filtered.length}
+        count={listed.length}
         primaryLabel={`新建${config.title}`}
         onPrimary={() => navigate(`/${type}/new`)}
       />
@@ -520,6 +542,25 @@ export function AssetListPage({ type }) {
           }
         />
       )}
+      {pendingIds.length || pendingOnly ? (
+        <div className="s4-pending-filter">
+          <button
+            type="button"
+            className={pendingOnly ? "is-active" : ""}
+            aria-pressed={pendingOnly}
+            onClick={togglePending}
+          >
+            <Icon name="warning" />
+            有待审核更新
+            <em>{pendingIds.length}</em>
+          </button>
+          <span>
+            {pendingOnly
+              ? `只显示有待审核更新的${config.title}；进入详情逐条采纳或不采纳。`
+              : "任务发现的资料变化会先放在各自详情里等你审核，不会自动写入。"}
+          </span>
+        </div>
+      ) : null}
       <BulkBar
         count={controller.selected.size}
         onClear={() => controller.setSelected(new Set())}

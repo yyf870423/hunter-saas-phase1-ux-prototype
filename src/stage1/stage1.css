@@ -3726,3 +3726,34 @@ a:focus-visible {
   font-size: 14px;
   line-height: 22px;
 }
+
+/* Workbench: “N 项资产有更新待审核” (design review topic 14) */
+.s1-dashboard-pending {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--s1-warning-soft);
+  color: var(--s1-ink);
+  font-size: 13px;
+  line-height: 20px;
+}
+.s1-dashboard-pending svg {
+  flex: none;
+  width: 16px;
+  height: 20px;
+  color: var(--s1-warning);
+}
+.s1-dashboard-pending button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--s1-accent);
+  font: inherit;
+  cursor: pointer;
+}
+.s1-dashboard-pending button:hover {
+  text-decoration: underline;
+}

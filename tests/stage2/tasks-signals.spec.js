@@ -125,9 +125,10 @@ test("所有周期运行状态都使用可继续对话的完整详情", async ({
   await page.goto("#/tasks/periodic?view=runs");
   await page.locator(".s2-periodic-time-filter > button").click();
   await page.getByRole("button", { name: "近一个月", exact: true }).click();
-  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(8);
+  // 9 runs in the last month, including the mailbox round.
+  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(9);
 
-  for (const index of [0, 2, 3, 4, 5, 6, 7]) {
+  for (const index of [0, 2, 3, 4, 5, 6, 7, 8]) {
     await page.locator(".s2-periodic-list > button").nth(index).click();
     await expect(page.locator(".s2-run-conversation")).toBeVisible();
     await expect(page.getByLabel("任务对话输入")).toBeVisible();
@@ -538,4 +539,44 @@ test("移动端可以从信号列表进入详情并返回", async ({ page }) => 
   await expect(
     page.getByPlaceholder("搜索公司、人物或洞察"),
   ).toBeVisible();
+});
+
+test("资料变化放在资产自己的待审核里，影响进行中任务的才进洞察中心，两处互相同步", async ({ page }) => {
+  // 规则（议题 14）：图谱关系变化只进图谱“更新与审核”；候选人资料变化进候选人待审核；
+  // 例：陈松（在 VLA 推荐阶段）加入星澜 → 洞察写明影响的任务和相关更新，在候选人里确认后洞察自动标记已处理。
+  await page.goto("#/signals");
+  await expect(page.locator(".s2-signal-feed")).not.toContainText("知识图谱");
+  await expect(page.locator(".s2-signal-feed")).toContainText("陈雨来信：星澜机器人想再加 2 个数据平台岗位");
+  await page.goto("#/signals?signal=signal-chensong");
+  const links = page.locator(".s2-signal-links");
+  await expect(links).toContainText("具身智能 VLA 算法负责人（陈松在推荐阶段）");
+  await expect(links).toContainText("2 项待审核");
+  await page.goto("#/candidates?pending=1");
+  await expect(page.getByRole("button", { name: /有待审核更新/ })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("table tbody tr")).toHaveCount(3);
+  await page.goto("#/reviews/fields/candidate-chensong");
+  await expect(page.getByRole("heading", { name: "陈松 · 2 项资料建议" })).toBeVisible();
+  await page.getByRole("button", { name: "应用变化" }).click();
+  await expect(page).toHaveURL(/candidates\/candidate-chensong/);
+  await page.goto("#/signals?signal=signal-chensong");
+  await expect(page.locator(".s2-signal-detail")).toContainText("9/3 已处理：更新了陈松的资料");
+  await expect(links).toContainText("已审核");
+  await page.goto("#/candidates?pending=1");
+  await expect(page.locator("table tbody tr")).toHaveCount(2);
+});
+
+test("周期任务每一轮分开列出写入洞察中心的发现和资料更新，图谱变化只进图谱审核", async ({ page }) => {
+  await page.goto("#/tasks/periodic?view=runs&run=run-graph-sept");
+  const round = page.locator("#round-run-graph-sept");
+  await expect(round).toContainText("不进洞察中心");
+  await expect(round.locator(".s2-run-findings.is-updates")).toContainText("具身智能公司关系知识图谱：人才流动：陈松从小鹏汽车加入星澜机器人");
+  await round.locator(".s2-run-findings.is-updates").getByRole("button", { name: "去审核" }).click();
+  await expect(page).toHaveURL(/mappings\/mapping-company-relations\?tab=reviews/);
+  await expect(page.getByRole("heading", { name: "陈松从小鹏汽车加入星澜机器人" })).toBeVisible();
+  await page.goto("#/tasks/periodic?view=runs&run=run-mailbox-0903");
+  await expect(page.locator("#round-run-mailbox-0903")).toContainText("陈雨来信：星澜机器人想再加 2 个数据平台岗位");
+  await page.goto("#/home");
+  await expect(page.locator(".s1-dashboard-pending")).toContainText("5 个资产有更新待审核");
+  await page.locator(".s1-dashboard-pending").getByRole("button", { name: "公司 1" }).click();
+  await expect(page).toHaveURL(/companies\?pending=1/);
 });

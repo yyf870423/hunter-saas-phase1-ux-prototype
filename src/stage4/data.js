@@ -303,9 +303,19 @@ const candidateSeed = [
     "博士",
     "4 年",
   ],
+  // Found by the periodic follow-up of the “重点候选人” folder; his pending update is in his own review.
+  [
+    "candidate-chensong",
+    "陈松",
+    "小鹏汽车",
+    "自动驾驶感知算法专家",
+    "广州",
+    "硕士",
+    "10 年",
+  ],
 ];
 
-const candidateAges = [37, 35, 34, 40, 33, 31, 36, 39, 38, 35, 32, 30];
+const candidateAges = [37, 35, 34, 40, 33, 31, 36, 39, 38, 35, 32, 30, 36];
 
 export const candidatePositionRelations = [
   {
@@ -355,6 +365,12 @@ export const candidatePositionRelations = [
     positionId: "position-vla",
     stage: "已入职",
     active: false,
+  },
+  {
+    candidateId: "candidate-chensong",
+    positionId: "position-vla",
+    stage: "推荐",
+    active: true,
   },
 ];
 
