@@ -32,13 +32,17 @@ test("周期计划改期不残留旧周期，暂停删除跨刷新保留", async
   await button(page, "确认删除").click();
   await page.reload();
   await expect(page.locator(".s2-periodic-list")).not.toContainText("检查中国大陆具身智能");
-  for (let i = 0; i < 4; i += 1) {
+  for (let i = 0; i < 3; i += 1) {
     await button(page, "删除").click();
     await button(page, "确认删除").click();
   }
-  await expect(page.getByRole("heading", { name: "还没有周期性任务" })).toBeVisible();
+  // The mailbox task follows the mailbox connection and cannot be deleted on its own.
+  const list = page.locator(".s2-periodic-list");
+  await expect(list).toContainText("邮箱：读取 shenlan@qq.com 的邮件");
+  await expect(button(page, "删除")).toHaveCount(0);
   await page.reload();
-  await expect(page.getByRole("heading", { name: "还没有周期性任务" })).toBeVisible();
+  await expect(list).toContainText("邮箱：读取 shenlan@qq.com 的邮件");
+  await expect(list).not.toContainText("每月更新机器人行业知识图谱");
 });
 
 test("已有运行复用，停止与新运行保留独立 ID", async ({ page }) => {
