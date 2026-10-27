@@ -65,19 +65,11 @@ test("招聘机会新建页面展示完整字段和必填校验", async ({ page 
   await assertNoConsoleErrors();
 });
 
-test("洞察中心分类完整且主从区域没有横向溢出", async ({ page }) => {
+test("洞察中心只有全部、只看未处理、已忽略三个筛选且主从区域没有横向溢出", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#/signals");
-  for (const label of [
-    "全部",
-    "待你决定",
-    "观察中",
-    "核验中",
-    "已处理",
-    "已忽略",
-    "已失效",
-  ]) {
+  for (const label of ["全部", "只看未处理", "已忽略"]) {
     await expect(
       page.getByRole("tab", { name: new RegExp(label) }),
     ).toBeVisible();

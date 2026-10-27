@@ -1,3 +1,4 @@
+import { assessmentTone, companyAssessment } from "./company-assessment";
 import { useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
@@ -115,9 +116,13 @@ export function OpportunityDetailPage() {
     <DetailTabs value={tab} onChange={changeTab} tabs={[{ value: "profile", label: "机会资料" }, { value: "directions", label: "招聘方向", count: summary.directions }, { value: "work", label: "关联任务" }, { value: "history", label: "活动记录" }]} />
     {tab === "profile" ? <div className="s4-detail-stack">
       <FieldGroup title="机会资料" action={<Button size="sm" icon="edit" disabled={getOpportunityPermission()} onClick={() => setSection("basic")}>编辑资料</Button>}>
-        <DefinitionGrid items={[["所属公司", company ? <button type="button" className="s4-inline-link" onClick={() => navigate("/companies/" + company.id)}>{company.name}</button> : summary.company + "（已删除）"],
+        <DefinitionGrid items={[["所属公司", company ? <span className="s4-company-with-assessment"><button type="button" className="s4-inline-link" onClick={() => navigate("/companies/" + company.id)}>{company.name}</button>
+          <button type="button" className="s4-assessment-chips" title="点开查看依据" onClick={() => navigate("/companies/" + company.id + "#assessment")}>
+            <StatusBadge tone={assessmentTone[companyAssessment(company).payment.level]}>付费潜力 {companyAssessment(company).payment.level}</StatusBadge>
+            <StatusBadge tone={assessmentTone[companyAssessment(company).risk.level]}>合作风险 {companyAssessment(company).risk.level}</StatusBadge>
+          </button></span> : summary.company + "（已删除）"],
           ["状态", <StatusBadge tone={opportunity.status === "跟进中" ? "success" : "neutral"}>{opportunity.status}</StatusBadge>], ["预计人数", opportunity.people || "待确认"], ["预计时间", opportunity.period || "待确认"],
-          ["优先级", opportunity.priority || "普通"], ["已形成岗位", summary.positions + " 个"]]} />
+          ["优先级", (!opportunity.priority || opportunity.priority === "普通" ? "中" : opportunity.priority) + (opportunity.priorityReason ? "：" + opportunity.priorityReason : "")], ["已形成岗位", summary.positions + " 个"]]} />
       </FieldGroup>
       <OpportunityFollowupSummary opportunity={opportunity} />
       <FieldGroup title="相关联系人">{contact ? <div className="s4-opportunity-contact-path"><i><Icon name="user" /></i>

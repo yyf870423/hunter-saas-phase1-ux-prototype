@@ -724,7 +724,7 @@ export function RecycleBinPage() {
       <AssetPageHeader
         eyebrow="数据管理"
         title="回收站"
-        description="正式资产删除后保留 30 天；到期自动永久清理。"
+        description="正式资产删除后保留 30 天；到期自动永久清理。候选人和联系人清理时，资料版本和文件一并删除，任务对话和运行记录里这个人的信息换成“已删除的候选人 / 联系人”；知识图谱里的节点和连线保留，只解除关联。"
         count={rows.length}
       />
       <DataManagementNav value="recycle" />
@@ -939,8 +939,13 @@ export function RecycleBinPage() {
           <span>
             <b>将永久清理资产和专属文件</b>
             <p>
-              其他独立资产不会删除，但相关页面只保留必要历史名称和“已删除”引用。
+              其他独立资产不会删除，相关页面显示“对象已删除”。
             </p>
+            {["候选人", "公司联系人", "联系人"].includes(deleteTarget?.type) ? (
+              <p>
+                这是代表真实的人的资产：资料版本和文件（简历、附件）会删除；任务对话和运行记录里关于这个人的姓名、联系方式、简历摘录会换成“已删除的{deleteTarget?.type === "候选人" ? "候选人" : "联系人"}”；知识图谱里的节点和连线保留，只解除关联。
+              </p>
+            ) : null}
           </span>
         </div>
       </Modal>

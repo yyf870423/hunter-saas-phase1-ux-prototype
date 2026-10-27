@@ -33,3 +33,20 @@
   .s4-direction-list .s4-command-actions { grid-column: 1 / -1; min-width: 0; justify-content: flex-start; }
   .s4-command-actions > .s1-button { flex-shrink: 0; }
 }
+
+/* Client assessment on company (design 07 §4.2) */
+.s4-company-with-assessment {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.s4-assessment-chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}

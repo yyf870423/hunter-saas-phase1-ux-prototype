@@ -15,6 +15,7 @@ import {
   positions,
 } from "../stage4/data";
 import { topicGraphs } from "../stage4/topic-graph-data";
+import { markerText, viewSignal } from "../stage2/signal-handling";
 
 export const dashboardItemLimit = 10;
 export const limitDashboardItems = (items) =>
@@ -116,7 +117,7 @@ export const dashboardTasks = Object.entries(taskPlanSnapshots).map(
   }),
 );
 
-export const dashboardInsights = [
+const dashboardInsightIds = [
   "signal-verifying",
   "signal-graph-sync",
   "signal-cloudchip",
@@ -125,14 +126,28 @@ export const dashboardInsights = [
   "signal-xinglan",
   "signal-ignored",
   "signal-expired",
-].map((id) => {
-  const signal = signals.find((item) => item.id === id);
-  return {
-    ...signal,
-    detail: signal.nextLabel,
-    route: `/signals?signal=${id}`,
-  };
-});
+];
+
+// Workbench insight cards: 未处理 first, then handled (with the marker sentence), then ignored (design 10 §4.2).
+export function buildDashboardInsights() {
+  const rank = (item) => (item.isOpen ? 0 : item.status === "已忽略" ? 2 : 1);
+  return dashboardInsightIds
+    .map((id) => viewSignal(signals.find((item) => item.id === id)))
+    .sort((a, b) => rank(a) - rank(b))
+    .map((signal) => ({
+      ...signal,
+      status: signal.status === "已忽略" ? "已忽略" : signal.marker ? "已处理" : "未处理",
+      tone: signal.status === "已忽略" ? "neutral" : signal.marker ? "success" : "warning",
+      detail: signal.marker
+        ? markerText(signal.marker)
+        : signal.status === "已忽略"
+          ? "同一事件不再提醒"
+          : `来源：${signal.sourceTask?.title || "任务"}`,
+      route: `/signals?signal=${signal.id}`,
+    }));
+}
+
+export const dashboardInsights = buildDashboardInsights();
 
 export const dashboardAssetChanges = [
   {
@@ -235,7 +250,7 @@ export function getDashboardData(params) {
     allEmpty || empty.has(key) ? [] : limitDashboardItems(items);
   return {
     tasks: visible("tasks", orderDashboardTasks(dashboardTasks)),
-    insights: visible("insights", dashboardInsights),
+    insights: visible("insights", buildDashboardInsights()),
     assets: visible("assets", dashboardAssetChanges),
   };
 }

@@ -2184,3 +2184,38 @@
     animation: none;
   }
 }
+
+.s5-matrix-none {
+  display: inline-flex;
+  justify-content: center;
+  color: var(--s1-subtle);
+}
+
+.s5-account-deletion-copy {
+  display: grid;
+  gap: 8px;
+  color: var(--s1-muted);
+  font-size: 13px;
+  line-height: 21px;
+}
+.s5-account-deletion-copy p {
+  margin: 0;
+}
+.s5-account-deletion-copy b {
+  color: var(--s1-ink);
+}
+.s5-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 20px 0 0;
+  font-size: 12px;
+}
+.s5-legal-links a {
+  color: var(--s1-muted);
+  text-decoration: none;
+}
+.s5-legal-links a:hover {
+  color: var(--s1-accent);
+  text-decoration: underline;
+}

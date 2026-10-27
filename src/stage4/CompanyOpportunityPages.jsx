@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 export { OpportunityCreatePage, OpportunityDetailPage } from "./OpportunityPages";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
@@ -64,6 +64,7 @@ import {
 } from "./data";
 import { summarizePosition, useOpportunityState } from "./opportunity-store";
 import { summarizeOpportunity } from "./opportunity-domain";
+import { assessmentLevels, assessmentTone, companyAssessment, companyDeleteImpact } from "./company-assessment";
 
 const companyProfileData = (item) => ({
   ...(item?.id === "company-xinglan" ? companyDetail : {
@@ -347,6 +348,32 @@ function CompanyProfile({
             ["待核实内容", "薪资福利与面试周期仍需随具体岗位复核"],
           ]}
         />
+      </FieldGroup>
+      <FieldGroup
+        title="付费潜力与合作风险"
+        action={
+          <Button size="sm" icon="edit" onClick={() => onEditSection("assessment")}>
+            编辑
+          </Button>
+        }
+      >
+        <div className="s4-company-assessment" id="assessment">
+          {[["付费潜力", companyAssessment(data).payment], ["合作风险", companyAssessment(data).risk]].map(([label, item]) => (
+            <div key={label}>
+              <span>
+                <b>{label}</b>
+                <StatusBadge tone={assessmentTone[item.level]}>{item.level}</StatusBadge>
+              </span>
+              <p>{item.basis}</p>
+              <small>
+                {item.source ? `来源：${item.source} · ` : ""}更新于 {item.updatedAt}
+              </small>
+            </div>
+          ))}
+          <p className="s4-company-assessment-note">
+            结论只分三档，不打分。来自公司调研和客户开发任务的研判，确认后才写入；公开查不到、只有你知道的（如已有独家猎头、账期）标“待确认”，可以手改或在对话里补。
+          </p>
+        </div>
       </FieldGroup>
       {companyCopySections.map(([key, title]) => (
         <FieldGroup
@@ -862,11 +889,14 @@ function CompanySectionEditor({ section, data, close, onSave }) {
   const [industries, setIndustries] = useState(data.industries);
   const [aliases, setAliases] = useState(data.aliases);
   const [copy, setCopy] = useState("");
+  const [assessment, setAssessment] = useState(() => companyAssessment(data));
   const [error, setError] = useState("");
   const sectionTitle =
     section === "basic"
       ? "公司基本资料"
-      : companyCopySections.find(([key]) => key === section)?.[1] || "公司资料";
+      : section === "assessment"
+        ? "付费潜力与合作风险"
+        : companyCopySections.find(([key]) => key === section)?.[1] || "公司资料";
 
   useEffect(() => {
     setName(data.name);
@@ -875,13 +905,21 @@ function CompanySectionEditor({ section, data, close, onSave }) {
     setIndustries(data.industries);
     setAliases(data.aliases);
     setCopy(section && section !== "basic" ? data[section] || "" : "");
+    setAssessment(companyAssessment(data));
   }, [data, section]);
 
   const save = () => {
     const patch =
       section === "basic"
         ? { name, website, location, industries, aliases }
-        : { [section]: copy };
+        : section === "assessment"
+          ? {
+              assessment: {
+                payment: { ...assessment.payment, updatedAt: "刚刚" },
+                risk: { ...assessment.risk, updatedAt: "刚刚" },
+              },
+            }
+          : { [section]: copy };
     try {
       onSave(patch);
       close();
@@ -944,6 +982,32 @@ function CompanySectionEditor({ section, data, close, onSave }) {
               <TagList items={aliases} tone="info" />
             </div>
           </FormField>
+        </div>
+      ) : section === "assessment" ? (
+        <div className="s4-form-grid">
+          {[["payment", "付费潜力"], ["risk", "合作风险"]].map(([key, label]) => (
+            <Fragment key={key}>
+              <FormField label={`${label}结论`} required>
+                <SelectMenu
+                  label={`${label}结论`}
+                  value={assessment[key].level}
+                  options={assessmentLevels}
+                  onChange={(level) =>
+                    setAssessment((current) => ({ ...current, [key]: { ...current[key], level } }))
+                  }
+                />
+              </FormField>
+              <FormField label={`${label}依据`} span={2}>
+                <TextArea
+                  value={assessment[key].basis}
+                  onChange={(basis) =>
+                    setAssessment((current) => ({ ...current, [key]: { ...current[key], basis } }))
+                  }
+                  rows={3}
+                />
+              </FormField>
+            </Fragment>
+          ))}
         </div>
       ) : (
         <FormField label={sectionTitle} required={section !== "note"}>
@@ -1222,7 +1286,7 @@ export function CompanyDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="公司"
         assetName={profileData.name}
-        impact="该公司的联系人将一并进入回收站；不会删除被引用的候选人、招聘机会、岗位和任务。"
+        impact={companyDeleteImpact([companyId], { contacts: companyContactRecords, opportunities: lifecycle.opportunities, positions: lifecycle.positions })}
         onConfirm={() => {
           recycleCompany(companyId);
           setDeleteOpen(false);
@@ -1634,6 +1698,7 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
               options={[
                 "客户 HR",
                 "招聘负责人",
+                "决策人",
                 "投资人",
                 "顾问",
                 "中间介绍人",
@@ -2156,6 +2221,7 @@ export function ContactCreatePage() {
                 options={[
                   "客户 HR",
                   "招聘负责人",
+                  "决策人",
                   "投资人",
                   "顾问",
                   "中间介绍人",

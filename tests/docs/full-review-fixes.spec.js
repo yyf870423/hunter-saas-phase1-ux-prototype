@@ -32,7 +32,7 @@ test("周期计划改期不残留旧周期，暂停删除跨刷新保留", async
   await button(page, "确认删除").click();
   await page.reload();
   await expect(page.locator(".s2-periodic-list")).not.toContainText("检查中国大陆具身智能");
-  for (let i = 0; i < 3; i += 1) {
+  for (let i = 0; i < 4; i += 1) {
     await button(page, "删除").click();
     await button(page, "确认删除").click();
   }

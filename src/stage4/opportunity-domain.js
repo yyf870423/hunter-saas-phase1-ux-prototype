@@ -4,7 +4,7 @@ export const OPPORTUNITY_STATUSES = ["跟进中", "已完成", "已关闭"];
 export const DIRECTION_STATUSES = ["待处理", "已形成或关联岗位", "不再推进"];
 export const OPPORTUNITY_FIELDS = [
   "title", "companyId", "contactId", "summary", "evidence", "priority",
-  "people", "period", "requirements", "missing",
+  "priorityReason", "people", "period", "requirements", "missing",
 ];
 export const POSITION_FIELDS = [
   "name", "companyId", "company", "location", "salary", "experience",

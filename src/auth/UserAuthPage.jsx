@@ -7,6 +7,26 @@ import "./auth.css";
 
 const phonePattern = /^1[3-9]\d{9}$/;
 
+
+const legalLinks = {
+  terms: "https://www.boseekai.com/terms/",
+  privacy: "https://www.boseekai.com/privacy/",
+  dpa: "https://www.boseekai.com/dpa/",
+};
+
+// Registration consent (design 11 §8.4): 同意《服务条款》《数据处理协议》，并确认《隐私政策》.
+function LegalConsentText() {
+  return (
+    <span>
+      我已阅读并同意
+      <a href={legalLinks.terms} target="_blank" rel="noreferrer">《服务条款》</a>
+      <a href={legalLinks.dpa} target="_blank" rel="noreferrer">《数据处理协议》</a>
+      ，并确认
+      <a href={legalLinks.privacy} target="_blank" rel="noreferrer">《隐私政策》</a>
+    </span>
+  );
+}
+
 export function UserAuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState("phone");
@@ -108,7 +128,7 @@ export function UserAuthPage() {
 
   const completeWechatAuth = () => {
     if (isRegister && !agreed) {
-      setErrors({ agreed: "注册前需要同意服务条款与隐私说明" });
+      setErrors({ agreed: "注册前需要勾选同意《服务条款》《数据处理协议》并确认《隐私政策》" });
       return;
     }
     setErrors({});
@@ -123,7 +143,7 @@ export function UserAuthPage() {
     if (!/^\d{4,6}$/.test(code)) nextErrors.code = "请输入 4–6 位数字验证码";
     if (isRegister && !name.trim()) nextErrors.name = "请输入你的姓名";
     if (isRegister && !agreed)
-      nextErrors.agreed = "注册前需要同意服务条款与隐私说明";
+      nextErrors.agreed = "注册前需要勾选同意《服务条款》《数据处理协议》并确认《隐私政策》";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length === 0) completeAuth();
   };
@@ -263,7 +283,7 @@ export function UserAuthPage() {
                   <span className="auth-checkbox">
                     <Icon name="check" size={13} />
                   </span>
-                  <span>我已阅读并同意服务条款与隐私说明</span>
+                  <LegalConsentText />
                   {errors.agreed ? (
                     <small role="alert">{errors.agreed}</small>
                   ) : null}
@@ -344,7 +364,7 @@ export function UserAuthPage() {
                   <span className="auth-checkbox">
                     <Icon name="check" size={13} />
                   </span>
-                  <span>我已阅读并同意服务条款与隐私说明</span>
+                  <LegalConsentText />
                   {errors.agreed ? (
                     <small role="alert">{errors.agreed}</small>
                   ) : null}
@@ -376,6 +396,11 @@ export function UserAuthPage() {
               </button>
             </p>
           ) : null}
+          <nav className="auth-legal-links" aria-label="协议">
+            <a href={legalLinks.terms} target="_blank" rel="noreferrer">服务条款</a>
+            <a href={legalLinks.privacy} target="_blank" rel="noreferrer">隐私政策</a>
+            <a href={legalLinks.dpa} target="_blank" rel="noreferrer">数据处理协议</a>
+          </nav>
           <p className="auth-disclosure">
             本页面为交互原型，不会发送短信或创建真实账号。
           </p>

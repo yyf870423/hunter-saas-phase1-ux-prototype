@@ -5699,3 +5699,169 @@
     grid-column: auto;
   }
 }
+
+/* Insight handled markers (design 10 §6.2) */
+.s2-signal-handled-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.s2-signal-handled-list button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  color: var(--s1-ink);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: left;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 7px;
+  cursor: pointer;
+}
+.s2-signal-handled-list button:hover {
+  border-color: color-mix(in srgb, var(--s1-success) 40%, var(--s1-line));
+}
+.s2-signal-handled-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* Periodic task as one continuous conversation (design 02 §6.4) */
+.s2-run-round {
+  display: grid;
+  gap: 12px;
+  scroll-margin-top: 12px;
+}
+.s2-run-round-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 2px;
+  color: var(--s1-subtle);
+  font-size: 12px;
+}
+.s2-run-round-divider::before,
+.s2-run-round-divider::after {
+  flex: 1;
+  height: 1px;
+  content: "";
+  background: var(--s1-line);
+}
+.s2-run-round-divider span {
+  padding: 2px 10px;
+  white-space: nowrap;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 999px;
+}
+.s2-run-round.is-current .s2-run-round-divider span {
+  color: var(--s1-accent);
+  border-color: color-mix(in srgb, var(--s1-accent) 40%, var(--s1-line));
+}
+.s2-run-findings {
+  padding: 12px 14px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s2-run-findings h4 {
+  margin: 0 0 8px;
+  color: var(--s1-ink);
+  font-size: 13px;
+}
+.s2-run-findings ol {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.s2-run-findings li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  scroll-margin-top: 12px;
+}
+.s2-run-findings li > span:first-child {
+  display: grid;
+  min-width: 0;
+}
+.s2-run-findings li b {
+  color: var(--s1-ink);
+  font-size: 13px;
+}
+.s2-run-findings li small {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s2-run-finding-actions {
+  display: flex;
+  gap: 6px;
+}
+.s2-quote-chip {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  color: var(--s1-ink);
+  background: color-mix(in srgb, var(--s1-accent-soft) 50%, var(--s1-surface));
+  border: 1px solid color-mix(in srgb, var(--s1-accent) 24%, var(--s1-line));
+  border-left-width: 3px;
+  border-radius: 8px;
+}
+.s2-quote-chip > span {
+  display: grid;
+  min-width: 0;
+}
+.s2-quote-chip small {
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s2-quote-chip b {
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.s2-quote-chip button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: var(--s1-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.s2-message-quote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  border-left: 3px solid var(--s1-accent);
+  background: color-mix(in srgb, var(--s1-accent-soft) 40%, transparent);
+  border-radius: 4px;
+}
+.s2-run-handled-note {
+  margin: 8px 0 0;
+  color: var(--s1-success);
+  font-size: 13px;
+}

@@ -15040,3 +15040,37 @@
     padding-inline: 14px;
   }
 }
+
+/* Company assessment block (design 07 §4.2) */
+.s4-company-assessment {
+  display: grid;
+  gap: 12px;
+}
+.s4-company-assessment > div {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s4-company-assessment > div > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.s4-company-assessment > div > span b {
+  font-size: 13px;
+}
+.s4-company-assessment > div > p {
+  margin: 0;
+  color: var(--s1-ink);
+  font-size: 13px;
+  line-height: 20px;
+}
+.s4-company-assessment > div > small,
+.s4-company-assessment-note {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}

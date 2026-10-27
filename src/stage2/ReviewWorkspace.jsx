@@ -115,8 +115,9 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
   const [query, setQuery] = useState(
     () => sessionStorage.getItem("hunter-review-query") || "",
   );
+  // Sourcing review is sorted by score only, no tiers (design 02 §9.2, 06 §8.5).
   const [tab, setTab] = useState(
-    () => sessionStorage.getItem("hunter-review-tab") || "all",
+    () => "all",
   );
   const [sortDescending, setSortDescending] = useState(
     () => sessionStorage.getItem("hunter-review-sort") !== "asc",
@@ -212,27 +213,10 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
         <div
           className="s2-review-tabs app-tabs"
           role="tablist"
-          aria-label="候选人分层"
+          aria-label="候选人"
+          title="只按匹配分排序，不分档；由你看分数自己判断"
         >
-          {[
-            ["all", "全部", candidates.length],
-            [
-              "strong",
-              "建议联系",
-              candidates.filter((item) => item.score >= 85).length,
-            ],
-            [
-              "reserve",
-              "储备与观察",
-              candidates.filter((item) => item.score >= 75 && item.score < 85)
-                .length,
-            ],
-            [
-              "low",
-              "不建议",
-              candidates.filter((item) => item.score < 75).length,
-            ],
-          ].map(([value, label, count]) => (
+          {[["all", "全部", candidates.length]].map(([value, label, count]) => (
             <button
               type="button"
               role="tab"

@@ -573,12 +573,15 @@ export function ProfileSettingsPage() {
   );
 }
 
+// Design 12 §8: in-app for every type; email only for “账号与订阅” (must notify, cannot be turned off).
+// Row: [id, title, description, app default, email default, app locked, email available]
 const notificationRows = [
-  ["decision", "需要我处理", "待确认、待授权和需要补充信息", true, true, true],
-  ["reply", "外部回复", "邮件回复、新简历和附件到达", true, true, true],
-  ["task", "任务状态", "需要处理、暂停、等待用户和等待外部", true, true, false],
-  ["signal", "高优先级信号", "即将失效的机会和强信号", true, true, false],
-  ["billing", "额度与订阅", "额度不足、预算上限和订阅到期", true, true, true],
+  ["decision", "需要我处理", "待确认、待授权、冲突审核和需要补充信息", true, false, true, false],
+  ["reply", "外部回复", "邮件回复、新简历和附件到达", true, false, true, false],
+  ["task", "任务状态", "本轮交付结束、失败、暂停和等待外部", true, false, false, false],
+  ["signal", "洞察", "洞察中心的新洞察", true, false, false, false],
+  ["data", "数据处理", "导入导出完成或失败、资料解析失败、回收站即将清理", true, false, false, false],
+  ["billing", "账号与订阅", "试用和订阅到期、续费、额度和存储、账号安全", true, true, true, true],
 ];
 
 export function NotificationSettingsPage() {
@@ -590,7 +593,6 @@ export function NotificationSettingsPage() {
       notificationRows.map(([id, , , app, email]) => [id, { app, email }]),
     ),
   );
-  const [digest, setDigest] = useState("每日 18:00 汇总");
   const [saving, setSaving] = useState(false);
   const save = () => {
     setSaving(true);
@@ -623,7 +625,7 @@ export function NotificationSettingsPage() {
       ) : null}
       <SettingsSection
         title="通知渠道"
-        description="站内通知用于实时处理，邮件用于离开 Hunter 后的重要提醒。"
+        description="站内通知用于处理所有事项；邮件只用于账号与订阅提醒，短信只用于登录验证码。"
       >
         <div className="s5-channel-summary">
           <SettingRow
@@ -646,7 +648,7 @@ export function NotificationSettingsPage() {
       </SettingsSection>
       <SettingsSection
         title="通知内容"
-        description="系统安全、订阅到期和额度耗尽等通知不能关闭。"
+        description="需要我处理、外部回复和账号与订阅的站内通知不能关闭；邮件只发账号与订阅，必须通知。其他类型的邮件通知暂缓。"
       >
         <div className="s5-notification-matrix">
           <div className="s5-matrix-head">
@@ -654,7 +656,7 @@ export function NotificationSettingsPage() {
             <span>站内</span>
             <span>邮件</span>
           </div>
-          {notificationRows.map(([id, title, description, , , locked]) => (
+          {notificationRows.map(([id, title, description, , , locked, emailAvailable]) => (
             <div className="s5-matrix-row" key={id}>
               <span>
                 <b>{title}</b>
@@ -676,38 +678,20 @@ export function NotificationSettingsPage() {
                   }))
                 }
               />
-              <Toggle
-                label={`${title}邮件通知`}
-                checked={matrix[id].email}
-                disabled={locked || limited}
-                onChange={(value) =>
-                  setMatrix((current) => ({
-                    ...current,
-                    [id]: { ...current[id], email: value },
-                  }))
-                }
-              />
+              {emailAvailable ? (
+                <Toggle
+                  label={`${title}邮件通知`}
+                  checked={matrix[id].email}
+                  disabled
+                  onChange={() => {}}
+                />
+              ) : (
+                <span className="s5-matrix-none" aria-label={`${title}不发邮件`}>
+                  —
+                </span>
+              )}
             </div>
           ))}
-        </div>
-      </SettingsSection>
-      <SettingsSection
-        title="低优先级摘要"
-        description="普通任务进展和观察信号可以合并提醒，减少打断。"
-      >
-        <div className="s5-summary-choice">
-          <SelectMenu
-            label="摘要频率"
-            value={digest}
-            options={[
-              "即时通知",
-              "每日 18:00 汇总",
-              "每周一 09:00 汇总",
-              "仅站内查看",
-            ]}
-            onChange={setDigest}
-          />
-          <p>高优先级信号、失败和待确认事项仍会即时提醒。</p>
         </div>
       </SettingsSection>
     </PageState>
@@ -986,11 +970,9 @@ export function ConnectionSettingsPage() {
         closeDisabled={mailStage === "detecting" || mailStage === "verifying"}
         title={mailStage === "success" ? "邮箱连接完成" : "连接发件邮箱"}
         description={
-          mailStage === "credentials"
-            ? "填写个人邮箱凭据，Hunter 会自动探测发件和收件配置。"
-            : mailStage === "manual"
-              ? "自动探测失败，请确认邮箱服务商提供的协议和服务器信息。"
-              : "验证邮箱协议和登录凭据。"
+          ["credentials", "detected", "manual"].includes(mailStage)
+            ? "连接后，Hunter 会用这个邮箱发送你确认过的邮件，并定期读取邮箱里的所有邮件，从中发现潜在机会和需要你处理的事项；只保存和工作相关的邮件。点“验证并连接”即表示同意，不想被读取可以不连接。"
+            : "验证邮箱协议和登录凭据。"
         }
         footer={
           mailStage === "credentials" ? (
@@ -1055,7 +1037,7 @@ export function ConnectionSettingsPage() {
                 type="password"
                 value={mailSecret}
                 onChange={(event) => setMailSecret(event.target.value)}
-                placeholder="仅用于验证邮箱连接"
+                placeholder="用于发送你确认的邮件，并读取邮箱中的邮件"
               />
             </FormField>
             {mailFieldError ? (
@@ -1224,7 +1206,7 @@ export function ConnectionSettingsPage() {
         close={() => setDisconnect(null)}
         size="sm"
         title="断开发件邮箱"
-        description="已发送邮件和历史回复仍会保留。"
+        description="邮箱地址、授权码和服务器设置会立即删除，重新连接要重新填写；已发出的邮件和已保存的邮件留在工作空间。"
         footer={
           <>
             <Button onClick={() => setDisconnect(null)}>取消</Button>
@@ -1242,7 +1224,7 @@ export function ConnectionSettingsPage() {
         }
       >
         <InlineNotice tone="warning" icon="warning">
-          尚未发送的邮件草稿会保留，但发送和读取后续回复前需要重新连接邮箱。
+          断开后停止读取邮件，“邮箱”周期任务随之停止；尚未发送的邮件草稿会保留，发送前需要重新连接邮箱。
         </InlineNotice>
       </Modal>
     </PageState>
@@ -1255,6 +1237,7 @@ export function SubscriptionSettingsPage() {
   const limited = state === "limited";
   const empty = state === "empty";
   const noSubscription = state === "none";
+  const trial = state === "trial";
   const [planModal, setPlanModal] = useState(false);
   const [renewModal, setRenewModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("专业版");
@@ -1284,7 +1267,23 @@ export function SubscriptionSettingsPage() {
           </button>
         </InlineNotice>
       ) : null}
-      {noSubscription ? (
+      {trial ? (
+        <section className="s5-no-subscription s5-trial-subscription">
+          <i>
+            <Icon name="clock" />
+          </i>
+          <span>
+            <small>当前订阅 · 试用中</small>
+            <h2>试用剩余 18 天</h2>
+            <p>
+              试用到 2026 年 9 月 21 日。试用额度已用 35%，存储已用 120 MB（示意；试用额度和存储的具体数量待定）。到期前 5 天和到期当天会发邮件提醒；到期没订阅时，和订阅到期一样：付费功能受限，数据可以查看和导出。
+            </p>
+          </span>
+          <Button tone="primary" onClick={() => setPlanModal(true)}>
+            选择订阅
+          </Button>
+        </section>
+      ) : noSubscription ? (
         <section className="s5-no-subscription">
           <i>
             <Icon name="creditCard" />
@@ -1531,7 +1530,7 @@ export function DataPrivacySettingsPage() {
           <SettingRow
             icon="download"
             title="导出全部数据"
-            description="生成候选人、岗位、公司、版图、论文、专利和业务记录的可下载文件"
+            description="生成候选人、岗位、公司、版图、论文、专利和业务记录的可下载文件，7 天内可以下载"
             meta="订阅到期后仍可使用"
             action={
               <Button size="sm" onClick={() => navigate("/data/exports")}>
@@ -1552,7 +1551,7 @@ export function DataPrivacySettingsPage() {
           <SettingRow
             icon="file"
             title="创建诊断包"
-            description="只包含脱敏任务状态、错误码和运行环境，不包含业务内容"
+            description="只包含脱敏任务状态、错误码和运行环境，不包含业务内容；问题处理完 30 天内删除"
             meta="上次创建：2026 年 8 月 21 日"
             action={
               <Button
@@ -1573,6 +1572,19 @@ export function DataPrivacySettingsPage() {
         </div>
       </SettingsSection>
       <SettingsSection
+        title="注销账号"
+        description="暂时只支持发邮件申请注销，产品内不提供注销按钮。"
+      >
+        <div className="s5-account-deletion-copy">
+          <p>
+            发邮件到 <b>privacy@boseekai.com</b> 申请。我们用你绑定的手机号或邮箱核实身份后，15 个工作日内完成注销，并删除或匿名化处理你的个人信息。
+          </p>
+          <p>
+            注销后未到期的订阅和没用完的额度作废，不退款；注销后不能恢复，请先导出需要保留的数据。同一个手机号或微信以后可以重新注册，但不再开试用。
+          </p>
+        </div>
+      </SettingsSection>
+      <SettingsSection
         title="危险操作"
         description="这些操作会影响整个个人工作空间。"
         tone="danger"
@@ -1580,7 +1592,7 @@ export function DataPrivacySettingsPage() {
         <div className="s5-danger-list">
           <SettingRow
             title="删除个人工作空间"
-            description="所有业务资产、任务及相关文件进入待清理状态；保留期内可联系客服恢复。"
+            description="所有业务资产、任务及相关文件进入待清理状态；30 天内可以联系我们恢复，期满彻底删除。账号保留，可以再建一个空的工作空间（不再送试用）。"
             action={
               <Button
                 tone="danger"
@@ -1630,6 +1642,9 @@ export function DataPrivacySettingsPage() {
         ) : null}
         <div className="s5-danger-copy">
           <p>删除后所有业务数据将不可继续编辑，正在运行的任务会停止。</p>
+          <p>
+            提交后有 30 天恢复期，期间可以联系我们恢复，期满彻底删除、不能恢复；提交时和恢复期结束前 3 天各会发一封邮件。删除工作空间不会注销账号。
+          </p>
           <FormField
             label={`输入“${workspaceName}”确认`}
             required
@@ -1639,6 +1654,11 @@ export function DataPrivacySettingsPage() {
           </FormField>
         </div>
       </Modal>
+      <nav className="s5-legal-links" aria-label="协议">
+        <a href="https://www.boseekai.com/terms/" target="_blank" rel="noreferrer">《服务条款》</a>
+        <a href="https://www.boseekai.com/privacy/" target="_blank" rel="noreferrer">《隐私政策》</a>
+        <a href="https://www.boseekai.com/dpa/" target="_blank" rel="noreferrer">《数据处理协议》</a>
+      </nav>
     </PageState>
   );
 }

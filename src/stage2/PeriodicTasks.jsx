@@ -21,6 +21,14 @@ import {
   UserMessage,
 } from "./automation-ui";
 import { TaskAreaNav } from "./TaskAreaNav";
+import { signals as seedSignals } from "./data";
+import {
+  addHandled,
+  classifyHandling,
+  handledToday,
+  markerText,
+  viewSignal,
+} from "./signal-handling";
 
 const timeRangeOptions = [
   "近一天",
@@ -103,17 +111,31 @@ const periodicTasks = [
   },
   {
     id: "periodic-candidate-change",
-    title: "每两周核验重点候选人公开变化",
+    title: "每两周核验收藏夹“重点候选人”的公开变化",
     prompt:
-      "核验重点候选人收藏夹中的公开任职、成果和团队变化，只保留值得猎头注意的变化。",
+      "跟进范围：收藏夹“重点候选人”（当前 128 人）。核验公开任职、成果和团队变化，只保留有证据、值得猎头注意的变化。",
     scenarios: ["候选人", "洞察发现"],
     schedule: "每两周周五 17:00",
     nextRun: "已暂停",
     lastRun: "8 月 28 日 17:00",
     status: "已暂停",
     tone: "neutral",
-    destination: "值得注意的变化进入洞察中心",
-    memory: "仅核验重点候选人收藏夹；不把用户主动录入的资料生成为洞察。",
+    destination: "发现的变化（包括资料变化）都进洞察中心；资料更新由你在对话里确认后才写入",
+    memory: "仅核验收藏夹“重点候选人”；不把用户主动录入的资料生成为洞察。",
+  },
+  {
+    id: "periodic-mailbox",
+    title: "邮箱：读取 shenlan@hunter-demo.cn 的邮件",
+    prompt:
+      "连接发件邮箱时系统自动建立。定期读取邮箱里的所有邮件：回复回到原任务，发现的机会和待处理事项写入洞察中心；只保存和工作相关的邮件，其他邮件读完就丢，只记邮件编号。",
+    scenarios: ["邮箱", "洞察发现"],
+    schedule: "每 30 分钟",
+    nextRun: "今天 10:00",
+    lastRun: "今天 09:30",
+    status: "已启用",
+    tone: "success",
+    destination: "回复回到原任务；机会和待处理事项进入洞察中心；邮件里的简历进入候选人补全审核",
+    memory: "断开邮箱后停止读取；已保存的邮件、洞察和对话保留。",
   },
 ];
 
@@ -161,11 +183,25 @@ const periodicRuns = [
     memory: "覆盖水位已更新至今天 09:00。",
   },
   {
-    id: "run-graph-empty",
+    id: "run-graph-sept",
     taskId: "periodic-graph-refresh",
     task: "每月更新机器人行业知识图谱",
     startedAt: "9 月 1 日 08:30",
     startedAtDate: "2026-09-01",
+    duration: "22 分 05 秒",
+    status: "已完成",
+    tone: "success",
+    summary: "发现 3 条关系变化：2 条证据充分已同步，1 条人物流动关系证据不足，写入洞察中心。",
+    scope: "12 张知识图谱 · 214 个正式节点",
+    result: "同步 2 条关系；1 条洞察待你处理",
+    memory: "成功水位已推进至 9 月 1 日。",
+  },
+  {
+    id: "run-graph-empty",
+    taskId: "periodic-graph-refresh",
+    task: "每月更新机器人行业知识图谱",
+    startedAt: "8 月 1 日 08:30",
+    startedAtDate: "2026-08-01",
     duration: "8 分 42 秒",
     status: "无变化",
     tone: "neutral",
@@ -177,7 +213,7 @@ const periodicRuns = [
   {
     id: "run-candidate-partial",
     taskId: "periodic-candidate-change",
-    task: "每两周核验重点候选人公开变化",
+    task: "每两周核验收藏夹“重点候选人”的公开变化",
     startedAt: "8 月 28 日 17:00",
     startedAtDate: "2026-08-28",
     duration: "18 分 03 秒",
@@ -216,7 +252,26 @@ const periodicRuns = [
     result: "更新 23 条匹配结果，没有创建重复运行",
     memory: "连续记忆和成功水位均已更新。",
   },
+  {
+    id: "run-startups-0817",
+    taskId: "periodic-startups",
+    task: "每周发现具身智能创业公司与招聘机会",
+    startedAt: "8 月 17 日 09:00",
+    startedAtDate: "2026-08-17",
+    duration: "10 分 48 秒",
+    status: "已完成",
+    tone: "success",
+    summary: "核验 65 家公司，合并 14 条重复线索，产生 5 条新洞察。",
+    scope: "中国大陆 · 具身智能 · 新成立至 B 轮",
+    result: "5 条新洞察，已处理 2 条",
+    memory: "覆盖水位已更新至 8 月 17 日 09:00。",
+  },
 ];
+
+const runOrderKey = (run) => {
+  const time = (run.startedAt || "").match(/(\d{1,2}):(\d{2})/);
+  return `${run.startedAtDate || "2026-09-03"} ${time ? time[1].padStart(2, "0") + ":" + time[2] : "23:59"}`;
+};
 
 function StateView({ state, onReset }) {
   if (state === "loading") {
@@ -416,42 +471,123 @@ function buildRunPlan(run, resolved, followUpCount, stopped) {
   ];
 }
 
-function RunDetail({ run, onBack, onUpdate }) {
-  const resolved = Boolean(run.decision);
+function roundFindings(runId) {
+  return seedSignals
+    .filter((signal) => signal.sourceTask?.runId === runId)
+    .map((signal) => viewSignal(signal));
+}
+
+function quoteReply(message, signal) {
+  const object = signal?.object || "这条洞察";
+  if (message.kind === "update") {
+    const rows = (signal?.changes || []).map((change) => {
+      const [field, value] = change.includes("：") ? change.split("：") : ["变化", change];
+      const [from, to] = value.includes("→") ? value.split("→").map((item) => item.trim()) : ["—", value];
+      return `| ${field} | ${from} | ${to} | ${signal?.sources?.[0] || "来源证据"} |`;
+    });
+    return `## 资料更新草稿\n\n| 字段 | 当前 | 新值 | 来源 |\n| --- | --- | --- | --- |\n${rows.join("\n")}\n\n确认后写入${object.split(" · ")[0]}的资料，形成新版本。证据再充分也要你确认，我不会自动写入。`;
+  }
+  if (message.kind === "start") return `好的，开始围绕${object}做客户开发：先核实招聘负责人和合作意愿，再列出潜在机会请你确认。\n\n这条洞察已标记“${markerText(message.marker)}”。`;
+  if (message.kind === "recheck") return `已记下复查时间，到时我在这段对话里复查${object}的变化。\n\n这条洞察已标记“${markerText(message.marker)}”。`;
+  if (message.kind === "conclusion") return `已记成这条洞察的处理结论。\n\n这条洞察已标记“${markerText(message.marker)}”。`;
+  return `（原型示意）根据已有证据：${signal?.summary || ""}\n\n这条要记个结论吗？回复“知道了”就记成“已知情”。`;
+}
+
+function RunDetail({ run, runs, onBack, onUpdate }) {
+  const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
   const authMode = run.authMode || "confirm";
   const [planOpen, setPlanOpen] = useState(false);
-  const stopped = run.status === "已停止";
-  const followUps = run.followUps || [];
+  const [, setHandledVersion] = useState(0);
   const notify = useToast();
+  const rounds = useMemo(
+    () =>
+      runs
+        .filter((item) => item.taskId === run.taskId)
+        .sort((a, b) => runOrderKey(a).localeCompare(runOrderKey(b))),
+    [run.taskId, runs],
+  );
+  const quoteId = params.get("quote");
+  const quotedSeed = seedSignals.find((signal) => signal.id === quoteId);
+  const quoted = quotedSeed ? viewSignal(quotedSeed) : null;
+  const followUps = run.followUps || [];
+  const stopped = run.status === "已停止";
+  const resolved = Boolean(run.decision);
   useEffect(() => {
     setComposer("");
     setAttachments([]);
     setPlanOpen(false);
+    const target = document.getElementById(
+      quotedSeed?.sourceTask?.runId === run.id ? `finding-${quotedSeed.id}` : `round-${run.id}`,
+    );
+    if (target?.scrollIntoView) target.scrollIntoView({ block: "start" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run.id]);
-  const effectiveStatus = run.status;
-  const effectiveTone = run.tone;
+  useEffect(() => {
+    const refresh = () => setHandledVersion((value) => value + 1);
+    window.addEventListener("hunter-signal-handling", refresh);
+    return () => window.removeEventListener("hunter-signal-handling", refresh);
+  }, []);
   const plan = buildRunPlan(run, resolved, followUps.length, stopped);
+  const removeQuote = () => {
+    const next = new URLSearchParams(params);
+    next.delete("quote");
+    setParams(next, { replace: true });
+  };
+  const quoteSignal = (signal) => {
+    const next = new URLSearchParams(params);
+    next.set("quote", signal.id);
+    setParams(next, { replace: true });
+  };
   const send = (text, files) => {
     const normalized = text.trim();
+    const last = followUps[followUps.length - 1];
+    const pendingQuestion =
+      !quoted && last?.quote && last.kind === "question" ? last.quote : null;
+    const signalId = quoted?.id || pendingQuestion;
+    const signal = signalId ? seedSignals.find((item) => item.id === signalId) : null;
     const waiting = run.status === "等待用户";
-    const followUp = {
-      followUps: [
-        ...followUps,
-        {
-          id: crypto.randomUUID(),
-          text: normalized,
-          files: files.map((file) => ({ name: file.name, size: file.size })),
-          waiting,
-        },
-      ],
-      ...(waiting ? {} : { status: "正在运行", tone: "info" }),
+    let entry = {
+      id: crypto.randomUUID(),
+      text: normalized,
+      files: files.map((file) => ({ name: file.name, size: file.size })),
+      waiting,
     };
-    if (!onUpdate(run.id, followUp)) return;
+    if (signal) {
+      const handling = classifyHandling(normalized, signal);
+      const marker = handling.marker
+        ? { ...handling.marker, time: handledToday(), route: `/tasks/periodic?view=runs&run=${run.id}` }
+        : null;
+      entry = { ...entry, quote: signal.id, quoteTitle: quoted ? signal.title : "", kind: handling.kind, marker };
+      if (marker && handling.kind !== "update") addHandled(signal.id, marker);
+    }
+    const patch = {
+      followUps: [...followUps, entry],
+      ...(waiting || signal ? {} : { status: "正在运行", tone: "info" }),
+    };
+    if (!onUpdate(run.id, patch)) return;
     setComposer("");
     setAttachments([]);
-    notify("补充要求已加入当前运行会话", "success");
+    if (quoted) removeQuote();
+    notify(signal ? "已收到，正在按你的话处理这条洞察" : "补充要求已加入这一轮对话", "success");
+  };
+  const resolveUpdate = (message, option) => {
+    if (option.value === "suggest") {
+      setComposer("是，但");
+      return;
+    }
+    const next = followUps.map((item) =>
+      item.id === message.id ? { ...item, resolution: option.value } : item,
+    );
+    if (!onUpdate(run.id, { followUps: next })) return;
+    if (option.value === "yes") {
+      addHandled(message.quote, message.marker);
+      notify("资料已更新，这条洞察已标记“已处理”", "success");
+    } else {
+      notify("草稿已保留，没有写入", "info");
+    }
   };
   return (
     <aside className="s2-periodic-detail s2-run-detail">
@@ -465,118 +601,178 @@ function RunDetail({ run, onBack, onUpdate }) {
       </button>
       <header>
         <div>
-          <small>周期运行记录</small>
+          <small>周期任务对话 · {rounds.length} 轮运行</small>
           <h2>{run.task}</h2>
           <p>
-            {run.startedAt} · {run.duration}
+            当前定位：{run.startedAt} 那一轮 · 左侧运行记录是这段对话的目录
           </p>
         </div>
-        <StatusBadge tone={effectiveTone}>{effectiveStatus}</StatusBadge>
+        <StatusBadge tone={run.tone}>{run.status}</StatusBadge>
       </header>
       <div className="s2-run-conversation">
         <div className="s2-run-timeline">
           <HunterReply
-            markdown={`## 本轮已按周期计划启动
+            markdown={`## 周期任务对话
 
-- **触发时间：** ${run.startedAt}
-- **本轮范围：** ${run.scope}
-- **读取记忆：** ${run.memory}
+这段对话记录这个周期任务的每一次运行，每次运行是其中一轮。
 
-本轮使用独立会话执行，但会读取同一周期任务上一次成功的结论和用户修正规则。`}
+- 每一轮读取连续记忆和相关的那一轮，不读全部历史。
+- 你正在对话里处理时，新一轮会等你离开后再开始，不和你的消息交错。`}
           />
-          <HunterReply
-            streaming={effectiveStatus === "正在运行"}
-            markdown={`## ${effectiveStatus === "正在运行" ? "当前执行进度" : "本轮运行结果"}
-
-${run.summary}
-
-**当前结果：** ${run.result}`}
-          />
-          {run.id === "run-startups-success" ? (
-            <div className="s2-run-result-link">
-              <Button
-                size="sm"
-                tone="secondary"
-                icon="signal"
-                onClick={() =>
-                  window.location.assign("#/signals?signal=signal-cloudchip")
-                }
+          {rounds.map((round) => {
+            const findings = roundFindings(round.id);
+            const roundFollowUps = round.followUps || [];
+            const roundWaiting = round.status === "等待用户" && !round.decision;
+            return (
+              <section
+                key={round.id}
+                id={`round-${round.id}`}
+                className={`s2-run-round ${round.id === run.id ? "is-current" : ""}`}
               >
-                查看本轮产生的洞察
-              </Button>
-            </div>
-          ) : null}
-          {run.status === "等待用户" && !resolved ? (
-            <HunterReply>
-              <DecisionRequest
-                title="确认当前两份候选人资料的身份关系"
-                description="确认后会继续同一轮运行；本次决定不会自动成为后续长期规则。"
-                options={[
-                  {
-                    value: "merge",
-                    label: "按较新资料合并",
-                    description:
-                      "保留两个来源和冲突记录，继续更新受影响的匹配结果。",
-                  },
-                  {
-                    value: "separate",
-                    label: "保留为不同人物",
-                    description: "不合并档案，并继续处理剩余岗位。",
-                  },
-                  {
-                    value: "skip",
-                    label: "跳过本轮冲突项",
-                    description: "先完成其他结果，冲突项留待以后处理。",
-                  },
-                  {
-                    value: "custom",
-                    label: "我来补充其他要求",
-                    description: "在下方输入你掌握的信息或指定处理方式。",
-                  },
-                ]}
-                onSelect={(option) => {
-                  if (option.value === "custom") {
-                    setComposer("关于当前身份冲突，请按以下要求处理：");
-                    return;
-                  }
-                  if (authMode === "analysis" && option.value !== "skip") {
-                    notify("当前仅分析，尚未修改身份关系；可跳过冲突项或调整授权。", "warning");
-                    return;
-                  }
-                  if (!onUpdate(run.id, { decision: option.label, status: "正在运行", tone: "info",
-                    followUps: [...followUps, { id: crypto.randomUUID(), text: option.label, files: [], decision: true }] })) return;
-                  notify("已记录决定，并从当前检查点继续运行", "success");
-                }}
-              />
-            </HunterReply>
-          ) : null}
-          {followUps.map((message) => (
-            <div className="s2-decision-thread" key={message.id}>
-              <UserMessage time="刚刚">
-                {message.text ? <span>{message.text}</span> : null}
-                {message.files.map((file) => (
-                  <span className="s2-message-file" key={file.name}>
-                    <Icon name="file" />
-                    <span>
-                      <b>{file.name}</b>
-                      <small>
-                        {file.size
-                          ? `${Math.max(file.size / 1024 / 1024, 0.1).toFixed(1)} MB`
-                          : "已上传文件"}
-                      </small>
-                    </span>
+                <div className="s2-run-round-divider">
+                  <span>
+                    {round.startedAt} 运行 · {round.status}
+                    {round.id === run.id ? " · 当前定位" : ""}
                   </span>
-                ))}
-              </UserMessage>
-              <HunterReply
-                streaming={effectiveStatus === "正在运行"}
-                markdown={message.decision ? "## 运行已继续\n\n决定已经写入当前运行会话，我会从身份冲突检查点继续，不重复执行已完成的 6 个岗位。后续独立问题逐项确认，不沿用本次决定。" : message.waiting ? "补充内容已保留，尚未据此修改身份关系。请核对当前身份问题并明确选择处理方式；本轮仍在等待确认。" : "已收到补充要求，并加入本次运行的上下文。我会保留已经完成的结果，只重新执行受影响的步骤；新的结论仍记录在本次运行会话中。"}
-              />
-            </div>
-          ))}
-          {stopped ? (
-            <HunterReply markdown="### 本轮运行已停止\n\n对话、证据和当前处理水位已保留，可以继续补充要求。" />
-          ) : null}
+                </div>
+                <HunterReply
+                  streaming={round.status === "正在运行"}
+                  markdown={`## ${round.status === "正在运行" ? "当前执行进度" : "本轮运行结果"}
+
+${round.summary}
+
+- **本轮范围：** ${round.scope}
+- **当前结果：** ${round.result}
+- **连续记忆：** ${round.memory}`}
+                />
+                {findings.length ? (
+                  <div className="s2-run-findings">
+                    <h4>本轮发现</h4>
+                    <ol>
+                      {findings.map((signal) => (
+                        <li key={signal.id} id={`finding-${signal.id}`}>
+                          <span>
+                            <b>{signal.title}</b>
+                            <small>
+                              {signal.marker
+                                ? markerText(signal.marker)
+                                : signal.status === "已忽略"
+                                  ? "已忽略"
+                                  : "未处理"}
+                            </small>
+                          </span>
+                          <span className="s2-run-finding-actions">
+                            {round.id === run.id ? (
+                              <Button size="sm" tone="secondary" onClick={() => quoteSignal(signal)}>
+                                引用并处理
+                              </Button>
+                            ) : null}
+                            <Button
+                              size="sm"
+                              tone="ghost"
+                              onClick={() => navigate(`/signals?signal=${signal.id}`)}
+                            >
+                              在洞察中心查看
+                            </Button>
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : null}
+                {roundWaiting ? (
+                  <HunterReply>
+                    <DecisionRequest
+                      title="确认当前两份候选人资料的身份关系"
+                      description="确认后会继续这一轮运行；本次决定不会自动成为后续长期规则。"
+                      options={[
+                        { value: "merge", label: "按较新资料合并", description: "保留两个来源和冲突记录，继续更新受影响的匹配结果。" },
+                        { value: "separate", label: "保留为不同人物", description: "不合并档案，并继续处理剩余岗位。" },
+                        { value: "skip", label: "跳过本轮冲突项", description: "先完成其他结果，冲突项留待以后处理。" },
+                        { value: "custom", label: "我来补充其他要求", description: "在下方输入你掌握的信息或指定处理方式。" },
+                      ]}
+                      onSelect={(option) => {
+                        if (option.value === "custom") {
+                          setComposer("关于当前身份冲突，请按以下要求处理：");
+                          return;
+                        }
+                        if (authMode === "analysis" && option.value !== "skip") {
+                          notify("当前仅分析，尚未修改身份关系；可跳过冲突项或调整授权。", "warning");
+                          return;
+                        }
+                        if (!onUpdate(round.id, { decision: option.label, status: "正在运行", tone: "info",
+                          followUps: [...roundFollowUps, { id: crypto.randomUUID(), text: option.label, files: [], decision: true }] })) return;
+                        notify("已记录决定，并从当前检查点继续运行", "success");
+                      }}
+                    />
+                  </HunterReply>
+                ) : null}
+                {roundFollowUps.map((message) => {
+                  const signal = message.quote
+                    ? seedSignals.find((item) => item.id === message.quote)
+                    : null;
+                  return (
+                    <div className="s2-decision-thread" key={message.id}>
+                      <UserMessage time="刚刚">
+                        {message.quoteTitle ? (
+                          <span className="s2-message-quote">
+                            <Icon name="signal" />
+                            引用洞察：{message.quoteTitle}
+                          </span>
+                        ) : null}
+                        {message.text ? <span>{message.text}</span> : null}
+                        {message.files.map((file) => (
+                          <span className="s2-message-file" key={file.name}>
+                            <Icon name="file" />
+                            <span>
+                              <b>{file.name}</b>
+                              <small>
+                                {file.size
+                                  ? `${Math.max(file.size / 1024 / 1024, 0.1).toFixed(1)} MB`
+                                  : "已上传文件"}
+                              </small>
+                            </span>
+                          </span>
+                        ))}
+                      </UserMessage>
+                      {message.quote ? (
+                        <HunterReply markdown={quoteReply(message, signal)}>
+                          {message.kind === "update" && !message.resolution ? (
+                            <DecisionRequest
+                              title="是否按草稿更新资料？"
+                              description="是 / 否 / 建议；“是，但改一下……”算修改建议，不算确认。"
+                              options={[
+                                { value: "yes", label: "是", description: "写入资料，形成新版本。" },
+                                { value: "no", label: "否", description: "保留草稿，不写入。" },
+                                { value: "suggest", label: "建议", description: "在下方说明要怎么改，我会出新的草稿。" },
+                              ]}
+                              onSelect={(option) => resolveUpdate(message, option)}
+                            />
+                          ) : null}
+                          {message.resolution === "yes" ? (
+                            <p className="s2-run-handled-note">
+                              已写入，这条洞察已标记“{markerText(message.marker)}”。
+                            </p>
+                          ) : null}
+                          {message.resolution === "no" ? (
+                            <p className="s2-run-handled-note">草稿已保留，没有写入。这条要记个结论吗？</p>
+                          ) : null}
+                        </HunterReply>
+                      ) : (
+                        <HunterReply
+                          streaming={round.status === "正在运行"}
+                          markdown={message.decision ? "## 运行已继续\n\n决定已经写入这一轮，我会从身份冲突检查点继续，不重复执行已完成的 6 个岗位。后续独立问题逐项确认，不沿用本次决定。" : message.waiting ? "补充内容已保留，尚未据此修改身份关系。请核对当前身份问题并明确选择处理方式；这一轮仍在等待确认。" : "已收到补充要求，并加入这一轮的上下文。我会保留已经完成的结果，只重新执行受影响的步骤。"}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+                {round.status === "已停止" ? (
+                  <HunterReply markdown="### 这一轮已停止\n\n对话、证据和当前处理水位已保留，可以继续补充要求。" />
+                ) : null}
+              </section>
+            );
+          })}
         </div>
         <div className="s2-run-composer-dock">
           <div className="s2-task-plan">
@@ -591,7 +787,7 @@ ${run.summary}
                 <small>
                   {plan.filter((step) => step.status === "done").length} /{" "}
                   {plan.length}
-                  项完成 · {effectiveStatus}
+                  项完成 · {run.status}
                 </small>
               </span>
               <Icon name={planOpen ? "chevronDown" : "chevronUp"} />
@@ -602,6 +798,20 @@ ${run.summary}
               </div>
             ) : null}
           </div>
+          {quoted ? (
+            <div className="s2-quote-chip" role="note">
+              <Icon name="signal" />
+              <span>
+                <small>
+                  引用洞察 · {quoted.marker ? markerText(quoted.marker) : quoted.status}
+                </small>
+                <b>{quoted.title}</b>
+              </span>
+              <button type="button" aria-label="移除引用" onClick={removeQuote}>
+                <Icon name="close" />
+              </button>
+            </div>
+          ) : null}
           <Composer
             value={composer}
             onChange={setComposer}
@@ -613,12 +823,16 @@ ${run.summary}
             }}
             attachments={attachments}
             onAttachmentsChange={setAttachments}
-            streaming={effectiveStatus === "正在运行"}
+            streaming={run.status === "正在运行"}
             onStop={() => {
               if (!onUpdate(run.id, { status: "已停止", tone: "neutral" })) return;
-              notify("本轮运行已停止，当前进度已经保留", "info");
+              notify("这一轮已停止，当前进度已经保留", "info");
             }}
-            placeholder="继续补充信息、文件、链接或新的处理要求"
+            placeholder={
+              quoted
+                ? "说说要怎么处理这条洞察，例如“更新资料”“开始客户开发”“先不跟”“下个月再看看”"
+                : "继续补充信息、文件、链接或新的处理要求"
+            }
           />
         </div>
       </div>
@@ -718,7 +932,9 @@ export function PeriodicTasksPage() {
   }, [customEnd, customStart, query, runStatus, runs, taskViews, timeRange, view]);
   const selectedRun =
     visible.find((run) => view === "runs" && run.id === runId) ||
-    (view === "runs" ? visible[0] : null);
+    (view === "runs"
+      ? runs.find((run) => requestedRunId && run.id === requestedRunId) || visible[0]
+      : null);
   const setView = (nextView) => {
     setMobileDetailOpen(false);
     setRunStatus("");
@@ -768,7 +984,7 @@ export function PeriodicTasksPage() {
           <small>按计划重复执行的猎头工作</small>
           <h1>周期性任务</h1>
           <p>
-            每次运行使用独立会话，并读取上次成功结论、最新正式资产和用户修正规则。
+            每个周期任务是一段连续对话，每次运行是其中一轮；运行记录是这段对话的目录。
           </p>
         </div>
         <Button
@@ -952,7 +1168,7 @@ export function PeriodicTasksPage() {
           </div>
           {view === "runs" ? (
             selectedRun ? (
-              <RunDetail run={selectedRun} onBack={closeMobileDetail} onUpdate={updateRun} />
+              <RunDetail run={selectedRun} runs={runs} onBack={closeMobileDetail} onUpdate={updateRun} />
             ) : (
               <aside className="s2-periodic-detail">
                 <EmptyState
@@ -996,7 +1212,7 @@ export function PeriodicTasksPage() {
                 setRunId(activeRun.id);
                 setRunStatus("正在运行");
                 setMobileDetailOpen(true);
-                notify("已创建新的独立运行，会从上次成功水位继续", "info");
+                notify("已在这段对话里开始新的一轮，会从上次成功水位继续", "info");
                 setParams({
                   view: "runs",
                   run: activeRun.id,

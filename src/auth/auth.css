@@ -752,3 +752,27 @@
     transition: none;
   }
 }
+
+.auth-consent a {
+  color: var(--auth-blue);
+  text-decoration: none;
+}
+.auth-consent a:hover {
+  text-decoration: underline;
+}
+.auth-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  margin: 16px 0 0;
+  font-size: 12px;
+}
+.auth-legal-links a {
+  color: #768298;
+  text-decoration: none;
+}
+.auth-legal-links a:hover {
+  color: var(--auth-blue);
+  text-decoration: underline;
+}

@@ -96,9 +96,8 @@ test("周期性任务提供关键页面状态和运行时间筛选", async ({ pa
   await page.goto("#/tasks/periodic?view=runs&status=正在运行");
   await expect(page.locator(".s2-periodic-list > button")).toHaveCount(1);
   await expect(page.getByText("当前执行进度", { exact: true })).toBeVisible();
-  await expect(page.locator(".s2-run-timeline .s2-hunter-reply")).toHaveCount(
-    2,
-  );
+  await expect(page.locator(".s2-run-round.is-current .s2-hunter-reply")).toHaveCount(1);
+  await expect(page.locator(".s2-run-round-divider").first()).toBeVisible();
   await expect(
     page.locator(".s2-run-composer-dock .s2-composer"),
   ).toBeVisible();
@@ -126,9 +125,9 @@ test("所有周期运行状态都使用可继续对话的完整详情", async ({
   await page.goto("#/tasks/periodic?view=runs");
   await page.locator(".s2-periodic-time-filter > button").click();
   await page.getByRole("button", { name: "近一个月", exact: true }).click();
-  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(7);
+  await expect(page.locator(".s2-periodic-list > button")).toHaveCount(8);
 
-  for (const index of [0, 2, 3, 4, 5, 6]) {
+  for (const index of [0, 2, 3, 4, 5, 6, 7]) {
     await page.locator(".s2-periodic-list > button").nth(index).click();
     await expect(page.locator(".s2-run-conversation")).toBeVisible();
     await expect(page.getByLabel("任务对话输入")).toBeVisible();
@@ -336,7 +335,7 @@ test("新建任务和直接核验任务的普通回复统一由动态 Markdown �
   }
 });
 
-test("洞察中心持续跟进观察项并把处理结果带入任务", async ({ page }) => {
+test("洞察只有处理和忽略两个按钮，没有处理结果时不标记", async ({ page }) => {
   await page.goto("#/signals?signal=signal-cloudchip");
   await expect(
     page.getByRole("heading", { name: /云脉芯能正在组建机器人芯片团队/ }),
@@ -347,96 +346,81 @@ test("洞察中心持续跟进观察项并把处理结果带入任务", async ({
   expect(listBox).not.toBeNull();
   expect(detailBox).not.toBeNull();
   expect(detailBox.width).toBeGreaterThan(listBox.width * 1.35);
-  await expect(page.getByText("等待你的决定", { exact: true })).toBeVisible();
-  await expect(
-    page.getByText(/是否围绕云脉芯能启动一次客户开发任务/),
-  ).toBeVisible();
-  await page.goto("#/signals?signal=signal-tuoji");
-  await expect(
-    page.getByRole("heading", {
-      name: "拓界智驾新增感知与规划团队招聘页面",
-    }),
-  ).toBeVisible();
-  await expect(page.getByText("Hunter 将继续观察")).toBeVisible();
-  await expect(
-    page.getByText("9 月 7 日 09:00", { exact: true }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "立即复查" }).click();
-  await expect(page.getByText("Hunter 正在重新核验")).toBeVisible();
-  await expect(
-    page.getByRole("progressbar", { name: "信号核验进度" }),
-  ).toBeVisible();
-  await expect(page.getByText("等待你的决定", { exact: true })).toBeVisible({
-    timeout: 3_000,
-  });
-  await page.getByRole("button", { name: "处理洞察" }).click();
-  await expect(page.getByRole("heading", { name: "处理洞察" })).toBeVisible();
-  await page.getByRole("radio", { name: /创建新任务/ }).click();
-  await page.getByRole("button", { name: "创建任务", exact: true }).click();
-  await expect(page).toHaveURL(/#\/tasks\/task-opportunity-/);
-  await expect(page.getByRole("heading", { name: "待确认的招聘机会" })).toBeVisible();
-  const state = await page.evaluate(() => JSON.parse(localStorage.getItem("hunter-opportunity-lifecycle-v1")));
-  expect(state.tasks[0].source.id).toBe("signal-tuoji");
-  expect(state.tasks[0].messages[0].content).toContain("拓界智驾新增感知与规划团队招聘页面");
-  expect(state.tasks[0].results).toEqual([]);
-});
-
-test("洞察加入已有任务前必须明确选择目标任务", async ({ page }) => {
-  await page.goto("#/signals?signal=signal-cloudchip");
-  await page.getByRole("button", { name: "处理洞察" }).click();
-  await page.getByRole("radio", { name: /加入已有任务/ }).click();
-  const submit = page.getByRole("button", { name: "加入所选任务" });
-  await expect(submit).toBeDisabled();
-  await expect(page.getByText("选择目标任务")).toBeVisible();
-  await page.goto("#/new?kind=opportunity&prompt=" + encodeURIComponent("公司：星澜机器人\n机会名称：洞察核验任务\n招聘需求摘要：核验研发团队招聘\n需求依据：待核验"));
-  await page.getByRole("button", { name: "发送", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "待确认的招聘机会" })).toBeVisible();
-  const taskUrl = page.url();
-  await page.goto("#/signals?signal=signal-cloudchip");
-  await page.getByRole("button", { name: "处理洞察" }).click();
-  await page.getByRole("radio", { name: /加入已有任务/ }).click();
-  await page.getByRole("radiogroup", { name: "已有任务" }).getByRole("radio").first().click();
-  await expect(submit).toBeEnabled();
-  await submit.click();
-  await expect(page).toHaveURL(taskUrl);
-  const state = await page.evaluate(() => JSON.parse(localStorage.getItem("hunter-opportunity-lifecycle-v1")));
-  expect(state.tasks).toHaveLength(1);
-  expect(state.tasks[0].sourceSignals).toContain("signal-cloudchip");
-});
-
-test("洞察可以记录系统外处理结果而不创建任务", async ({ page }) => {
-  await page.goto("#/signals?signal=signal-chensong");
-  await page.getByRole("button", { name: "处理洞察" }).click();
-  await page.getByRole("radio", { name: /记录处理结果/ }).click();
-  await page
-    .getByPlaceholder(/已电话联系招聘负责人/)
-    .fill("已电话联系陈松，对方暂时不考虑新机会。");
-  await page.getByRole("button", { name: "记录已处理" }).click();
-  await expect(
-    page.getByRole("heading", { name: "已记录处理结果" }),
-  ).toBeVisible();
-  await expect(
-    page
-      .locator(".s2-signal-followup")
-      .getByText("已电话联系陈松，对方暂时不考虑新机会。"),
-  ).toBeVisible();
-});
-
-test("不同业务类型的洞察统一使用通用处理入口", async ({ page }) => {
-  for (const id of [
-    "signal-graph-sync",
-    "signal-cloudchip",
-    "signal-chensong",
-  ]) {
-    await page.goto(`#/signals?signal=${id}`);
-    await expect(page.getByRole("button", { name: "处理洞察" })).toBeVisible();
+  const footer = page.locator(".s2-signal-detail > footer");
+  await expect(footer.getByRole("button", { name: "处理", exact: true })).toBeVisible();
+  await expect(footer.getByRole("button", { name: "忽略", exact: true })).toBeVisible();
+  for (const removed of ["处理洞察", "继续观察", "立即复查", "恢复观察", "查看完整上下文对话"]) {
+    await expect(page.getByRole("button", { name: removed, exact: true })).toHaveCount(0);
   }
-  await expect(page.getByRole("button", { name: "发起客户开发" })).toHaveCount(
-    0,
-  );
-  await expect(page.getByRole("button", { name: "安排联系核实" })).toHaveCount(
-    0,
-  );
+  await expect(page.getByRole("heading", { name: "还没有处理结果" })).toBeVisible();
+  await expect(page.locator(".s2-signal-task-context")).toContainText("今天 09:00 那一轮");
+});
+
+test("点处理回到来源任务对话并引用洞察，开始客户开发后自动标记已处理", async ({ page }) => {
+  await page.goto("#/signals?signal=signal-cloudchip");
+  await page.locator(".s2-signal-detail > footer").getByRole("button", { name: "处理", exact: true }).click();
+  await expect(page).toHaveURL(/run=run-startups-success.*quote=signal-cloudchip/);
+  await expect(page.locator(".s2-quote-chip")).toContainText("云脉芯能正在组建机器人芯片团队");
+  await expect(page.locator(".s2-run-round.is-current")).toBeVisible();
+  await expect(page.locator(".s2-run-round-divider")).toHaveCount(4);
+  await page.getByLabel("任务对话输入").fill("这家开始客户开发");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.locator(".s2-message-quote")).toContainText("云脉芯能正在组建机器人芯片团队");
+  await expect(page.locator(".s2-quote-chip")).toHaveCount(0);
+  await expect(page.locator(".s2-run-round.is-current").getByText(/已标记“9\/3 已处理：开始客户开发：云脉芯能”/)).toBeVisible();
+  await page.goto("#/signals?signal=signal-cloudchip");
+  await expect(page.locator(".s2-signal-detail")).toContainText("9/3 已处理：开始客户开发：云脉芯能");
+  await page.goto("#/signals?filter=open");
+  await expect(page.locator(".s2-signal-feed")).not.toContainText("云脉芯能正在组建机器人芯片团队");
+});
+
+test("只问问题不打标记，回复知道了记为已知情", async ({ page }) => {
+  await page.goto("#/signals?signal=signal-chensong");
+  await page.locator(".s2-signal-detail > footer").getByRole("button", { name: "处理", exact: true }).click();
+  await expect(page).toHaveURL(/run=run-candidate-partial.*quote=signal-chensong/);
+  await page.getByLabel("任务对话输入").fill("他现在团队多大？");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.getByText(/这条要记个结论吗/)).toBeVisible();
+  await page.goto("#/signals?filter=open");
+  await expect(page.locator(".s2-signal-feed")).toContainText("陈松加入星澜机器人");
+  await page.goto("#/tasks/periodic?view=runs&run=run-candidate-partial");
+  await page.getByLabel("任务对话输入").fill("知道了");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await page.goto("#/signals?signal=signal-chensong");
+  await expect(page.locator(".s2-signal-detail")).toContainText("已处理：已知情");
+});
+
+test("资料更新先出草稿，确认后才打已处理标记", async ({ page }) => {
+  await page.goto("#/tasks/periodic?view=runs&run=run-candidate-partial&quote=signal-chensong");
+  await page.getByLabel("任务对话输入").fill("更新陈松的资料");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "资料更新草稿" })).toBeVisible();
+  await page.goto("#/signals?signal=signal-chensong");
+  await expect(page.getByRole("heading", { name: "还没有处理结果" })).toBeVisible();
+  await page.goto("#/tasks/periodic?view=runs&run=run-candidate-partial");
+  await page.getByRole("button", { name: /^是 写入资料/ }).click();
+  await expect(page.getByText(/已写入，这条洞察已标记/)).toBeVisible();
+  await page.goto("#/signals?signal=signal-chensong");
+  await expect(page.locator(".s2-signal-detail")).toContainText("更新了陈松的资料（v5）");
+});
+
+test("只看未处理、忽略、取消忽略和撤销标记", async ({ page }) => {
+  await page.goto("#/signals?filter=open");
+  const feed = page.locator(".s2-signal-feed");
+  await expect(feed).not.toContainText("拓界智驾新增感知与规划团队招聘页面");
+  await expect(feed).not.toContainText("周明远近期连续转发具身智能招聘内容");
+  await expect(feed).toContainText("云脉芯能正在组建机器人芯片团队");
+  await page.goto("#/signals?signal=signal-cloudchip");
+  await page.locator(".s2-signal-detail > footer").getByRole("button", { name: "忽略", exact: true }).click();
+  await expect(page.getByRole("button", { name: "取消忽略" })).toBeVisible();
+  await page.getByRole("tab", { name: /已忽略/ }).click();
+  await expect(feed).toContainText("云脉芯能正在组建机器人芯片团队");
+  await page.getByRole("button", { name: "取消忽略" }).click();
+  await expect(page.locator(".s2-signal-detail > footer").getByRole("button", { name: "忽略", exact: true })).toBeVisible();
+  await page.goto("#/signals?signal=signal-tuoji");
+  await expect(page.locator(".s2-signal-detail")).toContainText("9/3 已处理：约了 9 月 17 日复查");
+  await page.getByRole("button", { name: "撤销标记" }).click();
+  await expect(page.getByRole("heading", { name: "还没有处理结果" })).toBeVisible();
 });
 
 test("洞察来源可以查看证据内容且不会伪装为真实外部链接", async ({ page }) => {
@@ -477,56 +461,14 @@ test("洞察列表与详情在桌面端独立纵向滚动", async ({ page }) => 
   expect(await detail.evaluate((node) => node.scrollTop)).toBe(detailScrollTop);
 });
 
-test("洞察中心展示核验、处理、忽略和失效的真实后续", async ({ page }) => {
-  for (const [id, marker] of [
-    ["signal-verifying", "Hunter 正在重新核验"],
-    ["signal-xinglan", "创建任务"],
-    ["signal-ignored", "同一事件不再提醒"],
-    ["signal-expired", "观察已经结束"],
-  ]) {
-    await page.goto(`#/signals?signal=${id}`);
-    await expect(page.getByRole("heading", { name: marker })).toBeVisible();
-    await expectNoHorizontalOverflow(page);
-  }
-
-  await page.goto("#/signals?signal=signal-verifying");
-  const activity = page.locator(".s2-signal-verification-activity");
-  await expect(activity.getByRole("listitem")).toHaveCount(5);
-  await expect(
-    activity.getByText("正在核验任职时间和近期团队公开动态"),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "查看完整上下文对话" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "查看完整上下文对话" }).click();
-  await expect(page).toHaveURL(/run=run-startups-active/);
-  await expect(page.locator(".s2-run-conversation")).toBeVisible();
-});
-
-test("洞察关联任务的完整对话入口不随洞察状态变化丢失", async ({ page }) => {
-  await page.goto("#/signals?signal=signal-tuoji");
-  const conversationButton = page.getByRole("button", {
-    name: "查看完整上下文对话",
-  });
-  await expect(conversationButton).toBeVisible();
-  await page.getByRole("button", { name: "立即复查" }).click();
-  await expect(conversationButton).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Hunter 正在重新核验" }),
-  ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "等待你的决定" })).toBeVisible(
-    {
-      timeout: 3000,
-    },
-  );
-  await expect(conversationButton).toBeVisible();
-});
-
 test("周期运行与洞察可以双向追溯", async ({ page }) => {
-  await page.goto("#/signals?signal=signal-cloudchip");
-  await page.getByRole("button", { name: "查看完整上下文对话" }).click();
-  await expect(page).toHaveURL(/run=run-startups-success/);
-  await page.getByRole("button", { name: "查看本轮产生的洞察" }).click();
+  await page.goto("#/signals?signal=signal-xinglan");
+  await expect(page.locator(".s2-signal-detail")).toContainText("8/18 已处理：交给岗位招聘任务");
+  await page.locator(".s2-signal-task-context").getByRole("button", { name: "处理" }).click();
+  await expect(page).toHaveURL(/run=run-startups-0817/);
+  const finding = page.locator("#finding-signal-cloudchip");
+  await expect(finding).toContainText("未处理");
+  await finding.getByRole("button", { name: "在洞察中心查看" }).click();
   await expect(page).toHaveURL(/signal=signal-cloudchip/);
   await expect(
     page.getByRole("heading", { name: /云脉芯能正在组建机器人芯片团队/ }),
@@ -538,14 +480,14 @@ test("移动端可以从信号列表进入详情并返回", async ({ page }) => 
   await page.goto("#/signals");
   await page
     .locator(".s2-signal-feed > button")
-    .filter({ hasText: "陈松的公开任职信息发生变化" })
+    .filter({ hasText: "陈松加入星澜机器人，任自动驾驶技术经理" })
     .click();
   await expect(page.locator(".s2-signal-detail")).toHaveCSS("opacity", "1");
   await expect(
-    page.getByRole("heading", { name: /陈松的公开任职信息发生变化/ }),
+    page.getByRole("heading", { name: /陈松加入星澜机器人/ }),
   ).toBeVisible();
   await page.getByRole("button", { name: "返回洞察列表" }).click();
   await expect(
-    page.getByPlaceholder("搜索公司、人物、信号或洞察"),
+    page.getByPlaceholder("搜索公司、人物或洞察"),
   ).toBeVisible();
 });

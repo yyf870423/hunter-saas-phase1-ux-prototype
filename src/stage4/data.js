@@ -863,7 +863,7 @@ export const contacts = [
     id: "contact-zhangmin",
     companyId: "company-tuojie",
     name: "张敏",
-    categories: ["招聘负责人"],
+    categories: ["招聘负责人", "决策人"],
     company: "拓界机器人",
     role: "人才招聘总监",
     phone: "139 **** 4803",

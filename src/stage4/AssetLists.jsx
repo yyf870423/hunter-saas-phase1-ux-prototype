@@ -36,6 +36,7 @@ import {
 import { useCompanyContacts, recycleCompany } from "./company-contact-store";
 import { runOpportunityCommand, summarizePosition, useOpportunityState } from "./opportunity-store";
 import { summarizeOpportunity } from "./opportunity-domain";
+import { companyDeleteImpact } from "./company-assessment";
 import { displayDateTime } from "./OpportunityComponents";
 
 const educationTones = {
@@ -603,7 +604,11 @@ export function AssetListPage({ type }) {
         assetName={deleteTarget?.name || deleteTarget?.title || ""}
         impact={
           type === "companies"
-            ? "所属联系人将一并进入回收站；关联候选人、招聘机会、岗位和任务不会删除。"
+            ? companyDeleteImpact(deleteTarget?.id ? [deleteTarget.id] : [...controller.selected], {
+                contacts: companyContext.contacts,
+                opportunities: lifecycle.opportunities,
+                positions: lifecycle.positions,
+              })
             : "关联的其他正式资产不会删除；从反向列表进入时，也不会创建第二份关系。"
         }
         onConfirm={() => {

@@ -52,6 +52,27 @@ export function Dashboard() {
     notify("洞察摘要已重新加载", "success");
   };
 
+  if (state === "not-activated") {
+    // Before official launch: signed in, but the trial application is not approved yet (design 11 §8.4).
+    return (
+      <div className="s1-dashboard" aria-label="试用暂未开通">
+        <section className="s1-not-activated">
+          <i>
+            <Icon name="clock" />
+          </i>
+          <h1>申请审核中 · 暂未开通</h1>
+          <p>
+            你的试用申请正在审核，提交申请不代表试用已开通。审核通过后，我们会把开通邮件发到申请时填写的邮箱，用申请手机号登录即可进入；没有获批前，暂时不能使用业务页面。
+          </p>
+          <p>如果换了手机号，请用开通邮件里的链接认领工作空间。</p>
+          <Button tone="secondary" onClick={() => navigate("/login")}>
+            返回登录
+          </Button>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div
       className="s1-dashboard"

@@ -18,7 +18,7 @@ export const localDateTime = (value) => {
   return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()) + " " + pad(date.getHours()) + ":" + pad(date.getMinutes());
 };
 export const displayDateTime = (value) => localDateTime(value) || "待确认";
-export const emptyOpportunity = (companyId = "") => Object.fromEntries(OPPORTUNITY_FIELDS.map((key) => [key, key === "companyId" ? companyId : key === "priority" ? "普通" : ""]));
+export const emptyOpportunity = (companyId = "") => Object.fromEntries(OPPORTUNITY_FIELDS.map((key) => [key, key === "companyId" ? companyId : key === "priority" ? "中" : ""]));
 export const pickOpportunity = (item) => Object.fromEntries(OPPORTUNITY_FIELDS.map((key) => [key, item?.[key] || ""]));
 export const positionFromDirection = (opportunity, direction) => ({
   name: direction?.name || "", companyId: opportunity?.companyId || "", company: opportunity?.company || "",
@@ -79,7 +79,8 @@ export function OpportunityFields({ value, onChange, errors = {}, section = "all
       <FormField label="相关联系人" error={errors.contactId}><EntitySelect label="未关联联系人" value={value.contactId}
         options={[{ value: "", label: "未关联联系人" }, ...contacts.filter((item) => item.companyId === value.companyId && !item.deletedAt).map((item) => ({ value: item.id, label: item.name + (item.role ? " · " + item.role : "") }))]}
         onChange={(next) => set("contactId", next)} searchable /></FormField>
-      <FormField label="优先级"><SelectMenu value={value.priority || "普通"} options={["普通", "高", "低"]} onChange={(next) => set("priority", next)} /></FormField>
+      <FormField label="优先级"><SelectMenu value={!value.priority || value.priority === "普通" ? "中" : value.priority} options={["高", "中", "低"]} onChange={(next) => set("priority", next)} /></FormField>
+      <FormField label="优先级理由" help="Hunter 会给出建议和理由，确认后写入；也可以自己写。"><TextInput value={value.priorityReason || ""} onChange={(next) => set("priorityReason", next)} placeholder="例如：融资后扩张，岗位级别高" /></FormField>
     </> : null}
     {["all", "summary"].includes(section) ? <FormField label="招聘需求摘要" required span={2} error={errors.summary}>
       <TextArea value={value.summary} onChange={(next) => set("summary", next)} rows={5} />{old("summary")}</FormField> : null}

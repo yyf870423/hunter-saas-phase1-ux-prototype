@@ -218,7 +218,7 @@ test("user auth supports validation, QR login and registration", async ({
     page.getByRole("heading", { name: "注册 Hunter" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("checkbox", { name: /服务条款与隐私说明/ }),
+    page.getByRole("checkbox", { name: /服务条款.*数据处理协议.*隐私政策/ }),
   ).toBeVisible();
   await expect(page.getByRole("tab", { name: /微信扫码注册/ })).toBeVisible();
 });
@@ -254,7 +254,7 @@ test("phone registration hands off to the existing console", async ({
   await page.getByLabel("姓名").fill("林昊");
   await page.getByLabel("手机号").fill("13800138000");
   await page.getByLabel("验证码").fill("123456");
-  await page.getByRole("checkbox", { name: /服务条款与隐私说明/ }).check();
+  await page.getByRole("checkbox", { name: /服务条款.*数据处理协议.*隐私政策/ }).check();
   await page.getByRole("button", { name: "注册并进入 Hunter" }).click();
 
   await expect(page).toHaveURL(/#\/home$/);
@@ -275,9 +275,9 @@ test("wechat registration validates consent and hands off to the console", async
   });
   await confirm.click();
   await expect(
-    page.getByText("注册前需要同意服务条款与隐私说明"),
+    page.getByText("注册前需要勾选同意《服务条款》《数据处理协议》并确认《隐私政策》"),
   ).toBeVisible();
-  await page.getByRole("checkbox", { name: /服务条款与隐私说明/ }).check();
+  await page.getByRole("checkbox", { name: /服务条款.*数据处理协议.*隐私政策/ }).check();
   await confirm.click();
 
   await expect(page).toHaveURL(/#\/home$/);
