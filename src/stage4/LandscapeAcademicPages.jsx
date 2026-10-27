@@ -185,7 +185,7 @@ const initialMappingTargets = [
     status: "已完成",
     gap: "—",
     action: "已关联赵星羽",
-    completion: "确认负责人身份，并关联到正式候选人或稳定人物线索。",
+    completion: "确认负责人身份，并关联到正式候选人。",
     evidence: "候选人档案、公司团队页面和公开履历相互印证。",
   },
   {
@@ -1207,7 +1207,7 @@ function AcademicCardList({ kind }) {
         close={() => setDeleteOpen(false)}
         assetLabel={label}
         assetName={`已选的 ${selected.size} 项${label}`}
-        impact="候选人、人物线索和知识图谱不会删除；已有关系保留已删除引用。"
+        impact="候选人和知识图谱不会删除；已有关系保留已删除引用。"
         onConfirm={() => { setDeleteOpen(false); setSelected(new Set()); }}
       />
     </div>
@@ -1489,6 +1489,7 @@ function PersonIdentityReview({
   onSave,
 }) {
   const notify = useToast();
+  const navigate = useNavigate();
   const suggestedId = candidateIdentityMatches[person] || "";
   const suggestedCandidate = candidates.find(
     (candidate) => candidate.id === suggestedId,
@@ -1564,9 +1565,7 @@ function PersonIdentityReview({
     notify(
       decision === "candidate"
         ? `已关联至候选人 ${suggestedCandidate.name}`
-        : decision === "lead"
-          ? `${person} 已保留为人物线索`
-          : `${person} 已暂不关联`,
+        : `${person} 已暂不关联`,
     );
   };
   return (
@@ -1581,7 +1580,17 @@ function PersonIdentityReview({
           <Button tone="ghost" onClick={() => saveDecision("none")}>
             暂不关联
           </Button>
-          <Button onClick={() => saveDecision("lead")}>保留人物线索</Button>
+          {/* No separate “person lead” entry (decision 4): verifying an unknown person happens in a task. */}
+          <Button
+            onClick={() => {
+              close();
+              navigate(
+                `/new?prompt=${encodeURIComponent(`核实${kind === "paper" ? "论文作者" : "专利发明人"}“${person}”（${institution}）是谁，能确认就建为候选人或关联已有候选人`)}`,
+              );
+            }}
+          >
+            让 Hunter 核实
+          </Button>
           {suggestedCandidate ? (
             <Button tone="primary" onClick={() => saveDecision("candidate")}>
               确认是同一人并关联
@@ -1630,7 +1639,7 @@ function PersonIdentityReview({
               <article className="is-empty">
                 <Icon name="search" />
                 <h4>没有可靠的疑似候选人</h4>
-                <p>可以保留为人物线索，获得更多信息后再判断。</p>
+                <p>可以暂不关联，或让 Hunter 在任务里核实这位{noun}。</p>
               </article>
             )}
           </div>
@@ -1745,7 +1754,7 @@ function AcademicPeopleList({
           {linked
             ? "已关联"
             : reviewStates[person] ||
-              (kind === "paper" ? "人物线索" : "待确认")}
+              (kind === "paper" ? "未关联" : "待确认")}
         </StatusBadge>
       </article>
     );
@@ -1916,7 +1925,7 @@ export function PaperDetailPage() {
             setReviewStates((current) => ({
               ...current,
               [identityPerson.person]:
-                decision === "lead" ? "人物线索" : "未关联",
+                "未关联",
             }));
           }}
         />
@@ -1926,7 +1935,7 @@ export function PaperDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="论文"
         assetName={item.title}
-        impact="候选人、人物线索和知识图谱不会删除；人物关系显示论文已删除引用。"
+        impact="候选人和知识图谱不会删除；人物关系显示论文已删除引用。"
         onConfirm={() => {
           setDeleteOpen(false);
           navigate("/papers");
@@ -2054,7 +2063,7 @@ export function PatentDetailPage() {
             setReviewStates((current) => ({
               ...current,
               [identityPerson.person]:
-                decision === "lead" ? "人物线索" : "未关联",
+                "未关联",
             }));
           }}
         />
@@ -2064,7 +2073,7 @@ export function PatentDetailPage() {
         close={() => setDeleteOpen(false)}
         assetLabel="专利"
         assetName={item.title}
-        impact="候选人、人物线索和知识图谱不会删除；共同发明人关系保留已删除引用。"
+        impact="候选人和知识图谱不会删除；共同发明人关系保留已删除引用。"
         onConfirm={() => {
           setDeleteOpen(false);
           navigate("/patents");

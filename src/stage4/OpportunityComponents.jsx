@@ -84,7 +84,7 @@ export function OpportunityFields({ value, onChange, errors = {}, section = "all
     </> : null}
     {["all", "summary"].includes(section) ? <FormField label="招聘需求摘要" required span={2} error={errors.summary}>
       <TextArea value={value.summary} onChange={(next) => set("summary", next)} rows={5} />{old("summary")}</FormField> : null}
-    {["all", "evidence"].includes(section) ? <FormField label="发现依据" required span={2} error={errors.evidence}>
+    {["all", "evidence"].includes(section) ? <FormField label="发现依据" required span={2} error={errors.evidence} help="先写结论（有依据 / 待确认 / 有风险），再写依据，如“有依据：招聘页 10/20 新挂 3 个职位，两个平台同时发布”">
       <TextArea value={value.evidence} onChange={(next) => set("evidence", next)} rows={4} />{old("evidence")}</FormField> : null}
     {["all", "summary"].includes(section) ? <>
       <FormField label="已确认要求" span={2}><TextArea value={value.requirements} onChange={(next) => set("requirements", next)} rows={3} /></FormField>

@@ -5865,3 +5865,13 @@
   color: var(--s1-success);
   font-size: 13px;
 }
+
+.s2-periodic-system-note {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--s1-canvas);
+  color: var(--s1-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}

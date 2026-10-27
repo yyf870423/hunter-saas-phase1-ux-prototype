@@ -421,6 +421,52 @@ test("只看未处理、忽略、取消忽略和撤销标记", async ({ page }) 
   await expect(page.locator(".s2-signal-detail")).toContainText("9/3 已处理：约了 9 月 17 日复查");
   await page.getByRole("button", { name: "撤销标记" }).click();
   await expect(page.getByRole("heading", { name: "还没有处理结果" })).toBeVisible();
+  // The undo is kept in the history (design 10 §6.6).
+  await expect(page.locator(".s2-signal-history")).toContainText("撤销了“已处理”标记");
+  await expect(page.locator(".s2-signal-history")).toContainText("原标记：约了 9 月 17 日复查");
+});
+
+test("对话里交给已有任务、发邮件确认后、否决草稿后回“知道了”都会打标记；说“撤销”会去掉标记", async ({ page }) => {
+  // 例：交给已有任务 → “交给“岗位招聘任务”继续”
+  await page.goto("#/tasks/periodic?view=runs&run=run-startups-success&quote=signal-cloudchip");
+  await page.getByLabel("任务对话输入").fill("交给岗位招聘任务继续跟");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.getByText(/已标记“9\/3 已处理：交给“岗位招聘任务”继续”/)).toBeVisible();
+  // 例：说“撤销” → 去掉标记
+  await page.goto("#/tasks/periodic?view=runs&run=run-startups-success&quote=signal-cloudchip");
+  await page.getByLabel("任务对话输入").fill("刚才标错了，撤销");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.getByText(/已撤销这条洞察的“已处理”标记/)).toBeVisible();
+  // 例：发邮件 → 先出草稿，点“是”才算已处理
+  await page.goto("#/tasks/periodic?view=runs&run=run-startups-success&quote=signal-cloudchip");
+  await page.getByLabel("任务对话输入").fill("给他们发封邮件问问");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "邮件草稿" })).toBeVisible();
+  await page.getByRole("button", { name: /^是 从你的邮箱发出/ }).click();
+  await expect(page.getByText(/已发出，这条洞察已标记“9\/3 已处理：发出邮件给云脉芯能”/)).toBeVisible();
+  await page.goto("#/signals?signal=signal-cloudchip");
+  await expect(page.locator(".s2-signal-detail")).toContainText("9/3 已处理：发出邮件给云脉芯能");
+  // 例：更新草稿选“否”，Hunter 问要不要记结论，回“知道了” → 已知情；这一轮不会变成“正在运行”
+  await page.goto("#/tasks/periodic?view=runs&run=run-candidate-partial&quote=signal-chensong");
+  await page.getByLabel("任务对话输入").fill("更新一下他的资料");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await page.getByRole("button", { name: /^否 保留草稿/ }).click();
+  await expect(page.getByText("草稿已保留，没有写入。这条要记个结论吗？")).toBeVisible();
+  await page.getByLabel("任务对话输入").fill("知道了");
+  await page.getByRole("button", { name: "发送", exact: true }).click();
+  await expect(page.getByText(/已标记“9\/3 已处理：已知情”/)).toBeVisible();
+  await expect(page.locator(".s2-run-detail > header")).not.toContainText("正在运行");
+});
+
+test("未处理的洞察不加标记，邮箱周期任务不能单独暂停或删除", async ({ page }) => {
+  await page.goto("#/signals?signal=signal-cloudchip");
+  await expect(page.locator(".s2-signal-detail > header")).not.toContainText("未处理");
+  await expect(page.locator(".s2-signal-detail > header small")).toHaveText(/^洞察 · /);
+  await page.goto("#/tasks/periodic?selected=periodic-mailbox");
+  await expect(page.getByRole("heading", { name: "邮箱：读取 shenlan@qq.com 的邮件" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "暂停", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "删除", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "管理邮箱连接" })).toBeVisible();
 });
 
 test("洞察来源可以查看证据内容且不会伪装为真实外部链接", async ({ page }) => {
@@ -464,7 +510,9 @@ test("洞察列表与详情在桌面端独立纵向滚动", async ({ page }) => 
 test("周期运行与洞察可以双向追溯", async ({ page }) => {
   await page.goto("#/signals?signal=signal-xinglan");
   await expect(page.locator(".s2-signal-detail")).toContainText("8/18 已处理：交给岗位招聘任务");
-  await page.locator(".s2-signal-task-context").getByRole("button", { name: "处理" }).click();
+  // Only two actions on the detail (处理 / 忽略); the source-task block has no button of its own.
+  await expect(page.locator(".s2-signal-task-context").getByRole("button")).toHaveCount(0);
+  await page.locator(".s2-signal-detail > footer").getByRole("button", { name: "处理", exact: true }).click();
   await expect(page).toHaveURL(/run=run-startups-0817/);
   const finding = page.locator("#finding-signal-cloudchip");
   await expect(finding).toContainText("未处理");

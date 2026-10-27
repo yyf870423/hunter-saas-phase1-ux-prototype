@@ -3688,6 +3688,13 @@ a:focus-visible {
   }
 }
 
+.s1-not-activated-page {
+  display: flow-root;
+  min-height: 100vh;
+  padding: 0 16px 32px;
+  background: var(--s1-canvas);
+  color: var(--s1-ink);
+}
 .s1-not-activated {
   display: grid;
   justify-items: center;

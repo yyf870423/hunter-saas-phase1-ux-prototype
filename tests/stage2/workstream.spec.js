@@ -1,3 +1,4 @@
+import { selectTopReviewCandidates } from "../review-helpers";
 import { expect, test } from "@playwright/test";
 import {
   expectNoHorizontalOverflow,
@@ -132,6 +133,8 @@ test("大型候选人审核支持筛选、详情和结构化决定", async ({ pa
   await expect(page.getByRole("button", { name: "加入联系名单" })).toHaveCount(
     0,
   );
+  await page.getByPlaceholder("搜索姓名、公司、职位或技能").fill("");
+  await selectTopReviewCandidates(page);
   await page.getByRole("button", { name: "加入岗位储备" }).click();
   await expect(page.getByText(/已应用审核决定/)).toBeVisible();
   await expect(

@@ -1,3 +1,4 @@
+import { selectTopReviewCandidates } from "../review-helpers";
 import { expect, test } from "@playwright/test";
 import {
   expectNoHorizontalOverflow,
@@ -566,6 +567,7 @@ test("候选人来源证据逐项可打开且详情加载状态完整", async ({
 test("岗位和公司详情按关系规模提供表格与关系图", async ({ page }) => {
   await page.goto("#/tasks/position-vla?state=review");
   await page.getByRole("button", { name: "打开候选人审核（18）", exact: true }).click();
+  await selectTopReviewCandidates(page);
   await page.getByRole("button", { name: /加入岗位储备/ }).click();
   await page.getByRole("link", { name: "查看人才梳理", exact: true }).click();
   await expect(page.getByRole("heading", { name: "重点人才" })).toBeVisible();
@@ -1498,18 +1500,21 @@ test("论文作者身份和专利发明人身份使用同一审核边界", async
     patentModal.getByText("浙江大学 · 控制科学与工程"),
   ).toBeVisible();
   await expect(
-    patentModal.getByRole("button", { name: "保留人物线索" }),
+    patentModal.getByRole("button", { name: "让 Hunter 核实" }),
   ).toBeVisible();
+  await expect(
+    patentModal.getByRole("button", { name: "保留人物线索" }),
+  ).toHaveCount(0);
   await expect(
     patentModal.getByRole("button", { name: "暂不关联" }),
   ).toBeVisible();
   await expect(patentModal.getByText("陈雨")).toHaveCount(0);
-  await patentModal.getByRole("button", { name: "保留人物线索" }).click();
+  await patentModal.getByRole("button", { name: "暂不关联" }).click();
   await expect(patentModal).toBeHidden();
   const wangyi = page
     .locator(".s4-authorship-list article")
     .filter({ hasText: "王奕" });
-  await expect(wangyi.getByText("人物线索", { exact: true })).toBeVisible();
+  await expect(wangyi.getByText("未关联", { exact: true })).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("#/papers/paper-vla-survey");

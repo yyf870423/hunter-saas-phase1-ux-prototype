@@ -47,6 +47,14 @@ function classifyWork(prompt) {
   return "mainline";
 }
 
+// Follow-up scope is stated with the current count when it is known (design 02 §7.12).
+// e.g. “每月核对‘VLA 储备’收藏夹里的人” → 收藏夹“VLA 储备”（当前 23 人）
+function periodicScope(text = "") {
+  const folder = text.match(/[“"‘']([^”"’']+)[”"’']\s*收藏夹|收藏夹\s*[“"‘']([^”"’']+)[”"’']/);
+  if (folder) return `收藏夹“${folder[1] || folder[2]}”（当前 23 人）`;
+  return "任务目标里写的市场和公司；首轮运行后在这段对话里列出名单和数量";
+}
+
 function OutcomeReply({ outcome, prompt, periodicPlan }) {
   if (outcome === "organization") return <HunterReply markdown={organizationTargets(prompt).length
     ? "本轮整理“" + organizationTargets(prompt).map((company) => company.name).join("、") + "”的组织、团队、关键岗位与任职人，交付人才地图。未知项保留待核实，不针对招聘岗位找人。\n\n正在创建公司组织梳理任务。"
@@ -98,12 +106,13 @@ ${details.map((item) => `- ${item}`).join("\n")}
         markdown={`## 周期性任务草案
 
 - **任务目标：** ${markdownText(periodicPlan?.prompt || prompt)}
+- **跟进范围：** ${markdownText(periodicScope(periodicPlan?.prompt || prompt))}
 - **执行周期：** ${markdownText(periodicPlan?.schedule || "每周一 09:00")}。
-- **结果去向：** 高价值变化进入洞察中心；公司、联系人和招聘机会草稿按当前授权等待确认。
-- **连续记忆：** 每轮读取上次成功水位、用户修正规则和最新正式资产，不重复处理没有变化的资料。
+- **结果去向：** 发现的外部变化写入洞察中心，你点“处理”回到这段对话决定怎么做；资料更新先出草稿，你确认后才写入。
+- **连续记忆：** 每轮读取上次成功水位、用户修正规则、最新正式资产和相关的那一轮，不重读全部历史，不重复处理没有变化的资料。
 - **异常处理：** 非阻塞来源失败会记录后继续；只有写入冲突或需要外部发送时才等待确认。
 
-后续每次运行使用独立会话，但会继承以上已确认结论。`}
+这是一段连续对话，每次运行是其中一轮，轮与轮之间有分隔；你在对话里处理发现时，新一轮等你停下再开始。是否创建？`}
       />
     );
   }
@@ -239,8 +248,8 @@ export function NewWork() {
       setLifecycleBusy(true); setLifecycleError("");
       try {
         const result = await createOpportunityTask({ kind, prompt, files, authMode,
-          opportunityId: params.get("opportunityId") || "", positionId: params.get("positionId") || "",
-          source: params.get("signalId") ? { kind: "signal", id: params.get("signalId"), material: prompt } : undefined });
+          // Insights never create tasks (design 10 §6.4): there is no “new task from insight” source here.
+          opportunityId: params.get("opportunityId") || "", positionId: params.get("positionId") || "" });
         navigate("/tasks/" + result.taskId);
       } catch (error) { setLifecycleError(error.message); }
       finally { setLifecycleBusy(false); }

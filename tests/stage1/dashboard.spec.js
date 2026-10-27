@@ -307,7 +307,11 @@ test("八条洞察沿用来源状态和下一步，并进入对应详情", async
   for (const insight of dashboardInsights) {
     await page.goto("#/home");
     const row = insightRows(page).filter({ hasText: insight.title });
-    await expect(row.getByText(insight.status, { exact: true })).toBeVisible();
+    // Open insights carry no badge (design 10 §4.2); handled / ignored ones show their badge.
+    if (insight.status)
+      await expect(row.getByText(insight.status, { exact: true })).toBeVisible();
+    else
+      await expect(row.getByText(/^(未处理|已处理|已忽略)$/)).toHaveCount(0);
     await expect(row.getByText(insight.detail, { exact: true })).toBeVisible();
     await row.click();
     await expect.poll(() => new URL(page.url()).hash).toBe(`#${insight.route}`);

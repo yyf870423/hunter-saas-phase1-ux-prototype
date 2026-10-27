@@ -1,3 +1,4 @@
+import { selectTopReviewCandidates } from "../review-helpers";
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { replyToAsset } from "../stage4/opportunity-helpers";
@@ -30,6 +31,7 @@ for (const [device, width, height] of [
     await page.setViewportSize({ width, height });
     await page.goto("#/tasks/position-vla?state=review");
     await button(page, "打开候选人审核（18）").click();
+    await selectTopReviewCandidates(page);
     await page.getByRole("button", { name: /加入岗位储备/ }).click();
     await expect(
       page.getByRole("link", { name: "查看人才梳理", exact: true }),
@@ -286,6 +288,7 @@ test("岗位储备写入失败时人才梳理不部分保存，选择可重试",
   });
   await page.goto("#/tasks/position-vla?state=review");
   await button(page, "打开候选人审核（18）").click();
+  await selectTopReviewCandidates(page);
   await page.getByRole("button", { name: /加入岗位储备/ }).click();
   await expect(page.getByText(/本地保存失败，资料未改变/)).toBeVisible();
   expect(await snapshot(page)).toBeNull();

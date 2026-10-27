@@ -136,7 +136,8 @@ export function buildDashboardInsights() {
     .sort((a, b) => rank(a) - rank(b))
     .map((signal) => ({
       ...signal,
-      status: signal.status === "已忽略" ? "已忽略" : signal.marker ? "已处理" : "未处理",
+      // Design 10 §4.2: an open insight carries no badge; only 已处理 / 已忽略 are shown.
+      status: signal.status === "已忽略" ? "已忽略" : signal.marker ? "已处理" : "",
       tone: signal.status === "已忽略" ? "neutral" : signal.marker ? "success" : "warning",
       detail: signal.marker
         ? markerText(signal.marker)

@@ -36,9 +36,9 @@ test("任务历史与工作台使用同一当前状态", () => {
     const source = signals.find((signal) => signal.id === item.id);
     for (const key of ["title", "type", "evidence"])
       expect(item[key], `${item.id}.${key}`).toBe(source[key]);
-    // Workbench shows 未处理 / 已处理 (system marker) / 已忽略, derived from the same signal record.
+    // Workbench shows 已处理 (system marker) / 已忽略 and no badge for open insights, from the same signal record.
     const expected =
-      source.status === "已忽略" ? "已忽略" : source.handled?.length ? "已处理" : "未处理";
+      source.status === "已忽略" ? "已忽略" : source.handled?.length ? "已处理" : "";
     expect(item.status, `${item.id}.status`).toBe(expected);
   }
 });

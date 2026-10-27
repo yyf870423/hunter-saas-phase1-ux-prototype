@@ -9,7 +9,6 @@ import {
   useToast,
 } from "../stage1/ui";
 import { signals as initialSignals } from "./data";
-import { useOpportunityState } from "../stage4/opportunity-store";
 import {
   markerText,
   processRoute,
@@ -31,13 +30,14 @@ function matchesFilter(signal, filter) {
   return true;
 }
 
+// Design 10 §4.2 / §6.2: an open insight carries no badge; only “已处理” (system) and “已忽略” are shown.
 function signalBadge(signal) {
   if (signal.status === "已忽略") return { tone: "neutral", label: "已忽略" };
   if (signal.marker) return { tone: "success", label: "已处理" };
-  return { tone: "warning", label: "未处理" };
+  return null;
 }
 
-function SourceTask({ task, onProcess }) {
+function SourceTask({ task }) {
   if (!task) return null;
   return (
     <section className="s2-signal-task-context">
@@ -52,11 +52,8 @@ function SourceTask({ task, onProcess }) {
         <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
       </header>
       <p>
-        这条洞察报告在 {task.round}。点“处理”会回到这段对话、定位到报告它的位置，并在输入框里引用它；不会新建任务。
+        这条洞察报告在 {task.round}。点下方“处理”会回到这段对话、定位到报告它的位置，并在输入框里引用它；不会新建任务。
       </p>
-      <Button tone="secondary" icon="message" onClick={onProcess}>
-        处理
-      </Button>
     </section>
   );
 }
@@ -142,7 +139,6 @@ export function SignalsPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
-  const lifecycle = useOpportunityState();
   const [version, setVersion] = useState(0);
   useEffect(() => {
     const refresh = () => setVersion((value) => value + 1);
@@ -151,23 +147,9 @@ export function SignalsPage() {
   }, []);
   const signals = useMemo(
     () =>
-      initialSignals.map((seed) => {
-        const signal = viewSignal(seed);
-        const task = lifecycle.tasks.find(
-          (item) =>
-            !item.deletedAt &&
-            ((item.source?.kind === "signal" && item.source.id === seed.id) ||
-              item.sourceSignals?.includes(seed.id)),
-        );
-        if (!task || signal.handled.some((item) => item.route === "/tasks/" + task.id)) return signal;
-        const handled = [
-          { id: "task-" + task.id, kind: "start", time: "刚刚", text: `开始客户开发：${task.title}`, route: "/tasks/" + task.id },
-          ...signal.handled,
-        ];
-        return { ...signal, handled, marker: handled[0], isOpen: false };
-      }),
+      initialSignals.map((seed) => viewSignal(seed)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lifecycle, version],
+    [version],
   );
   const requestedFilter = signalFilters.some(([value]) => value === params.get("filter"))
     ? params.get("filter")
@@ -235,7 +217,7 @@ export function SignalsPage() {
   };
 
   const undo = () => {
-    if (!undoHandled(selected.id)) {
+    if (!undoHandled(selected.id, selected.marker)) {
       notify("撤销失败，请重试", "error");
       return;
     }
@@ -299,7 +281,7 @@ export function SignalsPage() {
                   aria-controls="selected-signal-detail"
                   onClick={() => selectSignal(signal.id)}
                 >
-                  <i className={`tone-${rowBadge.tone}`}>
+                  <i className={`tone-${rowBadge?.tone || "warning"}`}>
                     <Icon
                       name={
                         signal.type === "候选人动向"
@@ -330,7 +312,9 @@ export function SignalsPage() {
                     </em>
                   </span>
                   <span className="s2-signal-row-trailing">
-                    <StatusBadge tone={rowBadge.tone}>{rowBadge.label}</StatusBadge>
+                    {rowBadge ? (
+                      <StatusBadge tone={rowBadge.tone}>{rowBadge.label}</StatusBadge>
+                    ) : null}
                     <Icon name="chevronRight" />
                   </span>
                 </button>
@@ -370,17 +354,15 @@ export function SignalsPage() {
             </button>
             <header>
               <span>
-                <small>
-                  {selected.kind || "洞察"} · {selected.type}
-                </small>
+                <small>洞察 · {selected.type}</small>
                 <h2>{selected.title}</h2>
                 <p>
                   {selected.object} · {selected.time}
                 </p>
               </span>
-              <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge>
+              {badge ? <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge> : null}
             </header>
-            <section className={`s2-signal-priority is-${badge.tone}`}>
+            <section className={`s2-signal-priority is-${badge?.tone || "warning"}`}>
               <Icon name={selected.marker ? "check" : "signal"} />
               <span>
                 <b>{selected.priority}</b>
@@ -424,15 +406,17 @@ export function SignalsPage() {
                 ))}
               </div>
             </section>
-            <SourceTask
-              task={selected.sourceTask}
-              onProcess={() => navigate(processRoute(selected))}
-            />
+            <SourceTask task={selected.sourceTask} />
             <HandledResults
               signal={selected}
               onOpen={(route) => navigate(route)}
               onUndo={undo}
             />
+            <section>
+              <h3>处理与变化记录</h3>
+              <SignalHistory items={selected.history} />
+            </section>
+            {/* Only two actions, placed last (design 10 §6.3): 处理 and 忽略 / 取消忽略. */}
             <footer>
               <Button tone="primary" icon="message" onClick={() => navigate(processRoute(selected))}>
                 处理
@@ -447,10 +431,6 @@ export function SignalsPage() {
                 </Button>
               )}
             </footer>
-            <section>
-              <h3>处理与变化记录</h3>
-              <SignalHistory items={selected.history} />
-            </section>
           </aside>
         ) : null}
       </section>

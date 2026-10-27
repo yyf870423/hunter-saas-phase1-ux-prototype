@@ -27,6 +27,7 @@ import {
   classifyHandling,
   handledToday,
   markerText,
+  undoHandled,
   viewSignal,
 } from "./signal-handling";
 
@@ -75,7 +76,7 @@ const periodicTasks = [
     lastRun: "今天 09:00",
     status: "已启用",
     tone: "success",
-    destination: "新信号进入洞察中心；公司与联系人草稿等待确认",
+    destination: "发现的公司和招聘变化进入洞察中心；你点“处理”在这段对话里决定后，公司、联系人才出草稿等你确认",
     memory:
       "已覆盖 86 家公司；忽略工业设备经销商；同一公司 30 天内无实质变化不重复提醒。",
   },
@@ -125,7 +126,8 @@ const periodicTasks = [
   },
   {
     id: "periodic-mailbox",
-    title: "邮箱：读取 shenlan@hunter-demo.cn 的邮件",
+    title: "邮箱：读取 shenlan@qq.com 的邮件",
+    system: true,
     prompt:
       "连接发件邮箱时系统自动建立。定期读取邮箱里的所有邮件：回复回到原任务，发现的机会和待处理事项写入洞察中心；只保存和工作相关的邮件，其他邮件读完就丢，只记邮件编号。",
     scenarios: ["邮箱", "洞察发现"],
@@ -134,8 +136,8 @@ const periodicTasks = [
     lastRun: "今天 09:30",
     status: "已启用",
     tone: "success",
-    destination: "回复回到原任务；机会和待处理事项进入洞察中心；邮件里的简历进入候选人补全审核",
-    memory: "断开邮箱后停止读取；已保存的邮件、洞察和对话保留。",
+    destination: "回复回到原任务；机会和待处理事项进入洞察中心；邮件里的简历按外部资料处理：新的人走建档（身份、查重，你确认后创建），已有候选人走补全审核，都要你确认",
+    memory: "随邮箱连接运行，不能单独暂停或删除；断开邮箱后停止读取，已保存的邮件、洞察和对话保留。",
   },
 ];
 
@@ -179,7 +181,7 @@ const periodicRuns = [
     tone: "success",
     summary: "核验 73 家公司，合并 19 条重复线索，产生 7 条新洞察。",
     scope: "中国大陆 · 具身智能 · 新成立至 B 轮",
-    result: "3 条高优先级洞察、4 条观察项",
+    result: "3 条洞察写入洞察中心，另有 4 条证据不足，留在这一轮记录里不提醒",
     memory: "覆盖水位已更新至今天 09:00。",
   },
   {
@@ -363,24 +365,43 @@ function PeriodicTaskDetail({ task, runs, onRun, onToggle, onDelete, onBack }) {
         <Button tone="primary" icon="play" onClick={onRun}>
           立即运行
         </Button>
-        <Button
-          tone="secondary"
-          icon={task.status === "已暂停" ? "play" : "pause"}
-          onClick={onToggle}
-        >
-          {task.status === "已暂停" ? "继续" : "暂停"}
-        </Button>
-        <Button
-          tone="secondary"
-          icon="edit"
-          onClick={() => navigate(`/new?edit=${task.id}&originalPrompt=${encodeURIComponent(task.prompt)}&schedule=${encodeURIComponent(task.schedule)}`)}
-        >
-          调整任务
-        </Button>
-        <Button tone="ghost" icon="trash" onClick={onDelete}>
-          删除
-        </Button>
+        {task.system ? (
+          // The mailbox task follows the mailbox connection: no separate pause or delete
+          // (connecting = consent; disconnecting = withdrawal, decision 12.2).
+          <Button
+            tone="secondary"
+            icon="settings"
+            onClick={() => navigate("/settings/connections")}
+          >
+            管理邮箱连接
+          </Button>
+        ) : (
+          <>
+            <Button
+              tone="secondary"
+              icon={task.status === "已暂停" ? "play" : "pause"}
+              onClick={onToggle}
+            >
+              {task.status === "已暂停" ? "继续" : "暂停"}
+            </Button>
+            <Button
+              tone="secondary"
+              icon="edit"
+              onClick={() => navigate(`/new?edit=${task.id}&originalPrompt=${encodeURIComponent(task.prompt)}&schedule=${encodeURIComponent(task.schedule)}`)}
+            >
+              调整任务
+            </Button>
+            <Button tone="ghost" icon="trash" onClick={onDelete}>
+              删除
+            </Button>
+          </>
+        )}
       </div>
+      {task.system ? (
+        <p className="s2-periodic-system-note">
+          连接发件邮箱时自动建立，随连接运行：不能单独暂停或删除，不想被读取就在设置里断开邮箱。
+        </p>
+      ) : null}
       <div className="s2-periodic-body">
         <section>
           <h3>任务要求</h3>
@@ -487,6 +508,13 @@ function quoteReply(message, signal) {
     });
     return `## 资料更新草稿\n\n| 字段 | 当前 | 新值 | 来源 |\n| --- | --- | --- | --- |\n${rows.join("\n")}\n\n确认后写入${object.split(" · ")[0]}的资料，形成新版本。证据再充分也要你确认，我不会自动写入。`;
   }
+  if (message.kind === "outbound") {
+    const name = object.split(" · ")[0];
+    return `## 邮件草稿\n\n- **收件人：** ${name}（已有联系方式）\n- **标题：** 关于近期的合作机会\n- **正文：** 您好，注意到${signal?.summary || "贵司近期的变化"}，想约 15 分钟交流一下招聘方面的合作。\n\n每封邮件都要你确认收件人、标题、正文和附件后才会发出，自动执行也不跳过。`;
+  }
+  if (message.kind === "undo") return `已撤销这条洞察的“已处理”标记，它回到“未处理”。已经写入的资料不会撤回。`;
+  if (message.kind === "start" && message.marker?.text.startsWith("交给"))
+    return `好的，已把${object}的这条洞察交给那个任务继续，相关上下文一并带过去。\n\n这条洞察已标记“${markerText(message.marker)}”。`;
   if (message.kind === "start") return `好的，开始围绕${object}做客户开发：先核实招聘负责人和合作意愿，再列出潜在机会请你确认。\n\n这条洞察已标记“${markerText(message.marker)}”。`;
   if (message.kind === "recheck") return `已记下复查时间，到时我在这段对话里复查${object}的变化。\n\n这条洞察已标记“${markerText(message.marker)}”。`;
   if (message.kind === "conclusion") return `已记成这条洞察的处理结论。\n\n这条洞察已标记“${markerText(message.marker)}”。`;
@@ -519,9 +547,12 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
     setComposer("");
     setAttachments([]);
     setPlanOpen(false);
-    const target = document.getElementById(
-      quotedSeed?.sourceTask?.runId === run.id ? `finding-${quotedSeed.id}` : `round-${run.id}`,
-    );
+    const messageId = params.get("msg");
+    const target =
+      (messageId && document.getElementById(`msg-${messageId}`)) ||
+      document.getElementById(
+        quotedSeed?.sourceTask?.runId === run.id ? `finding-${quotedSeed.id}` : `round-${run.id}`,
+      );
     if (target?.scrollIntoView) target.scrollIntoView({ block: "start" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run.id]);
@@ -544,8 +575,13 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
   const send = (text, files) => {
     const normalized = text.trim();
     const last = followUps[followUps.length - 1];
+    // Hunter asked “这条要记个结论吗？” after a question, or after a draft was declined.
     const pendingQuestion =
-      !quoted && last?.quote && last.kind === "question" ? last.quote : null;
+      !quoted &&
+      last?.quote &&
+      (last.kind === "question" || (["update", "outbound"].includes(last.kind) && last.resolution === "no"))
+        ? last.quote
+        : null;
     const signalId = quoted?.id || pendingQuestion;
     const signal = signalId ? seedSignals.find((item) => item.id === signalId) : null;
     const waiting = run.status === "等待用户";
@@ -557,11 +593,13 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
     };
     if (signal) {
       const handling = classifyHandling(normalized, signal);
+      // The marker jumps back to the message that produced the result.
       const marker = handling.marker
-        ? { ...handling.marker, time: handledToday(), route: `/tasks/periodic?view=runs&run=${run.id}` }
+        ? { ...handling.marker, time: handledToday(), route: `/tasks/periodic?view=runs&run=${run.id}&msg=${entry.id}` }
         : null;
       entry = { ...entry, quote: signal.id, quoteTitle: quoted ? signal.title : "", kind: handling.kind, marker };
-      if (marker && handling.kind !== "update") addHandled(signal.id, marker);
+      if (handling.kind === "undo") undoHandled(signal.id, viewSignal(signal).marker);
+      else if (marker && !["update", "outbound"].includes(handling.kind)) addHandled(signal.id, marker);
     }
     const patch = {
       followUps: [...followUps, entry],
@@ -584,7 +622,10 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
     if (!onUpdate(run.id, { followUps: next })) return;
     if (option.value === "yes") {
       addHandled(message.quote, message.marker);
-      notify("资料已更新，这条洞察已标记“已处理”", "success");
+      notify(
+        message.kind === "outbound" ? "邮件已从你的邮箱发出，这条洞察已标记“已处理”" : "资料已更新，这条洞察已标记“已处理”",
+        "success",
+      );
     } else {
       notify("草稿已保留，没有写入", "info");
     }
@@ -712,7 +753,7 @@ ${round.summary}
                     ? seedSignals.find((item) => item.id === message.quote)
                     : null;
                   return (
-                    <div className="s2-decision-thread" key={message.id}>
+                    <div className="s2-decision-thread" key={message.id} id={`msg-${message.id}`}>
                       <UserMessage time="刚刚">
                         {message.quoteTitle ? (
                           <span className="s2-message-quote">
@@ -737,6 +778,18 @@ ${round.summary}
                       </UserMessage>
                       {message.quote ? (
                         <HunterReply markdown={quoteReply(message, signal)}>
+                          {message.kind === "outbound" && !message.resolution ? (
+                            <DecisionRequest
+                              title="确认发出这封邮件？"
+                              description="是 / 否 / 建议；确认后从你连接的邮箱发出。"
+                              options={[
+                                { value: "yes", label: "是", description: "从你的邮箱发出这封邮件。" },
+                                { value: "no", label: "否", description: "保留草稿，不发送。" },
+                                { value: "suggest", label: "建议", description: "在下方说明要怎么改，我会出新的草稿。" },
+                              ]}
+                              onSelect={(option) => resolveUpdate(message, option)}
+                            />
+                          ) : null}
                           {message.kind === "update" && !message.resolution ? (
                             <DecisionRequest
                               title="是否按草稿更新资料？"
@@ -751,7 +804,7 @@ ${round.summary}
                           ) : null}
                           {message.resolution === "yes" ? (
                             <p className="s2-run-handled-note">
-                              已写入，这条洞察已标记“{markerText(message.marker)}”。
+                              {message.kind === "outbound" ? "已发出" : "已写入"}，这条洞察已标记“{markerText(message.marker)}”。
                             </p>
                           ) : null}
                           {message.resolution === "no" ? (

@@ -48,9 +48,10 @@ export function addHandled(signalId, item) {
   return write(signalHandledKey, all);
 }
 
-export function undoHandled(signalId) {
+// Undo keeps a record in the insight's history (design 10 §6.6): what was undone and when.
+export function undoHandled(signalId, marker) {
   const undone = read(signalUndoneKey);
-  undone[signalId] = true;
+  undone[signalId] = { time: handledToday(), text: marker ? marker.text : "" };
   return write(signalUndoneKey, undone);
 }
 
@@ -63,9 +64,29 @@ export function setIgnored(signalId, ignored) {
 // Merge seed data with what happened in this browser session.
 export function viewSignal(signal) {
   const handledSession = read(signalHandledKey)[signal.id] || [];
-  const undone = Boolean(read(signalUndoneKey)[signal.id]);
+  const undoneEntry = read(signalUndoneKey)[signal.id];
+  const undone = Boolean(undoneEntry);
   const ignoredOverride = read(signalIgnoredKey)[signal.id];
   const handled = undone ? [] : [...handledSession, ...(signal.handled || [])];
+  const handledHistory = handledSession.map((item) => ({
+    time: item.time,
+    title: `已处理：${item.text}`,
+    detail: "系统根据对话里的处理结果自动标记。",
+    tone: "success",
+  }));
+  const undoHistory = undone
+    ? [
+        {
+          time: undoneEntry.time || handledToday(),
+          title: "撤销了“已处理”标记",
+          detail: undoneEntry.text
+            ? `原标记：${undoneEntry.text}。已经写入的资料不会撤回。`
+            : "已经写入的资料不会撤回。",
+          tone: "neutral",
+        },
+      ]
+    : [];
+  const history = [...undoHistory, ...handledHistory, ...(signal.history || [])];
   const status =
     ignoredOverride === true
       ? "已忽略"
@@ -76,6 +97,7 @@ export function viewSignal(signal) {
     ...signal,
     status,
     handled,
+    history,
     marker: handled[0] || null,
     isOpen: status === "未处理" && !handled.length,
   };
@@ -91,9 +113,24 @@ export function processRoute(signal) {
 }
 
 // Classify how a reply handles a quoted insight. Returns the marker to add (if any) and the reply kind.
+// Examples (design 10 §6.2):
+//   “更新一下资料” → update draft, marked only after “是”;   “这家开始客户开发” → start
+//   “交给岗位招聘任务继续” → start (handed to an existing task);  “给他发封邮件问问” → outbound draft, marked after “是”
+//   “下个月再看看” → recheck;   “先不跟” / “知道了” → conclusion;   “标错了，撤销” → undo the marker
+//   “他现在在哪家公司？” → question, no marker
 export function classifyHandling(text, signal) {
   const value = text.trim();
   const person = (signal.object || "").split(" · ")[0];
+  if (/撤销|标错/.test(value)) {
+    return { kind: "undo", marker: null };
+  }
+  if (/发邮件|发封邮件|写封邮件|邮件给|发一封/.test(value)) {
+    return { kind: "outbound", marker: { kind: "outbound", text: `发出邮件给${person}` } };
+  }
+  const handOver = value.match(/交给[“"]?([^”"，,。]+?任务)/);
+  if (handOver) {
+    return { kind: "start", marker: { kind: "start", text: `交给“${handOver[1]}”继续` } };
+  }
   if (/更新|改成|写入|改一下/.test(value)) {
     return { kind: "update", marker: { kind: "update", text: `更新了${person}的资料（v5）` } };
   }

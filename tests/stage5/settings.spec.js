@@ -104,7 +104,7 @@ test("通知页区分可配置通知和强制通知", async ({ page }) => {
   const billingMail = page.getByRole("switch", { name: "账号与订阅邮件通知" });
   await expect(billingMail).toBeChecked();
   await expect(billingMail).toBeDisabled();
-  for (const title of ["需要我处理", "外部回复", "任务状态", "洞察", "数据处理"])
+  for (const title of ["需要我处理", "外部回复", "跟进提醒", "任务状态", "洞察", "数据处理"])
     await expect(page.getByLabel(`${title}不发邮件`)).toBeVisible();
   const taskApp = page.getByRole("switch", { name: "任务状态站内通知" });
   await expect(taskApp).toBeChecked();

@@ -1,3 +1,4 @@
+import { selectTopReviewCandidates } from "../review-helpers";
 import { expect, test } from "@playwright/test";
 import { confirmClientOpportunity } from "./client-helpers";
 import { waitForOpportunityDraft, replyToAsset } from "../stage4/opportunity-helpers";
@@ -195,6 +196,7 @@ test("候选人求职新简历只触发受影响岗位重匹配", async ({ page 
 test("岗位招聘在入岗位储备后单独确认联系并接收新简历", async ({ page }) => {
   await page.goto("#/tasks/position-vla?state=review");
   await page.getByRole("button", { name: /打开候选人审核/ }).click();
+  await selectTopReviewCandidates(page);
   await page.getByRole("button", { name: "加入岗位储备" }).click();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
   await input.fill("给林昊、周明远和陈楚宁发邮件，先了解意愿。");

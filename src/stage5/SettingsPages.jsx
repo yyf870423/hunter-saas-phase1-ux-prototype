@@ -578,6 +578,7 @@ export function ProfileSettingsPage() {
 const notificationRows = [
   ["decision", "需要我处理", "待确认、待授权、冲突审核和需要补充信息", true, false, true, false],
   ["reply", "外部回复", "邮件回复、新简历和附件到达", true, false, true, false],
+  ["followup", "跟进提醒", "到期的跟进安排：招聘机会和任务里约好的下次跟进", true, false, false, false],
   ["task", "任务状态", "本轮交付结束、失败、暂停和等待外部", true, false, false, false],
   ["signal", "洞察", "洞察中心的新洞察", true, false, false, false],
   ["data", "数据处理", "导入导出完成或失败、资料解析失败、回收站即将清理", true, false, false, false],

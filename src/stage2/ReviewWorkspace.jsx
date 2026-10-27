@@ -2,14 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Icon } from "../components/Icon";
 import { Button, IconButton, SearchField, StatusBadge } from "../stage1/ui";
 
-function recommendationTone(recommendation) {
-  if (recommendation.includes("强烈") || recommendation.includes("建议联系"))
-    return "success";
-  if (recommendation.includes("不建议")) return "danger";
-  if (recommendation.includes("谨慎")) return "warning";
-  return "neutral";
-}
-
 export function InspectionPanel({ item, onClose }) {
   if (!item) return null;
   const isTask = item.kind === "task";
@@ -131,13 +123,8 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
     } catch {
       restored = null;
     }
-    return new Set(
-      restored
-        ? restored
-        : candidates
-            .filter((candidate) => candidate.score >= 85)
-            .map((candidate) => candidate.id),
-    );
+    // No pre-selection by score threshold: the hunter decides who to act on (decision 7).
+    return new Set(restored || []);
   });
   const [focused, setFocused] = useState(
     () => sessionStorage.getItem("hunter-review-focused") || candidates[0]?.id,
@@ -272,7 +259,7 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
             <span>候选人</span>
             <span>当前任职</span>
             <span>匹配</span>
-            <span>推荐建议</span>
+            <span>主要依据</span>
             <span>来源</span>
           </div>
           {visible.map((candidate) => (
@@ -309,11 +296,7 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
                 <small>/ 100</small>
               </span>
               <span>
-                <StatusBadge
-                  tone={recommendationTone(candidate.recommendation)}
-                >
-                  {candidate.recommendation}
-                </StatusBadge>
+                <small>{candidate.strength}</small>
               </span>
               <span>
                 <small>{candidate.source}</small>
@@ -324,7 +307,7 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
             <div className="s2-review-empty">
               <Icon name="search" />
               <b>没有符合当前条件的候选人</b>
-              <span>可以清空搜索或切换候选人分层。</span>
+              <span>可以清空搜索条件。</span>
             </div>
           ) : null}
         </div>
@@ -396,13 +379,10 @@ export function CandidateReviewWorkspace({ candidates, onClose, onApply }) {
             </div>
           </section>
           <section>
-            <h2>建议动作</h2>
+            <h2>依据与待核实</h2>
             <p>
-              {current.score >= 85
-                ? "优先加入岗位储备，后续再决定联系范围并核实求职意愿。"
-                : current.score >= 75
-                  ? "加入岗位储备，补全风险项后再决定是否联系。"
-                  : "本轮不建议推进，保留匹配记录供后续参考。"}
+              依据：{current.strength}。待核实：{current.risk}。
+              是否加入储备、先联系谁，由你看分数和依据决定。
             </p>
           </section>
         </aside>

@@ -3,7 +3,7 @@ import { LandingPage } from "./landing/LandingPage";
 import { UserAuthPage } from "./auth/UserAuthPage";
 import { OpsLoginPage } from "./auth/OpsLoginPage";
 import { ComponentsPage } from "./stage1/ComponentsPage";
-import { Dashboard } from "./stage1/Dashboard";
+import { Dashboard, NotActivatedPage } from "./stage1/Dashboard";
 import { ReviewPage } from "./stage1/ReviewPage";
 import { Stage1Shell } from "./stage1/Stage1Shell";
 import { NewWork } from "./stage2/NewWork";
@@ -101,6 +101,7 @@ export default function App() {
         <Route path="/ops/capabilities" element={<CapabilitiesPage />} />
         <Route path="/ops/support" element={<SupportPage />} />
       </Route>
+      <Route path="/not-activated" element={<NotActivatedPage />} />
       <Route element={<Stage1Shell />}>
         <Route path="/demo/opportunities" element={<OpportunityDemoPage />} />
         <Route path="/demo/opportunity-source/:caseId" element={<OpportunityDemoSourcePage />} />

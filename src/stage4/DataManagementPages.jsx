@@ -373,7 +373,7 @@ export function ImportsPage() {
               tone="warning"
               icon="warning"
               title="2 条资料需要后续身份审核"
-              description="只有姓名或身份依据不足的资料不会创建正式候选人，将保留为人物线索。"
+              description="只有姓名、身份依据不足的行不会创建候选人，留在本次导入结果里并写明原因；补齐公司、职位、手机或邮箱后可以重新导入。"
             />
             {matchEnabled && (type === "候选人" || type === "岗位") ? (
               <StateBanner
@@ -944,6 +944,11 @@ export function RecycleBinPage() {
             {["候选人", "公司联系人", "联系人"].includes(deleteTarget?.type) ? (
               <p>
                 这是代表真实的人的资产：资料版本和文件（简历、附件）会删除；任务对话和运行记录里关于这个人的姓名、联系方式、简历摘录会换成“已删除的{deleteTarget?.type === "候选人" ? "候选人" : "联系人"}”；知识图谱里的节点和连线保留，只解除关联。
+              </p>
+            ) : null}
+            {deleteTarget?.type === "公司" ? (
+              <p>
+                和公司一起进回收站的联系人也会一并永久删除，按同样的规则清理：联系人的资料和文件删除；任务对话和运行记录里关于他们的姓名、联系方式换成“已删除的联系人”；知识图谱节点保留，只解除关联。
               </p>
             ) : null}
           </span>

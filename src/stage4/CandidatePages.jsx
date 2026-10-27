@@ -2746,13 +2746,17 @@ export function CandidateCreatePage() {
                   tone="danger"
                   icon="warning"
                   title="资料不足，不能创建正式候选人"
-                  description="请至少补充公司、职位、手机或邮箱中的一项；否则可以先保留为人物线索。"
+                  description="请至少补充公司、职位、手机或邮箱中的一项。不知道这些信息时，可以让 Hunter 在任务里先核实这个人，核实后在对话里建档或放弃。"
                   action={
                     <Button
                       size="sm"
-                      onClick={() => notify("已保存为人物线索")}
+                      onClick={() =>
+                        navigate(
+                          `/new?prompt=${encodeURIComponent(`核实一下“${name.trim()}”是谁：现在在哪家公司、做什么，能确认就建为候选人`)}`,
+                        )
+                      }
                     >
-                      保存为人物线索
+                      让 Hunter 核实
                     </Button>
                   }
                 />

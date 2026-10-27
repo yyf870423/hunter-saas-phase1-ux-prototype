@@ -1698,6 +1698,7 @@ function ContactSectionEditor({ section, contact, close, onSave }) {
               options={[
                 "客户 HR",
                 "招聘负责人",
+                "用人经理",
                 "决策人",
                 "投资人",
                 "顾问",
@@ -2221,6 +2222,7 @@ export function ContactCreatePage() {
                 options={[
                   "客户 HR",
                   "招聘负责人",
+                  "用人经理",
                   "决策人",
                   "投资人",
                   "顾问",

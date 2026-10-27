@@ -1,7 +1,7 @@
 // Client assessment on the company (design 07 §4.2): 付费潜力 and 合作风险, three levels + basis + update time, no scores.
 
 export const assessmentLevels = ["有依据", "待确认", "有风险"];
-export const assessmentTone = { 有依据: "success", 待确认: "warning", 有风险: "danger" };
+export const assessmentTone = { 有依据: "success", 待确认: "warning", 有风险: "danger", 未研判: "neutral" };
 
 const seeds = {
   "company-xinglan": {
@@ -20,8 +20,9 @@ const seeds = {
   },
 };
 
+// “未研判” (never assessed) is shown apart from “待确认” (assessed, but needs the hunter to confirm).
 const empty = {
-  level: "待确认",
+  level: "未研判",
   basis: "还没有研判。可以在“公司调研”或客户开发任务里让 Hunter 研判，也可以自己填写。",
   source: "",
   updatedAt: "—",
@@ -42,10 +43,10 @@ export function assessmentSummary(company) {
 export function companyDeleteImpact(companyIds, { contacts = [], opportunities = [], positions = [] }) {
   const ids = new Set(companyIds);
   const contactCount = contacts.filter((item) => ids.has(item.companyId) && !item.deletedAt).length;
-  const opportunityCount = opportunities.filter(
-    (item) => ids.has(item.companyId) && !item.deletedAt && item.status === "跟进中",
-  ).length;
+  const kept = opportunities.filter((item) => ids.has(item.companyId) && !item.deletedAt);
+  const opportunityCount = kept.length;
+  const activeCount = kept.filter((item) => item.status === "跟进中").length;
   const positionCount = positions.filter((item) => ids.has(item.companyId) && !item.deletedAt).length;
   const subject = ids.size > 1 ? `这 ${ids.size} 家公司` : "这家公司";
-  return `${subject}有 ${contactCount} 位联系人会一起进回收站；还有 ${opportunityCount} 条跟进中的机会、${positionCount} 个岗位不会删除，会显示“公司已删除”。候选人和任务也不会删除。`;
+  return `${subject}有 ${contactCount} 位联系人会一起进回收站；还有 ${opportunityCount} 条招聘机会（其中跟进中 ${activeCount} 条）、${positionCount} 个岗位不会删除，会显示“公司已删除”。候选人和任务也不会删除。`;
 }
