@@ -926,7 +926,7 @@ export const signals = [
     priority: "来源冲突",
     status: "未处理",
     tone: "info",
-    time: "6 分钟前",
+    time: "今天 09:12",
     evidence: 5,
     summary:
       "公司官网与近期活动议程中的负责人姓名不一致，可能是页面更新时间差，也可能是真实的负责人变化。",
@@ -938,18 +938,19 @@ export const signals = [
       "历史组织图",
     ],
     changes: ["官网负责人姓名更新", "活动议程仍显示原负责人"],
+    // A round hands over its findings only after it finishes (decision 2026-10-27).
     sourceTask: {
       title: "每周发现具身智能创业公司与招聘机会",
-      round: "今天 09:26 那一轮（正在运行）",
-      runId: "run-startups-active",
-      route: "/tasks/periodic?view=runs&run=run-startups-active",
-      status: "正在运行",
-      tone: "info",
+      round: "今天 09:00 那一轮",
+      runId: "run-startups-success",
+      route: "/tasks/periodic?view=runs&run=run-startups-success",
+      status: "已完成",
+      tone: "success",
     },
     handled: [],
     history: [
       {
-        time: "6 分钟前",
+        time: "今天 09:12",
         title: "写入洞察中心",
         detail: "公司官网与近期行业活动议程显示不同负责人。",
         tone: "warning",

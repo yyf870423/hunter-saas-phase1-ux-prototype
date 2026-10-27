@@ -179,7 +179,7 @@ const periodicRuns = [
     duration: "12 分 36 秒",
     status: "已完成",
     tone: "success",
-    summary: "核验 73 家公司，合并 19 条重复线索，产生 7 条新洞察。",
+    summary: "核验 73 家公司，合并 19 条重复线索，有 7 条新发现。",
     scope: "中国大陆 · 具身智能 · 新成立至 B 轮",
     result: "3 条洞察写入洞察中心，另有 4 条证据不足，留在这一轮记录里不提醒",
     memory: "覆盖水位已更新至今天 09:00。",
@@ -658,7 +658,8 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
 这段对话记录这个周期任务的每一次运行，每次运行是其中一轮。
 
 - 每一轮读取连续记忆和相关的那一轮，不读全部历史。
-- 你正在对话里处理时，新一轮会等你离开后再开始，不和你的消息交错。`}
+- 每一轮跑完才交出这一轮的发现，运行中不会出现半截发现；运行中只能停止。
+- 你正在对话里处理时，新一轮等你停下再开始（离开这段对话，或最后一条消息后 15 分钟没有新输入），不和你的消息交错。`}
           />
           {rounds.map((round) => {
             const findings = roundFindings(round.id);
@@ -683,7 +684,7 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
 ${round.summary}
 
 - **本轮范围：** ${round.scope}
-- **当前结果：** ${round.result}
+- **当前结果：** ${round.result}${round.status === "正在运行" ? "\n- **本轮发现：** 跑完后一起交出，运行中不会出现半截发现。" : ""}
 - **连续记忆：** ${round.memory}`}
                 />
                 {findings.length ? (
