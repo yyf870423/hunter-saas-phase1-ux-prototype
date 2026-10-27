@@ -1,24 +1,28 @@
 // Credits outside the monthly plan, one record per grant (design 12 §11.5, 13 §8.4).
 // Rules:
-// - Bought Credits are valid for 12 months from the day they arrive; whatever is left at expiry is taken
-//   back automatically and not refunded. Gifted or compensation Credits keep the validity stated when they
-//   were granted (12 months when nothing was stated).
+// - Topped-up Credits (an amount paid, converted at the rate when the payment succeeded) are valid for
+//   12 months from the day they arrive; whatever is left at expiry is taken back automatically and not
+//   refunded. Gifted or compensation Credits keep the validity stated when they were granted (12 months
+//   when nothing was stated).
 // - Spending order: this month's plan Credits first, then these grants by expiry date, earliest first.
 // - A grant expiring within 30 days is marked “即将到期”; reminders go out 30 and 7 days before.
 // - Expiry never changes the order and creates no refund; the take-back is kept as its own record.
 //
 // Example (the prototype's “today” on subscription pages is 2026-08-24):
-//   the 10,000 Credits pack bought on 6 月 5 日 has 2,500 left and expires on 2027-06-05 (有效);
+//   ¥100 topped up on 6 月 5 日 became 10,000 Credits; 2,500 are left and they expire on 2027-06-05 (有效);
 //   the 500 compensation Credits granted on 7 月 25 日 expire on 9 月 23 日 (即将到期) and are used first;
 //   300 compensation Credits from 6 月 20 日 expired on 7 月 20 日 with 200 unused, taken back.
 export const creditsToday = "2026-08-24";
 
 export const creditGrants = [
   {
-    id: "grant-pack-0605",
+    id: "grant-recharge-0605",
     workspace: "深蓝猎头工作室",
-    kind: "purchase",
-    label: "Credits 包",
+    kind: "recharge",
+    label: "充值",
+    amount: 100,
+    rate: 100,
+    method: "微信支付",
     credits: 10000,
     used: 7500,
     arrivedOn: "2026-06-05",
@@ -71,6 +75,19 @@ export const grantsFor = (workspace) =>
   creditGrants
     .filter((grant) => grant.workspace === workspace)
     .sort((a, b) => a.expiresOn.localeCompare(b.expiresOn));
+
+// Row title: a top-up shows what was paid and what it became; other grants show their Credits.
+export const grantTitle = (grant) =>
+  grant.kind === "recharge"
+    ? `充值 ¥${grant.amount} → ${Number(grant.credits).toLocaleString("zh-CN")} Credits`
+    : `${grant.label} ${Number(grant.credits).toLocaleString("zh-CN")}`;
+
+export const addMonths = (value, months) => {
+  const [year, month, date] = value.split("-").map(Number);
+  const total = month - 1 + months;
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${year + Math.floor(total / 12)}-${pad((total % 12) + 1)}-${pad(date)}`;
+};
 
 export const displayDate = (value) => {
   const [year, month, date] = value.split("-").map(Number);

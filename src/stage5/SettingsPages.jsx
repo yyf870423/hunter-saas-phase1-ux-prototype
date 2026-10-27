@@ -5,11 +5,21 @@ import {
   addOns,
   formatCny,
   formatCredits,
+  recharge,
+  rechargeCredits,
   subscriptionPlanChoices,
   subscriptionPlans,
   trialGrant,
 } from "../shared/productCatalog";
-import { displayDate, grantBalance, grantStatus, grantsFor } from "../shared/creditGrants";
+import {
+  addMonths,
+  creditsToday,
+  displayDate,
+  grantBalance,
+  grantStatus,
+  grantTitle,
+  grantsFor,
+} from "../shared/creditGrants";
 import { FormField, SelectMenu, TextInput } from "../stage4/asset-ui";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import { agentUsage } from "../stage1/data";
@@ -1238,28 +1248,36 @@ export function ConnectionSettingsPage() {
 
 // Credits outside the monthly plan, one row per grant (12 §11.5): arrival, expiry, what is left, and
 // “即将到期” within 30 days. Expired grants stay listed with what was taken back.
-function CreditGrantsSection() {
-  const grants = grantsFor("深蓝猎头工作室");
+function CreditGrantsSection({ extra = [] }) {
+  const grants = [...grantsFor("深蓝猎头工作室"), ...extra].sort((a, b) =>
+    a.expiresOn.localeCompare(b.expiresOn),
+  );
   return (
     <SettingsSection
       title="购买和补偿的 Credits"
-      description="按笔显示到账、到期和剩余。先用套餐 Credits，再按到期日从早到晚用这些；购买的到账后 12 个月有效，补偿的按发放时说明的有效期，到期没用完的自动收回、不退款。"
+      description="按笔显示到账、到期和剩余。先用套餐 Credits，再按到期日从早到晚用这些；充值的到账后 12 个月有效，补偿的按发放时说明的有效期，到期没用完的自动收回、不退款。"
     >
       <div className="s5-setting-list s5-credit-grants">
         {grants.map((grant) => {
           const status = grantStatus(grant);
           const { left, recovered } = grantBalance(grant);
+          const source =
+            grant.kind === "recharge"
+              ? ` · ${grant.method} · ¥1 = ${grant.rate} Credits`
+              : grant.reason
+                ? ` · ${grant.reason}`
+                : "";
           return (
             <SettingRow
               key={grant.id}
-              icon={grant.kind === "purchase" ? "receipt" : "activity"}
-              title={`${grant.label} ${formatCredits(grant.credits)}`}
+              icon={grant.kind === "recharge" ? "receipt" : "activity"}
+              title={grantTitle(grant)}
               status={
                 <StatusBadge tone={status === "有效" ? "success" : status === "即将到期" ? "warning" : "neutral"}>
                   {status}
                 </StatusBadge>
               }
-              description={`${displayDate(grant.arrivedOn)}到账 · ${displayDate(grant.expiresOn)}到期（${grant.validity}）${grant.reason ? ` · ${grant.reason}` : ""}`}
+              description={`${displayDate(grant.arrivedOn)}到账 · ${displayDate(grant.expiresOn)}到期（${grant.validity}）${source}`}
               action={
                 <span className="s5-credit-grant-left">
                   {status === "已失效" ? (
@@ -1283,6 +1301,195 @@ function CreditGrantsSection() {
   );
 }
 
+// A stand-in for the WeChat Pay QR code: a fixed pattern with the three finder squares.
+function PaymentQr({ seed }) {
+  const size = 25;
+  const cells = [];
+  const finder = (x, y) =>
+    [[0, 0], [size - 7, 0], [0, size - 7]].some(
+      ([fx, fy]) => x >= fx && x < fx + 7 && y >= fy && y < fy + 7,
+    );
+  let value = [...seed].reduce((sum, char) => sum * 31 + char.charCodeAt(0), 7) >>> 0;
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++) {
+      value = (value * 1103515245 + 12345) >>> 0;
+      if (!finder(x, y) && value % 3 === 0) cells.push(<rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" />);
+    }
+  return (
+    <svg className="s5-pay-qr" viewBox="-2 -2 29 29" role="img" aria-label="微信支付二维码">
+      <rect x="-2" y="-2" width="29" height="29" fill="#fff" />
+      {[[0, 0], [size - 7, 0], [0, size - 7]].map(([x, y]) => (
+        <g key={`${x}-${y}`}>
+          <rect x={x} y={y} width="7" height="7" />
+          <rect x={x + 1} y={y + 1} width="5" height="5" fill="#fff" />
+          <rect x={x + 2} y={y + 2} width="3" height="3" />
+        </g>
+      ))}
+      {cells}
+    </svg>
+  );
+}
+
+// 12 §11.6: top up an amount, converted to Credits at the rate when the payment succeeds (the rate is not
+// decided; ¥1 = 100 Credits is an example). Phase 1 only WeChat Pay: a QR code on desktop, a jump to
+// WeChat on phones. Nothing is charged or credited until the payment succeeds; closing cancels the order.
+// Example: pick ¥200 → “到账 20,000 Credits” → 去支付 ¥200 → scan → a new grant “充值 ¥200 → 20,000 Credits”
+// expiring 2027-08-24 and the balance goes from 12,000 to 32,000.
+function RechargeModal({ open, orderNo, close, onPaid }) {
+  const [step, setStep] = useState("amount");
+  const [preset, setPreset] = useState(100);
+  const [custom, setCustom] = useState("");
+  const [paying, setPaying] = useState(false);
+  const customMode = preset === "custom";
+  const amount = customMode ? Number(custom) : preset;
+  const customError =
+    customMode &&
+    custom !== "" &&
+    (!/^\d+$/.test(custom) || amount < recharge.min || amount > recharge.max)
+      ? `请输入 ${recharge.min}–${formatCredits(recharge.max)} 之间的整数金额`
+      : "";
+  const valid = !customMode || (custom !== "" && !customError);
+  const credits = valid ? rechargeCredits(amount) : 0;
+  const reset = () => {
+    setStep("amount");
+    setPreset(100);
+    setCustom("");
+    setPaying(false);
+  };
+  const dismiss = () => {
+    const cancelled = step === "pay";
+    reset();
+    close(cancelled);
+  };
+  return (
+    <Modal
+      open={open}
+      close={dismiss}
+      title={step === "amount" ? "充值 Credits" : "微信支付"}
+      description={
+        step === "amount"
+          ? `按支付成功时的汇率换成 Credits：当前 ¥1 = ${recharge.rate} Credits（示例，汇率待定），到账后不随汇率变化。`
+          : `充值 ¥${amount}，到账 ${formatCredits(credits)} Credits。`
+      }
+      size="sm"
+      closeDisabled={paying}
+      footer={
+        step === "amount" ? (
+          <ModalActions
+            cancel={dismiss}
+            confirmText={valid ? `去支付 ¥${amount}` : "去支付"}
+            confirmDisabled={!valid}
+            confirm={() => setStep("pay")}
+          />
+        ) : (
+          <>
+            <Button onClick={() => setStep("amount")} disabled={paying}>
+              返回修改
+            </Button>
+            <Button
+              tone="primary"
+              loading={paying}
+              onClick={() => {
+                setPaying(true);
+                window.setTimeout(() => {
+                  onPaid({ amount, credits, orderNo });
+                  reset();
+                }, 600);
+              }}
+            >
+              我已完成支付
+            </Button>
+          </>
+        )
+      }
+    >
+      {step === "amount" ? (
+        <div className="s5-recharge">
+          <div className="s5-recharge-amounts" role="radiogroup" aria-label="充值金额">
+            {[...recharge.presets, "custom"].map((value) => (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={preset === value}
+                className={preset === value ? "is-selected" : ""}
+                onClick={() => setPreset(value)}
+              >
+                <b>{value === "custom" ? "其他金额" : `¥${value}`}</b>
+                <small>
+                  {value === "custom"
+                    ? `¥${recharge.min}–${formatCredits(recharge.max)}`
+                    : `${formatCredits(rechargeCredits(value))} Credits`}
+                </small>
+              </button>
+            ))}
+          </div>
+          {customMode ? (
+            <FormField
+              label="充值金额（元）"
+              help={`整数金额，¥${recharge.min} 起，单次不超过 ¥${formatCredits(recharge.max)}（示例）`}
+              error={customError}
+            >
+              <TextInput
+                value={custom}
+                onChange={setCustom}
+                inputMode="numeric"
+                maxLength={5}
+                ariaLabel="充值金额（元）"
+                placeholder="例如 300"
+              />
+            </FormField>
+          ) : null}
+          <div className="s5-recharge-result" aria-live="polite">
+            <small>到账</small>
+            <b>{valid ? `${formatCredits(credits)} Credits` : "—"}</b>
+          </div>
+          <div className="s5-subscription-payment">
+            <span>
+              <b>支付方式</b>
+              <small>充值目前只支持微信支付。</small>
+            </span>
+            <div className="s5-payment-options" role="radiogroup">
+              <ChoiceCard
+                title="微信支付"
+                description="电脑上扫码，手机上跳转微信完成"
+                selected
+                icon="qrCode"
+                onClick={() => {}}
+              />
+            </div>
+          </div>
+          <InlineNotice>
+            到账后 12 个月内有效，到期没用完的部分自动收回，不退款。和套餐 Credits 合并显示一个余额：先用套餐
+            Credits，再按到期日从早到晚用充值和补偿的；到期前 30 天和 7 天会站内通知并发邮件提醒（见服务条款第五节）。不会自动续充。
+          </InlineNotice>
+        </div>
+      ) : (
+        <div className="s5-wechat-pay">
+          <PaymentQr seed={orderNo} />
+          <div>
+            <strong>{formatCny(amount)}</strong>
+            <span>充值 {formatCredits(credits)} Credits</span>
+            <small>订单号 {orderNo}</small>
+            <p>
+              电脑上用微信扫一扫支付，手机上点“打开微信支付”跳转微信完成。二维码 {recharge.qrMinutes} 分钟内有效，过期可以刷新；支付成功后 Credits 立即到账。
+            </p>
+            <Button className="s5-wechat-open" tone="primary">
+              打开微信支付
+            </Button>
+            <em>
+              <i aria-hidden="true" /> 等待支付
+            </em>
+          </div>
+          <InlineNotice tone="warning" icon="warning">
+            关闭这个窗口，订单自动取消，不会扣款，也不会加余额。
+          </InlineNotice>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
 export function SubscriptionSettingsPage() {
   const { state, clearState } = usePageState();
   const notify = useToast();
@@ -1295,7 +1502,11 @@ export function SubscriptionSettingsPage() {
   const [selectedPlan, setSelectedPlan] = useState("专业版");
   const [paymentMethod, setPaymentMethod] = useState("支付宝");
   const [addOnModal, setAddOnModal] = useState(null);
+  const [rechargeOpen, setRechargeOpen] = useState(false);
+  const [recharges, setRecharges] = useState([]);
   const [autoRenew, setAutoRenew] = useState(true);
+  const rechargedCredits = recharges.reduce((sum, grant) => sum + grant.credits, 0);
+  const rechargeOrderNo = `ORD-${creditsToday.replaceAll("-", "")}-${String(41 + recharges.length).padStart(4, "0")}`;
   const [saving, setSaving] = useState(false);
   const commit = (message, close) => {
     setSaving(true);
@@ -1401,8 +1612,8 @@ export function SubscriptionSettingsPage() {
                 </span>
                 <span>
                   <i style={{ "--usage": "0%" }} />
-                  <b>可用余额（含套餐外的 {formatCredits(agentUsage.purchasedLeft)}）</b>
-                  <em>{formatCredits(agentUsage.balance)}</em>
+                  <b>可用余额（含套餐外的 {formatCredits(agentUsage.purchasedLeft + rechargedCredits)}）</b>
+                  <em>{formatCredits(agentUsage.balance + rechargedCredits)}</em>
                 </span>
                 <span>
                   <i style={{ "--usage": `${Math.round((agentUsage.storageUsedGb / agentUsage.storageLimitGb) * 100)}%` }} />
@@ -1414,19 +1625,23 @@ export function SubscriptionSettingsPage() {
               </div>
             </div>
           </section>
-          <CreditGrantsSection />
+          <CreditGrantsSection extra={recharges} />
           <SettingsSection
             title="单独加购"
-            description="Credits 和存储分开买，不用为了一项不够就升级整个套餐（价格为示例）。"
+            description="Credits 按金额充值，存储按月扩容，不用为了一项不够就升级整个套餐（价格和汇率为示例）。"
           >
             <div className="s5-setting-list">
               <SettingRow
                 icon="activity"
-                title={`Credits 包：${formatCredits(addOns.creditsPack.credits)} Credits / ¥${addOns.creditsPack.price}`}
-                description="一次性购买，加到同一个可用余额；先用套餐 Credits，再用购买的。到账后 12 个月有效，到期没用完的自动收回、不退款。不会自动续购。"
+                title="充值 Credits"
+                description={
+                  limited
+                    ? "订阅到期期间不能充值：充值的 Credits 从到账起算 12 个月，到期期间又用不了，续订后再充。"
+                    : `按金额充值，¥${recharge.min} 起；到账时按当时的汇率换成 Credits（示例 ¥1 = ${recharge.rate} Credits，汇率待定），加到同一个可用余额。到账后 12 个月有效，到期没用完的自动收回、不退款。目前只支持微信支付。`
+                }
                 action={
-                  <Button size="sm" onClick={() => setAddOnModal("credits")}>
-                    购买
+                  <Button size="sm" disabled={limited} onClick={() => setRechargeOpen(true)}>
+                    充值
                   </Button>
                 }
               />
@@ -1481,38 +1696,54 @@ export function SubscriptionSettingsPage() {
         ) : (
           <div className="s5-order-list">
             {[
+              // Top-ups made on this page (newest first), then the history.
+              ...[...recharges].reverse().map((grant) => [
+                displayDate(grant.arrivedOn),
+                `充值 ¥${grant.amount} · ${formatCredits(grant.credits)} Credits`,
+                formatCny(grant.amount),
+                "支付成功",
+                displayDate(grant.expiresOn),
+                grant.method,
+              ]),
               [
                 "2026 年 8 月 1 日",
                 "专业版月度订阅",
                 formatCny(subscriptionPlans.professional.monthlyPrice),
                 "支付成功",
+                null,
+                "支付宝",
               ],
               [
                 "2026 年 7 月 1 日",
                 "专业版月度订阅",
                 formatCny(subscriptionPlans.professional.monthlyPrice),
                 "支付成功",
+                null,
+                "支付宝",
               ],
               [
                 "2026 年 6 月 5 日",
-                `Credits 包 ${formatCredits(addOns.creditsPack.credits)}`,
-                formatCny(addOns.creditsPack.price),
+                "充值 ¥100 · 10,000 Credits",
+                formatCny(100),
                 "支付成功",
-                // 12 §11.5: order records show each purchase's expiry date.
+                // 12 §11.5: order records show each top-up's expiry date.
                 "2027 年 6 月 5 日",
+                "微信支付",
               ],
               [
                 "2026 年 6 月 1 日",
                 "专业版月度订阅",
                 formatCny(subscriptionPlans.professional.monthlyPrice),
                 "支付成功",
+                null,
+                "支付宝",
               ],
-            ].map((order) => (
-              <div key={order[0]}>
+            ].map((order, index) => (
+              <div key={`${order[0]}-${order[1]}-${index}`}>
                 <span>
                   <b>{order[1]}</b>
                   <small>
-                    {order[0]}
+                    {order[0]} · {order[5]}
                     {order[4] ? ` · 到期 ${order[4]}` : ""}
                   </small>
                 </span>
@@ -1611,32 +1842,52 @@ export function SubscriptionSettingsPage() {
         </InlineNotice>
       </Modal>
       <Modal
-        open={Boolean(addOnModal)}
+        open={addOnModal === "storage"}
         close={() => setAddOnModal(null)}
-        title={addOnModal === "storage" ? "添加存储扩容" : "购买 Credits 包"}
-        description={
-          addOnModal === "storage"
-            ? `+${addOns.storage.gb} GB，每月 ¥${addOns.storage.monthlyPrice}（示例），和订阅同一账期续费，可以随时关闭续费。`
-            : `${formatCredits(addOns.creditsPack.credits)} Credits，¥${addOns.creditsPack.price}（示例），一次性购买，不自动续购。到账后 12 个月内有效，到期没用完的部分自动收回，不退款。`
-        }
+        title="添加存储扩容"
+        description={`+${addOns.storage.gb} GB，每月 ¥${addOns.storage.monthlyPrice}（示例），和订阅同一账期续费，可以随时关闭续费。`}
         size="sm"
         footer={
           <ModalActions
             cancel={() => setAddOnModal(null)}
             confirmText="确认并支付"
             loading={saving}
-            confirm={() =>
-              commit(addOnModal === "storage" ? "存储扩容已生效" : "Credits 已加到可用余额", () => setAddOnModal(null))
-            }
+            confirm={() => commit("存储扩容已生效", () => setAddOnModal(null))}
           />
         }
       >
-        <InlineNotice>
-          {addOnModal === "storage"
-            ? "扩容只增加空间，不增加 Credits；升级套餐时要选择保留几个扩容。"
-            : "和套餐 Credits 合并显示一个余额：先用套餐 Credits，再按到期日从早到晚用购买的。到期前 30 天和 7 天会站内通知并发邮件提醒（见服务条款第五节）。"}
-        </InlineNotice>
+        <InlineNotice>扩容只增加空间，不增加 Credits；升级套餐时要选择保留几个扩容。</InlineNotice>
       </Modal>
+      <RechargeModal
+        open={rechargeOpen}
+        orderNo={rechargeOrderNo}
+        close={(cancelled) => {
+          setRechargeOpen(false);
+          if (cancelled) notify("订单已取消，没有扣款");
+        }}
+        onPaid={({ amount, credits, orderNo }) => {
+          setRecharges((items) => [
+            ...items,
+            {
+              id: `grant-recharge-${orderNo}`,
+              workspace: "深蓝猎头工作室",
+              kind: "recharge",
+              label: "充值",
+              amount,
+              rate: recharge.rate,
+              method: "微信支付",
+              credits,
+              used: 0,
+              arrivedOn: creditsToday,
+              expiresOn: addMonths(creditsToday, 12),
+              validity: "到账后 12 个月",
+              order: orderNo,
+            },
+          ]);
+          setRechargeOpen(false);
+          notify(`充值成功：${formatCredits(credits)} Credits 已到账`);
+        }}
+      />
     </PageState>
   );
 }

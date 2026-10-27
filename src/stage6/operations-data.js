@@ -1,4 +1,4 @@
-import { addOns, formatCny, subscriptionPlans } from "../shared/productCatalog";
+import { formatCny, subscriptionPlans } from "../shared/productCatalog";
 
 export const overviewMetrics = [
   {
@@ -734,12 +734,13 @@ export const orders = [
     completedAt: "8 月 19 日",
   },
   {
-    // Credits pack (12 §11.5): valid 12 months from arrival; see src/shared/creditGrants.js.
+    // Top-up (12 §11.6): ¥100 at the example rate ¥1 = 100 Credits, valid 12 months from arrival
+    // (12 §11.5); top-ups are WeChat Pay only in phase 1. See src/shared/creditGrants.js.
     id: "ORD-20260605-0031",
     workspace: "深蓝猎头工作室",
-    plan: "Credits 包 10,000",
-    amount: formatCny(addOns.creditsPack.price),
-    method: "支付宝",
+    plan: "充值 ¥100 · 10,000 Credits",
+    amount: formatCny(100),
+    method: "微信支付",
     status: "已支付",
     createdAt: "6 月 5 日",
     completedAt: "6 月 5 日",

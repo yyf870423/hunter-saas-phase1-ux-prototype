@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { Button, Drawer, Modal, useToast } from "../stage1/ui";
-import { grantBalance, grantStatus, grantsFor } from "../shared/creditGrants";
+import { grantBalance, grantStatus, grantTitle, grantsFor } from "../shared/creditGrants";
 import { formatCredits } from "../shared/productCatalog";
 import {
   CustomCheckbox,
@@ -771,7 +771,7 @@ function CreditGrantsSection({ workspace }) {
               <div className="ops-adjustment-row" key={grant.id}>
                 <span>
                   <b>
-                    {grant.label} {formatCredits(grant.credits)}
+                    {grantTitle(grant)}
                     {grant.order ? ` · ${grant.order}` : ""}
                   </b>
                   <small>
@@ -792,7 +792,7 @@ function CreditGrantsSection({ workspace }) {
             <span>
               <b>到期回收 {formatCredits(amount)} Credits</b>
               <small>
-                {grant.expiresOn} 自动回收 · {grant.label} {formatCredits(grant.credits)}（{grant.arrivedOn} 到账）· 不改订单、不退款
+                {grant.expiresOn} 自动回收 · {grantTitle(grant)}（{grant.arrivedOn} 到账）· 不改订单、不退款
               </small>
             </span>
             <OpsStatus tone="neutral">系统记录</OpsStatus>

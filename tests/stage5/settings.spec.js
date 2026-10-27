@@ -198,11 +198,9 @@ test("订阅与数据覆盖支付、无订阅、到期和危险操作", async ({
   await expect(page.getByText(/业务数据仍可查看和导出/)).toBeVisible();
   await expect(page.getByText(/正在运行的那一轮已经跑完并保存/)).toBeVisible();
 
-  await page.goto("#/settings/subscription");
-  await page.getByRole("button", { name: "购买", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "购买 Credits 包" })).toContainText("不自动续购");
-  await page.getByRole("button", { name: "确认并支付" }).click();
-  await expect(page.getByText("Credits 已加到可用余额")).toBeVisible();
+  // Expired: topping up is unavailable (the 12 months would run while nothing can be used).
+  await expect(page.getByRole("button", { name: "充值", exact: true })).toBeDisabled();
+  await expect(page.getByText(/订阅到期期间不能充值/)).toBeVisible();
 
   await page.goto("#/settings/data-privacy");
   await expect(page.getByText("隐私边界")).toHaveCount(0);
@@ -235,20 +233,66 @@ test("购买和补偿的 Credits 按笔显示到账、到期和剩余", async ({
   await expect(rows.nth(1)).toContainText("补偿 Credits 500");
   await expect(rows.nth(1)).toContainText("即将到期");
   await expect(rows.nth(1)).toContainText("2026 年 9 月 23 日到期（发放时说明 60 天）");
-  await expect(rows.nth(2)).toContainText("Credits 包 10,000");
-  await expect(rows.nth(2)).toContainText("2027 年 6 月 5 日到期（到账后 12 个月）");
+  await expect(rows.nth(2)).toContainText("充值 ¥100 → 10,000 Credits");
+  await expect(rows.nth(2)).toContainText("2027 年 6 月 5 日到期（到账后 12 个月） · 微信支付 · ¥1 = 100 Credits");
   await expect(rows.nth(2)).toContainText("剩余 2,500");
   // The usage card's balance equals what the grants still hold (2,500 + 500).
   await expect(page.getByText("可用余额（含套餐外的 3,000）")).toBeVisible();
   await expect(
-    page.locator(".s5-order-list > div").filter({ hasText: "Credits 包 10,000" }),
-  ).toContainText("2026 年 6 月 5 日 · 到期 2027 年 6 月 5 日");
-  await page.getByRole("button", { name: "购买", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "购买 Credits 包" })).toContainText(
-    "到账后 12 个月内有效，到期没用完的部分自动收回，不退款",
+    page.locator(".s5-order-list > div").filter({ hasText: "充值 ¥100 · 10,000 Credits" }),
+  ).toContainText("2026 年 6 月 5 日 · 微信支付 · 到期 2027 年 6 月 5 日");
+  await assertNoConsoleErrors();
+});
+
+// 12 §11.6: top up an amount, converted at the rate when the payment succeeds (example ¥1 = 100 Credits);
+// WeChat Pay only; nothing is charged or credited until paid, closing the QR step cancels the order.
+test("充值按金额换成 Credits，只支持微信支付", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/settings/subscription");
+  await page.getByRole("button", { name: "充值", exact: true }).click();
+  let dialog = page.getByRole("dialog", { name: "充值 Credits" });
+  await expect(dialog).toContainText("当前 ¥1 = 100 Credits（示例，汇率待定）");
+  await expect(dialog).toContainText("充值目前只支持微信支付");
+  await expect(dialog).toContainText("到账后 12 个月内有效，到期没用完的部分自动收回，不退款");
+  await expect(dialog.getByRole("radio")).toHaveCount(6); // 4 amounts + 其他金额 + 微信支付
+  await dialog.getByRole("radio", { name: /其他金额/ }).click();
+  await dialog.getByLabel("充值金额（元）").fill("5");
+  await expect(dialog).toContainText("请输入 10–5,000 之间的整数金额");
+  await expect(dialog.getByRole("button", { name: "去支付" })).toBeDisabled();
+  await dialog.getByLabel("充值金额（元）").fill("300");
+  await expect(dialog.locator(".s5-recharge-result")).toContainText("30,000 Credits");
+  await dialog.getByRole("radio", { name: /¥200/ }).click();
+  await expect(dialog.locator(".s5-recharge-result")).toContainText("20,000 Credits");
+  await dialog.getByRole("button", { name: "去支付 ¥200" }).click();
+
+  // Closing on the QR step cancels the order: no charge, no Credits.
+  dialog = page.getByRole("dialog", { name: "微信支付" });
+  await expect(dialog.getByRole("img", { name: "微信支付二维码" })).toBeVisible();
+  await expect(dialog).toContainText("¥ 200.00");
+  await dialog.getByRole("button", { name: "关闭" }).click();
+  await expect(page.getByText("订单已取消，没有扣款")).toBeVisible();
+  await expect(page.getByText("可用余额（含套餐外的 3,000）")).toBeVisible();
+
+  await page.getByRole("button", { name: "充值", exact: true }).click();
+  await page.getByRole("dialog", { name: "充值 Credits" }).getByRole("radio", { name: /¥200/ }).click();
+  await page.getByRole("button", { name: "去支付 ¥200" }).click();
+  await page.getByRole("button", { name: "我已完成支付" }).click();
+  await expect(page.getByText("充值成功：20,000 Credits 已到账")).toBeVisible();
+  const grants = page
+    .locator(".s5-section")
+    .filter({ has: page.getByRole("heading", { name: "购买和补偿的 Credits" }) });
+  const rows = grants.locator(".s5-setting-row");
+  await expect(rows).toHaveCount(4);
+  await expect(rows.nth(3)).toContainText("充值 ¥200 → 20,000 Credits");
+  await expect(rows.nth(3)).toContainText("2026 年 8 月 24 日到账 · 2027 年 8 月 24 日到期（到账后 12 个月）");
+  await expect(rows.nth(3)).toContainText("剩余 20,000");
+  await expect(page.getByText("可用余额（含套餐外的 23,000）")).toBeVisible();
+  await expect(page.locator(".s5-usage-breakdown")).toContainText("32,000");
+  await expect(page.locator(".s5-order-list > div").first()).toContainText(
+    "充值 ¥200 · 20,000 Credits",
   );
-  await expect(page.getByRole("dialog", { name: "购买 Credits 包" })).toContainText(
-    "到期前 30 天和 7 天会站内通知并发邮件提醒",
+  await expect(page.locator(".s5-order-list > div").first()).toContainText(
+    "2026 年 8 月 24 日 · 微信支付 · 到期 2027 年 8 月 24 日",
   );
   await assertNoConsoleErrors();
 });

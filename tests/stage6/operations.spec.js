@@ -124,7 +124,7 @@ test("订阅详情区分正常订阅与例外权益调整", async ({ page }) => 
     .filter({ has: page.getByRole("heading", { name: "套餐外 Credits" }) });
   await expect(grants.locator(".ops-adjustment-row")).toHaveCount(4);
   await expect(grants).toContainText(
-    "Credits 包 10,000 · ORD-20260605-0031",
+    "充值 ¥100 → 10,000 Credits · ORD-20260605-0031",
   );
   await expect(grants).toContainText("到期 2027-06-05（到账后 12 个月）");
   await expect(grants).toContainText("到期回收 200 Credits");

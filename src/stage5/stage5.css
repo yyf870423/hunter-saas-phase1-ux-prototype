@@ -2247,3 +2247,141 @@
     gap: 10px;
   }
 }
+
+/* 12 §11.6 top-up: amount chips, the converted result, and the WeChat Pay step. */
+.s5-recharge {
+  display: grid;
+  gap: 14px;
+}
+.s5-recharge-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.s5-recharge .s5-subscription-payment .s5-payment-options {
+  grid-template-columns: minmax(0, 1fr);
+}
+.s5-recharge-amounts > button {
+  display: grid;
+  min-height: 56px;
+  align-content: center;
+  gap: 2px;
+  padding: 8px 6px;
+  color: var(--s1-ink);
+  text-align: center;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.s5-recharge-amounts > button:hover {
+  border-color: color-mix(in srgb, var(--s1-accent) 45%, var(--s1-line));
+}
+.s5-recharge-amounts > button.is-selected {
+  background: var(--s1-accent-soft);
+  border-color: var(--s1-accent);
+}
+.s5-recharge-amounts b {
+  font-size: 14px;
+  font-weight: 640;
+}
+.s5-recharge-amounts small {
+  color: var(--s1-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.s5-recharge-result {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--s1-canvas);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s5-recharge-result small {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s5-recharge-result b {
+  font-size: 18px;
+  font-weight: 650;
+}
+.s5-wechat-pay {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 16px 18px;
+  align-items: start;
+}
+.s5-wechat-pay > .s5-inline-notice {
+  grid-column: 1 / -1;
+}
+.s5-pay-qr {
+  width: 168px;
+  height: 168px;
+  padding: 6px;
+  fill: #111;
+  background: #fff;
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 8px;
+}
+.s5-wechat-pay > div {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+.s5-wechat-pay strong {
+  font-size: 24px;
+  font-weight: 650;
+}
+.s5-wechat-pay span {
+  font-size: 13px;
+}
+.s5-wechat-pay small,
+.s5-wechat-pay p {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+.s5-wechat-pay em {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--s1-muted);
+  font-size: 12px;
+  font-style: normal;
+}
+.s5-wechat-pay em i {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--s1-line-strong);
+  border-top-color: var(--s1-accent);
+  border-radius: 50%;
+  animation: s5-pay-wait 900ms linear infinite;
+}
+@keyframes s5-pay-wait {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.s5-wechat-pay .s5-wechat-open {
+  display: none;
+}
+@media (max-width: 560px) {
+  .s5-wechat-pay {
+    grid-template-columns: 1fr;
+  }
+  /* Phones pay by jumping to WeChat instead of scanning. */
+  .s5-pay-qr {
+    display: none;
+  }
+  .s5-wechat-pay .s5-wechat-open {
+    display: inline-flex;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s5-wechat-pay em i {
+    animation: none;
+  }
+}

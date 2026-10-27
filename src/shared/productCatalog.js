@@ -29,11 +29,25 @@ export const subscriptionPlans = {
   },
 };
 
-// Add-ons are bought separately: Credits packs once, storage blocks monthly.
+// Add-ons are bought separately: Credits by topping up an amount, storage blocks monthly.
 export const addOns = {
-  creditsPack: { credits: 10000, price: 100 },
   storage: { gb: 10, monthlyPrice: 20 },
 };
+
+// Top-up (decision 2026-10-28, replaces the Credits pack): pay an amount, converted to Credits at the rate
+// in force when the payment succeeds; the Credits then follow 12 §11.5 (valid 12 months from arrival).
+// The rate is not decided yet — ¥1 = 100 Credits is an example (same as the old 10,000 / ¥100 pack).
+// Phase 1 top-up only supports WeChat Pay: a QR code on desktop, a jump to WeChat on phones.
+export const recharge = {
+  rate: 100,
+  presets: [50, 100, 200, 500],
+  min: 10,
+  max: 5000,
+  qrMinutes: 15,
+  methods: ["微信支付"],
+};
+
+export const rechargeCredits = (amount) => Math.floor(Number(amount) * recharge.rate);
 
 // Trial (decision 2026-10-27): 30 days, one-time experience Credits with a hard cap, high-cost external
 // data off by default, stops when used up; storage as the personal plan.
