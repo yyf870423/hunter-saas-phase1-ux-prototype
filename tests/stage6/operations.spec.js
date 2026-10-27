@@ -115,7 +115,21 @@ test("订阅详情区分正常订阅与例外权益调整", async ({ page }) => 
     name: "深蓝猎头工作室",
   });
   await expect(subscription.getByText("当前订阅")).toBeVisible();
-  await expect(subscription.getByText("例外权益调整")).toBeVisible();
+  await expect(
+    subscription.getByText("例外权益调整", { exact: true }),
+  ).toBeVisible();
+  // 13 §8.4: Credits outside the plan, one row per grant, plus the take-back record expiry creates.
+  const grants = subscription
+    .locator(".ops-section")
+    .filter({ has: page.getByRole("heading", { name: "套餐外 Credits" }) });
+  await expect(grants.locator(".ops-adjustment-row")).toHaveCount(4);
+  await expect(grants).toContainText(
+    "Credits 包 10,000 · ORD-20260605-0031",
+  );
+  await expect(grants).toContainText("到期 2027-06-05（到账后 12 个月）");
+  await expect(grants).toContainText("到期回收 200 Credits");
+  await expect(grants).toContainText("不改订单、不退款");
+  await expect(grants).toContainText("到期日期不能直接修改");
   await subscription.getByRole("button", { name: "发起权益调整" }).click();
   const dialog = page.getByRole("dialog", { name: "发起权益调整" });
   await expect(dialog).toBeVisible();

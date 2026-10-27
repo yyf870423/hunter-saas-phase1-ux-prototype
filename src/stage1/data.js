@@ -225,6 +225,16 @@ export const notifications = [
     time: "今天 09:12",
     unread: true,
   },
+  // 12 §11.5: 30 and 7 days before Credits outside the plan expire, an in-app notice and an email (cannot be turned off).
+  {
+    id: "notification-credits-expiry",
+    type: "账号与订阅",
+    title: "500 补偿 Credits 将于 9 月 23 日到期",
+    source: "订阅与用量",
+    route: "/settings/subscription",
+    time: "今天 08:00",
+    unread: false,
+  },
   {
     id: "notification-4",
     type: "资料导入",

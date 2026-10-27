@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { Button, Drawer, Modal, useToast } from "../stage1/ui";
+import { grantBalance, grantStatus, grantsFor } from "../shared/creditGrants";
+import { formatCredits } from "../shared/productCatalog";
 import {
   CustomCheckbox,
   FormField,
@@ -743,6 +745,64 @@ const subscriptionColumns = [
   },
 ];
 
+// 13 §8.4: Credits outside the plan, one row per grant (arrival, expiry, used, left, status), plus the
+// take-back records that expiry creates. Expiry dates cannot be edited here; extending one goes through
+// an exception adjustment with a reason (8.3).
+function CreditGrantsSection({ workspace }) {
+  const grants = grantsFor(workspace);
+  const recovered = grants
+    .map((grant) => ({ grant, ...grantBalance(grant) }))
+    .filter((item) => item.recovered > 0);
+  return (
+    <OpsSection
+      title="套餐外 Credits"
+      description={
+        grants.length
+          ? "按到期日从早到晚使用。到期日期不能直接修改；确需延长（如系统故障影响使用），通过例外权益调整发起并填写原因。"
+          : undefined
+      }
+    >
+      <div className="ops-compact-table">
+        {grants.length ? (
+          grants.map((grant) => {
+            const { left } = grantBalance(grant);
+            const status = grantStatus(grant);
+            return (
+              <div className="ops-adjustment-row" key={grant.id}>
+                <span>
+                  <b>
+                    {grant.label} {formatCredits(grant.credits)}
+                    {grant.order ? ` · ${grant.order}` : ""}
+                  </b>
+                  <small>
+                    到账 {grant.arrivedOn} · 到期 {grant.expiresOn}（{grant.validity}）· 已用 {formatCredits(grant.used)} · 剩余 {formatCredits(left)}
+                  </small>
+                </span>
+                <OpsStatus tone={status === "有效" ? "success" : status === "即将到期" ? "warning" : "neutral"}>
+                  {status}
+                </OpsStatus>
+              </div>
+            );
+          })
+        ) : (
+          <p className="ops-muted-copy">没有购买或补偿的 Credits。</p>
+        )}
+        {recovered.map(({ grant, recovered: amount }) => (
+          <div className="ops-adjustment-row" key={grant.id + "-recovered"}>
+            <span>
+              <b>到期回收 {formatCredits(amount)} Credits</b>
+              <small>
+                {grant.expiresOn} 自动回收 · {grant.label} {formatCredits(grant.credits)}（{grant.arrivedOn} 到账）· 不改订单、不退款
+              </small>
+            </span>
+            <OpsStatus tone="neutral">系统记录</OpsStatus>
+          </div>
+        ))}
+      </div>
+    </OpsSection>
+  );
+}
+
 function SubscriptionDrawer({ subscription, close, adjust }) {
   if (!subscription) return null;
   return (
@@ -772,6 +832,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
             ]}
           />
         </OpsSection>
+        <CreditGrantsSection workspace={subscription.workspace} />
         <OpsInlineState
           tone="info"
           icon="info"
@@ -1007,7 +1068,7 @@ export function SubscriptionsPage() {
               ? [
                   {
                     label: "套餐",
-                    options: ["试用", "基础版", "专业版"],
+                    options: ["试用", "个人版", "专业版"],
                     value: filters.plan || "",
                     onChange: (value) =>
                       setFilters((current) => ({ ...current, plan: value })),

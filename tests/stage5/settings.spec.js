@@ -219,6 +219,40 @@ test("订阅与数据覆盖支付、无订阅、到期和危险操作", async ({
   await assertNoConsoleErrors();
 });
 
+// 12 §11.5: Credits outside the plan are listed one grant per row, ordered by expiry (the order they are
+// spent in), with arrival, expiry, validity, what is left and — once expired — what was taken back.
+test("购买和补偿的 Credits 按笔显示到账、到期和剩余", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/settings/subscription");
+  const grants = page
+    .locator(".s5-section")
+    .filter({ has: page.getByRole("heading", { name: "购买和补偿的 Credits" }) });
+  const rows = grants.locator(".s5-setting-row");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0)).toContainText("补偿 Credits 300");
+  await expect(rows.nth(0)).toContainText("已失效");
+  await expect(rows.nth(0)).toContainText("已收回 200");
+  await expect(rows.nth(1)).toContainText("补偿 Credits 500");
+  await expect(rows.nth(1)).toContainText("即将到期");
+  await expect(rows.nth(1)).toContainText("2026 年 9 月 23 日到期（发放时说明 60 天）");
+  await expect(rows.nth(2)).toContainText("Credits 包 10,000");
+  await expect(rows.nth(2)).toContainText("2027 年 6 月 5 日到期（到账后 12 个月）");
+  await expect(rows.nth(2)).toContainText("剩余 2,500");
+  // The usage card's balance equals what the grants still hold (2,500 + 500).
+  await expect(page.getByText("可用余额（含套餐外的 3,000）")).toBeVisible();
+  await expect(
+    page.locator(".s5-order-list > div").filter({ hasText: "Credits 包 10,000" }),
+  ).toContainText("2026 年 6 月 5 日 · 到期 2027 年 6 月 5 日");
+  await page.getByRole("button", { name: "购买", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "购买 Credits 包" })).toContainText(
+    "到账后 12 个月内有效，到期没用完的部分自动收回，不退款",
+  );
+  await expect(page.getByRole("dialog", { name: "购买 Credits 包" })).toContainText(
+    "到期前 30 天和 7 天会站内通知并发邮件提醒",
+  );
+  await assertNoConsoleErrors();
+});
+
 test("设置公共状态可重复验收", async ({ page }) => {
   await page.goto("#/settings/profile?state=loading");
   await expect(page.getByLabel("设置加载中")).toBeVisible();

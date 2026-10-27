@@ -1,4 +1,4 @@
-import { formatCny, subscriptionPlans } from "../shared/productCatalog";
+import { addOns, formatCny, subscriptionPlans } from "../shared/productCatalog";
 
 export const overviewMetrics = [
   {
@@ -161,7 +161,7 @@ export const workspaces = [
     owner: "顾清越",
     email: "qingyue@zhixing-talent.com",
     account: "已停用",
-    plan: "基础版",
+    plan: "个人版",
     subscription: "已到期",
     quota: 100,
     storage: "3.1 GB",
@@ -199,7 +199,7 @@ export const workspaces = [
     owner: "许诺言",
     email: "nuoyan@northstar-hr.cn",
     account: "正常",
-    plan: "基础版",
+    plan: "个人版",
     subscription: "正常",
     quota: 83,
     storage: "1.9 GB",
@@ -732,6 +732,17 @@ export const orders = [
     status: "已退款",
     createdAt: "8 月 18 日",
     completedAt: "8 月 19 日",
+  },
+  {
+    // Credits pack (12 §11.5): valid 12 months from arrival; see src/shared/creditGrants.js.
+    id: "ORD-20260605-0031",
+    workspace: "深蓝猎头工作室",
+    plan: "Credits 包 10,000",
+    amount: formatCny(addOns.creditsPack.price),
+    method: "支付宝",
+    status: "已支付",
+    createdAt: "6 月 5 日",
+    completedAt: "6 月 5 日",
   },
 ];
 

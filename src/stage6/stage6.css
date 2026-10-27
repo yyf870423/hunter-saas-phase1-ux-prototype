@@ -1931,8 +1931,9 @@
 .ops-adjustment-row:last-child {
   border-bottom: 0;
 }
-.ops-adjustment-row > span {
+.ops-adjustment-row > span:not(.s1-status) {
   display: grid;
+  min-width: 0;
 }
 .ops-adjustment-row b {
   font-size: 11px;

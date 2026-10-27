@@ -9,6 +9,7 @@ import {
   subscriptionPlans,
   trialGrant,
 } from "../shared/productCatalog";
+import { displayDate, grantBalance, grantStatus, grantsFor } from "../shared/creditGrants";
 import { FormField, SelectMenu, TextInput } from "../stage4/asset-ui";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import { agentUsage } from "../stage1/data";
@@ -1235,6 +1236,53 @@ export function ConnectionSettingsPage() {
   );
 }
 
+// Credits outside the monthly plan, one row per grant (12 §11.5): arrival, expiry, what is left, and
+// “即将到期” within 30 days. Expired grants stay listed with what was taken back.
+function CreditGrantsSection() {
+  const grants = grantsFor("深蓝猎头工作室");
+  return (
+    <SettingsSection
+      title="购买和补偿的 Credits"
+      description="按笔显示到账、到期和剩余。先用套餐 Credits，再按到期日从早到晚用这些；购买的到账后 12 个月有效，补偿的按发放时说明的有效期，到期没用完的自动收回、不退款。"
+    >
+      <div className="s5-setting-list s5-credit-grants">
+        {grants.map((grant) => {
+          const status = grantStatus(grant);
+          const { left, recovered } = grantBalance(grant);
+          return (
+            <SettingRow
+              key={grant.id}
+              icon={grant.kind === "purchase" ? "receipt" : "activity"}
+              title={`${grant.label} ${formatCredits(grant.credits)}`}
+              status={
+                <StatusBadge tone={status === "有效" ? "success" : status === "即将到期" ? "warning" : "neutral"}>
+                  {status}
+                </StatusBadge>
+              }
+              description={`${displayDate(grant.arrivedOn)}到账 · ${displayDate(grant.expiresOn)}到期（${grant.validity}）${grant.reason ? ` · ${grant.reason}` : ""}`}
+              action={
+                <span className="s5-credit-grant-left">
+                  {status === "已失效" ? (
+                    <>
+                      <b>已收回 {formatCredits(recovered)}</b>
+                      <small>已用 {formatCredits(grant.used)}</small>
+                    </>
+                  ) : (
+                    <>
+                      <b>剩余 {formatCredits(left)}</b>
+                      <small>已用 {formatCredits(grant.used)}</small>
+                    </>
+                  )}
+                </span>
+              }
+            />
+          );
+        })}
+      </div>
+    </SettingsSection>
+  );
+}
+
 export function SubscriptionSettingsPage() {
   const { state, clearState } = usePageState();
   const notify = useToast();
@@ -1353,7 +1401,7 @@ export function SubscriptionSettingsPage() {
                 </span>
                 <span>
                   <i style={{ "--usage": "0%" }} />
-                  <b>可用余额（含购买的 {formatCredits(agentUsage.purchasedLeft)}）</b>
+                  <b>可用余额（含套餐外的 {formatCredits(agentUsage.purchasedLeft)}）</b>
                   <em>{formatCredits(agentUsage.balance)}</em>
                 </span>
                 <span>
@@ -1366,6 +1414,7 @@ export function SubscriptionSettingsPage() {
               </div>
             </div>
           </section>
+          <CreditGrantsSection />
           <SettingsSection
             title="单独加购"
             description="Credits 和存储分开买，不用为了一项不够就升级整个套餐（价格为示例）。"
@@ -1374,7 +1423,7 @@ export function SubscriptionSettingsPage() {
               <SettingRow
                 icon="activity"
                 title={`Credits 包：${formatCredits(addOns.creditsPack.credits)} Credits / ¥${addOns.creditsPack.price}`}
-                description="一次性购买，加到同一个可用余额；先用套餐 Credits，再用购买的。不会自动续购。"
+                description="一次性购买，加到同一个可用余额；先用套餐 Credits，再用购买的。到账后 12 个月有效，到期没用完的自动收回、不退款。不会自动续购。"
                 action={
                   <Button size="sm" onClick={() => setAddOnModal("credits")}>
                     购买
@@ -1409,6 +1458,11 @@ export function SubscriptionSettingsPage() {
                 action={<Toggle label="Credits 用完提醒" checked disabled />}
               />
               <SettingRow
+                title="购买和补偿的 Credits 到期前 30 天 / 7 天"
+                description="站内通知和邮件，必须通知；写明哪一笔、剩多少、哪天到期"
+                action={<Toggle label="Credits 到期提醒" checked disabled />}
+              />
+              <SettingRow
                 title="存储用到 90% / 用满"
                 description="站内通知和邮件，必须通知（用到 70% 只发站内）；用满后暂停需要写入的步骤"
                 action={<Toggle label="存储提醒" checked disabled />}
@@ -1440,6 +1494,14 @@ export function SubscriptionSettingsPage() {
                 "支付成功",
               ],
               [
+                "2026 年 6 月 5 日",
+                `Credits 包 ${formatCredits(addOns.creditsPack.credits)}`,
+                formatCny(addOns.creditsPack.price),
+                "支付成功",
+                // 12 §11.5: order records show each purchase's expiry date.
+                "2027 年 6 月 5 日",
+              ],
+              [
                 "2026 年 6 月 1 日",
                 "专业版月度订阅",
                 formatCny(subscriptionPlans.professional.monthlyPrice),
@@ -1449,7 +1511,10 @@ export function SubscriptionSettingsPage() {
               <div key={order[0]}>
                 <span>
                   <b>{order[1]}</b>
-                  <small>{order[0]}</small>
+                  <small>
+                    {order[0]}
+                    {order[4] ? ` · 到期 ${order[4]}` : ""}
+                  </small>
                 </span>
                 <em>{order[2]}</em>
                 <StatusBadge tone="success">{order[3]}</StatusBadge>
@@ -1552,7 +1617,7 @@ export function SubscriptionSettingsPage() {
         description={
           addOnModal === "storage"
             ? `+${addOns.storage.gb} GB，每月 ¥${addOns.storage.monthlyPrice}（示例），和订阅同一账期续费，可以随时关闭续费。`
-            : `${formatCredits(addOns.creditsPack.credits)} Credits，¥${addOns.creditsPack.price}（示例），一次性购买，不自动续购。`
+            : `${formatCredits(addOns.creditsPack.credits)} Credits，¥${addOns.creditsPack.price}（示例），一次性购买，不自动续购。到账后 12 个月内有效，到期没用完的部分自动收回，不退款。`
         }
         size="sm"
         footer={
@@ -1569,7 +1634,7 @@ export function SubscriptionSettingsPage() {
         <InlineNotice>
           {addOnModal === "storage"
             ? "扩容只增加空间，不增加 Credits；升级套餐时要选择保留几个扩容。"
-            : "购买的 Credits 和套餐 Credits 合并显示一个余额，先用套餐的；有效期 12 个月（见服务条款）。"}
+            : "和套餐 Credits 合并显示一个余额：先用套餐 Credits，再按到期日从早到晚用购买的。到期前 30 天和 7 天会站内通知并发邮件提醒（见服务条款第五节）。"}
         </InlineNotice>
       </Modal>
     </PageState>
