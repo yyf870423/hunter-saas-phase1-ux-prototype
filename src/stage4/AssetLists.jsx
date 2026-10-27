@@ -545,7 +545,7 @@ export function AssetListPage({ type }) {
           }
         />
       )}
-      {pendingIds.length || pendingOnly ? (
+      {state === "normal" && (pendingIds.length || pendingOnly) ? (
         <div className="s4-pending-filter">
           <button
             type="button"
