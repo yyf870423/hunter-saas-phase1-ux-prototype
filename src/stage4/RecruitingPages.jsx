@@ -55,6 +55,7 @@ import { AssetRelatedTasks } from "./AssetRelatedTasks";
 import { runOpportunityCommand, useOpportunityState } from "./opportunity-store";
 import { PositionTalentMap } from "./PositionTalentMap";
 import { CreatedPositionWorkspace } from "./CreatedPositionWorkspace";
+import { hasSeededPipeline, lastMove, seedRelation, stageNameById } from "./pipeline-relations";
 export { PositionCreatePage } from "./PositionCreatePage";
 
 const tabs = [
@@ -1401,6 +1402,15 @@ const legacyPipelineCandidateSeed = {
     note: "客户认为管理跨度不足",
     enteredAt: "8 月 18 日",
   },
+  chensong: {
+    id: "chensong",
+    name: "陈松",
+    company: "星澜机器人",
+    title: "自动驾驶技术经理",
+    score: 87,
+    note: "推荐报告已发送客户",
+    stageDays: 18,
+  },
   wangyi: {
     id: "wangyi",
     name: "王奕",
@@ -1517,9 +1527,26 @@ function CandidatePipeline({ position }) {
     const legacyId = record.candidateId.replace(/^candidate-/, "");
     return { ...record, id: legacyPipelineCandidateSeed[legacyId] ? legacyId : record.candidateId, person };
   }).filter((record) => record.person);
-  const pipelineCandidateSeed = { ...legacyPipelineCandidateSeed, ...Object.fromEntries(incoming.map((record) => [record.id, { ...record.person, id: record.id, title: record.person.title || record.person.role, enteredAt: "本轮审核", note: record.person.risk || "待联系核实" }])) };
+  // Positions with seeded relations (具身智能 VLA 算法负责人) show only what the store holds, so the board,
+  // the candidate list and the candidate page agree; other prototype positions keep the sample board.
+  const seeded = hasSeededPipeline(position?.id);
+  const cardFor = (record) => {
+    const relation = seedRelation(record.candidateId, position?.id);
+    const move = lastMove(record);
+    if (relation || move) {
+      return {
+        ...(legacyPipelineCandidateSeed[record.id] || {}),
+        ...record.person, id: record.id, title: record.person.title || record.person.role,
+        note: move ? move.note || `从${stageNameById[move.from] || "上一阶段"}移入` : relation.note,
+        stageDays: move ? 0 : relation.stageDays, enteredAt: move ? undefined : relation.enteredAt,
+        history: record.history, candidateId: record.candidateId,
+      };
+    }
+    return { ...record.person, id: record.id, title: record.person.title || record.person.role, enteredAt: "本轮审核", note: record.person.risk || "待联系核实" };
+  };
+  const pipelineCandidateSeed = { ...legacyPipelineCandidateSeed, ...Object.fromEntries(incoming.map((record) => [record.id, cardFor(record)])) };
   const initialStages = initialPipelineStages.map((stage) => ({ ...stage,
-    people: [...stage.people.filter((id) => !incoming.some((record) => record.id === id)), ...incoming.filter((record) => record.stage === (stage.id === "salary" ? "offer" : stage.id)).map((record) => record.id)] }));
+    people: [...(seeded ? [] : stage.people.filter((id) => !incoming.some((record) => record.id === id))), ...incoming.filter((record) => record.stage === (stage.id === "salary" ? "offer" : stage.id)).map((record) => record.id)] }));
   const notify = useToast();
   const boardRef = useRef(null);
   const scrollDragRef = useRef(null);
@@ -2090,7 +2117,14 @@ function PipelineCandidateModal({ candidate, close }) {
           items={[
             ["当前公司", candidate?.company],
             ["当前职位", candidate?.title],
-            ["进入阶段", candidate?.days],
+            [
+              "进入阶段",
+              candidate?.stageDays === 0
+                ? "今天"
+                : Number.isFinite(candidate?.stageDays)
+                  ? `${candidate.stageDays} 天前`
+                  : candidate?.enteredAt,
+            ],
             ["最近备注", candidate?.note],
           ]}
         />
@@ -2129,12 +2163,28 @@ function PipelineCandidateModal({ candidate, close }) {
           ) : null}
           <ActivityTimeline
             items={[
-              [
-                "今天 10:20",
-                candidate?.stage || "阶段更新",
-                candidate?.note || "等待下一步反馈",
-                "沈岚",
-              ],
+              // Moves recorded after the seed: drags on the board and moves Hunter made after the user
+              // confirmed them in a task conversation (the actor says so).
+              ...(candidate?.history || []).slice(1).reverse().map((entry, index) => ({
+                id: `move-${entry.at}-${index}`,
+                editable: false,
+                time: new Date(entry.at).toLocaleString("zh-CN", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }),
+                type: `${stageNameById[entry.from] || "上一阶段"} → ${stageNameById[entry.stage] || entry.stage}`,
+                content: entry.taskId ? (
+                  <>
+                    {entry.note || "未填写备注"} · <a href={`#/tasks/${entry.taskId}`}>查看对话</a>
+                  </>
+                ) : entry.note || "未填写备注",
+                source: entry.actor || "沈岚",
+              })),
+              ...((candidate?.history || []).length > 1
+                ? []
+                : [[
+                    "今天 10:20",
+                    candidate?.stage || "阶段更新",
+                    candidate?.note || "等待下一步反馈",
+                    "沈岚",
+                  ]]),
               [
                 "昨天 16:40",
                 "补充沟通备注",
@@ -3031,7 +3081,7 @@ function LegacyPositionDetailPage() {
         </TooltipText>
       </DetailHeader>
       <DetailTabs
-        tabs={tabs.map((entry) => entry.value === "talent-map" ? { ...entry, count: item.talentMap?.rows.length || 0 } : entry.value === "pipeline" ? { ...entry, count: new Set([...initialPipelineStages.flatMap((stage) => stage.people), ...item.pipeline.map((record) => record.candidateId.replace(/^candidate-/, ""))]).size } : entry)}
+        tabs={tabs.map((entry) => entry.value === "talent-map" ? { ...entry, count: item.talentMap?.rows.length || 0 } : entry.value === "pipeline" ? { ...entry, count: new Set([...(hasSeededPipeline(item.id) ? [] : initialPipelineStages.flatMap((stage) => stage.people)), ...item.pipeline.map((record) => record.candidateId.replace(/^candidate-/, ""))]).size } : entry)}
         value={tab}
         onChange={(value) =>
           updateQuery({

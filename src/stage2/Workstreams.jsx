@@ -23,6 +23,8 @@ import {
 import { CandidateReviewWorkspace, InspectionPanel } from "./ReviewWorkspace";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
+import { dialogueActor } from "../stage4/pipeline-relations";
+import { draftMarkdown, parsePipelineMessage, replyToDraft, resultMarkdown } from "./pipeline-dialogue";
 
 const defaultPrompt =
   "为星澜机器人“具身智能 VLA 算法负责人”岗位做多渠道找人。优先北京，候选人要有机器人学习或多模态策略经验，也要真正做过产品落地和团队管理。本轮先给我 20 位以内值得判断的人选，不要直接联系。";
@@ -124,6 +126,9 @@ export function WorkstreamHeader({
   );
 }
 
+// Example used by the “对话中推进” prototype entry (#/tasks/position-vla?state=pipeline-dialogue).
+const pipelineDialogueExample = "陈楚宁约了一面，梁辰二面过了、进谈薪，周明远客户没通过";
+
 export function AutomationWorkspace() {
   const opportunityState = useOpportunityState();
   const talentResult = opportunityState.positions.find((item) => item.id === "position-vla")?.talentMap;
@@ -139,6 +144,7 @@ export function AutomationWorkspace() {
     if (forcedState === "resume-batch") return 3;
     if (forcedState === "merge-conflict") return 4;
     if (forcedState === "review") return 4;
+    if (forcedState === "pipeline-dialogue") return 4;
     if (forcedState === "no-candidate") return 4;
     if (forcedState === "waiting" || forcedState === "candidate-reply")
       return 5;
@@ -169,9 +175,13 @@ export function AutomationWorkspace() {
   const [authMode, setAuthMode] = useState(
     () => sessionStorage.getItem("hunter-workstream-auth") || "confirm",
   );
-  const [composer, setComposer] = useState(
-    () => sessionStorage.getItem("hunter-workstream-draft") || "",
+  const [composer, setComposer] = useState(() =>
+    forcedState === "pipeline-dialogue"
+      ? pipelineDialogueExample
+      : sessionStorage.getItem("hunter-workstream-draft") || "",
   );
+  // A pending batch of stage moves waiting for 是 / 否 / per-person changes (06 §7.5).
+  const [pipelineDraft, setPipelineDraft] = useState(null);
   const [attachments, setAttachments] = useState([]);
   const [userDecisions, setUserDecisions] = useState([]);
   const [planAdjusted, setPlanAdjusted] = useState(
@@ -219,7 +229,7 @@ export function AutomationWorkspace() {
       setPhase(3);
     } else if (forcedState === "merge-conflict") {
       setPhase(4);
-    } else if (forcedState === "review") {
+    } else if (forcedState === "review" || forcedState === "pipeline-dialogue") {
       setPhase(4);
     } else if (forcedState === "waiting") {
       setPhase(5);
@@ -342,10 +352,69 @@ export function AutomationWorkspace() {
     } catch (error) { notify(error.message, "danger"); }
   };
 
+  const reply = (text, result) => {
+    setUserDecisions((items) => [...items, { text, result }]);
+    setComposer("");
+    setAttachments([]);
+  };
+
+  // Stage moves said in the conversation: draft first, write only after the user confirms (02 §7.14).
+  const handlePipelineMessage = (text) => {
+    const position = opportunityState.positions.find((item) => item.id === "position-vla");
+    if (pipelineDraft) {
+      const answer = replyToDraft(text, pipelineDraft);
+      if (answer.action === "decline") {
+        setPipelineDraft(null);
+        reply(text, "好的，这次不改，岗位流程保持原样。");
+        return true;
+      }
+      if (answer.action === "redraft") {
+        if (!answer.draft.items.length) {
+          setPipelineDraft(null);
+          reply(text, "好的，这几位都先不动，岗位流程保持原样。");
+          return true;
+        }
+        setPipelineDraft(answer.draft);
+        reply(text, draftMarkdown(answer.draft, position.name));
+        return true;
+      }
+      if (answer.action === "apply") {
+        const items = answer.items.filter((item) => item.add || item.from !== item.stage);
+        try {
+          const additions = items.filter((item) => item.add).map((item) => item.candidateId);
+          if (additions.length)
+            runOpportunityCommand("pipeline.add", { positionId: position.id, candidateIds: additions });
+          if (items.length)
+            runOpportunityCommand("pipeline.move", {
+              positionId: position.id,
+              moves: items.map((item) => ({ candidateId: item.candidateId, stage: item.stage, note: item.note })),
+              actor: dialogueActor,
+              taskId: "position-vla",
+            });
+        } catch (error) {
+          notify(error.message, "danger");
+          return true;
+        }
+        setPipelineDraft(null);
+        reply(text, resultMarkdown(items, answer.held, position.id, position.name));
+        return true;
+      }
+      reply(text, "这批推进还没执行。请回复“是”整批执行、“否”不改，或说明要调整哪一位（如“周明远先不动”）。");
+      return true;
+    }
+    const items = parsePipelineMessage(text, position);
+    if (!items.length) return false;
+    const draft = { positionId: position.id, items };
+    setPipelineDraft(draft);
+    reply(text, draftMarkdown(draft, position.name));
+    return true;
+  };
+
   const send = (text, files) => {
     const attachmentText = files.length
       ? `；附带 ${files.map((file) => file.name).join("、")}`
       : "";
+    if (!files.length && handlePipelineMessage(text)) return;
     if (phase < 4) {
       setUserDecisions((items) => [
         ...items,

@@ -4,6 +4,7 @@ import { sourcingCandidates } from "../stage2/recruiting-review-data.js";
 import { getCompanyContactSnapshot } from "./company-contact-store.js";
 import { applyOpportunityCommand, OpportunityError, opportunityNow } from "./opportunity-domain.js";
 import { createOpportunitySeed } from "./opportunity-seed.js";
+import { hasSeededPipeline, seedPipeline } from "./pipeline-relations.js";
 
 const key = "hunter-opportunity-lifecycle-v1";
 const listeners = new Set();
@@ -17,12 +18,24 @@ const matchingTimers = new Map();
 const valid = (value) => value?.schemaVersion === 1 &&
   ["opportunities", "positions", "tasks", "followups", "notifications", "imports", "files", "tombstones"].every((field) => Array.isArray(value[field])) &&
   value.commands && typeof value.commands === "object" && Number.isInteger(value.revision);
+// Demo data saved before 2026-10-28 has empty pipelines for positions that now seed theirs from the
+// candidate ↔ position relations; add the seeded people that are missing and keep everything already saved.
+const withSeededPipelines = (value) => ({
+  ...value,
+  positions: value.positions.map((position) => {
+    if (position.pipelineSeeded || !hasSeededPipeline(position.id)) return position;
+    const pipeline = position.pipeline || [];
+    const missing = seedPipeline(position.id, position.createdAt || new Date().toISOString())
+      .filter((entry) => !pipeline.some((item) => item.candidateId === entry.candidateId));
+    return { ...position, pipeline: [...missing, ...pipeline], pipelineSeeded: true };
+  }),
+});
 try {
   const raw = localStorage.getItem(key);
   if (raw) {
     const saved = JSON.parse(raw);
     if (!valid(saved)) throw new Error("资料格式不正确");
-    state = saved;
+    state = withSeededPipelines(saved);
   }
 } catch {
   loadError = "本地机会资料无法读取，已进入只读状态。请恢复浏览器备份或明确重置演示资料。";

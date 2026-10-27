@@ -695,12 +695,25 @@ export function applyOpportunityCommand(current, command, context = {}) {
       }
       updatePositionTalentMap(position, context.candidates.filter((person) => (data.candidateIds || []).includes(person.id)).map((person) => ({ ...person, assetPath: "/candidates/" + person.id })), "", now);
     } else {
-      const item = position.pipeline.find((entry) => entry.candidateId === data.candidateId);
-      if (!item || !position.stages.some((stage) => stage.id === data.stage))
-        fail("候选人或目标阶段不存在。", "REFERENCE");
-      item.stage = data.stage;
-      item.at = now;
-      item.history.push({ stage: data.stage, at: now, note: text(data.note) });
+      // One move from the board, or several confirmed together in a task conversation (02 §7.14:
+      // batch confirmed as a whole or item by item). All moves are checked before any is written.
+      const moves = Array.isArray(data.moves) ? data.moves : [data];
+      if (!moves.length) fail("请至少选择一位候选人。");
+      const items = moves.map((move) => {
+        const item = position.pipeline.find((entry) => entry.candidateId === move.candidateId);
+        if (!item || !position.stages.some((stage) => stage.id === move.stage))
+          fail("候选人或目标阶段不存在。", "REFERENCE");
+        return [item, move];
+      });
+      for (const [item, move] of items) {
+        const from = item.stage;
+        item.stage = move.stage;
+        item.at = now;
+        item.history ||= [];
+        item.history.push({ stage: move.stage, from, at: now, note: text(move.note),
+          actor: text(data.actor), taskId: text(data.taskId) });
+      }
+      result.moved = items.map(([item]) => item.candidateId);
     }
     position.updatedAt = now;
     result.positionId = position.id;

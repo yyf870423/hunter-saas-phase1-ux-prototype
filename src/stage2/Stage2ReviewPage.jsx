@@ -71,6 +71,11 @@ const reviewLinks = [
     "/tasks/position-vla?state=merge-conflict",
     "用户上传简历与系统候选人疑似同人时等待用户决定",
   ],
+  [
+    "对话中推进候选人",
+    "/tasks/position-vla?state=pipeline-dialogue",
+    "一句话推进多位候选人：先列出整批草稿，可整批或逐项确认，确认后泳道和候选人页同步",
+  ],
   ["阶段一工作台", "/home", "已审批并冻结的全局框架与工作台"],
 ];
 

@@ -43,6 +43,8 @@ import {
 } from "./asset-ui";
 import { pendingGroup, resolveUpdates } from "./pending-updates";
 import { addHandled } from "../stage2/signal-handling";
+import { useOpportunityState } from "./opportunity-store";
+import { candidateRelations, failureStageIds } from "./pipeline-relations";
 import {
   AssetAiProcessBanner,
   AssetAiProcessDrawer,
@@ -1625,8 +1627,11 @@ function TimelineTab({ candidate }) {
   );
 }
 
-function MatchingTab({ onRematch, refreshing }) {
+function MatchingTab({ onRematch, refreshing, candidate }) {
   const navigate = useNavigate();
+  const lifecycle = useOpportunityState();
+  // Same relations as the position board: a move on the board or one confirmed in a conversation shows here.
+  const relations = candidateRelations(lifecycle, candidate?.id);
   const [matchOpen, setMatchOpen] = useState(false);
   const [matchMode, setMatchMode] = useState("all");
   const [matchStep, setMatchStep] = useState("scope");
@@ -1695,20 +1700,50 @@ function MatchingTab({ onRematch, refreshing }) {
       </FieldGroup>
       <FieldGroup title="岗位推进">
         <div className="s4-pipeline-relations">
-          <article>
-            <span>
-              <b>具身智能 VLA 算法负责人</b>
-              <small>星澜机器人</small>
-            </span>
-            <StatusBadge tone="warning">一面</StatusBadge>
-            <p>昨天 16:20 从推荐进入一面 · 下一步：确认技术面时间</p>
-            <button
-              type="button"
-              onClick={() => navigate("/positions/position-vla?tab=pipeline")}
-            >
-              查看推进
-            </button>
-          </article>
+          {relations.length ? (
+            relations.map((relation) => (
+              <article key={relation.positionId}>
+                <span>
+                  <b>{relation.positionName}</b>
+                  <small>{relation.company}</small>
+                </span>
+                <StatusBadge
+                  tone={
+                    relation.stageId === "joined"
+                      ? "success"
+                      : failureStageIds.includes(relation.stageId)
+                        ? "danger"
+                        : relation.active
+                          ? "warning"
+                          : "neutral"
+                  }
+                >
+                  {relation.stage}
+                </StatusBadge>
+                <p>
+                  {relation.summary}
+                  {relation.actor ? ` · ${relation.actor}` : ""}
+                </p>
+                <footer>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(`/positions/${relation.positionId}?tab=pipeline`)
+                    }
+                  >
+                    查看推进
+                  </button>
+                  {relation.taskRoute ? (
+                    <button type="button" onClick={() => navigate(relation.taskRoute)}>
+                      查看对话
+                    </button>
+                  ) : null}
+                </footer>
+              </article>
+            ))
+          ) : (
+            <p>还没有进入任何岗位流程。</p>
+          )}
         </div>
       </FieldGroup>
       <Modal
@@ -2546,6 +2581,7 @@ export function CandidateDetailPage() {
       {tab === "timeline" ? <TimelineTab candidate={candidateDetail} /> : null}
       {tab === "matching" ? (
         <MatchingTab
+          candidate={candidate}
           refreshing={refreshing}
           onRematch={() => setRematchOpen(true)}
         />

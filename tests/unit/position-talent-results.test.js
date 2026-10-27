@@ -8,6 +8,8 @@ import { positionTalentRows } from "../../src/stage4/position-talent-results.js"
 import { displayDraftConfirmation } from "../../src/stage4/single-asset-confirmation.js";
 import { organizationGraphPages } from "../../src/stage3/organization-mapping-data.js";
 const context = { candidates, sourcingCandidates };
+// position-vla starts with the people from the candidate ↔ position relations (design review 2026-10-28).
+const seededCount = createOpportunitySeed().positions.find((item) => item.id === "position-vla").pipeline.length;
 const review = (state, data = {}, ctx = context) =>
   applyOpportunityCommand(
     state,
@@ -28,9 +30,11 @@ test("岗位审核原子同步储备与梳理，重复审核不重复加人或�
   const initial = createOpportunitySeed();
   const { state } = review(initial);
   const position = state.positions.find((item) => item.id === "position-vla");
-  assert.equal(position.pipeline.length, 2);
+  // 林昊 (candidate-1) is already in the pipeline; only the new person is added, nobody moves back to reserve.
+  assert.equal(position.pipeline.length, seededCount + 1);
+  assert.equal(position.pipeline.find((entry) => entry.candidateId === "candidate-linhao").stage, "interview-1");
   assert.equal(position.talentMap.rows.length, 2);
-  assert.equal(initial.positions[0].pipeline.length, 0);
+  assert.equal(initial.positions[0].pipeline.length, seededCount);
   assert.ok(
     position.talentMap.rows.every(
       (row) => row.basis && row.risk && row.sourceTaskId,
@@ -39,7 +43,7 @@ test("岗位审核原子同步储备与梳理，重复审核不重复加人或�
   const repeated = review(state).state.positions.find(
     (item) => item.id === position.id,
   );
-  assert.equal(repeated.pipeline.length, 2);
+  assert.equal(repeated.pipeline.length, seededCount + 1);
   assert.equal(repeated.talentMap.version, 1);
   assert.equal(repeated.talentMap.rows[1].assetPath, "");
 });
@@ -76,7 +80,7 @@ test("不合法身份、错误岗位、分析模式和受限模式均不能部�
   ])
     assert.throws(() => review(state, data));
   assert.throws(() => review(state, {}, { ...context, limited: true }), /权限/);
-  assert.equal(state.positions[0].pipeline.length, 0);
+  assert.equal(state.positions[0].pipeline.length, seededCount);
   assert.equal(state.positions[0].talentMap, undefined);
 });
 
@@ -126,5 +130,38 @@ test("只兼容首次客户草稿确认显示，保留原文及后续是/否", (
   assert.equal(
     displayDraftConfirmation({ ...task, id: "other" }, messages[0]),
     "是",
+  );
+});
+
+test("对话中整批推进：先校验全部再写入，记录来源阶段和“按对话要求执行”", () => {
+  const initial = createOpportunitySeed();
+  const move = (moves) =>
+    applyOpportunityCommand(
+      initial,
+      {
+        type: "pipeline.move",
+        data: { positionId: "position-vla", moves, actor: "Hunter · 按对话要求执行", taskId: "position-vla" },
+      },
+      context,
+    );
+  assert.throws(() =>
+    move([
+      { candidateId: "candidate-chenchuning", stage: "interview-1", note: "约了一面" },
+      { candidateId: "candidate-chenchuning", stage: "cto-interview" },
+    ]),
+  );
+  assert.equal(
+    initial.positions[0].pipeline.find((entry) => entry.candidateId === "candidate-chenchuning").stage,
+    "recommended",
+  );
+  const { state } = move([
+    { candidateId: "candidate-chenchuning", stage: "interview-1", note: "约了一面" },
+    { candidateId: "candidate-liangchen", stage: "offer", note: "二面过了、进谈薪" },
+  ]);
+  const entry = state.positions[0].pipeline.find((item) => item.candidateId === "candidate-chenchuning");
+  assert.equal(entry.stage, "interview-1");
+  assert.deepEqual(
+    { from: entry.history.at(-1).from, actor: entry.history.at(-1).actor, taskId: entry.history.at(-1).taskId, note: entry.history.at(-1).note },
+    { from: "recommended", actor: "Hunter · 按对话要求执行", taskId: "position-vla", note: "约了一面" },
   );
 });

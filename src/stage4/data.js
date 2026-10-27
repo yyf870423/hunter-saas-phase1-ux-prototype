@@ -157,6 +157,8 @@ export const candidateIndustryTree = {
 };
 
 export const candidateFavoriteTree = [
+  // Followed by the periodic task “每两周核验收藏夹‘重点候选人’的公开变化”.
+  { id: "key", name: "重点候选人", count: 36 },
   {
     id: "focus",
     name: "重点岗位人才",
@@ -317,62 +319,104 @@ const candidateSeed = [
 
 const candidateAges = [37, 35, 34, 40, 33, 31, 36, 39, 38, 35, 32, 30, 36];
 
+// One source for “具身智能 VLA 算法负责人” (design review 2026-10-28): the position board, the candidate list’s
+// 流程 column, candidate details and the position talent map all read these relations (through the
+// opportunity store, which seeds its pipeline from them). Stage names are the ones defined in 06 §7.1.
+// note / stageDays describe the current stage; summary is the latest change shown on the candidate page.
 export const candidatePositionRelations = [
-  {
-    candidateId: "candidate-linhao",
-    positionId: "position-vla",
-    stage: "一面",
-    active: true,
-  },
   {
     candidateId: "candidate-zhaoxingyu",
     positionId: "position-vla",
     stage: "储备",
     active: false,
-  },
-  {
-    candidateId: "candidate-chenchuning",
-    positionId: "position-vla",
-    stage: "推荐",
-    active: true,
-  },
-  {
-    candidateId: "candidate-zhoumingyuan",
-    positionId: "position-vla",
-    stage: "储备",
-    active: false,
+    note: "等待确认本周沟通时间",
+    stageDays: 2,
   },
   {
     candidateId: "candidate-hewenting",
     positionId: "position-vla",
     stage: "储备",
     active: false,
+    note: "需要补充团队管理经历",
+    stageDays: 9,
   },
   {
-    candidateId: "candidate-wangyi",
+    candidateId: "candidate-jiangyifan",
     positionId: "position-vla",
-    stage: "待核实",
+    stage: "储备",
+    active: false,
+    note: "手动加入，尚未进行人岗匹配",
+    stageDays: 0,
+  },
+  {
+    candidateId: "candidate-chenchuning",
+    positionId: "position-vla",
+    stage: "已推荐",
     active: true,
-  },
-  {
-    candidateId: "candidate-sunran",
-    positionId: "position-vla",
-    stage: "不合适",
-    active: false,
-  },
-  {
-    candidateId: "candidate-liangchen",
-    positionId: "position-vla",
-    stage: "已入职",
-    active: false,
+    note: "客户已确认进入技术面",
+    stageDays: 1,
   },
   {
     candidateId: "candidate-chensong",
     positionId: "position-vla",
-    stage: "推荐",
+    stage: "已推荐",
     active: true,
+    note: "推荐报告已发送客户；8 月底已加入星澜机器人，推荐需重新确认",
+    stageDays: 18,
+  },
+  {
+    candidateId: "candidate-linhao",
+    positionId: "position-vla",
+    stage: "一面",
+    active: true,
+    note: "技术面时间待确认",
+    stageDays: 1,
+    summary: "昨天 16:20 从已推荐进入一面 · 下一步：确认技术面时间",
+  },
+  {
+    candidateId: "candidate-zhoumingyuan",
+    positionId: "position-vla",
+    stage: "一面",
+    active: true,
+    note: "等待客户反馈一面结论",
+    stageDays: 33,
+  },
+  {
+    candidateId: "candidate-liangchen",
+    positionId: "position-vla",
+    stage: "二面",
+    active: true,
+    note: "二面安排在周五 14:00",
+    stageDays: 1,
+  },
+  {
+    candidateId: "candidate-gaoyuan",
+    positionId: "position-vla",
+    stage: "谈薪",
+    active: true,
+    note: "候选人期望总包 115 万",
+    stageDays: 8,
+  },
+  {
+    candidateId: "candidate-sunran",
+    positionId: "position-vla",
+    stage: "已落选",
+    active: false,
+    note: "客户认为管理跨度不足",
+    enteredAt: "8 月 18 日",
+  },
+  {
+    candidateId: "candidate-wangyi",
+    positionId: "position-vla",
+    stage: "候选人放弃",
+    active: false,
+    note: "候选人暂不考虑外部机会",
+    enteredAt: "8 月 17 日",
   },
 ];
+
+// Members of the “重点候选人” folder in this sample (the folder holds 36 people in total).
+const keyCandidateIds = ["candidate-linhao", "candidate-zhaoxingyu", "candidate-chensong"];
 
 const candidateContactMethods = {
   "candidate-linhao": { phone: "138 **** 6217", email: "hao.lin@example.com" },
@@ -408,8 +452,9 @@ export const candidates = candidateSeed.map((item, index) => ({
   pipelineActive: candidatePositionRelations.some(
     (relation) => relation.candidateId === item[0] && relation.active,
   ),
-  folders:
-    index < 3
+  folders: [
+    ...(keyCandidateIds.includes(item[0]) ? ["重点候选人"] : []),
+    ...(index < 3
       ? ["重点岗位人才/VLA 算法负责人/优先联系", "客户项目/星澜机器人"]
       : index < 5
         ? ["重点岗位人才/VLA 算法负责人/论文作者"]
@@ -417,7 +462,8 @@ export const candidates = candidateSeed.map((item, index) => ({
           ? ["长期观察/半年内可接触"]
           : index < 10
             ? ["客户项目/拓界机器人"]
-            : [],
+            : []),
+  ],
 }));
 
 export const candidateDetail = {
@@ -522,7 +568,7 @@ export const positions = [
     status: "招聘中",
     skills: ["VLA", "强化学习", "真机部署"],
     matches: 18,
-    reserve: 12,
+    reserve: 3,
     progress: 6,
     hired: 0,
     failed: 2,

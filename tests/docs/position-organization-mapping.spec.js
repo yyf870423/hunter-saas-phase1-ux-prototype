@@ -44,7 +44,15 @@ for (const [device, width, height] of [
       (item) => item.id === "position-vla",
     );
     expect(position.pipeline.length).toBeGreaterThan(0);
-    expect(position.talentMap.rows.length).toBe(position.pipeline.length);
+    // The pipeline also holds the people already in the position's flow (one set of relations); every
+    // reviewed person is in it, and people already past 储备 keep their stage.
+    expect(
+      position.talentMap.rows.every((row) =>
+        position.pipeline.some((entry) => entry.candidateId === row.id),
+      ),
+    ).toBe(true);
+    const added = position.pipeline.find((entry) => entry.candidate && entry.stage === "reserve");
+    expect(added).toBeTruthy();
     await page.getByRole("link", { name: "查看人才梳理", exact: true }).click();
     await expect(
       page.getByTestId("position-talent-hierarchy-table"),
@@ -71,7 +79,12 @@ for (const [device, width, height] of [
       page.getByTestId("position-talent-hierarchy-table"),
     ).toContainText("林昊");
     await page.getByRole("tab", { name: /候选人流程/ }).click();
-    await expect(page.locator(".s4-kanban-reserve")).toContainText("林昊");
+    await expect(page.locator(".s4-kanban-reserve")).toContainText(added.candidate.name);
+    await expect(
+      page
+        .locator(".s4-kanban > section")
+        .filter({ has: page.locator("header b", { hasText: /^一面$/ }) }),
+    ).toContainText("林昊");
     await capture(page, `${device}-position-reserve`);
     await errors();
   });

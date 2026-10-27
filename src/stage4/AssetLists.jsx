@@ -39,6 +39,7 @@ import { summarizeOpportunity } from "./opportunity-domain";
 import { companyDeleteImpact } from "./company-assessment";
 import { displayDateTime } from "./OpportunityComponents";
 import { pendingAssetIds, pendingUpdatesEvent } from "./pending-updates";
+import { candidatePipelineLabel } from "./pipeline-relations";
 
 const educationTones = {
   博士: "violet",
@@ -333,8 +334,10 @@ export function AssetListPage({ type }) {
       controller.filtered.map((row) => ({
         ...row,
         folders: candidateFolders[row.id] || [],
+        // 流程 column reads the same relations as the position board (moves made there or in a conversation).
+        ...candidatePipelineLabel(lifecycle, row.id, row),
       })),
-    [candidateFolders, controller.filtered],
+    [candidateFolders, controller.filtered, lifecycle],
   );
   const filtered = useMemo(() => {
     if (type === "candidates") {

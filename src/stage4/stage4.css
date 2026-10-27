@@ -8257,6 +8257,10 @@
   width: 13px;
   color: var(--s1-subtle);
 }
+.s4-pipeline-relations {
+  display: grid;
+  gap: 10px;
+}
 .s4-pipeline-relations article {
   padding: 14px;
   background: var(--s1-canvas);
@@ -8282,6 +8286,10 @@
 .s4-pipeline-relations p {
   color: var(--s1-muted);
   font-size: 12px;
+}
+.s4-pipeline-relations footer {
+  display: flex;
+  gap: 16px;
 }
 .s4-pipeline-relations button {
   padding: 0;

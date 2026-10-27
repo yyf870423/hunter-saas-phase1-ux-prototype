@@ -1,6 +1,7 @@
 import { companies, opportunities, positions, positionDetail } from "./data.js";
 import { PIPELINE_STAGES } from "./opportunity-domain.js";
 import { legacyLearningJd as learningJd } from "./opportunity-jd.js";
+import { seedPipeline } from "./pipeline-relations.js";
 
 const createdAt = "2026-08-20T01:00:00.000Z";
 const seedDirections = {
@@ -56,7 +57,7 @@ export function createOpportunitySeed() {
       experience: item.id === "position-vla" ? positionDetail.experience : "",
       education: item.id === "position-vla" ? positionDetail.education : "",
       legacyCounts: { matches: item.matches, reserve: item.reserve, progress: item.progress, hired: item.hired, failed: item.failed },
-      managed: false, matches: [], pipeline: [], stages: structuredClone(PIPELINE_STAGES),
+      managed: false, matches: [], pipeline: seedPipeline(item.id, createdAt), pipelineSeeded: true, stages: structuredClone(PIPELINE_STAGES),
       processing: [], versions: [], sources: [], version: 1, createdAt, updatedAt: createdAt, deletedAt: null,
       origin: { opportunityId: opportunity?.id || "", directionId: direction?.id || "", taskId: "", label: opportunity?.title || "用户创建" },
     };
