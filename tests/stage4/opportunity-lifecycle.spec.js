@@ -449,38 +449,24 @@ test("新建机会可同时记录首次跟进并安排未来事项，失败整�
   expect(state.followups[0].opportunityId).toBe(state.opportunities.at(-1).id);
 });
 
-test("洞察只创建核验任务，加入原任务后再确认正式机会", async ({ page }) => {
+test("洞察不直接创建任务或机会，处理回到来源任务后只留已处理标记", async ({ page }) => {
+  // 规则（设计 10 §6）：洞察只有“处理”和“忽略”。处理 = 回到产生它的任务对话并引用它；
+  // 例：回复“这家开始客户开发”只给洞察加“已处理”标记，正式机会仍要在客户开发里确认后才创建。
   const errors = trackConsoleErrors(page);
   await page.goto("#/signals?signal=signal-cloudchip");
-  await button(page, "处理洞察").click();
-  await page.getByRole("dialog").getByRole("button", { name: "创建任务", exact: true }).click();
-  await waitForOpportunityDraft(page);
-  await expect(heading(page, "待确认的招聘机会")).toBeVisible();
-  let state = await snapshot(page);
-  expect(state.opportunities).toHaveLength(4);
-  expect(state.tasks).toHaveLength(1);
-  const taskId = state.tasks[0].id;
-  await page.getByRole("link", { name: "查看来源洞察", exact: true }).click();
-  await expect(page).toHaveURL(/signal=signal-cloudchip/);
-  await page.reload();
-  await expect(page.getByText("来源与证据已保存在该任务。", { exact: true })).toBeVisible();
-  await page.goto("#/signals?signal=signal-tuoji");
-  await button(page, "立即复查").click();
-  await button(page, "处理洞察").click();
-  await page.getByRole("radio", { name: /^加入已有任务/ }).click();
-  await page.getByRole("radiogroup", { name: "已有任务" }).getByRole("radio").click();
-  await button(page, "加入所选任务").click();
-  await expect(page).toHaveURL(new RegExp("tasks/" + taskId));
-  await waitForOpportunityDraft(page);
-  await expect(heading(page, "待确认的招聘机会")).toBeVisible();
-  state = await snapshot(page);
-  expect(state.tasks).toHaveLength(1);
-  expect(state.tasks[0].sourceSignals).toHaveLength(2);
-  expect(state.opportunities).toHaveLength(4);
-  await replyToAsset(page, "公司：拓界机器人\n机会名称：洞察核验后的新招聘需求\n招聘需求摘要：已与公司核实，确实需要平台工程师\n发现依据：后续电话核实，不以招聘网页变化代替确认");
-  await replyToAsset(page, "是");
-  await expect(page.getByRole("link", { name: "查看招聘机会", exact: true })).toBeVisible();
-  expect((await snapshot(page)).opportunities.at(-1).sources[0].content).toContain("拓界智驾新增感知");
+  const footer = page.locator(".s2-signal-detail > footer");
+  await expect(footer.getByRole("button", { name: "处理洞察", exact: true })).toHaveCount(0);
+  await expect(footer.getByRole("button", { name: "立即复查", exact: true })).toHaveCount(0);
+  const before = await snapshot(page);
+  await footer.getByRole("button", { name: "处理", exact: true }).click();
+  await expect(page).toHaveURL(/quote=signal-cloudchip/);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByLabel("任务对话输入").fill("这家开始客户开发");
+  await button(page, "发送").click();
+  await expect(page.getByText(/已标记“9\/3 已处理：开始客户开发：云脉芯能”/)).toBeVisible();
+  const after = await snapshot(page);
+  expect(after?.opportunities.length ?? 4).toBe(before?.opportunities.length ?? 4);
+  expect(after?.tasks?.length ?? 0).toBe(before?.tasks?.length ?? 0);
   await errors();
 });
 

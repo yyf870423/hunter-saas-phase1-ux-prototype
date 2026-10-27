@@ -99,10 +99,17 @@ test("个人资料支持分区编辑、校验和安全操作", async ({ page }) 
 test("通知页区分可配置通知和强制通知", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/settings/notifications");
-  const taskMail = page.getByRole("switch", { name: "任务状态邮件通知" });
-  await expect(taskMail).toBeChecked();
-  await taskMail.click();
-  await expect(taskMail).not.toBeChecked();
+  // 规则：邮件只发“账号与订阅”，且必须发送；其他事项只有站内通知。
+  await expect(page.getByRole("switch", { name: /邮件通知$/ })).toHaveCount(1);
+  const billingMail = page.getByRole("switch", { name: "账号与订阅邮件通知" });
+  await expect(billingMail).toBeChecked();
+  await expect(billingMail).toBeDisabled();
+  for (const title of ["需要我处理", "外部回复", "任务状态", "洞察", "数据处理"])
+    await expect(page.getByLabel(`${title}不发邮件`)).toBeVisible();
+  const taskApp = page.getByRole("switch", { name: "任务状态站内通知" });
+  await expect(taskApp).toBeChecked();
+  await taskApp.click();
+  await expect(taskApp).not.toBeChecked();
   await expect(
     page.getByRole("switch", { name: "需要我处理站内通知" }),
   ).toBeDisabled();
@@ -111,7 +118,7 @@ test("通知页区分可配置通知和强制通知", async ({ page }) => {
 
   await page.goto("#/settings/notifications?state=limited");
   await expect(page.getByText(/联系邮箱尚未验证/)).toBeVisible();
-  await expect(taskMail).toBeDisabled();
+  await expect(billingMail).toBeDisabled();
   await assertNoConsoleErrors();
 });
 
