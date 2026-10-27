@@ -837,7 +837,7 @@ function SubscriptionDrawer({ subscription, close, adjust }) {
           tone="info"
           icon="info"
           title="例外权益调整"
-          description="仅用于系统故障补偿、延长试用，或经审批临时增加 Credits、并发和存储。正常套餐升降级应通过订阅流程完成。"
+          description="仅用于系统故障补偿、延长试用，或经审批临时增加 Credits、并发和存储。正常的套餐升级应通过订阅流程完成；套餐只能升级、不能降级。"
         />
         <OpsSection title="最近调整记录">
           <div className="ops-compact-table">
@@ -1068,7 +1068,7 @@ export function SubscriptionsPage() {
               ? [
                   {
                     label: "套餐",
-                    options: ["试用", "个人版", "专业版"],
+                    options: ["试用", "基础版", "标准版", "专业版"],
                     value: filters.plan || "",
                     onChange: (value) =>
                       setFilters((current) => ({ ...current, plan: value })),

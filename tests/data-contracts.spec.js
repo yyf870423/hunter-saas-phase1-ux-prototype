@@ -91,16 +91,22 @@ test("论文作者和署名机构使用结构化署名关系", () => {
 });
 
 test("用户端套餐和运营端订单使用同一产品目录", () => {
-  const professionalOrders = orders.filter((order) =>
-    order.plan.startsWith(subscriptionPlans.professional.name),
+  // 2026-10-28: 基础版 / 标准版 / 专业版 (the top tier is no longer “团队版”).
+  const standardOrders = orders.filter((order) =>
+    order.plan.startsWith(subscriptionPlans.standard.name),
   );
   const basicOrders = orders.filter((order) =>
-    order.plan.startsWith(subscriptionPlans.personal.name),
+    order.plan.startsWith(subscriptionPlans.basic.name),
   );
-  expect(professionalOrders.every((order) => order.amount === "¥ 399.00")).toBe(
-    true,
-  );
+  expect(standardOrders.length).toBeGreaterThan(0);
+  expect(standardOrders.every((order) => order.amount === "¥ 399.00")).toBe(true);
   expect(basicOrders.every((order) => order.amount === "¥ 199.00")).toBe(true);
+  expect(Object.values(subscriptionPlans).map((plan) => plan.name)).toEqual([
+    "基础版",
+    "标准版",
+    "专业版",
+  ]);
+  expect(orders.some((order) => /个人版|团队版/.test(order.plan))).toBe(false);
 });
 
 test("运营指标有统计口径，四类运行使用统一阶段摘要", () => {

@@ -179,19 +179,32 @@ test("订阅与数据覆盖支付、无订阅、到期和危险操作", async ({
     0,
   );
   await expect(page.getByRole("button", { name: /下载收据/ })).toHaveCount(0);
-  await page.getByRole("button", { name: "更换套餐" }).click();
-  // Pricing doc 2026-09-28: tiers with monthly Credits and base storage; the team tier comes in phase 2.
-  await expect(page.getByRole("radio", { name: /团队版/ })).toBeDisabled();
-  await expect(page.getByRole("radio", { name: /个人版.*10,000 Credits.*5 GB/ })).toBeVisible();
-  await page.getByRole("radio", { name: /个人版/ }).click();
-  await page.getByRole("radio", { name: /微信支付/ }).click();
-  await page.getByRole("button", { name: "确认并支付" }).click();
-  await expect(page.getByText("套餐已更新")).toBeVisible();
+  // 2026-10-28: 基础版 / 标准版 / 专业版; plans only go up — “升级套餐”, lower tiers disabled, none at the top.
+  await expect(page.getByRole("button", { name: "更换套餐" })).toHaveCount(0);
+  await expect(page.locator(".s5-plan-card h2")).toHaveText("标准版");
+  await page.getByRole("button", { name: "升级套餐" }).click();
+  const upgrade = page.getByRole("dialog", { name: "升级套餐" });
+  await expect(upgrade).toContainText("只能升级，不能降级");
+  await expect(upgrade.getByRole("radio", { name: /基础版.*10,000 Credits.*5 GB.*不能降级/ })).toBeDisabled();
+  await expect(upgrade.getByRole("radio", { name: /标准版（当前套餐）/ })).toBeDisabled();
+  await expect(upgrade.getByRole("radio", { name: /专业版.*60,000 Credits.*100 GB/ })).toHaveAttribute("aria-checked", "true");
+  await upgrade.getByRole("radio", { name: /微信支付/ }).click();
+  await upgrade.getByRole("button", { name: "确认并支付" }).click();
+  await expect(page.getByText("已升级到专业版：本套餐整月的 60,000 Credits 已加到可用余额")).toBeVisible();
+  await expect(page.locator(".s5-plan-card h2")).toHaveText("专业版");
+  await expect(page.getByRole("button", { name: "升级套餐" })).toHaveCount(0);
+  await expect(page.getByText("已是最高一档，不能再升级")).toBeVisible();
+  await expect(page.locator(".s5-usage-breakdown")).toContainText("72,000");
+  await expect(page.locator(".s5-usage-breakdown")).toContainText("8.2 / 100 GB");
+  await page.goto("#/settings/subscription?state=top");
+  await expect(page.getByText("已是最高一档，不能再升级")).toBeVisible();
 
   await page.goto("#/settings/subscription?state=none");
   await expect(page.getByText("尚未订阅 Hunter")).toBeVisible();
   await page.getByRole("button", { name: "选择订阅" }).click();
   await expect(page.getByRole("radio", { name: /支付宝/ })).toBeVisible();
+  // A first subscription (or one after expiry) can start at any tier.
+  await expect(page.getByRole("radio", { name: /基础版/ })).toBeEnabled();
   await page.getByRole("button", { name: "取消" }).click();
 
   await page.goto("#/settings/subscription?state=limited");

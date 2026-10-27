@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
   addOns,
   formatCny,
   formatCredits,
+  isTopPlan,
+  planOrder,
+  planRank,
   recharge,
   rechargeCredits,
   subscriptionPlanChoices,
@@ -1499,7 +1502,25 @@ export function SubscriptionSettingsPage() {
   const trial = state === "trial";
   const [planModal, setPlanModal] = useState(false);
   const [renewModal, setRenewModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState("专业版");
+  // 2026-10-28: plans only go up. The demo user is on 标准版; `?state=top` shows the page right after upgrading
+  // to 专业版 (the top tier), where there is nothing left to upgrade to.
+  const [planKey, setPlanKey] = useState(state === "top" ? "professional" : "standard");
+  useEffect(() => {
+    if (state === "top") setPlanKey("professional");
+  }, [state]);
+  const plan = subscriptionPlans[planKey];
+  const topPlan = isTopPlan(planKey);
+  const planMode = limited ? "restore" : noSubscription || trial ? "choose" : "upgrade";
+  const [selectedPlan, setSelectedPlan] = useState("standard");
+  const openPlanModal = () => {
+    setSelectedPlan(planMode === "upgrade" ? planOrder[Math.min(planRank(planKey) + 1, planOrder.length - 1)] : "standard");
+    setPlanModal(true);
+  };
+  // Upgrading keeps the balance and adds the new tier's full month (12 §11.1): 12,000 + 60,000 = 72,000.
+  const upgraded = planKey === "professional";
+  const usage = upgraded
+    ? { ...agentUsage, usedPercent: 0, balance: agentUsage.balance + subscriptionPlans.professional.monthlyCredits, storageLimitGb: subscriptionPlans.professional.storageGb }
+    : agentUsage;
   const [paymentMethod, setPaymentMethod] = useState("支付宝");
   const [addOnModal, setAddOnModal] = useState(null);
   const [rechargeOpen, setRechargeOpen] = useState(false);
@@ -1527,7 +1548,7 @@ export function SubscriptionSettingsPage() {
           订阅已于 2026 年 8 月 20 日到期。不能再发起新的 Agent
           运行：到期时正在运行的那一轮已经跑完并保存，周期任务已暂停、续订后自动恢复；已购买的 Credits
           不清零，业务数据仍可查看和导出。
-          <button type="button" onClick={() => setPlanModal(true)}>
+          <button type="button" onClick={openPlanModal}>
             恢复订阅
           </button>
         </InlineNotice>
@@ -1544,7 +1565,7 @@ export function SubscriptionSettingsPage() {
               试用到 2026 年 9 月 21 日。体验 Credits 已用 350 / {formatCredits(trialGrant.credits)}，存储已用 120 MB / {trialGrant.storageGb} GB（数字为示例）。体验 Credits 一次性发放、用完即停，高价外部数据默认关闭。到期前 5 天和到期当天会发邮件提醒；到期没订阅时，和订阅到期一样：不能发起新的 Agent 运行，数据可以查看和导出。
             </p>
           </span>
-          <Button tone="primary" onClick={() => setPlanModal(true)}>
+          <Button tone="primary" onClick={openPlanModal}>
             选择订阅
           </Button>
         </section>
@@ -1561,7 +1582,7 @@ export function SubscriptionSettingsPage() {
               Agent、自动化任务和付费数据处理前需要选择套餐。
             </p>
           </span>
-          <Button tone="primary" onClick={() => setPlanModal(true)}>
+          <Button tone="primary" onClick={openPlanModal}>
             选择订阅
           </Button>
         </section>
@@ -1571,10 +1592,13 @@ export function SubscriptionSettingsPage() {
             <div className="s5-plan-card">
               <span>
                 <small>当前套餐</small>
-                <h2>{limited ? "专业版 · 已到期" : "专业版"}</h2>
+                <h2>{limited ? `${plan.name} · 已到期` : plan.name}</h2>
                 <p>
-                  每月 {formatCredits(subscriptionPlans.professional.monthlyCredits)} Credits，基础空间{" "}
-                  {subscriptionPlans.professional.storageGb} GB（示例）。按实际用到的模型、工具、付费数据和计算折算扣减，不按 Agent 次数计费。
+                  每月 {formatCredits(plan.monthlyCredits)} Credits，基础空间{" "}
+                  {plan.storageGb} GB（示例）。按实际用到的模型、工具、付费数据和计算折算扣减，不按 Agent 次数计费。
+                  {upgraded && !limited
+                    ? ` 2026 年 8 月 24 日从标准版升级：余额保留，再加上本套餐整月的 ${formatCredits(plan.monthlyCredits)} Credits。`
+                    : ""}
                 </p>
               </span>
               <dl>
@@ -1592,9 +1616,19 @@ export function SubscriptionSettingsPage() {
                 </div>
               </dl>
               <div>
-                <Button tone="primary" onClick={() => setPlanModal(true)}>
-                  {limited ? "恢复订阅" : "更换套餐"}
-                </Button>
+                {limited ? (
+                  <Button tone="primary" onClick={openPlanModal}>
+                    恢复订阅
+                  </Button>
+                ) : topPlan ? (
+                  <span className="s5-plan-top">
+                    <Icon name="check" /> 已是最高一档，不能再升级
+                  </span>
+                ) : (
+                  <Button tone="primary" onClick={openPlanModal}>
+                    升级套餐
+                  </Button>
+                )}
                 {!limited ? (
                   <Button onClick={() => setRenewModal(true)}>
                     {autoRenew ? "关闭自动续订" : "开启自动续订"}
@@ -1603,23 +1637,23 @@ export function SubscriptionSettingsPage() {
               </div>
             </div>
             <div className="s5-usage-card">
-              <MetricDonut value={agentUsage.usedPercent} label={`${agentUsage.usedPercent}%`} caption="本月套餐 Credits 已用" />
+              <MetricDonut value={usage.usedPercent} label={`${usage.usedPercent}%`} caption="本月套餐 Credits 已用" />
               <div className="s5-usage-breakdown">
                 <span>
-                  <i style={{ "--usage": `${agentUsage.usedPercent}%` }} />
+                  <i style={{ "--usage": `${usage.usedPercent}%` }} />
                   <b>本月套餐 Credits</b>
-                  <em>{agentUsage.usedPercent}%</em>
+                  <em>{usage.usedPercent}%</em>
                 </span>
                 <span>
                   <i style={{ "--usage": "0%" }} />
                   <b>可用余额（含套餐外的 {formatCredits(agentUsage.purchasedLeft + rechargedCredits)}）</b>
-                  <em>{formatCredits(agentUsage.balance + rechargedCredits)}</em>
+                  <em>{formatCredits(usage.balance + rechargedCredits)}</em>
                 </span>
                 <span>
-                  <i style={{ "--usage": `${Math.round((agentUsage.storageUsedGb / agentUsage.storageLimitGb) * 100)}%` }} />
+                  <i style={{ "--usage": `${Math.round((usage.storageUsedGb / usage.storageLimitGb) * 100)}%` }} />
                   <b>存储</b>
                   <em>
-                    {agentUsage.storageUsedGb} / {agentUsage.storageLimitGb} GB
+                    {usage.storageUsedGb} / {usage.storageLimitGb} GB
                   </em>
                 </span>
               </div>
@@ -1707,16 +1741,16 @@ export function SubscriptionSettingsPage() {
               ]),
               [
                 "2026 年 8 月 1 日",
-                "专业版月度订阅",
-                formatCny(subscriptionPlans.professional.monthlyPrice),
+                "标准版月度订阅",
+                formatCny(subscriptionPlans.standard.monthlyPrice),
                 "支付成功",
                 null,
                 "支付宝",
               ],
               [
                 "2026 年 7 月 1 日",
-                "专业版月度订阅",
-                formatCny(subscriptionPlans.professional.monthlyPrice),
+                "标准版月度订阅",
+                formatCny(subscriptionPlans.standard.monthlyPrice),
                 "支付成功",
                 null,
                 "支付宝",
@@ -1732,8 +1766,8 @@ export function SubscriptionSettingsPage() {
               ],
               [
                 "2026 年 6 月 1 日",
-                "专业版月度订阅",
-                formatCny(subscriptionPlans.professional.monthlyPrice),
+                "标准版月度订阅",
+                formatCny(subscriptionPlans.standard.monthlyPrice),
                 "支付成功",
                 null,
                 "支付宝",
@@ -1758,30 +1792,51 @@ export function SubscriptionSettingsPage() {
       <Modal
         open={planModal}
         close={() => setPlanModal(false)}
-        title={limited ? "恢复订阅" : "更换套餐"}
-        description="升级立即生效：当前 Credits 余额保留，再加上新套餐整月的 Credits；基础空间换成新套餐的，不叠加旧套餐的。降级在下个账期生效。"
+        title={planMode === "upgrade" ? "升级套餐" : planMode === "restore" ? "恢复订阅" : "选择订阅"}
+        description={
+          planMode === "upgrade"
+            ? "只能升级，不能降级。升级立即生效：当前 Credits 余额保留，再加上新套餐整月的 Credits；基础空间换成新套餐的，不叠加旧套餐的。"
+            : planMode === "restore"
+              ? "订阅已到期，重新订阅可以选任意一档；已充值的 Credits 不清零。之后只能升级，不能降级。"
+              : "选择一档开始订阅；之后只能升级，不能降级。"
+        }
         size="lg"
         footer={
           <ModalActions
             cancel={() => setPlanModal(false)}
             confirmText="确认并支付"
             loading={saving}
-            confirm={() => commit("套餐已更新", () => setPlanModal(false))}
+            confirmDisabled={planMode === "upgrade" && planRank(selectedPlan) <= planRank(planKey)}
+            confirm={() =>
+              commit(
+                planMode === "upgrade"
+                  ? `已升级到${subscriptionPlans[selectedPlan].name}：本套餐整月的 ${formatCredits(subscriptionPlans[selectedPlan].monthlyCredits)} Credits 已加到可用余额`
+                  : "订阅已开通",
+                () => {
+                  if (planMode === "upgrade") setPlanKey(selectedPlan);
+                  setPlanModal(false);
+                },
+              )
+            }
           />
         }
       >
         <div className="s5-plan-choices" role="radiogroup">
-          {subscriptionPlanChoices.map(({ title, price, description, disabled }) => (
-            <ChoiceCard
-              key={title}
-              title={title}
-              description={`${price} · ${description}`}
-              selected={selectedPlan === title}
-              onClick={() => setSelectedPlan(title)}
-              icon="creditCard"
-              disabled={disabled}
-            />
-          ))}
+          {subscriptionPlanChoices.map(({ key, title, price, description }) => {
+            const below = planMode === "upgrade" && planRank(key) < planRank(planKey);
+            const current = planMode === "upgrade" && key === planKey;
+            return (
+              <ChoiceCard
+                key={key}
+                title={current ? `${title}（当前套餐）` : title}
+                description={`${price} · ${description}${below ? " · 不能降级" : ""}`}
+                selected={selectedPlan === key}
+                onClick={() => setSelectedPlan(key)}
+                icon="creditCard"
+                disabled={below || current}
+              />
+            );
+          })}
         </div>
         <div className="s5-subscription-payment">
           <span>
