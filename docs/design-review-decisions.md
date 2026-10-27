@@ -353,6 +353,19 @@
   3. 其他邮件只在读取时判断，不保存正文和附件，只记录邮件编号，避免重复读取。
   - 例：收件箱来了张总问进展的邮件、猎聘发来的简历、一张信用卡账单。前两封保存；张总那封生成“需要你回复”的待处理事项，简历进候选人补全等确认；账单读完就丢，Hunter 里没有痕迹。
 
-**待定**
+**隐私政策改写（2026-10-27 已同意文字，正式开放前那一批上线，上线前照常经产品负责人同意）**
 
-- 隐私政策改写的具体文字（中英文）。上线时间按“正式上线前做”：放进正式开放前对照实际功能核对隐私政策的那一批（隐私政策“生效范围”已写开放前逐条核对、有变化先更新）。
+改 `scripts/legal/zh.mjs`、`scripts/legal/en.mjs` 两处，重新生成 `landing-redesign/privacy/` 和 `en/privacy/`，更新日期同步改。保存期限表里“发件邮箱的地址、服务器设置和授权码：断开连接后立即删除”不变；保存下来的邮件属于“工作空间中的内容”。
+
+1. 信息表“连接发件邮箱”一行的“用途”
+   - 中文：在你逐封确认后从你的邮箱发出邮件；读取你邮箱中的邮件，从中发现潜在机会和需要你处理的事项
+   - 英文：To send emails from your mailbox after you confirm each one, and to read the emails in your mailbox to find potential opportunities and matters that need your attention
+2. “关于发件邮箱”一段
+   - 中文：连接发件邮箱是可选功能。**每封邮件都要你确认收件人、标题、正文和附件后才会发出**，自动执行模式也不能跳过这一步。**连接后，我们会定期读取你邮箱中的所有邮件**，从中发现潜在机会和需要你处理的事项。与招聘工作相关的邮件和附件会保存到你的工作空间，包括你通过 HunterBuddy 发出邮件的回复、与你工作空间中的联系人和候选人往来的邮件，以及简历、职位描述、面试安排等招聘相关的邮件。其他邮件只在读取时判断，不保存正文和附件，只记录邮件编号，以免重复读取。不希望我们读取的，可以不连接，或随时断开。邮箱密码或授权码加密保存，不向任何人显示，你断开连接后我们立即删除。你使用的邮箱服务商或收件人在境外的，邮件会经该服务商传输到境外，由你自行决定并承担相应责任。
+   - 英文（初稿，上线前和中文一起再核对）：Connecting a sending mailbox is optional. **No email is sent until you confirm its recipients, subject, body and attachments**, and automatic mode cannot skip this step. **Once connected, we regularly read all emails in your mailbox** to find potential opportunities and matters that need your attention. Emails and attachments related to your recruiting work are kept in your workspace: replies to emails you sent through HunterBuddy, emails exchanged with contacts and candidates in your workspace, and recruiting emails such as CVs, job descriptions and interview arrangements. Other emails are only assessed as they are read: their body and attachments are not kept, only the message ID, so they are not read twice. If you do not want us to read your emails, do not connect a mailbox, or disconnect it at any time. The mailbox password or authorization code is stored encrypted, is never shown to anyone, and is deleted as soon as you disconnect the mailbox. If your mailbox provider or a recipient is outside China, emails travel abroad through that provider, at your own discretion and responsibility.
+
+**要改的地方（待授权）**
+
+- 设计 12 §10：补读取范围（读取全部邮件）、保存规则（只存工作相关，其他只记邮件编号）、断开即删地址授权码和服务器设置；连接弹窗在“验证并连接”前显示读取说明。
+- 设计 02 / 10：邮箱成为发现来源，发现的机会和待处理事项进洞察中心并链接原邮件；邮件里的简历走候选人补全审核。
+- 原型 `SettingsPages.jsx`：连接弹窗加读取说明；授权码提示“仅用于验证邮箱连接”改为“用于发送你确认的邮件，并读取邮箱中的邮件”；断开确认框写明邮箱地址、授权码和服务器设置立即删除，已发出的邮件和保存的邮件留在工作空间。
