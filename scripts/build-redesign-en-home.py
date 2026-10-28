@@ -203,8 +203,8 @@ r('<span class="fx-cap">三处来源合成一份</span><span class="fx-tags"><em
 # 02 text
 r('人选散在招聘平台、论文、代码仓库和自己的简历库里，翻一遍就是一整天。', 'Candidates are scattered across recruiting platforms, papers, code repositories and your own CV database. Going through them all takes a whole day.')
 r('<h3 id="n-step-sourcing">读懂你的需求，自动寻访</h3>', '<h3 id="n-step-sourcing">It reads your brief and sources for you</h3>')
-r('整合公开信息、专利论文、代码痕迹，以及你多年沉淀的简历库，把人选收拢到一起，排好优先级。检索比对的事交给它，你安心把精力留给识人沟通。',
-  'It brings together public information, patents and papers, code footprints and the CV database you have built over the years, gathers the candidates in one place and puts them in order of priority. Leave the searching and comparing to it, and keep your energy for judging people and talking to them.')
+r('整合公开信息、专利论文、代码痕迹，以及你多年沉淀的简历库等多方渠道，穷尽人选，把人选收拢到一起，排好优先级。检索比对的事交给它，你安心把精力留给识人沟通。',
+  'It draws on public information, patents and papers, code footprints, the CV database you have built over the years and other sources to search exhaustively for candidates. It brings them together in one place and puts them in order of priority. Leave the searching and comparing to it, and focus on getting to know people and having meaningful conversations.')
 r('>了解猎头怎么找人</a>', '>How headhunters find candidates</a>')
 
 # 03 identity — scene
