@@ -264,7 +264,7 @@ r('<b>产品交付</b><em>负责人待补</em>', '<b>Delivery</b><em>Lead to fil
 r('<p class="fx-src">来源 · 官网 · 新闻 · 公开演讲</p>', '<p class="fx-src">Sources · Website · News · Public talks</p>')
 # 06 text
 r('做 Mapping 要对着官网和新闻一点点拼，画完的图还存着好几个版本。', 'Mapping a company means piecing it together from its website and the news, and once it’s drawn you’re left keeping several versions of the chart.')
-r('<h3 id="n-step-mapping">组织架构梳理，轻松做 Mapping</h3>', '<h3 id="n-step-mapping">Org charts and talent mapping, made easy</h3>')
+r('<h3 id="n-step-mapping">组织架构梳理，轻松 Mapping</h3>', '<h3 id="n-step-mapping">Org charts and talent mapping, made easy</h3>')
 r('自动汇总人员、部门、岗位和汇报关系，一键生成架构图，省去反复核对、画图、维护多个版本的麻烦。搭配多维度视图，团队脉络一目了然，人才盘点和招聘 Mapping 都更轻松。',
   'It gathers people, departments, roles and reporting lines automatically and builds the org chart in one click, sparing you the repeated checking, drawing and juggling of versions. With views along several dimensions, each team’s shape is clear at a glance, and both talent reviews and recruitment mapping get easier.')
 r('>了解组织架构图</a>', '>More on org charts</a>')

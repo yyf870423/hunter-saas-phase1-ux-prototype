@@ -2428,6 +2428,9 @@ body.n-page::after {
     font-size: clamp(28px, 2.5vw, 36px);
     line-height: 1.35;
   }
+  :lang(zh-CN) #n-step-mapping {
+    white-space: nowrap;
+  }
   .js .n-step-text h3 + p {
     margin-top: 18px !important;
     font-size: 16.5px;
