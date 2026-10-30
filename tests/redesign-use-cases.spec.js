@@ -70,10 +70,27 @@ const hanLeft = (page) =>
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     while (walker.nextNode()) {
       const t = walker.currentNode.nodeValue.trim();
-      if (/[一-鿿]/.test(t) && t !== "中文" && !t.includes("京ICP备")) out.push(t.slice(0, 40));
+      if (/[一-鿿]/.test(t) && t !== "中文" && !t.includes("京ICP备") && t !== "京公网安备11011302008508号") out.push(t.slice(0, 40));
     }
     return out;
   });
+
+test("All bilingual redesign pages preserve ICP and link the public security registration", async ({ page }) => {
+  const paths = ["", "use-cases/", ...pages.map((slug) => `use-cases/${slug}/`), "privacy/", "terms/", "dpa/"];
+  for (const locale of ["", "en/"]) {
+    for (const path of paths) {
+      const response = await page.goto(`./landing-redesign/${locale}${path}`);
+      expect(response.status()).toBe(200);
+      const footer = page.locator(".n-footer-meta");
+      await expect(footer.getByRole("link", { name: "京ICP备2026068903号-1", exact: true })).toHaveAttribute("href", "https://beian.miit.gov.cn/");
+      const registration = footer.getByRole("link", { name: "京公网安备11011302008508号", exact: true });
+      await expect(registration).toHaveCount(1);
+      await expect(registration).toHaveAttribute("href", "https://beian.mps.gov.cn/#/query/webSearch?code=11011302008508");
+      await expect(registration).toHaveAttribute("target", "_blank");
+      await expect(registration).toHaveAttribute("rel", "noopener noreferrer");
+    }
+  }
+});
 
 for (const slug of pages) {
   test(`English use case ${slug} matches its structured data and its Chinese twin`, async ({ page }) => {

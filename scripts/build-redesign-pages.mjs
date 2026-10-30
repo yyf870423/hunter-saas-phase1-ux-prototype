@@ -303,6 +303,7 @@ ${redesignFooterGroups(home, here, L)}
         <ul class="n-footer-meta" aria-label="${L.metaLabel}">
 ${L.meta.map((m) => `          <li>${m}</li>`).join("\n")}
           <li><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备2026068903号-1</a></li>
+          <li><a href="https://beian.mps.gov.cn/#/query/webSearch?code=11011302008508" target="_blank" rel="noopener noreferrer">京公网安备11011302008508号</a></li>
         </ul>
       </div>
     </footer>
@@ -760,7 +761,7 @@ ${paths
       const han = html
         .replace(/<!--[\s\S]*?-->/g, "")
         .split("\n")
-        .filter((l) => /[一-鿿]/.test(l) && !l.includes("中文") && !l.includes("京ICP备"));
+        .filter((l) => /[一-鿿]/.test(l) && !l.includes("中文") && !l.includes("京ICP备") && !l.includes("京公网安备11011302008508号"));
       if (han.length) throw new Error(`${path}: Chinese left: ${han[0].trim().slice(0, 80)}`);
     }
     const target = resolve(OUT, path);

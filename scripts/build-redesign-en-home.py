@@ -355,7 +355,7 @@ if missing:
 
 body = re.sub(r"<!--.*?-->", "", s, flags=re.S)
 han = [line.strip() for line in body.splitlines() if re.search(r"[一-鿿]", line)]
-allowed = ("中文", "京ICP备")
+allowed = ("中文", "京ICP备", "京公网安备11011302008508号")
 bad = [h for h in han if not any(a in h for a in allowed)]
 if bad:
     sys.exit("Chinese left:\n  " + "\n  ".join(bad))
