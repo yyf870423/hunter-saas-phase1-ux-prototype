@@ -2,20 +2,20 @@
 // ./zh.mjs. Section count and paragraph structure must match the Chinese; the Chinese version prevails. No Chinese
 // characters here (the English pages carry none). **bold** marks the clauses the reader must notice, as in the Chinese.
 // "China" in data-location statements means mainland China (excluding Hong Kong, Macao and Taiwan), as in the Chinese.
-export const UPDATED = "2026-10-26";
-export const EFFECTIVE = "2026-10-26";
+export const UPDATED = "2026-11-02";
+export const EFFECTIVE = "2026-11-02";
 
 const privacy = {
   slug: "privacy",
   name: "Privacy policy",
-  title: "Privacy policy | HunterBuddy",
+  title: "Privacy policy | TalentBuddy",
   description:
-    "How Beijing Boseek Intelligent Technology Co., Ltd. handles your personal information on its website and in HunterBuddy, and the information about candidates and other people: what we collect, how we use it, where it is stored, how long we keep it, who processes it for us, and how you can access, correct or delete it and close your account.",
-  lead: "This privacy policy (“this policy”) explains how Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) handles your personal information on www.boseekai.com and in HunterBuddy, and the information about candidates, contacts and other people that you keep in HunterBuddy. Please read it carefully, especially the parts in bold.",
+    "How Beijing Boseek Intelligent Technology Co., Ltd. handles your personal information on its website and in TalentBuddy, and the information about candidates and other people: what we collect, how we use it, where it is stored, how long we keep it, who processes it for us, and how you can access, correct or delete it and close your account.",
+  lead: "This privacy policy (“this policy”) explains how Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) handles your personal information on www.boseekai.com and in TalentBuddy, and the information about candidates, contacts and other people that you keep in TalentBuddy. Please read it carefully, especially the parts in bold.",
   keys: [
     "**The website uses no cookies and no analytics, advertising or tracking code.** When you browse it, our server only keeps access logs, for security and troubleshooting.",
     "**When you request a trial**, we collect the name, company, phone number, email, role, number of active searches and industry you enter, and use them only to review your request and contact you when trial access opens.",
-    "**You decide how the candidates, contacts and other people you keep in HunterBuddy are used.** We process that information for you under the Data processing agreement and use it for no other purpose.",
+    "**You decide how the candidates, contacts and other people you keep in TalentBuddy are used.** We process that information for you under the Data processing agreement and use it for no other purpose.",
     "**We store and process personal information in mainland China. We never provide it outside China, never use it to train AI models and never sell it.**",
     "AI results show their sources and how reliable they are (verified, inferred, to be confirmed). Who to contact and who to put forward is your decision.",
     "You can access, copy, correct and delete your information and close your account. Email privacy@boseekai.com and we will reply within 15 working days.",
@@ -25,12 +25,12 @@ const privacy = {
       h2: "Who we are and what this policy covers",
       body: [
         "The personal information handler is Beijing Boseek Intelligent Technology Co., Ltd. For anything about personal information, contact privacy@boseekai.com.",
-        "This policy covers the website (the Chinese and English pages of www.boseekai.com), trial requests, and the HunterBuddy service, including accounts, workspaces and the features in them.",
-        "**When each part applies**: the parts of this policy about the website and trial requests apply from the effective date. The parts about the HunterBuddy service apply from the day HunterBuddy is formally opened to you. Before it opens, we will check this policy line by line against the features actually launched, and update the policy first wherever anything differs, before opening the service.",
+        "This policy covers the website (the Chinese and English pages of www.boseekai.com), trial requests, and the TalentBuddy service, including accounts, workspaces and the features in them.",
+        "**When each part applies**: the parts of this policy about the website and trial requests apply from the effective date. The parts about the TalentBuddy service apply from the day TalentBuddy is formally opened to you. Before it opens, we will check this policy line by line against the features actually launched, and update the policy first wherever anything differs, before opening the service.",
         { h3: "We act in two different capacities" },
         {
           list: [
-            "For information about website visitors, trial applicants, HunterBuddy users themselves and people who make requests to us, **we are the personal information handler** and follow this policy.",
+            "For information about website visitors, trial applicants, TalentBuddy users themselves and people who make requests to us, **we are the personal information handler** and follow this policy.",
             "For the information you keep and process in your workspace about candidates, client contacts, paper authors, patent inventors, email correspondents and other people (“other people’s information in your workspace”), **you are the personal information handler and we process it on your behalf**, under the Data processing agreement. For the search sources and methods we choose, the refusal list and our security measures, we bear a personal information handler’s responsibility as the law requires. Section 9 is written for the people that information is about.",
           ],
         },
@@ -70,23 +70,23 @@ const privacy = {
       h2: "Cookies and browser storage",
       body: [
         "**The website uses no cookies and does not use browser storage to record what you do.** It has no analytics, advertising or third-party tracking code. Its fonts, videos and scripts are all served from our own server.",
-        "The HunterBuddy service uses the cookies and browser storage it needs to keep you signed in and to keep unsent drafts and interface preferences, such as pinned tasks. None of this is used for advertising or profiling. If you clear your browser data, you will need to sign in again and your interface preferences return to their defaults.",
+        "The TalentBuddy service uses the cookies and browser storage it needs to keep you signed in and to keep unsent drafts and interface preferences, such as pinned tasks. None of this is used for advertising or profiling. If you clear your browser data, you will need to sign in again and your interface preferences return to their defaults.",
       ],
     },
     {
       h2: "How AI handles your information",
       body: [
-        "HunterBuddy uses large language models to understand your requests, parse files, search and organize public information, compare and resolve identities, calculate matches, and draft summaries, reports, interview materials and emails.",
+        "TalentBuddy uses large language models to understand your requests, parse files, search and organize public information, compare and resolve identities, calculate matches, and draft summaries, reports, interview materials and emails.",
         {
           list: [
             "**Models in China only.** To carry out the tasks you start, we send the necessary content to large-model providers in mainland China, and never to models outside China.",
             "**Never used for training.** We do not use what you type, upload or generate, or other people’s information in your workspace, to train or fine-tune any model, and our agreements require the model providers not to either.",
             "**Results are labeled.** Content generated or inferred by AI is marked with labels such as AI-generated, Inferred or To be confirmed, together with the sources it relies on, and is shown apart from verified facts. Generated reports, interview materials and other files are marked too. Section 7 of the Terms of service describes the labels.",
-            "**You make the decisions.** Match scores, identity judgments and career-move alerts are for your reference only. HunterBuddy never contacts anyone by itself, and never puts forward, hires or rejects a candidate by itself.",
+            "**You make the decisions.** Match scores, identity judgments and career-move alerts are for your reference only. TalentBuddy never contacts anyone by itself, and never puts forward, hires or rejects a candidate by itself.",
           ],
         },
         { h3: "Automated processing" },
-        "Within the authorization you give, HunterBuddy carries out some processing automatically, for example linking two records of the same person when the evidence is strong, or scoring and ranking candidates against a role. All of it keeps its evidence, and you can review, undo or correct it. In settings you can switch to Analyze only or Confirm before acting, and turn off automatic steps such as matching right after saving. Where the results concern candidates or other individuals, those individuals may ask the user who keeps their information to explain, and may refuse decisions made solely by automated means that significantly affect their rights. We help the user explain the basis of the processing. If you have questions about automated processing that concerns you, contact us as described in section 10.",
+        "Within the authorization you give, TalentBuddy carries out some processing automatically, for example linking two records of the same person when the evidence is strong, or scoring and ranking candidates against a role. All of it keeps its evidence, and you can review, undo or correct it. In settings you can switch to Analyze only or Confirm before acting, and turn off automatic steps such as matching right after saving. Where the results concern candidates or other individuals, those individuals may ask the user who keeps their information to explain, and may refuse decisions made solely by automated means that significantly affect their rights. We help the user explain the basis of the processing. If you have questions about automated processing that concerns you, contact us as described in section 10.",
       ],
     },
     {
@@ -168,7 +168,7 @@ const privacy = {
             ],
           },
         },
-        "If your subscription ends, your data stays and you can still view and export it. If your account is suspended for breaching the Terms of service, you cannot sign in while it is suspended, but you can email us to ask for an export of your data, which we provide within 15 working days, unless laws or administrative regulations provide otherwise or unlawful content is involved. If we stop operating HunterBuddy, we will announce it and notify you 30 days in advance, and delete or anonymize personal information once the service stops.",
+        "If your subscription ends, your data stays and you can still view and export it. If your account is suspended for breaching the Terms of service, you cannot sign in while it is suspended, but you can email us to ask for an export of your data, which we provide within 15 working days, unless laws or administrative regulations provide otherwise or unlawful content is involved. If we stop operating TalentBuddy, we will announce it and notify you 30 days in advance, and delete or anonymize personal information once the service stops.",
       ],
     },
     {
@@ -192,36 +192,36 @@ const privacy = {
     {
       h2: "Minors",
       body: [
-        "HunterBuddy is a work tool for professional headhunters and recruiters and **is not intended for anyone under 18**, and we do not actively collect minors’ personal information. If we find we have collected personal information of a child under 14 without a guardian’s consent, we will delete it as soon as possible.",
-        "Please do not keep personal information about children under 14 in HunterBuddy.",
+        "TalentBuddy is a work tool for people who recruit professionally, such as headhunters, in-house recruiters and engineering leaders, and **is not intended for anyone under 18**, and we do not actively collect minors’ personal information. If we find we have collected personal information of a child under 14 without a guardian’s consent, we will delete it as soon as possible.",
+        "Please do not keep personal information about children under 14 in TalentBuddy.",
       ],
     },
     {
       h2: "For candidates and other people on record",
       body: [
-        "If you are a candidate, a contact at a client company, a paper author or a patent inventor, or you have exchanged emails with a HunterBuddy user, some of your information may be kept in the workspace of a HunterBuddy user (“the headhunter”). This section explains where that information comes from, how it is processed and what you can do.",
+        "If you are a candidate, a contact at a client company, a paper author or a patent inventor, or you have exchanged emails with a TalentBuddy user, some of your information may be kept in the workspace of a TalentBuddy user (a headhunter or someone hiring for a company, “the user”). This section explains where that information comes from, how it is processed and what you can do.",
         { h3: "Where the information comes from" },
         {
           list: [
-            "Material the headhunter uploads or enters, such as a resume you gave them, or their own work notes.",
-            "**Public professional information** the headhunter asks HunterBuddy to look up: public web pages, company websites, news, papers, patents and open-source projects that can be read without signing in.",
-            "Emails the headhunter confirms and sends from their own mailbox, and the replies to them.",
+            "Material the user uploads or enters, such as a resume you gave them, or their own work notes.",
+            "**Public professional information** the user asks TalentBuddy to look up: public web pages, company websites, news, papers, patents and open-source projects that can be read without signing in.",
+            "Emails the user confirms and sends from their own mailbox, and the replies to them.",
           ],
         },
-        "HunterBuddy matches up the records in these sources that belong to the same person, including matching aliases, nicknames, English names and online IDs to real names, to work out that person\u2019s professional identity. It relies only on information made public in a professional context and on material the headhunter provides. Anything that does not match up is marked to be confirmed and left for the headhunter to check.",
+        "TalentBuddy matches up the records in these sources that belong to the same person, including matching aliases, nicknames, English names and online IDs to real names, to work out that person\u2019s professional identity. It relies only on information made public in a professional context and on material the user provides. Anything that does not match up is marked to be confirmed and left for the user to check.",
         { h3: "What we do not do" },
         {
           list: [
             "**We do not sign in to or operate recruiting or social platforms that require a login**, such as Liepin, Maimai, BOSS Zhipin or LinkedIn, and we do not get around websites’ access restrictions.",
             "We do not collect private information unrelated to work, such as ID numbers, home addresses, family members, health or religious beliefs.",
-            "We never contact you by ourselves. Whether and how to contact you is the headhunter’s own decision.",
+            "We never contact you by ourselves. Whether and how to contact you is the user’s own decision.",
             "Inferences, such as a possible colleague relationship or a career move, are marked as inferred or to be confirmed and are never treated as facts.",
           ],
         },
         { h3: "Who is responsible" },
-        "The headhunter who keeps your information is its personal information handler. They are responsible for having a lawful basis and for answering your requests. Boseek processes it on the headhunter’s instructions. For the search sources and methods we choose, the refusal list and our security measures, we are also responsible as the law requires, and we help the headhunter respond to you.",
+        "The user who keeps your information is its personal information handler. They are responsible for having a lawful basis and for answering your requests. Boseek processes it on the user’s instructions. For the search sources and methods we choose, the refusal list and our security measures, we are also responsible as the law requires, and we help the user respond to you.",
         { h3: "What you can do" },
-        "You can contact the headhunter who keeps your information and ask to access, correct or delete it, or refuse their processing of information you have made public. You can also email privacy@boseekai.com with your name, contact details and your request. We usually ask you to confirm by replying from your own email address or phone number, and we do not need an ID document. Once verified, the system automatically checks across workspaces, and within 15 working days we pass your request on to the headhunters who keep your information and help them handle it, pausing the processing of that information first where needed, and then tell you the outcome. The check is done by the system, and no staff member looks at workspace content.",
+        "You can contact the user who keeps your information and ask to access, correct or delete it, or refuse their processing of information you have made public. You can also email privacy@boseekai.com with your name, contact details and your request. We usually ask you to confirm by replying from your own email address or phone number, and we do not need an ID document. Once verified, the system automatically checks across workspaces, and within 15 working days we pass your request on to the users who keep your information and help them handle it, pausing the processing of that information first where needed, and then tell you the outcome. The check is done by the system, and no staff member looks at workspace content.",
         "If you expressly refuse our processing of information you have made public, we will put you on a refusal list, keeping only what is needed to identify you, and **from then on stop automatically collecting or completing your information from public sources for any user**.",
       ],
     },
@@ -279,12 +279,12 @@ const privacy = {
 const terms = {
   slug: "terms",
   name: "Terms of service",
-  title: "Terms of service | HunterBuddy",
+  title: "Terms of service | TalentBuddy",
   description:
-    "The terms for using HunterBuddy: what the service does, accounts, trials, subscriptions and auto-renewal, credit validity, your responsibility for candidates’ information, labeling and checking AI-generated content, limits of liability, complaints and disputes.",
-  lead: "These terms of service (“these terms”) are the agreement between you and Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) for using HunterBuddy. Please read them carefully, especially the clauses in bold that exclude or limit liability or deal with disputes. When you tick to accept these terms on signing up, they take effect together with the Data processing agreement, which forms part of them. The Privacy policy explains how we handle your personal information, and you confirm it separately when you sign up.",
+    "The terms for using TalentBuddy: what the service does, accounts, trials, subscriptions and auto-renewal, credit validity, your responsibility for candidates’ information, labeling and checking AI-generated content, limits of liability, complaints and disputes.",
+  lead: "These terms of service (“these terms”) are the agreement between you and Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) for using TalentBuddy. Please read them carefully, especially the clauses in bold that exclude or limit liability or deal with disputes. When you tick to accept these terms on signing up, they take effect together with the Data processing agreement, which forms part of them. The Privacy policy explains how we handle your personal information, and you confirm it separately when you sign up.",
   keys: [
-    "HunterBuddy is an AI work tool for headhunters, currently in an invitation-only trial.",
+    "TalentBuddy is an AI work tool for hiring R&D talent, currently in an invitation-only trial.",
     "**It never contacts anyone, and never puts candidates forward or makes business decisions, for you.** No email is sent until you confirm it.",
     "**You decide how candidates’ and other people’s information is used, and you are responsible for doing so lawfully.**",
     "**AI results can be wrong, so check them before you rely on them.** We mark what is AI-generated, inferred or to be confirmed.",
@@ -296,17 +296,17 @@ const terms = {
     {
       h2: "Scope of these terms",
       body: [
-        "These terms apply to your use of HunterBuddy, including the web service, accounts, workspaces and their features. The Data processing agreement and the rules we publish in the service form part of these terms. The Privacy policy separately explains how we handle your personal information.",
-        "**You must be at least 18 and have full civil capacity.** If you use HunterBuddy for an organization, you must be authorized by it, and these terms bind that organization too.",
+        "These terms apply to your use of TalentBuddy, including the web service, accounts, workspaces and their features. The Data processing agreement and the rules we publish in the service form part of these terms. The Privacy policy separately explains how we handle your personal information.",
+        "**You must be at least 18 and have full civil capacity.** If you use TalentBuddy for an organization, you must be authorized by it, and these terms bind that organization too.",
         "We use bold type to draw your attention to clauses that exclude or limit liability or otherwise significantly affect you. If anything is unclear, contact us before you agree and we will explain it.",
       ],
     },
     {
       h2: "What the service does",
       body: [
-        "HunterBuddy is an AI work tool for headhunters and recruiters, for recruiting work. Its main uses are: analyzing roles, finding people in your own material and in public information, bringing records of the same person from different sources together, working out the real name behind an alias and removing duplicates, matching candidates to roles, mapping company org charts, assessing potential clients, keeping a talent pool current, and drafting reports, interview materials and emails.",
-        "**HunterBuddy never contacts anyone for you.** Who to contact, who to put forward and how to talk to them is your decision. Once you connect a sending mailbox, no email leaves your mailbox until you confirm its recipients, subject, body and attachments.",
-        "**HunterBuddy does not sign in to or operate recruiting or social platforms that require a login.** You can upload resumes you have lawfully obtained from those platforms yourself.",
+        "TalentBuddy is an AI work tool for search consultants, HR and talent leads, and CTOs and engineering leaders, for recruiting work. Its main uses are: analyzing roles, finding people in your own material and in public information, bringing records of the same person from different sources together, working out the real name behind an alias and removing duplicates, matching candidates to roles, mapping company org charts, assessing potential clients, keeping a talent pool current, and drafting reports, interview materials and emails.",
+        "**TalentBuddy never contacts anyone for you.** Who to contact, who to put forward and how to talk to them is your decision. Once you connect a sending mailbox, no email leaves your mailbox until you confirm its recipients, subject, body and attachments.",
+        "**TalentBuddy does not sign in to or operate recruiting or social platforms that require a login.** You can upload resumes you have lawfully obtained from those platforms yourself.",
         "The service is in an invitation-only trial and some features are still being built. **The features, quota and scope actually offered in the service are what apply.** We may change, add or retire features, and will tell you in advance of changes that significantly affect you.",
       ],
     },
@@ -315,7 +315,7 @@ const terms = {
       body: [
         {
           list: [
-            "You sign up and sign in with a mainland China mobile number and SMS code, or by scanning a WeChat QR code. HunterBuddy has no sign-in password.",
+            "You sign up and sign in with a mainland China mobile number and SMS code, or by scanning a WeChat QR code. TalentBuddy has no sign-in password.",
             "Please give true and accurate information and keep it up to date.",
             "**Your account is for you alone. Do not lend, transfer, sell or share it.** You bear losses caused by your own failure to keep it safe, except where we are at fault.",
             "If you notice anything unusual, such as someone else using your account, sign out other sessions at once and contact us.",
@@ -359,7 +359,7 @@ const terms = {
       body: [
         "You must comply with laws and regulations, respect public morality and not harm the lawful rights of others.",
         { h3: "Candidates’ and other people’s information" },
-        "**For the personal information of candidates, contacts and other people that you upload, enter, look up and use in HunterBuddy, you decide the purpose and method of processing, and you are its personal information handler.** You must comply with the Personal Information Protection Law and other laws and regulations, including:",
+        "**For the personal information of candidates, contacts and other people that you upload, enter, look up and use in TalentBuddy, you decide the purpose and method of processing, and you are its personal information handler.** You must comply with the Personal Information Protection Law and other laws and regulations, including:",
         {
           list: [
             "Having a lawful basis, such as the person’s consent, or processing information they have made public within a reasonable scope.",
@@ -378,7 +378,7 @@ const terms = {
             "Sell or unlawfully provide personal information, or use it for fraud or harassment, or send emails containing commercial advertising without the recipient’s express consent.",
             "Upload or generate content that violates laws or regulations, or content that infringes others’ intellectual property, trade secrets, reputation, privacy or other lawful rights.",
             "Harvest data from the service with crawlers or scripts, reverse engineer, crack or interfere with the service, or get around quota or security measures.",
-            "Use the service or its output to build a product that competes with HunterBuddy, or to train other models.",
+            "Use the service or its output to build a product that competes with TalentBuddy, or to train other models.",
             "Lend or resell your account or the service.",
           ],
         },
@@ -389,12 +389,12 @@ const terms = {
       h2: "AI-generated content",
       body: [
         { h3: "Check before you rely on it" },
-        "HunterBuddy’s results are produced by models and programs from the material you provide and from public information, **and may be incomplete, out of date or wrong. A match score is not a probability of being hired, and identity judgments and inferred relationships can be mistaken. You must check results before you use them, and you are responsible for the decisions you make based on them.**",
+        "TalentBuddy’s results are produced by models and programs from the material you provide and from public information, **and may be incomplete, out of date or wrong. A match score is not a probability of being hired, and identity judgments and inferred relationships can be mistaken. You must check results before you use them, and you are responsible for the decisions you make based on them.**",
         { h3: "How we label it" },
         {
           list: [
             "**In the interface**: content generated or inferred by AI is shown with text labels such as AI-generated, Inferred or To be confirmed, with the sources it relies on and when it was generated, and apart from verified facts and what you entered yourself.",
-            "**In generated files**: reports, interview materials and other files HunterBuddy generates state that they were generated by HunterBuddy with AI, and carry an implicit label in their metadata.",
+            "**In generated files**: reports, interview materials and other files TalentBuddy generates state that they were generated by TalentBuddy with AI, and carry an implicit label in their metadata.",
           ],
         },
         "**Email drafts** are edited and confirmed by you one by one and sent in your name from your mailbox, and no explicit label is added to their body automatically. **When you send, publish or provide AI-generated content to others, you must state and label it as the law requires and bear responsibility for its use, and you must not delete, alter, forge or hide the labels we add.** As the law requires, we keep records of providing content without explicit labels for at least 6 months.",
@@ -420,7 +420,7 @@ const terms = {
     {
       h2: "Intellectual property",
       body: [
-        "The intellectual property in HunterBuddy’s software, interface, text, graphics, trademarks and brand, and in material we provide, belongs to Boseek or the relevant rights holders. You may not copy, modify, distribute or commercially use them without permission.",
+        "The intellectual property in TalentBuddy’s software, interface, text, graphics, trademarks and brand, and in material we provide, belongs to Boseek or the relevant rights holders. You may not copy, modify, distribute or commercially use them without permission.",
         "You keep your rights in what you upload, and you must make sure you are entitled to upload and use it.",
       ],
     },
@@ -433,7 +433,7 @@ const terms = {
             "If the service is interrupted for reasons we are not responsible for, such as force majeure, failures of the public telecom network or cyberattacks, we will restore it as soon as possible.",
             "If you break these terms, we may limit or end the service. Except in an emergency, we will tell you first and give you a chance to put things right.",
             "You can stop using the service and close your account at any time.",
-            "If we decide to stop providing HunterBuddy, we will announce it and notify you 30 days in advance, refund fees paid for any unused period, and give you time to export your data.",
+            "If we decide to stop providing TalentBuddy, we will announce it and notify you 30 days in advance, refund fees paid for any unused period, and give you time to export your data.",
           ],
         },
       ],
@@ -441,9 +441,9 @@ const terms = {
     {
       h2: "Limits of liability",
       body: [
-        "**HunterBuddy is provided as is. We do our best to keep the service stable and its results grounded in evidence, but we do not guarantee that you will find the right candidate, fill a role or reach your business goals, or that public sources are complete, accurate or current.**",
+        "**TalentBuddy is provided as is. We do our best to keep the service stable and its results grounded in evidence, but we do not guarantee that you will find the right candidate, fill a role or reach your business goals, or that public sources are complete, accurate or current.**",
         "**Disputes and claims arising from your processing of other people’s personal information, your emails or your use of generated content in breach of the law or these terms are your responsibility. If we incur liability or losses because of them, you must compensate us.**",
-        "**To the extent the law allows, our liability to you is limited to the fees you actually paid for HunterBuddy in the 12 months before the loss occurred, and to no less than RMB 100. We are not liable for indirect losses or loss of profits that would otherwise have been obtained.**",
+        "**To the extent the law allows, our liability to you is limited to the fees you actually paid for TalentBuddy in the 12 months before the loss occurred, and to no less than RMB 100. We are not liable for indirect losses or loss of profits that would otherwise have been obtained.**",
         "**These limits do not apply to property losses caused by our intent or gross negligence, or to personal injury, and they do not exclude the rights you have as a consumer under the law.**",
       ],
     },
@@ -485,13 +485,13 @@ const terms = {
 const dpa = {
   slug: "dpa",
   name: "Data processing agreement",
-  title: "Data processing agreement | HunterBuddy",
+  title: "Data processing agreement | TalentBuddy",
   description:
-    "The data processing agreement for HunterBuddy users who entrust Beijing Boseek Intelligent Technology Co., Ltd. with the personal information of candidates, contacts and other people: roles, purpose, duration, methods, types of information, safeguards, sub-processing, security incidents and deletion.",
-  lead: "This data processing agreement (“this agreement”) sets out the rights and obligations of you, the HunterBuddy user, and Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) when you entrust us with processing other people’s personal information in your workspace. It forms part of the Terms of service and takes effect when you accept them.",
+    "The data processing agreement for TalentBuddy users who entrust Beijing Boseek Intelligent Technology Co., Ltd. with the personal information of candidates, contacts and other people: roles, purpose, duration, methods, types of information, safeguards, sub-processing, security incidents and deletion.",
+  lead: "This data processing agreement (“this agreement”) sets out the rights and obligations of you, the TalentBuddy user, and Beijing Boseek Intelligent Technology Co., Ltd. (“Boseek”, “we”) when you entrust us with processing other people’s personal information in your workspace. It forms part of the Terms of service and takes effect when you accept them.",
   keys: [
     "You decide the purpose and method of processing. **You are the personal information handler and Boseek is the entrusted party.**",
-    "We process only on your instructions and only to provide HunterBuddy to you. **Nothing is used for training, nothing is provided outside China, and nothing is given to other users.**",
+    "We process only on your instructions and only to provide TalentBuddy to you. **Nothing is used for training, nothing is provided outside China, and nothing is given to other users.**",
     "Every type of sub-processor we use is listed here, and we tell you 15 days before adding or changing a type.",
     "If a security incident happens, we notify you within 24 hours of confirming it.",
     "When the agreement ends, we delete the entrusted personal information and keep none of it, unless laws or administrative regulations provide otherwise.",
@@ -500,7 +500,7 @@ const dpa = {
     {
       h2: "Definitions and scope",
       body: [
-        "“Entrusted personal information” means personal information about natural persons, such as candidates, people of interest, client contacts, paper authors, patent inventors and email correspondents, that you upload, enter or import into your HunterBuddy workspace, or instruct HunterBuddy to look up, generate and save.",
+        "“Entrusted personal information” means personal information about natural persons, such as candidates, people of interest, client contacts, paper authors, patent inventors and email correspondents, that you upload, enter or import into your TalentBuddy workspace, or instruct TalentBuddy to look up, generate and save.",
         "Your own account information is outside this agreement and is handled under the Privacy policy.",
         "This agreement is made under Article 21 of the Personal Information Protection Law, Article 12 of the Regulations on Network Data Security Management and other provisions. Anything it does not cover is governed by the Terms of service.",
       ],
@@ -522,7 +522,7 @@ const dpa = {
     {
       h2: "Purpose",
       body: [
-        "We process entrusted personal information only to provide HunterBuddy to you, including to:",
+        "We process entrusted personal information only to provide TalentBuddy to you, including to:",
         {
           list: [
             "Find people in your material and in public information for your tasks.",
@@ -541,7 +541,7 @@ const dpa = {
     {
       h2: "Duration",
       body: [
-        "From when you start using HunterBuddy until this agreement ends, plus the deletion period in section 11.",
+        "From when you start using TalentBuddy until this agreement ends, plus the deletion period in section 11.",
         "What you delete goes to the recycle bin and is permanently deleted after 30 days, together with its files. At that point, that individual’s personal information is also cleared or anonymized in record versions, task conversations and run records, leaving only a note that the record was deleted. Copies in backups are cleared on the backup cycle within 30 days.",
       ],
     },
@@ -573,7 +573,7 @@ const dpa = {
             ],
           },
         },
-        "**HunterBuddy is not designed to process sensitive personal information.** It does not extract ID numbers, health, religious beliefs, biometric data, financial accounts, location tracks and the like into structured data, and it runs no face or voiceprint recognition. Resumes and other files may contain such information. **You should avoid uploading it, and where processing it is truly necessary, you must first obtain the person’s separate consent. You must not upload personal information about children under 14.**",
+        "**TalentBuddy is not designed to process sensitive personal information.** It does not extract ID numbers, health, religious beliefs, biometric data, financial accounts, location tracks and the like into structured data, and it runs no face or voiceprint recognition. Resumes and other files may contain such information. **You should avoid uploading it, and where processing it is truly necessary, you must first obtain the person’s separate consent. You must not upload personal information about children under 14.**",
       ],
     },
     {
@@ -584,7 +584,7 @@ const dpa = {
           list: [
             "Make sure processing has a lawful basis, such as the person’s consent or processing public information within a reasonable scope, and inform the person as the law requires.",
             "Make sure the material you provide was obtained lawfully, for example by following a platform’s rules and the scope of the person’s authorization when you download a resume from it.",
-            "Stop processing information a person has made public when they expressly refuse it, and delete it from HunterBuddy.",
+            "Stop processing information a person has made public when they expressly refuse it, and delete it from TalentBuddy.",
             "Answer people’s requests to access, correct or delete their information. We will help you.",
             "Have a person review AI results, and do not make decisions that significantly affect someone’s rights on automated results alone.",
             "Carry out any personal information protection impact assessment the law requires, for example for entrusted processing or automated decision-making. We will provide the information you need.",
