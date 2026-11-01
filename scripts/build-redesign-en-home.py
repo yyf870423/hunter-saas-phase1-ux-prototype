@@ -146,8 +146,8 @@ r('>查看交付示例</a>', '>See sample results</a>')
 
 # ---------- intro + film ----------
 r('<p class="n-kicker">产品短片 · 2 分 32 秒</p>', '<p class="n-kicker">Product video · 2:32</p>')
-r('<span>最耗时的检索和核对，交给 TalentBuddy。</span>', '<span>Hand the searching and checking to TalentBuddy.</span>')
-r('<span>你把时间留给判断和沟通。</span>', '<span>Spend your time on judgment and conversations.</span>')
+r('<span>检索与核对，交给 TalentBuddy。</span>', '<span>Searching and checking go to TalentBuddy.</span>')
+r('<span>判断与沟通，留给你。</span>', '<span>Judgment and conversations stay with you.</span>')
 r('从客户研判、组织架构、寻访、匹配，到身份核实和人才库更新，每一步都交回有出处的结果。',
   'From BD client research, org charts, sourcing and matching to identity checks and talent pool updates, every step hands back a sourced result.')
 r('poster="../assets/film-poster.jpg?v=10"', 'poster="../assets/film-poster-en.jpg?v=7"')
@@ -156,7 +156,7 @@ r('aria-label="TalentBuddy 产品短片"', 'aria-label="TalentBuddy product vide
 
 # ---------- six capabilities: heading ----------
 r('<p class="n-kicker">01 · 核心能力</p>', '<p class="n-kicker">01 · Capabilities</p>')
-r('<h2 class="n-h2" id="n-caps-title">六个环节，六份能直接用的结果</h2>', '<h2 class="n-h2" id="n-caps-title">Six stages, six results you can use</h2>')
+r('<h2 class="n-h2" id="n-caps-title">六个环节，环环交付</h2>', '<h2 class="n-h2" id="n-caps-title">Six stages, six deliverables</h2>')
 r('匹配短名单、寻访名单、核实结论、客户研判、变动提示、组织架构图，每条都有出处。联系谁、怎么谈，由你决定。',
   'Matched shortlists, sourced candidate lists, identity checks, BD client research, change alerts and org charts, each with its source. Who to contact, and how to approach them, is your call.')
 r('<i>找人</i>', '<i>Find</i>')
@@ -179,7 +179,7 @@ r('<u class="is-risk">风险</u>', '<u class="is-risk">Risk</u>')
 r('<p>推荐理由 · 三项要求都对上，带过量产项目</p>', '<p>Why · Meets all three, has led mass production</p>')
 # 01 text
 r('JD 只写了技术方向和年限，库里却有几千份简历，逐份对比要花大半天。', 'The JD names a technical field and years of experience, your database holds thousands of CVs, and comparing them one by one takes most of a day.')
-r('<h3 id="n-step-match">人岗匹配：从简历库里排出短名单</h3>', '<h3 id="n-step-match">Job matching: a shortlist from your CV database</h3>')
+r('<h3 id="n-step-match">人岗匹配：千份简历，排出短名单</h3>', '<h3 id="n-step-match">Job matching: from thousands of CVs to a shortlist</h3>')
 r('把 JD 拆成核心技能、行业背景和硬性门槛，在简历全文和结构化信息中一并检索，交回按匹配分排序的短名单。每位人选附亮点、风险和推荐理由，一点即可查看原文出处。也可以反过来，为一份简历匹配在手岗位。',
   'It breaks the JD into core skills, industry background and must-haves, then searches the full text of your CVs and their structured fields together. You get back a shortlist ranked by match score, with each candidate’s strengths, risks and why we recommend them, and one click takes you to the original source. It works the other way too: give it a CV and it finds the live searches that fit.')
 r('>了解人岗匹配</a>', '>More on job matching</a>')
@@ -202,7 +202,7 @@ r('<span class="fx-cap">三处来源合成一份</span><span class="fx-tags"><em
   '<span class="fx-cap">3 sources, 1 profile</span><span class="fx-tags"><em>Papers</em><em>Code</em><em>Your CVs</em></span>')
 # 02 text
 r('研发人才的能力写在论文、专利和代码里，只在招聘平台上搜，很多人找不到。', 'The clearest evidence of R&amp;D talent is in papers, patents and code. Search only on recruiting platforms, and many people never turn up.')
-r('<h3 id="n-step-sourcing">寻访：招聘平台搜不到的人，也能找到</h3>', '<h3 id="n-step-sourcing">Sourcing: find the people recruiting platforms miss</h3>')
+r('<h3 id="n-step-sourcing">寻访：平台之外，也能找到</h3>', '<h3 id="n-step-sourcing">Sourcing: beyond the platforms</h3>')
 r('按岗位要求，同时检索公开信息、论文、专利、开源代码和你的简历库，同一个人的多处资料先核对再合并。交回排好序的人选名单，并标明哪些渠道已经找过、哪些尚未覆盖。',
   'Working from the role’s requirements, it searches public information, papers, patents, open-source code and your CV database together, and checks the same person’s records from different places before merging them. You get back a ranked candidate list, with a note of which sources have been searched and which are not yet covered.')
 r('>了解猎头怎么找人</a>', '>How headhunters find candidates</a>')
@@ -220,7 +220,7 @@ r('<li class="is-wait">现任职级<em>待你确认</em></li>', '<li class="is-w
 r('<span class="fx-cap">触达路径</span><span>前同事引荐</span>', '<span class="fx-cap">Way in</span><span>Intro through an ex-teammate</span>')
 # 03 text
 r('论文署名是缩写，社区里是花名，代码仓库只有 ID，人到底是谁，往往要来回比对。', 'On papers it’s initials, in forums it’s an alias, and in a code repository it’s only a user ID. Working out who someone really is means comparing back and forth.')
-r('<h3 id="n-step-identity">身份核实：从花名、缩写和 ID 查清是谁</h3>', '<h3 id="n-step-identity">Identity checks: from an alias, initials or ID to who they are</h3>')
+r('<h3 id="n-step-identity">身份核实：花名缩写，查清是谁</h3>', '<h3 id="n-step-identity">Identity checks: who’s behind the alias</h3>')
 r('用任职经历、时间线、研究方向和公开作品交叉比对，排除同名。交回核实结论：是谁、依据是什么、排除了哪些同名、把握有多大，以及可行的联系途径。只用公开的职业信息和你提供的资料，拿不准的标为待确认。',
   'It cross-checks career history, timelines, research areas and public work, and rules out namesakes. You get back a written finding: who the person is, what that rests on, which namesakes were ruled out, how sure it is, and how you might reach them. It uses only public professional information and the material you provide, and anything uncertain is marked “To confirm”.')
 r('>了解身份核实</a>', '>More on identity checks</a>')
@@ -234,7 +234,7 @@ r('<li class="is-wait"><span>合作风险</span><i style="--n: 2"></i><b>待确�
 r('<span class="fx-cap">决策链</span><ol><li>创始人</li><li>技术 VP</li><li class="is-wait">用人经理</li></ol>', '<span class="fx-cap">Decision chain</span><ol><li>Founder</li><li>Tech VP</li><li class="is-wait">Hiring manager</li></ol>')
 # 04 text
 r('融资、新设研发部门、挂出新职位，信号很多，但不是每一条都能变成委托。', 'A funding round, a new R&amp;D department, fresh openings: there are plenty of signals, but not every one turns into a mandate.')
-r('<h3 id="n-step-bd">BD 客户研判（猎头适用）：先判断哪家值得跟</h3>', '<h3 id="n-step-bd">BD client research (for headhunters): know which clients are worth pursuing</h3>')
+r('<h3 id="n-step-bd">BD 客户研判（猎头适用）：哪家值得跟，心中有数</h3>', '<h3 id="n-step-bd">BD client research (for headhunters): know who’s worth pursuing</h3>')
 r('综合行业前景、融资动态、创始人背景、岗位与业务信号，交回客户研判：真实需求、付费潜力、合作风险分别给出“有依据 / 待确认 / 有风险”的结论和理由，附决策链和跟进优先级。跟不跟，由你决定。',
   'It looks at the industry outlook, funding news, the founders’ backgrounds, and hiring and business signals together. You get back BD client research that rates the real need, the ability to pay and the risk in working with them as “Sourced”, “To confirm” or “At risk”, with the reasons, plus the decision chain and a follow-up priority. Whether to pursue it is your call.')
 r('>了解客户开发</a>', '>More on business development</a>')
@@ -249,7 +249,7 @@ r('<li><i>2025</i><b>换了团队</b><span>并入新平台部</span></li>', '<li
 r('<li class="is-now"><i>2026</i><b>承担新职责</b><span>带起一支新团队</span></li>', '<li class="is-now"><i>2026</i><b>New role</b><span>Building a new team</span></li>')
 # 05 text
 r('研发人才换岗、转方向、发新成果都很快，简历库的信息一两年就过时。', 'R&amp;D people change roles, switch fields and publish new work quickly, and what your CV database says goes stale in a year or two.')
-r('<h3 id="n-step-network">人才库更新：人选有变动，及时提示</h3>', '<h3 id="n-step-network">Talent pool updates: timely alerts when candidates move</h3>')
+r('<h3 id="n-step-network">人才库更新：人选有变，及时提醒</h3>', '<h3 id="n-step-network">Talent pool updates: alerts when candidates move</h3>')
 r('定期核对你指定人选的公开履历、论文和专利，任职、方向或职责一有变化，就交回附出处的变动提示。经你确认才写入人才库，不会擅自改动你的资料。',
   'For the candidates you choose, it regularly checks public profiles, papers and patents. When a role, field or responsibility changes, you get a change alert with its source. Nothing goes into your talent pool until you confirm it, and it never edits your records on its own.')
 r('>了解人才库管理</a>', '>More on talent pools</a>')
@@ -264,7 +264,7 @@ r('<b>产品交付</b><em>负责人待补</em>', '<b>Delivery</b><em>Lead to fil
 r('<p class="fx-src">来源 · 官网 · 新闻 · 公开演讲</p>', '<p class="fx-src">Sources · Website · News · Public talks</p>')
 # 06 text
 r('目标公司的研发部门怎么分、谁负责什么，要从官网、新闻、论文和专利里一点点拼。人一变动，又得重画。', 'How a target company’s R&amp;D is organized, and who is responsible for what, has to be pieced together from its website, the news, papers and patents. When people move, the chart has to be redrawn.')
-r('<h3 id="n-step-mapping">组织架构梳理（Mapping）：研发组织，画成一张图</h3>', '<h3 id="n-step-mapping">Org charts (mapping): an R&amp;D organization, in one chart</h3>')
+r('<h3 id="n-step-mapping">组织架构梳理（Mapping）：研发组织，一图看清</h3>', '<h3 id="n-step-mapping">Org charts (mapping): an R&amp;D organization at a glance</h3>')
 r('汇总部门、关键岗位、任职人和汇报关系，交回一张组织架构图，可按部门、汇报线、项目切换查看，历史版本全部保留。每个节点附出处，未证实的汇报关系标为待确认。已有的 Excel 架构图可以导入后继续补充。',
   'It gathers departments, key roles, the people in them and reporting lines, and hands back an org chart you can view by department, reporting line or project, with every past version kept. Each node names its source, and any reporting line not yet confirmed is marked “To confirm”. Org charts you already have in Excel can be imported and built on.')
 r('>了解组织架构图</a>', '>More on org charts</a>')
@@ -283,8 +283,8 @@ r('和候选人、用人方的沟通，<br />始终由你主导。', 'Conversati
 
 # ---------- sectors ----------
 r('<p class="n-kicker">03 · 研发领域</p>', '<p class="n-kicker">03 · R&amp;D fields</p>')
-r('<h2 class="n-h2" id="n-industries-title">覆盖的研发领域</h2>', '<h2 class="n-h2" id="n-industries-title">R&amp;D fields we cover</h2>')
-r('<p class="n-sub">各行业的研发岗位，包括新开设的 AI 与大模型岗位。</p>', '<p class="n-sub">R&amp;D roles in every industry, including newly created AI and large-model roles.</p>')
+r('<h2 class="n-h2" id="n-industries-title">跨行研发，一并覆盖</h2>', '<h2 class="n-h2" id="n-industries-title">R&amp;D roles, across industries</h2>')
+r('<p class="n-sub">也包括各行业新开设的 AI 与大模型岗位。</p>', '<p class="n-sub">Including the new AI and large-model roles opening in every industry.</p>')
 r('<li>人工智能与大模型</li><li>互联网与云计算</li><li>具身智能与机器人</li><li>智能汽车</li><li>半导体与电子</li><li>医药与医疗器械</li><li>工业制造与装备</li><li>新能源与储能</li><li>核聚变</li>',
   '<li>AI &amp; large models</li><li>Internet &amp; cloud</li><li>Embodied AI &amp; robotics</li><li>Smart vehicles</li><li>Semiconductors &amp; electronics</li><li>Pharma &amp; medical devices</li><li>Industrial manufacturing &amp; equipment</li><li>New energy &amp; storage</li><li>Nuclear fusion</li>')
 
