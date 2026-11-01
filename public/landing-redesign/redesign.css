@@ -545,11 +545,14 @@ body.n-page::after {
   filter: drop-shadow(0 2px 22px rgb(0 0 0 / 38%));
 }
 .n-role {
-  margin-top: clamp(14px, 2vh, 22px) !important;
-  color: #c9c3ef;
-  font-size: 15px;
-  letter-spacing: 0.32em;
-  text-shadow: 0 1px 14px rgb(12 10 40 / 55%);
+  /* 首屏主标语：产品的核心收益，字号介于品牌字标和下面两行之间 */
+  margin-top: clamp(12px, 1.8vh, 20px) !important;
+  color: #f4f1ff;
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 18px rgb(12 10 40 / 60%);
 }
 .n-promise {
   display: grid;
@@ -2237,8 +2240,8 @@ body.n-page::after {
     font-size: min(71px, calc((100vw - 32px) / 6.9));
   }
   .n-role {
-    font-size: 13px;
-    letter-spacing: 0.24em;
+    font-size: 21px;
+    letter-spacing: 0.04em;
   }
   .n-promise {
     font-size: 17px;
@@ -2504,8 +2507,8 @@ html.lenis.lenis-smooth {
 }
 /* English type: the Chinese tagline's wide tracking reads as gaps in Latin, and headings break more evenly when balanced */
 :lang(en) .n-role {
-  font-size: 16px;
-  letter-spacing: 0.06em;
+  font-size: clamp(21px, 2.2vw, 32px);
+  letter-spacing: 0.005em;
 }
 :lang(en) .n-step-text h3,
 :lang(en) .n-card h3 {
