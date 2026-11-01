@@ -107,7 +107,7 @@ const LOCALES = {
     // 页脚“法律”一栏，链到三个法律页面
     legal: [["privacy", "隐私政策"], ["terms", "服务条款"], ["dpa", "数据处理协议"]],
     legalPage: { kicker: "法律", keys: "要点", updated: "更新日期", effective: "生效日期", others: "其他法律文件", byline: "铂寻 Boseek", tableLabel: "表格" },
-    footNotes: ["TalentBuddy：研发人才，找得到，也查得清。", "铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。"],
+    footNotes: ["TalentBuddy：更快找到对的研发人才。", "铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。"],
     contact: "联系我们：",
     metaLabel: "版权、网站主体与备案信息",
     meta: ["&copy; <span data-footer-year>2026</span> 铂寻 Boseek", "网站域名：www.boseekai.com", "网站主体：北京铂寻智能科技有限公司"],
@@ -166,7 +166,7 @@ const LOCALES = {
     groups: ["Product", "Use cases", "Legal"],
     legal: [["privacy", "Privacy policy"], ["terms", "Terms of service"], ["dpa", "Data processing agreement"]],
     legalPage: { kicker: "Legal", keys: "Key points", updated: "Updated", effective: "Effective", others: "Other legal documents", byline: "Boseek", tableLabel: "Table" },
-    footNotes: ["TalentBuddy: R&D talent, found and verified.", "Built by Boseek for search consultants, HR and talent leads, and CTOs and engineering leaders."],
+    footNotes: ["TalentBuddy: find the right R&D talent, faster.", "Built by Boseek for search consultants, HR and talent leads, and CTOs and engineering leaders."],
     contact: "Contact: ",
     metaLabel: "Copyright, operator and registration",
     meta: ["&copy; <span data-footer-year>2026</span> Boseek", "www.boseekai.com", "Operated by Beijing Boseek Intelligent Technology Co., Ltd."],

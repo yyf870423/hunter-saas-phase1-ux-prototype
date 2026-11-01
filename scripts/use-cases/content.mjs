@@ -33,7 +33,7 @@ export const COMMON = {
     nextUp: "下一步",
     trialTitle: "申请 TalentBuddy 试用",
     trialBody: "目前采用邀请制试用。留下你的信息，我们会逐一审核，并在开通时与你联系。",
-    footerNotes: ["TalentBuddy：研发人才，找得到，也查得清。", "铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。"],
+    footerNotes: ["TalentBuddy：更快找到对的研发人才。", "铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。"],
     contact: "联系我们：",
     footerProduct: "产品",
     footerCases: "使用场景",
@@ -78,7 +78,7 @@ export const COMMON = {
     trialBody:
       "Trial access is by invitation. Leave your details and we will review each application, then contact you when your access is ready.",
     footerNotes: [
-      "TalentBuddy: R&D talent, found and verified.",
+      "TalentBuddy: find the right R&D talent, faster.",
       "Built by Boseek for search consultants, HR and talent leads, and CTOs and engineering leaders.",
     ],
     contact: "Contact: ",

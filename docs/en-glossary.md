@@ -25,7 +25,7 @@ This guide is shared by the English homepage (`public/landing-redesign/en/`), th
 | Chinese | English |
 |---|---|
 | TalentBuddy（原名 HunterBuddy） | TalentBuddy (one word, never translated) |
-| 研发人才，找得到，也查得清 | R&D talent, found and verified (homepage, footer, share card, film end card) |
+| 更快找到对的研发人才 | Find the right R&D talent, faster (homepage, footer, share card, film end card; replaced “研发人才，找得到，也查得清 / R&D talent, found and verified” on 2026-11-02) |
 | 研发人才招聘 AI | AI for hiring R&D talent |
 | 猎头顾问 · 企业 HR 与招聘负责人 · CTO 与技术负责人 | search consultants · HR and talent leads · CTOs and engineering leaders |
 | 交回 / 交付结果 | hands back / delivers results |

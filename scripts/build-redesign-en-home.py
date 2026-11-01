@@ -29,7 +29,7 @@ ORG = {
 LANGS = {
     "zh": dict(
         home=SITE, lang="zh-CN", og="zh_CN", og_alt="en_US", site_name="铂寻 Boseek", title_cut="｜铂寻 Boseek", baidu=True,
-        app="研发人才，找得到，也查得清。TalentBuddy 是面向猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人的研发人才招聘 AI，交回人选名单、匹配结论、身份核实结论、BD 客户研判、人才库变动提示和组织架构图，每一条都查得到出处。联系谁、推不推荐，由你决定。目前邀请制试用。",
+        app="更快找到对的研发人才。TalentBuddy 是面向猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人的研发人才招聘 AI，交回人选名单、匹配结论、身份核实结论、BD 客户研判、人才库变动提示和组织架构图，每一条都查得到出处。联系谁、推不推荐，由你决定。目前邀请制试用。",
         app_sub="研发人才招聘 AI", audience="招聘研发与技术人才的猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人",
         # the share card (1200×630, the film's last scene): what Feishu, LinkedIn and the like show when the link is pasted
         share="assets/share-card.jpg",
@@ -37,7 +37,7 @@ LANGS = {
     ),
     "en": dict(
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
-        app="R&D talent, found and verified. TalentBuddy is AI for hiring R&D talent, built for search consultants, HR and talent leads, and CTOs and engineering leaders. It hands back candidate lists, match findings, identity checks, BD client research, talent pool change alerts and org charts, each traceable to its source. Who to contact and whom to put forward is always your call. Invitation-only trial.",
+        app="Find the right R&D talent, faster. TalentBuddy is AI for hiring R&D talent, built for search consultants, HR and talent leads, and CTOs and engineering leaders. It hands back candidate lists, match findings, identity checks, BD client research, talent pool change alerts and org charts, each traceable to its source. Who to contact and whom to put forward is always your call. Invitation-only trial.",
         app_sub="AI for hiring R&D talent", audience="Search consultants, HR and talent leads, and CTOs and engineering leaders hiring R&D talent",
         share="assets/share-card-en.jpg",
         film=("TalentBuddy product video", "From one role in a sea of people, follow TalentBuddy through six capabilities: BD client research, org charts, sourcing, job matching, identity checks and talent pool updates.", "assets/film-poster-en.jpg", "assets/talentbuddy-film-en.mp4"),
@@ -139,26 +139,26 @@ r('aria-label="打开导航"', 'aria-label="Open navigation"')
 
 # ---------- hero ----------
 r('<span aria-hidden="true"></span>正在开发中，邀请制试用申请已开放', '<span aria-hidden="true"></span>In development. Applications for the invitation-only trial are open.')
-r('<p class="n-role">研发人才，找得到，也查得清</p>', '<p class="n-role">R&amp;D talent, found and verified</p>')
-r('<span>论文、专利、代码与简历库，一并检索。</span>', '<span>Papers, patents, code and CV databases, searched together.</span>')
-r('<span>人选、身份与组织架构，结论均可追溯来源。</span>', '<span>Candidates, identities and org charts, every finding traceable to its source.</span>')
+r('<p class="n-role">更快找到对的研发人才</p>', '<p class="n-role">Find the right R&amp;D talent, faster</p>')
+r('<span>论文、专利、代码与简历库，一并检索，</span>', '<span>Papers, patents, code and CV databases, searched together,</span>')
+r('<span>交回排好序、条条有出处的人选名单。</span>', '<span>handed back as a ranked shortlist with a source for every name.</span>')
 r('>看它交回什么</a>', '>See what it delivers</a>')
 
 # ---------- intro + film ----------
 r('<p class="n-kicker">TalentBuddy 能做什么</p>', '<p class="n-kicker">What TalentBuddy does</p>')
-r('<span>覆盖研发人才招聘的关键环节。</span>', '<span>Every key stage of hiring R&amp;D talent, covered.</span>')
-r('<span>每项结果均注明来源，判断与沟通由你完成。</span>', '<span>Each result names its source. Judgment and conversations stay with you.</span>')
-r('人选寻访、人岗匹配、身份核实、BD 客户研判、人才库更新、组织架构梳理，每一项都交回一份具体结果。',
-  'Sourcing, job matching, identity checks, BD client research, talent pool updates and org charts, each handing back a concrete result.')
+r('<span>最耗时的检索和核对，交给 TalentBuddy。</span>', '<span>Hand the searching and checking to TalentBuddy.</span>')
+r('<span>你把时间留给判断和沟通。</span>', '<span>Spend your time on judgment and conversations.</span>')
+r('从客户研判、组织架构、寻访、匹配到身份核实和人才库更新，每一步都交回查得到出处的结果。',
+  'From BD client research, org charts, sourcing and matching to identity checks and talent pool updates, every step hands back a result you can trace to its source.')
 r('poster="../assets/film-poster.jpg?v=10"', 'poster="../assets/film-poster-en.jpg?v=7"')
 r('src="../assets/talentbuddy-film.mp4?v=10"', 'src="../assets/talentbuddy-film-en.mp4?v=7"')
 r('aria-label="TalentBuddy 产品短片"', 'aria-label="TalentBuddy product video"')
 
 # ---------- six capabilities: heading ----------
 r('<p class="n-kicker">01 · 核心能力</p>', '<p class="n-kicker">01 · Capabilities</p>')
-r('<h2 class="n-h2" id="n-caps-title">六项核心能力</h2>', '<h2 class="n-h2" id="n-caps-title">Six core capabilities</h2>')
-r('每条结果都查得到出处，拿不准的会单独标出来。联系谁、怎么谈，由你决定。',
-  'Every result can be traced to its source, and anything uncertain is flagged on its own. Who to contact, and how to approach them, is your call.')
+r('<h2 class="n-h2" id="n-caps-title">六个环节，六份能直接用的结果</h2>', '<h2 class="n-h2" id="n-caps-title">Six stages, six results you can use</h2>')
+r('人选名单、匹配结论、核实结论、客户研判、变动提示、组织架构图，每条都有出处。联系谁、怎么谈，由你决定。',
+  'Candidate lists, match findings, identity checks, BD client research, change alerts and org charts, each with its source. Who to contact, and how to approach them, is your call.')
 r('<i>找人</i>', '<i>Find</i>')
 r('<i>看清</i>', '<i>Know</i>')   # not "Assess": HunterBuddy never judges people
 r('<i>沉淀</i>', '<i>Keep</i>')
@@ -325,7 +325,7 @@ for qz, qe, az, ae in FAQ:
 # ---------- footer ----------
 r('<img src="../../landing-origin/assets/boseek-b5.svg" alt="Boseek 铂寻" width="150" height="54" loading="lazy" />',
   '<img src="../assets/boseek-b5-en-light.svg" alt="Boseek" width="150" height="46" loading="lazy" />')
-r('<p>TalentBuddy：研发人才，找得到，也查得清。</p>', '<p>TalentBuddy: R&amp;D talent, found and verified.</p>')
+r('<p>TalentBuddy：更快找到对的研发人才。</p>', '<p>TalentBuddy: find the right R&amp;D talent, faster.</p>')
 r('<p>铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。</p>', '<p>Built by Boseek for search consultants, HR and talent leads, and CTOs and engineering leaders.</p>')
 r('<p class="n-footer-mail">联系我们：<a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>', '<p class="n-footer-mail">Contact: <a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>')
 r('<h2>产品</h2>', '<h2>Product</h2>')  # its links are the header's, already replaced above
