@@ -1,13 +1,13 @@
 export default {
   slug: "ai-assistant-for-headhunters",
   name: "AI assistant for headhunters",
-  title: "AI assistant for headhunters: what it is, what AI agents do | HunterBuddy",
+  title: "AI assistant for headhunters: what it is, what AI agents do | TalentBuddy",
   description:
-    "What an AI assistant for headhunters like HunterBuddy is, how it differs from general AI, the six jobs it can do, which calls stay yours, and how to choose one.",
+    "What an AI assistant for headhunters like TalentBuddy is, how it differs from general AI, the six jobs it can do, which calls stay yours, and how to choose one.",
   kicker: "Headhunting in practice · AI assistants",
   h1: ["What is an AI assistant", "for headhunters, and what can it do?"],
   answer:
-    "An AI assistant for headhunters is an AI partner built to do a headhunter’s research. It looks for leads in funding news, careers pages, papers and patents, open-source communities and your own CV database, matches people to companies, names the source of every finding and flags anything uncertain on its own. You can hand it BD client research, org charts, job matching, sourcing, identity checks and keeping your network current, while who to contact, who to put forward and how to negotiate remain the headhunter’s decisions.",
+    "An AI assistant for headhunters is an AI tool that does a headhunter’s research and hands back the results. It looks for leads in funding news, careers pages, papers and patents, open-source communities and your own CV database, matches people to companies, names the source of every finding and flags anything uncertain on its own. You can hand it BD client research, org charts, job matching, sourcing, identity checks and keeping your network current, while who to contact, who to put forward and how to negotiate remain the headhunter’s decisions.",
   teaser: "What an AI assistant for headhunters can and can’t do, and how to choose one.",
   keywords: [
     "AI assistant for headhunters",
@@ -106,16 +106,16 @@ export default {
       ],
     },
     {
-      h2: "How can HunterBuddy help?",
+      h2: "How can TalentBuddy help?",
       body: [
-        "HunterBuddy is an AI assistant for headhunters, built by Boseek for independent headhunters and senior search consultants, and it can help with all six jobs above. Take the Xingchuan Robotics example from our homepage. Xingchuan has just raised a Series B. HunterBuddy spots a new Head of Computer Vision role on its careers page, finds the hiring manager, Qing Xu, then maps the org charts of Xingchuan and two peer companies and matches them against the candidates in your database.",
+        "TalentBuddy is Boseek’s AI for hiring R&D talent, one of the AI assistants for headhunters, and it hands back results for all six jobs above. Take the Xingchuan Robotics example from our homepage. Xingchuan has just raised a Series B. TalentBuddy spots a new Head of Computer Vision role on its careers page, finds the hiring manager, Qing Xu, then maps the org charts of Xingchuan and two peer companies and matches them against the candidates in your database.",
         "When sourcing, it searches your CV database and org charts first, then fills the gaps from papers, patents and open-source communities. Yue Lin has a record in your CV database, another on a team page and a third in a paper. Once the details are cross-checked and namesakes ruled out, the three are merged into one person. Every finding names its source, and anything uncertain is marked “To confirm”.",
         {
           demo: {
             context: "Example · Xingchuan Robotics · Head of Computer Vision",
             title: "One search, joined up from start to finish",
             caption:
-              "Illustrative: the results HunterBuddy hands you. Every line names its source, and anything uncertain is flagged on its own.",
+              "Illustrative: the results TalentBuddy hands you. Every line names its source, and anything uncertain is flagged on its own.",
             items: [
               [
                 "Business development · 2 sources",
@@ -140,7 +140,7 @@ export default {
             ],
           },
         },
-        "It uses only public information and your own material. It never contacts anyone or makes promises on your behalf. Who to contact, how to open the conversation and whether to put someone forward are for you to decide. HunterBuddy is still in development and offered as an invitation-only trial.",
+        "It uses only public information and your own material. It never contacts anyone or makes promises on your behalf. Who to contact, how to open the conversation and whether to put someone forward are for you to decide. TalentBuddy is still in development and offered as an invitation-only trial.",
       ],
     },
     {
@@ -155,11 +155,11 @@ export default {
   faq: [
     [
       "What software and tools do headhunters use?",
-      "Headhunters usually combine a few kinds of tools: office software and general-purpose AI assistants for writing and organizing material, recruiting platforms for posting roles and finding and contacting candidates, and a recruitment CRM or ATS for tracking clients, roles and where each submission stands. Then there is the AI assistant for headhunters, built for the research before and during a search, such as HunterBuddy from Boseek. Each covers its own stage, and they can be used side by side.",
+      "Headhunters usually combine a few kinds of tools: office software and general-purpose AI assistants for writing and organizing material, recruiting platforms for posting roles and finding and contacting candidates, and a recruitment CRM or ATS for tracking clients, roles and where each submission stands. Then there is the AI assistant for headhunters, built for the research before and during a search, such as TalentBuddy from Boseek. Each covers its own stage, and they can be used side by side.",
     ],
     [
       "What kinds of AI recruiting agents are there, and which suit headhunters?",
-      "AI tools and agents with “recruiting” in the name fall roughly into two groups, by who uses them. One serves in-house HR, helping post roles, screen CVs and schedule interviews. The other serves headhunters, helping with BD client research, org charts, sourcing and keeping your network current. When choosing, headhunters should look at three things: whether it can use their own CV database, whether every finding has a source, and whether it flags anything uncertain separately. HunterBuddy belongs to the second group and is currently offered as an invitation-only trial.",
+      "AI tools and agents with “recruiting” in the name fall roughly into two groups, by who uses them. One serves in-house HR, helping post roles, screen CVs and schedule interviews. The other serves headhunters, helping with BD client research, org charts, sourcing and keeping your network current. When choosing, headhunters should look at three things: whether it can use their own CV database, whether every finding has a source, and whether it flags anything uncertain separately. TalentBuddy belongs to the second group and is currently offered as an invitation-only trial.",
     ],
     [
       "Will AI replace search consultants?",

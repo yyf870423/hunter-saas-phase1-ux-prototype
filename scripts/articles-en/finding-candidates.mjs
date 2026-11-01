@@ -2,13 +2,13 @@
 export default {
   slug: "finding-candidates",
   name: "How headhunters find candidates",
-  title: "How headhunters find candidates: channels, CV search, outreach | HunterBuddy",
+  title: "How headhunters find candidates for R&D roles: channels, search, outreach | TalentBuddy",
   description:
-    "How do headhunters find candidates? A HunterBuddy guide to channels from referrals to patents, papers and open-source code, CV search tips and first contact.",
+    "How do headhunters find R&D and technical candidates? A guide to channels from referrals to patents, papers and open-source code, how to search, and first contact.",
   kicker: "Headhunting in practice · Sourcing channels",
   h1: ["How do headhunters find candidates?", "Channels, search and first contact"],
   answer:
-    "Headhunters usually start with their own CV database and network and ask people they trust for referrals, then look on recruiting platforms, in professional communities, at industry conferences, and in patents, papers, open-source code, company websites and the news. When they search, they combine every way a keyword might be written, search by company and team rather than by title, which is often more precise, and once they find one good fit, work outward through that person’s colleagues and collaborators. Once the list is ready, they decide who comes first and reach out with a specific reason.",
+    "Headhunters usually start with their own CV database and network and ask people they trust for referrals, then look on recruiting platforms, in professional communities, at industry conferences, and in patents, papers, open-source code, company websites and the news. When they search, they combine every way a keyword might be written, search by company and team rather than by title, which is often more precise, and once they find one good fit, work outward through that person’s colleagues and collaborators. Once the list is ready, they decide who comes first and reach out with a specific reason. For R&D roles, the evidence of what people can do is mostly in papers, patents and code, so search those together with your CV database.",
   teaser: "From your CV database to papers and code: where to find candidates and how to search.",
   keywords: [
     "how do headhunters find candidates",
@@ -116,9 +116,9 @@ export default {
       ],
     },
     {
-      h2: "How can HunterBuddy help you find candidates with AI?",
+      h2: "How can TalentBuddy help you find candidates with AI?",
       body: [
-        "The hard part of these methods is not thinking of them. It is the time they take: going through the CV database, reading the papers, cross-checking one person’s records across several places. It is hard for one person to do all of it for every search. HunterBuddy, the AI partner for headhunters, takes on the searching and checking. Back to the Xingchuan Robotics example: the hiring manager, Qing Xu, has sent over the JD for the Head of Computer Vision role.",
+        "The hard part of these methods is not thinking of them. It is the time they take: going through the CV database, reading the papers, cross-checking one person’s records across several places. It is hard for one person to do all of it for every search. TalentBuddy, Boseek’s AI for hiring R&D talent, takes on the searching and checking. Back to the Xingchuan Robotics example: the hiring manager, Qing Xu, has sent over the JD for the Head of Computer Vision role.",
         {
           steps: [
             [
@@ -143,7 +143,7 @@ export default {
           demo: {
             context: "Xingchuan Robotics · Head of Computer Vision",
             title: "Candidates worth approaching",
-            caption: "Illustrative: the list HunterBuddy hands you. Why each person fits and what is still to confirm are noted alongside.",
+            caption: "Illustrative: the list TalentBuddy hands you. Why each person fits and what is still to confirm are noted alongside.",
             items: [
               ["Industrial vision · Team lead", "Yue Lin", "Has led a production-line vision team. Three records merged. To confirm: team size and reporting line."],
               ["Robotics perception · Senior engineer", "Ning Zhou", "Relevant papers and project experience. To confirm: any mass-production experience."],
@@ -151,7 +151,7 @@ export default {
             ],
           },
         },
-        "The list is a sourced reference, not a final verdict. Whether someone is open to a move is for you to ask. You decide who to contact first and what to say, and it does not contact anyone on your behalf. CVs downloaded from recruiting platforms can also be uploaded and checked alongside the rest. HunterBuddy is in development, with an invitation-only trial.",
+        "The list is a sourced reference, not a final verdict. Whether someone is open to a move is for you to ask. You decide who to contact first and what to say, and it does not contact anyone on your behalf. CVs downloaded from recruiting platforms can also be uploaded and checked alongside the rest. TalentBuddy is in development, with an invitation-only trial.",
       ],
     },
     {
@@ -196,7 +196,7 @@ export default {
     ],
     [
       "How can you use AI to find candidates?",
-      "AI is well suited to searching and checking: going through your CV database, reading papers and patents, matching up one person’s records from different places, and listing the reasons for a match with their sources. An AI assistant for headhunters such as HunterBuddy checks your existing org charts and CV database first, then fills the gaps from public information, and marks anything uncertain “To confirm”. Who to contact first, and what to say, is still your call.",
+      "AI is well suited to searching and checking: going through your CV database, reading papers and patents, matching up one person’s records from different places, and listing the reasons for a match with their sources. An AI assistant for headhunters such as TalentBuddy checks your existing org charts and CV database first, then fills the gaps from public information, and marks anything uncertain “To confirm”. Who to contact first, and what to say, is still your call.",
     ],
   ],
 };

@@ -9,6 +9,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const HUB = "ai-assistant-for-headhunters";
 export const PUBLISHED = "2026-10-25";
+// the last content update: 2026-11-02 the product became TalentBuddy, AI for hiring R&D talent
+export const MODIFIED = "2026-11-02";
 
 export async function loadArticles() {
   const dir = resolve(root, "scripts/articles");
@@ -39,7 +41,7 @@ export function checkArticleEn(a) {
   if (a.slug !== "ai-tools-compared")
     for (const name of ["Doubao", "DeepSeek", "ChatGPT", "Liepin", "LinkedIn", "Maimai", "BOSS Zhipin"])
       if (all.includes(name)) problems.push(`platform "${name}" only in ai-tools-compared`);
-  if (!/ \| HunterBuddy$/.test(a.title)) problems.push('title must end with " | HunterBuddy"');
+  if (!/ \| TalentBuddy$/.test(a.title)) problems.push('title must end with " | TalentBuddy"');
   if (a.description.length < 120 || a.description.length > 170) problems.push(`description is ${a.description.length} characters`);
   if (a.faq.length < 3) problems.push("fewer than 3 FAQs");
   return problems;
@@ -60,7 +62,7 @@ export function checkArticle(a) {
   if (a.slug !== "ai-tools-compared")
     for (const name of ["豆包", "DeepSeek", "ChatGPT", "猎聘", "领英", "脉脉", "BOSS直聘"])
       if (all.includes(name)) problems.push(`平台名“${name}”只能出现在对比那一篇`);
-  if (!/｜HunterBuddy$/.test(a.title)) problems.push("title 要以“｜HunterBuddy”结尾");
+  if (!/｜TalentBuddy$/.test(a.title)) problems.push("title 要以“｜TalentBuddy”结尾");
   if (a.faq.length < 3) problems.push("常见问题少于 3 条");
   return problems;
 }

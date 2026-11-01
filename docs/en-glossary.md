@@ -1,4 +1,6 @@
-# HunterBuddy English: glossary and voice
+# TalentBuddy English: glossary and voice
+
+> 2026-11-02: the product was renamed from HunterBuddy to TalentBuddy and repositioned as AI for hiring R&D talent (search consultants, HR and talent leads, CTOs and engineering leaders). Older pages and the film’s six chapter cards still use some of the earlier terms below.
 
 This guide is shared by the English homepage (`public/landing-redesign/en/`), the nine English use-case pages (`scripts/articles-en/`) and the English film. When a Chinese term below appears, use the English given here, every time.
 
@@ -16,15 +18,20 @@ This guide is shared by the English homepage (`public/landing-redesign/en/`), th
 - Prefer periods and colons. Use the em dash rarely, at most one per paragraph. Do not use semicolons in headings.
 - Numbers: write one to nine in words in prose, and use digits on cards and labels ("10+", "Series B").
 - Curly apostrophes and quotes (’ “ ”) on the website. A quoted label keeps its own capital and the sentence’s period stays outside: marked “To confirm”.
-- The stance never changes: HunterBuddy gathers and sources, and **you decide**. It never contacts anyone, judges people or makes business decisions for you.
+- The stance never changes: TalentBuddy gathers and sources, and **you decide**. It never contacts anyone, judges people or makes business decisions for you.
 
 ## Product and company
 
 | Chinese | English |
 |---|---|
-| HunterBuddy | HunterBuddy (one word, never translated) |
+| TalentBuddy（原名 HunterBuddy） | TalentBuddy (one word, never translated) |
+| 研发人才，找得到，也查得清 | R&D talent, found and verified (homepage, footer, share card, film end card) |
+| 研发人才招聘 AI | AI for hiring R&D talent |
+| 猎头顾问 · 企业 HR 与招聘负责人 · CTO 与技术负责人 | search consultants · HR and talent leads · CTOs and engineering leaders |
+| 交回 / 交付结果 | hands back / delivers results |
+| 查得到出处 | traceable to its source |
 | 铂寻 / 铂寻 Boseek | Boseek |
-| 猎头的 AI 工作伙伴 | the AI partner for headhunters |
+| 猎头的 AI 工作伙伴（2026-11-02 起不再使用） | the AI partner for headhunters |
 | 猎头 AI 助手 | AI assistant for headhunters |
 | 猎头 | headhunter (the person) · headhunting / executive search (the work) |
 | 独立猎头和资深顾问 | independent headhunters and senior search consultants |
@@ -127,6 +134,6 @@ Platforms, in the ai-tools-compared article only: 豆包 Doubao, DeepSeek, ChatG
 
 ## SEO on the English pages
 
-- Titles name the English search intent, end with " | HunterBuddy" and stay within about 60 characters before that suffix. Examples: "How headhunters find candidates", "Company org charts for recruiters", "AI assistant for headhunters".
-- Descriptions run 140 to 160 characters, answer the question and mention HunterBuddy once.
+- Titles name the English search intent, end with " | TalentBuddy" and stay within about 60 characters before that suffix. Examples: "How headhunters find candidates", "Company org charts for recruiters", "AI assistant for headhunters".
+- Descriptions run 140 to 160 characters, answer the question and mention TalentBuddy once.
 - Put keywords in the title, description, H1, H2s and FAQ only. The body reads like a person talking.

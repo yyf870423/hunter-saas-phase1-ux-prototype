@@ -3,13 +3,13 @@
 export default {
   slug: "business-development",
   name: "Business development for headhunters",
-  title: "Business development for headhunters: funding news to new roles | HunterBuddy",
+  title: "Business development for headhunters: R&D mandates from funding and hiring signals | TalentBuddy",
   description:
-    "How do headhunters find clients? HunterBuddy tracks funding news in your sectors and finds the role, the hiring manager and who can introduce you, with sources.",
+    "How do headhunters win R&D clients? TalentBuddy tracks funding and hiring signals in your sectors and finds the role, hiring manager and an introduction, with sources.",
   kicker: "Use case · Business development",
-  h1: ["A funding round", "could be your next mandate."],
+  h1: ["Spot mandates at R&D companies", "in funding and hiring signals."],
   answer:
-    "New clients often hide in a piece of news that is easy to miss. HunterBuddy keeps watch on the sectors you follow and, starting from the funding news, finds the new role, a possible hiring manager and a route to an introduction, weighs whether the lead is worth pursuing, and names a source for every finding. Who to contact, and what to say, is up to you.",
+    "TalentBuddy keeps watch on the technical sectors you follow and, from funding news and careers pages, spots the R&D companies that are expanding. It hands back the new role, a possible hiring manager, a route to an introduction and research on whether the lead is worth pursuing, naming a source for every lead. Who to contact, and how to approach them, is up to you.",
   teaser: "From a single funding announcement to the new role and its hiring manager.",
   keywords: [
     "business development for headhunters",
@@ -78,7 +78,7 @@ export default {
       ],
     },
     {
-      h2: "How does HunterBuddy help with business development?",
+      h2: "How does TalentBuddy help with business development?",
       body: [
         "Here again is the Xingchuan Robotics example from our homepage, one step at a time.",
         {
@@ -114,7 +114,7 @@ export default {
           demo: {
             context: "Every Monday, 09:00 · Sectors you track",
             title: "Xingchuan Robotics · Possible new role",
-            caption: "This is what HunterBuddy hands you. Every line names its source, and anything uncertain is flagged separately.",
+            caption: "This is what TalentBuddy hands you. Every line names its source, and anything uncertain is flagged separately.",
             items: [
               ["Role found · 2 sources", "New on the careers page: Head of Computer Vision", "The careers page and the funding news agree."],
               ["BD client research · Sourced", "Real need, ability to pay", "A fresh Series B and a new role on the careers page. Risk to the relationship: to confirm."],
@@ -138,7 +138,7 @@ export default {
           ],
         },
         {
-          note: "HunterBuddy never contacts anyone on your behalf, and never makes promises for you.",
+          note: "TalentBuddy never contacts anyone on your behalf, and never makes promises for you.",
         },
       ],
     },
@@ -146,14 +146,14 @@ export default {
   faq: [
     [
       "Where can headhunters find business development leads?",
-      "Funding news, company websites and careers pages, changes in leadership and teams, news of new business lines and new plants, and your own long-standing clients and network. HunterBuddy looks at all of these together and records where every lead came from.",
+      "Funding news, company websites and careers pages, changes in leadership and teams, news of new business lines and new plants, and your own long-standing clients and network. TalentBuddy looks at all of these together and records where every lead came from.",
     ],
     [
       "If a role is on a company’s careers page, can I pitch for the mandate?",
-      "Not necessarily. A role on a careers page is only a lead. First confirm whether it is really open, whether the headcount has been approved and who makes the decision. HunterBuddy lists these open questions, but answering them takes a conversation, and that part is yours.",
+      "Not necessarily. A role on a careers page is only a lead. First confirm whether it is really open, whether the headcount has been approved and who makes the decision. TalentBuddy lists these open questions, but answering them takes a conversation, and that part is yours.",
     ],
     [
-      "Will HunterBuddy contact clients for me?",
+      "Will TalentBuddy contact clients for me?",
       "No. It finds the leads, the hiring manager and the route to an introduction, with the reasons and the sources. Who to contact, when to reach out and how to have the conversation are up to you.",
     ],
     [

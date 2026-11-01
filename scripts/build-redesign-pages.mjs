@@ -17,7 +17,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COMMON } from "./use-cases/content.mjs";
 import { PAGES } from "./use-cases/pages.mjs";
-import { PUBLISHED, checkArticle, checkArticleEn, loadArticles, loadArticlesEn } from "./build-articles.mjs";
+import { PUBLISHED, MODIFIED, checkArticle, checkArticleEn, loadArticles, loadArticlesEn } from "./build-articles.mjs";
 import { LEGAL_ZH, UPDATED as LEGAL_UPDATED, EFFECTIVE as LEGAL_EFFECTIVE } from "./legal/zh.mjs";
 import { LEGAL_EN } from "./legal/en.mjs";
 
@@ -68,7 +68,7 @@ const LOCALES = {
     dir: "",
     site: SITE,
     siteName: "铂寻 Boseek",
-    titleSuffix: /｜HunterBuddy$/,
+    titleSuffix: /｜TalentBuddy$/,
     skip: "跳到正文",
     homeLabel: "铂寻 Boseek 首页",
     logo: { src: "../landing-origin/assets/boseek-b5-dark.svg", alt: "Boseek 铂寻", w: 150, h: 54 },
@@ -88,12 +88,12 @@ const LOCALES = {
     home: "首页",
     list: {
       name: "使用场景",
-      title: "使用场景：猎头客户开发、组织架构图、找人、人岗匹配与人才库｜HunterBuddy",
+      title: "使用场景：研发人才招聘的找人、人岗匹配、组织架构图、人才库与猎头客户开发｜TalentBuddy",
       description:
-        "写给独立猎头和资深顾问的使用场景：猎头怎么找客户、公司组织架构图怎么画、猎头怎么找人、人岗匹配怎么做、同名候选人怎么区分、人才库怎么建，以及猎头能用 AI 助手做哪些事。",
+        "写给猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人的使用场景：怎么从论文、专利和代码里找研发人才，人岗匹配怎么做，目标公司的组织架构图怎么画，同名候选人怎么区分，人才库怎么建，以及猎头怎么开发研发型企业客户。",
       kicker: "使用场景",
       h1: "使用场景",
-      lead: "从客户开发、组织架构到找人、匹配和人选维护，把猎头每天最花时间的几件事讲清楚：一般怎么做、难在哪里、HunterBuddy 能帮什么，哪些还得你自己来。",
+      lead: "围绕研发人才招聘的各个环节，讲清一般怎么做、难在哪里、TalentBuddy 交回哪些结果，以及哪些还要你自己判断。",
     },
     // 页脚“使用场景”一栏：四篇主要的（链接文字用各篇的主攻词），最后一行“全部 >>”
     footerCases: [
@@ -107,7 +107,7 @@ const LOCALES = {
     // 页脚“法律”一栏，链到三个法律页面
     legal: [["privacy", "隐私政策"], ["terms", "服务条款"], ["dpa", "数据处理协议"]],
     legalPage: { kicker: "法律", keys: "要点", updated: "更新日期", effective: "生效日期", others: "其他法律文件", byline: "铂寻 Boseek", tableLabel: "表格" },
-    footNotes: ["HunterBuddy，猎头的 AI 工作伙伴。", "铂寻为独立猎头和资深顾问打造。"],
+    footNotes: ["TalentBuddy：研发人才，找得到，也查得清。", "铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。"],
     contact: "联系我们：",
     metaLabel: "版权、网站主体与备案信息",
     meta: ["&copy; <span data-footer-year>2026</span> 铂寻 Boseek", "网站域名：www.boseekai.com", "网站主体：北京铂寻智能科技有限公司"],
@@ -129,7 +129,7 @@ const LOCALES = {
     dir: "en/",
     site: `${SITE}en/`,
     siteName: "Boseek",
-    titleSuffix: / \| HunterBuddy$/,
+    titleSuffix: / \| TalentBuddy$/,
     skip: "Skip to content",
     homeLabel: "Boseek home",
     logo: { src: "../landing-origin/assets/boseek-b5-en.svg", alt: "Boseek", w: 150, h: 48 },
@@ -149,12 +149,12 @@ const LOCALES = {
     home: "Home",
     list: {
       name: "Use cases",
-      title: "Use cases for headhunters: BD, org charts, sourcing and matching | HunterBuddy",
+      title: "Use cases for hiring R&D talent: sourcing, matching, org charts and BD | TalentBuddy",
       description:
-        "Guides for independent headhunters: winning clients, mapping org charts, finding and matching candidates, telling namesakes apart and keeping a talent pool current.",
+        "Guides for search consultants, HR and talent leads, and CTOs and engineering leaders: finding R&D talent through papers, patents and code, job matching, org charts, telling namesakes apart, talent pools and winning R&D clients.",
       kicker: "Use cases",
       h1: "Use cases",
-      lead: "From business development and org charts to finding, matching and keeping up with candidates, the jobs that take up most of a headhunter’s day, explained plainly: how they’re usually done, where they get hard, what HunterBuddy can help with, and what is still yours to do.",
+      lead: "Each stage of hiring R&D talent, explained plainly: how it’s usually done, where it gets hard, what TalentBuddy hands back, and what is still yours to judge.",
     },
     footerCases: [
       ["business-development", "Business development"],
@@ -166,7 +166,7 @@ const LOCALES = {
     groups: ["Product", "Use cases", "Legal"],
     legal: [["privacy", "Privacy policy"], ["terms", "Terms of service"], ["dpa", "Data processing agreement"]],
     legalPage: { kicker: "Legal", keys: "Key points", updated: "Updated", effective: "Effective", others: "Other legal documents", byline: "Boseek", tableLabel: "Table" },
-    footNotes: ["HunterBuddy, the AI partner for headhunters.", "Built by Boseek for independent headhunters and senior search consultants."],
+    footNotes: ["TalentBuddy: R&D talent, found and verified.", "Built by Boseek for search consultants, HR and talent leads, and CTOs and engineering leaders."],
     contact: "Contact: ",
     metaLabel: "Copyright, operator and registration",
     meta: ["&copy; <span data-footer-year>2026</span> Boseek", "www.boseekai.com", "Operated by Beijing Boseek Intelligent Technology Co., Ltd."],
@@ -425,7 +425,7 @@ function page(L, a, items) {
         { "@type": "ListItem", position: 2, name: L.list.name, item: `${L.site}use-cases/` },
         { "@type": "ListItem", position: 3, name: a.name, item: self },
       ] },
-      { "@type": "Article", "@id": `${self}#article`, headline: a.title.replace(L.titleSuffix, ""), description: a.description, inLanguage: L.lang, datePublished: a.published || PUBLISHED, dateModified: PUBLISHED, mainEntityOfPage: { "@id": `${self}#webpage` }, image: { "@type": "ImageObject", url: image, width: 1600, height: 900 }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#hunterbuddy` } },
+      { "@type": "Article", "@id": `${self}#article`, headline: a.title.replace(L.titleSuffix, ""), description: a.description, inLanguage: L.lang, datePublished: a.published || PUBLISHED, dateModified: MODIFIED, mainEntityOfPage: { "@id": `${self}#webpage` }, image: { "@type": "ImageObject", url: image, width: 1600, height: 900 }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#talentbuddy` } },
       { "@type": "FAQPage", "@id": `${self}#faq`, inLanguage: L.lang, isPartOf: { "@id": `${self}#webpage` }, mainEntity: a.faq.map(([q, ans]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: ans } })) },
     ],
   };
@@ -437,7 +437,7 @@ ${hero(L, {
   kicker: a.kicker,
   h1: lines(a.h1),
   lead: a.answer,
-  meta: `<p class="s-meta">${L.byline(PUBLISHED)}</p>`,
+  meta: `<p class="s-meta">${L.byline(MODIFIED)}</p>`,
 })}
 
       <div class="n-light s-paper">
@@ -640,7 +640,8 @@ function checkLegal(zh, en) {
 
 /* ---------- 客户开发: the old use-case page, rewritten into the same format, with a few corrections ---------- */
 function businessDevelopment() {
-  const c = PAGES.find((p) => p.slug === "business-development").zh;
+  // the source still says HunterBuddy (2026-11-02 the product became TalentBuddy)
+  const c = JSON.parse(JSON.stringify(PAGES.find((p) => p.slug === "business-development").zh).replaceAll("HunterBuddy", "TalentBuddy"));
   const how = c.how.steps.map((step) =>
     step[0] === "找到用人经理"
       ? [step[0], step[1], "负责视觉团队的是技术负责人许晴，很可能就是这个职位的用人经理，直接联系方式待确认。"]
@@ -664,19 +665,19 @@ function businessDevelopment() {
   return {
     slug: "business-development",
     name: c.name,
-    title: c.title,
+    title: "猎头客户开发：从融资与招聘信号识别研发型企业的新职位和用人经理｜TalentBuddy",
     description: c.description,
     kicker: "使用场景 · 猎头客户开发",
-    h1: c.h1,
+    h1: ["从融资与招聘信号，", "识别研发型企业的委托机会"],
     answer:
-      "新客户常常藏在一条不起眼的消息里。HunterBuddy 帮你盯着关注的赛道，从融资新闻出发，找到新职位、可能的用人经理和引荐路线，判断值不值得跟，每条线索都写明来源。联系谁、怎么开口，由你决定。",
+      "TalentBuddy 持续跟踪你关注的技术赛道，从融资新闻和招聘页里找出正在扩张的研发型企业，交回新职位、可能的用人经理、引荐路线，以及值不值得跟的研判，每条线索都写明来源。联系谁、怎么切入，由你决定。",
     teaser: c.teaser,
     related: ["org-chart", "finding-candidates", "ai-assistant-for-headhunters"],
     sections: [
       { h2: "猎头客户开发，一般怎么做？", body: [c.method.intro, { steps: c.method.steps }] },
       // 平台名只在工具对比那一篇里出现
       { h2: "难的不是打电话，是知道该打给谁", body: [{ cards: c.hard.items.map(([t, b]) => [t, b.replace("领英和脉脉上", "职业社交平台上")]) }] },
-      { h2: "HunterBuddy 怎么帮你做客户开发？", body: [c.how.intro, { steps: how }, { demo: card }] },
+      { h2: "TalentBuddy 怎么帮你做客户开发？", body: [c.how.intro, { steps: how }, { demo: card }] },
       {
         h2: "你会拿到什么，哪些要你确认？",
         body: [
@@ -750,7 +751,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${paths
-  .flatMap((path) => [LOCALES.zh, LOCALES.en].map((L) => `  <url>\n    <loc>${L.site}${path}</loc>\n    <lastmod>${PUBLISHED}</lastmod>\n${pair(path)}\n  </url>`))
+  .flatMap((path) => [LOCALES.zh, LOCALES.en].map((L) => `  <url>\n    <loc>${L.site}${path}</loc>\n    <lastmod>${MODIFIED}</lastmod>\n${pair(path)}\n  </url>`))
   .join("\n")}
 </urlset>
 `;

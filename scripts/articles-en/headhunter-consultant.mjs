@@ -1,9 +1,9 @@
 export default {
   slug: "headhunter-consultant",
   name: "What a headhunter does",
-  title: "What does a headhunter do? Daily work, challenges and AI | HunterBuddy",
+  title: "What does a headhunter do? Daily work, challenges and AI | TalentBuddy",
   description:
-    "What does a headhunter do? A search consultant’s real day, how a search runs from mandate to hire, the hard parts, and what AI like HunterBuddy can take on.",
+    "What does a headhunter do? A search consultant’s real day, how a search runs from mandate to hire, the hard parts, and what AI like TalentBuddy can take on.",
   kicker: "Headhunting in practice · Search consultants",
   h1: ["What does a headhunter do?", "A day’s work, and what AI can take on"],
   answer:
@@ -134,7 +134,7 @@ export default {
     {
       h2: "What can headhunters use AI for, and what stays with them?",
       body: [
-        "Broadly, AI can help a good deal with looking things up, reading material, checking information and keeping track of changes. Take HunterBuddy, the AI partner for headhunters. It’s still in development and offered as an invitation-only trial, and it can take on these six jobs:",
+        "Broadly, AI can help a good deal with looking things up, reading material, checking information and keeping track of changes. Take TalentBuddy, Boseek’s AI for hiring R&D talent. It’s still in development and offered as an invitation-only trial, and it can take on these six jobs:",
         {
           list: [
             "BD client research: it watches the sectors you follow, spots expanding companies in funding news and on careers pages, and finds new roles, hiring managers and routes to an introduction.",
@@ -172,7 +172,7 @@ export default {
         },
         "The rest, AI can’t do for you. Whether someone is truly capable or just has a well-written CV, whether what the hiring manager says matches what they actually want, whether a candidate will tell you what they really think: these call for judgment built from face-to-face conversations and long dealings with people. How much a candidate chooses to share, and whether they want to be approached at all, is also theirs to decide, and yours to respect.",
         {
-          note: "HunterBuddy uses only public information and your own material. Every finding names its source, and who to contact and how to open the conversation is up to you.",
+          note: "TalentBuddy uses only public information and your own material. Every finding names its source, and who to contact and how to open the conversation is up to you.",
         },
       ],
     },
@@ -204,7 +204,7 @@ export default {
     ],
     [
       "What can headhunters use AI for?",
-      "AI can take on much of the research, reading, checking and organizing: mapping the org charts of target companies, finding people in public information and your CV database, matching candidates against a JD, and watching for changes in candidates’ situations. An AI assistant for headhunters like HunterBuddy names the source of every finding and flags anything uncertain for you to confirm. Judging whether someone is right, reading the concerns a client hasn’t voiced and building trust with candidates are still up to the consultant.",
+      "AI can take on much of the research, reading, checking and organizing: mapping the org charts of target companies, finding people in public information and your CV database, matching candidates against a JD, and watching for changes in candidates’ situations. An AI assistant for headhunters like TalentBuddy names the source of every finding and flags anything uncertain for you to confirm. Judging whether someone is right, reading the concerns a client hasn’t voiced and building trust with candidates are still up to the consultant.",
     ],
     [
       "Will AI replace headhunters?",

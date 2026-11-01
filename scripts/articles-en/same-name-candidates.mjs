@@ -1,9 +1,9 @@
 export default {
   slug: "same-name-candidates",
   name: "Candidates with the same name",
-  title: "Same-name candidates: identity checks and where to stop | HunterBuddy",
+  title: "Same-name candidates: identity checks and where to stop | TalentBuddy",
   description:
-    "Tell same-name candidates apart: cross-check employers, dates, cities and public records, flag what’s unconfirmed, and know where to stop. A HunterBuddy guide.",
+    "Tell same-name candidates apart: cross-check employers, dates, cities and public records, flag what’s unconfirmed, and know where to stop. A TalentBuddy guide.",
   kicker: "Headhunting in practice · Identity checks",
   h1: ["How to tell same-name candidates apart", "Identity checks, and where to stop"],
   answer:
@@ -116,9 +116,9 @@ export default {
       ],
     },
     {
-      h2: "How does HunterBuddy help you tell same-name candidates apart?",
+      h2: "How does TalentBuddy help you tell same-name candidates apart?",
       body: [
-        "The method isn’t hard. The volume is. Everyone on a longlist may be scattered across your CV database, team pages, papers, patents and open-source projects, and checking record by record takes a long time. HunterBuddy, the AI partner for headhunters, takes over the cross-checking and leaves the judgment to you. Here’s the example our homepage uses throughout: Xingchuan Robotics is hiring a Head of Computer Vision, and say Yue Lin has one record each in your CV database, on a team page and in a paper.",
+        "The method isn’t hard. The volume is. Everyone on a longlist may be scattered across your CV database, team pages, papers, patents and open-source projects, and checking record by record takes a long time. TalentBuddy, Boseek’s AI for hiring R&D talent, takes over the cross-checking and leaves the judgment to you. Here’s the example our homepage uses throughout: Xingchuan Robotics is hiring a Head of Computer Vision, and say Yue Lin has one record each in your CV database, on a team page and in a paper.",
         {
           list: [
             "When the same person is scattered across different sources, it checks their identity before merging. It won’t treat two records as one person just because the names match.",
@@ -133,7 +133,7 @@ export default {
             context: "Xingchuan Robotics · Head of Computer Vision",
             title: "Yue Lin · Identity check",
             caption:
-              "Illustrative: the check results HunterBuddy hands you. What matches, what’s ruled out and what still needs confirming are kept apart.",
+              "Illustrative: the check results TalentBuddy hands you. What matches, what’s ruled out and what still needs confirming are kept apart.",
             items: [
               [
                 "Merged · 3 sources",
@@ -153,7 +153,7 @@ export default {
             ],
           },
         },
-        "Whether these records belong to the candidate in your database, and whether to merge them, is yours to confirm. Who to contact and how to open the conversation is your decision too. It won’t contact candidates for you. HunterBuddy is currently in development, with an invitation-only trial.",
+        "Whether these records belong to the candidate in your database, and whether to merge them, is yours to confirm. Who to contact and how to open the conversation is your decision too. It won’t contact candidates for you. TalentBuddy is currently in development, with an invitation-only trial.",
       ],
     },
     {

@@ -1,13 +1,13 @@
 export default {
   slug: "job-matching",
   name: "Matching candidates to jobs",
-  title: "Candidate job matching: JD to shortlist and the limits of AI | HunterBuddy",
+  title: "Candidate job matching: JD to shortlist and the limits of AI | TalentBuddy",
   description:
-    "How to match candidates to jobs: break down the job description, uncover the real need, rank a shortlist, and see what AI can and can’t do. A HunterBuddy guide.",
+    "How to match candidates to jobs: break down the job description, uncover the real need, rank a shortlist, and see what AI can and can’t do. A TalentBuddy guide.",
   kicker: "Headhunting in practice · Job matching",
   h1: ["How do you match candidates to jobs?", "From job requirements to a shortlist"],
   answer:
-    "Job matching means lining up what a role really needs with what a person has really done. You break the job description (JD) into must-haves, core skills, industry background and nice-to-haves, ask the hiring manager about the needs nobody wrote down, then screen and rank on that basis, setting out why you recommend each candidate and what the risks are. Keywords alone will both miss good people and let the wrong ones through, and while AI can help you search and compare, the final judgment stays with the consultant.",
+    "Job matching means lining up what a role really needs with what a person has really done. You break the job description (JD) into must-haves, core skills, industry background and nice-to-haves (for R&D roles, also telling the technical field apart from hands-on delivery), ask the hiring manager about the needs nobody wrote down, then screen and rank on that basis, setting out why you recommend each candidate and what the risks are. Keywords alone will both miss good people and let the wrong ones through, and while AI can help you search and compare, the final judgment stays with the consultant.",
   teaser: "Breaking down the JD, probing the real need, ranking the list, and why keywords let you down.",
   keywords: [
     "candidate job matching",
@@ -118,9 +118,9 @@ export default {
       ],
     },
     {
-      h2: "How can HunterBuddy help with job matching?",
+      h2: "How can TalentBuddy help with job matching?",
       body: [
-        "HunterBuddy is the AI partner for headhunters. It’s still in development and currently offered as an invitation-only trial. Take the example from our homepage: Xingchuan Robotics has just raised a Series B, and the hiring manager, Qing Xu, sends over the JD for a Head of Computer Vision. Once you’ve talked it through with her, you hand the JD to HunterBuddy, and it helps like this:",
+        "TalentBuddy is Boseek’s AI for hiring R&D talent. It’s still in development and currently offered as an invitation-only trial. Take the example from our homepage: Xingchuan Robotics has just raised a Series B, and the hiring manager, Qing Xu, sends over the JD for a Head of Computer Vision. Once you’ve talked it through with her, you hand the JD to TalentBuddy, and it helps like this:",
         {
           list: [
             "It starts with what you already have: the org charts you’ve built and your CV database, so the homework you’ve already done is put to use first.",

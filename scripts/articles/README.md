@@ -15,7 +15,7 @@ node scripts/build-redesign-pages.mjs  # 生成九篇和列表页（会先检查
 |---|---|
 | `slug`、`order` | 网址 `/use-cases/<slug>/`（列表顺序由构建脚本里的 ORDER 决定） |
 | `name` | 面包屑、相关阅读、页脚里的短名，16 字以内 |
-| `title` | `<title>`，含主攻词，以“｜HunterBuddy”结尾，40 字以内 |
+| `title` | `<title>`，含主攻词，以“｜TalentBuddy”结尾，40 字以内 |
 | `description` | 搜索结果摘要，80–120 字 |
 | `kicker`、`h1` | 首屏小标签和标题（1–2 行） |
 | `answer` | 首屏第一段，直接回答标题的问题，2–3 句，能被单独引用 |
@@ -31,7 +31,7 @@ node scripts/build-redesign-pages.mjs  # 生成九篇和列表页（会先检查
 ## 规矩
 - 不用中文分号“；”（构建时会检查）。
 - 不编造数据、统计、客户、案例、引语。星川机器人只作为讲清用法的例子。
-- HunterBuddy 的能力和边界只写首页、场景页已有的。称“猎头 AI 助手”，不自称“猎头软件 / 猎头系统”，不用“猎头 BD”。
+- TalentBuddy 的能力和边界只写首页、场景页已有的。自称“研发人才招聘 AI”，猎头向的文章里可以说它属于“猎头 AI 助手”这一类（2026-11-02 起，原名 HunterBuddy）。不自称“猎头软件 / 猎头系统”，不用“猎头 BD”。
 - 平台名（豆包、DeepSeek、ChatGPT、猎聘、领英、脉脉、BOSS直聘）只出现在 `ai-tools-compared`，只讲各自适合做什么，不贬低。
 - 不碰背调、查身份证 / 手机号 / 住址，找人和核实身份只用公开信息、拿不准就标出来。
 - 关键词只放在 title、description、h1、h2 和常见问题里，正文是平常说话的语气。

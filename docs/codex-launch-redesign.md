@@ -54,7 +54,7 @@
 
 改版页面现在带着预览期的 `<meta name="robots" content="noindex" />`（每个页面一行，共 28 个页面：2 个首页、2 个列表页、18 个使用场景页、6 个法律页），**上线时全部去掉**。其他头部信息已经按正式站写好，不要再改：
 
-- 两个首页的 `<!-- seo -->…<!-- /seo -->` 里有 canonical、hreflang、Open Graph、JSON-LD（Organization、WebSite、WebPage、SoftwareApplication、VideoObject、FAQPage）。中文首页带百度验证 `<meta name="baidu-site-verification" content="codeva-SxHxeGOeZL" />`，**必须保留**（英文首页不加）。JSON-LD 里短片和封面的网址是 `https://www.boseekai.com/assets/hunterbuddy-film.mp4`、`…/assets/film-poster.jpg`（英文：`hunterbuddy-film-en.mp4`、`film-poster-en.jpg`），按第 1 条的布局正好有效；如果你换了布局，就同步改这四个网址。
+- 两个首页的 `<!-- seo -->…<!-- /seo -->` 里有 canonical、hreflang、Open Graph、JSON-LD（Organization、WebSite、WebPage、SoftwareApplication、VideoObject、FAQPage）。中文首页带百度验证 `<meta name="baidu-site-verification" content="codeva-SxHxeGOeZL" />`，**必须保留**（英文首页不加）。JSON-LD 里短片和封面的网址是 `https://www.boseekai.com/assets/talentbuddy-film.mp4`、`…/assets/film-poster.jpg`（英文：`hunterbuddy-film-en.mp4`、`film-poster-en.jpg`），按第 1 条的布局正好有效；如果你换了布局，就同步改这四个网址。
 - 18 个使用场景页和 2 个列表页已有 canonical（`https://www.boseekai.com/use-cases/<slug>/`、`/en/use-cases/<slug>/`）、三条 hreflang、Open Graph 和 JSON-LD。使用场景页的 `og:image` 和 Article 的 `image` 指向 `https://www.boseekai.com/assets/use-cases/<slug>.jpg`（英文 `…/assets/use-cases/en/<slug>.jpg`），按第 1 条的布局正好有效。
 - 6 个法律页已有 canonical（`https://www.boseekai.com/privacy/` 等）、三条 hreflang、Open Graph 和 JSON-LD（Organization、WebPage、BreadcrumbList）。
 - `<meta name="trial-api" content="disabled" />`：和现在线上一样处理。两个首页有试用申请表单，换成生产接口的值（你上次上线时的做法）；使用场景页和法律页没有表单，保持 `disabled` 或按你们的惯例。
@@ -94,7 +94,7 @@
 2. 已发布的 HTML 里没有 `noindex`：对 28 个页面 `curl -s … | grep -c noindex` 都是 0。
 3. 首页：canonical 是 `https://www.boseekai.com/`，有百度验证 meta；英文首页 canonical 是 `/en/`。
 4. 页面引用的所有文件（CSS、JS、字体、图片、短片、封面）都返回 200，浏览器控制台没有 404 和脚本错误（中文、英文首页各打开一次，滚到底）。
-5. 短片：`curl -I -H "Range: bytes=0-1" https://www.boseekai.com/assets/hunterbuddy-film.mp4` 返回 206；中英文首页点封面能播放（中英文都是 2 分 32 秒）。
+5. 短片：`curl -I -H "Range: bytes=0-1" https://www.boseekai.com/assets/talentbuddy-film.mp4` 返回 206；中英文首页点封面能播放（中英文都是 2 分 32 秒）。
 6. 语言切换：中文首页右上角 “EN” 到 `/en/`，英文页 “中文” 回来；任意一个使用场景页切换语言，落到同一篇的另一种语言。
 7. 试用申请表单在中英文首页都能显示，提交走生产接口（只确认能提交，按你们平时的方式测）。
 8. 结构化数据：用 Google 富媒体检测工具测 `/`、`/en/`、`/use-cases/org-chart/`、`/en/use-cases/org-chart/`，无错误；使用场景页的“文章”应能读到作者（铂寻 Boseek / Boseek）和配图。缺少价格、地址细节这类“非关键问题”属预期；FAQ 不再出现在检测结果里也属正常（Google 已停止支持 FAQ 富媒体结果）。

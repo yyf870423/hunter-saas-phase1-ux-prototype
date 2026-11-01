@@ -2,13 +2,13 @@
 export default {
   slug: "org-chart",
   name: "Making a company org chart",
-  title: "How to make an org chart, and how recruiters map target companies | HunterBuddy",
+  title: "How to make an org chart, and map a target company from public sources | TalentBuddy",
   description:
-    "How to make an org chart: levels, reporting lines, functional, divisional and matrix types, and how headhunters map rivals from public sources with HunterBuddy.",
+    "How to make an org chart: levels, reporting lines, functional, divisional and matrix types, and how to map a target company’s R&D organization from public sources.",
   kicker: "Headhunting in practice · Org charts",
   h1: ["How to make a company org chart", "and map one from public sources"],
   answer:
-    "To make a company org chart, set the levels first, then draw the reporting lines: the most senior leader goes at the top, departments and teams form the levels below, solid lines show direct reporting and dotted lines show functional oversight. The common structures are functional, divisional and matrix. When headhunters map a target company, they can only piece it together from public information such as the company website, careers page, press releases, papers and patents, naming a source for every position and marking anything they cannot verify “To confirm”.",
+    "To make a company org chart, set the levels first, then draw the reporting lines: the most senior leader goes at the top, departments and teams form the levels below, solid lines show direct reporting and dotted lines show functional oversight. The common structures are functional, divisional and matrix. When you map a target company from the outside, you can only piece it together from public information such as the company website, careers page, press releases, papers and patents, naming a source for every position and marking anything you cannot verify “To confirm”.",
   teaser: "How to make an org chart, and how to map a target company from public information.",
   keywords: [
     "org chart",
@@ -123,9 +123,9 @@ export default {
       ],
     },
     {
-      h2: "How can HunterBuddy help you map a target company with AI?",
+      h2: "How can TalentBuddy help you map a target company with AI?",
       body: [
-        "HunterBuddy is an AI assistant for headhunters, built by Boseek for independent headhunters and senior search consultants. Here is the example from our homepage and product video: say you want to map Xingchuan Robotics alongside two peer companies, Tuojie Robotics and Qiongding AI.",
+        "TalentBuddy is Boseek’s AI for hiring R&D talent. Here is the example from our homepage and product video: say you want to map Xingchuan Robotics alongside two peer companies, Tuojie Robotics and Qiongding AI.",
         {
           list: [
             "Tell it which companies and teams to look at. It finds departments and reporting lines in public information, puts people in the right positions and notes where each piece of information came from.",
@@ -146,7 +146,7 @@ export default {
             ],
           },
         },
-        "Whether the department names and reporting lines are right, whether a person on the chart is the one in your database, and which gaps are worth filling: all of this is left for you to confirm. Who to contact, and what to say, is also your call. HunterBuddy is still in development, with an invitation-only trial.",
+        "Whether the department names and reporting lines are right, whether a person on the chart is the one in your database, and which gaps are worth filling: all of this is left for you to confirm. Who to contact, and what to say, is also your call. TalentBuddy is still in development, with an invitation-only trial.",
       ],
     },
     {

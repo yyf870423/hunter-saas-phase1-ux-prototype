@@ -19,7 +19,7 @@
 }
 
 @font-face {
-  /* 首屏 HunterBuddy 字标专用：阿里妈妈数黑体 Bold，只保留基本拉丁字符 */
+  /* 首屏 TalentBuddy 字标专用：阿里妈妈数黑体 Bold，只保留基本拉丁字符 */
   font-family: "HB Wordmark";
   src: url("assets/fonts/alimama-shuheiti-bold-latin.woff2") format("woff2");
   font-weight: 700;

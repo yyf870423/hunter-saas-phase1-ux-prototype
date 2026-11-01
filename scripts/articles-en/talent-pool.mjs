@@ -1,13 +1,13 @@
 export default {
   slug: "talent-pool",
   name: "Building and updating talent pools",
-  title: "How headhunters build a talent pool and keep it current | HunterBuddy",
+  title: "How headhunters and HR build a talent pool and keep it current | TalentBuddy",
   description:
-    "For independent headhunters: how to build a talent pool, what to record, how to tag and de-duplicate, keep it current and respect privacy. A HunterBuddy guide.",
+    "For headhunters and in-house HR: how to build a talent pool, what to record, how to tag and de-duplicate, keep it current and respect privacy. A TalentBuddy guide.",
   kicker: "Headhunting in practice · Talent pool",
   h1: ["How do you build a talent pool,", "and keep it current?"],
   answer:
-    "What makes a headhunter’s talent pool useful isn’t how many CVs it holds, but whether each person in it can be found, adds up and stays current. When you build it, keep one master record per person that sets out their experience, what they’re looking for, where the information came from and when it was last verified, tag field and seniority with a fixed set of tags, and check for duplicates before anything goes in. After that, review people regularly by priority, update the record the same day after every conversation, and delete anything the candidate doesn’t want kept.",
+    "What makes a headhunter’s talent pool useful isn’t how many CVs it holds, but whether each person in it can be found, adds up and stays current. When you build it, keep one master record per person that sets out their experience, what they’re looking for, where the information came from and when it was last verified (for R&D candidates, also their technical field and key work), tag field and seniority with a fixed set of tags, and check for duplicates before anything goes in. After that, review people regularly by priority, update the record the same day after every conversation, and delete anything the candidate doesn’t want kept.",
   teaser: "What to record, how to tag, how to de-duplicate, and how to keep it current.",
   keywords: [
     "talent pool",
@@ -112,9 +112,9 @@ export default {
       ],
     },
     {
-      h2: "How can HunterBuddy help manage your CV database?",
+      h2: "How can TalentBuddy help manage your CV database?",
       body: [
-        "HunterBuddy is an AI assistant for headhunters, built by Boseek for independent headhunters and senior search consultants, and keeping your CV database current is one of the things it does. To show how, here’s the Xingchuan Robotics story from our homepage and product video, in which Yue Lin is the candidate.",
+        "TalentBuddy is Boseek’s AI for hiring R&D talent, and keeping your CV database current is one of the things it does. To show how, here’s the Xingchuan Robotics story from our homepage and product video, in which Yue Lin is the candidate.",
         {
           list: [
             "Upload CVs one at a time or in bulk. Everything you bring in goes through identity checks and is de-duplicated and merged, and can also be matched against all your live searches.",
@@ -152,7 +152,7 @@ export default {
             ],
           },
         },
-        "Every conclusion names its source, and anything uncertain is flagged for you to confirm. Whether to make the call, and whether to put him forward, is up to you. HunterBuddy is still in development, with an invitation-only trial.",
+        "Every conclusion names its source, and anything uncertain is flagged for you to confirm. Whether to make the call, and whether to put him forward, is up to you. TalentBuddy is still in development, with an invitation-only trial.",
       ],
     },
     {

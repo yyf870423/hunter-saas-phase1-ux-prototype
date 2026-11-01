@@ -1,9 +1,9 @@
 export default {
   slug: "ai-tools-compared",
   name: "Headhunting tools compared",
-  title: "Recruitment software and AI tools for headhunters compared | HunterBuddy",
+  title: "Recruitment software and AI tools for headhunters compared | TalentBuddy",
   description:
-    "General AI like ChatGPT, platforms like LinkedIn and Liepin, a CRM or ATS, and an AI assistant like HunterBuddy: what each is for, and how to combine them.",
+    "General AI like ChatGPT, platforms like LinkedIn and Liepin, a CRM or ATS, and an AI assistant like TalentBuddy: what each is for, and how to combine them.",
   kicker: "Headhunting in practice · Tools compared",
   h1: ["General AI, job platforms, CRM", "and AI assistants for headhunters:", "what is each for?"],
   answer:
@@ -84,16 +84,16 @@ export default {
       ],
     },
     {
-      h2: "What gap does an AI assistant for headhunters fill, and how can HunterBuddy help?",
+      h2: "What gap does an AI assistant for headhunters fill, and how can TalentBuddy help?",
       body: [
         "Of the three kinds of tool above, one handles writing and reading, one finding and contacting people, and one record-keeping. In between lies a stretch that often falls to the headhunter alone: the research before and during a search. Which companies are expanding, who sits where in the target team, whether these few records are the same person, who in your database fits this role. That stretch is what an AI assistant for headhunters does.",
-        "HunterBuddy is an AI assistant for headhunters, built by Boseek for independent headhunters and senior search consultants. Starting from public information, patents and papers, open-source communities and your CV database, it helps with BD client research, org charts, job matching, automated sourcing and keeping your network current. When the same person is scattered across different places, it cross-checks the records and rules out namesakes before merging them. Every finding names its source, and anything uncertain is flagged for you to confirm.",
+        "TalentBuddy is Boseek’s AI for hiring R&D talent, one of the AI assistants for headhunters. Starting from public information, patents and papers, open-source communities and your CV database, it helps with BD client research, org charts, job matching, automated sourcing and keeping your network current. When the same person is scattered across different places, it cross-checks the records and rules out namesakes before merging them. Every finding names its source, and anything uncertain is flagged for you to confirm.",
         {
           demo: {
             context: "Example · Xingchuan Robotics · Head of Computer Vision",
             title: "Target candidates · Sources and points to confirm",
             caption:
-              "Illustrative: the list HunterBuddy hands you. Why each person fits, and what still needs confirming, is noted alongside.",
+              "Illustrative: the list TalentBuddy hands you. Why each person fits, and what still needs confirming, is noted alongside.",
             items: [
               [
                 "Your CV database · 3 records merged",
@@ -113,7 +113,7 @@ export default {
             ],
           },
         },
-        "It works in relay with the other three. CVs downloaded from recruiting platforms can be uploaded and checked along with everything else, and the people and relationships you’ve confirmed in HunterBuddy still go into your CRM or ATS as usual. Who to contact and how to open the conversation is up to you. The product is still in development and currently offered as an invitation-only trial.",
+        "It works in relay with the other three. CVs downloaded from recruiting platforms can be uploaded and checked along with everything else, and the people and relationships you’ve confirmed in TalentBuddy still go into your CRM or ATS as usual. Who to contact and how to open the conversation is up to you. The product is still in development and currently offered as an invitation-only trial.",
       ],
     },
     {
@@ -155,16 +155,16 @@ export default {
       "By “recruitment software”, many people mean the recruiting platforms for posting roles and finding and contacting candidates, such as Liepin and BOSS Zhipin. A “recruitment system” usually means a management system that records the hiring process. The one in-house HR uses is called a recruitment management system or ATS. The one headhunters use also manages clients, and is often combined with a CRM. One is for finding people, the other for keeping records, and they can be used together.",
     ],
     [
-      "How is HunterBuddy different from Doubao, DeepSeek and ChatGPT?",
-      "Doubao, DeepSeek and ChatGPT are general-purpose AI assistants, good for writing, reading material and answering one question at a time. HunterBuddy is an AI assistant for headhunters. It starts from your clients, your candidates and the org charts you’ve mapped, matches people and companies in public information, checks records of the same person before merging them, names the source of every finding and keeps the research it has done. The two kinds of tool can be used together.",
+      "How is TalentBuddy different from Doubao, DeepSeek and ChatGPT?",
+      "Doubao, DeepSeek and ChatGPT are general-purpose AI assistants, good for writing, reading material and answering one question at a time. TalentBuddy is an AI assistant for headhunters. It starts from your clients, your candidates and the org charts you’ve mapped, matches people and companies in public information, checks records of the same person before merging them, names the source of every finding and keeps the research it has done. The two kinds of tool can be used together.",
     ],
     [
-      "How does HunterBuddy fit with Liepin, LinkedIn, Maimai and BOSS Zhipin?",
-      "These recruiting platforms are channels for posting roles and finding and contacting candidates, and HunterBuddy doesn’t replace them. What it does is the research before and during a search, helping you decide who to approach first and why. CVs downloaded from the platforms can be uploaded, then checked for identity, de-duplicated and merged along with your other material.",
+      "How does TalentBuddy fit with Liepin, LinkedIn, Maimai and BOSS Zhipin?",
+      "These recruiting platforms are channels for posting roles and finding and contacting candidates, and TalentBuddy doesn’t replace them. What it does is the research before and during a search, helping you decide who to approach first and why. CVs downloaded from the platforms can be uploaded, then checked for identity, de-duplicated and merged along with your other material.",
     ],
     [
       "If I use an AI assistant for headhunters, do I still need a recruitment CRM?",
-      "Yes. The two don’t do the same job. A CRM or ATS records clients, roles and where each submission stands, so it manages work already under way. An AI assistant for headhunters helps you find what’s worth doing next, with findings backed by sources. People and relationships you’ve confirmed in HunterBuddy still go into your CRM or ATS as usual.",
+      "Yes. The two don’t do the same job. A CRM or ATS records clients, roles and where each submission stands, so it manages work already under way. An AI assistant for headhunters helps you find what’s worth doing next, with findings backed by sources. People and relationships you’ve confirmed in TalentBuddy still go into your CRM or ATS as usual.",
     ],
   ],
 };
