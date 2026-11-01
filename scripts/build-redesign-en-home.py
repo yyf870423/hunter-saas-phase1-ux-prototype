@@ -157,7 +157,7 @@ r('aria-label="TalentBuddy 产品短片"', 'aria-label="TalentBuddy product vide
 # ---------- six capabilities: heading ----------
 r('<p class="n-kicker">01 · 核心能力</p>', '<p class="n-kicker">01 · Capabilities</p>')
 r('<h2 class="n-h2" id="n-caps-title">六个环节，环环交付</h2>', '<h2 class="n-h2" id="n-caps-title">Six stages, six deliverables</h2>')
-r('匹配短名单、寻访名单、核实结论、客户研判、变动提示、组织架构图，每条都有出处。联系谁、怎么谈，由你决定。',
+r('匹配名单、寻访名单、核实结论、客户研判、变动提示、组织架构图，每条都有出处。联系谁、怎么谈，由你决定。',
   'Matched shortlists, sourced candidate lists, identity checks, BD client research, change alerts and org charts, each with its source. Who to contact, and how to approach them, is your call.')
 r('<i>找人</i>', '<i>Find</i>')
 r('<i>看清</i>', '<i>Know</i>')   # not "Assess": HunterBuddy never judges people
@@ -179,8 +179,8 @@ r('<u class="is-risk">风险</u>', '<u class="is-risk">Risk</u>')
 r('<p>推荐理由 · 三项要求都对上，带过量产项目</p>', '<p>Why · Meets all three, has led mass production</p>')
 # 01 text
 r('JD 只写了技术方向和年限，库里却有几千份简历，逐份对比要花大半天。', 'The JD names a technical field and years of experience, your database holds thousands of CVs, and comparing them one by one takes most of a day.')
-r('<h3 id="n-step-match">人岗匹配：千份简历，排出短名单</h3>', '<h3 id="n-step-match">Job matching: from thousands of CVs to a shortlist</h3>')
-r('把 JD 拆成核心技能、行业背景和硬性门槛，在简历全文和结构化信息中一并检索，交回按匹配分排序的短名单。每位人选附亮点、风险和推荐理由，一点即可查看原文出处。也可以反过来，为一份简历匹配在手岗位。',
+r('<h3 id="n-step-match">人岗匹配：千份简历，挑出最匹配的人</h3>', '<h3 id="n-step-match">Job matching: from thousands of CVs to a shortlist</h3>')
+r('把 JD 拆成核心技能、行业背景和硬性门槛，在简历全文和结构化信息中一并检索，交回按匹配分排序的推荐名单。每位人选附亮点、风险和推荐理由，一点即可查看原文出处。也可以反过来，为一份简历匹配在手岗位。',
   'It breaks the JD into core skills, industry background and must-haves, then searches the full text of your CVs and their structured fields together. You get back a shortlist ranked by match score, with each candidate’s strengths, risks and why we recommend them, and one click takes you to the original source. It works the other way too: give it a CV and it finds the live searches that fit.')
 r('>了解人岗匹配</a>', '>More on job matching</a>')
 
