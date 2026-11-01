@@ -116,7 +116,7 @@ export default {
       ],
     },
     {
-      h2: "How does TalentBuddy help you tell same-name candidates apart?",
+      h2: "Telling same-name candidates apart: what does TalentBuddy hand back?",
       body: [
         "The method isn’t hard. The volume is. Everyone on a longlist may be scattered across your CV database, team pages, papers, patents and open-source projects, and checking record by record takes a long time. TalentBuddy, Boseek’s AI for hiring R&D talent, takes over the cross-checking and leaves the judgment to you. Here’s the example our homepage uses throughout: Xingchuan Robotics is hiring a Head of Computer Vision, and say Yue Lin has one record each in your CV database, on a team page and in a paper.",
         {
@@ -153,7 +153,7 @@ export default {
             ],
           },
         },
-        "Whether these records belong to the candidate in your database, and whether to merge them, is yours to confirm. Who to contact and how to open the conversation is your decision too. It won’t contact candidates for you. TalentBuddy is currently in development, with an invitation-only trial.",
+        "Whether these records belong to the candidate in your database, and whether to merge them, is yours to confirm. Who to contact and how to open the conversation is your decision too. It won’t contact candidates for you. TalentBuddy is in development, with an invitation-only trial.",
       ],
     },
     {

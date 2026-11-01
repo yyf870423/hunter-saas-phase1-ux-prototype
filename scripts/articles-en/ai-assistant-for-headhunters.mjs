@@ -7,7 +7,7 @@ export default {
   kicker: "Headhunting in practice · AI assistants",
   h1: ["What is an AI assistant", "for headhunters, and what can it do?"],
   answer:
-    "An AI assistant for headhunters is an AI tool that does a headhunter’s research and hands back the results. It looks for leads in funding news, careers pages, papers and patents, open-source communities and your own CV database, matches people to companies, names the source of every finding and flags anything uncertain on its own. You can hand it BD client research, org charts, job matching, sourcing, identity checks and keeping your network current, while who to contact, who to put forward and how to negotiate remain the headhunter’s decisions.",
+    "An AI assistant for headhunters is an AI tool that does a headhunter’s research and hands back the results. It looks for leads in funding news, careers pages, papers and patents, open-source communities and your own CV database, matches people to companies, names the source of every finding and flags anything uncertain on its own. You can hand it BD client research, org charts, job matching, sourcing, identity checks and talent pool updates, while who to contact, who to put forward and how to negotiate remain the headhunter’s decisions.",
   teaser: "What an AI assistant for headhunters can and can’t do, and how to choose one.",
   keywords: [
     "AI assistant for headhunters",
@@ -39,7 +39,7 @@ export default {
             "Job matching: break the job description (JD) into must-haves and nice-to-haves, and for each candidate set out why they match and what still needs confirming.",
             "Sourcing: search your CV database and org charts first, then fill the gaps from public information, papers and patents, and open-source communities.",
             "Identity checks: the same person’s name may be written differently on a CV, in papers and in open-source communities. Cross-check the records before merging them, and rule out namesakes.",
-            "Keeping your network current: watch for changes in key candidates’ public career histories and in their teams, so the records in your database don’t fall behind.",
+            "Talent pool updates: watch for changes in key candidates’ public career histories and in their teams, so the records in your database don’t fall behind.",
           ],
         },
         "These six have one thing in common: they take time, but there is a clear right and wrong. Either you can find it or you can’t. Either it matches or it doesn’t. Handing them to AI is not only about speed. It’s about nothing missed, nothing muddled and everything sourced. You might spend an afternoon tracking down a lead, then by next month forget where you saw it. AI keeps a record of every source.",
@@ -106,7 +106,7 @@ export default {
       ],
     },
     {
-      h2: "How can TalentBuddy help?",
+      h2: "What does TalentBuddy hand back?",
       body: [
         "TalentBuddy is Boseek’s AI for hiring R&D talent, one of the AI assistants for headhunters, and it hands back results for all six jobs above. Take the Xingchuan Robotics example from our homepage. Xingchuan has just raised a Series B. TalentBuddy spots a new Head of Computer Vision role on its careers page, finds the hiring manager, Qing Xu, then maps the org charts of Xingchuan and two peer companies and matches them against the candidates in your database.",
         "When sourcing, it searches your CV database and org charts first, then fills the gaps from papers, patents and open-source communities. Yue Lin has a record in your CV database, another on a team page and a third in a paper. Once the details are cross-checked and namesakes ruled out, the three are merged into one person. Every finding names its source, and anything uncertain is marked “To confirm”.",
@@ -140,7 +140,7 @@ export default {
             ],
           },
         },
-        "It uses only public information and your own material. It never contacts anyone or makes promises on your behalf. Who to contact, how to open the conversation and whether to put someone forward are for you to decide. TalentBuddy is still in development and offered as an invitation-only trial.",
+        "It uses only public information and your own material. It never contacts anyone or makes promises on your behalf. Who to contact, how to open the conversation and whether to put someone forward are for you to decide. TalentBuddy is in development, with an invitation-only trial.",
       ],
     },
     {
@@ -159,7 +159,7 @@ export default {
     ],
     [
       "What kinds of AI recruiting agents are there, and which suit headhunters?",
-      "AI tools and agents with “recruiting” in the name fall roughly into two groups, by who uses them. One serves in-house HR, helping post roles, screen CVs and schedule interviews. The other serves headhunters, helping with BD client research, org charts, sourcing and keeping your network current. When choosing, headhunters should look at three things: whether it can use their own CV database, whether every finding has a source, and whether it flags anything uncertain separately. TalentBuddy belongs to the second group and is currently offered as an invitation-only trial.",
+      "AI tools and agents with “recruiting” in the name fall roughly into two groups, by who uses them. One serves in-house HR, helping post roles, screen CVs and schedule interviews. The other serves headhunters, helping with BD client research, org charts, sourcing and talent pool updates. When choosing, headhunters should look at three things: whether it can use their own CV database, whether every finding has a source, and whether it flags anything uncertain separately. TalentBuddy belongs to the second group. It is in development, with an invitation-only trial.",
     ],
     [
       "Will AI replace search consultants?",

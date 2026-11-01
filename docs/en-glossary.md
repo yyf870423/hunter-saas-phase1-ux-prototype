@@ -42,6 +42,8 @@ This guide is shared by the English homepage (`public/landing-redesign/en/`), th
 
 ## The six capabilities (fixed names)
 
+> 2026-11-02: the six names on the website are now 人岗匹配 Job matching · 寻访 Sourcing · 身份核实 Identity checks · BD 客户研判 BD client research · 人才库更新 Talent pool updates · 组织架构梳理 Org charts. Use these in all new copy; the older names in the table below survive only in the film’s chapter cards.
+
 | Chinese | English name | Short label (nav, footer, chips) |
 |---|---|---|
 | 智能人岗匹配 / 人岗匹配 | job matching | Job matching |

@@ -84,10 +84,10 @@ export default {
       ],
     },
     {
-      h2: "What gap does an AI assistant for headhunters fill, and how can TalentBuddy help?",
+      h2: "What gap does an AI assistant for headhunters fill, and what does TalentBuddy hand back?",
       body: [
         "Of the three kinds of tool above, one handles writing and reading, one finding and contacting people, and one record-keeping. In between lies a stretch that often falls to the headhunter alone: the research before and during a search. Which companies are expanding, who sits where in the target team, whether these few records are the same person, who in your database fits this role. That stretch is what an AI assistant for headhunters does.",
-        "TalentBuddy is Boseek’s AI for hiring R&D talent, one of the AI assistants for headhunters. Starting from public information, patents and papers, open-source communities and your CV database, it helps with BD client research, org charts, job matching, automated sourcing and keeping your network current. When the same person is scattered across different places, it cross-checks the records and rules out namesakes before merging them. Every finding names its source, and anything uncertain is flagged for you to confirm.",
+        "TalentBuddy is Boseek’s AI for hiring R&D talent, one of the AI assistants for headhunters. Starting from public information, patents and papers, open-source communities and your CV database, it hands back results for BD client research, org charts, job matching, sourcing, identity checks and talent pool updates. When the same person is scattered across different places, it cross-checks the records and rules out namesakes before merging them. Every finding names its source, and anything uncertain is flagged for you to confirm.",
         {
           demo: {
             context: "Example · Xingchuan Robotics · Head of Computer Vision",
@@ -113,7 +113,7 @@ export default {
             ],
           },
         },
-        "It works in relay with the other three. CVs downloaded from recruiting platforms can be uploaded and checked along with everything else, and the people and relationships you’ve confirmed in TalentBuddy still go into your CRM or ATS as usual. Who to contact and how to open the conversation is up to you. The product is still in development and currently offered as an invitation-only trial.",
+        "It works in relay with the other three. CVs downloaded from recruiting platforms can be uploaded and checked along with everything else, and the people and relationships you’ve confirmed in TalentBuddy still go into your CRM or ATS as usual. Who to contact and how to open the conversation is up to you. TalentBuddy is in development, with an invitation-only trial.",
       ],
     },
     {

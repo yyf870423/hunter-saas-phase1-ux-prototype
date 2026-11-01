@@ -112,9 +112,9 @@ export default {
       ],
     },
     {
-      h2: "How can TalentBuddy help manage your CV database?",
+      h2: "Managing your talent pool: what does TalentBuddy hand back?",
       body: [
-        "TalentBuddy is Boseek’s AI for hiring R&D talent, and keeping your CV database current is one of the things it does. To show how, here’s the Xingchuan Robotics story from our homepage and product video, in which Yue Lin is the candidate.",
+        "TalentBuddy is Boseek’s AI for hiring R&D talent, and talent pool updates are one of the things it does. To show how, here’s the Xingchuan Robotics story from our homepage and product video, in which Yue Lin is the candidate.",
         {
           list: [
             "Upload CVs one at a time or in bulk. Everything you bring in goes through identity checks and is de-duplicated and merged, and can also be matched against all your live searches.",
@@ -152,7 +152,7 @@ export default {
             ],
           },
         },
-        "Every conclusion names its source, and anything uncertain is flagged for you to confirm. Whether to make the call, and whether to put him forward, is up to you. TalentBuddy is still in development, with an invitation-only trial.",
+        "Every conclusion names its source, and anything uncertain is flagged for you to confirm. Whether to make the call, and whether to put him forward, is up to you. TalentBuddy is in development, with an invitation-only trial.",
       ],
     },
     {

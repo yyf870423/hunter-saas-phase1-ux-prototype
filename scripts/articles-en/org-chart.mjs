@@ -123,7 +123,7 @@ export default {
       ],
     },
     {
-      h2: "How can TalentBuddy help you map a target company with AI?",
+      h2: "Mapping a target company with AI: what does TalentBuddy hand back?",
       body: [
         "TalentBuddy is Boseek’s AI for hiring R&D talent. Here is the example from our homepage and product video: say you want to map Xingchuan Robotics alongside two peer companies, Tuojie Robotics and Qiongding AI.",
         {
@@ -146,7 +146,7 @@ export default {
             ],
           },
         },
-        "Whether the department names and reporting lines are right, whether a person on the chart is the one in your database, and which gaps are worth filling: all of this is left for you to confirm. Who to contact, and what to say, is also your call. TalentBuddy is still in development, with an invitation-only trial.",
+        "Whether the department names and reporting lines are right, whether a person on the chart is the one in your database, and which gaps are worth filling: all of this is left for you to confirm. Who to contact, and what to say, is also your call. TalentBuddy is in development, with an invitation-only trial.",
       ],
     },
     {

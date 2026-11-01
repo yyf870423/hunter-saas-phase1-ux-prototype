@@ -134,15 +134,15 @@ export default {
     {
       h2: "What can headhunters use AI for, and what stays with them?",
       body: [
-        "Broadly, AI can help a good deal with looking things up, reading material, checking information and keeping track of changes. Take TalentBuddy, Boseek’s AI for hiring R&D talent. It’s still in development and offered as an invitation-only trial, and it can take on these six jobs:",
+        "Broadly, AI can help a good deal with looking things up, reading material, checking information and keeping track of changes. Take TalentBuddy, Boseek’s AI for hiring R&D talent. It’s in development, with an invitation-only trial, and it can take on these six jobs:",
         {
           list: [
             "BD client research: it watches the sectors you follow, spots expanding companies in funding news and on careers pages, and finds new roles, hiring managers and routes to an introduction.",
             "Org charts: it lays out the departments and reporting lines of target companies and their peers, noting where each piece of information came from and which positions are still blank.",
             "Job matching: it checks a JD against your CV database and public information, and for each candidate sets out why they match, the sources and what still needs confirming.",
-            "Automated sourcing: it looks for people in public information, patents and papers, code footprints (public code and repositories) and your CV database, and checks several records of the same person before merging them.",
-            "Finding the real name behind an alias: when all you have is an alias, the nickname many Chinese tech companies use at work, or a few scattered clues, it cross-checks several public sources, rules out namesakes, suggests a suitable way in, and flags anything uncertain for you to confirm.",
-            "Keeping your network current: it watches key candidates’ public career histories and team changes, and when you get a new CV after a conversation, the record and the matches are updated together.",
+            "Sourcing: it looks for people in public information, patents and papers, code footprints (public code and repositories) and your CV database, and checks several records of the same person before merging them.",
+            "Identity checks: when all you have is an alias, the nickname many Chinese tech companies use at work, or a few scattered clues, it cross-checks several public sources, rules out namesakes, suggests a suitable way in, and flags anything uncertain for you to confirm.",
+            "Talent pool updates: it watches key candidates’ public career histories and team changes, and when you get a new CV after a conversation, the record and the matches are updated together.",
           ],
         },
         {

@@ -78,7 +78,7 @@ export default {
       ],
     },
     {
-      h2: "How does TalentBuddy help with business development?",
+      h2: "Business development: what does TalentBuddy hand back?",
       body: [
         "Here again is the Xingchuan Robotics example from our homepage, one step at a time.",
         {

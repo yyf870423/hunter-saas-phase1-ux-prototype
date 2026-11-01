@@ -116,7 +116,7 @@ export default {
       ],
     },
     {
-      h2: "How can TalentBuddy help you find candidates with AI?",
+      h2: "Finding candidates with AI: what does TalentBuddy hand back?",
       body: [
         "The hard part of these methods is not thinking of them. It is the time they take: going through the CV database, reading the papers, cross-checking one person’s records across several places. It is hard for one person to do all of it for every search. TalentBuddy, Boseek’s AI for hiring R&D talent, takes on the searching and checking. Back to the Xingchuan Robotics example: the hiring manager, Qing Xu, has sent over the JD for the Head of Computer Vision role.",
         {

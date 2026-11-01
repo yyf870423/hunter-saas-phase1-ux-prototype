@@ -118,9 +118,9 @@ export default {
       ],
     },
     {
-      h2: "How can TalentBuddy help with job matching?",
+      h2: "Job matching: what does TalentBuddy hand back?",
       body: [
-        "TalentBuddy is Boseek’s AI for hiring R&D talent. It’s still in development and currently offered as an invitation-only trial. Take the example from our homepage: Xingchuan Robotics has just raised a Series B, and the hiring manager, Qing Xu, sends over the JD for a Head of Computer Vision. Once you’ve talked it through with her, you hand the JD to TalentBuddy, and it helps like this:",
+        "TalentBuddy is Boseek’s AI for hiring R&D talent. It’s in development, with an invitation-only trial. Take the example from our homepage: Xingchuan Robotics has just raised a Series B, and the hiring manager, Qing Xu, sends over the JD for a Head of Computer Vision. Once you’ve talked it through with her, you hand the JD to TalentBuddy, and it helps like this:",
         {
           list: [
             "It starts with what you already have: the org charts you’ve built and your CV database, so the homework you’ve already done is put to use first.",

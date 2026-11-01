@@ -650,7 +650,7 @@ function businessDevelopment() {
   // BD 客户研判 (on the homepage) gets its own step after the two sources are matched
   how.splice(2, 0, [
     "BD 客户研判：值不值得跟",
-    "它把融资动态、创始团队、岗位和业务信号放在一起，看需求是不是真的、付不付得起猎头费、合作上有没有风险，再理清决策链和优先级。有依据的写明来源，没依据的标为待确认。",
+    "它把融资动态、创始团队、岗位和业务信号放在一起，看需求是不是真的、付不付得起猎头费、合作上有没有风险，再理清决策链和优先级。有依据的附上出处，没依据的标为待确认。",
     "真实需求、付费潜力都有依据：刚拿到 B 轮，招聘页上了新职位。合作风险待确认：以前和猎头合作过没有、谁拍板，还不清楚。",
   ]);
   const card = {
@@ -670,18 +670,18 @@ function businessDevelopment() {
     kicker: "使用场景 · 猎头客户开发",
     h1: ["从融资与招聘信号，", "识别研发型企业的委托机会"],
     answer:
-      "TalentBuddy 持续跟踪你关注的技术赛道，从融资新闻和招聘页里找出正在扩张的研发型企业，交回新职位、可能的用人经理、引荐路线，以及值不值得跟的研判，每条线索都写明来源。联系谁、怎么切入，由你决定。",
+      "TalentBuddy 持续跟踪你关注的技术赛道，从融资新闻和招聘页里找出正在扩张的研发型企业，交回新职位、可能的用人经理、引荐路线，以及值不值得跟的研判，每条线索都附出处。联系谁、怎么切入，由你决定。",
     teaser: c.teaser,
     related: ["org-chart", "finding-candidates", "ai-assistant-for-headhunters"],
     sections: [
       { h2: "猎头客户开发，一般怎么做？", body: [c.method.intro, { steps: c.method.steps }] },
       // 平台名只在工具对比那一篇里出现
       { h2: "难的不是打电话，是知道该打给谁", body: [{ cards: c.hard.items.map(([t, b]) => [t, b.replace("领英和脉脉上", "职业社交平台上")]) }] },
-      { h2: "TalentBuddy 怎么帮你做客户开发？", body: [c.how.intro, { steps: how }, { demo: card }] },
+      { h2: "做客户开发，TalentBuddy 交回什么？", body: [c.how.intro, { steps: how }, { demo: card }] },
       {
         h2: "你会拿到什么，哪些要你确认？",
         body: [
-          "一条两处来源对得上的职位线索、一位很可能的用人经理，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，你说了算。拿到 JD、谈妥委托，它才是你手上的正式职位。",
+          "一条两处来源对得上的职位线索、一位很可能的用人经理，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，由你决定。拿到 JD、谈妥委托，它才是你手上的正式职位。",
           c.result.paras[1],
           { list: c.result.confirm },
           { note: c.result.note },
