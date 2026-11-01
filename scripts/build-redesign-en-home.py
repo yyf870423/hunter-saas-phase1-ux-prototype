@@ -29,7 +29,7 @@ ORG = {
 LANGS = {
     "zh": dict(
         home=SITE, lang="zh-CN", og="zh_CN", og_alt="en_US", site_name="铂寻 Boseek", title_cut="｜铂寻 Boseek", baidu=True,
-        app="更快找到对的研发人才。TalentBuddy 是面向猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人的研发人才招聘 AI，交回人选名单、匹配结论、身份核实结论、BD 客户研判、人才库变动提示和组织架构图，每条都有出处。联系谁、推不推荐，由你决定。目前邀请制试用。",
+        app="先人一步，锁定研发人才。TalentBuddy 是面向猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人的研发人才招聘 AI，交回人选名单、匹配结论、身份核实结论、BD 客户研判、人才库变动提示和组织架构图，每条都有出处。联系谁、推不推荐，由你决定。目前邀请制试用。",
         app_sub="研发人才招聘 AI", audience="招聘研发与技术人才的猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人",
         # the share card (1200×630, the film's last scene): what Feishu, LinkedIn and the like show when the link is pasted
         share="assets/share-card.jpg",
@@ -37,7 +37,7 @@ LANGS = {
     ),
     "en": dict(
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
-        app="Find the right R&D talent, faster. TalentBuddy is AI for hiring R&D talent, built for search consultants, HR and talent leads, and CTOs and engineering leaders. It hands back candidate lists, match findings, identity checks, BD client research, talent pool change alerts and org charts, each traceable to its source. Who to contact and whom to put forward is always your call. Invitation-only trial.",
+        app="Be first to the right R&D talent. TalentBuddy is AI for hiring R&D talent, built for search consultants, HR and talent leads, and CTOs and engineering leaders. It hands back candidate lists, match findings, identity checks, BD client research, talent pool change alerts and org charts, each traceable to its source. Who to contact and whom to put forward is always your call. Invitation-only trial.",
         app_sub="AI for hiring R&D talent", audience="Search consultants, HR and talent leads, and CTOs and engineering leaders hiring R&D talent",
         share="assets/share-card-en.jpg",
         film=("TalentBuddy product video", "From one role in a sea of people, follow TalentBuddy through six capabilities: BD client research, org charts, sourcing, job matching, identity checks and talent pool updates.", "assets/film-poster-en.jpg", "assets/talentbuddy-film-en.mp4"),
@@ -139,7 +139,7 @@ r('aria-label="打开导航"', 'aria-label="Open navigation"')
 
 # ---------- hero ----------
 r('<span aria-hidden="true"></span>正在开发中，邀请制试用申请已开放', '<span aria-hidden="true"></span>In development. Applications for the invitation-only trial are open.')
-r('<p class="n-role">更快找到对的研发人才</p>', '<p class="n-role">Find the right R&amp;D talent, faster</p>')
+r('<p class="n-role">先人一步，锁定研发人才</p>', '<p class="n-role">Be first to the right R&amp;D talent</p>')
 r('<span>论文、专利、代码与简历库，一并检索，</span>', '<span>Papers, patents, code and CV databases, searched together,</span>')
 r('<span>交回排好序、条条有出处的人选名单。</span>', '<span>handed back as a ranked shortlist with a source for every name.</span>')
 r('>查看交付示例</a>', '>See sample results</a>')
@@ -325,7 +325,7 @@ for qz, qe, az, ae in FAQ:
 # ---------- footer ----------
 r('<img src="../../landing-origin/assets/boseek-b5.svg" alt="Boseek 铂寻" width="150" height="54" loading="lazy" />',
   '<img src="../assets/boseek-b5-en-light.svg" alt="Boseek" width="150" height="46" loading="lazy" />')
-r('<p>TalentBuddy：更快找到对的研发人才。</p>', '<p>TalentBuddy: find the right R&amp;D talent, faster.</p>')
+r('<p>TalentBuddy：先人一步，锁定研发人才。</p>', '<p>TalentBuddy: be first to the right R&amp;D talent.</p>')
 r('<p>铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。</p>', '<p>Built by Boseek for search consultants, HR and talent leads, and CTOs and engineering leaders.</p>')
 r('<p class="n-footer-mail">联系我们：<a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>', '<p class="n-footer-mail">Contact: <a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>')
 r('<h2>产品</h2>', '<h2>Product</h2>')  # its links are the header's, already replaced above
