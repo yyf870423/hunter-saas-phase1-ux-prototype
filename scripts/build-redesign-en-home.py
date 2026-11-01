@@ -140,18 +140,16 @@ r('aria-label="打开导航"', 'aria-label="Open navigation"')
 # ---------- hero ----------
 r('<span aria-hidden="true"></span>正在开发中，邀请制试用申请已开放', '<span aria-hidden="true"></span>In development. Applications for the invitation-only trial are open.')
 r('<p class="n-role">研发人才，找得到，也查得清</p>', '<p class="n-role">R&amp;D talent, found and verified</p>')
-r('<span>给它一个岗位、一家目标公司或一个名字，拿回排好序的人选名单、身份核实结论和组织架构图，每一条都查得到出处。</span>',
-  '<span>Give it a role, a target company or a name, and get back a ranked candidate list, identity checks and an org chart, every item traceable to its source.</span>')
-r('<span>论文、专利、代码和你的简历库，一起找。</span>', '<span>Papers, patents, code and your own CV database, searched together.</span>')
-r('<span>适合猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人。</span>', '<span>For search consultants, HR and talent leads, and CTOs and engineering leaders.</span>')
+r('<span>论文、专利、代码与简历库，一并检索。</span>', '<span>Papers, patents, code and CV databases, searched together.</span>')
+r('<span>人选、身份与组织架构，结论均可追溯来源。</span>', '<span>Candidates, identities and org charts, every finding traceable to its source.</span>')
 r('>看它交回什么</a>', '>See what it delivers</a>')
 
 # ---------- intro + film ----------
 r('<p class="n-kicker">TalentBuddy 能做什么</p>', '<p class="n-kicker">What TalentBuddy does</p>')
-r('<span>你说要找谁，它交回名单。</span>', '<span>Say who you’re looking for, and it hands back a list.</span>')
-r('<span>判断和沟通，仍由你来。</span>', '<span>The judgment and the conversations stay with you.</span>')
-r('六项能力，对应招聘研发人才的六个环节，每一项都交回一份具体结果。',
-  'Six capabilities, one for each stage of hiring R&amp;D talent, and each one hands back a concrete result.')
+r('<span>覆盖研发人才招聘的关键环节。</span>', '<span>Every key stage of hiring R&amp;D talent, covered.</span>')
+r('<span>每项结果均注明来源，判断与沟通由你完成。</span>', '<span>Each result names its source. Judgment and conversations stay with you.</span>')
+r('人选寻访、人岗匹配、身份核实、BD 客户研判、人才库更新、组织架构梳理，每一项都交回一份具体结果。',
+  'Sourcing, job matching, identity checks, BD client research, talent pool updates and org charts, each handing back a concrete result.')
 r('poster="../assets/film-poster.jpg?v=10"', 'poster="../assets/film-poster-en.jpg?v=7"')
 r('src="../assets/talentbuddy-film.mp4?v=10"', 'src="../assets/talentbuddy-film-en.mp4?v=7"')
 r('aria-label="TalentBuddy 产品短片"', 'aria-label="TalentBuddy product video"')
