@@ -151,7 +151,7 @@ r('<span>判断与沟通，留给你。</span>', '<span>Judgment and conversatio
 r('从客户研判、组织架构、寻访、匹配，到身份核实和人才库更新，每一步都交回有出处的结果。',
   'From BD client research, org charts, sourcing and matching to identity checks and talent pool updates, every step hands back a sourced result.')
 r('poster="../assets/film-poster.jpg?v=12"', 'poster="../assets/film-poster-en.jpg?v=8"')
-r('src="../assets/talentbuddy-film.mp4?v=12"', 'src="../assets/talentbuddy-film-en.mp4?v=8"')
+r('src="../assets/talentbuddy-film.mp4?v=13"', 'src="../assets/talentbuddy-film-en.mp4?v=9"')
 r('aria-label="TalentBuddy 产品短片"', 'aria-label="TalentBuddy product video"')
 
 # ---------- six capabilities: heading ----------
