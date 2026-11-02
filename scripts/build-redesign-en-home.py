@@ -150,8 +150,8 @@ r('<span>检索与核对，交给 TalentBuddy。</span>', '<span>Searching and c
 r('<span>判断与沟通，留给你。</span>', '<span>Judgment and conversations stay with you.</span>')
 r('从客户研判、组织架构、寻访、匹配，到身份核实和人才库更新，每一步都交回有出处的结果。',
   'From BD client research, org charts, sourcing and matching to identity checks and talent pool updates, every step hands back a sourced result.')
-r('poster="../assets/film-poster.jpg?v=10"', 'poster="../assets/film-poster-en.jpg?v=7"')
-r('src="../assets/talentbuddy-film.mp4?v=10"', 'src="../assets/talentbuddy-film-en.mp4?v=7"')
+r('poster="../assets/film-poster.jpg?v=11"', 'poster="../assets/film-poster-en.jpg?v=8"')
+r('src="../assets/talentbuddy-film.mp4?v=11"', 'src="../assets/talentbuddy-film-en.mp4?v=8"')
 r('aria-label="TalentBuddy 产品短片"', 'aria-label="TalentBuddy product video"')
 
 # ---------- six capabilities: heading ----------
