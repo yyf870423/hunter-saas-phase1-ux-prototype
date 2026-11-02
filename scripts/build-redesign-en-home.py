@@ -33,7 +33,7 @@ LANGS = {
         app_sub="研发人才招聘 AI", audience="招聘研发与技术人才的猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人",
         # the share card (1200×630, the film's last scene): what Feishu, LinkedIn and the like show when the link is pasted
         share="assets/share-card.jpg",
-        film=("TalentBuddy 产品短片", "从人海里的一个职位出发，跟着 TalentBuddy 走完六件事：BD 客户研判、组织架构梳理、寻访、人岗匹配、身份核实、人才库更新。", "assets/film-poster.jpg", "assets/talentbuddy-film.mp4"),
+        film=("TalentBuddy 产品短片", "从人海里的一个职位出发，跟着 TalentBuddy 走完六件事：BD 客户研判、组织架构梳理、人才寻访、人岗匹配、身份核实、人才库更新。", "assets/film-poster.jpg", "assets/talentbuddy-film.mp4"),
     ),
     "en": dict(
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
@@ -112,14 +112,14 @@ R = []  # (old, new) — old must occur at least once; every occurrence is repla
 def r(old, new): R.append((old, new))
 
 # ---------- head ----------
-r('<html lang="zh-CN">', '<html lang="en">')
+r('<html lang="zh-CN" data-product="TalentBuddy">', '<html lang="en" data-product="TalentBuddy">')
 r('<!-- 改版草稿：只用于预览，不收录 -->', '<!-- Redesign draft: preview only, not indexed -->')
 r('<title>TalentBuddy · 研发人才招聘 AI：人选寻访、人岗匹配、组织架构｜铂寻 Boseek</title>',
   '<title>TalentBuddy · AI for hiring R&amp;D talent: sourcing, job matching, org charts | Boseek</title>')
 r('content="TalentBuddy 是铂寻 Boseek 推出的研发人才招聘 AI，面向猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人。给它一个岗位、一家目标公司或一个名字，交回排好序的人选名单、身份核实结论和组织架构图，每条都有出处。覆盖互联网与 AI、智能汽车、工业制造、半导体、医药医疗等行业的研发岗位。目前邀请制试用。"',
   'content="TalentBuddy by Boseek is AI for hiring R&amp;D talent, built for search consultants, HR and talent leads, and CTOs and engineering leaders. Give it a role, a target company or a name, and get back a ranked candidate list, identity checks and an org chart, every item traceable to its source. It covers R&amp;D roles in the internet and AI, smart vehicles, industrial manufacturing, semiconductors, and pharma and medical devices. Invitation-only trial."')
 r('<script defer src="../../landing/shared-ui.js',
-  '<script defer src="../../landing-origin/locale-en.js?v=20261024-org"></script>\n    <script defer src="../trial-locale-en.js?v=1"></script>\n    <script defer src="../../landing/shared-ui.js')
+  '<script defer src="../../landing-origin/locale-en.js?v=20261024-org"></script>\n    <script defer src="../trial-locale-en.js?v=2"></script>\n    <script defer src="../../landing/shared-ui.js')
 
 # ---------- header ----------
 r('<a class="n-skip" href="#main">跳到正文</a>', '<a class="n-skip" href="#main">Skip to content</a>')
@@ -150,8 +150,8 @@ r('<span>检索与核对，交给 TalentBuddy。</span>', '<span>Searching and c
 r('<span>判断与沟通，留给你。</span>', '<span>Judgment and conversations stay with you.</span>')
 r('从客户研判、组织架构、寻访、匹配，到身份核实和人才库更新，每一步都交回有出处的结果。',
   'From BD client research, org charts, sourcing and matching to identity checks and talent pool updates, every step hands back a sourced result.')
-r('poster="../assets/film-poster.jpg?v=11"', 'poster="../assets/film-poster-en.jpg?v=8"')
-r('src="../assets/talentbuddy-film.mp4?v=11"', 'src="../assets/talentbuddy-film-en.mp4?v=8"')
+r('poster="../assets/film-poster.jpg?v=12"', 'poster="../assets/film-poster-en.jpg?v=8"')
+r('src="../assets/talentbuddy-film.mp4?v=12"', 'src="../assets/talentbuddy-film-en.mp4?v=8"')
 r('aria-label="TalentBuddy 产品短片"', 'aria-label="TalentBuddy product video"')
 
 # ---------- six capabilities: heading ----------
@@ -202,7 +202,7 @@ r('<span class="fx-cap">三处来源合成一份</span><span class="fx-tags"><em
   '<span class="fx-cap">3 sources, 1 profile</span><span class="fx-tags"><em>Papers</em><em>Code</em><em>Your CVs</em></span>')
 # 02 text
 r('研发人才的能力写在论文、专利和代码里，只在招聘平台上搜，很多人找不到。', 'The clearest evidence of R&amp;D talent is in papers, patents and code. Search only on recruiting platforms, and many people never turn up.')
-r('<h3 id="n-step-sourcing">寻访：平台之外，也能找到</h3>', '<h3 id="n-step-sourcing">Sourcing: beyond the platforms</h3>')
+r('<h3 id="n-step-sourcing">人才寻访：平台之外，也能找到</h3>', '<h3 id="n-step-sourcing">Sourcing: beyond the platforms</h3>')
 r('按岗位要求，同时检索公开信息、论文、专利、开源代码和你的简历库，同一个人的多处资料先核对再合并。交回排好序的人选名单，并标明哪些渠道已经找过、哪些尚未覆盖。',
   'Working from the role’s requirements, it searches public information, papers, patents, open-source code and your CV database together, and checks the same person’s records from different places before merging them. You get back a ranked candidate list, with a note of which sources have been searched and which are not yet covered.')
 r('>了解猎头怎么找人</a>', '>How headhunters find candidates</a>')
@@ -264,14 +264,14 @@ r('<b>产品交付</b><em>负责人待补</em>', '<b>Delivery</b><em>Lead to fil
 r('<p class="fx-src">来源 · 官网 · 新闻 · 公开演讲</p>', '<p class="fx-src">Sources · Website · News · Public talks</p>')
 # 06 text
 r('目标公司的研发部门怎么分、谁负责什么，要从官网、新闻、论文和专利里一点点拼。人一变动，又得重画。', 'How a target company’s R&amp;D is organized, and who is responsible for what, has to be pieced together from its website, the news, papers and patents. When people move, the chart has to be redrawn.')
-r('<h3 id="n-step-mapping">组织架构梳理（Mapping）：研发组织，一图看清</h3>', '<h3 id="n-step-mapping">Org charts (mapping): an R&amp;D organization at a glance</h3>')
+r('<h3 id="n-step-mapping">组织架构梳理（Mapping）：<br />研发组织，一图看清</h3>', '<h3 id="n-step-mapping">Org charts (mapping): an R&amp;D organization at a glance</h3>')
 r('汇总部门、关键岗位、任职人和汇报关系，交回一张组织架构图，可按部门、汇报线、项目切换查看，历史版本全部保留。每个节点附出处，未证实的汇报关系标为待确认。已有的 Excel 架构图可以导入后继续补充。',
   'It gathers departments, key roles, the people in them and reporting lines, and hands back an org chart you can view by department, reporting line or project, with every past version kept. Each node names its source, and any reporting line not yet confirmed is marked “To confirm”. Org charts you already have in Excel can be imported and built on.')
 r('>了解组织架构图</a>', '>More on org charts</a>')
 
 # ---------- what we believe ----------
 r('<p class="n-kicker">02 · 产品边界</p>', '<p class="n-kicker">02 · Boundaries</p>')
-r('它做什么，<br />不做什么。', 'What it does,<br />and what it doesn’t.')
+r('各司其职，边界清晰', 'What it does,<br />and what it doesn’t.')
 r('<p>查资料、比对、整理，交给它。</p>', '<p>Research, cross-checking and organizing: leave those to it.</p>')
 r('<p>人选的意愿和顾虑、用人方没说出口的需求，需要你当面了解。</p>', '<p>A candidate’s intentions and doubts, and what an employer hasn’t said out loud, you learn in person.</p>')
 r('alt="一位招聘者和一位人选面对面交谈"', 'alt="A recruiter and a candidate talking face to face"')
@@ -290,11 +290,11 @@ r('<li>人工智能与大模型</li><li>互联网与云计算</li><li>具身智�
 
 # ---------- FAQ (the live English site's approved answers, terms aligned with the glossary) ----------
 r('<p class="n-kicker">04 · 常见问题</p>', '<p class="n-kicker">04 · FAQ</p>')
-r('<h2 class="n-h2" id="n-faq-title">常见问题</h2>', '<h2 class="n-h2" id="n-faq-title">FAQ</h2>')
+r('<h2 class="n-h2" id="n-faq-title">试用之前，<br />大家常问这些。</h2>', '<h2 class="n-h2" id="n-faq-title">What people ask<br />before they try it.</h2>')
 r('其他问题请发邮件至 <a href="mailto:hello@boseekai.com">hello@boseekai.com</a>。', 'Anything else? Email <a href="mailto:hello@boseekai.com">hello@boseekai.com</a>.')
 FAQ = [
  ("TalentBuddy 适合谁使用？", "Who is TalentBuddy for?",
-  "招聘研发与技术人才的个人用户。猎头顾问可以使用全部能力，包括 BD 客户研判。企业 HR 与招聘负责人常用寻访、人岗匹配和人才库更新。CTO 与技术负责人可以梳理同行的研发组织，按论文、专利、代码寻找领域专家，核实人选的技术履历。覆盖互联网与 AI、智能汽车与工业制造、半导体与电子、医药与医疗器械等行业的研发岗位，包括 AI 与大模型岗位。按个人账号使用。",
+  "招聘研发与技术人才的个人用户。猎头顾问可以使用全部能力，包括 BD 客户研判。企业 HR 与招聘负责人常用人才寻访、人岗匹配和人才库更新。CTO 与技术负责人可以梳理同行的研发组织，按论文、专利、代码寻找领域专家，核实人选的技术履历。覆盖互联网与 AI、智能汽车与工业制造、半导体与电子、医药与医疗器械等行业的研发岗位，包括 AI 与大模型岗位。按个人账号使用。",
   "Individuals who hire R&amp;D and technical talent. Search consultants can use every capability, including BD client research. HR and talent leads mostly use sourcing, job matching and talent pool updates. CTOs and engineering leaders can map peer companies’ R&amp;D organizations, find domain experts through papers, patents and code, and check a candidate’s technical track record. It covers R&amp;D roles in the internet and AI, smart vehicles and industrial manufacturing, semiconductors and electronics, and pharma and medical devices, including AI and large-model roles. Each person uses their own account."),
  ("和直接用豆包、DeepSeek、ChatGPT 这类通用 AI，有什么不同？", "How is it different from just using a general-purpose AI like Doubao, DeepSeek or ChatGPT?",
   "通用 AI 回答一个问题，TalentBuddy 交回一份完整结果。它从你的候选人、熟悉的公司和已梳理的组织出发，完成检索、身份核实、去重和比对，交回有出处的人选名单、结论或架构图，并保存在你的账号里，下次接着用。",

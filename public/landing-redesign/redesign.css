@@ -2431,9 +2431,6 @@ body.n-page::after {
     font-size: clamp(28px, 2.5vw, 36px);
     line-height: 1.35;
   }
-  :lang(zh-CN) #n-step-mapping {
-    white-space: nowrap;
-  }
   .js .n-step-text h3 + p {
     margin-top: 18px !important;
     font-size: 16.5px;
@@ -2529,4 +2526,16 @@ html.lenis.lenis-smooth {
 }
 .f-form-consent a:hover {
   text-decoration-color: currentColor;
+}
+
+/* 四字对仗的中文标题在窄屏上也保持一行：字号随屏宽收小，不拆成两行 */
+@media (max-width: 389px) {
+  :lang(zh-CN) #n-belief-title {
+    font-size: min(34px, calc((100vw - 40px) / 9.3));
+    white-space: nowrap;
+  }
+  :lang(zh-CN) #n-industries-title {
+    font-size: min(32px, calc((100vw - 86px) / 9.3));
+    white-space: nowrap;
+  }
 }

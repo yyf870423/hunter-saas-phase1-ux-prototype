@@ -42,12 +42,12 @@ This guide is shared by the English homepage (`public/landing-redesign/en/`), th
 
 ## The six capabilities (fixed names)
 
-> 2026-11-02: the six names on the website are now 人岗匹配 Job matching · 寻访 Sourcing · 身份核实 Identity checks · BD 客户研判 BD client research · 人才库更新 Talent pool updates · 组织架构梳理 Org charts. Use these in all new copy. The film’s chapter cards and cover were updated to them on the same day; the older names in the table below are for reading old drafts only.
+> 2026-11-02: the six names on the website are now 人岗匹配 Job matching · 人才寻访 Sourcing · 身份核实 Identity checks · BD 客户研判 BD client research · 人才库更新 Talent pool updates · 组织架构梳理 Org charts. Use these in all new copy. The film’s chapter cards and cover were updated to them on the same day; the older names in the table below are for reading old drafts only.
 
 | Chinese | English name | Short label (nav, footer, chips) |
 |---|---|---|
 | 智能人岗匹配 / 人岗匹配 | job matching | Job matching |
-| 自动寻访 / 职位寻访 | automated sourcing / sourcing | Sourcing |
+| 人才寻访 / 自动寻访 / 职位寻访 | sourcing (old: automated sourcing) | Sourcing |
 | 还原花名背后的真实姓名 / 定位真实姓名 / 身份核实 | finding the real name behind an alias / identity checks (in prose, where “professional identity” is clear) | Identity checks |
 | BD 客户研判 / 客户开发研判 | BD client research (always with “BD”, never plain “client research”) | BD client research |
 | 客户开发 | business development (BD) | Business development |

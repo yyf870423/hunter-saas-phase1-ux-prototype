@@ -286,5 +286,6 @@
 | 3 | 品牌名 | 产品暂用 TalentBuddy（原名 HunterBuddy），公司仍为“铂寻 Boseek”；结构化数据 alternateName 过渡期保留 HunterBuddy（替代第 4 节第 3 条） |
 | 11 | 一句话介绍 | “先人一步，锁定研发人才”（英文 Be first to the right R&D talent），首屏、页脚、分享图、短片片尾同用（替代第 4 节第 11 条；当天先后试过“研发人才，找得到，也查得清”“更快找到对的研发人才”） |
 | 12 | 首页标题 | TalentBuddy · 研发人才招聘 AI：人选寻访、人岗匹配、组织架构｜铂寻 Boseek |
-| — | 短片 | 文件改名 talentbuddy-film.mp4 / talentbuddy-film-en.mp4；只改了片尾品牌名、标语和“猎头的价值”一句，六个章节名仍是旧叫法 |
+| — | 短片 | 文件改名 talentbuddy-film.mp4 / talentbuddy-film-en.mp4；只改了片尾品牌名、标语和“猎头的价值”一句；同日六个章节卡和封面标签也换成官网叫法 |
+| — | 能力名 | 六项能力：人岗匹配、人才寻访、身份核实、BD 客户研判、人才库更新、组织架构梳理（“寻访”同日改为“人才寻访”；英文仍为 Sourcing） |
 

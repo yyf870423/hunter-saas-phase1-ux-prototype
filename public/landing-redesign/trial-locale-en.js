@@ -25,6 +25,11 @@
   }
   catalog.set("请选择目前同时在做的岗位数", "Select a range");
   catalog.set("其他职位", "Specify your job title");
+  // the form shows the renamed product (see <html data-product>)
+  catalog.set("申请 TalentBuddy 试用", "Request a TalentBuddy trial");
+  catalog.set("TalentBuddy 试用申请", "TalentBuddy trial application");
+  catalog.set("感谢你关注 TalentBuddy。开放试用后，我们会通过你留下的联系方式与你联系。", "Thank you for your interest in TalentBuddy. We will get in touch when trial access becomes available.");
+  catalog.set("继续了解 TalentBuddy", "Explore TalentBuddy");
 
   function text(value) {
     if (typeof value !== "string") return value;

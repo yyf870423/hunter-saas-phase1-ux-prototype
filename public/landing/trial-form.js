@@ -4,6 +4,8 @@
   if (!ui || !forms) return;
   const html = ui.localizeHTML || ((value) => value);
   const t = (value) => ui.text?.(value) ?? value;
+  // product name shown in the form; pages that renamed the product set <html data-product="...">
+  const product = document.documentElement.dataset.product || "HunterBuddy";
 
   const fields = [
     { name: "name", label: "姓名", autocomplete: "name", maxLength: 80 },
@@ -99,12 +101,12 @@
     return html(`<section class="f-trial" id="apply" tabindex="-1" aria-labelledby="f-trial-title">
       <div class="f-container f-trial-layout">
         <div class="f-trial-intro">
-          <h2 id="f-trial-title">申请 HunterBuddy 试用</h2>
+          <h2 id="f-trial-title">申请 ${product} 试用</h2>
           <p>目前采用邀请制试用。留下你的信息，我们会逐一审核，并在开通时与你联系。</p>
           <p class="f-trial-thought">把时间，留给<br />真正重要的人。</p>
         </div>
         <div class="f-trial-content">
-          <form class="f-trial-form" novalidate aria-label="HunterBuddy 试用申请" data-state="empty">
+          <form class="f-trial-form" novalidate aria-label="${product} 试用申请" data-state="empty">
             <div class="f-form-grid">${fields.map((field) => (field.options ? forms.selectField : forms.field)(field)).join("")}</div>
             ${forms.consent("我已了解：以上信息将用于处理本次试用申请，并在开放试用后联系我。")}
             <button class="f-button f-trial-submit" type="submit" disabled><span data-submit-label>提交试用申请</span>${ui.icon("chevronRight")}</button>
@@ -112,9 +114,9 @@
           </form>
           <div class="f-form-success" tabindex="-1" data-form-success hidden>
             <h3>申请已收到</h3>
-            <p>感谢你关注 HunterBuddy。开放试用后，我们会通过你留下的联系方式与你联系。</p>
+            <p>感谢你关注 ${product}。开放试用后，我们会通过你留下的联系方式与你联系。</p>
             <p>提交申请不代表试用已开通。</p>
-            ${ui.button("继续了解 HunterBuddy", "#work", true)}
+            ${ui.button(`继续了解 ${product}`, "#work", true)}
           </div>
         </div>
       </div>

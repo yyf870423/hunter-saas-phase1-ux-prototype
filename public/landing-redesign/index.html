@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-product="TalentBuddy">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -129,7 +129,7 @@
             "@type": "VideoObject",
             "@id": "https://www.boseekai.com/#film",
             "name": "TalentBuddy 产品短片",
-            "description": "从人海里的一个职位出发，跟着 TalentBuddy 走完六件事：BD 客户研判、组织架构梳理、寻访、人岗匹配、身份核实、人才库更新。",
+            "description": "从人海里的一个职位出发，跟着 TalentBuddy 走完六件事：BD 客户研判、组织架构梳理、人才寻访、人岗匹配、身份核实、人才库更新。",
             "thumbnailUrl": "https://www.boseekai.com/assets/film-poster.jpg",
             "contentUrl": "https://www.boseekai.com/assets/talentbuddy-film.mp4",
             "uploadDate": "2026-10-25T00:00:00+08:00",
@@ -152,7 +152,7 @@
                 "name": "TalentBuddy 适合谁使用？",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "招聘研发与技术人才的个人用户。猎头顾问可以使用全部能力，包括 BD 客户研判。企业 HR 与招聘负责人常用寻访、人岗匹配和人才库更新。CTO 与技术负责人可以梳理同行的研发组织，按论文、专利、代码寻找领域专家，核实人选的技术履历。覆盖互联网与 AI、智能汽车与工业制造、半导体与电子、医药与医疗器械等行业的研发岗位，包括 AI 与大模型岗位。按个人账号使用。"
+                  "text": "招聘研发与技术人才的个人用户。猎头顾问可以使用全部能力，包括 BD 客户研判。企业 HR 与招聘负责人常用人才寻访、人岗匹配和人才库更新。CTO 与技术负责人可以梳理同行的研发组织，按论文、专利、代码寻找领域专家，核实人选的技术履历。覆盖互联网与 AI、智能汽车与工业制造、半导体与电子、医药与医疗器械等行业的研发岗位，包括 AI 与大模型岗位。按个人账号使用。"
                 }
               },
               {
@@ -225,7 +225,7 @@
     <link rel="stylesheet" href="../landing/shared-form.css?v=20261021" />
     <link rel="stylesheet" href="../landing/trial-page.css?v=20261021" />
     <link rel="preload" href="assets/fonts/alimama-shuheiti-bold-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="redesign.css?v=29" />
+    <link rel="stylesheet" href="redesign.css?v=30" />
     <script>
       document.documentElement.classList.add("js");
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");
@@ -233,7 +233,7 @@
     <script defer src="../landing/shared-ui.js?v=20261022-bilingual-a"></script>
     <script defer src="../landing/shared-form.js?v=20261022-bilingual-a"></script>
     <script defer src="../landing/vendor/libphonenumber-max.js?v=20261021"></script>
-    <script defer src="../landing/trial-form.js?v=20261022-bilingual-a"></script>
+    <script defer src="../landing/trial-form.js?v=20261102-product"></script>
     <script defer src="vendor/lenis-1.3.4.min.js"></script>
     <script defer src="redesign.js?v=28"></script>
   </head>
@@ -306,8 +306,8 @@
               controls
               preload="none"
               playsinline
-              poster="assets/film-poster.jpg?v=11"
-              src="assets/talentbuddy-film.mp4?v=11"
+              poster="assets/film-poster.jpg?v=12"
+              src="assets/talentbuddy-film.mp4?v=12"
               aria-label="TalentBuddy 产品短片"
             ></video>
           </figure>
@@ -394,7 +394,7 @@
               <div class="n-step-text">
                 <p class="n-step-meta"><i>找人</i><span>02 / 06</span></p>
                 <p class="n-pain">研发人才的能力写在论文、专利和代码里，只在招聘平台上搜，很多人找不到。</p>
-                <h3 id="n-step-sourcing">寻访：平台之外，也能找到</h3>
+                <h3 id="n-step-sourcing">人才寻访：平台之外，也能找到</h3>
                 <p>按岗位要求，同时检索公开信息、论文、专利、开源代码和你的简历库，同一个人的多处资料先核对再合并。交回排好序的人选名单，并标明哪些渠道已经找过、哪些尚未覆盖。</p>
                 <a class="n-more" href="use-cases/finding-candidates/">了解猎头怎么找人</a>
                 <span class="n-step-bar" aria-hidden="true"><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i></span>
@@ -513,7 +513,7 @@
               <div class="n-step-text">
                 <p class="n-step-meta"><i>沉淀</i><span>06 / 06</span></p>
                 <p class="n-pain">目标公司的研发部门怎么分、谁负责什么，要从官网、新闻、论文和专利里一点点拼。人一变动，又得重画。</p>
-                <h3 id="n-step-mapping">组织架构梳理（Mapping）：研发组织，一图看清</h3>
+                <h3 id="n-step-mapping">组织架构梳理（Mapping）：<br />研发组织，一图看清</h3>
                 <p>汇总部门、关键岗位、任职人和汇报关系，交回一张组织架构图，可按部门、汇报线、项目切换查看，历史版本全部保留。每个节点附出处，未证实的汇报关系标为待确认。已有的 Excel 架构图可以导入后继续补充。</p>
                 <a class="n-more" href="use-cases/org-chart/">了解组织架构图</a>
                 <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i></span>
@@ -528,7 +528,7 @@
         <div class="n-wrap">
           <div class="n-belief-head">
             <p class="n-kicker">02 · 产品边界</p>
-            <h2 class="n-h2" id="n-belief-title">它做什么，<br />不做什么。</h2>
+            <h2 class="n-h2" id="n-belief-title">各司其职，边界清晰</h2>
             <div class="n-belief-copy">
               <p>查资料、比对、整理，交给它。</p>
               <p>人选的意愿和顾虑、用人方没说出口的需求，需要你当面了解。</p>
@@ -566,13 +566,13 @@
         <div class="n-wrap n-faq-layout">
           <div class="n-section-head">
             <p class="n-kicker">04 · 常见问题</p>
-            <h2 class="n-h2" id="n-faq-title">常见问题</h2>
+            <h2 class="n-h2" id="n-faq-title">试用之前，<br />大家常问这些。</h2>
             <p class="n-sub">其他问题请发邮件至 <a href="mailto:hello@boseekai.com">hello@boseekai.com</a>。</p>
           </div>
           <div class="n-faq-list">
             <details>
               <summary><span>TalentBuddy 适合谁使用？</span><i aria-hidden="true"></i></summary>
-              <p>招聘研发与技术人才的个人用户。猎头顾问可以使用全部能力，包括 BD 客户研判。企业 HR 与招聘负责人常用寻访、人岗匹配和人才库更新。CTO 与技术负责人可以梳理同行的研发组织，按论文、专利、代码寻找领域专家，核实人选的技术履历。覆盖互联网与 AI、智能汽车与工业制造、半导体与电子、医药与医疗器械等行业的研发岗位，包括 AI 与大模型岗位。按个人账号使用。</p>
+              <p>招聘研发与技术人才的个人用户。猎头顾问可以使用全部能力，包括 BD 客户研判。企业 HR 与招聘负责人常用人才寻访、人岗匹配和人才库更新。CTO 与技术负责人可以梳理同行的研发组织，按论文、专利、代码寻找领域专家，核实人选的技术履历。覆盖互联网与 AI、智能汽车与工业制造、半导体与电子、医药与医疗器械等行业的研发岗位，包括 AI 与大模型岗位。按个人账号使用。</p>
             </details>
             <details>
               <summary><span>和直接用豆包、DeepSeek、ChatGPT 这类通用 AI，有什么不同？</span><i aria-hidden="true"></i></summary>
