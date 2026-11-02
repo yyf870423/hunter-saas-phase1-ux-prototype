@@ -12,6 +12,12 @@
 
 最近一次更新（2026-10-27，提交 `28170b2`，上一版线上是 `16fbb6e`）：首屏“破晓”，页面打开时是夜色，云海图片加载后约 4 秒亮到日出前（右侧地平线泛暖光），系统开了“减少动态效果”时直接显示天亮后的画面；云海去灰（天空不再铺雾纹、底部压暗从更低处开始、云海图略提对比）。改动只在 `redesign.css`、`redesign.js`（版本号 `v=27`）和两个首页的首屏结构（`.n-break`、`.n-night` 两层，云海图片的 `onload` 给 `.n-sky` 加 `is-ready`），其余页面只是版本号变化。验证见第 5 条第 11 项。
 
+### 0. TalentBuddy 改版上线前必做（2026-11-02 产品负责人确认）
+
+1. 商标检索结果为“可以申请”后才合并发布（清单见本仓库外 `docs/review-talentbuddy-20261102/商标检索清单.md`）。
+2. 把 `scripts/legal/zh.mjs`、`scripts/legal/en.mjs` 里的 `UPDATED` 和 `EFFECTIVE` 改成实际上线日，运行 `node scripts/build-redesign-pages.mjs` 重新生成法律页面。
+3. 发布前查一次试用申请表：如果已有申请人，按隐私政策变更的要求通知他们。
+
 ### 1. 上线什么
 
 源目录：`public/landing-redesign/`（GitHub Pages 预览：https://yyf870423.github.io/hunter-saas-phase1-ux-prototype/landing-redesign/ ）。
