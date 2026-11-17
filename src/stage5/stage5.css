@@ -1911,11 +1911,9 @@
     font-size: 11px;
     line-height: 17px;
   }
-  .s5-section-actions .s1-button span,
   .s5-section > header > .s1-button span {
     display: none;
   }
-  .s5-section-actions .s1-button,
   .s5-section > header > .s1-button {
     width: 32px;
     padding: 0;
