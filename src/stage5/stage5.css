@@ -942,6 +942,52 @@
   height: 12px;
 }
 
+.s5-plan-choices {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.s5-choice-card .s5-choice-price {
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 28px;
+}
+
+@media (min-width: 761px) {
+  .s5-choice-card.is-vertical {
+    min-height: 240px;
+    grid-template-rows: 32px minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+    row-gap: 16px;
+    padding: 16px;
+  }
+
+  .s5-choice-card.is-vertical > i {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .s5-choice-card.is-vertical > em {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .s5-choice-card.is-vertical > span {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    align-content: start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 760px) {
+  .s5-plan-choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .s5-connection-card,
 .s5-connection-empty,
 .s5-device-card {

@@ -163,6 +163,8 @@ export function ChoiceCard({
   selected,
   title,
   description,
+  price,
+  layout = "row",
   icon,
   onClick,
   disabled = false,
@@ -172,13 +174,14 @@ export function ChoiceCard({
       type="button"
       role="radio"
       aria-checked={selected}
-      className={`s5-choice-card ${selected ? "is-selected" : ""}`}
+      className={`s5-choice-card ${selected ? "is-selected" : ""}${layout === "vertical" ? " is-vertical" : ""}`}
       disabled={disabled}
       onClick={onClick}
     >
       <i>{icon ? <Icon name={icon} /> : <span />}</i>
       <span>
         <b>{title}</b>
+        {price ? <strong className="s5-choice-price">{price}</strong> : null}
         <small>{description}</small>
       </span>
       <em>{selected ? <Icon name="check" /> : null}</em>

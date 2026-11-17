@@ -1828,8 +1828,10 @@ export function SubscriptionSettingsPage() {
             return (
               <ChoiceCard
                 key={key}
+                layout="vertical"
+                price={price}
                 title={current ? `${title}（当前套餐）` : title}
-                description={`${price} · ${description}${below ? " · 不能降级" : ""}`}
+                description={`${description}${below ? " · 不能降级" : ""}`}
                 selected={selectedPlan === key}
                 onClick={() => setSelectedPlan(key)}
                 icon="creditCard"
