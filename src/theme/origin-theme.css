@@ -945,3 +945,10 @@
   border-radius: 50%;
   box-shadow: 0 0 0 2px var(--s1-nav);
 }
+
+/* 列表沿用公司/候选人的全内容区宽度，不额外居中限宽；详情与表单保持原宽度。 */
+.s1-main-list > :is(.s4-page, .s2-signals-page, .s2-module-page) {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}

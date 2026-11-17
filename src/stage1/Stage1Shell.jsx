@@ -347,9 +347,15 @@ function AssetCreateDialog({ open, close, onSelect }) {
   );
 }
 
+const LIST_PAGE_PATHS = new Set([
+  "/companies", "/candidates", "/positions", "/opportunities", "/mappings",
+  "/papers", "/patents", "/data/imports", "/data/exports", "/recycle-bin", "/signals",
+]);
+
 export function Stage1Shell() {
   const navigate = useNavigate();
   const location = useLocation();
+  const listPage = LIST_PAGE_PATHS.has(location.pathname);
   const notify = useToast();
   const [theme, setTheme] = useState(
     () => localStorage.getItem("hunter-theme") || "light",
@@ -780,7 +786,7 @@ export function Stage1Shell() {
           </div>
         </header>
         <main
-          className={`s1-main ${location.pathname === "/new" || location.pathname.startsWith("/tasks") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""} ${location.pathname.startsWith("/signals") ? "s1-main-signals" : ""}`}
+          className={`s1-main${listPage ? " s1-main-list" : ""} ${location.pathname === "/new" || location.pathname.startsWith("/tasks") || location.pathname.startsWith("/reviews/") ? "s1-main-workspace" : ""} ${location.pathname.startsWith("/signals") ? "s1-main-signals" : ""}`}
         >
           <Outlet />
         </main>
