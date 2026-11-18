@@ -130,6 +130,7 @@ export function MobileNavigation({
   visibleAssets,
   otherAssets,
   onModeChange,
+  accountEntry,
 }) {
   const more = [
     { id: "data", label: "数据管理", icon: "download" },
@@ -181,13 +182,7 @@ export function MobileNavigation({
       />
       {mode === "more" ? (
         <section className="s1-mobile-account-section">
-          <header>
-            <i>SL</i>
-            <span>
-              <b>沈岚</b>
-              <small>个人工作空间</small>
-            </span>
-          </header>
+          {accountEntry}
           <button
             type="button"
             onClick={() => {

@@ -117,20 +117,23 @@ export function StatusBadge({ children, tone = "neutral", dot = true }) {
   );
 }
 
-function useOverlay(open, close) {
+function useOverlay(open, close, isolateEscape = false) {
   useEffect(() => {
     if (!open) return undefined;
     const onKeyDown = (event) => {
-      if (event.key === "Escape") close();
+      if (event.key === "Escape") {
+        if (isolateEscape) event.stopImmediatePropagation();
+        close();
+      }
     };
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", onKeyDown, isolateEscape);
     return () => {
       document.body.style.overflow = previous;
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("keydown", onKeyDown, isolateEscape);
     };
-  }, [close, open]);
+  }, [close, open, isolateEscape]);
 }
 
 export function Modal({
@@ -142,9 +145,10 @@ export function Modal({
   size = "md",
   footer,
   closeDisabled = false,
+  isolateEscape = false,
 }) {
   const titleId = useId();
-  useOverlay(open, close);
+  useOverlay(open, close, isolateEscape);
   if (!open) return null;
   return (
     <div

@@ -189,3 +189,33 @@ test("桌面页面没有横向溢出或控制台错误", async ({ page }) => {
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });
+
+for (const width of [390, 320]) {
+  test(`手机${width}px更多账号区复用四项菜单，关闭上层保留抽屉`, async ({ page }) => {
+    const assertNoConsoleErrors = trackConsoleErrors(page);
+    await page.setViewportSize({ width, height: 844 });
+    await page.getByRole("navigation", { name: "移动端主导航" }).getByRole("button", { name: "更多", exact: true }).click();
+    const more = page.getByRole("dialog", { name: "更多", exact: true });
+    const entry = more.getByRole("button", { name: "打开用户菜单", exact: true });
+    await entry.click();
+    const menu = page.getByRole("menu", { name: "用户菜单" });
+    await expect(menu.getByRole("menuitem")).toHaveCount(4);
+    await expect(menu.getByRole("menuitem", { name: /退出登录/ })).toBeInViewport();
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(more).toBeVisible();
+    await expect(entry).toBeFocused();
+    await entry.click();
+    await menu.getByRole("menuitem", { name: /查看 Credits 用量/ }).click();
+    await expect(page.getByRole("dialog", { name: "Credits 用量", exact: true })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: "Credits 用量", exact: true })).toBeHidden();
+    await expect(more).toBeVisible();
+    await entry.click();
+    await menu.getByRole("menuitem", { name: /设置/ }).click();
+    await expect(page).toHaveURL(/#\/settings\/profile$/);
+    await expect(more).toBeHidden();
+    await expectNoHorizontalOverflow(page);
+    await assertNoConsoleErrors();
+  });
+}

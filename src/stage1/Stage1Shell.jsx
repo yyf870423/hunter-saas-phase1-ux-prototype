@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { AccountMenu } from "./AccountMenu";
 import boseekLogo from "../assets/brand/boseek-logo.svg";
 import boseekLogoDark from "../assets/brand/boseek-logo-dark.svg";
 import boseekMark from "../assets/brand/boseek-mark.svg";
@@ -367,7 +368,7 @@ export function Stage1Shell() {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
   const [usageOpen, setUsageOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
+  const mobileAccountActive = useRef(false);
   const [assetNavigationOpen, setAssetNavigationOpen] = useState(false);
   const [assetCreateOpen, setAssetCreateOpen] = useState(false);
   const [mobileMode, setMobileMode] = useState(null);
@@ -395,7 +396,6 @@ export function Stage1Shell() {
     location.pathname === `/${item.id}` ||
     location.pathname.startsWith(`/${item.id}/`);
   const assetTriggerRef = useRef(null);
-  const accountRef = useRef(null);
   const [legacyNotifications, setLegacyNotifications] =
     useState(initialNotifications);
   const lifecycle = useOpportunityState();
@@ -432,21 +432,6 @@ export function Stage1Shell() {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
-  useEffect(() => {
-    if (!accountOpen) return undefined;
-    const closeOnPointerDown = (event) => {
-      if (!accountRef.current?.contains(event.target)) setAccountOpen(false);
-    };
-    const closeOnEscape = (event) => {
-      if (event.key === "Escape") setAccountOpen(false);
-    };
-    document.addEventListener("pointerdown", closeOnPointerDown);
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.removeEventListener("pointerdown", closeOnPointerDown);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [accountOpen]);
 
   const selectNavigation = (item) => {
     const routes = {
@@ -628,98 +613,7 @@ export function Stage1Shell() {
           items={otherAssets}
         />
         <div className="s1-sidebar-foot">
-          <div className="s1-account-wrap" ref={accountRef}>
-            <button
-              type="button"
-              className={`s1-profile-entry ${accountOpen ? "is-open" : ""}`}
-              aria-label="打开用户菜单"
-              aria-expanded={accountOpen}
-              aria-haspopup="menu"
-              onClick={() => setAccountOpen((current) => !current)}
-            >
-              <i>SL</i>
-              <span>
-                <b>沈岚</b>
-                <small>个人工作空间</small>
-              </span>
-              <Icon name={accountOpen ? "chevronUp" : "chevronRight"} />
-            </button>
-            {accountOpen ? (
-              <div
-                className="s1-account-menu"
-                role="menu"
-                aria-label="用户菜单"
-              >
-                <header>
-                  <i>SL</i>
-                  <span>
-                    <b>沈岚</b>
-                    <small>个人工作空间</small>
-                  </span>
-                </header>
-                <div className="s1-account-menu-items">
-                  <button
-                    type="button"
-                    role="menuitem"
-                    aria-label={`查看 Credits 用量，余额 ${agentUsage.balance.toLocaleString("zh-CN")}，本月套餐已用 ${agentUsage.usedPercent}%`}
-                    onClick={() => {
-                      setAccountOpen(false);
-                      setUsageOpen(true);
-                    }}
-                  >
-                    <Icon name="activity" />
-                    <span>
-                      <b>Credits 余额 {agentUsage.balance.toLocaleString("zh-CN")}</b>
-                      <small>本月套餐已用 {agentUsage.usedPercent}% · {agentUsage.refreshOn} 刷新</small>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setAccountOpen(false);
-                      navigate("/settings/profile");
-                    }}
-                  >
-                    <Icon name="settings" />
-                    <span>
-                      <b>设置</b>
-                      <small>偏好、通知与自动化</small>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setAccountOpen(false);
-                      notify("当前没有需要切换的工作空间", "info");
-                    }}
-                  >
-                    <Icon name="swap" />
-                    <span>
-                      <b>切换工作空间</b>
-                      <small>当前仅有 1 个工作空间</small>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    className="is-danger"
-                    onClick={() => {
-                      setAccountOpen(false);
-                      notify("原型未连接真实账号", "info");
-                    }}
-                  >
-                    <Icon name="logout" />
-                    <span>
-                      <b>退出登录</b>
-                      <small>安全退出当前账号</small>
-                    </span>
-                  </button>
-                </div>
-              </div>
-            ) : null}
-          </div>
+          <AccountMenu onUsage={() => setUsageOpen(true)} />
           <button
             type="button"
             className="s1-sidebar-toggle"
@@ -834,12 +728,13 @@ export function Stage1Shell() {
       />
       <MobileNavigation
         open={Boolean(mobileMode)}
-        close={() => setMobileMode(null)}
+        close={() => { if (!mobileAccountActive.current && !usageOpen) setMobileMode(null); }}
         mode={mobileMode}
         onSelect={selectNavigation}
         visibleAssets={visibleAssets}
         otherAssets={otherAssets}
         onModeChange={setMobileMode}
+        accountEntry={<AccountMenu mobileEntry onUsage={() => setUsageOpen(true)} onActiveChange={(active) => { mobileAccountActive.current = active; }} />}
       />
       <AssetCreateDialog
         open={assetCreateOpen}
@@ -852,6 +747,7 @@ export function Stage1Shell() {
       <Modal
         open={usageOpen}
         close={() => setUsageOpen(false)}
+        isolateEscape={Boolean(mobileMode)}
         title="Credits 用量"
         size="sm"
         footer={

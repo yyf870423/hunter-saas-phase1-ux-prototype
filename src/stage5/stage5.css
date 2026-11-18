@@ -1769,6 +1769,52 @@
   color: var(--s1-subtle);
 }
 
+.s1-mobile-account-trigger {
+  display: grid;
+  height: auto;
+  grid-template-columns: 34px minmax(0, 1fr) 14px;
+  gap: 10px;
+  padding: 11px 12px;
+  color: var(--s1-ink);
+  background: var(--s1-canvas);
+  border-bottom: 1px solid var(--s1-line);
+  border-radius: 0;
+}
+.s1-mobile-account-trigger > i {
+  width: 34px;
+  height: 34px;
+  color: #fff;
+  font-size: 11px;
+  background: var(--b-brand-gradient);
+  border-radius: 50%;
+}
+.s1-mobile-account-trigger > span,
+.s1-mobile-account-trigger > svg {
+  display: block;
+}
+.s1-mobile-account-trigger b,
+.s1-mobile-account-trigger small {
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: normal;
+}
+.s1-mobile-account-trigger b {
+  font-size: 12px;
+  font-weight: 700;
+}
+.s1-mobile-account-trigger small {
+  margin-top: 0;
+  color: var(--s1-muted);
+  font-size: 11px;
+}
+.s1-mobile-account-trigger > svg {
+  color: var(--s1-subtle);
+}
+.s1-account-menu.is-mobile-account-menu {
+  z-index: 110;
+}
+
 .s5-mobile-settings-list {
   display: grid;
   gap: 3px;
