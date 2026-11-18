@@ -147,7 +147,7 @@ test("公司组织关系画布缩放可重置且移动端不产生页面横向�
 test("公司组织梳理检查点使用人才地图交付，不显示其他类型图谱", async ({ page }) => {
   await page.goto("#/tasks/mapping-embodied?state=gaps");
   await page.getByRole("button", { name: /^执行计划/ }).click();
-  await page.getByRole("button", { name: /相关处理/ }).click();
+  await page.getByRole("button", { name: /审核并更新人才地图/ }).click();
   await page.getByRole("button", { name: /组织隶属与任职关系/ }).click();
   await expect(page.getByText("目标公司人才地图 · 组织、关键岗位与任职人", { exact: true })).toBeVisible();
   await expect(page.getByText("3 个独立知识图谱 · 本批次增量更新", { exact: true })).toHaveCount(0);

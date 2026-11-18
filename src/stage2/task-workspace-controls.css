@@ -1,0 +1,6 @@
+.s2-workspace-header-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; min-width: 0; }
+.s2-workspace-header-actions > .s1-icon-button { width: 32px; height: 32px; }
+.s2-task-area-nav.app-tabs > .s2-workspace-header-actions { align-self: center; margin-left: auto; }
+.s2-task-area-nav.app-tabs > .s2-workspace-header-actions:empty { display: none; }
+.s2-task-area-nav.app-tabs > .s2-workspace-header-actions .s2-history-mobile-trigger { position: static; width: 32px; height: 32px; }
+.s2-task-artifact-preview > header:has(> .s2-workspace-header-actions) { grid-template-columns: minmax(0, 1fr) auto; }

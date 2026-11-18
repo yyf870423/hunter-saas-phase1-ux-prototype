@@ -3,6 +3,7 @@ import { Icon } from "../components/Icon";
 import { recommendationReportMarkdown } from "../components/RecommendationReportFile";
 import { Button, IconButton, useToast } from "../stage1/ui";
 import { HunterMarkdown } from "./automation-ui";
+import { TaskPaneActions } from "./TaskWorkspaceControls";
 
 const candidateRows = [
   ["项目", "结论", "证据状态"],
@@ -312,7 +313,7 @@ export function TaskArtifactPreview({
             </div>
           ) : null}
         </div>
-        <Button
+        <TaskPaneActions><Button
           size="sm"
           icon="download"
           onClick={() => {
@@ -322,7 +323,7 @@ export function TaskArtifactPreview({
         >
           下载
         </Button>
-        <IconButton icon="close" label="关闭文件预览" onClick={onClose} />
+        <IconButton icon="close" label="关闭文件预览" onClick={onClose} /></TaskPaneActions>
       </header>
       <div className="s2-artifact-preview-body">
         <ArtifactRenderer artifact={artifact} />

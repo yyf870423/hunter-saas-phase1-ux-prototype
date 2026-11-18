@@ -161,7 +161,7 @@ export function advanceLifecycleTask(taskId) {
   if (!latest) throw new Error("任务不存在或已删除。");
   if (latest.kind === "recruiting") {
     runOpportunityCommand("task.update", { id: taskId, patch: { phase: "candidate-review", status: "等待用户" },
-      message: { role: "assistant", content: "候选人资料已列出，等待逐人审核。确认只建立岗位储备关系，不发送联系消息。" } });
+      message: { role: "assistant", content: "候选人资料已列出。可以查看依据，再在原对话说明具体人选和要求；加入岗位储备前会核对本版范围，不发送联系消息。" } });
     return "";
   }
   const draft = latest.kind === "opportunity" ? prepareOpportunityDraft(latest) : preparePositionDraft(latest);

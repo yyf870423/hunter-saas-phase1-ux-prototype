@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { TaskHeaderActions } from "./TaskWorkspaceControls";
 
 export function TaskAreaNav({ value = "tasks" }) {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export function TaskAreaNav({ value = "tasks" }) {
           {label}
         </button>
       ))}
+      <TaskHeaderActions register />
     </nav>
   );
 }

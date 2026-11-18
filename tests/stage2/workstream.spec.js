@@ -54,9 +54,11 @@ test("持续任务从第一条输入渐进推进到审核节点", async ({ page 
   await expect(
     page.locator(".s2-runtime .s2-plan-list li.is-waiting"),
   ).toHaveCount(1);
-  const relatedTasks = page.getByRole("button", { name: /相关处理/ });
-  await expect(relatedTasks).toContainText("3 项完成 · 1 项等待用户");
-  await relatedTasks.click();
+  await expect(page.locator(".s2-runtime-tasks")).toHaveCount(0);
+  await page.getByRole("button", { name: /并行检索并接收补充资料/ }).click();
+  const relatedTasks = page.getByRole("group", { name: "并行检索并接收补充资料的相关处理" });
+  await expect(relatedTasks.locator(".s2-internal-tasks > button")).toHaveCount(3);
+  await expect(relatedTasks).not.toContainText("补全、查重与匹配");
   await expect(
     page.locator(".s2-runtime .s2-plan-list li").filter({
       hasText: "按决定继续后续动作",

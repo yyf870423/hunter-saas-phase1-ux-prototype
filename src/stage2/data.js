@@ -338,6 +338,7 @@ export const identityReviewPlan = [
 export const internalTasks = [
   {
     id: "internal-system",
+    stepId: "recall",
     title: "检索系统候选人",
     status: "完成",
     tone: "success",
@@ -346,6 +347,7 @@ export const internalTasks = [
   },
   {
     id: "internal-resume-import",
+    stepId: "recall",
     title: "读取用户上传的候选人资料",
     status: "完成",
     tone: "success",
@@ -354,6 +356,7 @@ export const internalTasks = [
   },
   {
     id: "internal-research",
+    stepId: "recall",
     title: "研究来源补充人物线索",
     status: "完成",
     tone: "success",
@@ -362,6 +365,7 @@ export const internalTasks = [
   },
   {
     id: "internal-enrichment",
+    stepId: "enrich",
     title: "补全、查重与匹配",
     status: "等待用户",
     tone: "warning",

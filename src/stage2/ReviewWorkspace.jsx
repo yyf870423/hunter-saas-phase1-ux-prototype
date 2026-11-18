@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Icon } from "../components/Icon";
 import { Button, IconButton, SearchField, StatusBadge } from "../stage1/ui";
+import { TaskPaneActions } from "./TaskWorkspaceControls";
 
 export function InspectionPanel({ item, onClose }) {
   if (!item) return null;
@@ -29,7 +30,7 @@ export function InspectionPanel({ item, onClose }) {
           <small>{isTask ? item.kindLabel || "相关处理" : "证据集合"}</small>
           <h2>{item.title}</h2>
         </span>
-        <IconButton icon="close" label="关闭检查区" onClick={onClose} />
+        <TaskPaneActions><IconButton icon="close" label="关闭检查区" onClick={onClose} /></TaskPaneActions>
       </header>
       {isTask ? (
         <div className="s2-inspector-content">

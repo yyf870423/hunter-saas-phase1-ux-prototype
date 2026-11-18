@@ -282,6 +282,8 @@ export function NewWork() {
     <div className="s2-page s2-workspace s2-task-create-workspace">
       <WorkHistory
         items={workItems}
+        loadState={forcedState}
+        onRetry={() => setParams({})}
         collapsed={historyCollapsed}
         currentId=""
         onToggle={() => setHistoryCollapsed((current) => !current)}
@@ -291,7 +293,7 @@ export function NewWork() {
           setStatus("idle");
           navigate("/tasks");
         }}
-        onSelect={(item) => navigate(`/tasks/${item.id}`)}
+        onSelect={(item) => window.open(`${location.pathname}${location.search}#/tasks/${item.id}`, "_blank", "noopener,noreferrer")}
       />
       <section className="s2-task-create-main">
         <TaskAreaNav value="tasks" />
