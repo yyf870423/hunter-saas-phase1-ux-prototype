@@ -1,83 +1,9 @@
 import { Link } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { StatusBadge } from "../stage1/ui";
+import { taskDesignScenarios, taskScenarioSteps } from "./task-design-scenarios";
 
-const reviewLinks = [
-  [
-    "任务渐进演示",
-    "/tasks/position-vla",
-    "从第一条用户输入开始，逐步出现回复、计划、运行、结果和审核",
-  ],
-  [
-    "任务工作区",
-    "/tasks",
-    "同一入口创建任务并查看历史对话，不要求用户选择任务类型",
-  ],
-  ["周期性任务", "/tasks/periodic", "统一创建周期、查看配置和逐轮运行记录"],
-  [
-    "等待用户的周期运行",
-    "/tasks/periodic?view=runs&run=run-position-waiting",
-    "同一批问题集中确认后继续本轮运行",
-  ],
-  [
-    "正在运行的周期记录",
-    "/tasks/periodic?view=runs&status=正在运行",
-    "在运行记录中筛选当前正在执行的周期运行",
-  ],
-  [
-    "直接核验任务",
-    "/tasks/task-hand-team",
-    "等待用户、补充信息、恢复和结果回流",
-  ],
-  ["洞察中心", "/signals", "统一处理 Hunter 主动发现的信号与洞察"],
-  [
-    "推进方式判断中",
-    "/new?state=classifying",
-    "保留用户输入，流式说明正在判断任务范围和推进方式",
-  ],
-  ["目标歧义确认", "/new?state=clarify", "只追问一个会改变推进方式的关键问题"],
-  [
-    "直接完成",
-    "/new?state=direct",
-    "可立即完成的任务创建后进入统一任务对话并返回 Markdown 结果",
-  ],
-  [
-    "创建权限受限",
-    "/new?state=limited",
-    "允许查看已有内容，禁用新建输入和授权操作",
-  ],
-  [
-    "加载状态",
-    "/tasks/position-vla?state=loading",
-    "任务详情骨架保持稳定，不出现布局跳动",
-  ],
-  [
-    "流式失败",
-    "/tasks/position-vla?state=stream-error",
-    "保留已生成内容并从当前检查点继续",
-  ],
-  [
-    "公开来源受限",
-    "/tasks/position-vla?state=limited",
-    "局部公开来源受限时保留系统候选人、知识图谱和已有结果",
-  ],
-  [
-    "用户上传简历批次",
-    "/tasks/position-vla?state=resume-batch",
-    "在对话中显示用户上传文件，并进入统一查重、合并和匹配流程",
-  ],
-  [
-    "候选人合并冲突",
-    "/tasks/position-vla?state=merge-conflict",
-    "用户上传简历与系统候选人疑似同人时等待用户决定",
-  ],
-  [
-    "对话中推进候选人",
-    "/tasks/position-vla?state=pipeline-dialogue",
-    "一句话推进多位候选人：先列出整批草稿，可整批或逐项确认，确认后泳道和候选人页同步",
-  ],
-  ["阶段一工作台", "/home", "已审批并冻结的全局框架与工作台"],
-];
+const reviewLinks = taskDesignScenarios.map(([id, title, route]) => [title, route, taskScenarioSteps[id] || "直接打开检查；示例资料与状态不代表真实执行。"]);
 
 export function Stage2ReviewPage() {
   return (
@@ -89,12 +15,12 @@ export function Stage2ReviewPage() {
           </i>
           Hunter SaaS
         </span>
-        <StatusBadge tone="info">统一任务模型待审批</StatusBadge>
+        <StatusBadge tone="info">全场景原型待检查</StatusBadge>
         <h1>垂类 Agent 任务模型</h1>
         <p>
-          本轮审批统一任务、周期性任务、运行记录和洞察中心的产品模型。用户不需要理解任何内部任务分类。
+          【原型说明，正式实现不展示】本地虚构数据与有限意图模拟，尚未部署；覆盖原详细设计的任务入口、四类业务、独立核验/摘要/报告、周期和异常状态，不代表真实Agent或业务接口已经接通。
         </p>
-        <Link className="s1-review-primary" to="/tasks/position-vla">
+        <Link className="s1-review-primary" to="/tasks/position-vla" target="_blank" rel="noopener noreferrer">
           进入渐进式任务演示
           <Icon name="chevronRight" />
         </Link>
@@ -107,7 +33,7 @@ export function Stage2ReviewPage() {
         </div>
         <div className="s1-review-links">
           {reviewLinks.map(([title, route, description]) => (
-            <Link to={route} key={title}>
+            <Link to={route} key={title} target="_blank" rel="noopener noreferrer">
               <span>
                 <b>{title}</b>
                 <small>{description}</small>
@@ -135,14 +61,14 @@ export function Stage2ReviewPage() {
             <Icon name="task" />
             <b>结果层级</b>
             <p>
-              少量结果内联、中量检查区和大量审核工作区是否支持完整业务判断。
+              结果用于阅读、比较和证据核对，原对话明确对象、范围与本版要求，不强制勾选和提交。
             </p>
           </article>
           <article>
             <Icon name="message" />
             <b>交互一致性</b>
             <p>
-              自然语言、结构化审核、授权模式和恢复机制是否使用同一业务语义。
+              自然语言、必要确认、授权与失败恢复共用业务规则；独立资产页手工操作保留。
             </p>
           </article>
           <article>

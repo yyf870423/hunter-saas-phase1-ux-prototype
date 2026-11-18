@@ -11,18 +11,19 @@ async function capture(page, name) {
   await mkdir("artifacts/task-followup-markdown", { recursive: true });
   const current = followup(page);
   if (await current.count()) await current.scrollIntoViewIfNeeded();
-  else if (name.includes("periodic")) await page.getByRole("heading", { name: "是否按此计划创建周期性任务？" }).scrollIntoViewIfNeeded();
+  else if (name.includes("periodic")) await page.getByRole("heading", { name: "周期性任务草案" }).scrollIntoViewIfNeeded();
   await expectNoHorizontalOverflow(page);
   await page.screenshot({ path: "artifacts/task-followup-markdown/" + name + ".png", fullPage: true, animations: "disabled" });
 }
 async function readyClient(page) {
   await page.goto("#/tasks/client-xinglan");
   await confirmClientOpportunity(page);
-  await button(page, "打开公司与联系人审核").click();
-  await button(page, "保存审核结果").click();
+  await replyToAsset(page, "保存陈雨、周琪为联系人");
+  await replyToAsset(page, "确认");
   await button(page, "确认并发送").click();
   await expect(page.getByRole("heading", { name: "等待陈雨回复招聘合作邮件" })).toBeVisible();
   await replyToAsset(page, "招聘需求摘要：客户已回复，新增机器人测试团队\n需求依据：陈雨确认需要进一步核对 JD");
+  await expect(page.getByRole("heading", { name: "待确认的招聘机会", exact: true })).toBeVisible();
   await replyToAsset(page, "是");
   await expect(followup(page)).toBeVisible();
 }
@@ -62,6 +63,7 @@ for (const [device, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await capture(page, device + "-client-followup-recorded");
     await replyToAsset(page, "招聘需求摘要：预算新增一档，仍待确认人数");
+    await expect(page.getByRole("heading", { name: "待确认的招聘机会", exact: true })).toBeVisible();
     await replyToAsset(page, "是");
     const opportunity = (await snapshot(page)).opportunities.at(-1);
     expect(opportunity.summary).toContain("预算新增一档");

@@ -100,16 +100,14 @@
   padding-right: 42px;
 }
 
-@media (max-width: 900px) {
-  .s1-icon-button.s2-history-mobile-trigger {
+.s1-icon-button.s2-history-mobile-trigger.is-visible {
     position: fixed;
     z-index: 30;
     top: 64px;
     right: 12px;
     display: grid;
-    width: 40px;
-    height: 40px;
-  }
+    width: 32px;
+    height: 32px;
 }
 
 @media (hover: none) {

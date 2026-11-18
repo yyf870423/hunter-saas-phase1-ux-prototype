@@ -64,7 +64,7 @@ export function OtherAssetNavigation({
   useEffect(() => {
     if (!open) return undefined;
     const frame = requestAnimationFrame(() =>
-      panelRef.current?.querySelector(".s1-asset-nav-items button")?.focus(),
+      panelRef.current?.querySelector(".s1-asset-nav-items button")?.focus({ preventScroll: true }),
     );
     const onPointerDown = (event) => {
       if (

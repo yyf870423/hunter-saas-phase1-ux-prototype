@@ -6,11 +6,13 @@ import { ComponentsPage } from "./stage1/ComponentsPage";
 import { Dashboard, NotActivatedPage } from "./stage1/Dashboard";
 import { ReviewPage } from "./stage1/ReviewPage";
 import { Stage1Shell } from "./stage1/Stage1Shell";
+import { TaskHeaderControlsProvider } from "./stage2/TaskWorkspaceControls";
 import { NewWork } from "./stage2/NewWork";
 import { PeriodicTasksPage } from "./stage2/PeriodicTasks";
 import { SignalsPage } from "./stage2/Signals";
 import { Stage2ReviewPage } from "./stage2/Stage2ReviewPage";
 import { WorkstreamRoute } from "./stage3/WorkstreamRoute";
+import { CandidateResearchDemo, CandidateResearchSourceDemo } from "./stage2/CandidateResearchDemo";
 import {
   CandidatesListPage,
   CompaniesListPage,
@@ -102,7 +104,7 @@ export default function App() {
         <Route path="/ops/support" element={<SupportPage />} />
       </Route>
       <Route path="/not-activated" element={<NotActivatedPage />} />
-      <Route element={<Stage1Shell />}>
+      <Route element={<TaskHeaderControlsProvider><Stage1Shell /></TaskHeaderControlsProvider>}>
         <Route path="/demo/opportunities" element={<OpportunityDemoPage />} />
         <Route path="/demo/opportunity-source/:caseId" element={<OpportunityDemoSourcePage />} />
         <Route path="/home" element={<Dashboard />} />
@@ -110,6 +112,8 @@ export default function App() {
         <Route path="/new" element={<NewWork />} />
         <Route path="/tasks" element={<NewWork />} />
         <Route path="/tasks/periodic" element={<PeriodicTasksPage />} />
+        <Route path="/tasks/candidate-research-demo" element={<CandidateResearchDemo />} />
+        <Route path="/demo/candidate-research-source/:candidateId" element={<CandidateResearchSourceDemo />} />
         <Route path="/tasks/:workstreamId" element={<WorkstreamRoute />} />
         <Route
           path="/processing"

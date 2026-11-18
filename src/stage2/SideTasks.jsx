@@ -21,6 +21,7 @@ import {
   HunterReply,
   PlanList,
   PlanUpdate,
+  RuntimeBar,
   UserMessage,
   WorkHistory,
 } from "./automation-ui";
@@ -32,6 +33,9 @@ import {
 import { TaskAreaNav } from "./TaskAreaNav";
 import { mergeLifecycleTasks, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
 import { OpportunityTaskWorkspace } from "../stage4/OpportunityTaskWorkspace";
+import { TaskReadingColumns, TaskReadingWorkspace } from "./TaskReadingWorkspace";
+import { TaskHeaderActions } from "./TaskWorkspaceControls";
+import { InspectionPanel } from "./ReviewWorkspace";
 
 const tabs = [
   ["all", "全部"],
@@ -310,25 +314,8 @@ function PositionCreationTask({ taskId }) {
   return task ? <OpportunityTaskWorkspace taskId={taskId} /> : <HunterReply markdown={error || "正在整理岗位资料。"} />;
 }
 
-function TaskWorkspaceShell({ currentId, children }) {
-  const navigate = useNavigate();
-  const [historyCollapsed, setHistoryCollapsed] = useState(false);
-  return (
-    <div className="s2-page s2-workspace">
-      <WorkHistory
-        items={workItems}
-        collapsed={historyCollapsed}
-        currentId={currentId}
-        onToggle={() => setHistoryCollapsed((value) => !value)}
-        onCreate={() => navigate("/new")}
-        onSelect={(item) => navigate(`/tasks/${item.id}`)}
-      />
-      <section className="s2-workstream-main s2-task-detail-page">
-        <TaskAreaNav value="tasks" />
-        {children}
-      </section>
-    </div>
-  );
+function TaskWorkspaceShell({ currentId, header, result, children }) {
+  return <TaskReadingWorkspace taskId={currentId} header={<><TaskAreaNav value="tasks" />{header}</>} result={result} inspection={Boolean(result)}>{children}</TaskReadingWorkspace>;
 }
 
 function IdentityReviewTask({ taskId }) {
@@ -342,16 +329,15 @@ function IdentityReviewTask({ taskId }) {
   const [authMode, setAuthMode] = useState("confirm");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
+  const [inspection, setInspection] = useState(null);
   const send = (text, files) => {
     setReplies((items) => [...items, { text, files: files.map((file) => file.name) }]);
-    setResolved(true);
+    setResolved(!files.length && /^(?:暂不合并|保留为不同人物|跳过本轮冲突项)[。 ]*$/.test(text.trim()));
     setComposer("");
     setAttachments([]);
     notify(
-      files.length
-        ? "补充资料已保存并从当前检查点继续"
-        : "处理意见已保存并从当前检查点继续",
-      "success",
+      "补充内容已保留；本地演示没有核实新资料或合并人物",
+      "info",
     );
   };
   const visiblePlan = identityReviewPlan.map((step, index) => ({
@@ -391,7 +377,7 @@ function IdentityReviewTask({ taskId }) {
           tone: "warning",
         };
   return (
-    <TaskWorkspaceShell currentId={taskId}>
+    <TaskWorkspaceShell currentId={taskId} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : null} header={
       <header className="s2-detail-header">
         <button type="button" onClick={() => navigate("/tasks")}>
           <Icon name="chevronLeft" />
@@ -412,7 +398,7 @@ function IdentityReviewTask({ taskId }) {
             onClick={() => setDeleteOpen(true)}
           />
         </div>
-      </header>
+      </header>}>
       <div className="s2-task-detail-layout">
         <section className="s2-task-conversation">
           <div className="s2-task-timeline">
@@ -442,36 +428,11 @@ function IdentityReviewTask({ taskId }) {
             />
             {replies.map((reply, index) => <div key={index}>
               <UserMessage>{[reply.text, ...reply.files].filter(Boolean).join("\n")}</UserMessage>
-              <HunterReply markdown="补充资料已回流“星澜机器人知识图谱”的更新与审核区，供继续核对身份；当前没有合并人物，原有冲突和证据仍保留。" />
+              <HunterReply markdown="补充内容已保留。原有冲突和证据仍保留，当前没有合并人物；本地示例未实际解析附件或核实新的任职资料。" />
             </div>)}
           </div>
           <div className="s2-task-composer-dock">
-            <div className="s2-task-plan">
-              <button
-                type="button"
-                aria-expanded={planOpen}
-                onClick={() => setPlanOpen((value) => !value)}
-              >
-                <Icon name="task" />
-                <span>
-                  <b>执行计划</b>
-                  <small>
-                    {resolved
-                      ? "3 / 3 项完成"
-                      : paused
-                        ? "2 / 3 项完成，当前已暂停"
-                        : "2 / 3 项完成，等待身份决定"}
-                  </small>
-                </span>
-                <Icon name={planOpen ? "chevronDown" : "chevronUp"} />
-              </button>
-              {planOpen ? (
-                <div className="s2-task-plan-body">
-                  <PlanUpdate update={planUpdate} />
-                  <PlanList steps={visiblePlan} />
-                </div>
-              ) : null}
-            </div>
+            <RuntimeBar open={planOpen} onToggle={() => setPlanOpen(value => !value)} plan={visiblePlan} planUpdate={planUpdate} paused={paused} docked tasks={visiblePlan.map(step => ({ id: `identity-${step.id}`, stepId: step.id, title: step.title, action: step.detail, status: step.status === "done" ? "完成" : "等待用户", kind: "task", duration: "本地示例", resultDestination: "当前身份核验任务；没有合并人物" }))} onInspectTask={setInspection} />
             <Composer
               value={composer}
               onChange={setComposer}
@@ -526,7 +487,7 @@ function OneStepSummaryTask({ taskId }) {
   const [authMode, setAuthMode] = useState("confirm");
   const [replies, setReplies] = useState([]);
   return (
-    <TaskWorkspaceShell currentId={taskId}>
+    <TaskWorkspaceShell currentId={taskId} header={
       <header className="s2-detail-header">
         <button type="button" onClick={() => navigate("/tasks")}>
           <Icon name="chevronLeft" />
@@ -540,7 +501,7 @@ function OneStepSummaryTask({ taskId }) {
         <div>
           <StatusBadge tone="info">可继续</StatusBadge>
         </div>
-      </header>
+      </header>}>
       <div className="s2-task-detail-layout">
         <section className="s2-task-conversation">
           <div className="s2-task-timeline">
@@ -572,7 +533,7 @@ function OneStepSummaryTask({ taskId }) {
                 setReplies((items) => [...items, { text, files: files.map((file) => file.name) }]);
                 setComposer("");
                 setAttachments([]);
-                notify("任务结果已更新", "success");
+                notify("补充要求已保留，未实际重写摘要", "info");
               }}
               authMode={authMode}
               onAuthChange={setAuthMode}
@@ -588,6 +549,7 @@ function OneStepSummaryTask({ taskId }) {
 }
 
 export function RecommendationReportWorkspace({ onClose }) {
+  const [inspection, setInspection] = useState(null);
   const notify = useToast();
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
@@ -666,15 +628,13 @@ export function RecommendationReportWorkspace({ onClose }) {
           <h1>为{candidateName}生成客户推荐报告</h1>
           <p>关联：具身智能 VLA 算法负责人 · {candidateName}</p>
         </div>
-        <div>
+        <TaskHeaderActions register>
           <StatusBadge tone={revised ? "success" : "warning"}>
             {revised ? "可继续修改" : "等待用户"}
           </StatusBadge>
-        </div>
+        </TaskHeaderActions>
       </header>
-      <div
-        className={`s2-task-detail-layout ${previewArtifact ? "has-artifact" : ""}`}
-      >
+      <TaskReadingColumns inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : previewArtifact ? <TaskArtifactPreview artifact={previewArtifact} artifacts={taskArtifacts} onSelect={setPreviewArtifactId} onClose={() => setPreviewArtifactId(null)} /> : null}>
         <section className="s2-task-conversation">
           <div className="s2-task-timeline">
             <UserMessage time="今天 10:08">{reportRequirement}</UserMessage>
@@ -723,27 +683,7 @@ export function RecommendationReportWorkspace({ onClose }) {
             ) : null}
           </div>
           <div className="s2-task-composer-dock">
-            <div className="s2-task-plan">
-              <button
-                type="button"
-                aria-expanded={planOpen}
-                onClick={() => setPlanOpen((value) => !value)}
-              >
-                <Icon name="task" />
-                <span>
-                  <b>执行计划</b>
-                  <small>
-                    {revised ? "3 / 3 项完成" : "2 / 3 项完成，等待修改意见"}
-                  </small>
-                </span>
-                <Icon name={planOpen ? "chevronDown" : "chevronUp"} />
-              </button>
-              {planOpen ? (
-                <div className="s2-task-plan-body">
-                  <PlanList steps={plan} />
-                </div>
-              ) : null}
-            </div>
+            <RuntimeBar open={planOpen} onToggle={() => setPlanOpen(value => !value)} plan={plan} docked tasks={plan.map(step => ({ id: `report-${step.id}`, stepId: step.id, title: step.title, action: step.detail, kind: "task", duration: "本地示例", status: step.status === "done" ? "完成" : "等待用户", resultDestination: "本资产推荐报告；未对外发送" }))} onInspectTask={setInspection} />
             <Composer
               value={composer}
               onChange={setComposer}
@@ -771,15 +711,7 @@ export function RecommendationReportWorkspace({ onClose }) {
             />
           </div>
         </section>
-        {previewArtifact ? (
-          <TaskArtifactPreview
-            artifact={previewArtifact}
-            artifacts={taskArtifacts}
-            onSelect={setPreviewArtifactId}
-            onClose={() => setPreviewArtifactId(null)}
-          />
-        ) : null}
-      </div>
+      </TaskReadingColumns>
     </section>
   );
 }

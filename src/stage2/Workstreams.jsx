@@ -11,16 +11,16 @@ import {
   IdentityConflictReview,
   RuntimeBar,
   UserMessage,
-  WorkHistory,
 } from "./automation-ui";
 import {
   candidates,
   evidenceRows,
   internalTasks,
   planSteps,
-  workItems,
 } from "./data";
-import { CandidateReviewWorkspace, InspectionPanel } from "./ReviewWorkspace";
+import { InspectionPanel } from "./ReviewWorkspace";
+import { TaskReadingWorkspace } from "./TaskReadingWorkspace";
+import { TaskResultReader, candidateReadingRows } from "./TaskResultReader";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
 import { dialogueActor, stageNameById } from "../stage4/pipeline-relations";
@@ -34,10 +34,10 @@ function CandidateReviewEntry({ onOpen }) {
   return (
     <div className="s2-markdown-action-row">
       <Button tone="primary" icon="users" onClick={onOpen}>
-        打开候选人审核（18）
+        查看候选人结果（18）
       </Button>
       <small>
-        也可以直接输入筛选规则，例如“将 85
+        在原对话说明要求，例如“将 85
         分以上的人加入岗位储备，但不选赵星羽”。
       </small>
     </div>
@@ -53,6 +53,7 @@ export function WorkstreamHeader({
   onReset,
   onArchive,
   onDelete,
+  phase,
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -67,7 +68,7 @@ export function WorkstreamHeader({
   return (
     <>
       <TaskAreaNav value="tasks" />
-      <header className="s2-workstream-header">
+      <header className="s2-workstream-header" data-prototype-phase={phase}>
         <div>
           <span>{type}</span>
           <h1>{title}</h1>
@@ -138,7 +139,6 @@ export function AutomationWorkspace() {
   const [params] = useSearchParams();
   const notify = useToast();
   const forcedState = params.get("state");
-  const [historyCollapsed, setHistoryCollapsed] = useState(false);
   const [phase, setPhase] = useState(() => {
     if (forcedState === "stream-error") return 1;
     if (forcedState === "limited") return 2;
@@ -210,6 +210,7 @@ export function AutomationWorkspace() {
     return sessionStorage.getItem("hunter-workstream-contact-stage") || "idle";
   });
   const [ingestionDecision, setIngestionDecision] = useState("");
+  const [ingestionDraft, setIngestionDraft] = useState(null);
   const [localError, setLocalError] = useState(forcedState === "error");
   const scrollRef = useRef(null);
   const prompt =
@@ -414,6 +415,18 @@ export function AutomationWorkspace() {
   };
 
   const send = (text, files) => {
+    if (forcedState === "candidate-ingestion" && !ingestionDecision && !files.length) {
+      if (ingestionDraft) {
+        if (/^(确认|是|是的)[。 ]*$/.test(text.trim()) && authMode !== "analysis") {
+          setIngestionDecision(ingestionDraft); reply(text, "本版本地演示范围已确认，身份未明确的记录仍保留。真实写入、匹配与逐对象回执尚未接入。");
+        } else reply(text, authMode === "analysis" ? "当前仅分析，没有写入或匹配；切换授权后请重新核对范围。" : "旧草稿未执行，请重新明确本版范围。");
+        setIngestionDraft(null); return;
+      }
+      const option = { "仅写入": "write-only", "本批仅写入": "write-only", "写入后匹配全部招聘中岗位": "all", "写入后匹配具身智能VLA算法负责人岗位": "selected" }[text.replace(/\s+/g, "").replace(/[。！!]+$/, "")];
+      if (!option) { reply(text, "请说明本批仅写入，还是成功写入后匹配全部招聘中岗位或指定岗位。当前没有执行；本地演示不解析未声明的额外范围。"); return; }
+      setIngestionDraft(option);
+      reply(text, `### 待确认的本批处理范围\n\n对象：12份简历中的9位新候选人与2位资料补充建议；身份有冲突的1位不提前写入或匹配。\n\n后续：${option === "write-only" ? "仅写入，不启动匹配" : option === "all" ? "成功写入后匹配全部8个招聘中岗位" : "成功写入后匹配当前具身智能VLA算法负责人岗位"}。本地模拟尚未真实写入；请确认或修改。`); return;
+    }
     const attachmentText = files.length
       ? `；附带 ${files.map((file) => file.name).join("、")}`
       : "";
@@ -583,20 +596,6 @@ export function AutomationWorkspace() {
                 }
               : null;
 
-  if (reviewOpen) {
-    return (
-      <div className="s2-page s2-review-page-shell">
-        <CandidateReviewWorkspace
-          candidates={candidates}
-          onClose={() => setReviewOpen(false)}
-          onApply={({ selected }) => {
-            applyCandidateReview(selected, `将已选择的 ${selected.length} 位候选人加入岗位储备，并同步更新人才梳理。`);
-          }}
-        />
-      </div>
-    );
-  }
-
   if (forcedState === "loading") {
     return (
       <div className="s2-page s2-workspace-loading">
@@ -625,19 +624,8 @@ export function AutomationWorkspace() {
   }
 
   return (
-    <div
-      className={`s2-page s2-workspace ${inspection ? "has-inspector" : ""}`}
-    >
-      <WorkHistory
-        items={workItems}
-        collapsed={historyCollapsed}
-        currentId="position-vla"
-        onToggle={() => setHistoryCollapsed((value) => !value)}
-        onCreate={() => navigate("/new")}
-        onSelect={(item) => navigate(`/tasks/${item.id}`)}
-      />
-      <section className="s2-workstream-main">
-        <WorkstreamHeader
+    <>
+      <TaskReadingWorkspace taskId="position-vla" inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : reviewOpen ? <TaskResultReader title="候选人结果" rows={candidateReadingRows(candidates)} onClose={() => setReviewOpen(false)} /> : null} header={<WorkstreamHeader
           status={
             contactStage === "waiting"
               ? "等待外部"
@@ -662,7 +650,7 @@ export function AutomationWorkspace() {
             notify("任务已归档，可从任务历史中的归档入口恢复", "success");
           }}
           onDelete={() => setDeleteOpen(true)}
-        />
+        />}>
         <div className="s2-conversation" ref={scrollRef}>
           <div className="s2-timeline">
             <UserMessage>{prompt}</UserMessage>
@@ -684,7 +672,7 @@ export function AutomationWorkspace() {
             ) : null}
             {streamError ? (
               <div role="alert">
-                <HunterReply markdown="### 回复生成中断\n\n已经生成的内容和输入已保留，可以从当前检查点继续。" />
+                <HunterReply markdown={"### 回复生成中断\n\n已经生成的内容和输入已保留，可以从当前检查点继续。"} />
                 <Button
                   tone="secondary"
                   size="sm"
@@ -696,14 +684,14 @@ export function AutomationWorkspace() {
               </div>
             ) : null}
             {streamStopped ? (
-              <HunterReply markdown="### 本轮执行已停止\n\n已经生成的内容和当前上下文不会丢失。请在下方输入新的要求后继续。" />
+              <HunterReply markdown={"### 本轮执行已停止\n\n已经生成的内容和当前上下文不会丢失。请在下方输入新的要求后继续。"} />
             ) : null}
             {forcedState === "limited" ? (
-              <HunterReply markdown="### 部分公开来源暂不可用\n\n系统候选人、知识图谱和已获得的公开结果继续保留。失败来源可以稍后单独重试，也可以直接上传补充简历。" />
+              <HunterReply markdown={"### 部分公开来源暂不可用\n\n系统候选人、知识图谱和已获得的公开结果继续保留。失败来源可以稍后单独重试，也可以直接上传补充简历。"} />
             ) : null}
             {localError ? (
               <div role="alert">
-                <HunterReply markdown="### 论文与专利人物线索处理失败\n\n系统候选人、知识图谱、公开资料和用户上传简历已经保留。可以只重试失败来源，不重新执行整轮任务。" />
+                <HunterReply markdown={"### 论文与专利人物线索处理失败\n\n系统候选人、知识图谱、公开资料和用户上传简历已经保留。可以只重试失败来源，不重新执行整轮任务。"} />
                 <Button
                   tone="secondary"
                   size="sm"
@@ -774,42 +762,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
 
 本批资料将新建 9 位候选人、补充 2 位已有候选人，另有 1 位需要先完成人工身份确认。匹配只会在正式写入成功后启动；待确认记录不会进入匹配。`}
               >
-                <DecisionRequest
-                  title="候选人写入后是否立即进行人岗匹配？"
-                  description="请选择本批成功写入候选人的后续处理方式。"
-                  options={[
-                    {
-                      value: "all",
-                      label: "写入并匹配全部招聘中岗位",
-                      description:
-                        "对当前工作空间中的 8 个招聘中岗位运行匹配。",
-                    },
-                    {
-                      value: "selected",
-                      label: "写入并匹配指定岗位",
-                      description:
-                        "先匹配当前的具身智能 VLA 算法负责人岗位，可继续输入其他岗位。",
-                    },
-                    {
-                      value: "write-only",
-                      label: "仅写入候选人",
-                      description: "完成新建或资料合并，不启动岗位匹配。",
-                    },
-                    {
-                      value: "custom",
-                      label: "我来补充其他要求",
-                      description:
-                        "在下方输入岗位范围、例外人选或其他处理要求。",
-                    },
-                  ]}
-                  onSelect={(option) => {
-                    if (option.value === "custom") {
-                      setComposer("写入候选人后，请按以下范围匹配：");
-                      return;
-                    }
-                    setIngestionDecision(option.value);
-                  }}
-                />
+                <p>本批尚未写入。请在原对话说明仅写入、写入后匹配全部招聘中岗位，或指定要匹配的岗位；先核对本版范围，再确认。</p>
               </HunterReply>
             ) : null}
             {forcedState === "candidate-ingestion" && ingestionDecision ? (
@@ -840,7 +793,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
 
 > 已完成身份检查、重复合并、角色门禁和匹配评分。被硬门槛跳过的 3 位候选人不进入本轮审核。`}
               >
-                <CandidateReviewEntry onOpen={() => setReviewOpen(true)} />
+                <CandidateReviewEntry onOpen={() => { setInspection(null); setReviewOpen(true); }} />
               </HunterReply>
             ) : null}
             {forcedState === "merge-conflict" ? (
@@ -981,7 +934,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
               </HunterReply>
             ) : null}
             {contactStage === "waiting" ? (
-              <HunterReply markdown="## 等待 3 位候选人回复邮件\n\n邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到当前任务；猎头在系统外获得的新信息也可以作为普通跟进记录补充。\n\n最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 · 7 天后标记长期未回复" />
+              <HunterReply markdown={"## 等待 3 位候选人回复邮件\n\n邮件已发送，岗位储备关系没有变化。收到邮件回复后会回到当前任务；猎头在系统外获得的新信息也可以作为普通跟进记录补充。\n\n最近检查：刚刚 · 下次检查：6 小时后 · 3 个工作日后建议跟进 · 7 天后标记长期未回复"} />
             ) : null}
             {contactStage === "reply" ? (
               <>
@@ -1015,7 +968,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
               </>
             ) : null}
             {terminated ? (
-              <HunterReply markdown="### 任务已终止\n\n对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建任务。" />
+              <HunterReply markdown={"### 任务已终止\n\n对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建任务。"} />
             ) : null}
           </div>
         </div>
@@ -1051,8 +1004,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
             disabled={terminated}
           />
         </div>
-      </section>
-      <InspectionPanel item={inspection} onClose={() => setInspection(null)} />
+      </TaskReadingWorkspace>
       <Modal
         open={terminateOpen}
         close={() => setTerminateOpen(false)}
@@ -1114,6 +1066,6 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
           <p>已确认写入的候选人、岗位和其他正式业务资产不会删除。</p>
         </div>
       </Modal>
-    </div>
+    </>
   );
 }

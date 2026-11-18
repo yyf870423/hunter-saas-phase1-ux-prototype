@@ -246,7 +246,7 @@ function edgeLabelPoint(source, target, index, layout) {
 function SelectedDetail({
   view,
   selection,
-  decisions,
+  decisions = {},
   onDecision,
   onSelect,
   onClose,
@@ -388,7 +388,7 @@ function SelectedDetail({
           </div>
         </section>
       ) : null}
-      {decisionKey ? (
+      {decisionKey && onDecision ? (
         <section className="s3-pending-decision">
           <h3>本批次写入决定</h3>
           <p>原始冲突和证据会保留；确认只影响本批次是否写入当前关系。</p>
@@ -571,6 +571,7 @@ export function RelationshipCanvas({
   editable = false,
   draggable = false,
   storageKey,
+  readingOnly = false,
 }) {
   const navigate = useNavigate();
   const notify = useToast();
@@ -1340,7 +1341,7 @@ export function RelationshipCanvas({
                   ...resolveEvidenceSnapshot(label, selected, activeView),
                 })
               }
-              onOpenEntity={(selected) => navigate(selected.detailPath)}
+              onOpenEntity={(selected) => readingOnly ? window.open(`${location.pathname}${location.search}#${selected.detailPath}`, "_blank", "noopener,noreferrer") : navigate(selected.detailPath)}
             />
           ) : null}
         </div>

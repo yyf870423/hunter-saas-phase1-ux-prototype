@@ -1,4 +1,4 @@
-import { EmptyState, IconButton, StatusBadge, useToast } from "../stage1/ui";
+import { Button, EmptyState, IconButton, StatusBadge, useToast } from "../stage1/ui";
 import { TooltipText } from "../stage4/asset-ui";
 import { saveTaskPin } from "./task-pin-store";
 
@@ -31,7 +31,11 @@ export function TaskHistoryList({
   onSelect,
   query,
   archived,
+  loadState,
+  onRetry,
 }) {
+  if (loadState === "error") return <EmptyState compact icon="warning" title="任务列表读取失败" description="未能读取任务，已有输入仍保留。" action={<Button size="sm" icon="refresh" onClick={onRetry}>重新加载任务</Button>} />;
+  if (loadState === "empty") return <EmptyState compact icon="task" title="暂无任务" description="新建任务后会显示在这里。" />;
   if (!items.length)
     return (
       <EmptyState

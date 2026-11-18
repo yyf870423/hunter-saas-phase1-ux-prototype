@@ -15,6 +15,7 @@ import {
 } from "../stage4/opportunity-store";
 import { applyTaskPins, useTaskPins } from "./task-pin-store";
 import { TaskHistoryList } from "./TaskHistoryList";
+import { TaskHeaderControlPortal } from "./TaskWorkspaceControls";
 import "./task-history.css";
 
 export const authorizationModes = [
@@ -579,7 +580,7 @@ export function RuntimeBar({
   onInspectTask,
   paused = false,
   docked = false,
-  waitingLabel = "候选人审核",
+  waitingLabel = "本轮确认",
 }) {
   const [expandedStepId, setExpandedStepId] = useState(null);
   const done = plan.filter((step) => step.status === "done").length;
@@ -671,6 +672,9 @@ export function WorkHistory({
   currentId,
   onSelect,
   onCreate,
+  drawerBreakpoint = 1180,
+  loadState,
+  onRetry,
 }) {
   const lifecycle = useOpportunityState();
   const pins = useTaskPins();
@@ -681,6 +685,13 @@ export function WorkHistory({
   const [query, setQuery] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [useDrawer, setUseDrawer] = useState(() => window.matchMedia(`(max-width: ${drawerBreakpoint}px)`).matches);
+  useEffect(() => {
+    const media = window.matchMedia(`(max-width: ${drawerBreakpoint}px)`);
+    const update = () => setUseDrawer(media.matches);
+    update(); media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [drawerBreakpoint]);
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     const scoped = orderedItems.filter(
@@ -713,7 +724,7 @@ export function WorkHistory({
               icon={collapsed ? "panelRight" : "panelLeft"}
               label={collapsed ? "展开任务历史" : "收起任务历史"}
               onClick={() => {
-                if (window.matchMedia("(max-width: 1180px)").matches) {
+                if (window.matchMedia(`(max-width: ${drawerBreakpoint}px)`).matches) {
                   setMobileOpen(true);
                 } else {
                   onToggle();
@@ -760,16 +771,18 @@ export function WorkHistory({
               onSelect={onSelect}
               query={query}
               archived={showArchived}
+              loadState={loadState}
+              onRetry={onRetry}
             />
           </>
         )}
       </aside>
-      <IconButton
-        className="s2-history-mobile-trigger"
+      <TaskHeaderControlPortal><IconButton
+        className={`s2-history-mobile-trigger${useDrawer ? " is-visible" : ""}`}
         icon="panelLeft"
         label="打开任务列表"
         onClick={() => setMobileOpen(true)}
-      />
+      /></TaskHeaderControlPortal>
       <Drawer
         open={mobileOpen}
         close={() => setMobileOpen(false)}
@@ -807,6 +820,8 @@ export function WorkHistory({
           }}
           query={query}
           archived={showArchived}
+          loadState={loadState}
+          onRetry={onRetry}
         />
       </Drawer>
     </>

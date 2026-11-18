@@ -18,9 +18,13 @@ import {
   DecisionRequest,
   HunterReply,
   PlanList,
+  RuntimeBar,
   UserMessage,
 } from "./automation-ui";
 import { TaskAreaNav } from "./TaskAreaNav";
+import { TaskReadingColumns } from "./TaskReadingWorkspace";
+import { InspectionPanel } from "./ReviewWorkspace";
+import { singleAssetDecision } from "../stage4/single-asset-confirmation";
 import { signals as seedSignals } from "./data";
 import { pendingGroup, resolveUpdates, roundUpdates } from "../stage4/pending-updates";
 import {
@@ -537,6 +541,7 @@ function quoteReply(message, signal) {
 }
 
 function RunDetail({ run, runs, onBack, onUpdate }) {
+  const [inspection, setInspection] = useState(null);
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const [composer, setComposer] = useState("");
@@ -590,6 +595,23 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
   const send = (text, files) => {
     const normalized = text.trim();
     const last = followUps[followUps.length - 1];
+    if (!files.length && run.status === "等待用户" && !run.decision) {
+      const decision = { "按较新资料合并": "merge", "保留为不同人物": "separate", "跳过本轮冲突项": "skip" }[normalized.replace(/[。！! ]+$/, "")];
+      if (decision) {
+        if (authMode === "analysis" && decision !== "skip") { notify("当前仅分析，未修改身份关系。", "warning"); return; }
+        if (!onUpdate(run.id, { decision: normalized, status: "正在运行", tone: "info", followUps: [...followUps, { id: crypto.randomUUID(), text: normalized, files: [], decision: true }] })) return;
+        setComposer(""); return;
+      }
+    }
+    if (!files.length && last && ["update", "outbound"].includes(last.kind) && !last.resolution) {
+      const decision = singleAssetDecision(normalized);
+      if (decision === "confirm" || decision === "decline") {
+        if (decision === "confirm" && authMode === "analysis") { notify("当前仅分析，草稿未写入，也没有发送邮件。", "warning"); return; }
+        resolveUpdate(last, { value: decision === "confirm" ? "yes" : "no" }); setComposer(""); return;
+      }
+      if (!onUpdate(run.id, { followUps: [...followUps.map(item => item.id === last.id ? { ...item, resolution: "no" } : item), { id: crypto.randomUUID(), text: normalized, files: [], waiting: true }] })) return;
+      setComposer(""); return;
+    }
     // Hunter asked “这条要记个结论吗？” after a question, or after a draft was declined.
     const pendingQuestion =
       !quoted &&
@@ -669,10 +691,11 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
           <p>
             当前定位：{run.startedAt} 那一轮 · 左侧运行记录是这段对话的目录
           </p>
+          <p>【原型说明，正式实现不展示】本地模拟，未接入真实调度、业务写入或邮件。</p>
         </div>
         <StatusBadge tone={run.tone}>{run.status}</StatusBadge>
       </header>
-      <div className="s2-run-conversation">
+      <TaskReadingColumns result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : null} inspection={Boolean(inspection)}>
         <div className="s2-run-timeline">
           <HunterReply
             markdown={`## 周期任务对话
@@ -735,7 +758,7 @@ ${round.summary}
                             <Button
                               size="sm"
                               tone="ghost"
-                              onClick={() => navigate(`/signals?signal=${signal.id}`)}
+                              onClick={() => window.open(`${location.pathname}${location.search}#/signals?signal=${signal.id}`, "_blank", "noopener,noreferrer")}
                             >
                               在洞察中心查看
                             </Button>
@@ -756,7 +779,7 @@ ${round.summary}
                             <small>{update.status}</small>
                           </span>
                           <span className="s2-run-finding-actions">
-                            <Button size="sm" tone="ghost" onClick={() => navigate(update.route)}>
+                            <Button size="sm" tone="ghost" onClick={() => window.open(`${location.pathname}${location.search}#${update.route}`, "_blank", "noopener,noreferrer")}>
                               去审核
                             </Button>
                           </span>
@@ -834,18 +857,7 @@ ${round.summary}
                               onSelect={(option) => resolveUpdate(message, option)}
                             />
                           ) : null}
-                          {message.kind === "update" && !message.resolution ? (
-                            <DecisionRequest
-                              title="是否按草稿更新资料？"
-                              description="是 / 否 / 建议；“是，但改一下……”算修改建议，不算确认。"
-                              options={[
-                                { value: "yes", label: "是", description: "写入资料，形成新版本。" },
-                                { value: "no", label: "否", description: "保留草稿，不写入。" },
-                                { value: "suggest", label: "建议", description: "在下方说明要怎么改，我会出新的草稿。" },
-                              ]}
-                              onSelect={(option) => resolveUpdate(message, option)}
-                            />
-                          ) : null}
+                          {message.kind === "update" && !message.resolution ? <p>是否按本版草稿更新资料？请在原对话确认、拒绝或提出修改建议；查看不会写入。</p> : null}
                           {message.resolution === "yes" ? (
                             <p className="s2-run-handled-note">
                               {message.kind === "outbound" ? "已发出" : "已写入"}，这条洞察已标记“{markerText(message.marker)}”。
@@ -865,36 +877,14 @@ ${round.summary}
                   );
                 })}
                 {round.status === "已停止" ? (
-                  <HunterReply markdown="### 这一轮已停止\n\n对话、证据和当前处理水位已保留，可以继续补充要求。" />
+                  <HunterReply markdown={"### 这一轮已停止\n\n对话、证据和当前处理水位已保留，可以继续补充要求。"} />
                 ) : null}
               </section>
             );
           })}
         </div>
         <div className="s2-run-composer-dock">
-          <div className="s2-task-plan">
-            <button
-              type="button"
-              aria-expanded={planOpen}
-              onClick={() => setPlanOpen((value) => !value)}
-            >
-              <Icon name="task" />
-              <span>
-                <b>执行计划</b>
-                <small>
-                  {plan.filter((step) => step.status === "done").length} /{" "}
-                  {plan.length}
-                  项完成 · {run.status}
-                </small>
-              </span>
-              <Icon name={planOpen ? "chevronDown" : "chevronUp"} />
-            </button>
-            {planOpen ? (
-              <div className="s2-task-plan-body">
-                <PlanList steps={plan} />
-              </div>
-            ) : null}
-          </div>
+          <RuntimeBar open={planOpen} onToggle={() => setPlanOpen(value => !value)} plan={plan} paused={stopped} docked tasks={plan.map(step => ({ id: `${run.id}-${step.id}`, stepId: step.id, kind: "task", title: step.title, action: step.detail, status: step.status === "done" ? "完成" : run.status, duration: "本轮示例", resultDestination: `${run.task} · ${run.startedAt}这一轮` }))} onInspectTask={setInspection} />
           {quoted ? (
             <div className="s2-quote-chip" role="note">
               <Icon name="signal" />
@@ -932,7 +922,7 @@ ${round.summary}
             }
           />
         </div>
-      </div>
+      </TaskReadingColumns>
     </aside>
   );
 }
@@ -1074,7 +1064,7 @@ export function PeriodicTasksPage() {
     setRunStatus(requestedRunStatus);
   }, [requestedRunStatus]);
   return (
-    <div className="s2-page s2-periodic-page">
+    <div className={`s2-page s2-periodic-page ${view === "runs" && mobileDetailOpen && selectedRun ? "is-run-reading" : ""}`}>
       <TaskAreaNav value="periodic" />
       <header className="s2-periodic-heading">
         <div>

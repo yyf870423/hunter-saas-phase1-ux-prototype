@@ -138,6 +138,7 @@ export function FloatingPanel({
       setStyle(null);
       return undefined;
     }
+    let lastGeometry = "";
     const update = () => {
       const rect = anchorRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -147,31 +148,28 @@ export function FloatingPanel({
         window.innerWidth - viewportPadding * 2,
       );
       if (placement === "right") {
-        const maxHeight = window.innerHeight - viewportPadding * 2;
-        const panelHeight = Math.min(
-          floatingRef.current?.getBoundingClientRect().height || 0,
-          maxHeight,
-        );
+        const panel = floatingRef.current;
+        const panelHeight = panel
+          ? panel.scrollHeight + panel.offsetHeight - panel.clientHeight
+          : 0;
+        const geometry = [rect.top, rect.right, rect.left, resolvedWidth, panelHeight, window.innerWidth, window.innerHeight].join(",");
+        if (geometry === lastGeometry) return;
+        lastGeometry = geometry;
         const preferredLeft =
           rect.right + gap + resolvedWidth <=
           window.innerWidth - viewportPadding
             ? rect.right + gap
             : rect.left - resolvedWidth - gap;
+        // Keep viewport bounds in CSS as well as tracking the anchor geometry.
+        const top = `clamp(8px, ${rect.top}px, calc(100dvh - ${panelHeight + viewportPadding}px))`;
         setStyle({
           position: "fixed",
-          left: Math.min(
-            Math.max(viewportPadding, preferredLeft),
-            window.innerWidth - resolvedWidth - viewportPadding,
-          ),
-          top: Math.max(
-            viewportPadding,
-            Math.min(
-              rect.top,
-              window.innerHeight - panelHeight - viewportPadding,
-            ),
-          ),
+          left: `clamp(8px, ${preferredLeft}px, calc(100vw - ${resolvedWidth + viewportPadding}px))`,
+          top,
           width: resolvedWidth,
-          maxHeight,
+          maxWidth: "calc(100vw - 16px)",
+          maxHeight: `calc(100dvh - 8px - ${top})`,
+          visibility: "visible",
           zIndex: 220,
         });
         return;
@@ -199,12 +197,23 @@ export function FloatingPanel({
     };
     update();
     const observer = placement === "right" ? new ResizeObserver(update) : null;
-    if (floatingRef.current) observer?.observe(floatingRef.current);
+    if (floatingRef.current) {
+      observer?.observe(floatingRef.current);
+      for (const child of floatingRef.current.children) observer?.observe(child);
+    }
     observer?.observe(anchorRef.current);
+    let frame;
+    // ResizeObserver misses position-only shifts caused by sibling layout or fonts.
+    const trackAnchor = () => {
+      update();
+      frame = requestAnimationFrame(trackAnchor);
+    };
+    if (placement === "right") frame = requestAnimationFrame(trackAnchor);
     window.addEventListener("resize", update);
     window.addEventListener("scroll", update, true);
     return () => {
       observer?.disconnect();
+      if (frame !== undefined) cancelAnimationFrame(frame);
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update, true);
     };
