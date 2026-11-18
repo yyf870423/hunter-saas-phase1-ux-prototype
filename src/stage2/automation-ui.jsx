@@ -1,9 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Icon } from "../components/Icon";
-import { Button, Drawer, IconButton, SearchField, StatusBadge } from "../stage1/ui";
-import { mergeLifecycleTasks, useOpportunityState } from "../stage4/opportunity-store";
+import {
+  Button,
+  Drawer,
+  IconButton,
+  SearchField,
+  StatusBadge,
+} from "../stage1/ui";
+import {
+  mergeLifecycleTasks,
+  useOpportunityState,
+} from "../stage4/opportunity-store";
 import { applyTaskPins, useTaskPins } from "./task-pin-store";
 import { TaskHistoryList } from "./TaskHistoryList";
 import "./task-history.css";
@@ -425,14 +434,25 @@ const planStatus = {
   pending: { label: "待开始", className: "is-pending" },
 };
 
-export function PlanList({ steps }) {
+export function PlanList({
+  steps,
+  tasks = [],
+  expandedStepId,
+  onToggleStep,
+  onInspectTask,
+}) {
+  const groupId = useId();
+  const interactive = typeof onToggleStep === "function";
   return (
-    <ol className="s2-plan-list">
+    <ol className={`s2-plan-list${interactive ? " is-interactive" : ""}`}>
       {steps.map((step, index) => {
         const status = planStatus[step.status] || planStatus.pending;
-        return (
-          <li className={status.className} key={step.id}>
-            <i>
+        const expanded = interactive && expandedStepId === step.id;
+        const related = tasks.filter((task) => task.stepId === step.id);
+        const detailsId = `${groupId}-${step.id}`;
+        const content = (
+          <>
+            <i aria-hidden="true">
               {step.status === "running" ? (
                 <span />
               ) : status.icon ? (
@@ -447,6 +467,66 @@ export function PlanList({ steps }) {
               {step.statusDetail ? <small>{step.statusDetail}</small> : null}
             </span>
             <em>{step.statusLabel || status.label}</em>
+          </>
+        );
+        return (
+          <li
+            className={`${status.className}${expanded ? " is-expanded" : ""}`}
+            key={step.id}
+            data-step-id={step.id}
+          >
+            {interactive ? (
+              <button
+                type="button"
+                className="s2-plan-step-toggle"
+                aria-expanded={expanded}
+                aria-controls={detailsId}
+                onClick={() => onToggleStep(step.id)}
+              >
+                {content}
+                <Icon name={expanded ? "chevronDown" : "chevronRight"} />
+              </button>
+            ) : (
+              content
+            )}
+            {expanded ? (
+              <div
+                id={detailsId}
+                className="s2-step-processes"
+                role="group"
+                aria-label={`${step.title}的相关处理`}
+              >
+                <header>
+                  <b>相关处理</b>
+                  <span>{related.length} 项</span>
+                </header>
+                {related.length ? (
+                  <div className="s2-internal-tasks">
+                    {related.map((task) => (
+                      <button
+                        type="button"
+                        key={task.id}
+                        onClick={() => onInspectTask(task)}
+                      >
+                        <span>
+                          <b>{task.title}</b>
+                          <small>{task.action}</small>
+                        </span>
+                        <StatusBadge tone={task.tone}>
+                          {task.status}
+                        </StatusBadge>
+                        <time>{task.duration}</time>
+                        <Icon name="chevronRight" />
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="s2-step-processes-empty">
+                    此步骤暂无独立处理记录
+                  </p>
+                )}
+              </div>
+            ) : null}
           </li>
         );
       })}
@@ -501,7 +581,7 @@ export function RuntimeBar({
   docked = false,
   waitingLabel = "候选人审核",
 }) {
-  const [tasksOpen, setTasksOpen] = useState(false);
+  const [expandedStepId, setExpandedStepId] = useState(null);
   const done = plan.filter((step) => step.status === "done").length;
   const waiting = plan.some((step) => step.status === "waiting-user");
   const adjusted = plan.some((step) => step.status === "adjusted");
@@ -524,19 +604,6 @@ export function RuntimeBar({
       : done === plan.length
         ? "已完成"
         : "推进中";
-  const completedTasks = tasks.filter((task) => task.status === "完成").length;
-  const waitingTasks = tasks.filter(
-    (task) => task.status === "等待用户",
-  ).length;
-  const taskSummary = [
-    completedTasks ? `${completedTasks} 项完成` : null,
-    waitingTasks ? `${waitingTasks} 项等待用户` : null,
-    tasks.length - completedTasks - waitingTasks > 0
-      ? `${tasks.length - completedTasks - waitingTasks} 项处理中`
-      : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
   return (
     <section
       className={`s2-runtime ${docked ? "is-docked" : ""} ${open ? "is-open" : ""}`}
@@ -581,40 +648,16 @@ export function RuntimeBar({
               </span>
             </header>
             <PlanUpdate update={planUpdate} />
-            <PlanList steps={plan} />
+            <PlanList
+              steps={plan}
+              tasks={tasks}
+              expandedStepId={expandedStepId}
+              onToggleStep={(id) =>
+                setExpandedStepId((current) => (current === id ? null : id))
+              }
+              onInspectTask={onInspectTask}
+            />
           </div>
-          <section className="s2-runtime-tasks">
-            <button
-              type="button"
-              aria-expanded={tasksOpen}
-              onClick={() => setTasksOpen((value) => !value)}
-            >
-              <span>
-                <b>相关处理</b>
-                <small>{taskSummary || `${tasks.length} 项处理`}</small>
-              </span>
-              <Icon name={tasksOpen ? "chevronUp" : "chevronDown"} />
-            </button>
-            {tasksOpen ? (
-              <div className="s2-internal-tasks">
-                {tasks.map((task) => (
-                  <button
-                    type="button"
-                    key={task.id}
-                    onClick={() => onInspectTask(task)}
-                  >
-                    <span>
-                      <b>{task.title}</b>
-                      <small>{task.action}</small>
-                    </span>
-                    <StatusBadge tone={task.tone}>{task.status}</StatusBadge>
-                    <time>{task.duration}</time>
-                    <Icon name="chevronRight" />
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </section>
         </div>
       ) : null}
     </section>
@@ -669,7 +712,13 @@ export function WorkHistory({
             <IconButton
               icon={collapsed ? "panelRight" : "panelLeft"}
               label={collapsed ? "展开任务历史" : "收起任务历史"}
-              onClick={onToggle}
+              onClick={() => {
+                if (window.matchMedia("(max-width: 1180px)").matches) {
+                  setMobileOpen(true);
+                } else {
+                  onToggle();
+                }
+              }}
             />
           </div>
         </header>

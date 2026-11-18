@@ -1026,6 +1026,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         <div className="s2-composer-wrap">
           {phase >= 1 ? (
             <RuntimeBar
+              key={scenarioId}
               open={runtimeOpen}
               onToggle={() => setRuntimeOpen((value) => !value)}
               plan={plan}

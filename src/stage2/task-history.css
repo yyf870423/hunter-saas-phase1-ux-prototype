@@ -100,7 +100,7 @@
   padding-right: 42px;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 900px) {
   .s1-icon-button.s2-history-mobile-trigger {
     position: fixed;
     z-index: 30;

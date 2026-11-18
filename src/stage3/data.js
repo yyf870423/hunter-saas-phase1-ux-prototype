@@ -1638,6 +1638,7 @@ export const businessScenarios = {
     tasks: [
       {
         id: "client-company",
+        stepId: "verify",
         title: "公司与融资信号核验",
         status: "完成",
         tone: "success",
@@ -1646,6 +1647,7 @@ export const businessScenarios = {
       },
       {
         id: "client-contacts",
+        stepId: "contacts",
         title: "联系人与联系方式核验",
         status: "等待用户",
         tone: "warning",
@@ -1654,6 +1656,7 @@ export const businessScenarios = {
       },
       {
         id: "client-outreach",
+        stepId: "outreach",
         title: "客户联系与回复跟进",
         status: "未开始",
         tone: "neutral",
@@ -1713,6 +1716,7 @@ export const businessScenarios = {
     tasks: [
       {
         id: "mapping-org",
+        stepId: "ecosystem",
         title: "公司与组织方向研究",
         status: "完成",
         tone: "success",
@@ -1721,6 +1725,7 @@ export const businessScenarios = {
       },
       {
         id: "mapping-people",
+        stepId: "people",
         title: "关键人物与身份检查",
         status: "完成",
         tone: "success",
@@ -1729,6 +1734,7 @@ export const businessScenarios = {
       },
       {
         id: "mapping-relations",
+        stepId: "update",
         title: "组织隶属与任职关系",
         status: "等待用户",
         tone: "warning",
@@ -1790,6 +1796,7 @@ export const businessScenarios = {
     tasks: [
       {
         id: "career-signal",
+        stepId: "signal",
         title: "候选人动向信号核验",
         status: "完成",
         tone: "success",
@@ -1798,6 +1805,7 @@ export const businessScenarios = {
       },
       {
         id: "career-match",
+        stepId: "match",
         title: "系统内岗位增量匹配",
         status: "完成",
         tone: "success",
@@ -1806,6 +1814,7 @@ export const businessScenarios = {
       },
       {
         id: "career-contact",
+        stepId: "contact",
         title: "等待猎头补充联系结果",
         status: "等待用户",
         tone: "warning",
