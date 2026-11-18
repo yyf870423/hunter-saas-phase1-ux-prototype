@@ -23,20 +23,24 @@ const assertNav = async (page, expected) =>
   expect(nav(page).getByRole("button")).toHaveText(expected);
 const assertSidePanel = async (page) => {
   await expect(other(page)).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => ({ width: innerWidth, height: innerHeight })))
+    .toEqual(page.viewportSize());
+  await page.evaluate(() => new Promise(resolve =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve)),
+  ));
   const sidebar = await page.locator(".s1-sidebar").boundingBox();
-  const trigger = await nav(page)
-    .getByRole("button", { name: "其他", exact: true })
-    .boundingBox();
   const panel = await other(page).boundingBox();
   const viewport = page.viewportSize();
   expect(panel.x).toBeGreaterThanOrEqual(sidebar.x + sidebar.width);
   expect(panel.x + panel.width).toBeLessThanOrEqual(viewport.width - 8);
   expect(panel.y).toBeGreaterThanOrEqual(8);
   expect(panel.y + panel.height).toBeLessThanOrEqual(viewport.height - 8);
-  expect(panel.y).toBeCloseTo(
-    Math.max(8, Math.min(trigger.y, viewport.height - panel.height - 8)),
-    0,
-  );
+  await expect.poll(async () => {
+    const target = await nav(page).getByRole("button", { name: "其他", exact: true }).boundingBox();
+    const placed = await other(page).boundingBox();
+    return placed.y - Math.max(8, Math.min(target.y, viewport.height - placed.height - 8));
+  }).toBeCloseTo(0, 0);
 };
 
 test("默认五项直接平铺，并按所属资产高亮详情", async ({ page }) => {
@@ -314,6 +318,36 @@ test("桌面收起、展开、低高度和深色其他侧向浮层截图", async
   await assertSidePanel(page);
   await check();
 });
+
+for (const expanded of [false, true]) {
+  test(`低高度侧向浮层覆盖全部资产并能滚到末项：${expanded ? "展开深色" : "收起浅色"}`, async ({ page }) => {
+    await page.addInitScript(({ expanded }) => {
+      localStorage.setItem("hunter-nav-expanded", expanded ? "1" : "0");
+      localStorage.setItem("hunter-theme", expanded ? "dark" : "light");
+      localStorage.setItem("hunter-asset-navigation-v1", JSON.stringify({ version: 1, visibleIds: [], graphTypeIds: [] }));
+    }, { expanded });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("#/companies");
+    const trigger = nav(page).getByRole("button", { name: "其他", exact: true });
+    await trigger.click();
+    for (const size of [{ width: 960, height: 600 }, { width: 900, height: 400 }, { width: 761, height: 220 }, { width: 1440, height: 900 }]) {
+      await page.setViewportSize(size);
+      await assertSidePanel(page);
+    }
+    await page.setViewportSize({ width: 761, height: 220 });
+    const last = other(page).getByRole("button", { name: "专利", exact: true });
+    await last.scrollIntoViewIfNeeded();
+    await expect(last).toBeInViewport();
+    await assertSidePanel(page);
+    await page.keyboard.press("Escape");
+    await expect(other(page)).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    await trigger.click();
+    await other(page).getByRole("button", { name: "专利", exact: true }).click();
+    await expect(page).toHaveURL(/#\/patents$/);
+    await expect(other(page)).toHaveCount(0);
+  });
+}
 
 test("数据管理增加同级数据工具标签，设置页其他侧向展开", async ({ page }) => {
   await mkdir("artifacts/asset-navigation/after", { recursive: true });
