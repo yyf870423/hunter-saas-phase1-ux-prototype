@@ -1498,6 +1498,8 @@ function GraphCanvas({
                 return (
                   <g
                     key={relation.id}
+                    data-source={relation.source}
+                    data-target={relation.target}
                     className={`tg-edge is-${relation.kind} ${selectedEdgeId === relation.id ? "is-selected" : ""} ${relation.status === "review" ? "is-review" : ""}`}
                   >
                     <path
@@ -2931,7 +2933,7 @@ function GraphReviewWorkspace({ pages, reviewItems, onLocate, onResolve }) {
             aria-label={isFullscreen ? "退出审核画布全屏" : "进入审核画布全屏"}
             onClick={toggleFullscreen}
           >
-            <Icon name={isFullscreen ? "minimize" : "maximize"} />
+            <Icon name={isFullscreen ? "minimize2" : "maximize2"} />
           </button>
         </header>
         <GraphCanvas
@@ -3169,7 +3171,7 @@ function GraphHistoryTab({ notify, sourcePage }) {
               }
               onClick={toggleFullscreen}
             >
-              <Icon name={isFullscreen ? "minimize" : "maximize"} />
+              <Icon name={isFullscreen ? "minimize2" : "maximize2"} />
             </button>
           </div>
         </div>
@@ -3414,46 +3416,32 @@ function GraphContent({
     const parent = page.nodes.find((node) => node.id === parentId);
     if (!parent) return;
     const movedNodes = page.nodes.filter((node) => ids.includes(node.id));
-    const oldParentById = Object.fromEntries(
-      movedNodes.map((node) => [node.id, node.parentId]),
-    );
-    updateActiveNodes((nodes) => {
-      const desiredById = Object.fromEntries(
-        ids.map((id, index) => [
-          id,
-          {
-            x: parent.x + (parent.width || 180) + 92,
-            y: parent.y + index * 88,
-          },
-        ]),
+    // Commit placement and hierarchy together; the prototype has no remote save to await.
+    setPages((current) => current.map((item) => {
+      if (item.id !== page.id) return item;
+      const currentParent = item.nodes.find((node) => node.id === parentId);
+      if (!currentParent) return item;
+      const oldParentById = Object.fromEntries(
+        item.nodes.filter((node) => ids.includes(node.id)).map((node) => [node.id, node.parentId]),
       );
-      return placeMovedGraphNodes(nodes, ids, desiredById).map((node) =>
+      const desiredById = Object.fromEntries(ids.map((id, index) => [id, {
+        x: currentParent.x + (currentParent.width || 180) + 92,
+        y: currentParent.y + index * 88,
+      }]));
+      const nodes = placeMovedGraphNodes(item.nodes, ids, desiredById).map((node) =>
         ids.includes(node.id) ? { ...node, parentId } : node,
       );
-    });
-    updateActiveEdges((edges) => {
-      const withoutOldHierarchy = edges.filter(
-        (edge) =>
-          !ids.some(
-            (id) => edge.target === id && edge.source === oldParentById[id],
-          ),
+      const retainedEdges = item.edges.filter((edge) =>
+        !ids.some((id) => edge.target === id && edge.source === oldParentById[id]),
       );
-      const existingPairs = new Set(
-        withoutOldHierarchy.map((edge) => `${edge.source}:${edge.target}`),
-      );
-      const hierarchyEdges = ids
-        .filter((id) => !existingPairs.has(`${parentId}:${id}`))
-        .map((id, index) => ({
-          id: `edge-reparent-${Date.now()}-${index}`,
-          source: parentId,
-          target: id,
-          label: "",
-          kind: "local",
-          status: "normal",
-          evidence: ["用户调整层级"],
-        }));
-      return [...withoutOldHierarchy, ...hierarchyEdges];
-    });
+      const existingPairs = new Set(retainedEdges.map((edge) => `${edge.source}:${edge.target}`));
+      const hierarchyEdges = ids.filter((id) => !existingPairs.has(`${parentId}:${id}`)).map((id, index) => ({
+        id: `edge-reparent-${Date.now()}-${index}`,
+        source: parentId, target: id, label: "", kind: "local", status: "normal",
+        evidence: ["用户调整层级"],
+      }));
+      return { ...item, nodes, edges: [...retainedEdges, ...hierarchyEdges] };
+    }));
     notify(
       `${movedNodes.map((node) => node.label).join("、")}已移动到“${parent.label}”下`,
     );
@@ -3580,6 +3568,7 @@ function GraphContent({
             >
               <Icon name="plus" />
             </button>
+            <TooltipText tip="自适应全部内容" trigger="always" className="s4-action-tooltip">
             <button
               type="button"
               aria-label="自适应全部内容"
@@ -3587,13 +3576,16 @@ function GraphContent({
             >
               <Icon name="maximize" />
             </button>
+            </TooltipText>
+            <TooltipText tip={isFullscreen ? "退出图谱全屏" : "进入图谱全屏"} trigger="always" className="s4-action-tooltip">
             <button
               type="button"
               aria-label={isFullscreen ? "退出图谱全屏" : "进入图谱全屏"}
               onClick={toggleFullscreen}
             >
-              <Icon name={isFullscreen ? "minimize" : "maximize"} />
+              <Icon name={isFullscreen ? "minimize2" : "maximize2"} />
             </button>
+            </TooltipText>
           </div>
         ) : null}
         <button

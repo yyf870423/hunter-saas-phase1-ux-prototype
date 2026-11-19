@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button, IconButton, StatusBadge } from "../stage1/ui";
 import { Composer, HunterReply, UserMessage, WorkHistory, RuntimeBar } from "./automation-ui";
 import { workItems } from "./data";
@@ -20,6 +20,7 @@ const timeLabel = () => new Date().toLocaleTimeString("zh-CN", { hour: "2-digit"
 const historyItems = [{ id: "candidate-research-demo", title: "具身智能 VLA 算法负责人", type: "岗位招聘", scenarios: ["岗位招聘", "候选人调研"], object: "星澜机器人 · 本地演示", status: "等待用户", tone: "neutral", time: "本轮", pinned: true }, ...workItems];
 
 export function CandidateResearchDemo() {
+  const navigate = useNavigate();
   const [state, setState] = useState(createResearchState);
   const [messages, setMessages] = useState(initialMessages);
   const [viewId, setViewId] = useState(null);
@@ -109,7 +110,7 @@ export function CandidateResearchDemo() {
   const inspectProcess = item => { setInspection(item); if (ratio === 100) setRatio(lastSplitRatio.current); requestAnimationFrame(() => document.querySelector(".s2-inspector button")?.focus()); };
   return <div className="s2-research-task-layout" ref={taskLayout} style={{ "--research-history-width": `${historyWidth}px` }}>
     <div id="research-history" className="s2-research-history-rail" role="region" aria-label="任务列表">
-      <WorkHistory items={historyItems} collapsed={historyWidth === 58} currentId="candidate-research-demo" drawerBreakpoint={900} onToggle={() => commitHistoryWidth(historyWidth === 58 ? lastHistoryWidth.current : 58)} onSelect={item => { if (item.id !== "candidate-research-demo") newTab(`/tasks/${item.id}`); }} onCreate={() => newTab("/new")} />
+      <WorkHistory items={historyItems} collapsed={historyWidth === 58} currentId="candidate-research-demo" drawerBreakpoint={900} onToggle={() => commitHistoryWidth(historyWidth === 58 ? lastHistoryWidth.current : 58)} onSelect={item => { if (item.id !== "candidate-research-demo") navigate(`/tasks/${item.id}`); }} onCreate={() => newTab("/new")} />
     </div>
     <TaskListSplitHandle width={historyWidth} maxWidth={maxHistoryWidth} onChange={setHistoryWidth} onCommit={commitHistoryWidth} containerRef={taskLayout} />
     <div id="research-main" className="s2-page s2-research-workspace">

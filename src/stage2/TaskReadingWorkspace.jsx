@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { IconButton } from "../stage1/ui";
 import { WorkHistory } from "./automation-ui";
 import { workItems } from "./data";
@@ -8,6 +9,7 @@ import { TaskHeaderControlPortal, TaskReadingActionsContext } from "./TaskWorksp
 
 // Same reading layout and live collapse thresholds as the approved research demo.
 export function TaskReadingWorkspace({ taskId, header, result, inspection = false, children }) {
+  const navigate = useNavigate();
   const [historyWidth, setHistoryWidth] = useState(252);
   const [maxHistoryWidth, setMaxHistoryWidth] = useState(420);
   const lastHistoryWidth = useRef(252);
@@ -30,7 +32,7 @@ export function TaskReadingWorkspace({ taskId, header, result, inspection = fals
   const openTab = path => window.open(`${location.pathname}${location.search}#${path}`, "_blank", "noopener,noreferrer");
   return <div className="s2-research-task-layout" ref={layout} style={{ "--research-history-width": `${historyWidth}px` }}>
     <div id="research-history" className="s2-research-history-rail" role="region" aria-label="任务列表">
-      <WorkHistory items={workItems} currentId={taskId} collapsed={historyWidth === 58} drawerBreakpoint={900} onToggle={() => commitWidth(historyWidth === 58 ? lastHistoryWidth.current : 58)} onCreate={() => openTab("/new")} onSelect={item => { if (item.id !== taskId) openTab(`/tasks/${item.id}`); }} />
+      <WorkHistory items={workItems} currentId={taskId} collapsed={historyWidth === 58} drawerBreakpoint={900} onToggle={() => commitWidth(historyWidth === 58 ? lastHistoryWidth.current : 58)} onCreate={() => openTab("/new")} onSelect={item => { if (item.id !== taskId) navigate(`/tasks/${item.id}`); }} />
     </div>
     <TaskListSplitHandle width={historyWidth} maxWidth={maxHistoryWidth} onChange={setHistoryWidth} onCommit={commitWidth} containerRef={layout} />
     <div id="research-main" className="s2-page s2-research-workspace s2-task-reading-workspace">

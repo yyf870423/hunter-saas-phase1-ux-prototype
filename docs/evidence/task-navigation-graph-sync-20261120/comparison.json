@@ -1,0 +1,40 @@
+{
+  "checks": [
+    {
+      "width": 1440,
+      "side": "prototype",
+      "sameTab": true,
+      "drawerClosed": true,
+      "distinctIcons": true,
+      "fullscreenFitEscape": true
+    },
+    {
+      "width": 1440,
+      "side": "implementation",
+      "sameTab": true,
+      "drawerClosed": true,
+      "distinctIcons": true,
+      "fullscreenFitEscape": true
+    },
+    {
+      "width": 390,
+      "side": "prototype",
+      "sameTab": true,
+      "drawerClosed": true,
+      "distinctIcons": true,
+      "fullscreenFitEscape": true
+    },
+    {
+      "width": 390,
+      "side": "implementation",
+      "sameTab": true,
+      "drawerClosed": true,
+      "distinctIcons": true,
+      "fullscreenFitEscape": true
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "external": [],
+  "writes": []
+}

@@ -1,3 +1,7 @@
+import { Maximize2, Minimize2 } from "lucide-react";
+
+const libraryIcons = { maximize2: Maximize2, minimize2: Minimize2 };
+
 const paths = {
   home: ["M3 10.5 12 3l9 7.5", "M5 9.5V21h14V9.5", "M9 21v-7h6v7"],
   route: [
@@ -230,6 +234,8 @@ const paths = {
 };
 
 export function Icon({ name, size = 18, className = "", label }) {
+  const LibraryIcon = libraryIcons[name];
+  if (LibraryIcon) return <LibraryIcon size={size} strokeWidth={1.8} className={className} aria-hidden={label ? undefined : true} aria-label={label || undefined} role={label ? "img" : undefined} data-icon={name} />;
   const lines = paths[name] || paths.info;
   return (
     <svg

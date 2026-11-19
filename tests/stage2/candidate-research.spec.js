@@ -143,20 +143,20 @@ test("分隔条可键盘操作，结果全宽可恢复", async ({ page }) => {
   await page.getByRole("button", { name: "恢复对话与结果分栏" }).click();
 });
 
-test("任务列表可搜索、新标签查看其他任务，当前草稿保留", async ({ page }) => {
+test("任务列表可搜索并在当前页切换，不打开新标签", async ({ page, context }) => {
   const rail = page.locator(".s2-research-history-rail > .s2-history");
   await expect(rail).toBeVisible();
   await expect(rail.locator('[data-task-id="candidate-research-demo"] .s2-history-item')).toHaveClass(/is-active/);
-  await input(page).fill("这个调研要求先留在输入框");
   await rail.getByPlaceholder("搜索任务").fill("职业机会");
   await expect(rail.locator(".s2-history-entry")).toHaveCount(1);
-  const popup = page.waitForEvent("popup");
+  const pagesBefore = context.pages().length;
+  const popups = [];
+  page.on("popup", popup => popups.push(popup));
   await rail.locator(".s2-history-item").click();
-  const other = await popup;
-  await expect(other.locator(".s2-workstream-header h1")).toContainText("林昊");
-  await other.close();
-  await expect(input(page)).toHaveValue("这个调研要求先留在输入框");
-  expect(page.url()).toContain("candidate-research-demo");
+  await expect(page).toHaveURL(/#\/tasks\/career-linhao$/);
+  await expect(page.locator(".s2-workstream-header h1")).toContainText("林昊");
+  expect(popups).toHaveLength(0);
+  expect(context.pages()).toHaveLength(pagesBefore);
 });
 
 test("任务列表实时收起且不松鼠标可拖回，宽度与结果分栏互不覆盖", async ({ page }) => {
