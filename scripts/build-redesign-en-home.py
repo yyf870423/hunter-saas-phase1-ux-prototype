@@ -142,7 +142,7 @@ r('>申请试用</a>', '>Request a trial</a>')
 r('aria-label="打开导航"', 'aria-label="Open navigation"')
 
 # ---------- hero (HunterBuddy as the eyebrow, the positioning line as the headline) ----------
-r('<span aria-hidden="true"></span>邀请制试用，现已开放申请 · 面向 HR 与专业猎头', '<span aria-hidden="true"></span>Invitation-only trial, now open for applications · For HR and professional headhunters')
+r('<span aria-hidden="true"></span>邀请制试用，现已开放申请 · 面向专业招聘者', '<span aria-hidden="true"></span>Invitation-only trial, now open for applications · For professional recruiters')
 r('<span class="n-role"><span>高阶技术人才寻访的</span> <span>AI 工作台</span></span>', '<span class="n-role"><span>The AI workbench for</span> <span>senior tech talent search</span></span>')
 r('<span>洞察行业，辨识人才，连接人脉，</span>', '<span>Read the industry, know the talent, connect the network,</span>')
 r('<span>把每一次招聘判断，沉淀为资产。</span>', '<span>and turn every hiring judgment into an asset.</span>')
