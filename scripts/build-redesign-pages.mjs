@@ -51,8 +51,8 @@ const CAPS = [
   "business-development",
   "org-chart",
   "finding-candidates",
-  "same-name-candidates",
   "job-matching",
+  "same-name-candidates",
   "referrals",
   "talent-pool",
 ];
@@ -88,9 +88,9 @@ const LOCALES = {
     home: "首页",
     list: {
       name: "使用场景",
-      title: "使用场景：客户研判、组织架构 Mapping、多源寻访、身份核实、人岗双向匹配与人才库｜HunterBuddy",
+      title: "使用场景：客户研判、组织架构 Mapping、多源寻访、人岗双向匹配、身份核实与人才库｜HunterBuddy",
       description:
-        "HunterBuddy 的八个核心能力和三篇实务文章：行业入门、客户研判、组织架构 Mapping、多源寻访、身份核实、人岗双向匹配、人选转介绍和人才库，每一篇都讲清它解决什么问题、怎么做、边界在哪里。",
+        "HunterBuddy 的八个核心能力和三篇实务文章：行业入门、客户研判、组织架构 Mapping、多源寻访、人岗双向匹配、身份核实、人选转介绍和人才库，每一篇都讲清它解决什么问题、怎么做、边界在哪里。",
       kicker: "使用场景",
       h1: "使用场景",
       lead: "八件事，三步走：看清、找人、沉淀。每一篇讲清这一步难在哪里、HunterBuddy 怎么做，以及哪些仍然由你判断。",
@@ -101,8 +101,8 @@ const LOCALES = {
       ["business-development", "客户研判"],
       ["org-chart", "组织架构 Mapping"],
       ["finding-candidates", "多源寻访"],
-      ["same-name-candidates", "身份核实"],
       ["job-matching", "人岗双向匹配"],
+      ["same-name-candidates", "身份核实"],
       ["referrals", "人选转介绍"],
       ["talent-pool", "人才库"],
     ],
@@ -158,9 +158,9 @@ const LOCALES = {
     home: "Home",
     list: {
       name: "Use cases",
-      title: "Use cases: org mapping, multi-source sourcing, identity checks, two-way matching and talent pools | HunterBuddy",
+      title: "Use cases: org mapping, multi-source sourcing, two-way matching, identity checks and talent pools | HunterBuddy",
       description:
-        "HunterBuddy’s eight capabilities and three practical guides: industry primers, client research, org mapping, multi-source sourcing, identity checks, two-way job matching, referrals and talent pools. Each explains the problem, how it works and where its limits are.",
+        "HunterBuddy’s eight capabilities and three practical guides: industry primers, client research, org mapping, multi-source sourcing, two-way job matching, identity checks, referrals and talent pools. Each explains the problem, how it works and where its limits are.",
       kicker: "Use cases",
       h1: "Use cases",
       lead: "Eight capabilities in three steps: know, find, keep. Each page explains where the work gets hard, how HunterBuddy handles it, and what is still yours to judge.",
@@ -170,8 +170,8 @@ const LOCALES = {
       ["business-development", "Client research"],
       ["org-chart", "Org mapping"],
       ["finding-candidates", "Multi-source sourcing"],
-      ["same-name-candidates", "Identity checks"],
       ["job-matching", "Two-way job matching"],
+      ["same-name-candidates", "Identity checks"],
       ["referrals", "Referrals"],
       ["talent-pool", "Talent pool"],
     ],

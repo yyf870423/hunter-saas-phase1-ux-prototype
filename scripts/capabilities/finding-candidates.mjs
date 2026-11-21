@@ -75,5 +75,5 @@ export default {
     ]
   },
   "boundary": "HunterBuddy 不做自动群发，也不给一键结论。它把搜索、补全、核对、合并和排序自动化，把识人、沟通和判断留给你。",
-  "next": "same-name-candidates"
+  "next": "job-matching"
 };

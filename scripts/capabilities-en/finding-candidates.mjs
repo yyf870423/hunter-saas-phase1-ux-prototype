@@ -41,5 +41,5 @@ export default {
   },
   boundary:
     "HunterBuddy doesn’t send mass messages or give one-click verdicts. It automates searching, enriching, checking, merging and ranking, and leaves judging people, conversations and decisions to you.",
-  next: "same-name-candidates",
+  next: "job-matching",
 };

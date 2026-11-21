@@ -29,7 +29,7 @@ ORG = {
 LANGS = {
     "zh": dict(
         home=SITE, lang="zh-CN", og="zh_CN", og_alt="en_US", site_name="铂寻 Boseek", title_cut="｜铂寻 Boseek", baidu=True,
-        app="HunterBuddy 是面向 HR 与专业猎头的高阶技术人才寻访 AI 工作台：行业入门、客户研判、组织架构 Mapping、多源寻访、身份核实、人岗双向匹配、人选转介绍和人才库，每条结论都有来源，拿不准的标为待确认。推荐、联系和商务决定由你作出。目前邀请制试用。",
+        app="HunterBuddy 是面向 HR 与专业猎头的高阶技术人才寻访 AI 工作台：行业入门、客户研判、组织架构 Mapping、多源寻访、人岗双向匹配、身份核实、人选转介绍和人才库，每条结论都有来源，拿不准的标为待确认。推荐、联系和商务决定由你作出。目前邀请制试用。",
         app_sub="高阶技术人才寻访的 AI 工作台", audience="HR 与专业猎头",
         # the share card (1200×630, the film's last scene): what Feishu, LinkedIn and the like show when the link is pasted
         share="assets/share-card.jpg",
@@ -37,7 +37,7 @@ LANGS = {
     ),
     "en": dict(
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
-        app="HunterBuddy is the AI workbench for senior tech talent search, built for HR teams and professional headhunters: industry primers, client research, org mapping, multi-source sourcing, identity checks, two-way job matching, referrals and talent pools. Every finding names its source, and anything uncertain is marked “To confirm”. Recommendations, outreach and business decisions are yours. Invitation-only trial.",
+        app="HunterBuddy is the AI workbench for senior tech talent search, built for HR teams and professional headhunters: industry primers, client research, org mapping, multi-source sourcing, two-way job matching, identity checks, referrals and talent pools. Every finding names its source, and anything uncertain is marked “To confirm”. Recommendations, outreach and business decisions are yours. Invitation-only trial.",
         app_sub="AI workbench for senior tech talent search", audience="HR teams and professional headhunters",
         share="assets/share-card-en.jpg",
         film=("HunterBuddy product demo", "Starting from one hiring brief, follow HunterBuddy through a complete senior technical search: client research, org mapping, multi-source sourcing, two-way job matching, identity checks and the talent pool.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4"),
@@ -161,8 +161,8 @@ r('aria-label="HunterBuddy 产品演示短片"', 'aria-label="HunterBuddy produc
 # ---------- eight capabilities: heading ----------
 r('<p class="n-kicker">01 · 核心能力</p>', '<p class="n-kicker">01 · Capabilities</p>')
 r('<h2 class="n-h2" id="n-caps-title">看清谁、找到谁、留住谁</h2>', '<h2 class="n-h2" id="n-caps-title">Know them, find them, keep them</h2>')
-r('八件事，三步走。先看懂行业、客户和组织，再多源召回、核实身份、人岗匹配，最后把每一次判断沉淀成下次能直接用的资产。每一步都保留来源、状态和人工确认点。',
-  'Eight capabilities in three steps. First understand the industry, the client and the organization, then search across sources, confirm identities and match people to roles, and turn every judgment into an asset you can use next time. Every step keeps its sources, its status and the points where you confirm.')
+r('八件事，三步走。先看懂行业、客户和组织，再多源召回、人岗匹配、核实身份，最后把每一次判断沉淀成下次能直接用的资产。每一步都保留来源、状态和人工确认点。',
+  'Eight capabilities in three steps. First understand the industry, the client and the organization, then search across sources, match people to roles and confirm identities, and turn every judgment into an asset you can use next time. Every step keeps its sources, its status and the points where you confirm.')
 r('<i>找人</i>', '<i>Find</i>')
 r('<i>看清</i>', '<i>Know</i>')   # not "Assess": HunterBuddy never judges people
 r('<i>沉淀</i>', '<i>Keep</i>')

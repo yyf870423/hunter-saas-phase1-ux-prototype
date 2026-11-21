@@ -7,8 +7,8 @@ const caps = [
   "business-development",
   "org-chart",
   "finding-candidates",
-  "same-name-candidates",
   "job-matching",
+  "same-name-candidates",
   "referrals",
   "talent-pool",
 ];
