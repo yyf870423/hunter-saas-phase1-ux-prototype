@@ -356,7 +356,7 @@
       video.play().catch(() => {});
     });
     video.addEventListener("play", reveal);
-    // 首屏“观看 2 分半演示”：滚到短片并开始播放（没有脚本时就是普通的 #film 锚点）
+    // 首屏“观看演示”：滚到短片并开始播放（没有脚本时就是普通的 #film 锚点）
     document.querySelectorAll("[data-play-film]").forEach((link) => {
       link.addEventListener("click", (event) => {
         event.preventDefault();
