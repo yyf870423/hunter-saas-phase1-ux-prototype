@@ -1,13 +1,13 @@
-// scripts/capabilities-en/industry-primer.mjs · Capability 08: industry primer
+// scripts/capabilities-en/industry-primer.mjs · Capability 01: industry primer
 export default {
   slug: "industry-primer",
-  no: "08",
-  group: "Keep",
+  no: "01",
+  group: "Know",
   name: "Industry primer",
   title: "Industry primer: from an unfamiliar sector to a confident first call | HunterBuddy",
   description:
     "The industry primer maps a value chain’s products, companies and roles into an industry map you can talk from, calibrated against real JDs and exported as an editable mind map.",
-  kicker: "Capability 08 · Keep",
+  kicker: "Capability 01 · Know",
   h1: "Industry primer: from an unfamiliar sector to a confident first call",
   definition:
     "The industry primer is a capability that organizes how a value chain, its products, companies and roles fit together into an industry map you can talk from. It calibrates its understanding of roles against real JDs, and produces an editable mind map.",
@@ -41,5 +41,5 @@ export default {
   },
   boundary:
     "HunterBuddy won’t pretend to know an industry for you, and won’t present inferences as market facts. It gives you the structure first, then tells you who to look for, how to judge and what to ask.",
-  next: null,
+  next: "business-development",
 };

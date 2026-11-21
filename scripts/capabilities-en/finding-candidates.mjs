@@ -1,13 +1,13 @@
-// scripts/capabilities-en/finding-candidates.mjs · Capability 01: multi-source sourcing (English for scripts/capabilities/finding-candidates.mjs)
+// scripts/capabilities-en/finding-candidates.mjs · Capability 04: multi-source sourcing (English for scripts/capabilities/finding-candidates.mjs)
 export default {
   slug: "finding-candidates",
-  no: "01",
+  no: "04",
   group: "Find",
   name: "Multi-source sourcing",
   title: "Multi-source sourcing: scattered leads, gathered into one list | HunterBuddy",
   description:
     "Multi-source sourcing searches the public web, papers and patents, open-source footprints and your talent pool together, then checks, merges and ranks each person’s records.",
-  kicker: "Capability 01 · Find",
+  kicker: "Capability 04 · Find",
   h1: "Multi-source sourcing: scattered leads, gathered into one list",
   definition:
     "Multi-source sourcing is a capability that searches the public web, papers and patents, open-source footprints and your authorized talent pool together. Records of the same person from different sources are checked first, then merged, then ranked.",
@@ -41,5 +41,5 @@ export default {
   },
   boundary:
     "HunterBuddy doesn’t send mass messages or give one-click verdicts. It automates searching, enriching, checking, merging and ranking, and leaves judging people, conversations and decisions to you.",
-  next: "job-matching",
+  next: "same-name-candidates",
 };

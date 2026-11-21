@@ -1,13 +1,13 @@
-// scripts/capabilities/same-name-candidates.mjs · 核心能力 03：身份核实
+// scripts/capabilities/same-name-candidates.mjs · 核心能力 05：身份核实
 // 正文来自飞书《HunterBuddy 官网文案-二级页面-2026.11.21》，由 2026-11-21 的拆分脚本生成，之后直接改这个文件。
 export default {
   "slug": "same-name-candidates",
-  "no": "03",
-  "group": "看清",
+  "no": "05",
+  "group": "找人",
   "name": "身份核实",
   "title": "身份核实：一个 ID，还原成一个真人｜HunterBuddy",
   "description": "身份核实是一项从花名、英文名、社区昵称或平台化名反查真实姓名与身份的能力，它依靠多源交叉核验排除同名，不依靠拼音推测汉字。",
-  "kicker": "核心能力 03 · 看清",
+  "kicker": "核心能力 05 · 找人",
   "h1": "身份核实：一个 ID，还原成一个真人",
   "definition": "身份核实是一项从花名、英文名、社区昵称或平台化名反查真实姓名与身份的能力，它依靠多源交叉核验排除同名，不依靠拼音推测汉字。",
   "intro": [
@@ -75,5 +75,5 @@ export default {
     ]
   },
   "boundary": "HunterBuddy 不虚构身份，也不把“可能”写成“确认”。它标出证据强度，由你决定这一步能不能用。",
-  "next": "org-chart"
+  "next": "job-matching"
 };

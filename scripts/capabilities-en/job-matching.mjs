@@ -1,13 +1,13 @@
-// scripts/capabilities-en/job-matching.mjs · Capability 02: two-way job matching
+// scripts/capabilities-en/job-matching.mjs · Capability 06: two-way job matching
 export default {
   slug: "job-matching",
-  no: "02",
+  no: "06",
   group: "Find",
   name: "Two-way job matching",
   title: "Two-way job matching: CVs find roles, roles find CVs | HunterBuddy",
   description:
     "Two-way job matching turns a role into conditions you can judge and checks each one against the candidate’s evidence. Give it a CV, and it finds better-fitting roles too.",
-  kicker: "Capability 02 · Find",
+  kicker: "Capability 06 · Find",
   h1: "Two-way job matching: CVs find roles, roles find CVs",
   definition:
     "Two-way job matching is a capability that breaks a role’s requirements into conditions that can be judged, then checks each one against the candidate’s evidence. It also works in reverse: give it one CV and it finds better-fitting roles in your database.",
@@ -43,5 +43,5 @@ export default {
   },
   boundary:
     "HunterBuddy makes clear what the role needs, what the candidate has done, why they match and what the risks are. Whether to recommend them, whether to reach out and how to present them to the client are still your calls.",
-  next: "same-name-candidates",
+  next: "referrals",
 };

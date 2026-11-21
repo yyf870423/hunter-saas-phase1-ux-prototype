@@ -1,13 +1,13 @@
-// scripts/capabilities/industry-primer.mjs · 核心能力 08：行业入门
+// scripts/capabilities/industry-primer.mjs · 核心能力 01：行业入门
 // 正文来自飞书《HunterBuddy 官网文案-二级页面-2026.11.21》，由 2026-11-21 的拆分脚本生成，之后直接改这个文件。
 export default {
   "slug": "industry-primer",
-  "no": "08",
-  "group": "沉淀",
+  "no": "01",
+  "group": "看清",
   "name": "行业入门",
   "title": "行业入门：从陌生赛道，到能开口｜HunterBuddy",
   "description": "行业入门是一项把产业链、产品、公司与岗位关系整理成可开口行业地图的能力，它用真实 JD 校准岗位理解，并输出可编辑思维导图。",
-  "kicker": "核心能力 08 · 沉淀",
+  "kicker": "核心能力 01 · 看清",
   "h1": "行业入门：从陌生赛道，到能开口",
   "definition": "行业入门是一项把产业链、产品、公司与岗位关系整理成可开口行业地图的能力，它用真实 JD 校准岗位理解，并输出可编辑思维导图。",
   "intro": [
@@ -75,5 +75,5 @@ export default {
     ]
   },
   "boundary": "HunterBuddy 不替你假装懂行业，也不把推测当成市场事实。它先给你结构，再告诉你找谁、怎么判断、问什么。",
-  "next": null
+  "next": "business-development"
 };

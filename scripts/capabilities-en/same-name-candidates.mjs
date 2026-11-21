@@ -1,13 +1,13 @@
-// scripts/capabilities-en/same-name-candidates.mjs · Capability 03: identity checks
+// scripts/capabilities-en/same-name-candidates.mjs · Capability 05: identity checks
 export default {
   slug: "same-name-candidates",
-  no: "03",
-  group: "Know",
+  no: "05",
+  group: "Find",
   name: "Identity checks",
   title: "Identity checks: from one ID to one real person | HunterBuddy",
   description:
     "Identity checks work back from an alias, a handle or an English name to a real person, ruling out namesakes by cross-checking sources, never by guessing from pinyin.",
-  kicker: "Capability 03 · Know",
+  kicker: "Capability 05 · Find",
   h1: "Identity checks: from one ID to one real person",
   definition:
     "Identity checks are a capability that works back from an alias, an English name, a community handle or a platform username to a person’s real name and identity. They rule out namesakes by cross-checking several sources, and never guess Chinese characters from pinyin.",
@@ -41,5 +41,5 @@ export default {
   },
   boundary:
     "HunterBuddy never invents identities, and never writes “possibly” as “confirmed”. It shows how strong the evidence is, and you decide whether it’s good enough to act on.",
-  next: "org-chart",
+  next: "job-matching",
 };

@@ -1,13 +1,13 @@
-// scripts/capabilities/talent-pool.mjs · 核心能力 07：人才库
+// scripts/capabilities/talent-pool.mjs · 核心能力 08：人才库
 // 正文来自飞书《HunterBuddy 官网文案-二级页面-2026.11.21》，由 2026-11-21 的拆分脚本生成，之后直接改这个文件。
 export default {
   "slug": "talent-pool",
-  "no": "07",
+  "no": "08",
   "group": "沉淀",
   "name": "人才库",
   "title": "人才库：一人一档，随时间更新｜HunterBuddy",
   "description": "人才库是一项把同一个人在不同平台的身份、履历和沟通记录合并成一份档案的能力，它自动查重、追踪变化，并把每次沟通沉淀到同一条时间线。",
-  "kicker": "核心能力 07 · 沉淀",
+  "kicker": "核心能力 08 · 沉淀",
   "h1": "人才库：一人一档，随时间更新",
   "definition": "人才库是一项把同一个人在不同平台的身份、履历和沟通记录合并成一份档案的能力，它自动查重、追踪变化，并把每次沟通沉淀到同一条时间线。",
   "intro": [
@@ -67,5 +67,5 @@ export default {
     ]
   },
   "boundary": "HunterBuddy 不把同名当同人，不从拼音猜中文名，也不把公开变化直接当成求职意愿。",
-  "next": "industry-primer"
+  "next": null
 };

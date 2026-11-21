@@ -1,13 +1,13 @@
-// scripts/capabilities/business-development.mjs · 核心能力 05：客户研判
+// scripts/capabilities/business-development.mjs · 核心能力 02：客户研判
 // 正文来自飞书《HunterBuddy 官网文案-二级页面-2026.11.21》，由 2026-11-21 的拆分脚本生成，之后直接改这个文件。
 export default {
   "slug": "business-development",
-  "no": "05",
+  "no": "02",
   "group": "看清",
   "name": "客户研判",
   "title": "客户研判：先判断值不值得跟，再决定怎么开口｜HunterBuddy",
   "description": "客户研判是一项把融资、在招岗位、创始团队、业务变化与公开风险放在一起判断的能力，它回答三个问题：这家客户值不值得跟、现在该不该切、自己能不能交付。",
-  "kicker": "核心能力 05 · 看清",
+  "kicker": "核心能力 02 · 看清",
   "h1": "客户研判：先判断值不值得跟，再决定怎么开口",
   "definition": "客户研判是一项把融资、在招岗位、创始团队、业务变化与公开风险放在一起判断的能力，它回答三个问题：这家客户值不值得跟、现在该不该切、自己能不能交付。",
   "intro": [
@@ -75,5 +75,5 @@ export default {
     ]
   },
   "boundary": "HunterBuddy 不替你联系客户，也不把融资新闻直接当成需求。它把证据、风险、引荐路径和下一步整理清楚。",
-  "next": "referrals"
+  "next": "org-chart"
 };

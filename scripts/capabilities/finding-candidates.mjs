@@ -1,13 +1,13 @@
-// scripts/capabilities/finding-candidates.mjs · 核心能力 01：多源寻访
+// scripts/capabilities/finding-candidates.mjs · 核心能力 04：多源寻访
 // 正文来自飞书《HunterBuddy 官网文案-二级页面-2026.11.21》，由 2026-11-21 的拆分脚本生成，之后直接改这个文件。
 export default {
   "slug": "finding-candidates",
-  "no": "01",
+  "no": "04",
   "group": "找人",
   "name": "多源寻访",
   "title": "多源寻访：把散在各处的线索，收成一份名单｜HunterBuddy",
   "description": "多源自动寻访是一项把公开网络、论文专利、开源痕迹与授权人才库合并检索的寻访能力，它对同一个人在不同渠道的资料先核对、再合并、最后排序。",
-  "kicker": "核心能力 01 · 找人",
+  "kicker": "核心能力 04 · 找人",
   "h1": "多源寻访：把散在各处的线索，收成一份名单",
   "definition": "多源自动寻访是一项把公开网络、论文专利、开源痕迹与授权人才库合并检索的寻访能力，它对同一个人在不同渠道的资料先核对、再合并、最后排序。",
   "intro": [
@@ -75,5 +75,5 @@ export default {
     ]
   },
   "boundary": "HunterBuddy 不做自动群发，也不给一键结论。它把搜索、补全、核对、合并和排序自动化，把识人、沟通和判断留给你。",
-  "next": "job-matching"
+  "next": "same-name-candidates"
 };

@@ -1,13 +1,13 @@
-// scripts/capabilities/org-chart.mjs · 核心能力 04：组织架构 Mapping
+// scripts/capabilities/org-chart.mjs · 核心能力 03：组织架构 Mapping
 // 正文来自飞书《HunterBuddy 官网文案-二级页面-2026.11.21》，由 2026-11-21 的拆分脚本生成，之后直接改这个文件。
 export default {
   "slug": "org-chart",
-  "no": "04",
+  "no": "03",
   "group": "看清",
   "name": "组织架构 Mapping",
   "title": "组织架构 Mapping：把一群人，还原成一张组织图｜HunterBuddy",
   "description": "组织架构 Mapping 是一项把公开线索整理成可追溯组织图的能力，它区分在职核心成员、双聘人员、联合培养与已离职人员，并对负责人做在职性校验。",
-  "kicker": "核心能力 04 · 看清",
+  "kicker": "核心能力 03 · 看清",
   "h1": "组织架构 Mapping：把一群人，还原成一张组织图",
   "definition": "组织架构 Mapping 是一项把公开线索整理成可追溯组织图的能力，它区分在职核心成员、双聘人员、联合培养与已离职人员，并对负责人做在职性校验。",
   "intro": [
@@ -75,5 +75,5 @@ export default {
     ]
   },
   "boundary": "HunterBuddy 不生成“官方架构图”。它给的是带来源和状态的推断底稿，最终关系由你复核。",
-  "next": "business-development"
+  "next": "finding-candidates"
 };

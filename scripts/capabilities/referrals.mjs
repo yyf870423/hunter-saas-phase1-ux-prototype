@@ -1,13 +1,13 @@
-// scripts/capabilities/referrals.mjs · 核心能力 06：人选转介绍
+// scripts/capabilities/referrals.mjs · 核心能力 07：人选转介绍
 // 正文来自飞书《HunterBuddy 官网文案-二级页面-2026.11.21》，由 2026-11-21 的拆分脚本生成，之后直接改这个文件。
 export default {
   "slug": "referrals",
-  "no": "06",
+  "no": "07",
   "group": "沉淀",
   "name": "人选转介绍",
   "title": "人选转介绍：谁最可能认识他｜HunterBuddy",
   "description": "人选转介绍是一项把同事、同门、论文合著、共同专利与历史互动连成关系网的能力，它沿 1 到 3 跳寻找桥接人，并按关系强度与可达性排序。",
-  "kicker": "核心能力 06 · 沉淀",
+  "kicker": "核心能力 07 · 沉淀",
   "h1": "人选转介绍：谁最可能认识他",
   "definition": "人选转介绍是一项把同事、同门、论文合著、共同专利与历史互动连成关系网的能力，它沿 1 到 3 跳寻找桥接人，并按关系强度与可达性排序。",
   "intro": [

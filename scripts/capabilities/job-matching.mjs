@@ -1,13 +1,13 @@
-// scripts/capabilities/job-matching.mjs · 核心能力 02：人岗双向匹配
+// scripts/capabilities/job-matching.mjs · 核心能力 06：人岗双向匹配
 // 正文来自飞书《HunterBuddy 官网文案-二级页面-2026.11.21》，由 2026-11-21 的拆分脚本生成，之后直接改这个文件。
 export default {
   "slug": "job-matching",
-  "no": "02",
+  "no": "06",
   "group": "找人",
   "name": "人岗双向匹配",
   "title": "人岗双向匹配：简历找岗位，岗位也找简历｜HunterBuddy",
   "description": "人岗双向匹配是一项把岗位要求拆成可判断条件、再用候选人证据逐条对照的匹配能力，它同时支持用一份简历反查库里更合适的岗位。",
-  "kicker": "核心能力 02 · 找人",
+  "kicker": "核心能力 06 · 找人",
   "h1": "人岗双向匹配：简历找岗位，岗位也找简历",
   "definition": "人岗双向匹配是一项把岗位要求拆成可判断条件、再用候选人证据逐条对照的匹配能力，它同时支持用一份简历反查库里更合适的岗位。",
   "intro": [
@@ -77,5 +77,5 @@ export default {
     ]
   },
   "boundary": "HunterBuddy 把“岗位要什么、候选人做过什么、为什么匹配、还有什么风险”讲清楚。推不推荐、要不要联系、怎么向客户表达，仍由你判断。",
-  "next": "same-name-candidates"
+  "next": "referrals"
 };

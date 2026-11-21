@@ -1,13 +1,13 @@
-// scripts/capabilities-en/talent-pool.mjs · Capability 07: talent pool
+// scripts/capabilities-en/talent-pool.mjs · Capability 08: talent pool
 export default {
   slug: "talent-pool",
-  no: "07",
+  no: "08",
   group: "Keep",
   name: "Talent pool",
   title: "Talent pool: one profile per person, kept current | HunterBuddy",
   description:
     "The talent pool merges one person’s identities, career history and conversations into a single profile, de-duplicating automatically and tracking changes on one timeline.",
-  kicker: "Capability 07 · Keep",
+  kicker: "Capability 08 · Keep",
   h1: "Talent pool: one profile per person, kept current",
   definition:
     "The talent pool is a capability that merges one person’s identities, career history and conversation records from different platforms into a single profile. It de-duplicates automatically, tracks changes, and keeps every conversation on the same timeline.",
@@ -39,5 +39,5 @@ export default {
   },
   boundary:
     "HunterBuddy never treats a namesake as the same person, never guesses Chinese names from pinyin, and never reads a public change as a wish to move.",
-  next: "industry-primer",
+  next: null,
 };

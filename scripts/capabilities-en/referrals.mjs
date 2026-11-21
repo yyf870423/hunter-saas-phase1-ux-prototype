@@ -1,13 +1,13 @@
-// scripts/capabilities-en/referrals.mjs · Capability 06: referrals
+// scripts/capabilities-en/referrals.mjs · Capability 07: referrals
 export default {
   slug: "referrals",
-  no: "06",
+  no: "07",
   group: "Keep",
   name: "Referrals",
   title: "Referrals: who is most likely to know them | HunterBuddy",
   description:
     "Referrals connects colleagues, lab mates, co-authors, shared patents and past interactions into a network, then finds and ranks bridges within one to three steps.",
-  kicker: "Capability 06 · Keep",
+  kicker: "Capability 07 · Keep",
   h1: "Referrals: who is most likely to know them",
   definition:
     "Referrals is a capability that connects colleagues, classmates from the same lab, paper co-authors, shared patents and past interactions into a network. It looks for bridges within one to three steps, and ranks them by relationship strength and how reachable they are.",

@@ -45,16 +45,16 @@ const HOME_OG = { zh: ogOf("index.html"), en: ogOf("en/index.html") };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 
-// 列表和页脚的顺序：先是首页上的八个核心能力（找人、看清、沉淀），再是三篇通用的
+// 列表和页脚的顺序：先是首页上的八个核心能力（看清、找人、沉淀），再是三篇通用的
 const CAPS = [
-  "finding-candidates",
-  "job-matching",
-  "same-name-candidates",
-  "org-chart",
+  "industry-primer",
   "business-development",
+  "org-chart",
+  "finding-candidates",
+  "same-name-candidates",
+  "job-matching",
   "referrals",
   "talent-pool",
-  "industry-primer",
 ];
 const ORDER = [...CAPS, "headhunter-consultant", "ai-assistant-for-headhunters", "ai-tools-compared"];
 
@@ -88,23 +88,23 @@ const LOCALES = {
     home: "首页",
     list: {
       name: "使用场景",
-      title: "使用场景：多源寻访、人岗双向匹配、身份核实、组织架构 Mapping、客户研判与人才库｜HunterBuddy",
+      title: "使用场景：客户研判、组织架构 Mapping、多源寻访、身份核实、人岗双向匹配与人才库｜HunterBuddy",
       description:
-        "HunterBuddy 的八个核心能力和三篇实务文章：多源寻访、人岗双向匹配、身份核实、组织架构 Mapping、客户研判、人选转介绍、人才库和行业入门，每一篇都讲清它解决什么问题、怎么做、边界在哪里。",
+        "HunterBuddy 的八个核心能力和三篇实务文章：行业入门、客户研判、组织架构 Mapping、多源寻访、身份核实、人岗双向匹配、人选转介绍和人才库，每一篇都讲清它解决什么问题、怎么做、边界在哪里。",
       kicker: "使用场景",
       h1: "使用场景",
-      lead: "八件事，三步走：找人、看清、沉淀。每一篇讲清这一步难在哪里、HunterBuddy 怎么做，以及哪些仍然由你判断。",
+      lead: "八件事，三步走：看清、找人、沉淀。每一篇讲清这一步难在哪里、HunterBuddy 怎么做，以及哪些仍然由你判断。",
     },
     // 页脚“使用场景”一栏：八个核心能力（和首页同一顺序），最后一行“全部 >>”
     footerCases: [
-      ["finding-candidates", "多源寻访"],
-      ["job-matching", "人岗双向匹配"],
-      ["same-name-candidates", "身份核实"],
-      ["org-chart", "组织架构 Mapping"],
+      ["industry-primer", "行业入门"],
       ["business-development", "客户研判"],
+      ["org-chart", "组织架构 Mapping"],
+      ["finding-candidates", "多源寻访"],
+      ["same-name-candidates", "身份核实"],
+      ["job-matching", "人岗双向匹配"],
       ["referrals", "人选转介绍"],
       ["talent-pool", "人才库"],
-      ["industry-primer", "行业入门"],
     ],
     all: "全部 &gt;&gt;",
     groups: ["产品", "使用场景", "法律"],
@@ -125,7 +125,7 @@ const LOCALES = {
     capBound: "边界",
     capNext: "看下一个能力",
     capBack: "回到核心能力总览",
-    capBackLine: "八件事，三步走：找人、看清、沉淀。",
+    capBackLine: "八件事，三步走：看清、找人、沉淀。",
     trialTitle: "申请 HunterBuddy 试用",
     trialBody: "当前采用邀请制。你留下信息后，我们会结合你的招聘方向、岗位类型与团队场景，确认试用安排。",
     example: T.example,
@@ -158,22 +158,22 @@ const LOCALES = {
     home: "Home",
     list: {
       name: "Use cases",
-      title: "Use cases: multi-source sourcing, two-way matching, identity checks, org mapping and talent pools | HunterBuddy",
+      title: "Use cases: org mapping, multi-source sourcing, identity checks, two-way matching and talent pools | HunterBuddy",
       description:
-        "HunterBuddy’s eight capabilities and three practical guides: multi-source sourcing, two-way job matching, identity checks, org mapping, client research, referrals, talent pools and industry primers. Each explains the problem, how it works and where its limits are.",
+        "HunterBuddy’s eight capabilities and three practical guides: industry primers, client research, org mapping, multi-source sourcing, identity checks, two-way job matching, referrals and talent pools. Each explains the problem, how it works and where its limits are.",
       kicker: "Use cases",
       h1: "Use cases",
-      lead: "Eight capabilities in three steps: find, know, keep. Each page explains where the work gets hard, how HunterBuddy handles it, and what is still yours to judge.",
+      lead: "Eight capabilities in three steps: know, find, keep. Each page explains where the work gets hard, how HunterBuddy handles it, and what is still yours to judge.",
     },
     footerCases: [
-      ["finding-candidates", "Multi-source sourcing"],
-      ["job-matching", "Two-way job matching"],
-      ["same-name-candidates", "Identity checks"],
-      ["org-chart", "Org mapping"],
+      ["industry-primer", "Industry primer"],
       ["business-development", "Client research"],
+      ["org-chart", "Org mapping"],
+      ["finding-candidates", "Multi-source sourcing"],
+      ["same-name-candidates", "Identity checks"],
+      ["job-matching", "Two-way job matching"],
       ["referrals", "Referrals"],
       ["talent-pool", "Talent pool"],
-      ["industry-primer", "Industry primer"],
     ],
     all: "All &gt;&gt;",
     groups: ["Product", "Use cases", "Legal"],
@@ -192,7 +192,7 @@ const LOCALES = {
     capBound: "Where it stops",
     capNext: "Next capability",
     capBack: "Back to all capabilities",
-    capBackLine: "Eight capabilities in three steps: find, know, keep.",
+    capBackLine: "Eight capabilities in three steps: know, find, keep.",
     trialTitle: "Request a HunterBuddy trial",
     trialBody: "Trials are by invitation for now. Leave your details, and we’ll arrange your trial around the roles you hire for, the kinds of positions you work on and how your team works.",
     example: COMMON.en.example,

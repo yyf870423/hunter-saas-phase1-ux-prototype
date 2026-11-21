@@ -103,7 +103,7 @@
             "@type": "SoftwareApplication",
             "@id": "https://www.boseekai.com/#hunterbuddy",
             "name": "HunterBuddy",
-            "description": "HunterBuddy 是面向 HR 与专业猎头的高阶技术人才寻访 AI 工作台：多源寻访、人岗双向匹配、身份核实、组织架构 Mapping、客户研判、人选转介绍、人才库和行业入门，每条结论都有来源，拿不准的标为待确认。推荐、联系和商务决定由你作出。目前邀请制试用。",
+            "description": "HunterBuddy 是面向 HR 与专业猎头的高阶技术人才寻访 AI 工作台：行业入门、客户研判、组织架构 Mapping、多源寻访、身份核实、人岗双向匹配、人选转介绍和人才库，每条结论都有来源，拿不准的标为待确认。推荐、联系和商务决定由你作出。目前邀请制试用。",
             "applicationCategory": "BusinessApplication",
             "applicationSubCategory": "高阶技术人才寻访的 AI 工作台",
             "operatingSystem": "Web",
@@ -323,12 +323,94 @@
         <div class="n-wrap">
           <div class="n-section-head n-section-head-wide">
             <p class="n-kicker">01 · 核心能力</p>
-            <h2 class="n-h2" id="n-caps-title">找谁、看清谁、留住谁</h2>
-            <p class="n-sub">八件事，三步走。从多源召回与人岗匹配开始，到身份、组织、客户这三层看清，最后把每一次判断沉淀成下次能直接用的资产。每一步都保留来源、状态和人工确认点。</p>
+            <h2 class="n-h2" id="n-caps-title">看清谁、找到谁、留住谁</h2>
+            <p class="n-sub">八件事，三步走。先看懂行业、客户和组织，再多源召回、核实身份、人岗匹配，最后把每一次判断沉淀成下次能直接用的资产。每一步都保留来源、状态和人工确认点。</p>
           </div>
 
           <div class="n-scrolly" data-scrolly>
-            <article class="n-card n-step is-active" aria-labelledby="n-step-sourcing">
+            <article class="n-card n-step is-active" aria-labelledby="n-step-industry">
+              <div class="n-figure" id="industry" aria-hidden="true">
+                <div class="fx fx-ind">
+                  <div class="fx-ind-map">
+                    <div class="fx-node fx-ind-root"><b>具身智能</b><span>产业链</span></div>
+                    <svg class="fx-ind-lines" viewBox="0 0 40 120" preserveAspectRatio="none"><path d="M0 60 C20 60 20 20 40 20 M0 60 L40 60 M0 60 C20 60 20 100 40 100" /></svg>
+                    <ul class="fx-ind-tiers">
+                      <li><b>上游</b><span>核心零部件</span><span>传感器</span></li>
+                      <li><b>中游</b><span>整机本体</span><span>运动控制</span></li>
+                      <li><b>下游</b><span>场景集成</span><span>工业 / 家用</span></li>
+                    </ul>
+                  </div>
+                  <div class="fx-card fx-ind-roles">
+                    <div class="fx-head"><span class="fx-cap">岗位地图</span><em class="fx-ok">已用 JD 校准</em></div>
+                    <p class="fx-tags"><em>感知算法</em><em>运动控制</em><em>整机测试</em><em>灵巧手</em></p>
+                    <p class="fx-ind-note"><span class="fx-cap">导出</span><span>可编辑的思维导图</span></p>
+                  </div>
+                </div>
+              </div>
+              <div class="n-step-text">
+                <p class="n-step-meta"><i>看清</i><span>01 / 08</span></p>
+                <p class="n-pain">新赛道术语成堆，产业链看不清，JD 里的黑话听不懂。</p>
+                <h3 id="n-step-industry">行业入门：从陌生赛道到能开口</h3>
+                <p>从一条产业链的上下游开始，把产品、公司、岗位逐层摊开，再用真实 JD 校准，最后收成一张可编辑的思维导图。招聘从业者拿到的不是研报，是一张能直接开口的行业地图。</p>
+                <a class="n-more" href="use-cases/industry-primer/">了解行业入门</a>
+                <span class="n-step-bar" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </article>
+            <article class="n-card n-step" aria-labelledby="n-step-bd">
+              <div class="n-figure" id="bd" aria-hidden="true">
+                <div class="fx fx-bd">
+                  <ul class="fx-signals">
+                    <li>融资动态</li><li>在招岗位</li><li>创始团队</li><li>业务变化</li><li>公开风险</li>
+                  </ul>
+                  <span class="fx-stem"></span>
+                  <div class="fx-card fx-verdict">
+                    <div class="fx-head"><span class="fx-cap">客户研判</span><em class="fx-ok">优先跟进</em></div>
+                    <ul class="fx-meters">
+                      <li><span>真实需求</span><i style="--n: 4"></i><b>有依据</b></li>
+                      <li><span>付费能力</span><i style="--n: 3"></i><b>有依据</b></li>
+                      <li class="is-wait"><span>交付可行性</span><i style="--n: 2"></i><b>待确认</b></li>
+                    </ul>
+                    <div class="fx-chain"><span class="fx-cap">接洽顺序</span><ol><li>创始人</li><li>技术 VP</li><li class="is-wait">用人经理</li></ol></div>
+                  </div>
+                </div>
+              </div>
+              <div class="n-step-text">
+                <p class="n-step-meta"><i>看清</i><span>02 / 08</span></p>
+                <p class="n-pain">有的客户岗位不少，跟下去才发现需求、预算或决策链还没准备好。</p>
+                <h3 id="n-step-bd">客户研判：先判断值不值得跟</h3>
+                <p>把融资、在招岗位、创始团队、业务变化和公开风险放在一起看，判断真实需求、付费能力与交付可行性，再理清决策链和接洽顺序。少做无用奔波。</p>
+                <a class="n-more" href="use-cases/business-development/">了解客户研判</a>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </article>
+            <article class="n-card n-step" aria-labelledby="n-step-mapping">
+              <div class="n-figure" id="mapping" aria-hidden="true">
+                <div class="fx fx-org">
+                  <p class="fx-legend"><span class="is-core">在职核心</span><span class="is-dual">双聘</span><span class="is-joint">联合培养</span><span class="is-left">已离职</span></p>
+                  <div class="fx-tree">
+                    <div class="fx-node fx-top"><b>具身智能研究院</b></div>
+                    <span class="fx-trunk"></span>
+                    <div class="fx-node fx-root"><i class="fx-av is-core">韩</i><div><b>技术负责人</b><span>韩征 · 在职核心 · 已核实</span></div></div>
+                    <svg class="fx-branches" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M150 0 L150 16 M50 40 L50 24 Q50 16 58 16 L242 16 Q250 16 250 24 L250 40 M150 16 L150 40" /></svg>
+                    <div class="fx-kids">
+                      <div class="fx-node"><b>视觉团队</b><span class="fx-avs"><i class="fx-av is-core">林</i><i class="fx-av is-dual">周</i><i class="fx-av fx-more">+4</i></span></div>
+                      <div class="fx-node is-guess"><b>控制团队</b><span class="fx-avs"><i class="fx-av is-core">许</i><i class="fx-av is-joint">宋</i><i class="fx-av is-left">何</i></span><em>疑似团队</em></div>
+                      <div class="fx-node is-gap"><b>产品交付</b><em>负责人待补</em></div>
+                    </div>
+                  </div>
+                  <p class="fx-src">来源 · 官网 · 新闻 · 论文署名 · 公开演讲</p>
+                </div>
+              </div>
+              <div class="n-step-text">
+                <p class="n-step-meta"><i>看清</i><span>03 / 08</span></p>
+                <p class="n-pain">Mapping 要对着官网和新闻一点点拼，画完的图还存着好几个版本。</p>
+                <h3 id="n-step-mapping">组织架构 Mapping：<br />把一群人还原成一张组织图</h3>
+                <p>先确认真正的研发主体，再判断每个人是在职核心、双聘、高校联合培养还是已离职，最后推断疑似团队与负责人。一键生成架构图，每个位置保留来源与确认状态。</p>
+                <a class="n-more" href="use-cases/org-chart/">了解组织架构图</a>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </article>
+            <article class="n-card n-step" aria-labelledby="n-step-sourcing">
               <div class="n-figure" id="sourcing" aria-hidden="true">
                 <div class="fx fx-source">
                   <p class="fx-need"><span class="fx-cap">读懂需求</span><b>视觉算法负责人 · 机器人方向</b></p>
@@ -353,12 +435,45 @@
                 </div>
               </div>
               <div class="n-step-text">
-                <p class="n-step-meta"><i>找人</i><span>01 / 08</span></p>
+                <p class="n-step-meta"><i>找人</i><span>04 / 08</span></p>
                 <p class="n-pain">人选散在招聘平台、论文、代码仓库和你自己的库里，翻一遍就是一整天。</p>
                 <h3 id="n-step-sourcing">多源寻访：不只搜简历</h3>
                 <p>整合公开网络、论文专利、开源痕迹和授权导入的人才库，统一查重、补全、按优先级排序。哪些渠道已经找过、哪些还是空白，也一并标出来，方便你决定下一步去哪里补。</p>
                 <a class="n-more" href="use-cases/finding-candidates/">了解多源寻访</a>
-                <span class="n-step-bar" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </article>
+            <article class="n-card n-step" aria-labelledby="n-step-identity">
+              <div class="n-figure" id="identity" aria-hidden="true">
+                <div class="fx fx-id">
+                  <ul class="fx-aliases">
+                    <li><small>社区</small>花名 · 阿越</li>
+                    <li><small>论文</small>Lin Y.</li>
+                    <li><small>GitHub</small>lin-yue</li>
+                  </ul>
+                  <svg class="fx-converge" viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M50 0 C50 18 150 12 150 30" /><path d="M150 0 L150 30" /><path d="M250 0 C250 18 150 12 150 30" /></svg>
+                  <div class="fx-id-stack">
+                    <div class="fx-card fx-ghost"><span>林越 · 电商运营</span><em>同名 · 已排除</em></div>
+                    <div class="fx-card fx-person">
+                      <div class="fx-who"><i class="fx-av fx-av-lg">林</i><div><b>林越</b><span>工业视觉 · 团队负责人</span></div><em class="fx-ok">已核实</em></div>
+                      <ul class="fx-checks">
+                        <li>三处来源交叉核验</li>
+                        <li>履历时间线吻合</li>
+                        <li>同名两位，已排除</li>
+                        <li class="is-wait">现任职级<em>待确认</em></li>
+                      </ul>
+                      <p class="fx-route"><span class="fx-cap">相关人选</span><span>论文合著者 2 位</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="n-step-text">
+                <p class="n-step-meta"><i>找人</i><span>05 / 08</span></p>
+                <p class="n-pain">手上只有一个花名、一个 GitHub ID，人到底是谁，往往要猜上半天。</p>
+                <h3 id="n-step-identity">身份核实：一个 ID，还原成一个真人</h3>
+                <p>用多个来源交叉核验、排除同名，还原候选人的真实姓名与身份，再沿履历和合作线索找到相关人选。确认不了的不猜：拼音不反推汉字，同名不当同人，拿不准的标为待确认。</p>
+                <a class="n-more" href="use-cases/same-name-candidates/">了解身份核实</a>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i></span>
               </div>
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-match">
@@ -390,99 +505,12 @@
                 </div>
               </div>
               <div class="n-step-text">
-                <p class="n-step-meta"><i>找人</i><span>02 / 08</span></p>
+                <p class="n-step-meta"><i>找人</i><span>06 / 08</span></p>
                 <p class="n-pain">人才库里躺着几千份简历，最合适的那个，往往搜不出来。</p>
                 <h3 id="n-step-match">人岗双向匹配：<br />简历找岗位，岗位也找简历</h3>
                 <p>把 JD 拆成核心技能、行业经验、项目职责和硬性门槛，用结构化检索与语义匹配一起找人。反过来，也能为一份简历找到库里更合适的岗位。每条结果附匹配依据、明确优势和待确认的风险。</p>
                 <a class="n-more" href="use-cases/job-matching/">了解人岗匹配</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-              </div>
-            </article>
-            <article class="n-card n-step" aria-labelledby="n-step-identity">
-              <div class="n-figure" id="identity" aria-hidden="true">
-                <div class="fx fx-id">
-                  <ul class="fx-aliases">
-                    <li><small>社区</small>花名 · 阿越</li>
-                    <li><small>论文</small>Lin Y.</li>
-                    <li><small>GitHub</small>lin-yue</li>
-                  </ul>
-                  <svg class="fx-converge" viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M50 0 C50 18 150 12 150 30" /><path d="M150 0 L150 30" /><path d="M250 0 C250 18 150 12 150 30" /></svg>
-                  <div class="fx-id-stack">
-                    <div class="fx-card fx-ghost"><span>林越 · 电商运营</span><em>同名 · 已排除</em></div>
-                    <div class="fx-card fx-person">
-                      <div class="fx-who"><i class="fx-av fx-av-lg">林</i><div><b>林越</b><span>工业视觉 · 团队负责人</span></div><em class="fx-ok">已核实</em></div>
-                      <ul class="fx-checks">
-                        <li>三处来源交叉核验</li>
-                        <li>履历时间线吻合</li>
-                        <li>同名两位，已排除</li>
-                        <li class="is-wait">现任职级<em>待确认</em></li>
-                      </ul>
-                      <p class="fx-route"><span class="fx-cap">相关人选</span><span>论文合著者 2 位</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="n-step-text">
-                <p class="n-step-meta"><i>看清</i><span>03 / 08</span></p>
-                <p class="n-pain">手上只有一个花名、一个 GitHub ID，人到底是谁，往往要猜上半天。</p>
-                <h3 id="n-step-identity">身份核实：一个 ID，还原成一个真人</h3>
-                <p>用多个来源交叉核验、排除同名，还原候选人的真实姓名与身份，再沿履历和合作线索找到相关人选。确认不了的不猜：拼音不反推汉字，同名不当同人，拿不准的标为待确认。</p>
-                <a class="n-more" href="use-cases/same-name-candidates/">了解身份核实</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i></span>
-              </div>
-            </article>
-            <article class="n-card n-step" aria-labelledby="n-step-mapping">
-              <div class="n-figure" id="mapping" aria-hidden="true">
-                <div class="fx fx-org">
-                  <p class="fx-legend"><span class="is-core">在职核心</span><span class="is-dual">双聘</span><span class="is-joint">联合培养</span><span class="is-left">已离职</span></p>
-                  <div class="fx-tree">
-                    <div class="fx-node fx-top"><b>具身智能研究院</b></div>
-                    <span class="fx-trunk"></span>
-                    <div class="fx-node fx-root"><i class="fx-av is-core">韩</i><div><b>技术负责人</b><span>韩征 · 在职核心 · 已核实</span></div></div>
-                    <svg class="fx-branches" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M150 0 L150 16 M50 40 L50 24 Q50 16 58 16 L242 16 Q250 16 250 24 L250 40 M150 16 L150 40" /></svg>
-                    <div class="fx-kids">
-                      <div class="fx-node"><b>视觉团队</b><span class="fx-avs"><i class="fx-av is-core">林</i><i class="fx-av is-dual">周</i><i class="fx-av fx-more">+4</i></span></div>
-                      <div class="fx-node is-guess"><b>控制团队</b><span class="fx-avs"><i class="fx-av is-core">许</i><i class="fx-av is-joint">宋</i><i class="fx-av is-left">何</i></span><em>疑似团队</em></div>
-                      <div class="fx-node is-gap"><b>产品交付</b><em>负责人待补</em></div>
-                    </div>
-                  </div>
-                  <p class="fx-src">来源 · 官网 · 新闻 · 论文署名 · 公开演讲</p>
-                </div>
-              </div>
-              <div class="n-step-text">
-                <p class="n-step-meta"><i>看清</i><span>04 / 08</span></p>
-                <p class="n-pain">Mapping 要对着官网和新闻一点点拼，画完的图还存着好几个版本。</p>
-                <h3 id="n-step-mapping">组织架构 Mapping：<br />把一群人还原成一张组织图</h3>
-                <p>先确认真正的研发主体，再判断每个人是在职核心、双聘、高校联合培养还是已离职，最后推断疑似团队与负责人。一键生成架构图，每个位置保留来源与确认状态。</p>
-                <a class="n-more" href="use-cases/org-chart/">了解组织架构图</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i></span>
-              </div>
-            </article>
-            <article class="n-card n-step" aria-labelledby="n-step-bd">
-              <div class="n-figure" id="bd" aria-hidden="true">
-                <div class="fx fx-bd">
-                  <ul class="fx-signals">
-                    <li>融资动态</li><li>在招岗位</li><li>创始团队</li><li>业务变化</li><li>公开风险</li>
-                  </ul>
-                  <span class="fx-stem"></span>
-                  <div class="fx-card fx-verdict">
-                    <div class="fx-head"><span class="fx-cap">客户研判</span><em class="fx-ok">优先跟进</em></div>
-                    <ul class="fx-meters">
-                      <li><span>真实需求</span><i style="--n: 4"></i><b>有依据</b></li>
-                      <li><span>付费能力</span><i style="--n: 3"></i><b>有依据</b></li>
-                      <li class="is-wait"><span>交付可行性</span><i style="--n: 2"></i><b>待确认</b></li>
-                    </ul>
-                    <div class="fx-chain"><span class="fx-cap">接洽顺序</span><ol><li>创始人</li><li>技术 VP</li><li class="is-wait">用人经理</li></ol></div>
-                  </div>
-                </div>
-              </div>
-              <div class="n-step-text">
-                <p class="n-step-meta"><i>看清</i><span>05 / 08</span></p>
-                <p class="n-pain">有的客户岗位不少，跟下去才发现需求、预算或决策链还没准备好。</p>
-                <h3 id="n-step-bd">客户研判：先判断值不值得跟</h3>
-                <p>把融资、在招岗位、创始团队、业务变化和公开风险放在一起看，判断真实需求、付费能力与交付可行性，再理清决策链和接洽顺序。少做无用奔波。</p>
-                <a class="n-more" href="use-cases/business-development/">了解客户研判</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i></span>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i></span>
               </div>
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-referral">
@@ -507,12 +535,12 @@
                 </div>
               </div>
               <div class="n-step-text">
-                <p class="n-step-meta"><i>沉淀</i><span>06 / 08</span></p>
+                <p class="n-step-meta"><i>沉淀</i><span>07 / 08</span></p>
                 <p class="n-pain">能想起谁转介绍，取决于自己记忆，而不是谁真的认识他。</p>
                 <h3 id="n-step-referral">人选转介绍：谁最可能认识他</h3>
                 <p>把同事、同门、论文合著、共同专利和组织关联连成一张关系网，沿 1 到 3 跳寻找桥接人，再按关系强度、可达性和意愿信号排序。每条路径写明依据，也写明哪里还没确认。</p>
                 <a class="n-more" href="use-cases/referrals/">了解人选转介绍</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i></span>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i></span>
               </div>
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-network">
@@ -540,39 +568,11 @@
                 </div>
               </div>
               <div class="n-step-text">
-                <p class="n-step-meta"><i>沉淀</i><span>07 / 08</span></p>
+                <p class="n-step-meta"><i>沉淀</i><span>08 / 08</span></p>
                 <p class="n-pain">当年聊过的人换了公司、换了赛道，你的库还停在入库那天。</p>
                 <h3 id="n-step-network">人才库：一人一档，随时间更新</h3>
                 <p>候选人不同平台身份自动查重归并，线索不足时用公开信息补全档案。公司、团队或职位变化会被识别为关注信号，由 Agent 自主更新并沉淀至同一时间线。人员信息一处更新，后续匹配自动复用。</p>
                 <a class="n-more" href="use-cases/talent-pool/">了解人才库</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i></span>
-              </div>
-            </article>
-            <article class="n-card n-step" aria-labelledby="n-step-industry">
-              <div class="n-figure" id="industry" aria-hidden="true">
-                <div class="fx fx-ind">
-                  <div class="fx-ind-map">
-                    <div class="fx-node fx-ind-root"><b>具身智能</b><span>产业链</span></div>
-                    <svg class="fx-ind-lines" viewBox="0 0 40 120" preserveAspectRatio="none"><path d="M0 60 C20 60 20 20 40 20 M0 60 L40 60 M0 60 C20 60 20 100 40 100" /></svg>
-                    <ul class="fx-ind-tiers">
-                      <li><b>上游</b><span>核心零部件</span><span>传感器</span></li>
-                      <li><b>中游</b><span>整机本体</span><span>运动控制</span></li>
-                      <li><b>下游</b><span>场景集成</span><span>工业 / 家用</span></li>
-                    </ul>
-                  </div>
-                  <div class="fx-card fx-ind-roles">
-                    <div class="fx-head"><span class="fx-cap">岗位地图</span><em class="fx-ok">已用 JD 校准</em></div>
-                    <p class="fx-tags"><em>感知算法</em><em>运动控制</em><em>整机测试</em><em>灵巧手</em></p>
-                    <p class="fx-ind-note"><span class="fx-cap">导出</span><span>可编辑的思维导图</span></p>
-                  </div>
-                </div>
-              </div>
-              <div class="n-step-text">
-                <p class="n-step-meta"><i>沉淀</i><span>08 / 08</span></p>
-                <p class="n-pain">新赛道术语成堆，产业链看不清，JD 里的黑话听不懂。</p>
-                <h3 id="n-step-industry">行业入门：从陌生赛道到能开口</h3>
-                <p>从一条产业链的上下游开始，把产品、公司、岗位逐层摊开，再用真实 JD 校准，最后收成一张可编辑的思维导图。招聘从业者拿到的不是研报，是一张能直接开口的行业地图。</p>
-                <a class="n-more" href="use-cases/industry-primer/">了解行业入门</a>
                 <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i></span>
               </div>
             </article>
@@ -688,14 +688,14 @@
             <div>
               <h2>使用场景</h2>
               <ul>
-                <li><a href="use-cases/finding-candidates/">多源寻访</a></li>
-                <li><a href="use-cases/job-matching/">人岗双向匹配</a></li>
-                <li><a href="use-cases/same-name-candidates/">身份核实</a></li>
-                <li><a href="use-cases/org-chart/">组织架构 Mapping</a></li>
+                <li><a href="use-cases/industry-primer/">行业入门</a></li>
                 <li><a href="use-cases/business-development/">客户研判</a></li>
+                <li><a href="use-cases/org-chart/">组织架构 Mapping</a></li>
+                <li><a href="use-cases/finding-candidates/">多源寻访</a></li>
+                <li><a href="use-cases/same-name-candidates/">身份核实</a></li>
+                <li><a href="use-cases/job-matching/">人岗双向匹配</a></li>
                 <li><a href="use-cases/referrals/">人选转介绍</a></li>
                 <li><a href="use-cases/talent-pool/">人才库</a></li>
-                <li><a href="use-cases/industry-primer/">行业入门</a></li>
                 <li><a href="use-cases/">全部 &gt;&gt;</a></li>
               </ul>
             </div>

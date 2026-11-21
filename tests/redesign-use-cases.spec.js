@@ -3,14 +3,14 @@ import { test, expect } from "@playwright/test";
 // 改版首页的“使用场景”（2026-11-21 起：八篇核心能力在前，三篇通用的实务文章在后，共十一篇）：
 // 规范网址、结构化数据和页面一致、目录、相关阅读能打开，首页的入口（核心能力里的“了解…”和页脚，不在顶部导航）
 const caps = [
-  "finding-candidates",
-  "job-matching",
-  "same-name-candidates",
-  "org-chart",
+  "industry-primer",
   "business-development",
+  "org-chart",
+  "finding-candidates",
+  "same-name-candidates",
+  "job-matching",
   "referrals",
   "talent-pool",
-  "industry-primer",
 ];
 const pages = [...caps, "headhunter-consultant", "ai-assistant-for-headhunters", "ai-tools-compared"];
 // 核心能力页：没有目录和常见问题，结尾链到下一个能力（最后一个回到首页的核心能力）

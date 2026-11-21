@@ -101,7 +101,7 @@
             "@type": "SoftwareApplication",
             "@id": "https://www.boseekai.com/#hunterbuddy",
             "name": "HunterBuddy",
-            "description": "HunterBuddy is the AI workbench for senior tech talent search, built for HR teams and professional headhunters: multi-source sourcing, two-way job matching, identity checks, org mapping, client research, referrals, talent pools and industry primers. Every finding names its source, and anything uncertain is marked “To confirm”. Recommendations, outreach and business decisions are yours. Invitation-only trial.",
+            "description": "HunterBuddy is the AI workbench for senior tech talent search, built for HR teams and professional headhunters: industry primers, client research, org mapping, multi-source sourcing, identity checks, two-way job matching, referrals and talent pools. Every finding names its source, and anything uncertain is marked “To confirm”. Recommendations, outreach and business decisions are yours. Invitation-only trial.",
             "applicationCategory": "BusinessApplication",
             "applicationSubCategory": "AI workbench for senior tech talent search",
             "operatingSystem": "Web",
@@ -323,12 +323,94 @@
         <div class="n-wrap">
           <div class="n-section-head n-section-head-wide">
             <p class="n-kicker">01 · Capabilities</p>
-            <h2 class="n-h2" id="n-caps-title">Find them, know them, keep them</h2>
-            <p class="n-sub">Eight capabilities in three steps. Start with multi-source search and job matching, see people, organizations and clients clearly, and turn every judgment into an asset you can use next time. Every step keeps its sources, its status and the points where you confirm.</p>
+            <h2 class="n-h2" id="n-caps-title">Know them, find them, keep them</h2>
+            <p class="n-sub">Eight capabilities in three steps. First understand the industry, the client and the organization, then search across sources, confirm identities and match people to roles, and turn every judgment into an asset you can use next time. Every step keeps its sources, its status and the points where you confirm.</p>
           </div>
 
           <div class="n-scrolly" data-scrolly>
-            <article class="n-card n-step is-active" aria-labelledby="n-step-sourcing">
+            <article class="n-card n-step is-active" aria-labelledby="n-step-industry">
+              <div class="n-figure" id="industry" aria-hidden="true">
+                <div class="fx fx-ind">
+                  <div class="fx-ind-map">
+                    <div class="fx-node fx-ind-root"><b>Embodied AI</b><span>Value chain</span></div>
+                    <svg class="fx-ind-lines" viewBox="0 0 40 120" preserveAspectRatio="none"><path d="M0 60 C20 60 20 20 40 20 M0 60 L40 60 M0 60 C20 60 20 100 40 100" /></svg>
+                    <ul class="fx-ind-tiers">
+                      <li><b>Upstream</b><span>Core parts</span><span>Sensors</span></li>
+                      <li><b>Midstream</b><span>Robot body</span><span>Motion control</span></li>
+                      <li><b>Downstream</b><span>Integration</span><span>Industry, home</span></li>
+                    </ul>
+                  </div>
+                  <div class="fx-card fx-ind-roles">
+                    <div class="fx-head"><span class="fx-cap">Role map</span><em class="fx-ok">Checked against JDs</em></div>
+                    <p class="fx-tags"><em>Perception</em><em>Motion control</em><em>System testing</em><em>Dexterous hands</em></p>
+                    <p class="fx-ind-note"><span class="fx-cap">Export</span><span>Editable mind map</span></p>
+                  </div>
+                </div>
+              </div>
+              <div class="n-step-text">
+                <p class="n-step-meta"><i>Know</i><span>01 / 08</span></p>
+                <p class="n-pain">A new sector means piles of jargon, a value chain you can’t see clearly and JDs full of insider terms.</p>
+                <h3 id="n-step-industry">Industry primer: from an unfamiliar sector to a confident first call</h3>
+                <p>Starting from one value chain, upstream and downstream, it lays out the products, companies and roles layer by layer, checks them against real JDs, and wraps it all up in an editable mind map. What recruiters get isn’t a research report. It’s an industry map they can start a conversation from.</p>
+                <a class="n-more" href="use-cases/industry-primer/">More on industry primers</a>
+                <span class="n-step-bar" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </article>
+            <article class="n-card n-step" aria-labelledby="n-step-bd">
+              <div class="n-figure" id="bd" aria-hidden="true">
+                <div class="fx fx-bd">
+                  <ul class="fx-signals">
+                    <li>Funding news</li><li>Open roles</li><li>Founding team</li><li>Business changes</li><li>Public risks</li>
+                  </ul>
+                  <span class="fx-stem"></span>
+                  <div class="fx-card fx-verdict">
+                    <div class="fx-head"><span class="fx-cap">Client research</span><em class="fx-ok">Follow up first</em></div>
+                    <ul class="fx-meters">
+                      <li><span>Real need</span><i style="--n: 4"></i><b>Sourced</b></li>
+                      <li><span>Ability to pay</span><i style="--n: 3"></i><b>Sourced</b></li>
+                      <li class="is-wait"><span>Deliverability</span><i style="--n: 2"></i><b>To confirm</b></li>
+                    </ul>
+                    <div class="fx-chain"><span class="fx-cap">Order of approach</span><ol><li>Founder</li><li>Tech VP</li><li class="is-wait">Hiring manager</li></ol></div>
+                  </div>
+                </div>
+              </div>
+              <div class="n-step-text">
+                <p class="n-step-meta"><i>Know</i><span>02 / 08</span></p>
+                <p class="n-pain">Some clients have plenty of openings, and only after chasing them do you find the need, the budget or the decision chain isn’t ready.</p>
+                <h3 id="n-step-bd">Client research: first, decide if it’s worth pursuing</h3>
+                <p>It looks at funding, open roles, the founding team, business changes and public risks together, judges the real need, the ability to pay and whether you can deliver, then lays out the decision chain and the order of approach. Fewer wasted trips.</p>
+                <a class="n-more" href="use-cases/business-development/">More on client research</a>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </article>
+            <article class="n-card n-step" aria-labelledby="n-step-mapping">
+              <div class="n-figure" id="mapping" aria-hidden="true">
+                <div class="fx fx-org">
+                  <p class="fx-legend"><span class="is-core">Core, current</span><span class="is-dual">Dual appointment</span><span class="is-joint">Joint training</span><span class="is-left">Left</span></p>
+                  <div class="fx-tree">
+                    <div class="fx-node fx-top"><b>Embodied AI Institute</b></div>
+                    <span class="fx-trunk"></span>
+                    <div class="fx-node fx-root"><i class="fx-av is-core">H</i><div><b>Head of Technology</b><span>Zheng Han · core · verified</span></div></div>
+                    <svg class="fx-branches" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M150 0 L150 16 M50 40 L50 24 Q50 16 58 16 L242 16 Q250 16 250 24 L250 40 M150 16 L150 40" /></svg>
+                    <div class="fx-kids">
+                      <div class="fx-node"><b>Vision</b><span class="fx-avs"><i class="fx-av is-core">L</i><i class="fx-av is-dual">Z</i><i class="fx-av fx-more">+4</i></span></div>
+                      <div class="fx-node is-guess"><b>Controls</b><span class="fx-avs"><i class="fx-av is-core">X</i><i class="fx-av is-joint">S</i><i class="fx-av is-left">H</i></span><em>Likely team</em></div>
+                      <div class="fx-node is-gap"><b>Delivery</b><em>Lead to fill</em></div>
+                    </div>
+                  </div>
+                  <p class="fx-src">Sources · Website · News · Bylines · Talks</p>
+                </div>
+              </div>
+              <div class="n-step-text">
+                <p class="n-step-meta"><i>Know</i><span>03 / 08</span></p>
+                <p class="n-pain">Mapping means piecing things together from websites and the news, and the finished chart lives on in several versions.</p>
+                <h3 id="n-step-mapping">Org mapping: from a group of people to an org chart</h3>
+                <p>It first establishes which entity really does the R&amp;D, then works out whether each person is a current core member, holds a dual appointment, is a joint-training student from a university or has left, and finally infers likely teams and their leads. The org chart is generated in one click, and every position keeps its source and confirmation status.</p>
+                <a class="n-more" href="use-cases/org-chart/">More on org mapping</a>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </article>
+            <article class="n-card n-step" aria-labelledby="n-step-sourcing">
               <div class="n-figure" id="sourcing" aria-hidden="true">
                 <div class="fx fx-source">
                   <p class="fx-need"><span class="fx-cap">Brief</span><b>Head of Computer Vision · robotics</b></p>
@@ -353,12 +435,45 @@
                 </div>
               </div>
               <div class="n-step-text">
-                <p class="n-step-meta"><i>Find</i><span>01 / 08</span></p>
+                <p class="n-step-meta"><i>Find</i><span>04 / 08</span></p>
                 <p class="n-pain">Candidates are spread across recruiting platforms, papers, code repositories and your own database. One pass through them takes a whole day.</p>
                 <h3 id="n-step-sourcing">Multi-source sourcing: more than a CV search</h3>
                 <p>It brings together the public web, papers and patents, open-source footprints and the talent pool you’ve authorized it to import, then de-duplicates, fills in and ranks by priority. It also shows which sources have been searched and which are still blank, so you can decide where to look next.</p>
                 <a class="n-more" href="use-cases/finding-candidates/">More on multi-source sourcing</a>
-                <span class="n-step-bar" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </article>
+            <article class="n-card n-step" aria-labelledby="n-step-identity">
+              <div class="n-figure" id="identity" aria-hidden="true">
+                <div class="fx fx-id">
+                  <ul class="fx-aliases">
+                    <li><small>Forum</small>Alias · A-Yue</li>
+                    <li><small>Paper</small>Lin Y.</li>
+                    <li><small>GitHub</small>lin-yue</li>
+                  </ul>
+                  <svg class="fx-converge" viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M50 0 C50 18 150 12 150 30" /><path d="M150 0 L150 30" /><path d="M250 0 C250 18 150 12 150 30" /></svg>
+                  <div class="fx-id-stack">
+                    <div class="fx-card fx-ghost"><span>Yue Lin · E-commerce ops</span><em>Namesake · ruled out</em></div>
+                    <div class="fx-card fx-person">
+                      <div class="fx-who"><i class="fx-av fx-av-lg">L</i><div><b>Yue Lin</b><span>Industrial vision · Team lead</span></div><em class="fx-ok">Verified</em></div>
+                      <ul class="fx-checks">
+                        <li>Three sources cross-checked</li>
+                        <li>Career timeline matches</li>
+                        <li>Two namesakes ruled out</li>
+                        <li class="is-wait">Current level<em>To confirm</em></li>
+                      </ul>
+                      <p class="fx-route"><span class="fx-cap">Related</span><span>2 paper co-authors</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="n-step-text">
+                <p class="n-step-meta"><i>Find</i><span>05 / 08</span></p>
+                <p class="n-pain">All you have is an alias and a GitHub ID, and working out who the person really is can take half a day of guesswork.</p>
+                <h3 id="n-step-identity">Identity checks: from one ID to one real person</h3>
+                <p>It cross-checks several sources and rules out namesakes to establish a candidate’s real name and identity, then follows their career and collaborations to related candidates. What it can’t confirm, it doesn’t guess: no reading Chinese characters from pinyin, no treating namesakes as one person, and anything uncertain is marked “To confirm”.</p>
+                <a class="n-more" href="use-cases/same-name-candidates/">More on identity checks</a>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i></span>
               </div>
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-match">
@@ -390,99 +505,12 @@
                 </div>
               </div>
               <div class="n-step-text">
-                <p class="n-step-meta"><i>Find</i><span>02 / 08</span></p>
+                <p class="n-step-meta"><i>Find</i><span>06 / 08</span></p>
                 <p class="n-pain">Thousands of CVs sit in your talent pool, and the best fit often never turns up in a search.</p>
                 <h3 id="n-step-match">Two-way job matching: CVs find roles, roles find CVs</h3>
                 <p>It breaks the JD into core skills, industry experience, project responsibilities and must-haves, and uses structured search and semantic matching together to find people. It works the other way too: give it a CV and it finds better-fitting roles in your database. Every result comes with the reasons for the match, its clear strengths and the risks still to confirm.</p>
                 <a class="n-more" href="use-cases/job-matching/">More on two-way job matching</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-              </div>
-            </article>
-            <article class="n-card n-step" aria-labelledby="n-step-identity">
-              <div class="n-figure" id="identity" aria-hidden="true">
-                <div class="fx fx-id">
-                  <ul class="fx-aliases">
-                    <li><small>Forum</small>Alias · A-Yue</li>
-                    <li><small>Paper</small>Lin Y.</li>
-                    <li><small>GitHub</small>lin-yue</li>
-                  </ul>
-                  <svg class="fx-converge" viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M50 0 C50 18 150 12 150 30" /><path d="M150 0 L150 30" /><path d="M250 0 C250 18 150 12 150 30" /></svg>
-                  <div class="fx-id-stack">
-                    <div class="fx-card fx-ghost"><span>Yue Lin · E-commerce ops</span><em>Namesake · ruled out</em></div>
-                    <div class="fx-card fx-person">
-                      <div class="fx-who"><i class="fx-av fx-av-lg">L</i><div><b>Yue Lin</b><span>Industrial vision · Team lead</span></div><em class="fx-ok">Verified</em></div>
-                      <ul class="fx-checks">
-                        <li>Three sources cross-checked</li>
-                        <li>Career timeline matches</li>
-                        <li>Two namesakes ruled out</li>
-                        <li class="is-wait">Current level<em>To confirm</em></li>
-                      </ul>
-                      <p class="fx-route"><span class="fx-cap">Related</span><span>2 paper co-authors</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="n-step-text">
-                <p class="n-step-meta"><i>Know</i><span>03 / 08</span></p>
-                <p class="n-pain">All you have is an alias and a GitHub ID, and working out who the person really is can take half a day of guesswork.</p>
-                <h3 id="n-step-identity">Identity checks: from one ID to one real person</h3>
-                <p>It cross-checks several sources and rules out namesakes to establish a candidate’s real name and identity, then follows their career and collaborations to related candidates. What it can’t confirm, it doesn’t guess: no reading Chinese characters from pinyin, no treating namesakes as one person, and anything uncertain is marked “To confirm”.</p>
-                <a class="n-more" href="use-cases/same-name-candidates/">More on identity checks</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i></span>
-              </div>
-            </article>
-            <article class="n-card n-step" aria-labelledby="n-step-mapping">
-              <div class="n-figure" id="mapping" aria-hidden="true">
-                <div class="fx fx-org">
-                  <p class="fx-legend"><span class="is-core">Core, current</span><span class="is-dual">Dual appointment</span><span class="is-joint">Joint training</span><span class="is-left">Left</span></p>
-                  <div class="fx-tree">
-                    <div class="fx-node fx-top"><b>Embodied AI Institute</b></div>
-                    <span class="fx-trunk"></span>
-                    <div class="fx-node fx-root"><i class="fx-av is-core">H</i><div><b>Head of Technology</b><span>Zheng Han · core · verified</span></div></div>
-                    <svg class="fx-branches" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M150 0 L150 16 M50 40 L50 24 Q50 16 58 16 L242 16 Q250 16 250 24 L250 40 M150 16 L150 40" /></svg>
-                    <div class="fx-kids">
-                      <div class="fx-node"><b>Vision</b><span class="fx-avs"><i class="fx-av is-core">L</i><i class="fx-av is-dual">Z</i><i class="fx-av fx-more">+4</i></span></div>
-                      <div class="fx-node is-guess"><b>Controls</b><span class="fx-avs"><i class="fx-av is-core">X</i><i class="fx-av is-joint">S</i><i class="fx-av is-left">H</i></span><em>Likely team</em></div>
-                      <div class="fx-node is-gap"><b>Delivery</b><em>Lead to fill</em></div>
-                    </div>
-                  </div>
-                  <p class="fx-src">Sources · Website · News · Bylines · Talks</p>
-                </div>
-              </div>
-              <div class="n-step-text">
-                <p class="n-step-meta"><i>Know</i><span>04 / 08</span></p>
-                <p class="n-pain">Mapping means piecing things together from websites and the news, and the finished chart lives on in several versions.</p>
-                <h3 id="n-step-mapping">Org mapping: from a group of people to an org chart</h3>
-                <p>It first establishes which entity really does the R&amp;D, then works out whether each person is a current core member, holds a dual appointment, is a joint-training student from a university or has left, and finally infers likely teams and their leads. The org chart is generated in one click, and every position keeps its source and confirmation status.</p>
-                <a class="n-more" href="use-cases/org-chart/">More on org mapping</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i><i></i></span>
-              </div>
-            </article>
-            <article class="n-card n-step" aria-labelledby="n-step-bd">
-              <div class="n-figure" id="bd" aria-hidden="true">
-                <div class="fx fx-bd">
-                  <ul class="fx-signals">
-                    <li>Funding news</li><li>Open roles</li><li>Founding team</li><li>Business changes</li><li>Public risks</li>
-                  </ul>
-                  <span class="fx-stem"></span>
-                  <div class="fx-card fx-verdict">
-                    <div class="fx-head"><span class="fx-cap">Client research</span><em class="fx-ok">Follow up first</em></div>
-                    <ul class="fx-meters">
-                      <li><span>Real need</span><i style="--n: 4"></i><b>Sourced</b></li>
-                      <li><span>Ability to pay</span><i style="--n: 3"></i><b>Sourced</b></li>
-                      <li class="is-wait"><span>Deliverability</span><i style="--n: 2"></i><b>To confirm</b></li>
-                    </ul>
-                    <div class="fx-chain"><span class="fx-cap">Order of approach</span><ol><li>Founder</li><li>Tech VP</li><li class="is-wait">Hiring manager</li></ol></div>
-                  </div>
-                </div>
-              </div>
-              <div class="n-step-text">
-                <p class="n-step-meta"><i>Know</i><span>05 / 08</span></p>
-                <p class="n-pain">Some clients have plenty of openings, and only after chasing them do you find the need, the budget or the decision chain isn’t ready.</p>
-                <h3 id="n-step-bd">Client research: first, decide if it’s worth pursuing</h3>
-                <p>It looks at funding, open roles, the founding team, business changes and public risks together, judges the real need, the ability to pay and whether you can deliver, then lays out the decision chain and the order of approach. Fewer wasted trips.</p>
-                <a class="n-more" href="use-cases/business-development/">More on client research</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i><i></i></span>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i></span>
               </div>
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-referral">
@@ -507,12 +535,12 @@
                 </div>
               </div>
               <div class="n-step-text">
-                <p class="n-step-meta"><i>Keep</i><span>06 / 08</span></p>
+                <p class="n-step-meta"><i>Keep</i><span>07 / 08</span></p>
                 <p class="n-pain">Who comes to mind for a referral depends on your memory, not on who really knows the person.</p>
                 <h3 id="n-step-referral">Referrals: who is most likely to know them</h3>
                 <p>It connects colleagues, lab mates, paper co-authors, shared patents and organizational ties into one network, looks for bridges within one to three steps, and ranks them by relationship strength, reachability and signs of willingness. Every route says what it rests on, and what hasn’t been confirmed yet.</p>
                 <a class="n-more" href="use-cases/referrals/">More on referrals</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i><i></i></span>
+                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i></span>
               </div>
             </article>
             <article class="n-card n-step" aria-labelledby="n-step-network">
@@ -540,39 +568,11 @@
                 </div>
               </div>
               <div class="n-step-text">
-                <p class="n-step-meta"><i>Keep</i><span>07 / 08</span></p>
+                <p class="n-step-meta"><i>Keep</i><span>08 / 08</span></p>
                 <p class="n-pain">The people you spoke with years ago have changed companies and fields, and your database is still stuck on the day they were added.</p>
                 <h3 id="n-step-network">Talent pool: one profile per person, kept current</h3>
                 <p>A candidate’s identities on different platforms are de-duplicated and merged automatically, and where clues are thin, public information fills in the profile. A change of company, team or role is picked up as a signal worth watching, and the agent updates the profile on its own, on a single timeline. Update a person once, and every later match uses it.</p>
                 <a class="n-more" href="use-cases/talent-pool/">More on talent pools</a>
-                <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i><i></i></span>
-              </div>
-            </article>
-            <article class="n-card n-step" aria-labelledby="n-step-industry">
-              <div class="n-figure" id="industry" aria-hidden="true">
-                <div class="fx fx-ind">
-                  <div class="fx-ind-map">
-                    <div class="fx-node fx-ind-root"><b>Embodied AI</b><span>Value chain</span></div>
-                    <svg class="fx-ind-lines" viewBox="0 0 40 120" preserveAspectRatio="none"><path d="M0 60 C20 60 20 20 40 20 M0 60 L40 60 M0 60 C20 60 20 100 40 100" /></svg>
-                    <ul class="fx-ind-tiers">
-                      <li><b>Upstream</b><span>Core parts</span><span>Sensors</span></li>
-                      <li><b>Midstream</b><span>Robot body</span><span>Motion control</span></li>
-                      <li><b>Downstream</b><span>Integration</span><span>Industry, home</span></li>
-                    </ul>
-                  </div>
-                  <div class="fx-card fx-ind-roles">
-                    <div class="fx-head"><span class="fx-cap">Role map</span><em class="fx-ok">Checked against JDs</em></div>
-                    <p class="fx-tags"><em>Perception</em><em>Motion control</em><em>System testing</em><em>Dexterous hands</em></p>
-                    <p class="fx-ind-note"><span class="fx-cap">Export</span><span>Editable mind map</span></p>
-                  </div>
-                </div>
-              </div>
-              <div class="n-step-text">
-                <p class="n-step-meta"><i>Keep</i><span>08 / 08</span></p>
-                <p class="n-pain">A new sector means piles of jargon, a value chain you can’t see clearly and JDs full of insider terms.</p>
-                <h3 id="n-step-industry">Industry primer: from an unfamiliar sector to a confident first call</h3>
-                <p>Starting from one value chain, upstream and downstream, it lays out the products, companies and roles layer by layer, checks them against real JDs, and wraps it all up in an editable mind map. What recruiters get isn’t a research report. It’s an industry map they can start a conversation from.</p>
-                <a class="n-more" href="use-cases/industry-primer/">More on industry primers</a>
                 <span class="n-step-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="is-on"></i></span>
               </div>
             </article>
@@ -688,14 +688,14 @@
             <div>
               <h2>Use cases</h2>
               <ul>
-                <li><a href="use-cases/finding-candidates/">Multi-source sourcing</a></li>
-                <li><a href="use-cases/job-matching/">Two-way job matching</a></li>
-                <li><a href="use-cases/same-name-candidates/">Identity checks</a></li>
-                <li><a href="use-cases/org-chart/">Org mapping</a></li>
+                <li><a href="use-cases/industry-primer/">Industry primer</a></li>
                 <li><a href="use-cases/business-development/">Client research</a></li>
+                <li><a href="use-cases/org-chart/">Org mapping</a></li>
+                <li><a href="use-cases/finding-candidates/">Multi-source sourcing</a></li>
+                <li><a href="use-cases/same-name-candidates/">Identity checks</a></li>
+                <li><a href="use-cases/job-matching/">Two-way job matching</a></li>
                 <li><a href="use-cases/referrals/">Referrals</a></li>
                 <li><a href="use-cases/talent-pool/">Talent pool</a></li>
-                <li><a href="use-cases/industry-primer/">Industry primer</a></li>
                 <li><a href="use-cases/">All &gt;&gt;</a></li>
               </ul>
             </div>

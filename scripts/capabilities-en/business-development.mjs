@@ -1,13 +1,13 @@
-// scripts/capabilities-en/business-development.mjs · Capability 05: client research
+// scripts/capabilities-en/business-development.mjs · Capability 02: client research
 export default {
   slug: "business-development",
-  no: "05",
+  no: "02",
   group: "Know",
   name: "Client research",
   title: "Client research: decide if it’s worth pursuing, then how to open | HunterBuddy",
   description:
     "Client research weighs funding, open roles, founders, business changes and public risks to answer three questions: is this client worth pursuing, is now the time, can you deliver?",
-  kicker: "Capability 05 · Know",
+  kicker: "Capability 02 · Know",
   h1: "Client research: decide if it’s worth pursuing, then how to open",
   definition:
     "Client research is a capability that weighs funding, open roles, the founding team, business changes and public risks together. It answers three questions: is this client worth pursuing, is now the right time, and can you deliver.",
@@ -41,5 +41,5 @@ export default {
   },
   boundary:
     "HunterBuddy doesn’t contact clients for you, and doesn’t treat funding news as a need. It lays out the evidence, the risks, the routes to an introduction and the next step.",
-  next: "referrals",
+  next: "org-chart",
 };

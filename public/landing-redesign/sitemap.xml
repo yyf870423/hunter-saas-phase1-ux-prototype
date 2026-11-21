@@ -29,46 +29,32 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/" />
   </url>
   <url>
-    <loc>https://www.boseekai.com/use-cases/finding-candidates/</loc>
+    <loc>https://www.boseekai.com/use-cases/industry-primer/</loc>
     <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/finding-candidates/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/finding-candidates/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/finding-candidates/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/industry-primer/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/industry-primer/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/industry-primer/" />
   </url>
   <url>
-    <loc>https://www.boseekai.com/en/use-cases/finding-candidates/</loc>
+    <loc>https://www.boseekai.com/en/use-cases/industry-primer/</loc>
     <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/finding-candidates/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/finding-candidates/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/finding-candidates/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/industry-primer/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/industry-primer/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/industry-primer/" />
   </url>
   <url>
-    <loc>https://www.boseekai.com/use-cases/job-matching/</loc>
+    <loc>https://www.boseekai.com/use-cases/business-development/</loc>
     <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/job-matching/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/job-matching/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/job-matching/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/business-development/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/business-development/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/business-development/" />
   </url>
   <url>
-    <loc>https://www.boseekai.com/en/use-cases/job-matching/</loc>
+    <loc>https://www.boseekai.com/en/use-cases/business-development/</loc>
     <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/job-matching/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/job-matching/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/job-matching/" />
-  </url>
-  <url>
-    <loc>https://www.boseekai.com/use-cases/same-name-candidates/</loc>
-    <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/same-name-candidates/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
-  </url>
-  <url>
-    <loc>https://www.boseekai.com/en/use-cases/same-name-candidates/</loc>
-    <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/same-name-candidates/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/business-development/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/business-development/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/business-development/" />
   </url>
   <url>
     <loc>https://www.boseekai.com/use-cases/org-chart/</loc>
@@ -85,18 +71,46 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/org-chart/" />
   </url>
   <url>
-    <loc>https://www.boseekai.com/use-cases/business-development/</loc>
+    <loc>https://www.boseekai.com/use-cases/finding-candidates/</loc>
     <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/business-development/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/business-development/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/business-development/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/finding-candidates/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/finding-candidates/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/finding-candidates/" />
   </url>
   <url>
-    <loc>https://www.boseekai.com/en/use-cases/business-development/</loc>
+    <loc>https://www.boseekai.com/en/use-cases/finding-candidates/</loc>
     <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/business-development/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/business-development/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/business-development/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/finding-candidates/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/finding-candidates/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/finding-candidates/" />
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/use-cases/same-name-candidates/</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/same-name-candidates/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/en/use-cases/same-name-candidates/</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/same-name-candidates/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/same-name-candidates/" />
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/use-cases/job-matching/</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/job-matching/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/job-matching/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/job-matching/" />
+  </url>
+  <url>
+    <loc>https://www.boseekai.com/en/use-cases/job-matching/</loc>
+    <lastmod>2026-11-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/job-matching/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/job-matching/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/job-matching/" />
   </url>
   <url>
     <loc>https://www.boseekai.com/use-cases/referrals/</loc>
@@ -125,20 +139,6 @@
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/talent-pool/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/talent-pool/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/talent-pool/" />
-  </url>
-  <url>
-    <loc>https://www.boseekai.com/use-cases/industry-primer/</loc>
-    <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/industry-primer/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/industry-primer/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/industry-primer/" />
-  </url>
-  <url>
-    <loc>https://www.boseekai.com/en/use-cases/industry-primer/</loc>
-    <lastmod>2026-11-21</lastmod>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.boseekai.com/use-cases/industry-primer/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.boseekai.com/en/use-cases/industry-primer/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.boseekai.com/use-cases/industry-primer/" />
   </url>
   <url>
     <loc>https://www.boseekai.com/use-cases/headhunter-consultant/</loc>
