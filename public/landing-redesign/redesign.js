@@ -342,7 +342,7 @@
     const cover = document.createElement("button");
     cover.type = "button";
     cover.className = "n-film-cover";
-    cover.setAttribute("aria-label", say("播放 TalentBuddy 产品短片，2 分 32 秒", "Play the TalentBuddy product video, 2 min 32 s"));
+    cover.setAttribute("aria-label", say("播放 HunterBuddy 产品演示，2 分 32 秒", "Play the HunterBuddy product demo, 2 min 32 s"));
     video.controls = false;
     frame.appendChild(cover);
     const reveal = () => {
@@ -356,6 +356,16 @@
       video.play().catch(() => {});
     });
     video.addEventListener("play", reveal);
+    // 首屏“观看 2 分半演示”：滚到短片并开始播放（没有脚本时就是普通的 #film 锚点）
+    document.querySelectorAll("[data-play-film]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (window.__lenis) window.__lenis.scrollTo(frame, { offset: -(innerHeight - frame.offsetHeight) / 2 });
+        else frame.scrollIntoView({ behavior: reduced.matches ? "auto" : "smooth", block: "center" });
+        reveal();
+        video.play().catch(() => {});
+      });
+    });
   }
 
   /* ---------- film chapters ---------- */
@@ -606,6 +616,13 @@
     kicker.className = "n-kicker";
     kicker.textContent = say("05 · 申请试用", "05 · Request a trial");
     section.querySelector(".f-trial-intro")?.prepend(kicker);
+    // 首页自己的试用说明（公共表单里的说明文字给其他旧页面用，不动）
+    const intro = section.querySelector(".f-trial-intro h2 + p");
+    if (intro)
+      intro.textContent = say(
+        "当前采用邀请制。你留下信息后，我们会结合你的招聘方向、岗位类型与团队场景，确认试用安排。",
+        "Trials are by invitation for now. Leave your details, and we’ll arrange your trial around the roles you hire for, the kinds of positions you work on and how your team works.",
+      );
     // break after the comma, the same as the live site
     const thought = section.querySelector(".f-trial-thought");
     if (thought) {

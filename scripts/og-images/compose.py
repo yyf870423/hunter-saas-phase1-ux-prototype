@@ -1,5 +1,5 @@
 """Article images for the use-case pages: the matching capability scene from the homepage, set beside the article's own
-kicker and headline (1600x900). The three overview articles get all six scenes.
+kicker and headline (1600x900). The three overview articles get six of the eight scenes.
 Run from a work folder that holds fig_<zh|en>_<step>.png (from shoot_figs.py, with the site served on :8765),
 inter-400/500.woff2, alimama-shuheiti-bold-latin.woff2 and boseek-b5-dark.svg; writes assets/use-cases/[en/]<slug>.jpg."""
 import re, html, os, sys
@@ -7,10 +7,10 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parents[2] / "public" / "landing-redesign"
 HERE = Path.cwd()
-SCENE = {"business-development": "bd", "org-chart": "mapping", "finding-candidates": "sourcing", "job-matching": "match",
-         "same-name-candidates": "identity", "talent-pool": "network"}
+SCENE = {"finding-candidates": "sourcing", "job-matching": "match", "same-name-candidates": "identity", "org-chart": "mapping",
+         "business-development": "bd", "referrals": "referral", "talent-pool": "network", "industry-primer": "industry"}
 SLUGS = list(SCENE) + ["headhunter-consultant", "ai-assistant-for-headhunters", "ai-tools-compared"]
-SIX = ["match", "sourcing", "identity", "bd", "network", "mapping"]
+SIX = ["sourcing", "match", "identity", "mapping", "bd", "referral"]
 CSS = """
 @font-face { font-family: "Inter"; src: url("inter-400.woff2") format("woff2"); font-weight: 400; }
 @font-face { font-family: "Inter"; src: url("inter-500.woff2") format("woff2"); font-weight: 500 700; }

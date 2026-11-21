@@ -29,18 +29,18 @@ ORG = {
 LANGS = {
     "zh": dict(
         home=SITE, lang="zh-CN", og="zh_CN", og_alt="en_US", site_name="铂寻 Boseek", title_cut="｜铂寻 Boseek", baidu=True,
-        app="先人一步，锁定研发人才。TalentBuddy 是面向猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人的研发人才招聘 AI，交回人选名单、匹配结论、身份核实结论、BD 客户研判、人才库变动提示和组织架构图，每条都有出处。联系谁、推不推荐，由你决定。目前邀请制试用。",
-        app_sub="研发人才招聘 AI", audience="招聘研发与技术人才的猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人",
+        app="HunterBuddy 是面向 HR 与专业猎头的高阶技术人才寻访 AI 工作台：多源寻访、人岗双向匹配、身份核实、组织架构 Mapping、客户研判、人选转介绍、人才库和行业入门，每条结论都有来源，拿不准的标为待确认。推荐、联系和商务决定由你作出。目前邀请制试用。",
+        app_sub="高阶技术人才寻访的 AI 工作台", audience="HR 与专业猎头",
         # the share card (1200×630, the film's last scene): what Feishu, LinkedIn and the like show when the link is pasted
         share="assets/share-card.jpg",
-        film=("TalentBuddy 产品短片", "从人海里的一个职位出发，跟着 TalentBuddy 走完六件事：BD 客户研判、组织架构梳理、人才寻访、人岗匹配、身份核实、人才库更新。", "assets/film-poster.jpg", "assets/talentbuddy-film.mp4"),
+        film=("HunterBuddy 产品演示", "从一个职位需求出发，跟着 HunterBuddy 走完一条高阶技术岗位的寻访链路：客户研判、组织架构 Mapping、多源寻访、人岗双向匹配、身份核实和人才库。", "assets/film-poster.jpg", "assets/hunterbuddy-film.mp4"),
     ),
     "en": dict(
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
-        app="Be first to the right R&D talent. TalentBuddy is AI for hiring R&D talent, built for search consultants, HR and talent leads, and CTOs and engineering leaders. It hands back candidate lists, match findings, identity checks, BD client research, talent pool change alerts and org charts, each traceable to its source. Who to contact and whom to put forward is always your call. Invitation-only trial.",
-        app_sub="AI for hiring R&D talent", audience="Search consultants, HR and talent leads, and CTOs and engineering leaders hiring R&D talent",
+        app="HunterBuddy is the AI workbench for senior tech talent search, built for HR teams and professional headhunters: multi-source sourcing, two-way job matching, identity checks, org mapping, client research, referrals, talent pools and industry primers. Every finding names its source, and anything uncertain is marked “To confirm”. Recommendations, outreach and business decisions are yours. Invitation-only trial.",
+        app_sub="AI workbench for senior tech talent search", audience="HR teams and professional headhunters",
         share="assets/share-card-en.jpg",
-        film=("TalentBuddy product video", "From one role in a sea of people, follow TalentBuddy through six capabilities: BD client research, org charts, sourcing, job matching, identity checks and talent pool updates.", "assets/film-poster-en.jpg", "assets/talentbuddy-film-en.mp4"),
+        film=("HunterBuddy product demo", "Starting from one hiring brief, follow HunterBuddy through a complete senior technical search: client research, org mapping, multi-source sourcing, two-way job matching, identity checks and the talent pool.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4"),
     ),
 }
 
@@ -56,10 +56,10 @@ def seo_block(html, key):
     home = L["home"]
     graph = [
         ORG,
-        {"@type": "WebSite", "@id": f"{SITE}#website", "url": SITE, "name": "铂寻 Boseek", "alternateName": ["TalentBuddy", "HunterBuddy"], "inLanguage": "zh-CN", "publisher": {"@id": f"{SITE}#organization"}},
+        {"@type": "WebSite", "@id": f"{SITE}#website", "url": SITE, "name": "铂寻 Boseek", "alternateName": ["HunterBuddy"], "inLanguage": "zh-CN", "publisher": {"@id": f"{SITE}#organization"}},
         {"@type": "WebPage", "@id": f"{home}#webpage", "url": home, "name": unesc(title), "description": unesc(desc), "inLanguage": L["lang"],
-         "isPartOf": {"@id": f"{SITE}#website"}, "about": {"@id": f"{SITE}#talentbuddy"}, "publisher": {"@id": f"{SITE}#organization"}, "video": {"@id": f"{home}#film"}},
-        {"@type": "SoftwareApplication", "@id": f"{SITE}#talentbuddy", "name": "TalentBuddy", "alternateName": "HunterBuddy", "description": L["app"], "applicationCategory": "BusinessApplication",
+         "isPartOf": {"@id": f"{SITE}#website"}, "about": {"@id": f"{SITE}#hunterbuddy"}, "publisher": {"@id": f"{SITE}#organization"}, "video": {"@id": f"{home}#film"}},
+        {"@type": "SoftwareApplication", "@id": f"{SITE}#hunterbuddy", "name": "HunterBuddy", "description": L["app"], "applicationCategory": "BusinessApplication",
          "applicationSubCategory": L["app_sub"], "operatingSystem": "Web", "url": SITE, "inLanguage": ["zh-CN", "en"],
          "audience": {"@type": "BusinessAudience", "audienceType": L["audience"]}, "publisher": {"@id": f"{SITE}#organization"}, "creator": {"@id": f"{SITE}#organization"}},
         {"@type": "VideoObject", "@id": f"{home}#film", "name": L["film"][0], "description": L["film"][1], "thumbnailUrl": SITE + L["film"][2], "contentUrl": SITE + L["film"][3],
@@ -111,15 +111,19 @@ for attr in ("src", "href", "poster"):
 R = []  # (old, new) — old must occur at least once; every occurrence is replaced
 def r(old, new): R.append((old, new))
 
+# the scenes' avatars carry one Chinese character (a surname, or 你 for “you”); in English, the pinyin initial
+AV = {"林": "L", "周": "Z", "陈": "C", "许": "X", "宋": "S", "何": "H", "唐": "T", "吴": "W", "郑": "Z", "韩": "H", "你": "You"}
+s = re.sub(r'(<i class="fx-av[^"]*">)([一-鿿])(</i>)', lambda m: m.group(1) + AV[m.group(2)] + m.group(3), s)
+
 # ---------- head ----------
-r('<html lang="zh-CN" data-product="TalentBuddy">', '<html lang="en" data-product="TalentBuddy">')
+r('<html lang="zh-CN" data-product="HunterBuddy">', '<html lang="en" data-product="HunterBuddy">')
 r('<!-- 改版草稿：只用于预览，不收录 -->', '<!-- Redesign draft: preview only, not indexed -->')
-r('<title>TalentBuddy · 研发人才招聘 AI：人选寻访、人岗匹配、组织架构｜铂寻 Boseek</title>',
-  '<title>TalentBuddy · AI for hiring R&amp;D talent: sourcing, job matching, org charts | Boseek</title>')
-r('content="TalentBuddy 是铂寻 Boseek 推出的研发人才招聘 AI，面向猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人。给它一个岗位、一家目标公司或一个名字，交回排好序的人选名单、身份核实结论和组织架构图，每条都有出处。覆盖互联网与 AI、智能汽车、工业制造、半导体、医药医疗等行业的研发岗位。目前邀请制试用。"',
-  'content="TalentBuddy by Boseek is AI for hiring R&amp;D talent, built for search consultants, HR and talent leads, and CTOs and engineering leaders. Give it a role, a target company or a name, and get back a ranked candidate list, identity checks and an org chart, every item traceable to its source. It covers R&amp;D roles in the internet and AI, smart vehicles, industrial manufacturing, semiconductors, and pharma and medical devices. Invitation-only trial."')
+r('<title>HunterBuddy · 高阶技术人才寻访的 AI 工作台：多源寻访、人岗匹配、组织架构｜铂寻 Boseek</title>',
+  '<title>HunterBuddy · The AI workbench for senior tech talent search: sourcing, job matching, org mapping | Boseek</title>')
+r('content="HunterBuddy 是面向 HR 与专业猎头的 AI 人才工作台：从一句岗位需求出发，多源寻访、人岗双向匹配、身份核实、梳理组织架构，每条结论都有来源，把每一次招聘判断沉淀为资产。邀请制试用申请已开放。"',
+  'content="HunterBuddy is an AI talent workbench for HR teams and professional headhunters. Starting from a single hiring brief, it runs multi-source sourcing, two-way job matching, identity checks and org mapping. Every finding names its source, and every hiring judgment becomes an asset. Applications for the invitation-only trial are open."')
 r('<script defer src="../../landing/shared-ui.js',
-  '<script defer src="../../landing-origin/locale-en.js?v=20261024-org"></script>\n    <script defer src="../trial-locale-en.js?v=2"></script>\n    <script defer src="../../landing/shared-ui.js')
+  '<script defer src="../../landing-origin/locale-en.js?v=20261024-org"></script>\n    <script defer src="../trial-locale-en.js?v=3"></script>\n    <script defer src="../../landing/shared-ui.js')
 
 # ---------- header ----------
 r('<a class="n-skip" href="#main">跳到正文</a>', '<a class="n-skip" href="#main">Skip to content</a>')
@@ -127,196 +131,227 @@ r('aria-label="铂寻 Boseek 首页"', 'aria-label="Boseek home"')
 r('<img src="../../landing-origin/assets/boseek-b5-dark.svg" alt="Boseek 铂寻" width="150" height="54" />',
   '<img src="../../landing-origin/assets/boseek-b5-en.svg" alt="Boseek" width="150" height="48" />')
 r('aria-label="主导航"', 'aria-label="Main navigation"')
-r('<a href="#film">产品短片</a>', '<a href="#film">Product video</a>')
+r('<a href="#film">产品演示</a>', '<a href="#film">Product demo</a>')
 r('<a href="#capabilities">核心能力</a>', '<a href="#capabilities">Capabilities</a>')
 r('<a href="#belief">产品边界</a>', '<a href="#belief">Boundaries</a>')
-r('<a href="#industries">研发领域</a>', '<a href="#industries">R&amp;D fields</a>')
+r('<a href="#industries">聚焦方向</a>', '<a href="#industries">Focus areas</a>')
 r('<a href="#faq">常见问题</a>', '<a href="#faq">FAQ</a>')
 r('<a class="n-lang" href="en/" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English">EN</a>',
   '<a class="n-lang" href="../" hreflang="zh-CN" lang="zh-CN" title="切换到中文" aria-label="切换到中文">中文</a>')
 r('>申请试用</a>', '>Request a trial</a>')
 r('aria-label="打开导航"', 'aria-label="Open navigation"')
 
-# ---------- hero ----------
-r('<span aria-hidden="true"></span>正在开发中，邀请制试用申请已开放', '<span aria-hidden="true"></span>In development. Applications for the invitation-only trial are open.')
-r('<p class="n-role">先人一步，锁定研发人才</p>', '<p class="n-role">Be first to the right R&amp;D talent</p>')
-r('<span>论文、专利、代码与简历库，一并检索，</span>', '<span>Papers, patents, code and CV databases, searched together,</span>')
-r('<span>交回排好序、条条有出处的人选名单。</span>', '<span>handed back as a ranked shortlist with a source for every name.</span>')
-r('>查看交付示例</a>', '>See sample results</a>')
+# ---------- hero (HunterBuddy as the eyebrow, the positioning line as the headline) ----------
+r('<span aria-hidden="true"></span>邀请制试用，现已开放申请 · 面向 HR 与专业猎头', '<span aria-hidden="true"></span>Invitation-only trial, now open for applications · For HR and professional headhunters')
+r('<span class="n-role"><span>高阶技术人才寻访的</span> <span>AI 工作台</span></span>', '<span class="n-role"><span>The AI workbench for</span> <span>senior tech talent search</span></span>')
+r('<span>洞察行业，辨识人才，连接人脉，</span>', '<span>Read the industry, know the talent, connect the network,</span>')
+r('<span>把每一次招聘判断，沉淀为资产。</span>', '<span>and turn every hiring judgment into an asset.</span>')
+r('>观看 2 分半演示</a>', '>Watch the 2½-minute demo</a>')
 
-# ---------- intro + film ----------
-r('<p class="n-kicker">产品短片 · 2 分 32 秒</p>', '<p class="n-kicker">Product video · 2:32</p>')
-r('<span>检索与核对，交给 TalentBuddy。</span>', '<span>Searching and checking go to TalentBuddy.</span>')
-r('<span>判断与沟通，留给你。</span>', '<span>Judgment and conversations stay with you.</span>')
-r('从客户研判、组织架构、寻访、匹配，到身份核实和人才库更新，每一步都交回有出处的结果。',
-  'From BD client research, org charts, sourcing and matching to identity checks and talent pool updates, every step hands back a sourced result.')
-r('poster="../assets/film-poster.jpg?v=12"', 'poster="../assets/film-poster-en.jpg?v=8"')
-r('src="../assets/talentbuddy-film.mp4?v=13"', 'src="../assets/talentbuddy-film-en.mp4?v=9"')
-r('aria-label="TalentBuddy 产品短片"', 'aria-label="TalentBuddy product video"')
+# ---------- product demo ----------
+r('<p class="n-kicker">产品演示</p>', '<p class="n-kicker">Product demo</p>')
+r('<h2 class="n-display" id="n-intro-title">从一个需求，到一份能交付的名单</h2>', '<h2 class="n-display" id="n-intro-title">From one brief to a list you can deliver</h2>')
+r('<p>从一句岗位需求出发，把条件拆开、把线索找全、把关系连起来，最后把这次判断存下来。</p>',
+  '<p>Start from a single line about the role: break down the requirements, gather every lead, connect the relationships, and keep the judgment you made for next time.</p>')
+r('<p>HunterBuddy 是一款面向 HR 与专业猎头的 AI 人才工作台。它不替你去谈，它让你在开口之前，已经知道这个人做过什么、做到什么程度、该从哪里切入。</p>',
+  '<p>HunterBuddy is an AI talent workbench for HR teams and professional headhunters. It doesn’t do the talking for you. It makes sure that before you say a word, you already know what this person has done, how far they took it, and where to begin.</p>')
+r('<p class="n-film-title">2 分半看完：一条高阶技术岗位的完整寻访链路</p>', '<p class="n-film-title">Two and a half minutes: one senior technical search, from start to finish</p>')
+r('poster="../assets/film-poster.jpg?v=13"', 'poster="../assets/film-poster-en.jpg?v=9"')
+r('src="../assets/hunterbuddy-film.mp4?v=14"', 'src="../assets/hunterbuddy-film-en.mp4?v=10"')
+r('aria-label="HunterBuddy 产品演示短片"', 'aria-label="HunterBuddy product demo"')
 
-# ---------- six capabilities: heading ----------
+# ---------- eight capabilities: heading ----------
 r('<p class="n-kicker">01 · 核心能力</p>', '<p class="n-kicker">01 · Capabilities</p>')
-r('<h2 class="n-h2" id="n-caps-title">六个环节，环环交付</h2>', '<h2 class="n-h2" id="n-caps-title">Six stages, six deliverables</h2>')
-r('匹配名单、寻访名单、核实结论、客户研判、变动提示、组织架构图，每条都有出处。联系谁、怎么谈，由你决定。',
-  'Matched shortlists, sourced candidate lists, identity checks, BD client research, change alerts and org charts, each with its source. Who to contact, and how to approach them, is your call.')
+r('<h2 class="n-h2" id="n-caps-title">找谁、看清谁、留住谁</h2>', '<h2 class="n-h2" id="n-caps-title">Find them, know them, keep them</h2>')
+r('八件事，三步走。从多源召回与人岗匹配开始，到身份、组织、客户这三层看清，最后把每一次判断沉淀成下次能直接用的资产。每一步都保留来源、状态和人工确认点。',
+  'Eight capabilities in three steps. Start with multi-source search and job matching, see people, organizations and clients clearly, and turn every judgment into an asset you can use next time. Every step keeps its sources, its status and the points where you confirm.')
 r('<i>找人</i>', '<i>Find</i>')
 r('<i>看清</i>', '<i>Know</i>')   # not "Assess": HunterBuddy never judges people
 r('<i>沉淀</i>', '<i>Keep</i>')
 
-# 01 job matching — scene
-r('<span class="fx-cap">岗位 JD</span><span class="fx-cap fx-hi">拆成三项</span>', '<span class="fx-cap">Job description</span><span class="fx-cap fx-hi">3 parts</span>')
-r('<b class="fx-title">视觉算法负责人</b>', '<b class="fx-title">Head of Computer Vision</b>')
-r('<div><dt>核心技能</dt><dd>视觉算法 · 量产落地</dd></div>', '<div><dt>Core skills</dt><dd>Vision · mass production</dd></div>')
-r('<div><dt>行业背景</dt><dd>机器人 / 智能硬件</dd></div>', '<div><dt>Industry</dt><dd>Robotics, smart hardware</dd></div>')
-r('<div><dt>硬性门槛</dt><dd>带过 10 人以上团队</dd></div>', '<div><dt>Must-haves</dt><dd>Has led a team of 10+</dd></div>')
-r('<p class="fx-pipe"><span>结构化检索</span><span>全文召回</span><span>语义匹配</span></p>', '<p class="fx-pipe"><span>Structured search</span><span>Full-text recall</span><span>Semantic matching</span></p>')
-r('<span class="fx-cap">匹配结果</span><span class="fx-cap">按匹配分排序</span>', '<span class="fx-cap">Matches</span><span class="fx-cap">By match score</span>')
-r('<b>人选 A</b>', '<b>Candidate A</b>')
-r('<b>人选 B</b>', '<b>Candidate B</b>')
-r('<b>人选 C</b>', '<b>Candidate C</b>')
-r('<u>亮点</u>', '<u>Strength</u>')
-r('<u class="is-risk">风险</u>', '<u class="is-risk">Risk</u>')
-r('<p>推荐理由 · 三项要求都对上，带过量产项目</p>', '<p>Why · Meets all three, has led mass production</p>')
-# 01 text
-r('JD 只写了技术方向和年限，库里却有几千份简历，逐份对比要花大半天。', 'The JD names a technical field and years of experience, your database holds thousands of CVs, and comparing them one by one takes most of a day.')
-r('<h3 id="n-step-match">人岗匹配：千份简历，挑出最匹配的人</h3>', '<h3 id="n-step-match">Job matching: from thousands of CVs to a shortlist</h3>')
-r('把 JD 拆成核心技能、行业背景和硬性门槛，在简历全文和结构化信息中一并检索，交回按匹配分排序的推荐名单。每位人选附亮点、风险和推荐理由，一点即可查看原文出处。也可以反过来，为一份简历匹配在手岗位。',
-  'It breaks the JD into core skills, industry background and must-haves, then searches the full text of your CVs and their structured fields together. You get back a shortlist ranked by match score, with each candidate’s strengths, risks and why we recommend them, and one click takes you to the original source. It works the other way too: give it a CV and it finds the live searches that fit.')
-r('>了解人岗匹配</a>', '>More on job matching</a>')
-
-# 02 sourcing — scene
+# 01 multi-source sourcing — scene
 r('<span class="fx-cap">读懂需求</span><b>视觉算法负责人 · 机器人方向</b>', '<span class="fx-cap">Brief</span><b>Head of Computer Vision · robotics</b>')
-r('</svg>公开信息</li>', '</svg>Public web</li>')
-r('</svg>专利论文</li>', '</svg>Patents &amp; papers</li>')
-r('</svg>代码痕迹</li>', '</svg>Code</li>')
-r('</svg>你的简历库</li>', '</svg>Your CVs</li>')
-r('<span class="fx-cap">合并去重 · 排好优先级</span>', '<span class="fx-cap">Merged · by priority</span>')
+r('</svg>公开网络</li>', '</svg>Public web</li>')
+r('</svg>论文专利</li>', '</svg>Papers &amp; patents</li>')
+r('</svg>开源痕迹</li>', '</svg>Open source</li>')
+r('</svg>授权人才库</li>', '</svg>Your talent pool</li>')
+r('<span class="fx-cap">查重补全 · 按优先级排好</span>', '<span class="fx-cap">De-duplicated · by priority</span>')
 r('<li><span>先联系</span>', '<li><span>Contact first</span>')
 r('<li><span>值得聊</span>', '<li><span>Worth a call</span>')
 r('<li><span>再看看</span>', '<li><span>Keep in view</span>')
-for zh, en in [("林", "L"), ("周", "Z"), ("陈", "C"), ("许", "X"), ("宋", "S"), ("何", "H"), ("唐", "T"), ("吴", "W"), ("郑", "Z"), ("韩", "H")]:
-    r(f'<i class="fx-av">{zh}</i>', f'<i class="fx-av">{en}</i>')
-    r(f'<i class="fx-av fx-av-lg">{zh}</i>', f'<i class="fx-av fx-av-lg">{en}</i>') if zh in "陈林" else None
-r('<b>陈屿</b><span>视觉算法 · 机器人感知</span></div><em class="fx-ok">先联系</em>', '<b>Yu Chen</b><span>Vision · robotics perception</span></div><em class="fx-ok">Contact first</em>')
-r('<span class="fx-cap">三处来源合成一份</span><span class="fx-tags"><em>专利论文</em><em>代码痕迹</em><em>你的简历库</em></span>',
-  '<span class="fx-cap">3 sources, 1 profile</span><span class="fx-tags"><em>Papers</em><em>Code</em><em>Your CVs</em></span>')
-# 02 text
-r('研发人才的能力写在论文、专利和代码里，只在招聘平台上搜，很多人找不到。', 'The clearest evidence of R&amp;D talent is in papers, patents and code. Search only on recruiting platforms, and many people never turn up.')
-r('<h3 id="n-step-sourcing">人才寻访：平台之外，也能找到</h3>', '<h3 id="n-step-sourcing">Sourcing: beyond the platforms</h3>')
-r('按岗位要求，同时检索公开信息、论文、专利、开源代码和你的简历库，同一个人的多处资料先核对再合并。交回排好序的人选名单，并标明哪些渠道已经找过、哪些尚未覆盖。',
-  'Working from the role’s requirements, it searches public information, papers, patents, open-source code and your CV database together, and checks the same person’s records from different places before merging them. You get back a ranked candidate list, with a note of which sources have been searched and which are not yet covered.')
-r('>了解猎头怎么找人</a>', '>How headhunters find candidates</a>')
+r('<span class="fx-cap">渠道覆盖</span><span class="fx-cover-done">已找过 4 处</span><span class="fx-cover-gap">空白 · 行业会议</span>',
+  '<span class="fx-cap">Coverage</span><span class="fx-cover-done">4 sources searched</span><span class="fx-cover-gap">Gap · industry events</span>')
+# 01 text
+r('人选散在招聘平台、论文、代码仓库和你自己的库里，翻一遍就是一整天。', 'Candidates are spread across recruiting platforms, papers, code repositories and your own database. One pass through them takes a whole day.')
+r('<h3 id="n-step-sourcing">多源寻访：不只搜简历</h3>', '<h3 id="n-step-sourcing">Multi-source sourcing: more than a CV search</h3>')
+r('整合公开网络、论文专利、开源痕迹和授权导入的人才库，统一查重、补全、按优先级排序。哪些渠道已经找过、哪些还是空白，也一并标出来，方便你决定下一步去哪里补。',
+  'It brings together the public web, papers and patents, open-source footprints and the talent pool you’ve authorized it to import, then de-duplicates, fills in and ranks by priority. It also shows which sources have been searched and which are still blank, so you can decide where to look next.')
+r('>了解多源寻访</a>', '>More on multi-source sourcing</a>')
 
-# 03 identity — scene
+# 02 two-way job matching — scene
+r('<p class="fx-dir"><span class="is-on">岗位找人</span><i>⇄</i><span>简历找岗位</span></p>', '<p class="fx-dir"><span class="is-on">Role to people</span><i>⇄</i><span>CV to roles</span></p>')
+r('<span class="fx-cap">岗位 JD</span><span class="fx-cap fx-hi">拆成四项</span>', '<span class="fx-cap">Job description</span><span class="fx-cap fx-hi">4 parts</span>')
+r('<b class="fx-title">视觉算法负责人</b>', '<b class="fx-title">Head of Computer Vision</b>')
+r('<div><dt>核心技能</dt><dd>视觉算法 · 量产落地</dd></div>', '<div><dt>Core skills</dt><dd>Vision · mass production</dd></div>')
+r('<div><dt>行业经验</dt><dd>机器人 / 智能硬件</dd></div>', '<div><dt>Industry</dt><dd>Robotics, smart hardware</dd></div>')
+r('<div><dt>项目职责</dt><dd>感知模块从 0 到 1</dd></div>', '<div><dt>Projects</dt><dd>Built perception from scratch</dd></div>')
+r('<div><dt>硬性门槛</dt><dd>带过 10 人以上团队</dd></div>', '<div><dt>Must-haves</dt><dd>Has led a team of 10+</dd></div>')
+r('<p class="fx-pipe"><span>结构化检索</span><span>语义匹配</span></p>', '<p class="fx-pipe"><span>Structured search</span><span>Semantic matching</span></p>')
+r('<span class="fx-cap">匹配结果</span><span class="fx-cap">附依据与风险</span>', '<span class="fx-cap">Matches</span><span class="fx-cap">With reasons &amp; risks</span>')
+r('<b>人选 A</b>', '<b>Candidate A</b>')
+r('<b>人选 B</b>', '<b>Candidate B</b>')
+r('<b>人选 C</b>', '<b>Candidate C</b>')
+r('<u>优势</u>', '<u>Strength</u>')
+r('<u class="is-risk">待确认</u>', '<u class="is-risk">To confirm</u>')
+r('<p>匹配依据 · 四项要求都对上，带过量产项目</p>', '<p>Why · Meets all four, has led mass production</p>')
+# 02 text
+r('人才库里躺着几千份简历，最合适的那个，往往搜不出来。', 'Thousands of CVs sit in your talent pool, and the best fit often never turns up in a search.')
+r('<h3 id="n-step-match">人岗双向匹配：<br />简历找岗位，岗位也找简历</h3>', '<h3 id="n-step-match">Two-way job matching: CVs find roles, roles find CVs</h3>')
+r('把 JD 拆成核心技能、行业经验、项目职责和硬性门槛，用结构化检索与语义匹配一起找人。反过来，也能为一份简历找到库里更合适的岗位。每条结果附匹配依据、明确优势和待确认的风险。',
+  'It breaks the JD into core skills, industry experience, project responsibilities and must-haves, and uses structured search and semantic matching together to find people. It works the other way too: give it a CV and it finds better-fitting roles in your database. Every result comes with the reasons for the match, its clear strengths and the risks still to confirm.')
+r('>了解人岗匹配</a>', '>More on two-way job matching</a>')
+
+# 03 identity checks — scene
 r('<li><small>社区</small>花名 · 阿越</li>', '<li><small>Forum</small>Alias · A-Yue</li>')
 r('<li><small>论文</small>Lin Y.</li>', '<li><small>Paper</small>Lin Y.</li>')
-r('<li><small>代码仓库</small>lin-yue</li>', '<li><small>Repo</small>lin-yue</li>')
 r('<span>林越 · 电商运营</span><em>同名 · 已排除</em>', '<span>Yue Lin · E-commerce ops</span><em>Namesake · ruled out</em>')
 r('<b>林越</b><span>工业视觉 · 团队负责人</span></div><em class="fx-ok">已核实</em>', '<b>Yue Lin</b><span>Industrial vision · Team lead</span></div><em class="fx-ok">Verified</em>')
-r('<li>三处来源对得上</li>', '<li>Three sources agree</li>')
+r('<li>三处来源交叉核验</li>', '<li>Three sources cross-checked</li>')
 r('<li>履历时间线吻合</li>', '<li>Career timeline matches</li>')
 r('<li>同名两位，已排除</li>', '<li>Two namesakes ruled out</li>')
-r('<li class="is-wait">现任职级<em>待你确认</em></li>', '<li class="is-wait">Current level<em>To confirm</em></li>')
-r('<span class="fx-cap">触达路径</span><span>前同事引荐</span>', '<span class="fx-cap">Way in</span><span>Intro through an ex-teammate</span>')
+r('<li class="is-wait">现任职级<em>待确认</em></li>', '<li class="is-wait">Current level<em>To confirm</em></li>')
+r('<span class="fx-cap">相关人选</span><span>论文合著者 2 位</span>', '<span class="fx-cap">Related</span><span>2 paper co-authors</span>')
 # 03 text
-r('论文署名是缩写，社区里是花名，代码仓库只有 ID，人到底是谁，往往要来回比对。', 'On papers it’s initials, in forums it’s an alias, and in a code repository it’s only a user ID. Working out who someone really is means comparing back and forth.')
-r('<h3 id="n-step-identity">身份核实：花名缩写，查清是谁</h3>', '<h3 id="n-step-identity">Identity checks: who’s behind the alias</h3>')
-r('用任职经历、时间线、研究方向和公开作品交叉比对，排除同名。交回核实结论：是谁、依据是什么、排除了哪些同名、把握有多大，以及可行的联系途径。只用公开的职业信息和你提供的资料，拿不准的标为待确认。',
-  'It cross-checks career history, timelines, research areas and public work, and rules out namesakes. You get back a written finding: who the person is, what that rests on, which namesakes were ruled out, how sure it is, and how you might reach them. It uses only public professional information and the material you provide, and anything uncertain is marked “To confirm”.')
+r('手上只有一个花名、一个 GitHub ID，人到底是谁，往往要猜上半天。', 'All you have is an alias and a GitHub ID, and working out who the person really is can take half a day of guesswork.')
+r('<h3 id="n-step-identity">身份核实：一个 ID，还原成一个真人</h3>', '<h3 id="n-step-identity">Identity checks: from one ID to one real person</h3>')
+r('用多个来源交叉核验、排除同名，还原候选人的真实姓名与身份，再沿履历和合作线索找到相关人选。确认不了的不猜：拼音不反推汉字，同名不当同人，拿不准的标为待确认。',
+  'It cross-checks several sources and rules out namesakes to establish a candidate’s real name and identity, then follows their career and collaborations to related candidates. What it can’t confirm, it doesn’t guess: no reading Chinese characters from pinyin, no treating namesakes as one person, and anything uncertain is marked “To confirm”.')
 r('>了解身份核实</a>', '>More on identity checks</a>')
 
-# 04 client research — scene
-r('<li>行业前景</li><li>融资动态</li><li>创始人背景</li><li>岗位信号</li><li>业务信号</li>', '<li>Industry outlook</li><li>Funding news</li><li>Founders</li><li>Hiring signals</li><li>Business signals</li>')
-r('<span class="fx-cap">客户研判</span><em class="fx-ok">优先级 · 高</em>', '<span class="fx-cap">BD client research</span><em class="fx-ok">Priority · High</em>')
-r('<li><span>真实需求</span><i style="--n: 4"></i><b>有依据</b></li>', '<li><span>Real need</span><i style="--n: 4"></i><b>Sourced</b></li>')
-r('<li><span>付费潜力</span><i style="--n: 3"></i><b>有依据</b></li>', '<li><span>Ability to pay</span><i style="--n: 3"></i><b>Sourced</b></li>')
-r('<li class="is-wait"><span>合作风险</span><i style="--n: 2"></i><b>待确认</b></li>', '<li class="is-wait"><span>Risk</span><i style="--n: 2"></i><b>To confirm</b></li>')
-r('<span class="fx-cap">决策链</span><ol><li>创始人</li><li>技术 VP</li><li class="is-wait">用人经理</li></ol>', '<span class="fx-cap">Decision chain</span><ol><li>Founder</li><li>Tech VP</li><li class="is-wait">Hiring manager</li></ol>')
-# 04 text
-r('融资、新设研发部门、挂出新职位，信号很多，但不是每一条都能变成委托。', 'A funding round, a new R&amp;D department, fresh openings: there are plenty of signals, but not every one turns into a mandate.')
-r('<h3 id="n-step-bd">BD 客户研判（猎头适用）：哪家值得跟，心中有数</h3>', '<h3 id="n-step-bd">BD client research (for headhunters): know who’s worth pursuing</h3>')
-r('综合行业前景、融资动态、创始人背景、岗位与业务信号，交回客户研判：真实需求、付费潜力、合作风险分别给出“有依据 / 待确认 / 有风险”的结论和理由，附决策链和跟进优先级。跟不跟，由你决定。',
-  'It looks at the industry outlook, funding news, the founders’ backgrounds, and hiring and business signals together. You get back BD client research that rates the real need, the ability to pay and the risk in working with them as “Sourced”, “To confirm” or “At risk”, with the reasons, plus the decision chain and a follow-up priority. Whether to pursue it is your call.')
-r('>了解客户开发</a>', '>More on business development</a>')
-
-# 05 network — scene
-r('>换了团队</span>', '>New team</span>')
-r('>换了赛道</span>', '>New field</span>')
-r('>新的职责</span>', '>New role</span>')
-r('<b>周宁</b><span>视觉算法 · 团队负责人</span></div><em class="fx-ok">已更新</em>', '<b>Ning Zhou</b><span>Vision · Team lead</span></div><em class="fx-ok">Updated</em>')
-r('<li><i>2024</i><b>收到简历</b><span>视觉算法 · 高级工程师</span></li>', '<li><i>2024</i><b>CV received</b><span>Senior vision engineer</span></li>')
-r('<li><i>2025</i><b>换了团队</b><span>并入新平台部</span></li>', '<li><i>2025</i><b>Changed teams</b><span>Into the new platform division</span></li>')
-r('<li class="is-now"><i>2026</i><b>承担新职责</b><span>带起一支新团队</span></li>', '<li class="is-now"><i>2026</i><b>New role</b><span>Building a new team</span></li>')
-# 05 text
-r('研发人才换岗、转方向、发新成果都很快，简历库的信息一两年就过时。', 'R&amp;D people change roles, switch fields and publish new work quickly, and what your CV database says goes stale in a year or two.')
-r('<h3 id="n-step-network">人才库更新：人选有变，及时提醒</h3>', '<h3 id="n-step-network">Talent pool updates: alerts when candidates move</h3>')
-r('定期核对你指定人选的公开履历、论文和专利，任职、方向或职责一有变化，就交回附出处的变动提示。经你确认才写入人才库，不会擅自改动你的资料。',
-  'For the candidates you choose, it regularly checks public profiles, papers and patents. When a role, field or responsibility changes, you get a change alert with its source. Nothing goes into your talent pool until you confirm it, and it never edits your records on its own.')
-r('>了解人才库管理</a>', '>More on talent pools</a>')
-
-# 06 org chart — scene
-r('<p class="fx-tabs"><span class="is-on">按部门</span><span>按汇报线</span><span>按项目</span></p>', '<p class="fx-tabs"><span class="is-on">By department</span><span>By reporting line</span><span>By project</span></p>')
-r('<div class="fx-node fx-top"><b>创始人</b></div>', '<div class="fx-node fx-top"><b>Founder</b></div>')
-r('<b>技术负责人</b><span>韩征 · 2019 年加入</span>', '<b>Head of Technology</b><span>Zheng Han · joined 2019</span>')
+# 04 org mapping — scene
+r('<p class="fx-legend"><span class="is-core">在职核心</span><span class="is-dual">双聘</span><span class="is-joint">联合培养</span><span class="is-left">已离职</span></p>',
+  '<p class="fx-legend"><span class="is-core">Core, current</span><span class="is-dual">Dual appointment</span><span class="is-joint">Joint training</span><span class="is-left">Left</span></p>')
+r('<div class="fx-node fx-top"><b>具身智能研究院</b></div>', '<div class="fx-node fx-top"><b>Embodied AI Institute</b></div>')
+r('<b>技术负责人</b><span>韩征 · 在职核心 · 已核实</span>', '<b>Head of Technology</b><span>Zheng Han · core · verified</span>')
 r('<b>视觉团队</b>', '<b>Vision</b>')
 r('<b>控制团队</b>', '<b>Controls</b>')
+r('<em>疑似团队</em>', '<em>Likely team</em>')
 r('<b>产品交付</b><em>负责人待补</em>', '<b>Delivery</b><em>Lead to fill</em>')
-r('<p class="fx-src">来源 · 官网 · 新闻 · 公开演讲</p>', '<p class="fx-src">Sources · Website · News · Public talks</p>')
+r('<p class="fx-src">来源 · 官网 · 新闻 · 论文署名 · 公开演讲</p>', '<p class="fx-src">Sources · Website · News · Bylines · Talks</p>')
+# 04 text
+r('Mapping 要对着官网和新闻一点点拼，画完的图还存着好几个版本。', 'Mapping means piecing things together from websites and the news, and the finished chart lives on in several versions.')
+r('<h3 id="n-step-mapping">组织架构 Mapping：<br />把一群人还原成一张组织图</h3>', '<h3 id="n-step-mapping">Org mapping: from a group of people to an org chart</h3>')
+r('先确认真正的研发主体，再判断每个人是在职核心、双聘、高校联合培养还是已离职，最后推断疑似团队与负责人。一键生成架构图，每个位置保留来源与确认状态。',
+  'It first establishes which entity really does the R&amp;D, then works out whether each person is a current core member, holds a dual appointment, is a joint-training student from a university or has left, and finally infers likely teams and their leads. The org chart is generated in one click, and every position keeps its source and confirmation status.')
+r('>了解组织架构图</a>', '>More on org mapping</a>')
+
+# 05 client research — scene
+r('<li>融资动态</li><li>在招岗位</li><li>创始团队</li><li>业务变化</li><li>公开风险</li>', '<li>Funding news</li><li>Open roles</li><li>Founding team</li><li>Business changes</li><li>Public risks</li>')
+r('<span class="fx-cap">客户研判</span><em class="fx-ok">优先跟进</em>', '<span class="fx-cap">Client research</span><em class="fx-ok">Follow up first</em>')
+r('<li><span>真实需求</span><i style="--n: 4"></i><b>有依据</b></li>', '<li><span>Real need</span><i style="--n: 4"></i><b>Sourced</b></li>')
+r('<li><span>付费能力</span><i style="--n: 3"></i><b>有依据</b></li>', '<li><span>Ability to pay</span><i style="--n: 3"></i><b>Sourced</b></li>')
+r('<li class="is-wait"><span>交付可行性</span><i style="--n: 2"></i><b>待确认</b></li>', '<li class="is-wait"><span>Deliverability</span><i style="--n: 2"></i><b>To confirm</b></li>')
+r('<span class="fx-cap">接洽顺序</span><ol><li>创始人</li><li>技术 VP</li><li class="is-wait">用人经理</li></ol>', '<span class="fx-cap">Order of approach</span><ol><li>Founder</li><li>Tech VP</li><li class="is-wait">Hiring manager</li></ol>')
+# 05 text
+r('有的客户岗位不少，跟下去才发现需求、预算或决策链还没准备好。', 'Some clients have plenty of openings, and only after chasing them do you find the need, the budget or the decision chain isn’t ready.')
+r('<h3 id="n-step-bd">客户研判：先判断值不值得跟</h3>', '<h3 id="n-step-bd">Client research: first, decide if it’s worth pursuing</h3>')
+r('把融资、在招岗位、创始团队、业务变化和公开风险放在一起看，判断真实需求、付费能力与交付可行性，再理清决策链和接洽顺序。少做无用奔波。',
+  'It looks at funding, open roles, the founding team, business changes and public risks together, judges the real need, the ability to pay and whether you can deliver, then lays out the decision chain and the order of approach. Fewer wasted trips.')
+r('>了解客户研判</a>', '>More on client research</a>')
+
+# 06 referrals — scene
+r('</i>前同事</span>', '</i>Ex-colleague</span>')
+r('</i>论文合著</span>', '</i>Co-author</span>')
+r('</i>同门</span>', '</i>Lab mate</span>')
+r('<span class="fx-cap">桥接人排序</span><span class="fx-cap">关系强度 · 可达性 · 意愿信号</span>', '<span class="fx-cap">Bridges, ranked</span><span class="fx-cap">Strength · reach · willingness</span>')
+r('<b>周宁</b><span>同团队共事 3 年</span><em class="fx-ok">优先</em>', '<b>Ning Zhou</b><span>3 years on the same team</span><em class="fx-ok">Ask first</em>')
+r('<b>陈思</b><span>合著论文 2 篇</span><em class="fx-ok">可找</em>', '<b>Si Chen</b><span>2 papers together</span><em class="fx-ok">Worth asking</em>')
+r('<b>许晴</b><span>同一实验室</span><em>待确认</em>', '<b>Qing Xu</b><span>Same lab</span><em>To confirm</em>')
 # 06 text
-r('目标公司的研发部门怎么分、谁负责什么，要从官网、新闻、论文和专利里一点点拼。人一变动，又得重画。', 'How a target company’s R&amp;D is organized, and who is responsible for what, has to be pieced together from its website, the news, papers and patents. When people move, the chart has to be redrawn.')
-r('<h3 id="n-step-mapping">组织架构梳理（Mapping）：<br />研发组织，一图看清</h3>', '<h3 id="n-step-mapping">Org charts (mapping): an R&amp;D organization at a glance</h3>')
-r('汇总部门、关键岗位、任职人和汇报关系，交回一张组织架构图，可按部门、汇报线、项目切换查看，历史版本全部保留。每个节点附出处，未证实的汇报关系标为待确认。已有的 Excel 架构图可以导入后继续补充。',
-  'It gathers departments, key roles, the people in them and reporting lines, and hands back an org chart you can view by department, reporting line or project, with every past version kept. Each node names its source, and any reporting line not yet confirmed is marked “To confirm”. Org charts you already have in Excel can be imported and built on.')
-r('>了解组织架构图</a>', '>More on org charts</a>')
+r('能想起谁转介绍，取决于自己记忆，而不是谁真的认识他。', 'Who comes to mind for a referral depends on your memory, not on who really knows the person.')
+r('<h3 id="n-step-referral">人选转介绍：谁最可能认识他</h3>', '<h3 id="n-step-referral">Referrals: who is most likely to know them</h3>')
+r('把同事、同门、论文合著、共同专利和组织关联连成一张关系网，沿 1 到 3 跳寻找桥接人，再按关系强度、可达性和意愿信号排序。每条路径写明依据，也写明哪里还没确认。',
+  'It connects colleagues, lab mates, paper co-authors, shared patents and organizational ties into one network, looks for bridges within one to three steps, and ranks them by relationship strength, reachability and signs of willingness. Every route says what it rests on, and what hasn’t been confirmed yet.')
+r('>了解人选转介绍</a>', '>More on referrals</a>')
 
-# ---------- what we believe ----------
+# 07 talent pool — scene
+r('>换了公司</span>', '>New company</span>')
+r('>换了团队</span>', '>New team</span>')
+r('>新的职位</span>', '>New role</span>')
+r('<b>周宁</b><span>视觉算法 · 团队负责人</span></div><em class="fx-ok">已更新</em>', '<b>Ning Zhou</b><span>Vision · Team lead</span></div><em class="fx-ok">Updated</em>')
+r('<p class="fx-merge-note"><span class="fx-cap">一人一档</span><span>3 份资料已归并</span></p>', '<p class="fx-merge-note"><span class="fx-cap">One profile</span><span>3 records merged</span></p>')
+r('<li><i>2024</i><b>收到简历</b><span>视觉算法 · 高级工程师</span></li>', '<li><i>2024</i><b>CV received</b><span>Senior vision engineer</span></li>')
+r('<li><i>2025</i><b>换了团队</b><span>并入新平台部</span></li>', '<li><i>2025</i><b>Changed teams</b><span>Into the new platform division</span></li>')
+r('<li class="is-now"><i>2026</i><b>新的职位</b><span>带起一支新团队</span></li>', '<li class="is-now"><i>2026</i><b>New role</b><span>Building a new team</span></li>')
+# 07 text
+r('当年聊过的人换了公司、换了赛道，你的库还停在入库那天。', 'The people you spoke with years ago have changed companies and fields, and your database is still stuck on the day they were added.')
+r('<h3 id="n-step-network">人才库：一人一档，随时间更新</h3>', '<h3 id="n-step-network">Talent pool: one profile per person, kept current</h3>')
+r('候选人不同平台身份自动查重归并，线索不足时用公开信息补全档案。公司、团队或职位变化会被识别为关注信号，由 Agent 自主更新并沉淀至同一时间线。人员信息一处更新，后续匹配自动复用。',
+  'A candidate’s identities on different platforms are de-duplicated and merged automatically, and where clues are thin, public information fills in the profile. A change of company, team or role is picked up as a signal worth watching, and the agent updates the profile on its own, on a single timeline. Update a person once, and every later match uses it.')
+r('>了解人才库</a>', '>More on talent pools</a>')
+
+# 08 industry primer — scene
+r('<div class="fx-node fx-ind-root"><b>具身智能</b><span>产业链</span></div>', '<div class="fx-node fx-ind-root"><b>Embodied AI</b><span>Value chain</span></div>')
+r('<li><b>上游</b><span>核心零部件</span><span>传感器</span></li>', '<li><b>Upstream</b><span>Core parts</span><span>Sensors</span></li>')
+r('<li><b>中游</b><span>整机本体</span><span>运动控制</span></li>', '<li><b>Midstream</b><span>Robot body</span><span>Motion control</span></li>')
+r('<li><b>下游</b><span>场景集成</span><span>工业 / 家用</span></li>', '<li><b>Downstream</b><span>Integration</span><span>Industry, home</span></li>')
+r('<span class="fx-cap">岗位地图</span><em class="fx-ok">已用 JD 校准</em>', '<span class="fx-cap">Role map</span><em class="fx-ok">Checked against JDs</em>')
+r('<p class="fx-tags"><em>感知算法</em><em>运动控制</em><em>整机测试</em><em>灵巧手</em></p>', '<p class="fx-tags"><em>Perception</em><em>Motion control</em><em>System testing</em><em>Dexterous hands</em></p>')
+r('<p class="fx-ind-note"><span class="fx-cap">导出</span><span>可编辑的思维导图</span></p>', '<p class="fx-ind-note"><span class="fx-cap">Export</span><span>Editable mind map</span></p>')
+# 08 text
+r('新赛道术语成堆，产业链看不清，JD 里的黑话听不懂。', 'A new sector means piles of jargon, a value chain you can’t see clearly and JDs full of insider terms.')
+r('<h3 id="n-step-industry">行业入门：从陌生赛道到能开口</h3>', '<h3 id="n-step-industry">Industry primer: from an unfamiliar sector to a confident first call</h3>')
+r('从一条产业链的上下游开始，把产品、公司、岗位逐层摊开，再用真实 JD 校准，最后收成一张可编辑的思维导图。招聘从业者拿到的不是研报，是一张能直接开口的行业地图。',
+  'Starting from one value chain, upstream and downstream, it lays out the products, companies and roles layer by layer, checks them against real JDs, and wraps it all up in an editable mind map. What recruiters get isn’t a research report. It’s an industry map they can start a conversation from.')
+r('>了解行业入门</a>', '>More on industry primers</a>')
+
+# ---------- boundaries ----------
 r('<p class="n-kicker">02 · 产品边界</p>', '<p class="n-kicker">02 · Boundaries</p>')
-r('各司其职，边界清晰', 'What it does,<br />and what it doesn’t.')
-r('<p>查资料、比对、整理，交给它。</p>', '<p>Research, cross-checking and organizing: leave those to it.</p>')
-r('<p>人选的意愿和顾虑、用人方没说出口的需求，需要你当面了解。</p>', '<p>A candidate’s intentions and doubts, and what an employer hasn’t said out loud, you learn in person.</p>')
+r('<span>招聘从业者的专业判断，</span><span>无法被算法替代</span>', '<span>A recruiter’s professional judgment</span><span>can’t be replaced by an algorithm</span>')
+r('<p>信息可以自动抓取，但一个人的期待、顾虑和抱负提取不出来。</p>', '<p>Information can be gathered automatically, but a person’s hopes, doubts and ambitions can’t be extracted.</p>')
+r('<p>客户的隐性诉求、人选没说出口的偏好，只能靠面对面的沟通去感知。</p>', '<p>A client’s unspoken needs and a candidate’s unsaid preferences can only be sensed in face-to-face conversation.</p>')
 r('alt="一位招聘者和一位人选面对面交谈"', 'alt="A recruiter and a candidate talking face to face"')
-r('<h3>TalentBuddy 的三条原则</h3>', '<h3>TalentBuddy’s three principles</h3>')
-r('<li><i>01</i>每条结论都有出处，拿不准的标为待确认，不当成定论。</li>', '<li><i>01</i>Every conclusion names its source. Anything uncertain is marked “To confirm”, never presented as settled.</li>')
-r('<li><i>02</i>给出有依据的匹配结论，但不替你评判人选。</li>', '<li><i>02</i>It gives sourced match findings, but it does not judge candidates for you.</li>')
-r('<li><i>03</i>不替你做任何商务决定。</li>', '<li><i>03</i>It makes no business decisions for you.</li>')
-r('和候选人、用人方的沟通，<br />始终由你主导。', 'Conversations with candidates and employers<br />are always yours to lead.')
+r('<h3>所以，HunterBuddy 有自己的边界</h3>', '<h3>So HunterBuddy keeps to clear boundaries</h3>')
+r('<li><i>01</i>它把所有信息整理成有来源的证据链。拿不准的地方明确标出，不包装成确定结论。</li>', '<li><i>01</i>It turns all information into a chain of evidence with sources. Anything uncertain is clearly marked, never dressed up as a firm conclusion.</li>')
+r('<li><i>02</i>它不绕过平台权限，不伪造身份，不自动群发，也不替你联系任何人。</li>', '<li><i>02</i>It never bypasses platform permissions, never fakes an identity, never sends mass messages, and never contacts anyone for you.</li>')
+r('<li><i>03</i>它不替你做推荐、录用或商务决定。</li>', '<li><i>03</i>It makes no recommendation, hiring or business decisions for you.</li>')
+r('我们懂你独自赶路的消耗。<br />同行的路上，可以把力气留给更重要的事。', 'We know how draining it is to go it alone.<br />With company on the road, save your energy for what matters most.')
 
-# ---------- sectors ----------
-r('<p class="n-kicker">03 · 研发领域</p>', '<p class="n-kicker">03 · R&amp;D fields</p>')
-r('<h2 class="n-h2" id="n-industries-title">跨行研发，一并覆盖</h2>', '<h2 class="n-h2" id="n-industries-title">R&amp;D roles, across industries</h2>')
-r('<p class="n-sub">也包括各行业新开设的 AI 与大模型岗位。</p>', '<p class="n-sub">Including the new AI and large-model roles opening in every industry.</p>')
-r('<li>人工智能与大模型</li><li>互联网与云计算</li><li>具身智能与机器人</li><li>智能汽车</li><li>半导体与电子</li><li>医药与医疗器械</li><li>工业制造与装备</li><li>新能源与储能</li><li>核聚变</li>',
-  '<li>AI &amp; large models</li><li>Internet &amp; cloud</li><li>Embodied AI &amp; robotics</li><li>Smart vehicles</li><li>Semiconductors &amp; electronics</li><li>Pharma &amp; medical devices</li><li>Industrial manufacturing &amp; equipment</li><li>New energy &amp; storage</li><li>Nuclear fusion</li>')
+# ---------- focus areas ----------
+r('<p class="n-kicker">03 · 聚焦方向</p>', '<p class="n-kicker">03 · Focus areas</p>')
+r('<h2 class="n-h2" id="n-industries-title">与你并肩，<br />奔赴每一场人才相逢。</h2>', '<h2 class="n-h2" id="n-industries-title">By your side,<br />on the road to every great match.</h2>')
+r('<li>互联网</li><li>人工智能</li><li>具身智能</li><li>云计算</li><li>医药</li><li>核聚变</li><li>半导体</li><li>能源与稀有资源</li><li>新型储能</li>',
+  '<li>Internet</li><li>Artificial intelligence</li><li>Embodied AI</li><li>Cloud computing</li><li>Pharmaceuticals</li><li>Nuclear fusion</li><li>Semiconductors</li><li>Energy and rare resources</li><li>New energy storage</li>')
 
 # ---------- FAQ (the live English site's approved answers, terms aligned with the glossary) ----------
 r('<p class="n-kicker">04 · 常见问题</p>', '<p class="n-kicker">04 · FAQ</p>')
-r('<h2 class="n-h2" id="n-faq-title">试用之前，<br />大家常问这些。</h2>', '<h2 class="n-h2" id="n-faq-title">What people ask<br />before they try it.</h2>')
-r('其他问题请发邮件至 <a href="mailto:hello@boseekai.com">hello@boseekai.com</a>。', 'Anything else? Email <a href="mailto:hello@boseekai.com">hello@boseekai.com</a>.')
+r('试用之前，<br />大家常问这些。', 'What people ask<br />before they try it.')
+r('还有别的想问，写信到 <a href="mailto:hello@boseekai.com">hello@boseekai.com</a>。', 'Anything else? Write to <a href="mailto:hello@boseekai.com">hello@boseekai.com</a>.')
 FAQ = [
- ("TalentBuddy 适合谁使用？", "Who is TalentBuddy for?",
-  "招聘研发与技术人才的个人用户。猎头顾问可以使用全部能力，包括 BD 客户研判。企业 HR 与招聘负责人常用人才寻访、人岗匹配和人才库更新。CTO 与技术负责人可以梳理同行的研发组织，按论文、专利、代码寻找领域专家，核实人选的技术履历。覆盖互联网与 AI、智能汽车与工业制造、半导体与电子、医药与医疗器械等行业的研发岗位，包括 AI 与大模型岗位。按个人账号使用。",
-  "Individuals who hire R&amp;D and technical talent. Search consultants can use every capability, including BD client research. HR and talent leads mostly use sourcing, job matching and talent pool updates. CTOs and engineering leaders can map peer companies’ R&amp;D organizations, find domain experts through papers, patents and code, and check a candidate’s technical track record. It covers R&amp;D roles in the internet and AI, smart vehicles and industrial manufacturing, semiconductors and electronics, and pharma and medical devices, including AI and large-model roles. Each person uses their own account."),
+ ("HunterBuddy 适合谁使用？", "Who is HunterBuddy for?",
+  "HR 与专业猎头，尤其是在招高阶技术岗位、手上有几个难做的职位、库里攒了不少候选人的人。线索散在融资新闻、招聘页、简历库、论文和开源社区里，一个人很难天天盯着、一一读完。做过的功课会存下来，下一件事接着用。",
+  "HR teams and professional headhunters, especially those hiring for senior technical roles, with a few hard-to-fill roles on their desk and a candidate database built up over the years. Leads are scattered across funding news, careers pages, CV databases, papers and open-source communities, too many for one person to watch every day and read in full. The research you’ve done is kept, ready for the next search."),
  ("和直接用豆包、DeepSeek、ChatGPT 这类通用 AI，有什么不同？", "How is it different from just using a general-purpose AI like Doubao, DeepSeek or ChatGPT?",
-  "通用 AI 回答一个问题，TalentBuddy 交回一份完整结果。它从你的候选人、熟悉的公司和已梳理的组织出发，完成检索、身份核实、去重和比对，交回有出处的人选名单、结论或架构图，并保存在你的账号里，下次接着用。",
-  "A general-purpose AI answers a question. TalentBuddy hands back a complete result. It starts from your candidates, the companies you know and the org charts you’ve mapped, does the searching, identity checks, de-duplication and comparison, and hands back a sourced candidate list, finding or org chart. It’s all kept in your account, ready for next time."),
+  "通用 AI 擅长回答单个问题，但它不知道你手上有哪些客户和候选人，摸过哪些公司的组织架构。它给的名单里，人是不是同一个、消息从哪来，往往还得你自己再查一遍。HunterBuddy 每次都从你手上的资源出发：熟悉的公司、做过的候选人、梳理过的组织架构和能帮你引荐的人。不同地方的同一个人会先核对再合并，每个判断都写着来源。做完的事会存下来，下一次更快。",
+  "General-purpose AI is good at answering one question at a time, but it doesn’t know your clients and candidates, or which companies you’ve already mapped. When it gives you a list of names, you often still have to check for yourself whether two entries are the same person and where each piece of information came from. HunterBuddy always starts from what you already have: the companies you know, the candidates you’ve worked with, the org charts you’ve mapped and the people who can introduce you. When the same person turns up in different places, the records are checked before they are merged, and every finding names its source. The work you finish is kept, so the next search goes faster."),
  ("它会替我盯着市场和候选人吗？", "Can it keep an eye on the market and my candidates for me?",
-  "可以。设置周期任务即可，比如每周检查某个技术方向的融资动态、目标公司招聘页的变化，或指定人选的公开履历和新发表的成果。每一轮只交回有依据的变化，重复的会合并，没有变化就不提示。下一步做什么，由你决定。",
-  "Yes. You can set up recurring tasks, such as checking funding news in a technical field each week, changes on a target company’s careers page, or the public profiles and new publications of the candidates you name. Each round hands back only changes it can source, merges duplicates and stays quiet when nothing has changed. What happens next is your call."),
+  "可以。你可以让它定期帮你看，比如每周看一次某个赛道有没有新公司拿到融资、目标公司的招聘页有没有变化，或你关注的候选人公开履历有没有更新。只有值得你看的变化才会提醒你，重复的会合并，没有新消息就不打扰你。它不会自己动手，下一步做什么由你决定。",
+  "Yes. You can have it check for you regularly, say once a week: whether any new companies in a sector you follow have raised funding, whether a target company’s careers page has changed, or whether a candidate you’re watching has updated their public profile. It only alerts you to changes worth your time, merges duplicates and stays quiet when there’s nothing new. It never acts on its own. What happens next is your call."),
  ("人选和线索从哪些渠道来？", "Where do candidates and leads come from?",
-  "已有候选人、梳理过的组织架构、公开网络与招聘页、论文与专利、开源项目，以及你上传的简历和资料。每条线索都记着来自哪里。不同渠道里的同一个人，先核对再合并。哪些渠道找过了、哪些还是空白，也会标出来，方便你决定下一步去哪里补。",
+  "已有候选人、梳理过的组织架构、公开网络与招聘页、论文与专利、开源项目，以及你上传的简历和资料。每条线索都记着来自哪里。散在不同渠道里的同一个人，会先核对再合并。哪些渠道找过了、哪些还是空白，也会标出来，方便你决定下一步去哪里补。",
   "From your existing candidates and org charts, the public web and careers pages, papers and patents, open-source projects, and the CVs and documents you upload. Every lead keeps a note of where it came from. When the same person turns up in different sources, the records are checked before they are merged. It also shows which sources have been searched and where the gaps are, so you can decide what to fill in next."),
  ("我手上的候选人库和组织架构图能带进来吗？", "Can I bring in my own candidate database and org charts?",
-  "可以。简历支持单份或批量上传，Excel 等格式的组织架构图可以导入后继续补充。带进来的资料同样会核对身份、查重合并，也可以对你所有的在手职位做一次匹配。",
+  "可以。简历可以单份或批量上传，Excel 等格式的组织架构图可以导入后接着补。带进来的资料同样会核对身份、查重合并，也可以对你所有的在手职位做一次匹配。",
   "Yes. Upload CVs one at a time or in bulk, and import org charts from Excel or similar formats to keep building on them. Everything you bring in goes through the same identity checks and de-duplication, and can be matched against all your live searches in one go."),
  ("匹配结果可以直接相信吗？", "Can I take the match results at face value?",
-  "匹配结果附依据和风险，每条理由都能点回去看原始资料。没有可靠来源的信息标为“待确认”，不会把猜测当成事实。实际管理多大范围、本人想不想动，这类只有聊了才知道的事，由你判断。",
-  "Match results come with their reasons and risks, and every reason links back to the original material. Anything without a reliable source is marked “To confirm”, and guesses are never presented as facts. Things you only learn by talking to the person, such as how much they really manage or whether they’re open to a move, are yours to judge."),
+  "把它当作带来源的参考，而不是最终结论。每条匹配理由都附上来源，你可以点回去看原始资料。没有可靠来源的信息会标为“待确认”，不会把猜测当成事实。像实际带多大团队、本人想不想动，这类只有聊了才知道的事，HunterBuddy 会明确留给你。",
+  "Treat them as sourced guidance, not a final verdict. Every reason for a match comes with its source, so you can click through to the original material. Anything without a reliable source is marked “To confirm”, and guesses are never presented as facts. Some things you only find out by talking to the person, such as how big a team they really lead or whether they’re open to a move. HunterBuddy leaves those explicitly to you."),
  ("和猎聘、领英、脉脉这些招聘平台是什么关系？", "How does it fit with recruiting platforms like Liepin, LinkedIn and Maimai?",
-  "招聘平台用来发布职位、搜索和联系候选人，TalentBuddy 不替代它们，它交回的是找人之前和找人过程中的结果：核实过的人选、关联关系和有出处的判断，帮你决定先找谁、怎么切入。从这些平台下载的简历，也可以上传进来一起核对。",
-  "Recruiting platforms are where you post roles, search for candidates and contact them, and TalentBuddy doesn’t replace them. What it hands back are results from before and during a search: verified candidates, how people are connected, and sourced findings, to help you decide who to approach first and how. CVs downloaded from these platforms can be uploaded too and checked along with everything else."),
- ("和招聘管理系统（ATS）、猎头 CRM 有什么不同？", "How is it different from an ATS or a recruitment CRM?",
-  "ATS 和猎头 CRM 记录职位、候选人和招聘进度（猎头 CRM 还记录客户），管的是已经在做的事。TalentBuddy 交回寻访和研判的结果：找到的人、核实过的身份、有出处的判断。两者可以配合着用。在 TalentBuddy 里确认过的人和关系，照样记进你的系统。",
-  "An ATS or a recruitment CRM records roles, candidates and hiring progress (a headhunter’s CRM also records clients). It manages work already under way. TalentBuddy hands back the results of sourcing and research: the people found, verified identities and sourced findings. The two can be used together. People and relationships you confirm in TalentBuddy go into your system as usual."),
+  "它们是发布职位、搜索和联系候选人的渠道，HunterBuddy 不替代它们。HunterBuddy 做的是找人之前和找人过程中的研究：把公开资料和你手上的资源放在一起，核对身份、连起关系、写明来源，帮你判断先找谁、怎么开口。从这些平台下载的简历，也可以上传进来一起核对。",
+  "Those are where you post roles, search for candidates and get in touch with them, and HunterBuddy doesn’t replace them. It does the research before and during a search: putting public information alongside what you already have, verifying identities, mapping connections and citing sources, to help you decide who to approach first and what to say. CVs downloaded from these platforms can be uploaded too and checked along with everything else."),
+ ("和猎头管理系统（CRM、ATS）有什么不同？", "How is it different from a recruitment CRM or ATS?",
+  "猎头管理系统记录客户、职位、候选人和推荐进度，管的是已经在做的事。HunterBuddy 帮你找到下一件值得做的事：从公开资料和你手上的资源里找线索、连关系，给出带来源的判断。两者可以配合着用。在 HunterBuddy 里确认过的人和关系，照样记进你的管理系统。",
+  "A CRM or ATS records your clients, roles and candidates, and where each submission stands. It manages work already under way. HunterBuddy helps you find what’s worth doing next: it looks for leads and connections in public information and your own resources, and gives you findings backed by sources. The two can be used together. People and relationships you’ve confirmed in HunterBuddy go into your CRM or ATS as usual."),
 ]
 for qz, qe, az, ae in FAQ:
     r(f'<span>{qz}</span>', f'<span>{qe}</span>')
@@ -325,15 +360,19 @@ for qz, qe, az, ae in FAQ:
 # ---------- footer ----------
 r('<img src="../../landing-origin/assets/boseek-b5.svg" alt="Boseek 铂寻" width="150" height="54" loading="lazy" />',
   '<img src="../assets/boseek-b5-en-light.svg" alt="Boseek" width="150" height="46" loading="lazy" />')
-r('<p>TalentBuddy：先人一步，锁定研发人才。</p>', '<p>TalentBuddy: be first to the right R&amp;D talent.</p>')
-r('<p>铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。</p>', '<p>Built by Boseek for search consultants, HR and talent leads, and CTOs and engineering leaders.</p>')
+r('<p>HunterBuddy，高阶技术人才寻访的 AI 工作台。</p>', '<p>HunterBuddy, the AI workbench for senior tech talent search.</p>')
+r('<p>由铂寻 Boseek 为 HR 与专业猎头打造。</p>', '<p>Built by Boseek for HR teams and professional headhunters.</p>')
 r('<p class="n-footer-mail">联系我们：<a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>', '<p class="n-footer-mail">Contact: <a href="mailto:hello@boseekai.com">hello@boseekai.com</a></p>')
 r('<h2>产品</h2>', '<h2>Product</h2>')  # its links are the header's, already replaced above
 r('<h2>使用场景</h2>', '<h2>Use cases</h2>')
-r('>客户开发</a></li>', '>Business development</a></li>')
-r('>组织架构图</a></li>', '>Org charts</a></li>')
-r('>猎头怎么找人</a></li>', '>Finding candidates</a></li>')
-r('>人岗匹配</a></li>', '>Job matching</a></li>')
+r('>多源寻访</a></li>', '>Multi-source sourcing</a></li>')
+r('>人岗双向匹配</a></li>', '>Two-way job matching</a></li>')
+r('>身份核实</a></li>', '>Identity checks</a></li>')
+r('>组织架构 Mapping</a></li>', '>Org mapping</a></li>')
+r('>客户研判</a></li>', '>Client research</a></li>')
+r('>人选转介绍</a></li>', '>Referrals</a></li>')
+r('>人才库</a></li>', '>Talent pool</a></li>')
+r('>行业入门</a></li>', '>Industry primer</a></li>')
 r('>全部 &gt;&gt;</a></li>', '>All &gt;&gt;</a></li>')
 r('<h2>法律</h2>', '<h2>Legal</h2>')
 r('<a href="privacy/">隐私政策</a>', '<a href="privacy/">Privacy policy</a>')

@@ -608,3 +608,39 @@
     font-size: 12.5px;
   }
 }
+
+/* ---------- 核心能力页（2026-11-21）：定义句之后的一段引言、编号痛点卡、边界、下一个能力 ---------- */
+.s-lead-more {
+  margin-top: 14px !important;
+  color: var(--on-night-muted);
+  font-size: 16px;
+}
+.s-cards.is-numbered {
+  counter-reset: s-card;
+}
+.s-cards.is-numbered li {
+  counter-increment: s-card;
+}
+.s-cards.is-numbered h3::before {
+  content: counter(s-card, decimal-leading-zero);
+  display: block;
+  margin-bottom: 6px;
+  color: var(--iris-ink);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+.s-bound {
+  margin-top: 14px !important;
+  padding: 18px 22px;
+  border: 1px solid #cfcbea;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 16.5px;
+  line-height: 1.85;
+}
+.s-next a {
+  border-color: #cfcbea;
+}
