@@ -1,6 +1,6 @@
-import { Maximize2, Minimize2 } from "lucide-react";
+import { AlignHorizontalDistributeCenter, AlignVerticalDistributeCenter, CornerDownRight, Maximize2, Minimize2, Spline, Undo2 } from "lucide-react";
 
-const libraryIcons = { maximize2: Maximize2, minimize2: Minimize2 };
+const libraryIcons = { maximize2: Maximize2, minimize2: Minimize2, curve: Spline, orthogonal: CornerDownRight, layoutHorizontal: AlignHorizontalDistributeCenter, layoutVertical: AlignVerticalDistributeCenter, undo: Undo2 };
 
 const paths = {
   home: ["M3 10.5 12 3l9 7.5", "M5 9.5V21h14V9.5", "M9 21v-7h6v7"],

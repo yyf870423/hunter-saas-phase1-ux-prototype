@@ -512,9 +512,10 @@ test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作",
     page.locator(".s3-relationship-node", { hasText: "前同事陈凯" }),
   ).toBeVisible();
   const edgeCountBefore = await page.locator(".s3-relationship-edge").count();
+  await page.locator(".s3-relationship-node", { hasText: "前同事陈凯" }).hover();
   const sourceConnector = page
     .locator(".s3-relationship-node", { hasText: "前同事陈凯" })
-    .locator(".s3-relationship-node-connector");
+    .locator('.s3-relationship-node-connector[data-port="right"]');
   const connectorBox = await sourceConnector.boundingBox();
   const targetBox = await contactTargetNode.boundingBox();
   expect(connectorBox).not.toBeNull();
@@ -539,11 +540,8 @@ test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作",
   await expect(edgeDialog).toBeVisible();
   await edgeDialog.locator("input").fill("前同事引荐");
   await edgeDialog.getByRole("button", { name: "保存修改" }).click();
-  await expect(
-    page.locator(".s3-relationship-edge-label text", {
-      hasText: "前同事引荐",
-    }),
-  ).toBeVisible();
+  // 关系名称按已确认规则仅 hover 显示；编辑成功由所选关系详情核对。
+  await expect(page.locator(".s3-relationship-detail h2")).toHaveText("前同事引荐");
 });
 
 test("候选人来源证据逐项可打开且详情加载状态完整", async ({ page }) => {

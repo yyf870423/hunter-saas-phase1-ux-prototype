@@ -4,6 +4,19 @@ import {
   trackConsoleErrors,
 } from "../stage1/helpers";
 
+async function hoverRelation(page, line) {
+  const point = await line.evaluate(path => {
+    for (const fraction of [.5, .3, .7, .15, .85]) {
+      const point = path.getPointAtLength(path.getTotalLength() * fraction).matrixTransform(path.getScreenCTM());
+      if (document.elementFromPoint(point.x, point.y)?.closest(".tg-edge") === path.closest(".tg-edge")) return { x: point.x, y: point.y };
+    }
+    return null;
+  });
+  expect(point).not.toBeNull();
+  await page.mouse.move(point.x, point.y);
+  return point;
+}
+
 async function expectVisibleGraphNodesDoNotOverlap(page) {
   const overlaps = await page
     .locator(".tg-node:visible")
@@ -148,6 +161,7 @@ test("公司、候选人、岗位和行业关系分别作为独立知识图谱",
       "aria-selected",
       "true",
     );
+    await hoverRelation(page, page.locator(`.tg-edge-hit[data-edge-label="${relationship}"]`).first());
     await expect(
       page.getByText(relationship, { exact: true }).first(),
     ).toBeVisible();
@@ -176,7 +190,10 @@ test("知识图谱缩小后可继续扩展画布且节点信息保持完整", as
     "50%",
   );
   const relationshipLabels = page.locator(".tg-edge-label-button");
-  expect(await relationshipLabels.count()).toBeGreaterThan(0);
+  await page.mouse.move(1, 1);
+  await expect(relationshipLabels).toHaveCount(0);
+  await hoverRelation(page, page.locator(".tg-edge-hit").first());
+  await expect(relationshipLabels).toHaveCount(1);
   const renderedRelationshipNames = await relationshipLabels
     .locator("text")
     .allTextContents();
@@ -217,9 +234,9 @@ test("知识图谱缩小后可继续扩展画布且节点信息保持完整", as
   const canvas = page.locator(".tg-canvas-scroll");
   const canvasBox = await canvas.boundingBox();
   expect(canvasBox).not.toBeNull();
-  await page.mouse.move(canvasBox.x + 28, canvasBox.y + 28);
+  await page.mouse.move(canvasBox.x + 28, canvasBox.y + 100);
   await page.mouse.down();
-  await page.mouse.move(canvasBox.x + 128, canvasBox.y + 98, { steps: 8 });
+  await page.mouse.move(canvasBox.x + 128, canvasBox.y + 170, { steps: 8 });
   await page.mouse.up();
   const transformAfterPan = await stage.evaluate(
     (element) => element.style.transform,
@@ -549,6 +566,7 @@ test("图谱关系可编辑且来源证据可查看", async ({ page }) => {
     }),
   );
   await page.goto("#/mappings/mapping-embodied?tab=content");
+  await hoverRelation(page, page.locator(".tg-edge-hit").first());
   await page.locator(".tg-edge-label-button").first().dblclick();
   const relationEditor = page.getByRole("dialog", { name: "编辑关系" });
   await expect(relationEditor).toBeVisible();
@@ -590,7 +608,8 @@ test("图谱支持先连线、后命名并调整节点层级", async ({ page }) 
   await page.getByRole("button", { name: "添加关系" }).click();
   const source = page.locator(".tg-node", { hasText: "具身智能中心" }).first();
   const target = page.locator(".tg-node", { hasText: "星澜机器人" }).first();
-  const connector = source.locator(".tg-node-connector");
+  await source.hover();
+  const connector = source.locator('.tg-node-connector[data-port="right"]');
   const edgeCountBefore = await page.locator(".tg-edge").count();
   const connectorBox = await connector.boundingBox();
   const targetBox = await target.boundingBox();
@@ -613,7 +632,8 @@ test("图谱支持先连线、后命名并调整节点层级", async ({ page }) 
   await expect(page.locator(".tg-edge")).toHaveCount(edgeCountBefore + 1);
   const createdEdge = page.locator(".tg-edge").last();
   await expect(createdEdge.locator(".tg-edge-label-button")).toHaveCount(0);
-  await createdEdge.locator(".tg-edge-hit").dblclick({ force: true });
+  const edgePoint = await hoverRelation(page, createdEdge.locator(".tg-edge-hit"));
+  await page.mouse.dblclick(edgePoint.x, edgePoint.y);
   const relationEditor = page.getByRole("dialog", { name: "编辑关系" });
   await expect(relationEditor).toBeVisible();
   await relationEditor
@@ -621,6 +641,7 @@ test("图谱支持先连线、后命名并调整节点层级", async ({ page }) 
     .fill("战略协作");
   await relationEditor.getByRole("button", { name: "保存关系" }).click();
   await expect(page.getByText("本图关系已更新")).toBeVisible();
+  await hoverRelation(page, createdEdge.locator(".tg-edge-hit"));
   await expect(
     page.getByRole("button", { name: "编辑关系：战略协作" }),
   ).toBeVisible();

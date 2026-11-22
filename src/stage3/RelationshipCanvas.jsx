@@ -2,6 +2,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { useCanvasFullscreen } from "../components/useCanvasFullscreen";
+import { GraphPresentationControls } from "../components/GraphPresentationControls";
+import { GraphNodePorts } from "../components/GraphNodePorts";
+import { GraphEdgeHandles } from "../components/GraphEdgeHandles";
+import { useGraphReconnect } from "../components/useGraphReconnect";
+import { graphConnectionPreview, graphPortHit } from "../components/graph-connection-preview";
+import { useGraphWheelZoom } from "../components/useGraphWheelZoom";
+import { readGraphPresentation, writeGraphPresentation } from "../components/graph-presentation-storage";
+import { useGraphEdgePorts } from "../components/useGraphEdgePorts";
+import { expandCanvasBounds, graphEdgeGeometry, graphFitZoom, graphLayoutPan, graphPortPoint, graphPositions, layoutGraph, projectGraphPositions } from "../components/graph-presentation";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import {
   FormField,
@@ -71,7 +80,7 @@ function loadRelationshipViews(storageKey, views) {
           ...view.edges.map((edge) => {
             const savedEdge = saved.edges.find((item) => item.id === edge.id);
             return savedEdge?.userEdited
-              ? { ...edge, label: savedEdge.label, userEdited: true }
+              ? { ...edge, label: savedEdge.label, source: savedEdge.source, target: savedEdge.target, sourcePort: savedEdge.sourcePort, targetPort: savedEdge.targetPort, userEdited: true }
               : edge;
           }),
           ...saved.edges.filter((edge) => !baseEdgeIds.has(edge.id)),
@@ -85,16 +94,7 @@ function loadRelationshipViews(storageKey, views) {
 }
 
 function relationshipCanvasSize(nodes) {
-  return {
-    width: Math.max(
-      CANVAS_WIDTH,
-      ...nodes.map((node) => node.x + NODE_WIDTH + CANVAS_EXPANSION_PADDING),
-    ),
-    height: Math.max(
-      CANVAS_HEIGHT,
-      ...nodes.map((node) => node.y + NODE_HEIGHT + CANVAS_EXPANSION_PADDING),
-    ),
-  };
+  return expandCanvasBounds({ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }, nodes, { minWidth: CANVAS_WIDTH, minHeight: CANVAS_HEIGHT, width: NODE_WIDTH, height: NODE_HEIGHT, padding: CANVAS_EXPANSION_PADDING, round: false });
 }
 
 function relationshipNodesOverlap(left, right) {
@@ -215,34 +215,6 @@ function resolveEvidenceSnapshot(label, selected, view) {
   );
 }
 
-function edgePath(source, target, index, layout) {
-  const startX = source.x + NODE_WIDTH;
-  const startY = source.y + NODE_HEIGHT / 2;
-  const endX = target.x;
-  const endY = target.y + NODE_HEIGHT / 2;
-  if (layout === "network") {
-    const offset = index % 2 === 0 ? -24 : 24;
-    const midX = (startX + endX) / 2;
-    const midY = (startY + endY) / 2 + offset;
-    return `M ${startX} ${startY} Q ${midX} ${midY} ${endX} ${endY}`;
-  }
-  const bendX = startX + Math.max(42, (endX - startX) / 2);
-  return `M ${startX} ${startY} C ${bendX} ${startY}, ${bendX} ${endY}, ${endX} ${endY}`;
-}
-
-function edgeLabelPoint(source, target, index, layout) {
-  const startX = source.x + NODE_WIDTH;
-  const startY = source.y + NODE_HEIGHT / 2;
-  const endX = target.x;
-  const endY = target.y + NODE_HEIGHT / 2;
-  return {
-    x: (startX + endX) / 2,
-    y:
-      (startY + endY) / 2 +
-      (layout === "network" ? (index % 2 === 0 ? -15 : 15) : -8),
-  };
-}
-
 function SelectedDetail({
   view,
   selection,
@@ -252,6 +224,8 @@ function SelectedDetail({
   onClose,
   onOpenEvidence,
   onOpenEntity,
+  onEdit,
+  onDelete,
 }) {
   const selected =
     selection.kind === "node"
@@ -429,6 +403,10 @@ function SelectedDetail({
           </div>
         </section>
       ) : null}
+      {onEdit && onDelete ? <footer className="s3-relationship-detail-actions">
+        <Button tone="secondary" size="sm" icon="edit" onClick={onEdit}>{isNode ? "编辑节点" : "编辑关系"}</Button>
+        <Button tone="danger" size="sm" icon="trash" onClick={onDelete}>{isNode ? "删除节点" : "删除关系"}</Button>
+      </footer> : null}
     </aside>
   );
 }
@@ -577,7 +555,7 @@ export function RelationshipCanvas({
   const notify = useToast();
   const [viewId, setViewId] = useState(views[0].id);
   const [viewStateById, setViewStateById] = useState(() =>
-    loadRelationshipViews(storageKey, views),
+    loadRelationshipViews(readingOnly ? undefined : storageKey, views),
   );
   const incomingView = views.find((item) => item.id === viewId) || views[0];
   const activeView = viewStateById[viewId] || incomingView;
@@ -586,7 +564,7 @@ export function RelationshipCanvas({
   );
   const [zoom, setZoom] = useState(1);
   const [panByView, setPanByView] = useState(() =>
-    Object.fromEntries(views.map((view) => [view.id, { x: 0, y: 0 }])),
+    Object.fromEntries(views.map((view) => { const bounds = relationshipCanvasSize((viewStateById[view.id] || view).nodes); return [view.id, { x: -(bounds.minX || 0), y: -(bounds.minY || 0) }]; })),
   );
   const [detailOpen, setDetailOpen] = useState(true);
   const [evidencePreview, setEvidencePreview] = useState(null);
@@ -599,8 +577,34 @@ export function RelationshipCanvas({
   const panRef = useRef(null);
   const connectionRef = useRef(null);
   const stageRef = useRef(null);
+  const viewportRef = useRef(null);
+  const [presentationByView, setPresentationByView] = useState(() => Object.fromEntries(views.map(view => [view.id, readGraphPresentation(!readingOnly && storageKey ? `${storageKey}.presentation.${view.id}` : undefined)])));
+  const [hoveredEdgeId, setHoveredEdgeId] = useState(null);
+  const presentation = presentationByView[activeView.id] || { lineStyle: "curve", direction: "LR", undo: null };
+  const portLocks = useGraphEdgePorts({ nodes: activeView.nodes, edges: activeView.edges, direction: presentation.direction, scopeKey: `${storageKey ?? ""}:${activeView.id}`, storageKey: !readingOnly && storageKey ? `${storageKey}.ports.${activeView.id}` : undefined, width: NODE_WIDTH, height: NODE_HEIGHT });
+  const reconnect = useGraphReconnect({ nodes: activeView.nodes, edges: activeView.edges, scopeKey: `${storageKey ?? ""}:${activeView.id}:${readingOnly}`, stageRef, zoom, width: NODE_WIDTH, height: NODE_HEIGHT, options: portLocks.options, setPorts: portLocks.set,
+    onCommit: async (edge, pair) => updateActiveView(view => ({ ...view, edges: view.edges.map(item => item.id === edge.id ? { ...item, ...pair, userEdited: true } : item) })),
+    onError: message => notify(message), messages: { self: "不能连接到同一个节点。", duplicate: "这两个节点之间已经存在同方向连接。", cycle: "不能改接成循环层级。", unavailable: "当前关系的改接保存接口尚未接通（B05），原连接保持不变。", failed: "连线改接保存失败，原连接保持不变。" } });
+  useEffect(() => {
+    if (!storageKey || readingOnly) return;
+    Object.entries(presentationByView).forEach(([id, value]) => writeGraphPresentation(`${storageKey}.presentation.${id}`, { lineStyle: value.lineStyle, direction: value.direction,
+      adaptiveNodes: [],
+    }));
+  }, [storageKey, readingOnly, presentationByView]);
+  const updatePresentation = (changes) => setPresentationByView(current => ({ ...current, [activeView.id]: { ...presentation, ...changes } }));
   const suppressClickRef = useRef(false);
   const viewSignature = views.map((view) => view.id).join("|");
+  const completeConnection = (connection, targetId, targetPort) => {
+    if (!connection || !targetId || targetId === connection.sourceId) return;
+    const edge = { id: `manual-edge-${Date.now()}`, source: connection.sourceId, target: targetId, sourcePort: connection.sourcePort, targetPort, label: "", status: "用户维护", tone: "info", observedAt: "刚刚", evidence: ["用户维护"] };
+    setViewStateById(current => {
+      const view = current[connection.viewId];
+      return view ? { ...current, [connection.viewId]: { ...view, edges: [...view.edges, edge] } } : current;
+    });
+    setSelectionByView(current => ({ ...current, [connection.viewId]: { kind: "edge", id: edge.id } }));
+    setDetailOpen(true);
+    notify("关系已添加；双击连线可以补充关系名称");
+  };
   useEffect(() => {
     setViewId((current) =>
       views.some((view) => view.id === current) ? current : views[0].id,
@@ -629,13 +633,13 @@ export function RelationshipCanvas({
     setZoom(1);
   }, [viewSignature]);
   useEffect(() => {
-    if (!storageKey) return;
+    if (!storageKey || readingOnly) return;
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(viewStateById));
     } catch {
       // The prototype remains usable when browser storage is unavailable.
     }
-  }, [storageKey, viewStateById]);
+  }, [storageKey, readingOnly, viewStateById]);
   useEffect(() => {
     if (!contextMenu) return undefined;
     const closeMenu = (event) => {
@@ -660,6 +664,7 @@ export function RelationshipCanvas({
         const dx = (event.clientX - drag.startX) / zoom;
         const dy = (event.clientY - drag.startY) / zoom;
         if (Math.abs(dx) + Math.abs(dy) > 4) {
+          if (!drag.moved) setPresentationByView(current => current[drag.viewId]?.undo ? { ...current, [drag.viewId]: { ...current[drag.viewId], undo: null } } : current);
           drag.moved = true;
           suppressClickRef.current = true;
         }
@@ -700,8 +705,9 @@ export function RelationshipCanvas({
           current
             ? {
                 ...current,
-                x2: (event.clientX - rect.left) / zoom,
-                y2: (event.clientY - rect.top) / zoom,
+                x2: (event.clientX - rect.left) / zoom + (Number(stageRef.current.dataset.originX) || 0),
+                y2: (event.clientY - rect.top) / zoom + (Number(stageRef.current.dataset.originY) || 0),
+                hit: graphPortHit(stageRef.current, event.clientX, event.clientY),
               }
             : current,
         );
@@ -710,39 +716,10 @@ export function RelationshipCanvas({
     const up = (event) => {
       if (connectionRef.current) {
         const connection = connectionRef.current;
-        const target = document
-          .elementFromPoint(event.clientX, event.clientY)
-          ?.closest(".s3-relationship-node");
-        const targetId = target?.dataset.nodeId;
-        if (targetId && targetId !== connection.sourceId) {
-          const edge = {
-            id: `manual-edge-${Date.now()}`,
-            source: connection.sourceId,
-            target: targetId,
-            label: "",
-            status: "用户维护",
-            tone: "info",
-            observedAt: "刚刚",
-            evidence: ["用户维护"],
-          };
-          setViewStateById((current) => {
-            const currentView = current[connection.viewId];
-            if (!currentView) return current;
-            return {
-              ...current,
-              [connection.viewId]: {
-                ...currentView,
-                edges: [...currentView.edges, edge],
-              },
-            };
-          });
-          setSelectionByView((current) => ({
-            ...current,
-            [connection.viewId]: { kind: "edge", id: edge.id },
-          }));
-          setDetailOpen(true);
-          notify("关系已添加；双击连线可以补充关系名称");
-        }
+        const hit = graphPortHit(stageRef.current, event.clientX, event.clientY);
+        const view = viewStateById[connection.viewId] || activeView;
+        const preview = graphConnectionPreview(view.nodes, connection.sourceId, connection.sourcePort, { x: 0, y: 0 }, hit, { direction: presentation.direction, style: presentation.lineStyle, width: NODE_WIDTH, height: NODE_HEIGHT });
+        completeConnection(connection, preview?.targetId, preview?.targetPort);
         connectionRef.current = null;
         setConnectionDraft(null);
       }
@@ -751,13 +728,21 @@ export function RelationshipCanvas({
         suppressClickRef.current = false;
       }, 0);
     };
+    const cancel = () => { connectionRef.current = null; setConnectionDraft(null); };
+    const escape = event => { if (event.key === "Escape" && connectionRef.current) { event.preventDefault(); cancel(); } };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", cancel);
+    window.addEventListener("blur", cancel);
+    window.addEventListener("keydown", escape);
     return () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", cancel);
+      window.removeEventListener("blur", cancel);
+      window.removeEventListener("keydown", escape);
     };
-  }, [notify, zoom]);
+  }, [notify, zoom, viewStateById, activeView, presentation.direction, presentation.lineStyle]);
   const selection =
     selectionByView[activeView.id] || activeView.defaultSelection;
   const activePan = panByView[activeView.id] || { x: 0, y: 0 };
@@ -769,6 +754,7 @@ export function RelationshipCanvas({
     () => relationshipCanvasSize(activeView.nodes),
     [activeView.nodes],
   );
+  const originX = canvasSize.minX || 0, originY = canvasSize.minY || 0;
   const selectedNodeId = selection.kind === "node" ? selection.id : null;
   const connectedEdges = new Set(
     selectedNodeId
@@ -816,6 +802,7 @@ export function RelationshipCanvas({
     setDetailOpen(true);
     setEditor(null);
     setContextMenu(null);
+    setHoveredEdgeId(null);
   };
   const updateActivePan = (next) =>
     setPanByView((current) => ({
@@ -830,6 +817,26 @@ export function RelationshipCanvas({
       ...current,
       [activeView.id]: updater(current[activeView.id] || activeView),
     }));
+  useGraphWheelZoom({ viewportRef, zoom, pan: activePan, onZoom: setZoom, onPan: updateActivePan, scopeKey: `${storageKey ?? ""}:${activeView.id}` });
+  const applyLayout = (direction) => {
+    reconnect.cancel();
+    const next = layoutGraph(activeView.nodes, activeView.edges, direction, { width: NODE_WIDTH, height: NODE_HEIGHT });
+    updatePresentation({ direction, undo: { positions: graphPositions(activeView.nodes), direction: presentation.direction, zoom, pan: activePan } });
+    updateActiveView(view => ({ ...view, nodes: next, edges: view.edges.map(edge => ({ ...edge, sourcePort: undefined, targetPort: undefined })) }));
+    portLocks.reset(next, direction);
+    const nextZoom = graphFitZoom(next, viewportRef.current, { width: NODE_WIDTH, height: NODE_HEIGHT });
+    updateActivePan(graphLayoutPan(next, viewportRef.current, nextZoom, direction, { width: NODE_WIDTH, height: NODE_HEIGHT }));
+    setZoom(nextZoom);
+    setHoveredEdgeId(null);
+  };
+  const restoreLayout = () => {
+    const undo = presentation.undo;
+    if (!undo) return;
+    updateActiveView(view => ({ ...view, nodes: projectGraphPositions(view.nodes, undo.positions) }));
+    updatePresentation({ direction: undo.direction, undo: null });
+    updateActivePan(undo.pan);
+    setZoom(undo.zoom);
+  };
   const saveEditor = (draft) => {
     const now = Date.now();
     if (editor.mode === "add-node") {
@@ -949,7 +956,7 @@ export function RelationshipCanvas({
   return (
     <>
       <section
-        className={`s3-relationship-workspace ${isFullscreen ? "is-fullscreen" : ""}`}
+        className={`s3-relationship-workspace ${isFullscreen ? "is-fullscreen" : ""} ${reconnect.active ? "is-reconnecting" : ""}`}
       >
         <header className="s3-relationship-header">
           {views.length > 1 ? (
@@ -988,6 +995,7 @@ export function RelationshipCanvas({
           className={`s3-relationship-body ${detailOpen ? "" : "is-detail-hidden"}`}
         >
           <div className="s3-relationship-canvas-shell">
+            <div className="s3-relationship-toolstrip">
             {editable ? (
               <div className="s3-relationship-actionbar">
                 <Button
@@ -1000,6 +1008,7 @@ export function RelationshipCanvas({
                 </Button>
               </div>
             ) : null}
+            <GraphPresentationControls lineStyle={presentation.lineStyle} direction={presentation.direction} onLineStyle={lineStyle => updatePresentation({ lineStyle })} onLayout={applyLayout} onUndo={restoreLayout} canUndo={Boolean(presentation.undo)} disabled={activeView.nodes.length < 2 || reconnect.pending} />
             <div className="s3-relationship-controls">
               <IconButton
                 icon="plus"
@@ -1014,10 +1023,10 @@ export function RelationshipCanvas({
               <IconButton
                 icon="minus"
                 label="缩小关系画布"
-                disabled={zoom <= 0.5}
+                disabled={zoom <= 0.1}
                 onClick={() =>
                   setZoom((value) =>
-                    Math.max(0.5, Number((value - 0.1).toFixed(1))),
+                    Math.max(0.1, Number((value - 0.1).toFixed(1))),
                   )
                 }
               />
@@ -1036,23 +1045,15 @@ export function RelationshipCanvas({
               />
               <span>{Math.round(zoom * 100)}%</span>
             </div>
+            </div>
             <div
+              ref={viewportRef}
               className="s3-relationship-viewport"
-              onWheel={(event) => {
-                event.preventDefault();
-                const direction = event.deltaY > 0 ? -0.1 : 0.1;
-                setZoom((value) =>
-                  Math.min(
-                    1.5,
-                    Math.max(0.5, Number((value + direction).toFixed(1))),
-                  ),
-                );
-              }}
               onPointerDown={(event) => {
                 if (
                   event.button !== 0 ||
                   event.target.closest(".s3-relationship-node") ||
-                  event.target.closest(".s3-relationship-edge") ||
+                  event.target.closest(".s3-relationship-edge, .graph-edge-handle") ||
                   event.target.closest(".s3-relationship-controls") ||
                   event.target.closest(".s3-relationship-actionbar")
                 )
@@ -1100,12 +1101,15 @@ export function RelationshipCanvas({
                 style={{
                   width: canvasSize.width,
                   height: canvasSize.height,
-                  transform: `translate(${activePan.x}px, ${activePan.y}px) scale(${zoom})`,
+                  transform: `translate(${activePan.x + originX * zoom}px, ${activePan.y + originY * zoom}px) scale(${zoom})`,
                 }}
+                data-origin-x={originX}
+                data-origin-y={originY}
               >
                 <svg
                   className="s3-relationship-edges"
-                  viewBox={`0 0 ${canvasSize.width} ${canvasSize.height}`}
+                  style={{ width: canvasSize.width, height: canvasSize.height }}
+                  viewBox={`${originX} ${originY} ${canvasSize.width} ${canvasSize.height}`}
                   aria-label={`${activeView.label}关系连线`}
                 >
                   <defs>
@@ -1126,25 +1130,15 @@ export function RelationshipCanvas({
                   {connectionDraft ? (
                     <path
                       className="s3-relationship-connection-draft"
-                      d={`M ${connectionDraft.x1} ${connectionDraft.y1} L ${connectionDraft.x2} ${connectionDraft.y2}`}
+                      d={graphConnectionPreview(activeView.nodes, connectionDraft.sourceId, connectionDraft.sourcePort, { x: connectionDraft.x2, y: connectionDraft.y2 }, connectionDraft.hit, { direction: presentation.direction, style: presentation.lineStyle, width: NODE_WIDTH, height: NODE_HEIGHT })?.path}
                       markerEnd="url(#s3-arrow-info)"
                     />
                   ) : null}
-                  {activeView.edges.map((edge, index) => {
+                  {activeView.edges.slice().sort((a, b) => Number(a.id === hoveredEdgeId) - Number(b.id === hoveredEdgeId)).map((edge) => {
                     const source = nodesById[edge.source];
                     const target = nodesById[edge.target];
-                    const path = edgePath(
-                      source,
-                      target,
-                      index,
-                      activeView.layout,
-                    );
-                    const point = edgeLabelPoint(
-                      source,
-                      target,
-                      index,
-                      activeView.layout,
-                    );
+                    if (!source || !target) return null;
+                    const { path, x, y } = graphEdgeGeometry(source, target, { direction: presentation.direction, style: presentation.lineStyle, width: NODE_WIDTH, height: NODE_HEIGHT, ...portLocks.options(edge) });
                     const active =
                       (selection.kind === "edge" && selection.id === edge.id) ||
                       connectedEdges.has(edge.id);
@@ -1152,6 +1146,10 @@ export function RelationshipCanvas({
                       <g
                         className={`s3-relationship-edge is-${edge.tone} ${active ? "is-active" : ""}`}
                         data-edge-id={edge.id}
+                        data-source={edge.source}
+                        data-target={edge.target}
+                        onPointerEnter={(event) => { if (event.pointerType !== "touch" && !window.matchMedia?.("(pointer: coarse)")?.matches) setHoveredEdgeId(edge.id); }}
+                        onPointerLeave={() => setHoveredEdgeId(null)}
                         key={edge.id}
                         role="button"
                         tabIndex="0"
@@ -1190,15 +1188,15 @@ export function RelationshipCanvas({
                             "--s3-edge-width": `${edge.width || 1.5}px`,
                           }}
                         />
-                        {edge.label ? (
+                        {edge.label && hoveredEdgeId === edge.id ? (
                           <g
                             className="s3-relationship-edge-label"
-                            transform={`translate(${point.x}, ${point.y})`}
+                            transform={`translate(${x}, ${y})`}
                           >
                             <rect
-                              x="-48"
+                              x={-Math.max(96, edge.label.length * 12 + 20) / 2}
                               y="-10"
-                              width="96"
+                              width={Math.max(96, edge.label.length * 12 + 20)}
                               height="20"
                               rx="4"
                             />
@@ -1214,6 +1212,7 @@ export function RelationshipCanvas({
                     );
                   })}
                 </svg>
+                {reconnect.draft ? <svg className="s3-relationship-edges" style={{ width: canvasSize.width, height: canvasSize.height, pointerEvents: "none" }} viewBox={`${originX} ${originY} ${canvasSize.width} ${canvasSize.height}`} aria-hidden="true"><path className="graph-reconnect-draft" d={reconnect.preview(presentation.lineStyle)?.path} markerEnd="url(#s3-arrow-info)" /></svg> : null}
                 {activeView.nodes.map((node) => {
                   const active =
                     selection.kind === "node" && selection.id === node.id;
@@ -1225,7 +1224,9 @@ export function RelationshipCanvas({
                       className={`s3-relationship-node is-${node.kind} is-${node.tone} ${active ? "is-active" : ""} ${draggable || editable ? "is-draggable" : ""}`}
                       aria-pressed={active}
                       key={node.id}
-                      style={{ left: node.x, top: node.y }}
+                      data-world-x={node.x}
+                      data-world-y={node.y}
+                      style={{ left: node.x - originX, top: node.y - originY }}
                       onPointerDown={(event) => {
                         if (
                           (!draggable && !editable) ||
@@ -1236,6 +1237,8 @@ export function RelationshipCanvas({
                         )
                           return;
                         event.preventDefault();
+                        if (event.pointerType === "touch") event.currentTarget.focus({ preventScroll: true });
+                        portLocks.freeze();
                         select("node", node.id);
                         dragRef.current = {
                           viewId: activeView.id,
@@ -1255,6 +1258,15 @@ export function RelationshipCanvas({
                         if (editable) {
                           setEditor({ mode: "edit-node", item: node });
                         }
+                      }}
+                      onKeyDown={event => {
+                        const connection = connectionRef.current;
+                        if (!connection?.keyboard || event.key !== "Enter" && event.key !== " ") return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        completeConnection(connection, node.id);
+                        connectionRef.current = null;
+                        setConnectionDraft(null);
                       }}
                       onContextMenu={(event) => {
                         if (!editable) return;
@@ -1293,35 +1305,37 @@ export function RelationshipCanvas({
                       </span>
                       {node.tone === "warning" ? <Icon name="warning" /> : null}
                       {editable ? (
-                        <span
-                          role="button"
-                          tabIndex="0"
-                          className="s3-relationship-node-connector"
-                          aria-label={`从${node.label}开始连线`}
-                          data-tooltip="拖到另一个节点建立关系"
-                          onPointerDown={(event) => {
-                            if (event.button !== 0) return;
-                            event.preventDefault();
-                            event.stopPropagation();
+                        <GraphNodePorts label={node.label} className="s3-relationship-node-connector" destination={reconnect.active} activeSide={connectionDraft?.sourceId === node.id ? connectionDraft.sourcePort : undefined}
+                          onStart={(sourcePort, keyboard) => {
+                            if (reconnect.active) { void reconnect.choose(node.id, sourcePort); return; }
+                            if (reconnect.pending) return;
+                            const point = graphPortPoint(node, sourcePort, { width: NODE_WIDTH, height: NODE_HEIGHT });
                             connectionRef.current = {
                               viewId: activeView.id,
                               sourceId: node.id,
+                              sourcePort,
+                              keyboard,
                             };
                             setConnectionDraft({
                               sourceId: node.id,
-                              x1: node.x + NODE_WIDTH,
-                              y1: node.y + NODE_HEIGHT / 2,
-                              x2: node.x + NODE_WIDTH + 24,
-                              y2: node.y + NODE_HEIGHT / 2,
+                              sourcePort,
+                              x1: point.x,
+                              y1: point.y,
+                              x2: point.x + (sourcePort === "left" ? -24 : sourcePort === "right" ? 24 : 0),
+                              y2: point.y + (sourcePort === "top" ? -24 : sourcePort === "bottom" ? 24 : 0),
                             });
                           }}
-                        >
-                          <Icon name="plus" />
-                        </span>
+                        />
                       ) : null}
                     </button>
                   );
                 })}
+                {editable && !readingOnly && selection.kind === "edge" ? (() => {
+                  const edge = activeView.edges.find(item => item.id === selection.id);
+                  return edge ? <GraphEdgeHandles points={reconnect.endpoints(edge)} originX={originX} originY={originY} zoom={zoom} pending={reconnect.pending} labels={{ source: "调整连线起点", target: "调整连线终点" }} onStart={(end, keyboard, pointerId) => {
+                    connectionRef.current = null; setConnectionDraft(null); dragRef.current = null; panRef.current = null; reconnect.start(edge, end, keyboard, pointerId);
+                  }} /> : null;
+                })() : null}
               </div>
             </div>
           </div>
@@ -1333,6 +1347,8 @@ export function RelationshipCanvas({
               onDecision={onDecision}
               onSelect={select}
               onClose={() => setDetailOpen(false)}
+              onEdit={editable && !readingOnly ? () => { const item = selection.kind === "node" ? activeView.nodes.find(node => node.id === selection.id) : activeView.edges.find(edge => edge.id === selection.id); if (item) setEditor({ mode: selection.kind === "node" ? "edit-node" : "edit-edge", item }); } : undefined}
+              onDelete={editable && !readingOnly ? () => { const item = selection.kind === "node" ? activeView.nodes.find(node => node.id === selection.id) : activeView.edges.find(edge => edge.id === selection.id); if (item) setDeleteTarget({ ...item, kind: selection.kind }); } : undefined}
               onOpenEvidence={(label, selected) =>
                 setEvidencePreview({
                   label,
