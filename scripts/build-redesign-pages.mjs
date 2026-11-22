@@ -45,7 +45,7 @@ const HOME_OG = { zh: ogOf("index.html"), en: ogOf("en/index.html") };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 
-// 列表和页脚的顺序：先是首页上的八个核心能力（看清、找人、沉淀），再是三篇通用的
+// 列表和页脚的顺序：先是首页上的八个核心能力（看清楚、找到人、留得住），再是三篇通用的
 const CAPS = [
   "industry-primer",
   "business-development",
@@ -93,7 +93,7 @@ const LOCALES = {
         "HunterBuddy 的八个核心能力和三篇实务文章：行业入门、客户研判、组织架构 Mapping、多源寻访、人岗双向匹配、身份核实、人选转介绍和人才库，每一篇都讲清它解决什么问题、怎么做、边界在哪里。",
       kicker: "使用场景",
       h1: "使用场景",
-      lead: "八件事，三步走：看清、找人、沉淀。每一篇讲清这一步难在哪里、HunterBuddy 怎么做，以及哪些仍然由你判断。",
+      lead: "八件事，三步走：看清楚、找到人、留得住。每一篇讲清这一步难在哪里、HunterBuddy 怎么做，以及哪些仍然由你判断。",
     },
     // 页脚“使用场景”一栏：八个核心能力（和首页同一顺序），最后一行“全部 >>”
     footerCases: [
@@ -125,7 +125,7 @@ const LOCALES = {
     capBound: "边界",
     capNext: "看下一个能力",
     capBack: "回到核心能力总览",
-    capBackLine: "八件事，三步走：看清、找人、沉淀。",
+    capBackLine: "八件事，三步走：看清楚、找到人、留得住。",
     trialTitle: "申请 HunterBuddy 试用",
     trialBody: "当前采用邀请制。你留下信息后，我们会结合你的招聘方向、岗位类型与团队场景，确认试用安排。",
     example: T.example,

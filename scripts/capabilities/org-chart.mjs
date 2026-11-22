@@ -3,11 +3,11 @@
 export default {
   "slug": "org-chart",
   "no": "03",
-  "group": "看清",
+  "group": "看清楚",
   "name": "组织架构 Mapping",
   "title": "组织架构 Mapping：把一群人，还原成一张组织图｜HunterBuddy",
   "description": "组织架构 Mapping 是一项把公开线索整理成可追溯组织图的能力，它区分在职核心成员、双聘人员、联合培养与已离职人员，并对负责人做在职性校验。",
-  "kicker": "核心能力 03 · 看清",
+  "kicker": "核心能力 03 · 看清楚",
   "h1": "组织架构 Mapping：把一群人，还原成一张组织图",
   "definition": "组织架构 Mapping 是一项把公开线索整理成可追溯组织图的能力，它区分在职核心成员、双聘人员、联合培养与已离职人员，并对负责人做在职性校验。",
   "intro": [

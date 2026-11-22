@@ -160,12 +160,12 @@ r('aria-label="HunterBuddy 产品演示短片"', 'aria-label="HunterBuddy produc
 
 # ---------- eight capabilities: heading ----------
 r('<p class="n-kicker">01 · 核心能力</p>', '<p class="n-kicker">01 · Capabilities</p>')
-r('<h2 class="n-h2" id="n-caps-title">看清谁、找到谁、留住谁</h2>', '<h2 class="n-h2" id="n-caps-title">Know them, find them, keep them</h2>')
+r('<h2 class="n-h2" id="n-caps-title">看清楚、找到人、留得住</h2>', '<h2 class="n-h2" id="n-caps-title">Know them, find them, keep them</h2>')
 r('八件事，三步走。先看懂行业、客户和组织，再多源召回、人岗匹配、核实身份，最后把每一次判断沉淀成下次能直接用的资产。每一步都保留来源、状态和人工确认点。',
   'Eight capabilities in three steps. First understand the industry, the client and the organization, then search across sources, match people to roles and confirm identities, and turn every judgment into an asset you can use next time. Every step keeps its sources, its status and the points where you confirm.')
-r('<i>找人</i>', '<i>Find</i>')
-r('<i>看清</i>', '<i>Know</i>')   # not "Assess": HunterBuddy never judges people
-r('<i>沉淀</i>', '<i>Keep</i>')
+r('<i>找到人</i>', '<i>Find</i>')
+r('<i>看清楚</i>', '<i>Know</i>')   # not "Assess": HunterBuddy never judges people
+r('<i>留得住</i>', '<i>Keep</i>')
 
 # 01 multi-source sourcing — scene
 r('<span class="fx-cap">读懂需求</span><b>视觉算法负责人 · 机器人方向</b>', '<span class="fx-cap">Brief</span><b>Head of Computer Vision · robotics</b>')
