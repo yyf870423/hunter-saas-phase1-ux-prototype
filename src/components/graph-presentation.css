@@ -1,0 +1,67 @@
+/* Keep geometry synchronous even when global reduced-motion rules set a duration. */
+.tg-canvas-size,
+.tg-canvas-stage,
+.tg-edge-layer,
+.s3-relationship-stage,
+.s3-relationship-edges { transition-property: none; }
+.tg-canvas-scroll,
+.s3-relationship-viewport { overflow-anchor: none; }
+
+.graph-presentation-controls {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.graph-presentation-controls .s4-select > button {
+  height: 28px;
+  min-height: 28px;
+  padding: 0 8px;
+  gap: 8px;
+  font-size: 12px;
+}
+.graph-presentation-controls .s1-icon-button { width: 28px; height: 28px; }
+.graph-presentation-controls .s4-select-value-icon { width: 14px; height: 14px; }
+.tg-presentation-controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 8;
+  max-width: calc(100% - 20px);
+  padding: 5px;
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+  background: var(--s1-surface);
+}
+.s3-relationship-toolstrip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px;
+  border-bottom: 1px solid var(--s1-line);
+  background: var(--s1-surface);
+}
+.s3-relationship-toolstrip > .s3-relationship-actionbar,
+.s3-relationship-toolstrip > .s3-relationship-controls {
+  position: static;
+  max-width: none;
+  box-shadow: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.s3-relationship-toolstrip > .s3-relationship-controls { margin-left: auto; }
+.s3-relationship-canvas-shell:has(> .s3-relationship-toolstrip) { display: flex; flex-direction: column; }
+.s3-relationship-toolstrip + .s3-relationship-viewport { flex: 1; height: auto; min-height: 0; }
+.s3-relationship-viewport { position: relative; }
+.s3-relationship-viewport > .s3-relationship-stage { position: absolute; top: 0; left: 0; }
+.s3-relationship-workspace .s3-relationship-node:hover { transform: none; }
+.tg-edge-hit:focus-visible { outline: none; stroke: color-mix(in srgb, var(--s1-accent) 25%, transparent); }
+@media (max-width: 760px) {
+  .graph-presentation-controls { gap: 4px; }
+  .s3-relationship-toolstrip { gap: 6px; }
+}

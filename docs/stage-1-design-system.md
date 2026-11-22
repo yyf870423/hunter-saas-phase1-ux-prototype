@@ -4,6 +4,12 @@
 
 ## 一、设计原则
 
+2026-11-22拖线预览扩展（本地待验收）：公共`graphPathGeometry`供正式线及新建/改接虚线共用，`graph-connection-preview`统一自由端、目标端口及改起点方向。两类画布均按当前线形展示，无新增样式或节点避让，不改只读/保存合同，用户验收后推送。
+
+2026-11-22端点改接扩展（本地待验收）：公共`GraphEdgeHandles`/`useGraphReconnect`供知识图谱与资产关系画布共用，选中线后显露两端拖柄，复用四侧`GraphNodePorts`完成同节点换面/跨节点改接，保持键盘、触摸、取消与只读边界。自然线仅按固定两端画平滑C段，用户最新取消节点避让，不保留A*及异形绕行。CSS同源，拖柄无位置过渡，缩小仍保持可点击尺寸；不新增单页样式或后台API。
+
+2026-11-22图谱公共交互扩展（本地待验收）：`useGraphEdgePorts`统一普通拖动固定端口及新层级连接选点，`graph-presentation-storage`按作用域保存方向/线形；知识图谱和RelationshipCanvas共用，不单页实现。现有自动/手动布局保存沿用，readonly不写快照。详见`docs/graph-presentation-prototype-20261121.md`最新追加，尚未推送。
+
 1. 采用 WorkBuddy 的持续工作区层级和 Vercel Geist 的清晰视觉语言，不复制任何单一产品页面。
 2. 页面背景、内容表面和浮层形成三层深度；侧栏在浅色模式使用低对比冷白灰形成安静边界，在深色模式使用冷炭黑形成稳定识别区，两种主题使用不同明度但保持相同信息层级；亮蓝色只强调当前导航、主操作和需要注意的系统状态，不使用装饰性卡片墙和大面积渐变。
 3. 业务优先级通过尺寸、位置、留白和边界表达，不依靠堆叠说明文字。
@@ -27,6 +33,12 @@
 | 阴影     | 控件、普通浮层、Modal 和 Tooltip 四级；页面区块默认不使用阴影 |
 
 ## 三、产品级组件
+
+2026-11-21本地原型：新增共享`GraphPresentationControls`（复用SelectMenu，预留的撤销入口复用IconButton/TooltipText）、`graph-presentation.js`（Dagre双侧自动布局、XYFlow圆角直角路径、坐标投影）及作用域样式。两类画布统一提供自然曲线/直角线、根节点居中的左/右及上/下双侧布局；用户要求先隐藏撤销布局入口，默认`showUndo=false`，不影响原有业务撤销。Icon使用lucide扩展曲线、直角、水平/垂直布局及撤销；SelectMenu仅新增可选`ariaLabel`，不改变已有调用。节点/关系详情文字不隐藏，画布关系标注仅悬停时出现。影响清单和只读边界见`graph-presentation-prototype-20261121.md`，待验收、不发布。
+
+2026-11-22追加：公共`GraphNodePorts`覆盖可建关系节点，默认隐藏，hover显示四边中点圆点；20px交互区域、8px圆点，键盘/触屏可聚焦显示。两类画布使用共享四向端点/边界工具，世界坐标支持负值，显示原点补偿不改变保存坐标。节点与SVG几何层不使用位置/尺寸过渡；关系画布不随扩展拉长页面，节点hover不单独上浮。端口只是前端偏好，不能凭此新增后端能力，见`graph-presentation-prototype-20261121.md`追加章节。
+
+2026-11-22鼠标中心缩放：公共`useGraphWheelZoom`与`graphZoomAtPoint`供两类画布复用，wheel锚定鼠标下的世界坐标，非被动监听阻止页面滚动。原生scroll量折算进pan，在绘制前归零，避免连续缩小时被滚动范围夹断；仅改变相机，不写节点或业务数据。保留工具栏命令、缩放步长和10%–150%范围。4条双端流程、48项锚点检查及12组算法对照通过，最新记录见round4第28号和`graph-presentation-prototype-20261121.md`。
 
 2026-11-20已审批局部修复同步：公共`Icon`新增`maximize2 / minimize2`，直接复用lucide-react 0.468.0的`Maximize2 / Minimize2`，保持18px默认尺寸、1.8描边及既有无障碍规则。图谱全屏使用该图标对，自适应继续使用原四角框`maximize`，不得复用同一图形；工具提示复用`TooltipText`，不新增另一套SVG或控件样式。
 

@@ -50,9 +50,10 @@ test("拖动重设父节点后首帧起节点与新连线连续八帧对齐", as
           const end = line?.getPointAtLength(line.getTotalLength()), start = line?.getPointAtLength(0);
           const screenEnd = end?.matrixTransform(line.getScreenCTM()), screenStart = start?.matrixTransform(line.getScreenCTM());
           const box = node.getBoundingClientRect(), parentBox = parent.getBoundingClientRect();
+          const portError = (point, rect) => Math.min(...[[rect.left + rect.width / 2, rect.top], [rect.right, rect.top + rect.height / 2], [rect.left + rect.width / 2, rect.bottom], [rect.left, rect.top + rect.height / 2]].map(([x, y]) => Math.max(Math.abs(point.x - x), Math.abs(point.y - y))));
           frames.push({
             hasNewLine: Boolean(line), hasOldLine: Boolean(oldLine),
-            error: screenEnd ? Math.max(Math.abs(screenEnd.x - box.left), Math.abs(screenEnd.y - (box.top + box.height / 2)), Math.abs(screenStart.x - parentBox.right), Math.abs(screenStart.y - (parentBox.top + parentBox.height / 2))) : null,
+            error: screenEnd ? Math.max(portError(screenEnd, box), portError(screenStart, parentBox)) : null,
           });
           if (frames.length < 8) requestAnimationFrame(sample); else resolve(frames);
         };

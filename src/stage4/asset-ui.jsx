@@ -243,6 +243,7 @@ export function FloatingPanel({
 
 export function SelectMenu({
   label,
+  ariaLabel,
   value,
   options,
   onChange,
@@ -318,6 +319,7 @@ export function SelectMenu({
     >
       <button
         type="button"
+        aria-label={ariaLabel}
         aria-expanded={open}
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
@@ -1533,6 +1535,8 @@ export function DeleteAssetModal({
   assetName,
   impact,
   onConfirm,
+  description,
+  confirmLabel,
 }) {
   const [busy, setBusy] = useState(false);
   useEffect(() => {
@@ -1544,7 +1548,7 @@ export function DeleteAssetModal({
       close={close}
       closeDisabled={busy}
       title={`删除${assetLabel}`}
-      description={`“${assetName}”将进入回收站 30 天`}
+      description={description ?? `“${assetName}”将进入回收站 30 天`}
       footer={
         <>
           <Button disabled={busy} onClick={close}>
@@ -1561,7 +1565,7 @@ export function DeleteAssetModal({
               }, 550);
             }}
           >
-            删除并进入回收站
+            {confirmLabel ?? "删除并进入回收站"}
           </Button>
         </>
       }
