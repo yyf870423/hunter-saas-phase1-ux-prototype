@@ -1,8 +1,29 @@
-# TalentBuddy English: glossary and voice
+# HunterBuddy English: glossary and voice
 
-> 2026-11-02: the product was renamed from HunterBuddy to TalentBuddy and repositioned as AI for hiring R&D talent (search consultants, HR and talent leads, CTOs and engineering leaders). The film’s six chapter cards and its cover now use the new names too.
+> 2026-11-21: the product is **HunterBuddy** again, repositioned as the AI workbench for senior tech talent search (高阶技术人才寻访的 AI 工作台), for HR teams and professional headhunters (面向 HR 与专业猎头). The homepage now has eight capabilities in three groups, each with its own page. The names in “HunterBuddy names (2026-11-21)” below replace the TalentBuddy names wherever they differ; the older tables are kept for reading old drafts.
+>
+> 2026-11-02 (superseded): the product was renamed from HunterBuddy to TalentBuddy and repositioned as AI for hiring R&D talent.
 
-This guide is shared by the English homepage (`public/landing-redesign/en/`), the nine English use-case pages (`scripts/articles-en/`) and the English film. When a Chinese term below appears, use the English given here, every time.
+## HunterBuddy names (2026-11-21)
+
+| Chinese | English | Short label |
+|---|---|---|
+| HunterBuddy（2026-11-21 起） | HunterBuddy (one word, never translated) | HunterBuddy |
+| 高阶技术人才寻访的 AI 工作台 | the AI workbench for senior tech talent search | — |
+| AI 人才工作台 | AI talent workbench | — |
+| 面向 HR 与专业猎头 | for HR teams and professional headhunters | For HR and professional headhunters |
+| 找人 · 看清 · 沉淀 | Find · Know · Keep | Find / Know / Keep |
+| 多源寻访 | multi-source sourcing | Multi-source sourcing |
+| 人岗双向匹配 | two-way job matching | Two-way job matching |
+| 身份核实 | identity checks | Identity checks |
+| 组织架构 Mapping | org mapping (the work), org chart (the result) | Org mapping |
+| 客户研判 | client research (no longer “BD client research”) | Client research |
+| 人选转介绍 | referrals; 桥接人 = bridge | Referrals |
+| 人才库 | talent pool | Talent pool |
+| 行业入门 | industry primer | Industry primer |
+| 产品演示 | product demo | Product demo |
+| 聚焦方向 | focus areas | Focus areas |
+| 待确认 | “To confirm” | To confirm |
 
 ## The bar: faithful, clear, elegant (信、达、雅)
 

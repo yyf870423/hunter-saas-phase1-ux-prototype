@@ -9,8 +9,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const HUB = "ai-assistant-for-headhunters";
 export const PUBLISHED = "2026-10-25";
-// the last content update: 2026-11-02 the product became TalentBuddy, AI for hiring R&D talent
-export const MODIFIED = "2026-11-02";
+// the last content update: 2026-11-21 the product is HunterBuddy again (高阶技术人才寻访的 AI 工作台), and six of the
+// articles became capability pages (scripts/capabilities/)
+export const MODIFIED = "2026-11-21";
 
 export async function loadArticles() {
   const dir = resolve(root, "scripts/articles");
@@ -41,7 +42,7 @@ export function checkArticleEn(a) {
   if (a.slug !== "ai-tools-compared")
     for (const name of ["Doubao", "DeepSeek", "ChatGPT", "Liepin", "LinkedIn", "Maimai", "BOSS Zhipin"])
       if (all.includes(name)) problems.push(`platform "${name}" only in ai-tools-compared`);
-  if (!/ \| TalentBuddy$/.test(a.title)) problems.push('title must end with " | TalentBuddy"');
+  if (!/ \| HunterBuddy$/.test(a.title)) problems.push('title must end with " | HunterBuddy"');
   if (a.description.length < 120 || a.description.length > 170) problems.push(`description is ${a.description.length} characters`);
   if (a.faq.length < 3) problems.push("fewer than 3 FAQs");
   return problems;
@@ -62,8 +63,37 @@ export function checkArticle(a) {
   if (a.slug !== "ai-tools-compared")
     for (const name of ["豆包", "DeepSeek", "ChatGPT", "猎聘", "领英", "脉脉", "BOSS直聘"])
       if (all.includes(name)) problems.push(`平台名“${name}”只能出现在对比那一篇`);
-  if (!/｜TalentBuddy$/.test(a.title)) problems.push("title 要以“｜TalentBuddy”结尾");
+  if (!/｜HunterBuddy$/.test(a.title)) problems.push("title 要以“｜HunterBuddy”结尾");
   if (a.faq.length < 3) problems.push("常见问题少于 3 条");
+  return problems;
+}
+
+// 核心能力的八篇（2026-11-21 起替换六篇旧文章、新增两篇）：scripts/capabilities/<slug>.mjs，英文在 scripts/capabilities-en/。
+// 正文照产品方定稿的文案，规矩只查结构和格式（平台名等措辞以定稿为准）。
+async function loadDir(name) {
+  const dir = resolve(root, `scripts/${name}`);
+  let files = [];
+  try {
+    files = (await readdir(dir)).filter((f) => f.endsWith(".mjs"));
+  } catch {
+    return [];
+  }
+  const list = [];
+  for (const file of files) list.push({ ...(await import(pathToFileURL(resolve(dir, file)).href)).default, cap: true });
+  return list.sort((a, b) => a.no.localeCompare(b.no));
+}
+export const loadCapabilities = () => loadDir("capabilities");
+export const loadCapabilitiesEn = () => loadDir("capabilities-en");
+export function checkCapability(a, en = false) {
+  const problems = [];
+  const all = JSON.stringify(a);
+  if (all.includes("；")) problems.push(en ? "Chinese semicolon" : "中文分号");
+  if (all.includes("**")) problems.push(en ? "leftover **" : "残留 **");
+  if (en && /[\u4e00-\u9fff]/.test(all)) problems.push("Chinese characters");
+  if (!(en ? / \| HunterBuddy$/ : /｜HunterBuddy$/).test(a.title)) problems.push(en ? 'title must end with " | HunterBuddy"' : "title 要以“｜HunterBuddy”结尾");
+  for (const key of ["pains", "how"])
+    if (!a[key] || a[key].items.length < 5 || a[key].items.some(([t, b]) => !t || !b)) problems.push(`${key} 不完整`);
+  if (!a.definition || !a.boundary) problems.push(en ? "missing definition or boundary" : "缺定义句或边界");
   return problems;
 }
 

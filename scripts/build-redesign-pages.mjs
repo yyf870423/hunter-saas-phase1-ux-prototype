@@ -1,8 +1,9 @@
 // 改版首页（public/landing-redesign/）配套的“使用场景”页面，中英文各一套，用改版首页的头部、页脚和字体：
 //   landing-redesign/use-cases/index.html             使用场景列表（中文）
-//   landing-redesign/use-cases/<slug>/index.html      九篇（中文）：客户开发（由原来的客户开发场景页改写成同一格式）和八篇实务文章
+//   landing-redesign/use-cases/<slug>/index.html      十一篇（中文）：八篇核心能力（scripts/capabilities/，2026-11-21 起替换了
+//                                                      六篇旧文章、新增人选转介绍和行业入门）和三篇通用的实务文章
 //   landing-redesign/en/use-cases/index.html          Use cases（英文列表）
-//   landing-redesign/en/use-cases/<slug>/index.html   九篇英文，和中文一一对应（scripts/articles-en/，术语见 docs/en-glossary.md）
+//   landing-redesign/en/use-cases/<slug>/index.html   十一篇英文，和中文一一对应（scripts/capabilities-en/、scripts/articles-en/，术语见 docs/en-glossary.md）
 //   landing-redesign/{privacy,terms,dpa}/index.html     法律页面：隐私政策、服务条款、数据处理协议（scripts/legal/zh.mjs）
 //   landing-redesign/en/{privacy,terms,dpa}/index.html  英文对应稿（scripts/legal/en.mjs），中文为准
 // 2026-10-25 起“使用场景”和“文章”合并：原来四个场景页里组织架构、职位寻访、人选维护三页和文章内容重复，去掉，
@@ -16,8 +17,7 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COMMON } from "./use-cases/content.mjs";
-import { PAGES } from "./use-cases/pages.mjs";
-import { PUBLISHED, MODIFIED, checkArticle, checkArticleEn, loadArticles, loadArticlesEn } from "./build-articles.mjs";
+import { PUBLISHED, MODIFIED, checkArticle, checkArticleEn, checkCapability, loadArticles, loadArticlesEn, loadCapabilities, loadCapabilitiesEn } from "./build-articles.mjs";
 import { LEGAL_ZH, UPDATED as LEGAL_UPDATED, EFFECTIVE as LEGAL_EFFECTIVE } from "./legal/zh.mjs";
 import { LEGAL_EN } from "./legal/en.mjs";
 
@@ -30,7 +30,7 @@ const orgOf = (L) => ({
   logo: { "@type": "ImageObject", url: `${SITE}apple-touch-icon.png`, width: 180, height: 180 },
 });
 const OUT = resolve(root, "public/landing-redesign");
-const V = { redesign: "27", subpage: "20261026-legal3", subpageJs: "20261025-en" };
+const V = { redesign: "31", subpage: "20261121-cap", subpageJs: "20261025-en" };
 // the share card shown when a link is pasted into Feishu, LinkedIn and the like (1200×630, the film's last scene);
 // the articles keep their own pictures, the lists and the legal pages use the share card
 const shareOf = (L) => ({ image: `${SITE}assets/${L.key === "zh" ? "share-card.jpg" : "share-card-en.jpg"}`, imageSize: [1200, 630] });
@@ -45,18 +45,18 @@ const HOME_OG = { zh: ogOf("index.html"), en: ogOf("en/index.html") };
 const HUB = "ai-assistant-for-headhunters";
 const T = COMMON.zh;
 
-// 列表和页脚的顺序：按一个职位从客户开发走到人选维护，再是几篇通用的
-const ORDER = [
+// 列表和页脚的顺序：先是首页上的八个核心能力（看清、找人、沉淀），再是三篇通用的
+const CAPS = [
+  "industry-primer",
   "business-development",
   "org-chart",
   "finding-candidates",
   "job-matching",
   "same-name-candidates",
+  "referrals",
   "talent-pool",
-  "headhunter-consultant",
-  "ai-assistant-for-headhunters",
-  "ai-tools-compared",
 ];
+const ORDER = [...CAPS, "headhunter-consultant", "ai-assistant-for-headhunters", "ai-tools-compared"];
 
 /* ---------- the two languages ---------- */
 // dir: the folder under landing-redesign; site: the public address of that language's home
@@ -68,17 +68,17 @@ const LOCALES = {
     dir: "",
     site: SITE,
     siteName: "铂寻 Boseek",
-    titleSuffix: /｜TalentBuddy$/,
+    titleSuffix: /｜HunterBuddy$/,
     skip: "跳到正文",
     homeLabel: "铂寻 Boseek 首页",
     logo: { src: "../landing-origin/assets/boseek-b5-dark.svg", alt: "Boseek 铂寻", w: 150, h: 54 },
     footLogo: { src: "../landing-origin/assets/boseek-b5.svg", alt: "Boseek 铂寻", w: 150, h: 54 },
     navLabel: "主导航",
     nav: [
-      ["产品短片", "film"],
+      ["产品演示", "film"],
       ["核心能力", "capabilities"],
       ["产品边界", "belief"],
-      ["研发领域", "industries"],
+      ["聚焦方向", "industries"],
       ["常见问题", "faq"],
     ],
     apply: "申请试用",
@@ -88,26 +88,30 @@ const LOCALES = {
     home: "首页",
     list: {
       name: "使用场景",
-      title: "使用场景：研发人才招聘的找人、人岗匹配、组织架构图、人才库与猎头客户开发｜TalentBuddy",
+      title: "使用场景：客户研判、组织架构 Mapping、多源寻访、人岗双向匹配、身份核实与人才库｜HunterBuddy",
       description:
-        "写给猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人的使用场景：怎么从论文、专利和代码里找研发人才，人岗匹配怎么做，目标公司的组织架构图怎么画，同名候选人怎么区分，人才库怎么建，以及猎头怎么开发研发型企业客户。",
+        "HunterBuddy 的八个核心能力和三篇实务文章：行业入门、客户研判、组织架构 Mapping、多源寻访、人岗双向匹配、身份核实、人选转介绍和人才库，每一篇都讲清它解决什么问题、怎么做、边界在哪里。",
       kicker: "使用场景",
       h1: "使用场景",
-      lead: "围绕研发人才招聘的各个环节，讲清一般怎么做、难在哪里、TalentBuddy 交回哪些结果，以及哪些还要你自己判断。",
+      lead: "八件事，三步走：看清、找人、沉淀。每一篇讲清这一步难在哪里、HunterBuddy 怎么做，以及哪些仍然由你判断。",
     },
-    // 页脚“使用场景”一栏：四篇主要的（链接文字用各篇的主攻词），最后一行“全部 >>”
+    // 页脚“使用场景”一栏：八个核心能力（和首页同一顺序），最后一行“全部 >>”
     footerCases: [
-      ["business-development", "客户开发"],
-      ["org-chart", "组织架构图"],
-      ["finding-candidates", "猎头怎么找人"],
-      ["job-matching", "人岗匹配"],
+      ["industry-primer", "行业入门"],
+      ["business-development", "客户研判"],
+      ["org-chart", "组织架构 Mapping"],
+      ["finding-candidates", "多源寻访"],
+      ["job-matching", "人岗双向匹配"],
+      ["same-name-candidates", "身份核实"],
+      ["referrals", "人选转介绍"],
+      ["talent-pool", "人才库"],
     ],
     all: "全部 &gt;&gt;",
     groups: ["产品", "使用场景", "法律"],
     // 页脚“法律”一栏，链到三个法律页面
     legal: [["privacy", "隐私政策"], ["terms", "服务条款"], ["dpa", "数据处理协议"]],
     legalPage: { kicker: "法律", keys: "要点", updated: "更新日期", effective: "生效日期", others: "其他法律文件", byline: "铂寻 Boseek", tableLabel: "表格" },
-    footNotes: ["TalentBuddy：先人一步，锁定研发人才。", "铂寻为猎头顾问、企业 HR 与招聘负责人、CTO 与技术负责人打造。"],
+    footNotes: ["HunterBuddy，高阶技术人才寻访的 AI 工作台。", "由铂寻 Boseek 为 HR 与专业猎头打造。"],
     contact: "联系我们：",
     metaLabel: "版权、网站主体与备案信息",
     meta: ["&copy; <span data-footer-year>2026</span> 铂寻 Boseek", "网站域名：www.boseekai.com", "网站主体：北京铂寻智能科技有限公司"],
@@ -117,8 +121,13 @@ const LOCALES = {
     faqKicker: "常见问题",
     faqTitle: ["关于这件事，", "大家常问这些。"],
     readMore: "阅读全文",
-    trialTitle: T.trialTitle,
-    trialBody: T.trialBody,
+    // 核心能力页
+    capBound: "边界",
+    capNext: "看下一个能力",
+    capBack: "回到核心能力总览",
+    capBackLine: "八件事，三步走：看清、找人、沉淀。",
+    trialTitle: "申请 HunterBuddy 试用",
+    trialBody: "当前采用邀请制。你留下信息后，我们会结合你的招聘方向、岗位类型与团队场景，确认试用安排。",
     example: T.example,
     homeName: T.homeName,
   },
@@ -129,17 +138,17 @@ const LOCALES = {
     dir: "en/",
     site: `${SITE}en/`,
     siteName: "Boseek",
-    titleSuffix: / \| TalentBuddy$/,
+    titleSuffix: / \| HunterBuddy$/,
     skip: "Skip to content",
     homeLabel: "Boseek home",
     logo: { src: "../landing-origin/assets/boseek-b5-en.svg", alt: "Boseek", w: 150, h: 48 },
     footLogo: { src: "assets/boseek-b5-en-light.svg", alt: "Boseek", w: 150, h: 46 },
     navLabel: "Main navigation",
     nav: [
-      ["Product video", "film"],
+      ["Product demo", "film"],
       ["Capabilities", "capabilities"],
       ["Boundaries", "belief"],
-      ["R&D fields", "industries"],
+      ["Focus areas", "industries"],
       ["FAQ", "faq"],
     ],
     apply: "Request a trial",
@@ -149,24 +158,28 @@ const LOCALES = {
     home: "Home",
     list: {
       name: "Use cases",
-      title: "Use cases for hiring R&D talent: sourcing, matching, org charts and BD | TalentBuddy",
+      title: "Use cases: org mapping, multi-source sourcing, two-way matching, identity checks and talent pools | HunterBuddy",
       description:
-        "Guides for search consultants, HR and talent leads, and CTOs and engineering leaders: finding R&D talent through papers, patents and code, job matching, org charts, telling namesakes apart, talent pools and winning R&D clients.",
+        "HunterBuddy’s eight capabilities and three practical guides: industry primers, client research, org mapping, multi-source sourcing, two-way job matching, identity checks, referrals and talent pools. Each explains the problem, how it works and where its limits are.",
       kicker: "Use cases",
       h1: "Use cases",
-      lead: "Each stage of hiring R&D talent, explained plainly: how it’s usually done, where it gets hard, what TalentBuddy hands back, and what is still yours to judge.",
+      lead: "Eight capabilities in three steps: know, find, keep. Each page explains where the work gets hard, how HunterBuddy handles it, and what is still yours to judge.",
     },
     footerCases: [
-      ["business-development", "Business development"],
-      ["org-chart", "Org charts"],
-      ["finding-candidates", "Finding candidates"],
-      ["job-matching", "Job matching"],
+      ["industry-primer", "Industry primer"],
+      ["business-development", "Client research"],
+      ["org-chart", "Org mapping"],
+      ["finding-candidates", "Multi-source sourcing"],
+      ["job-matching", "Two-way job matching"],
+      ["same-name-candidates", "Identity checks"],
+      ["referrals", "Referrals"],
+      ["talent-pool", "Talent pool"],
     ],
     all: "All &gt;&gt;",
     groups: ["Product", "Use cases", "Legal"],
     legal: [["privacy", "Privacy policy"], ["terms", "Terms of service"], ["dpa", "Data processing agreement"]],
     legalPage: { kicker: "Legal", keys: "Key points", updated: "Updated", effective: "Effective", others: "Other legal documents", byline: "Boseek", tableLabel: "Table" },
-    footNotes: ["TalentBuddy: be first to the right R&D talent.", "Built by Boseek for search consultants, HR and talent leads, and CTOs and engineering leaders."],
+    footNotes: ["HunterBuddy, the AI workbench for senior tech talent search.", "Built by Boseek for HR teams and professional headhunters."],
     contact: "Contact: ",
     metaLabel: "Copyright, operator and registration",
     meta: ["&copy; <span data-footer-year>2026</span> Boseek", "www.boseekai.com", "Operated by Beijing Boseek Intelligent Technology Co., Ltd."],
@@ -176,8 +189,12 @@ const LOCALES = {
     faqKicker: "FAQ",
     faqTitle: ["What people ask", "about this."],
     readMore: "Read more",
-    trialTitle: COMMON.en.trialTitle,
-    trialBody: COMMON.en.trialBody,
+    capBound: "Where it stops",
+    capNext: "Next capability",
+    capBack: "Back to all capabilities",
+    capBackLine: "Eight capabilities in three steps: know, find, keep.",
+    trialTitle: "Request a HunterBuddy trial",
+    trialBody: "Trials are by invitation for now. Leave your details, and we’ll arrange your trial around the roles you hire for, the kinds of positions you work on and how your team works.",
     example: COMMON.en.example,
     homeName: COMMON.en.homeName,
   },
@@ -324,7 +341,7 @@ function trial(L, home) {
       </section>`;
 }
 
-function hero(L, { crumbs, kicker, h1, lead, meta }) {
+function hero(L, { crumbs, kicker, h1, lead, lead2 = [], meta }) {
   return `      <section class="n-dark s-hero" aria-labelledby="s-title">
         <div class="n-wrap"><div class="s-col">
           <nav class="s-crumbs" aria-label="${L.crumbsLabel}">
@@ -332,7 +349,7 @@ function hero(L, { crumbs, kicker, h1, lead, meta }) {
           </nav>
           <p class="n-kicker">${text(kicker)}</p>
           <h1 id="s-title">${h1}</h1>
-          <p class="s-lead">${text(lead)}</p>${meta ? `\n          ${meta}` : ""}
+          <p class="s-lead">${text(lead)}</p>${lead2.map((p) => `\n          <p class="s-lead s-lead-more">${text(p)}</p>`).join("")}${meta ? `\n          ${meta}` : ""}
         </div></div>
       </section>`;
 }
@@ -369,8 +386,8 @@ function steps(items, example) {
     )
     .join("\n")}\n</ol>`;
 }
-const cards = (items) =>
-  `<ul class="s-cards">\n${items.map(([t, b]) => `  <li>\n    <h3>${text(t)}</h3>\n    <p>${text(b)}</p>\n  </li>`).join("\n")}\n</ul>`;
+const cards = (items, numbered = false) =>
+  `<ul class="s-cards${numbered ? " is-numbered" : ""}">\n${items.map(([t, b]) => `  <li>\n    <h3>${text(t)}</h3>\n    <p>${text(b)}</p>\n  </li>`).join("\n")}\n</ul>`;
 function demo(d) {
   return `<figure class="s-demo">
   <figcaption>
@@ -425,7 +442,7 @@ function page(L, a, items) {
         { "@type": "ListItem", position: 2, name: L.list.name, item: `${L.site}use-cases/` },
         { "@type": "ListItem", position: 3, name: a.name, item: self },
       ] },
-      { "@type": "Article", "@id": `${self}#article`, headline: a.title.replace(L.titleSuffix, ""), description: a.description, inLanguage: L.lang, datePublished: a.published || PUBLISHED, dateModified: MODIFIED, mainEntityOfPage: { "@id": `${self}#webpage` }, image: { "@type": "ImageObject", url: image, width: 1600, height: 900 }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#talentbuddy` } },
+      { "@type": "Article", "@id": `${self}#article`, headline: a.title.replace(L.titleSuffix, ""), description: a.description, inLanguage: L.lang, datePublished: a.published || PUBLISHED, dateModified: MODIFIED, mainEntityOfPage: { "@id": `${self}#webpage` }, image: { "@type": "ImageObject", url: image, width: 1600, height: 900 }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#hunterbuddy` } },
       { "@type": "FAQPage", "@id": `${self}#faq`, inLanguage: L.lang, isPartOf: { "@id": `${self}#webpage` }, mainEntity: a.faq.map(([q, ans]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: ans } })) },
     ],
   };
@@ -473,6 +490,74 @@ ${trial(L, home)}
 ${foot(L, home, base, a.slug)}`;
 }
 
+/* ---------- one 核心能力 page (the eight capabilities, 2026-11-21) ----------
+   眉题、H1、定义句和引言 → 为什么难（六张编号卡）→ HunterBuddy 怎么做（编号步骤）→ 边界 → 下一个能力 → 申请试用 */
+function capPage(L, c, items) {
+  const home = "../../";
+  const base = `${home}${L.key === "en" ? "../" : ""}`;
+  const path = `use-cases/${c.slug}/`;
+  const self = `${L.site}${path}`;
+  const image = `${SITE}assets/use-cases/${L.key === "en" ? "en/" : ""}${c.slug}.jpg`;
+  const next = c.next ? items.find((x) => x.slug === c.next) : null;
+  if (c.next && !next) throw new Error(`${c.slug}: next ${c.next} not found`);
+  const headline = c.title.replace(L.titleSuffix, "");
+  const graph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      orgOf(L),
+      { "@type": "WebPage", "@id": `${self}#webpage`, url: self, name: c.title, description: c.description, inLanguage: L.lang, isPartOf: { "@id": `${SITE}#website` }, publisher: { "@id": `${SITE}#organization` }, breadcrumb: { "@id": `${self}#breadcrumb` } },
+      { "@type": "BreadcrumbList", "@id": `${self}#breadcrumb`, itemListElement: [
+        { "@type": "ListItem", position: 1, name: L.homeName, item: L.site },
+        { "@type": "ListItem", position: 2, name: L.list.name, item: `${L.site}use-cases/` },
+        { "@type": "ListItem", position: 3, name: c.name, item: self },
+      ] },
+      { "@type": "Article", "@id": `${self}#article`, headline, description: c.description, inLanguage: L.lang, datePublished: c.published || PUBLISHED, dateModified: MODIFIED, mainEntityOfPage: { "@id": `${self}#webpage` }, image: { "@type": "ImageObject", url: image, width: 1600, height: 900 }, author: { "@id": `${SITE}#organization` }, publisher: { "@id": `${SITE}#organization` }, about: { "@id": `${SITE}#hunterbuddy` } },
+    ],
+  };
+  const h1Lines = headline.includes("：") ? [headline.slice(0, headline.indexOf("：") + 1), headline.slice(headline.indexOf("：") + 1)] : headline.includes(": ") ? [headline.slice(0, headline.indexOf(": ") + 1), headline.slice(headline.indexOf(": ") + 2)] : [headline];
+  const nextCard = next
+    ? `<li><a href="${home}use-cases/${next.slug}/"><span class="s-related-kind">${L.capNext} · ${text(next.no)}</span><strong>${text(next.name)}</strong><span class="s-related-line">${text(next.teaser)}</span></a></li>`
+    : `<li><a href="${home}#capabilities"><span class="s-related-kind">${L.capBack}</span><strong>${text(L.capBackLine)}</strong></a></li>`;
+  return `${head(L, { title: c.title, description: c.description, path, graph, ogType: "article", home, base, image })}
+    <main id="main" tabindex="-1">
+      <article class="s-cap">
+${hero(L, {
+  crumbs: `<a href="${home}">${L.home}</a><span aria-hidden="true">/</span><a href="${home}use-cases/">${L.list.name}</a><span aria-hidden="true">/</span><span aria-current="page">${text(c.name)}</span>`,
+  kicker: c.kicker,
+  h1: lines(h1Lines),
+  lead: c.definition,
+  lead2: c.intro,
+  meta: `<p class="s-meta">${L.byline(MODIFIED)}</p>`,
+})}
+
+      <div class="n-light s-paper">
+${section("s1", "01", c.pains.h2, [...c.pains.intro.map((p) => block(p, L)), cards(c.pains.items, true)].join("\n"))}
+
+${section("s2", "02", c.how.h2, [...c.how.intro.map((p) => block(p, L)), steps(c.how.items, L.example)].join("\n"))}
+
+        <section class="s-section s-bound-wrap" aria-labelledby="s-bound-title">
+          <div class="n-wrap"><div class="s-col">
+            <p class="s-label" id="s-bound-title">${L.capBound}</p>
+            <p class="s-bound">${text(c.boundary)}</p>
+          </div></div>
+        </section>
+
+        <section class="s-section s-related-wrap" aria-label="${next ? L.capNext : L.capBack}">
+          <div class="n-wrap"><div class="s-col">
+            <ul class="s-related s-next">
+              ${nextCard}
+            </ul>
+          </div></div>
+        </section>
+      </div>
+      </article>
+
+${trial(L, home)}
+    </main>
+
+${foot(L, home, base, c.slug)}`;
+}
+
 function listPage(L, items) {
   const home = "../";
   const base = `${home}${L.key === "en" ? "../" : ""}`;
@@ -506,7 +591,7 @@ ${items
   .map(
     (a, i) => `              <li>
                 <a href="${a.slug}/">
-                  <span class="s-index-no">${String(i + 1).padStart(2, "0")}</span>
+                  <span class="s-index-no">${String(i + 1).padStart(2, "0")}${a.cap ? ` · ${text(a.group)}` : ""}</span>
                   <strong>${text(a.title.replace(L.titleSuffix, ""))}</strong>
                   <span class="s-index-line">${text(a.teaser)}</span>
                   <span class="n-more">${L.readMore}</span>
@@ -638,62 +723,7 @@ function checkLegal(zh, en) {
   return problems;
 }
 
-/* ---------- 客户开发: the old use-case page, rewritten into the same format, with a few corrections ---------- */
-function businessDevelopment() {
-  // the source still says HunterBuddy (2026-11-02 the product became TalentBuddy)
-  const c = JSON.parse(JSON.stringify(PAGES.find((p) => p.slug === "business-development").zh).replaceAll("HunterBuddy", "TalentBuddy"));
-  const how = c.how.steps.map((step) =>
-    step[0] === "找到用人经理"
-      ? [step[0], step[1], "负责视觉团队的是技术负责人许晴，很可能就是这个职位的用人经理，直接联系方式待确认。"]
-      : step,
-  );
-  // BD 客户研判 (on the homepage) gets its own step after the two sources are matched
-  how.splice(2, 0, [
-    "BD 客户研判：值不值得跟",
-    "它把融资动态、创始团队、岗位和业务信号放在一起，看需求是不是真的、付不付得起猎头费、合作上有没有风险，再理清决策链和优先级。有依据的附上出处，没依据的标为待确认。",
-    "真实需求、付费潜力都有依据：刚拿到 B 轮，招聘页上了新职位。合作风险待确认：以前和猎头合作过没有、谁拍板，还不清楚。",
-  ]);
-  const card = {
-    ...c.how.card,
-    items: [
-      c.how.card.items[0],
-      ["研判 · 有依据", "真实需求、付费潜力", "刚拿到 B 轮，招聘页上了新职位。合作风险待确认。"],
-      ["可能的用人经理", "许晴 · 技术负责人", "负责视觉团队，直接联系方式待确认。"],
-      c.how.card.items[2],
-    ],
-  };
-  return {
-    slug: "business-development",
-    name: c.name,
-    title: "猎头客户开发：从融资与招聘信号识别研发型企业的新职位和用人经理｜TalentBuddy",
-    description: c.description,
-    kicker: "使用场景 · 猎头客户开发",
-    h1: ["从融资与招聘信号，", "识别研发型企业的委托机会"],
-    answer:
-      "TalentBuddy 持续跟踪你关注的技术赛道，从融资新闻和招聘页里找出正在扩张的研发型企业，交回新职位、可能的用人经理、引荐路线，以及值不值得跟的研判，每条线索都附出处。联系谁、怎么切入，由你决定。",
-    teaser: c.teaser,
-    related: ["org-chart", "finding-candidates", "ai-assistant-for-headhunters"],
-    sections: [
-      { h2: "猎头客户开发，一般怎么做？", body: [c.method.intro, { steps: c.method.steps }] },
-      // 平台名只在工具对比那一篇里出现
-      { h2: "难的不是打电话，是知道该打给谁", body: [{ cards: c.hard.items.map(([t, b]) => [t, b.replace("领英和脉脉上", "职业社交平台上")]) }] },
-      { h2: "做客户开发，TalentBuddy 交回什么？", body: [c.how.intro, { steps: how }, { demo: card }] },
-      {
-        h2: "你会拿到什么，哪些要你确认？",
-        body: [
-          "一条两处来源对得上的职位线索、一位很可能的用人经理，加一条备用的引荐路线。直接联系还是请人引荐、怎么开口，由你决定。拿到 JD、谈妥委托，它才是你手上的正式职位。",
-          c.result.paras[1],
-          { list: c.result.confirm },
-          { note: c.result.note },
-        ],
-      },
-    ],
-    faq: c.faq.items,
-    faqTitle: c.faq.h2,
-  };
-}
-
-/* ---------- the nine pages, in list order ---------- */
+/* ---------- the eleven pages, in list order ---------- */
 function inOrder(all) {
   const items = ORDER.map((slug) => {
     const it = all.find((a) => a.slug === slug);
@@ -704,17 +734,18 @@ function inOrder(all) {
   return items;
 }
 export async function zhItems() {
-  return inOrder([businessDevelopment(), ...(await loadArticles())]);
+  return inOrder([...(await loadCapabilities()), ...(await loadArticles())]);
 }
 export async function enItems() {
-  return inOrder(await loadArticlesEn());
+  return inOrder([...(await loadCapabilitiesEn()), ...(await loadArticlesEn())]);
 }
 
 /* ---------- write ---------- */
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  // ZH_ONLY=1：只生成中文页面（改稿时预览用，正式生成不要带）
   const sets = [
-    [LOCALES.zh, await zhItems(), checkArticle],
-    [LOCALES.en, await enItems(), checkArticleEn],
+    [LOCALES.zh, await zhItems(), (a) => (a.cap ? checkCapability(a) : checkArticle(a))],
+    ...(process.env.ZH_ONLY === "1" ? [] : [[LOCALES.en, await enItems(), (a) => (a.cap ? checkCapability(a, true) : checkArticleEn(a))]]),
   ];
   let failed = false;
   for (const [L, items, check] of sets) {
@@ -738,7 +769,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     await rm(resolve(OUT, "use-cases", old), { recursive: true, force: true });
   const out = sets.flatMap(([L, items]) => [
     [`${L.dir}use-cases/index.html`, listPage(L, items)],
-    ...items.map((a) => [`${L.dir}use-cases/${a.slug}/index.html`, page(L, a, items)]),
+    ...items.map((a) => [`${L.dir}use-cases/${a.slug}/index.html`, a.cap ? capPage(L, a, items) : page(L, a, items)]),
     ...(L.key === "zh" ? LEGAL_ZH : LEGAL_EN).map((d, _, all) => [`${L.dir}${d.slug}/index.html`, legalPage(L, d, all)]),
   ]);
   // the sitemap for the site once this redesign is live (www.boseekai.com): both homepages, both lists and all eighteen
@@ -755,7 +786,7 @@ ${paths
   .join("\n")}
 </urlset>
 `;
-  out.push(["sitemap.xml", sitemap]);
+  if (process.env.ZH_ONLY !== "1") out.push(["sitemap.xml", sitemap]);
   for (const [path, html] of out) {
     if (html.includes("；")) throw new Error(`${path}: 不用中文分号`);
     if (path.startsWith("en/")) {

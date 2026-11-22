@@ -1,18 +1,28 @@
 import { test, expect } from "@playwright/test";
 
-// 改版首页的“使用场景”（2026-10-25 起和实务文章合并成一套，九篇）：
-// 规范网址、结构化数据和页面一致、目录、相关阅读能打开，首页的入口（能做什么里的“了解…”和页脚，不在顶部导航）
-const pages = [
+// 改版首页的“使用场景”（2026-11-21 起：八篇核心能力在前，三篇通用的实务文章在后，共十一篇）：
+// 规范网址、结构化数据和页面一致、目录、相关阅读能打开，首页的入口（核心能力里的“了解…”和页脚，不在顶部导航）
+const caps = [
+  "industry-primer",
   "business-development",
   "org-chart",
   "finding-candidates",
   "job-matching",
   "same-name-candidates",
+  "referrals",
   "talent-pool",
-  "headhunter-consultant",
-  "ai-assistant-for-headhunters",
-  "ai-tools-compared",
 ];
+const pages = [...caps, "headhunter-consultant", "ai-assistant-for-headhunters", "ai-tools-compared"];
+// 核心能力页：没有目录和常见问题，结尾链到下一个能力（最后一个回到首页的核心能力）
+const capChecks = async (page, slug, graph) => {
+  expect(graph.map((node) => node["@type"])).toEqual(["Organization", "WebPage", "BreadcrumbList", "Article"]);
+  await expect(page.locator(".s-cards.is-numbered li")).toHaveCount(slug === "talent-pool" ? 5 : 6);
+  await expect(page.locator(".s-steps > li")).toHaveCount(slug === "talent-pool" ? 5 : 6);
+  await expect(page.locator(".s-bound")).toHaveCount(1);
+  const next = await page.locator(".s-next a").getAttribute("href");
+  const i = caps.indexOf(slug);
+  expect(next).toBe(i < caps.length - 1 ? `../../use-cases/${caps[i + 1]}/` : "../../#capabilities");
+};
 
 for (const slug of pages) {
   test(`Redesign use case ${slug} matches its structured data`, async ({ page }) => {
@@ -24,17 +34,20 @@ for (const slug of pages) {
     await expect(page.locator("meta[name=trial-api]")).toHaveAttribute("content", "disabled");
     await expect(page.locator("h1")).toHaveCount(1);
     const graph = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())["@graph"];
-    expect(graph.map((node) => node["@type"])).toEqual(["Organization", "WebPage", "BreadcrumbList", "Article", "FAQPage"]);
     const crumbs = graph.find((node) => node["@type"] === "BreadcrumbList").itemListElement;
     expect(crumbs[1].item).toBe("https://www.boseekai.com/use-cases/");
     await expect(page.locator(".s-crumbs [aria-current=page]")).toHaveText(crumbs[2].name);
-    const faq = graph.find((node) => node["@type"] === "FAQPage");
-    const visible = await page
-      .locator("#faq details")
-      .evaluateAll((items) => items.map((item) => [item.querySelector("h3").textContent, item.querySelector("p").textContent]));
-    expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text])).toEqual(visible);
-    expect(visible.length).toBeGreaterThanOrEqual(3);
-    expect(await page.locator(".s-toc a").allTextContents()).toEqual(await page.locator(".s-section[id^=s] h2").allTextContents());
+    if (caps.includes(slug)) await capChecks(page, slug, graph);
+    else {
+      expect(graph.map((node) => node["@type"])).toEqual(["Organization", "WebPage", "BreadcrumbList", "Article", "FAQPage"]);
+      const faq = graph.find((node) => node["@type"] === "FAQPage");
+      const visible = await page
+        .locator("#faq details")
+        .evaluateAll((items) => items.map((item) => [item.querySelector("h3").textContent, item.querySelector("p").textContent]));
+      expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text])).toEqual(visible);
+      expect(visible.length).toBeGreaterThanOrEqual(3);
+      expect(await page.locator(".s-toc a").allTextContents()).toEqual(await page.locator(".s-section[id^=s] h2").allTextContents());
+    }
     for (const href of await page.locator(".s-related a").evaluateAll((links) => links.map((a) => a.href))) {
       expect((await page.request.get(href)).ok(), href).toBeTruthy();
     }
@@ -43,27 +56,27 @@ for (const slug of pages) {
   });
 }
 
-test("Redesign use-case list links all nine pages", async ({ page }) => {
+test("Redesign use-case list links all eleven pages", async ({ page }) => {
   await page.goto("./landing-redesign/use-cases/");
   await expect(page.locator("link[rel=canonical]")).toHaveAttribute("href", "https://www.boseekai.com/use-cases/");
   const hrefs = await page.locator(".s-index a").evaluateAll((links) => links.map((a) => a.getAttribute("href")));
   expect(hrefs).toEqual(pages.map((slug) => `${slug}/`));
 });
 
-test("Redesign homepage reaches the use cases from 能做什么 and the footer, not the top navigation", async ({ page }) => {
+test("Redesign homepage reaches the use cases from 核心能力 and the footer, not the top navigation", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("./landing-redesign/");
   await expect(page.locator('#n-nav a[href*="use-cases"]')).toHaveCount(0);
   await expect(page.locator('a[href*="articles"]')).toHaveCount(0);
   const more = await page.locator(".n-more").evaluateAll((links) => links.map((a) => a.getAttribute("href")));
-  expect(more.length).toBe(6);
+  expect(more.length).toBe(8);
   for (const href of more) expect(pages.map((slug) => `use-cases/${slug}/`)).toContain(href);
   await expect(page.locator('.n-footer a[href="use-cases/"]')).toHaveText("全部 >>");
   await page.locator('.n-footer a[href="use-cases/"]').click();
   await expect(page).toHaveURL(/\/landing-redesign\/use-cases\/$/);
 });
 
-// 英文站：九篇和列表页一一对应，结构化数据和页面一致，语言切换直达对应的那一页，页面上没有中文（语言切换和备案号除外）
+// 英文站：十一篇和列表页一一对应，结构化数据和页面一致，语言切换直达对应的那一页，页面上没有中文（语言切换和备案号除外）
 const hanLeft = (page) =>
   page.evaluate(() => {
     const out = [];
@@ -103,17 +116,20 @@ for (const slug of pages) {
     await expect(page.locator("meta[name=trial-api]")).toHaveAttribute("content", "disabled");
     await expect(page.locator("h1")).toHaveCount(1);
     const graph = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())["@graph"];
-    expect(graph.map((node) => node["@type"])).toEqual(["Organization", "WebPage", "BreadcrumbList", "Article", "FAQPage"]);
     expect(graph.every((node) => !node.inLanguage || node.inLanguage === "en")).toBeTruthy();
     const crumbs = graph.find((node) => node["@type"] === "BreadcrumbList").itemListElement;
     expect(crumbs[1].item).toBe("https://www.boseekai.com/en/use-cases/");
     await expect(page.locator(".s-crumbs [aria-current=page]")).toHaveText(crumbs[2].name);
-    const faq = graph.find((node) => node["@type"] === "FAQPage");
-    const visible = await page
-      .locator("#faq details")
-      .evaluateAll((items) => items.map((item) => [item.querySelector("h3").textContent, item.querySelector("p").textContent]));
-    expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text])).toEqual(visible);
-    expect(await page.locator(".s-toc a").allTextContents()).toEqual(await page.locator(".s-section[id^=s] h2").allTextContents());
+    if (caps.includes(slug)) await capChecks(page, slug, graph);
+    else {
+      expect(graph.map((node) => node["@type"])).toEqual(["Organization", "WebPage", "BreadcrumbList", "Article", "FAQPage"]);
+      const faq = graph.find((node) => node["@type"] === "FAQPage");
+      const visible = await page
+        .locator("#faq details")
+        .evaluateAll((items) => items.map((item) => [item.querySelector("h3").textContent, item.querySelector("p").textContent]));
+      expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text])).toEqual(visible);
+      expect(await page.locator(".s-toc a").allTextContents()).toEqual(await page.locator(".s-section[id^=s] h2").allTextContents());
+    }
     for (const href of await page.locator(".s-related a, .n-footer a[href*='use-cases']").evaluateAll((links) => links.map((a) => a.href))) {
       expect((await page.request.get(href)).ok(), href).toBeTruthy();
     }
@@ -127,7 +143,7 @@ for (const slug of pages) {
   });
 }
 
-test("English use-case list links all nine pages", async ({ page }) => {
+test("English use-case list links all eleven pages", async ({ page }) => {
   await page.goto("./landing-redesign/en/use-cases/");
   await expect(page.locator("link[rel=canonical]")).toHaveAttribute("href", "https://www.boseekai.com/en/use-cases/");
   const hrefs = await page.locator(".s-index a").evaluateAll((links) => links.map((a) => a.getAttribute("href")));
@@ -144,7 +160,7 @@ test("English homepage is all English, reaches its use cases, and its trial form
   await expect(page.locator("#apply form")).toBeVisible();
   expect(await hanLeft(page)).toEqual([]);
   const more = await page.locator(".n-more").evaluateAll((links) => links.map((a) => a.getAttribute("href")));
-  expect(more.length).toBe(6);
+  expect(more.length).toBe(8);
   for (const href of more) expect(pages.map((slug) => `use-cases/${slug}/`)).toContain(href);
   await expect(page.locator('.n-footer a[href="use-cases/"]')).toHaveText("All >>");
   // the preview server answers unknown paths with the app page, so check that the English film really is a video
