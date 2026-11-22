@@ -30,6 +30,7 @@ export function createOpportunitySeed() {
   const opportunityRecords = opportunities.map((item) => ({
     ...item, companyId: companies.find((company) => company.name === item.company)?.id || "",
     contactId: ({ "opportunity-xinglan": "contact-chenyu", "opportunity-tuojie": "contact-zhangmin" })[item.id] || "",
+    contactIds: ({ "opportunity-xinglan": ["contact-chenyu", "contact-zhouqi"], "opportunity-tuojie": ["contact-zhangmin"] })[item.id] || [],
     priority: item.id === "opportunity-xinglan" ? "高" : "中",
     priorityReason: item.id === "opportunity-xinglan" ? "融资后扩张，负责人级岗位，客户已明确优先方向" : "",
     people: item.id === "opportunity-xinglan" ? "20 - 25 人" : "",

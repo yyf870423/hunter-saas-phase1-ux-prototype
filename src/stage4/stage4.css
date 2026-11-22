@@ -6535,6 +6535,17 @@
   width: 30px;
   height: 30px;
 }
+/* 每页条数切换（产品决策 2026-11-22）：靠右、紧凑，不受 .s4-pagination > div 的翻页按钮样式影响。 */
+.s4-pagination > .s4-select.s4-pagination-size {
+  display: block;
+  justify-self: end;
+  width: 124px;
+}
+.s4-pagination > .s4-select.s4-pagination-size > button {
+  width: 100%;
+  min-height: 30px;
+  font-size: 12px;
+}
 
 .s4-bulk-bar,
 .s4-floating-bulk {
@@ -15084,3 +15095,144 @@
 .s4-review-found-by:hover {
   text-decoration: underline;
 }
+
+/* 新标签页文件预览（产品决策 2026-11-22） */
+.s4-file-preview-page {
+  min-height: 100vh;
+  padding: 24px clamp(16px, 4vw, 48px);
+  background: var(--s1-canvas);
+  color: var(--s1-ink, inherit);
+}
+.s4-file-preview-page > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1080px;
+  margin: 0 auto 16px;
+}
+.s4-file-preview-page > header > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.s4-file-preview-page > header b {
+  overflow: hidden;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s4-file-preview-page > header small {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s4-file-preview-page > section {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  max-width: 1080px;
+  min-height: 60vh;
+  margin: 0 auto;
+  padding: 16px;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+}
+.s4-file-preview-page > section > img {
+  max-width: 100%;
+  margin: 0 auto;
+  object-fit: contain;
+}
+.s4-file-preview-page > section > iframe {
+  width: 100%;
+  height: calc(100vh - 160px);
+  border: 0;
+}
+.s4-file-preview-page.is-sample .s4-file-preview {
+  position: static;
+  max-width: 1080px;
+  height: calc(100vh - 48px);
+  margin: 0 auto;
+}
+.s4-file-preview-page.is-sample .s4-file-preview > div {
+  display: grid;
+  grid-template-columns: 164px minmax(0, 1fr);
+  overflow: hidden;
+}
+.s4-file-preview-page.is-sample .s4-file-preview > div > article {
+  overflow: auto;
+}
+
+/* 职业概览 · 建议匹配的岗位（产品决策 2026-11-22） */
+.s4-suggested-roles {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+.s4-suggested-roles > b {
+  font-size: 13px;
+}
+.s4-suggested-roles ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.s4-suggested-roles li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+}
+.s4-suggested-roles li small {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+
+/* 列表页搜索区和表头固定（产品决策 2026-11-23，适用于全部列表页）
+   桌面：表格类列表占满一屏，页头、搜索区、表头固定在上方，只滚动表格行（避免页面和表格两层滚动）。
+   卡片列表（论文、专利）和窄屏：搜索区吸顶在全局顶栏下方，内容随页面滚动。 */
+.s1-main-list .s4-filter-bar,
+.s1-main-list .s4-candidate-filter-shell {
+  position: sticky;
+  top: 56px;
+  z-index: 8;
+}
+@media (min-width: 1024px) and (min-height: 640px) {
+  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table)) {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 56px - 70px);
+    min-height: 560px;
+  }
+  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table)) > * {
+    flex: none;
+  }
+  .s1-main-list > .s4-page > :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table) {
+    flex: 1 1 auto;
+    min-height: 220px;
+    overflow: auto;
+  }
+  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table)) :is(.s4-filter-bar, .s4-candidate-filter-shell) {
+    position: static;
+  }
+  .s1-main-list > .s4-page > .s4-table-wrap thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: color-mix(in srgb, var(--s1-canvas) 75%, var(--s1-surface));
+  }
+  .s1-main-list > .s4-page > .s4-table-wrap.s4-table-sticky-edges thead :is(.s4-select-cell, .is-sticky-first, .s4-actions-cell) {
+    z-index: 7;
+  }
+  .s1-main-list > .s4-page > :is(.s4-task-table, .s4-recycle-table) > header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: color-mix(in srgb, var(--s1-canvas) 75%, var(--s1-surface));
+  }
+}
+

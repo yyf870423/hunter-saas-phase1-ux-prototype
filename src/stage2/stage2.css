@@ -2549,6 +2549,11 @@
   font-size: 12px;
   line-height: 18px;
 }
+.s2-new-work-limited > .s1-button {
+  flex: 0 0 auto;
+  margin-left: auto;
+  align-self: center;
+}
 
 /* Unified task area */
 .s2-task-create-workspace {

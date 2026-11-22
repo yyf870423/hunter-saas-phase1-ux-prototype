@@ -515,12 +515,17 @@ test("真实 TXT、DOCX、PDF、表格、截图和链接均保留来源与可审
     await expect(heading(page, "待确认的招聘机会")).toBeVisible();
     if (fixture.name.endsWith(".png")) await expect(page.getByText(new RegExp(fixture.expected)).first()).toBeVisible();
     if (!fixture.name.endsWith(".png")) expect((await snapshot(page)).tasks.at(-1).draft.source.content).toContain(fixture.expected);
-    await page.getByRole("button", { name: new RegExp(fixture.name) }).click();
-    await expect(heading(page, fixture.name)).toBeVisible();
+    // 产品决策 2026-11-22：附件预览在新标签页打开，下载留在当前页。
+    const fileRow = page.locator(".s4-contact-file-row", { hasText: fixture.name }).last();
+    await expect(fileRow).toBeVisible();
+    const previewTab = page.waitForEvent("popup");
+    await fileRow.getByRole("button", { name: "预览", exact: true }).click();
+    const preview = await previewTab;
+    await expect(preview.locator(".s4-file-preview-page")).toContainText(fixture.name);
+    await preview.close();
     const download = page.waitForEvent("download");
-    await page.getByRole("dialog").last().getByRole("button", { name: "下载", exact: true }).click();
+    await fileRow.getByRole("button", { name: "下载", exact: true }).click();
     expect(await downloadName(page, await download)).toBe(fixture.name);
-    await page.getByRole("dialog").last().getByRole("button", { name: "关闭", exact: true }).last().click();
     await replyToAsset(page, "是");
     await expect(page.getByRole("link", { name: "查看招聘机会", exact: true })).toBeVisible();
     const state = await snapshot(page);

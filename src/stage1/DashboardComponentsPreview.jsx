@@ -76,7 +76,7 @@ export function DashboardComponentsPreview() {
           id="sample-assets-title"
           title="资产变化"
           icon="database"
-          count={limitDashboardItems(assets).length}
+          countLabel={`最近 ${limitDashboardItems(assets).length} 条`}
         >
           <DashboardAssetTimeline items={assets} onOpen={navigate} />
         </DashboardSection>

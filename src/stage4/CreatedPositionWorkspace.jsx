@@ -7,6 +7,7 @@ import { displayDateTime, PositionFields, useOpportunityAction } from "./Opportu
 import { getOpportunityPermission, runOpportunityCommand, useOpportunityState } from "./opportunity-store";
 import { candidates } from "./data";
 import { PositionTalentMap } from "./PositionTalentMap";
+import { educationLabel } from "./education-policy";
 
 export function RecruitingTaskStart({ position, close }) {
   const [prompt, setPrompt] = useState("为“" + position.name + "”寻找合适候选人，先提交候选人审核，不自动联系。\n\n当前 JD：\n" + position.jd);
@@ -113,7 +114,7 @@ export function CreatedPositionWorkspace({ position }) {
           <Button size="sm" disabled={getOpportunityPermission()} onClick={() => setStatus(position.status)}>变更状态</Button></div>}>
           <DefinitionGrid items={[["招聘公司", position.companyId ? <button type="button" className="s4-inline-link" onClick={() => navigate("/companies/" + position.companyId)}>{position.company}</button> : position.company],
             ["招聘状态", <StatusBadge>{position.status}</StatusBadge>], ["工作地点", position.location || "待确认"], ["薪资范围", position.salary || "待确认"],
-            ["最低工作年限", position.experience || "待确认"], ["学历要求", position.education || "待确认"], ["当前来源机会", currentOpportunity ? <button type="button" className="s4-inline-link" onClick={() => navigate("/opportunities/" + currentOpportunity.id + "?tab=directions")}>{currentOpportunity.title}</button> : "未关联"],
+            ["最低工作年限", position.experience || "待确认"], ["学历要求", educationLabel(position) || "待确认"], ["当前来源机会", currentOpportunity ? <button type="button" className="s4-inline-link" onClick={() => navigate("/opportunities/" + currentOpportunity.id + "?tab=directions")}>{currentOpportunity.title}</button> : "未关联"],
             ["最初创建来源", originOpportunity ? <button type="button" className="s4-inline-link" onClick={() => navigate("/opportunities/" + originOpportunity.id)}>{position.origin.label}</button> : position.origin.label]]} />
           <div className="s4-labeled-row"><b>关键技能</b><TagList items={position.skills} tone="info" /></div>
         </FieldGroup>

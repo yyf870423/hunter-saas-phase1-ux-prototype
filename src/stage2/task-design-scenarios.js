@@ -6,6 +6,7 @@ export const taskDesignScenarios = [
   ["clarify", "目标歧义澄清", "/new?state=clarify", "云脉芯能"],
   ["direct", "一步交付摘要", "/new?state=direct", "面试反馈摘要"],
   ["create-limited", "创建权限受限", "/new?state=limited", "新建任务"],
+  ["create-unsubscribed", "没有可用套餐", "/new?state=unsubscribed", "当前没有可用套餐"],
   ["history-empty", "任务历史无数据", "/tasks?state=empty", "暂无任务"],
   ["history-error", "任务历史读取失败", "/tasks?state=error", "任务列表读取失败"],
   ["history-pins", "任务置顶与查找偏好", "/tasks", "具身智能 VLA 算法负责人"],

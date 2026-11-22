@@ -17,6 +17,7 @@ import {
   TagList,
   TooltipText,
   useListController,
+  usePagedUrlState,
   useToast,
 } from "./asset-ui";
 import {
@@ -299,7 +300,11 @@ export function AssetListPage({ type }) {
         : type === "positions" ? lifecycle.positions.filter((item) => !item.deletedAt).map(summarizePosition) : config.data,
     [type, config.data, companyRecords, companyContext, lifecycle, contactRecords, deletedCompanies],
   );
-  const controller = useListController(listData, config.searchKeys, 6);
+  const paging = usePagedUrlState([20, 50, 100], 50);
+  const controller = useListController(listData, config.searchKeys, paging.pageSize, {
+    page: paging.page,
+    onPageChange: paging.setPage,
+  });
   const [filterValues, setFilterValues] = useState(() =>
     Object.fromEntries(config.filters.map(([label]) => [label, []])),
   );
@@ -469,11 +474,11 @@ export function AssetListPage({ type }) {
     setSearchParams(next, { replace: true });
     controller.setPage(1);
   };
-  const pages = Math.max(1, Math.ceil(listed.length / 6));
+  const pages = Math.max(1, Math.ceil(listed.length / paging.pageSize));
   const sortedRows = type === "opportunities" ? [...listed].sort((a, b) => sort === "名称" ? a.title.localeCompare(b.title, "zh-CN") :
     sort === "下次跟进" ? (a.followup?.dueAt || "9999").localeCompare(b.followup?.dueAt || "9999") : b.updatedAt.localeCompare(a.updatedAt)) : listed;
   const currentPage = Math.min(controller.page, pages);
-  const filteredRows = sortedRows.slice((currentPage - 1) * 6, currentPage * 6);
+  const filteredRows = sortedRows.slice((currentPage - 1) * paging.pageSize, currentPage * paging.pageSize);
   useEffect(
     () => controller.setPage(1),
     [candidateFilters, companyIndustries, filterValues],
@@ -637,7 +642,9 @@ export function AssetListPage({ type }) {
         <Pagination
           page={Math.min(controller.page, pages)}
           pages={pages}
-          pageSize={6}
+          pageSize={paging.pageSize}
+          pageSizeOptions={paging.sizeOptions}
+          onPageSizeChange={paging.setPageSize}
           onChange={controller.setPage}
         />
       </AssetListState>

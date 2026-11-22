@@ -101,7 +101,8 @@ test("公司归属、机会联系人与候选人事实关系不随业务汇总�
   await expect(page.getByRole("button", { name: "添加联系人" })).toBeVisible();
   await expect(page.locator(".s4-relation-table")).toContainText("陈雨");
   await page.goto("#/opportunities/opportunity-xinglan");
-  await expect(page.getByRole("button", { name: "查看联系人" })).toBeVisible();
+  // 产品决策 2026-11-22：机会可关联多位联系人。
+  await expect(page.getByRole("button", { name: "查看联系人" }).first()).toBeVisible();
   await page.getByRole("tab", { name: /招聘方向/ }).click();
   await expect(
     page.getByRole("button", { name: "形成岗位" }).first(),

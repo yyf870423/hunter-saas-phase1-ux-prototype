@@ -3,12 +3,12 @@ import { updatePositionTalentMap } from "./position-talent-results.js";
 export const OPPORTUNITY_STATUSES = ["跟进中", "已完成", "已关闭"];
 export const DIRECTION_STATUSES = ["待处理", "已形成或关联岗位", "不再推进"];
 export const OPPORTUNITY_FIELDS = [
-  "title", "companyId", "contactId", "summary", "evidence", "priority",
+  "title", "companyId", "contactId", "contactIds", "summary", "evidence", "priority",
   "priorityReason", "people", "period", "requirements", "missing",
 ];
 export const POSITION_FIELDS = [
   "name", "companyId", "company", "location", "salary", "experience",
-  "education", "skills", "jd", "note", "requirements",
+  "education", "educationMode", "skills", "jd", "note", "requirements",
 ];
 export const DIRECTION_FIELDS = [
   "name", "requirement", "missing", "location", "salary", "experience",
@@ -55,10 +55,20 @@ export function checkFields(patch, allowed) {
     if (key === "skills") {
       if (!Array.isArray(value) || value.some((item) => typeof item !== "string"))
         fail("关键技能必须是文字列表。", "SCHEMA");
+    } else if (key === "contactIds") {
+      if (!Array.isArray(value) || value.some((item) => typeof item !== "string"))
+        fail("相关联系人必须是联系人列表。", "SCHEMA");
     } else if (typeof value !== "string") {
       fail("字段 " + key + " 必须是文字。", "SCHEMA");
     }
   }
+}
+
+// 产品决策 2026-11-22（1-24，按故事地图 3.4）：一条招聘机会可关联多位联系人（用人经理 / HR / 决策人……）。
+// contactIds 是正式字段；contactId 保留为第一位联系人，兼容旧数据和对话回复来源。
+export function opportunityContactIds(opportunity) {
+  if (Array.isArray(opportunity?.contactIds)) return opportunity.contactIds.filter(Boolean);
+  return opportunity?.contactId ? [opportunity.contactId] : [];
 }
 
 export function validateOpportunity(draft, context = {}) {
@@ -69,8 +79,8 @@ export function validateOpportunity(draft, context = {}) {
   const company = context.companies?.find((item) => item.id === draft.companyId);
   if (!company || context.deletedCompanies?.includes(company.id))
     errors.companyId = "请选择有效的所属公司";
-  if (draft.contactId && !context.contacts?.some((contact) =>
-    contact.id === draft.contactId && contact.companyId === draft.companyId && !contact.deletedAt))
+  if (opportunityContactIds(draft).some((contactId) => !context.contacts?.some((contact) =>
+    contact.id === contactId && contact.companyId === draft.companyId && !contact.deletedAt)))
     errors.contactId = "联系人不存在或不属于当前公司";
   if (draft.title?.length > 120) errors.title = "机会名称不能超过 120 个字符";
   return errors;
@@ -326,8 +336,8 @@ export function applyOpportunityCommand(current, command, context = {}) {
         createdAt: now, deletedAt: null,
       };
       const before = existing ? Object.fromEntries(OPPORTUNITY_FIELDS.map((key) =>
-        [key, existing[key] || ""])) : null;
-      for (const [key, value] of Object.entries(data.patch)) opportunity[key] = value.trim();
+        [key, key === "contactIds" ? opportunityContactIds(existing) : existing[key] || ""])) : null;
+      for (const [key, value] of Object.entries(data.patch)) opportunity[key] = Array.isArray(value) ? [...value] : value.trim();
       opportunity.company = company.name;
       addSource(opportunity, data.source, now);
       if (data.directions !== undefined && !Array.isArray(data.directions))

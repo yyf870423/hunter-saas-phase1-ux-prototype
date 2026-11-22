@@ -10,7 +10,7 @@ import { displayDateTime, emptyOpportunity, FollowupRecordEditor, InitialOpportu
   OpportunityFollowupSummary, OpportunityProfileEditor, useOpportunityAction } from "./OpportunityComponents";
 import { OpportunityFiles } from "./OpportunityFiles";
 import { getOpportunityPermission, getOpportunityStoreError, useOpportunityState } from "./opportunity-store";
-import { opportunityNow, summarizeOpportunity } from "./opportunity-domain";
+import { opportunityContactIds, opportunityNow, summarizeOpportunity } from "./opportunity-domain";
 import { contactRoute, useCompanyContacts } from "./company-contact-store";
 import { opportunityDemoCases } from "./opportunity-demo-data";
 
@@ -104,7 +104,7 @@ export function OpportunityDetailPage() {
   if (["permission-limited", "limited"].includes(stateMode)) return <StateBanner tone="warning" icon="lock" title="暂无权限查看机会资料" action={<Button onClick={() => navigate("/opportunities")}>返回列表</Button>} />;
   const summary = summarizeOpportunity(opportunity, state, context);
   const company = context.companies.find((item) => item.id === opportunity.companyId && !context.deletedCompanies.includes(item.id));
-  const contact = context.contacts.find((item) => item.id === opportunity.contactId && item.companyId === opportunity.companyId && !item.deletedAt);
+  const relatedContacts = opportunityContactIds(opportunity).map((id) => context.contacts.find((item) => item.id === id && item.companyId === opportunity.companyId && !item.deletedAt)).filter(Boolean);
   const changeTab = (value) => { const next = new URLSearchParams(params); next.set("tab", value); next.delete("followup"); setParams(next); };
   return <div className="s4-detail-page"><DetailHeader icon="target" title={opportunity.title} subtitle={summary.company}
     badges={[{ label: opportunity.status, tone: opportunity.status === "跟进中" ? "success" : "neutral" }, { label: summary.directions + " 个招聘方向", tone: "info" }]}
@@ -125,11 +125,12 @@ export function OpportunityDetailPage() {
           ["优先级", (!opportunity.priority || opportunity.priority === "普通" ? "中" : opportunity.priority) + (opportunity.priorityReason ? "：" + opportunity.priorityReason : "")], ["已形成岗位", summary.positions + " 个"]]} />
       </FieldGroup>
       <OpportunityFollowupSummary opportunity={opportunity} />
-      <FieldGroup title="相关联系人">{contact ? <div className="s4-opportunity-contact-path"><i><Icon name="user" /></i>
-        <span><b>{contact.name}{contact.role ? " · " + contact.role : ""}</b><p>{company?.name}</p><small>{contact.phone || contact.email || "尚无直接联系方式"}</small></span>
-        <StatusBadge tone={contact.phone || contact.email ? "success" : "warning"}>{contact.phone || contact.email ? "已有联系方式" : "待寻找路径"}</StatusBadge>
-        <div><Button size="sm" onClick={() => navigate(contactRoute(contact))}>查看联系人</Button></div>
-      </div> :
+      <FieldGroup title={relatedContacts.length ? `相关联系人（${relatedContacts.length}）` : "相关联系人"}>{relatedContacts.length ? <div className="s4-detail-stack">{relatedContacts.map((contact) =>
+        <div className="s4-opportunity-contact-path" key={contact.id}><i><Icon name="user" /></i>
+          <span><b>{contact.name}{contact.role ? " · " + contact.role : ""}</b><p>{contact.categories?.length ? contact.categories.join("、") : company?.name}</p><small>{contact.phone || contact.email || "尚无直接联系方式"}</small></span>
+          <StatusBadge tone={contact.phone || contact.email ? "success" : "warning"}>{contact.phone || contact.email ? "已有联系方式" : "待寻找路径"}</StatusBadge>
+          <div><Button size="sm" onClick={() => navigate(contactRoute(contact))}>查看联系人</Button></div>
+        </div>)}</div> :
         <StateBanner title="未关联联系人" action={company ? <Button size="sm" onClick={() => navigate("/companies/" + company.id + "?tab=contacts")}>前往公司联系人</Button> : null} />}</FieldGroup>
       <FieldGroup title="招聘需求摘要" action={<Button size="sm" icon="edit" disabled={getOpportunityPermission()} onClick={() => setSection("summary")}>编辑</Button>}>
         <div className="s4-detail-stack"><p className="s4-long-copy">{opportunity.summary}</p><DefinitionGrid columns={2} items={[

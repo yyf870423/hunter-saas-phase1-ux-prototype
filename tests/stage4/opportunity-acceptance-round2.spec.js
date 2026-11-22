@@ -76,7 +76,8 @@ for (const [device, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 
     await page.setViewportSize({ width, height });
     await page.goto("#/opportunities/opportunity-xinglan?tab=profile");
     await expect(button(page, "寻找联系路径")).toHaveCount(0);
-    await button(page, "查看联系人").click();
+    // 产品决策 2026-11-22：机会可关联多位联系人，进入陈雨的联系人详情。
+    await page.locator(".s4-opportunity-contact-path", { hasText: "陈雨" }).getByRole("button", { name: "查看联系人", exact: true }).click();
     await expect(page).toHaveURL(/companies\/company-xinglan\/contacts\/contact-chenyu/);
     await page.goto("#/opportunities/opportunity-xinglan?tab=directions");
     const learning = page.locator(".s4-direction-list article").filter({ hasText: "机器人学习负责人" });

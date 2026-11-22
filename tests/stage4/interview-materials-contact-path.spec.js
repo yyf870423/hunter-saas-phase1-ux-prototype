@@ -177,7 +177,10 @@ test("招聘机会先进入联系人详情，联系路径在联系人资产处�
   await expect(page.getByRole("heading", { name: "相关联系人" })).toBeVisible();
   await expect(page.getByText("陈雨 · 招聘负责人")).toBeVisible();
   await expect(page.getByRole("button", { name: "寻找联系路径" })).toHaveCount(0);
-  await page.getByRole("button", { name: "查看联系人" }).click();
+  await page
+    .locator(".s4-opportunity-contact-path", { hasText: "陈雨" })
+    .getByRole("button", { name: "查看联系人" })
+    .click();
   await expect(page).toHaveURL(
     /companies\/company-xinglan\/contacts\/contact-chenyu/,
   );

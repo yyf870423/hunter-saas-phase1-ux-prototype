@@ -6,6 +6,7 @@ import { ComponentsPage } from "./stage1/ComponentsPage";
 import { Dashboard, NotActivatedPage } from "./stage1/Dashboard";
 import { ReviewPage } from "./stage1/ReviewPage";
 import { Stage1Shell } from "./stage1/Stage1Shell";
+import { FilePreviewPage } from "./stage4/FilePreviewPage";
 import { TaskHeaderControlsProvider } from "./stage2/TaskWorkspaceControls";
 import { NewWork } from "./stage2/NewWork";
 import { PeriodicTasksPage } from "./stage2/PeriodicTasks";
@@ -88,6 +89,8 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<UserAuthPage />} />
       <Route path="/ops/login" element={<OpsLoginPage />} />
+      {/* 产品决策 2026-11-22：文件预览在新标签页打开，独立页面不带侧栏。 */}
+      <Route path="/files/preview" element={<FilePreviewPage />} />
       <Route path="/review" element={<Stage4ReviewPage />} />
       <Route path="/review/stage-1" element={<ReviewPage />} />
       <Route path="/review/stage-2" element={<Stage2ReviewPage />} />

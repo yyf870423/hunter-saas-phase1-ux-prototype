@@ -316,6 +316,8 @@ export function ImportsPage() {
                     : "PDF、DOCX、XLSX"
               }
               multiple={type !== "知识图谱"}
+              maxFiles={type === "候选人" ? 100 : undefined}
+              sizeLabel={type === "候选人" ? "20 MB" : undefined}
             />
             {type === "候选人" || type === "岗位" ? (
               <PostWriteMatchingOptions

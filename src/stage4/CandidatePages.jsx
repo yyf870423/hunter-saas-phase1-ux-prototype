@@ -20,7 +20,6 @@ import {
   EntityLink,
   FieldGroup,
   FileDrop,
-  FilePreview,
   FormField,
   Modal,
   NotFoundState,
@@ -59,6 +58,7 @@ import {
 } from "./data";
 
 import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import { openFilePreview } from "./file-preview";
 
 const candidateTabs = [
   { value: "profile", label: "候选人资料" },
@@ -699,6 +699,7 @@ function ProfileTab({
   onRetryAi,
 }) {
   const navigate = useNavigate();
+  const notify = useToast();
   const [editSection, setEditSection] = useState(null);
   // Pending updates found by tasks stay in the candidate's own review (design review topic 14).
   const pending = pendingGroup(candidate?.id === "candidate-linhao" || !candidate?.id ? "candidate-linhao" : candidate.id);
@@ -767,18 +768,52 @@ function ProfileTab({
       <FieldGroup
         title="职业概览"
         action={
-          <Button
-            size="sm"
-            icon="edit"
-            onClick={() => setEditSection("summary")}
-          >
-            编辑职业概览
-          </Button>
+          <>
+            <Button
+              size="sm"
+              icon="refresh"
+              onClick={() =>
+                notify("职业概览正在后台重新生成，可以继续浏览其他页面，完成后自动刷新")
+              }
+            >
+              重新生成
+            </Button>
+            <Button
+              size="sm"
+              icon="edit"
+              onClick={() => setEditSection("summary")}
+            >
+              编辑职业概览
+            </Button>
+          </>
         }
       >
         <p className="s4-long-copy">{candidate.summary}</p>
+        {candidate.suggestedRoles?.length ? (
+          <div className="s4-suggested-roles">
+            <b>建议匹配的岗位</b>
+            <ul>
+              {candidate.suggestedRoles.map((role) => (
+                <li key={role.title}>
+                  {role.positionId ? (
+                    <button
+                      type="button"
+                      className="s4-inline-link"
+                      onClick={() => navigate(`/positions/${role.positionId}`)}
+                    >
+                      {role.title}
+                    </button>
+                  ) : (
+                    <span>{role.title}</span>
+                  )}
+                  <small>{role.note}</small>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         <small className="s4-generated-meta">
-          基于资料版本 v6 生成 · 昨天 18:20
+          上传简历时由 AI 生成 · 基于资料版本 v6 · 昨天 18:20
         </small>
       </FieldGroup>
       <FieldGroup
@@ -1315,7 +1350,7 @@ function ExperienceModal({ open, close, onSave }) {
 function FilesTab({ candidate }) {
   const navigate = useNavigate();
   const notify = useToast();
-  const [preview, setPreview] = useState(null);
+  // 产品决策 2026-11-22：简历和其他文件的“预览”在新标签页打开。
   const [uploadOpen, setUploadOpen] = useState(false);
   const [changesOpen, setChangesOpen] = useState(false);
   return (
@@ -1354,7 +1389,7 @@ function FilesTab({ candidate }) {
                 </span>
                 <StatusBadge tone="success">{status}</StatusBadge>
                 <div>
-                  <button type="button" onClick={() => setPreview(name)}>
+                  <button type="button" onClick={() => openFilePreview({ name, type: "简历", source: `${candidate.name} · 简历版本` })}>
                     预览
                   </button>
                   <button
@@ -1398,7 +1433,7 @@ function FilesTab({ candidate }) {
               </span>
               <StatusBadge tone="neutral">已保存</StatusBadge>
               <div>
-                <button type="button" onClick={() => setPreview(name)}>
+                <button type="button" onClick={() => openFilePreview({ name, type, source: `${candidate.name} · 其他文件` })}>
                   预览
                 </button>
                 <button
@@ -1494,9 +1529,6 @@ function FilesTab({ candidate }) {
           ))}
         </div>
       </Modal>
-      {preview ? (
-        <FilePreview name={preview} close={() => setPreview(null)} />
-      ) : null}
     </div>
   );
 }
@@ -2343,6 +2375,7 @@ export function CandidateDetailPage() {
       : candidates.find((item) => item.id === candidateId);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rematchOpen, setRematchOpen] = useState(false);
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
   const [refreshing, setRefreshing] = useState(state === "matching-running");
   const updateQuery = (changes) => {
     const next = new URLSearchParams(params);
@@ -2496,6 +2529,22 @@ export function CandidateDetailPage() {
         onBack={() => navigate("/candidates")}
         onDelete={() => setDeleteOpen(true)}
       >
+        {/* 产品决策 2026-11-22：手动查重入口（另外两种触发：上传新简历时立即查一次、后台定时扫）。 */}
+        <Button
+          icon="search"
+          loading={checkingDuplicates}
+          onClick={() => {
+            setCheckingDuplicates(true);
+            window.setTimeout(() => {
+              setCheckingDuplicates(false);
+              if (candidate.id === "candidate-linhao")
+                notify("发现 1 位疑似重复候选人，已列入“处理身份冲突”", "info");
+              else notify("没有发现疑似重复的候选人");
+            }, 900);
+          }}
+        >
+          检查疑似重复
+        </Button>
         <Button icon="sparkles" onClick={() => setAiState("setup")}>
           信息补全
         </Button>

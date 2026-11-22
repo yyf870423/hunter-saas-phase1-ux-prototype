@@ -109,12 +109,12 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
       );
     expect(hasTruncatedTag).toBe(false);
   }
+  // 产品决策 2026-11-22：默认每页 50 条，13 位候选人都在第一页。
   const pagination = page.getByRole("navigation", { name: "分页" });
-  await pagination.getByRole("button", { name: "2", exact: true }).click();
+  await expect(pagination).toContainText("每页 50 条");
   await expect(
     page.locator("td.s4-data-col-education .s4-tag-success").first(),
   ).toBeVisible();
-  await pagination.getByRole("button", { name: "1", exact: true }).click();
   await tableWrap.evaluate((element) => {
     element.scrollLeft = element.scrollWidth;
   });
@@ -1169,7 +1169,8 @@ test("论文和专利列表提供足够的摘要信息", async ({ page }) => {
 
   await page.goto("#/patents");
   const patentSummaries = page.locator(".s4-academic-summary");
-  await expect(patentSummaries).toHaveCount(3);
+  // 产品决策 2026-11-23：专利示例补到 12 条，默认每页 10 条。
+  await expect(patentSummaries).toHaveCount(10);
   expect((await patentSummaries.first().textContent()).length).toBeGreaterThan(
     60,
   );

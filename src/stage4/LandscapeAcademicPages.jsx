@@ -31,6 +31,7 @@ import {
   TextInput,
   TooltipText,
   useListController,
+  usePagedUrlState,
   useToast,
 } from "./asset-ui";
 import { candidates, landscapes, papers, patents } from "./data";
@@ -989,12 +990,15 @@ function AcademicCardList({ kind }) {
   const items = kind === "papers" ? papers : patents;
   const navigate = useNavigate();
   const notify = useToast();
+  // 产品决策 2026-11-22：论文、专利卡片每页可选 5 / 10 / 20，默认 10；页码和条数写进网址。
+  const paging = usePagedUrlState([5, 10, 20], 10);
   const controller = useListController(
     items,
     kind === "papers"
       ? ["title", "titleZh", "authors", "institutions", "tags"]
       : ["title", "applicant", "inventors", "tags"],
-    4,
+    paging.pageSize,
+    { page: paging.page, onPageChange: paging.setPage },
   );
   const [selected, setSelected] = useState(new Set());
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -1022,10 +1026,10 @@ function AcademicCardList({ kind }) {
       return false;
     return true;
   });
-  const pages = Math.max(1, Math.ceil(filteredItems.length / 4));
+  const pages = Math.max(1, Math.ceil(filteredItems.length / paging.pageSize));
   const rows = filteredItems.slice(
-    (controller.page - 1) * 4,
-    controller.page * 4,
+    (Math.min(controller.page, pages) - 1) * paging.pageSize,
+    Math.min(controller.page, pages) * paging.pageSize,
   );
   useEffect(() => controller.setPage(1), [relationFilters, typeFilters]);
   return (
@@ -1197,9 +1201,11 @@ function AcademicCardList({ kind }) {
         </div>
       ) : null}
       <Pagination
-        page={controller.page}
+        page={Math.min(controller.page, pages)}
         pages={pages}
-        pageSize={4}
+        pageSize={paging.pageSize}
+        pageSizeOptions={paging.sizeOptions}
+        onPageSizeChange={paging.setPageSize}
         onChange={controller.setPage}
       />
       <DeleteAssetModal

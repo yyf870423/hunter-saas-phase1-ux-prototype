@@ -100,7 +100,8 @@ for (const [device, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 
     await capture(page, `${device}-paper-delete`);
     await button(page, "取消").click();
     await expect(page).toHaveURL(/papers\/paper-vla-survey/);
-    for (const [route, size] of [["papers", 4], ["patents", 4], ["candidates", 6], ["data/imports", 2]]) {
+    // 产品决策 2026-11-22：论文 / 专利卡片默认每页 10 条，表格类列表默认 50 条。
+    for (const [route, size] of [["papers", 10], ["patents", 10], ["candidates", 50], ["data/imports", 2]]) {
       await page.goto("#/" + route);
       await expect(page.getByText(`每页 ${size} 条`, { exact: true })).toHaveCount(1);
     }

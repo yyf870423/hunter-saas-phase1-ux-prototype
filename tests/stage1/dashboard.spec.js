@@ -450,8 +450,11 @@ for (const [empty, counts, title] of [
     await expect(page.locator(".s1-action-queue")).toHaveCount(
       empty === "tasks" ? 0 : 1,
     );
+    // 产品决策 2026-11-22：资产变化标题显示“最近 N 条”，为空时仍显示 0。
     await expect(page.locator(".s1-dashboard-count")).toHaveText(
-      counts.map(String),
+      counts.map((count, index) =>
+        index === 2 && count ? `最近 ${count} 条` : String(count),
+      ),
     );
   });
 }

@@ -4,11 +4,12 @@ import {
   Button, CustomCheckbox, DatePicker, DefinitionGrid, DetailTabs, EntitySelect,
   FieldGroup, FormField, Modal, SelectMenu, StateBanner, StatusBadge, TextArea, TextInput, useToast,
 } from "./asset-ui";
-import { currentFollowup, OPPORTUNITY_FIELDS, opportunityNow, summarizeOpportunity } from "./opportunity-domain";
+import { currentFollowup, OPPORTUNITY_FIELDS, opportunityContactIds, opportunityNow, summarizeOpportunity } from "./opportunity-domain";
 import { getOpportunityPermission, runOpportunityCommand, useOpportunityState } from "./opportunity-store";
 import { useCompanyContacts } from "./company-contact-store";
 import { OpportunityFiles } from "./OpportunityFiles";
 import { directionJdInfo } from "./opportunity-jd";
+import { EDUCATION_LEVELS, EDUCATION_MODES, normalizeEducation, normalizeEducationMode } from "./education-policy";
 import "./opportunity-components.css";
 
 export const localDateTime = (value) => {
@@ -18,8 +19,8 @@ export const localDateTime = (value) => {
   return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()) + " " + pad(date.getHours()) + ":" + pad(date.getMinutes());
 };
 export const displayDateTime = (value) => localDateTime(value) || "待确认";
-export const emptyOpportunity = (companyId = "") => Object.fromEntries(OPPORTUNITY_FIELDS.map((key) => [key, key === "companyId" ? companyId : key === "priority" ? "中" : ""]));
-export const pickOpportunity = (item) => Object.fromEntries(OPPORTUNITY_FIELDS.map((key) => [key, item?.[key] || ""]));
+export const emptyOpportunity = (companyId = "") => Object.fromEntries(OPPORTUNITY_FIELDS.map((key) => [key, key === "companyId" ? companyId : key === "priority" ? "中" : key === "contactIds" ? [] : ""]));
+export const pickOpportunity = (item) => Object.fromEntries(OPPORTUNITY_FIELDS.map((key) => [key, key === "contactIds" ? opportunityContactIds(item) : item?.[key] || ""]));
 export const positionFromDirection = (opportunity, direction) => ({
   name: direction?.name || "", companyId: opportunity?.companyId || "", company: opportunity?.company || "",
   location: direction?.location || "", salary: direction?.salary || "", experience: direction?.experience || "",
@@ -73,12 +74,17 @@ export function OpportunityFields({ value, onChange, errors = {}, section = "all
       <FormField label="机会名称" required error={errors.title}><TextInput value={value.title} onChange={(next) => set("title", next)} />{old("title")}</FormField>
       <FormField label="所属公司" required error={errors.companyId}>{fixedCompany ? <TextInput value={companies.find((item) => item.id === value.companyId)?.name || "公司不可用"} disabled /> : <EntitySelect label="选择公司" value={value.companyId}
         options={companies.filter((item) => !deletedCompanies.includes(item.id)).map((item) => ({ value: item.id, label: item.name }))}
-        onChange={(companyId) => onChange({ ...value, companyId, contactId: "" })} searchable />}</FormField>
+        onChange={(companyId) => onChange({ ...value, companyId, contactId: "", contactIds: [] })} searchable />}</FormField>
       <FormField label="预计人数"><TextInput value={value.people} onChange={(next) => set("people", next)} placeholder="待确认" /></FormField>
       <FormField label="预计时间"><DatePicker mode="month-range" label="选择预计时间" value={value.period} onChange={(next) => set("period", next)} /></FormField>
-      <FormField label="相关联系人" error={errors.contactId}><EntitySelect label="未关联联系人" value={value.contactId}
-        options={[{ value: "", label: "未关联联系人" }, ...contacts.filter((item) => item.companyId === value.companyId && !item.deletedAt).map((item) => ({ value: item.id, label: item.name + (item.role ? " · " + item.role : "") }))]}
-        onChange={(next) => set("contactId", next)} searchable /></FormField>
+      <FormField label="相关联系人" error={errors.contactId}>{(() => {
+        const choices = contacts.filter((item) => item.companyId === value.companyId && !item.deletedAt)
+          .map((item) => ({ id: item.id, label: item.name + (item.role ? " · " + item.role : "") }));
+        const selected = opportunityContactIds(value);
+        return <SelectMenu label="选择联系人" multiple searchable value={choices.filter((item) => selected.includes(item.id)).map((item) => item.label)}
+          options={choices.map((item) => item.label)}
+          onChange={(labels) => { const ids = choices.filter((item) => labels.includes(item.label)).map((item) => item.id); onChange({ ...value, contactIds: ids, contactId: ids[0] || "" }); }} />;
+      })()}</FormField>
       <FormField label="优先级"><SelectMenu value={!value.priority || value.priority === "普通" ? "中" : value.priority} options={["高", "中", "低"]} onChange={(next) => set("priority", next)} /></FormField>
       <FormField label="优先级理由" help="Hunter 会给出建议和理由，确认后写入；也可以自己写。"><TextInput value={value.priorityReason || ""} onChange={(next) => set("priorityReason", next)} placeholder="例如：融资后扩张，岗位级别高" /></FormField>
     </> : null}
@@ -117,8 +123,10 @@ export function PositionFields({ value, onChange, fixedCompany = false, disabled
       <EntitySelect label="选择公司" value={value.companyId} options={companies.filter((item) => !deletedCompanies.includes(item.id)).map((item) => ({ value: item.id, label: item.name }))}
         onChange={(companyId) => onChange({ ...value, companyId, company: companies.find((item) => item.id === companyId)?.name || "" })} searchable />}</FormField>
     {!fixedCompany && !value.companyId ? <FormField label="尚未建档的招聘公司" span={2}><TextInput value={value.company} onChange={(next) => set("company", next)} /></FormField> : null}
-    {[["location", "工作地点"], ["salary", "薪资范围"], ["experience", "最低工作年限"], ["education", "学历要求及弹性"]].map(([key, label]) =>
+    {[["location", "工作地点"], ["salary", "薪资范围"], ["experience", "最低工作年限"]].map(([key, label]) =>
       <FormField label={label} key={key}><TextInput value={value[key]} onChange={(next) => set(key, next)} placeholder="待确认" /></FormField>)}
+    <FormField label="学历要求"><SelectMenu label="学历要求" value={normalizeEducation(value.education)} options={EDUCATION_LEVELS} onChange={(next) => set("education", next)} /></FormField>
+    <FormField label="学历要求程度" help="可酌情降低时只放宽一级，匹配结果会写明折算原因"><SelectMenu label="学历要求程度" value={normalizeEducationMode(value.educationMode)} options={EDUCATION_MODES} onChange={(next) => set("educationMode", next)} /></FormField>
     <FormField label="关键技能" span={2}><SelectMenu label="关键技能" value={value.skills || []} options={value.skills || []} onChange={(next) => set("skills", next)} multiple searchable creatable /></FormField>
     <FormField label="完整岗位 JD" required span={2} error={errors.jd}><TextArea value={value.jd} onChange={(next) => set("jd", next)} rows={14} /></FormField>
     <FormField label="用户备注" span={2}><TextArea value={value.note} onChange={(next) => set("note", next)} rows={3} /></FormField>

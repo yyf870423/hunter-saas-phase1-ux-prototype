@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Button,
   FieldGroup,
@@ -10,6 +10,7 @@ import {
 import { saveContact } from "./company-contact-store";
 
 import { fileDatabase } from "./contact-file-storage";
+import { openFilePreview } from "./file-preview";
 
 export function ContactFiles({ contact }) {
   const notify = useToast();
@@ -17,14 +18,7 @@ export function ContactFiles({ contact }) {
   const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [preview, setPreview] = useState(null);
   const [deleting, setDeleting] = useState(null);
-  useEffect(
-    () => () => {
-      if (preview?.url) URL.revokeObjectURL(preview.url);
-    },
-    [preview],
-  );
   const upload = async () => {
     if (!files.length) {
       setError("请选择文件");
@@ -85,12 +79,7 @@ export function ContactFiles({ contact }) {
         link.download = file.name;
         link.click();
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-      } else
-        setPreview({
-          ...file,
-          url,
-          text: /\.txt$/i.test(file.name) ? await blob.text() : null,
-        });
+      }
     } catch {
       notify("文件读取失败，可能已被浏览器清理，请重新上传。", "error");
     }
@@ -119,7 +108,18 @@ export function ContactFiles({ contact }) {
                 <b>{file.name}</b>
                 <small>{Math.max(1, Math.ceil(file.size / 1024))} KB</small>
               </span>
-              <Button size="sm" onClick={() => openFile(file)}>
+              {/* 产品决策 2026-11-22：预览在新标签页打开。 */}
+              <Button
+                size="sm"
+                icon="external"
+                onClick={() =>
+                  openFilePreview({
+                    id: file.id,
+                    name: file.name,
+                    source: `联系人文件 · ${contact.name}`,
+                  })
+                }
+              >
                 预览
               </Button>
               <Button
@@ -164,30 +164,6 @@ export function ContactFiles({ contact }) {
           accept="PDF、DOCX、XLSX、TXT、PNG、JPG"
           error={error}
         />
-      </Modal>
-      <Modal
-        open={Boolean(preview)}
-        close={() => setPreview(null)}
-        size="xl"
-        title={preview?.name || "文件预览"}
-      >
-        {preview?.text !== null && preview?.text !== undefined ? (
-          <pre className="s4-contact-file-text">{preview.text}</pre>
-        ) : /\.(pdf|png|jpe?g)$/i.test(preview?.name || "") ? (
-          <iframe
-            sandbox=""
-            className="s4-contact-file-preview"
-            src={preview.url}
-            title={preview.name}
-          />
-        ) : (
-          <StateBanner
-            title="此格式暂不支持在线预览"
-            action={
-              <Button onClick={() => openFile(preview, true)}>下载文件</Button>
-            }
-          />
-        )}
       </Modal>
       <Modal
         open={Boolean(deleting)}

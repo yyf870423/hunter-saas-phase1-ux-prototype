@@ -254,9 +254,12 @@ test("文件可校验、上传、预览和下载，刷新后仍在所属联系�
   await page.getByRole("button", { name: "保存文件" }).click();
   await expect(page.getByText("文件已保存", { exact: true })).toBeVisible();
   await page.reload();
+  // 产品决策 2026-11-22：文件预览在新标签页打开。
+  const previewTab = page.waitForEvent("popup");
   await page.getByRole("button", { name: "预览", exact: true }).click();
-  await expect(page.getByRole("dialog")).toContainText("星澜客户沟通记录");
-  await page.getByRole("dialog").getByRole("button", { name: "关闭" }).click();
+  const preview = await previewTab;
+  await expect(preview.locator(".s4-file-preview-page")).toContainText("星澜客户沟通记录");
+  await preview.close();
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "下载", exact: true }).click();
   expect(await downloadName(page, await download)).toBe("客户沟通.txt");

@@ -58,6 +58,7 @@ export function DashboardSection({
   title,
   icon,
   count,
+  countLabel,
   action,
   children,
   className = "",
@@ -75,6 +76,9 @@ export function DashboardSection({
           {title}
           {typeof count === "number" ? (
             <span className="s1-dashboard-count">{count}</span>
+          ) : countLabel ? (
+            // Used where the number is "how many are listed", not a total (asset changes: latest N).
+            <span className="s1-dashboard-count">{countLabel}</span>
           ) : null}
         </h2>
         {action}

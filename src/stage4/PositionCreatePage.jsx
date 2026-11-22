@@ -41,7 +41,7 @@ export function PositionCreatePage() {
         {mode === "manual" ? <><PositionFields value={draft} onChange={setDraft} errors={action.error?.details?.fields} disabled={action.busy || getOpportunityPermission()} />
           <PostWriteMatchingOptions entityType="position" enabled={match} onEnabledChange={setMatch} disabled={action.busy || getOpportunityPermission()} /><footer><Button tone="primary" disabled={action.busy || getOpportunityPermission()} onClick={save}>{action.busy ? "保存中" : "创建岗位"}</Button></footer></> :
           mode === "file" ? <><FileDrop files={files} onFiles={setFiles} accept="PDF、DOCX、TXT、XLSX、CSV、图片" /><footer><Button tone="primary" disabled={!files.length || parsing || getOpportunityPermission()} onClick={() => parse(value, files)}>{parsing ? "读取中" : "整理岗位草稿"}</Button></footer></> :
-          <Composer value={value} onChange={setValue} onSend={parse} authMode={authMode} onAuthChange={setAuthMode} attachments={files} onAttachmentsChange={setFiles} disabled={parsing || getOpportunityPermission()} placeholder="粘贴完整 JD，补充岗位名称、公司、职责与要求" />}
+          <Composer value={value} onChange={setValue} onSend={parse} authMode={authMode} onAuthChange={setAuthMode} attachments={files} onAttachmentsChange={setFiles} disabled={parsing || getOpportunityPermission()} placeholder="粘贴完整 JD 或招聘链接，补充岗位名称、公司、职责与要求" />}
         {action.errorView}{parsing ? <StateBanner icon="refresh" title="正在保存并读取输入资料" /> : null}
       </section>
     </div>

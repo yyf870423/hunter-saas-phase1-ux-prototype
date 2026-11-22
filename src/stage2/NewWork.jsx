@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
+import { Button } from "../stage1/ui";
 import {
   Composer,
   DecisionRequest,
@@ -275,7 +276,9 @@ export function NewWork() {
     setStatus("idle");
   };
 
-  const isLimited = forcedState === "limited";
+  // 产品决策 2026-11-22（1-29）：没订阅、试用到期或 Credits 用完时也不能新建任务，和权限受限共用同一提示样式。
+  const isUnsubscribed = forcedState === "unsubscribed";
+  const isLimited = forcedState === "limited" || isUnsubscribed;
   const hasConversation = status !== "idle" && !isLimited;
 
   return (
@@ -319,12 +322,26 @@ export function NewWork() {
             {isLimited ? (
               <div className="s2-new-work-limited" role="alert">
                 <Icon name="warning" />
-                <span>
-                  <b>当前工作空间不能创建新任务</b>
-                  <small>
-                    你仍可查看已有任务；请联系工作空间管理员处理权限。
-                  </small>
-                </span>
+                {isUnsubscribed ? (
+                  <span>
+                    <b>当前没有可用套餐，不能开始新任务</b>
+                    <small>
+                      试用已到期或 Credits 已用完。你仍可浏览和导出已有数据；开始 Agent、自动化任务和付费数据处理前需要选择套餐。
+                    </small>
+                  </span>
+                ) : (
+                  <span>
+                    <b>当前工作空间不能创建新任务</b>
+                    <small>
+                      你仍可查看已有任务；请联系工作空间管理员处理权限。
+                    </small>
+                  </span>
+                )}
+                {isUnsubscribed ? (
+                  <Button size="sm" onClick={() => navigate("/settings/subscription")}>
+                    选择订阅
+                  </Button>
+                ) : null}
               </div>
             ) : null}
 

@@ -179,7 +179,8 @@ export function Dashboard() {
           id="dashboard-assets-title"
           title="资产变化"
           icon="layers"
-          count={loading ? undefined : assets.length}
+          count={!loading && !assets.length ? 0 : undefined}
+          countLabel={loading || !assets.length ? undefined : `最近 ${assets.length} 条`}
           loading={loading}
           className="s1-dashboard-assets"
         >

@@ -1,7 +1,7 @@
 import { getCompanyContactSnapshot } from "./company-contact-store";
 import { extractOpportunityText } from "./opportunity-file-parser";
 import { getOpportunitySnapshot, runOpportunityCommand } from "./opportunity-store";
-import { checkFields, DIRECTION_FIELDS } from "./opportunity-domain";
+import { checkFields, DIRECTION_FIELDS, opportunityContactIds } from "./opportunity-domain";
 import { storeOpportunityAttachment } from "./OpportunityFiles";
 import { draftFailureText, singleAssetDecision } from "./single-asset-confirmation";
 import { nextFollowupDraft } from "./task-followup";
@@ -64,10 +64,14 @@ export function prepareOpportunityDraft(task) {
   const company = context.companies.find((item) => !context.deletedCompanies.includes(item.id) &&
     (input.company ? item.name === input.company.trim() : sourceText.includes(item.name)));
   const previous = task.draft?.patch || current || {};
+  const patchContactId = (current?.companyId === company?.id ? current?.contactId : "") ||
+    context.contacts.find((item) => item.id === (last?.contactId || task.source?.contactId) && item.companyId === company?.id && !item.deletedAt)?.id || "";
+  // 产品决策 2026-11-22：机会可关联多位联系人；任务补充的联系人追加进列表，不覆盖已有联系人。
+  const keptContactIds = current?.companyId === company?.id ? opportunityContactIds(current) : [];
   const patch = {
     title: input.title ?? previous.title ?? (company ? company.name + "招聘需求" : ""),
-    companyId: input.company !== undefined ? company?.id || "" : previous.companyId || company?.id || "", contactId: (current?.companyId === company?.id ? current?.contactId : "") ||
-      context.contacts.find((item) => item.id === (last?.contactId || task.source?.contactId) && item.companyId === company?.id && !item.deletedAt)?.id || "",
+    companyId: input.company !== undefined ? company?.id || "" : previous.companyId || company?.id || "", contactId: patchContactId,
+    contactIds: [...new Set([...keptContactIds, patchContactId].filter(Boolean))],
     summary: input.summary ?? previous.summary ?? "", evidence: input.evidence ?? previous.evidence ?? "",
     priority: previous.priority || "普通", people: input.people ?? previous.people ?? "",
     period: input.period ?? previous.period ?? "", requirements: input.requirements ?? previous.requirements ?? "",

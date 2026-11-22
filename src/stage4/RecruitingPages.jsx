@@ -55,6 +55,7 @@ import { AssetRelatedTasks } from "./AssetRelatedTasks";
 import { runOpportunityCommand, useOpportunityState } from "./opportunity-store";
 import { PositionTalentMap } from "./PositionTalentMap";
 import { CreatedPositionWorkspace } from "./CreatedPositionWorkspace";
+import { educationLabel, EDUCATION_MODES } from "./education-policy";
 import { hasSeededPipeline, lastMove, seedRelation, stageNameById } from "./pipeline-relations";
 export { PositionCreatePage } from "./PositionCreatePage";
 
@@ -488,7 +489,7 @@ function PositionProfile({
                 ["工作地点", detail.location],
                 ["薪资范围", detail.salary],
                 ["最低工作年限", detail.experience],
-                ["学历要求", detail.education],
+                ["学历要求", educationLabel(detail) || detail.education],
                 [
                   "来源机会",
                   <button
@@ -1183,6 +1184,14 @@ function PositionSectionEditor({ section, close, onSave }) {
               label="学历要求"
               value="硕士"
               options={["不限", "本科", "硕士", "博士"]}
+              onChange={() => {}}
+            />
+          </FormField>
+          <FormField label="学历要求程度">
+            <SelectMenu
+              label="学历要求程度"
+              value="必须满足"
+              options={EDUCATION_MODES}
               onChange={() => {}}
             />
           </FormField>
@@ -2108,7 +2117,20 @@ function PipelineCandidateModal({ candidate, close }) {
             <PipelineStageTag stage={candidate?.stage || "储备"} />
             <MatchScore score={candidate?.score} />
           </span>
-          <Button size="sm" onClick={() => notify("已打开候选人完整档案")}>
+          {/* 产品决策 2026-11-22（HB-08）：点击在新标签页打开候选人详情，推进记录留在原页。 */}
+          <Button
+            size="sm"
+            icon="external"
+            onClick={() => {
+              const candidateId = candidate?.candidateId || candidate?.id;
+              if (!candidateId) return notify("找不到这位候选人的档案", "error");
+              window.open(
+                `${window.location.pathname}${window.location.search}#/candidates/${candidateId}`,
+                "_blank",
+                "noopener",
+              );
+            }}
+          >
             查看候选人档案
           </Button>
         </header>

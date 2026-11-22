@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
   Button,
@@ -1183,7 +1183,14 @@ export function DataTable({
   );
 }
 
-export function Pagination({ page, pages, onChange, pageSize = 20 }) {
+export function Pagination({
+  page,
+  pages,
+  onChange,
+  pageSize = 20,
+  pageSizeOptions,
+  onPageSizeChange,
+}) {
   return (
     <nav className="s4-pagination" aria-label="分页">
       <span>
@@ -1216,7 +1223,18 @@ export function Pagination({ page, pages, onChange, pageSize = 20 }) {
           onClick={() => onChange(page + 1)}
         />
       </div>
-      <span>每页 {pageSize} 条</span>
+      {pageSizeOptions?.length && onPageSizeChange ? (
+        // 产品决策 2026-11-22：列表可切换每页条数（表格 20 / 50 / 100，论文专利卡片 5 / 10 / 20）。
+        <SelectMenu
+          ariaLabel="每页条数"
+          className="s4-pagination-size"
+          value={`每页 ${pageSize} 条`}
+          options={pageSizeOptions.map((size) => `每页 ${size} 条`)}
+          onChange={(next) => onPageSizeChange(Number(String(next).replace(/\D/g, "")))}
+        />
+      ) : (
+        <span>每页 {pageSize} 条</span>
+      )}
     </nav>
   );
 }
@@ -1478,35 +1496,54 @@ export function FileDrop({
   accept = "PDF、DOCX、XLSX",
   multiple = true,
   error,
+  maxFiles,
+  sizeLabel = "50 MB",
 }) {
   const inputRef = useRef(null);
+  const [limitError, setLimitError] = useState("");
+  // 产品决策 2026-11-22：候选人批量导入单次最多 100 份；超出时提示分批，不静默丢弃。
+  const takeFiles = (next) => {
+    if (maxFiles && next.length > maxFiles) {
+      setLimitError(`单次最多上传 ${maxFiles} 份，本次选择了 ${next.length} 份，请分批上传。`);
+      return;
+    }
+    setLimitError("");
+    onFiles(next);
+  };
+  const shownError = error || limitError;
   return (
     <div className="s4-file-drop-wrap">
       <button
         type="button"
-        className={`s4-file-drop ${error ? "has-error" : ""}`}
+        className={`s4-file-drop ${shownError ? "has-error" : ""}`}
         onClick={() => inputRef.current?.click()}
         onDragOver={(event) => event.preventDefault()}
         onDrop={(event) => {
           event.preventDefault();
           const dropped = Array.from(event.dataTransfer.files || []);
-          onFiles(multiple ? dropped : dropped.slice(0, 1));
+          takeFiles(multiple ? dropped : dropped.slice(0, 1));
         }}
       >
         <i>
           <Icon name="upload" />
         </i>
         <b>选择文件或拖到这里</b>
-        <span>支持 {accept}，单个文件不超过 50 MB</span>
+        <span>
+          支持 {accept}，单个文件不超过 {sizeLabel}
+          {maxFiles ? `，单次最多 ${maxFiles} 份` : ""}
+        </span>
       </button>
       <input
         ref={inputRef}
         type="file"
         multiple={multiple}
         hidden
-        onChange={(event) => onFiles(Array.from(event.target.files || []))}
+        onChange={(event) => {
+          takeFiles(Array.from(event.target.files || []));
+          event.target.value = "";
+        }}
       />
-      {error ? <p className="s4-file-error">{error}</p> : null}
+      {shownError ? <p className="s4-file-error">{shownError}</p> : null}
       {files.length ? (
         <div className="s4-uploaded-files">
           {files.map((file) => (
@@ -1696,6 +1733,34 @@ export function useAssetNavigation() {
   return { navigate, detail };
 }
 
+// 产品决策 2026-11-22：页码和每页条数写进网址，从详情返回时自动恢复；切换每页条数回到第 1 页。
+export function usePagedUrlState(sizeOptions, defaultSize) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedSize = Number(searchParams.get("size"));
+  const pageSize = sizeOptions.includes(requestedSize) ? requestedSize : defaultSize;
+  const page = Math.max(1, Number(searchParams.get("page")) || 1);
+  const update = (patch) =>
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+        Object.entries(patch).forEach(([key, value]) => {
+          if (value === null || value === undefined) next.delete(key);
+          else next.set(key, String(value));
+        });
+        return next;
+      },
+      { replace: true },
+    );
+  return {
+    page,
+    pageSize,
+    sizeOptions,
+    setPage: (nextPage) => update({ page: nextPage > 1 ? nextPage : null }),
+    setPageSize: (nextSize) =>
+      update({ size: nextSize === defaultSize ? null : nextSize, page: null }),
+  };
+}
+
 export function useListController(
   items,
   searchKeys,
@@ -1725,9 +1790,14 @@ export function useListController(
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const page = Math.max(1, Math.min(controls.page ?? internalPage, pages));
   const rows = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const previousQuery = useRef(query);
   useEffect(() => {
+    if (previousQuery.current === query) return;
+    previousQuery.current = query;
     setInternalPage(1);
+    controls.onPageChange?.(1);
     setSelected(new Set());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
   return {
     query,
