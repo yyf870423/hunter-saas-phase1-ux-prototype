@@ -11,7 +11,7 @@ const HUB = "ai-assistant-for-headhunters";
 export const PUBLISHED = "2026-10-25";
 // the last content update: 2026-11-21 the product is HunterBuddy again (高阶技术人才寻访的 AI 工作台), and six of the
 // articles became capability pages (scripts/capabilities/)
-export const MODIFIED = "2026-11-21";
+export const MODIFIED = "2026-11-22";
 
 export async function loadArticles() {
   const dir = resolve(root, "scripts/articles");

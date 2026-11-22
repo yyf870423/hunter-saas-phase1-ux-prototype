@@ -2,8 +2,8 @@
 // ./zh.mjs. Section count and paragraph structure must match the Chinese; the Chinese version prevails. No Chinese
 // characters here (the English pages carry none). **bold** marks the clauses the reader must notice, as in the Chinese.
 // "China" in data-location statements means mainland China (excluding Hong Kong, Macao and Taiwan), as in the Chinese.
-export const UPDATED = "2026-11-02";
-export const EFFECTIVE = "2026-11-02";
+export const UPDATED = "2026-11-22";
+export const EFFECTIVE = "2026-11-22";
 
 const privacy = {
   slug: "privacy",

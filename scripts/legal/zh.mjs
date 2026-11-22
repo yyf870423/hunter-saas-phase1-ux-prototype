@@ -7,8 +7,8 @@
 // 隐私政策分两部分生效：官网和试用申请自生效日期起适用，HunterBuddy 服务自正式开放之日起适用。
 // 开放前要逐条兑现的承诺见 docs/legal-pages.md。
 // 写法：行文不用中文分号。**加粗** 用来提示免除或限制责任、重要权利等条款（民法典第四百九十六条）。
-export const UPDATED = "2026-11-02";
-export const EFFECTIVE = "2026-11-02";
+export const UPDATED = "2026-11-22";
+export const EFFECTIVE = "2026-11-22";
 export const PRIVACY_MAIL = "privacy@boseekai.com";
 export const HELLO_MAIL = "hello@boseekai.com";
 
