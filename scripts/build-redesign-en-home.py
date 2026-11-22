@@ -41,7 +41,7 @@ LANGS = {
         app="HunterBuddy is the AI workbench for senior tech talent search, built for HR teams and professional headhunters: industry primers, client research, org mapping, multi-source sourcing, two-way job matching, identity checks, referrals and talent pools. Every finding names its source, and anything uncertain is marked “To confirm”. Recommendations, outreach and business decisions are yours. Invitation-only trial.",
         app_sub="AI workbench for senior tech talent search", audience="HR teams and professional headhunters",
         share="assets/share-card-en.jpg",
-        film=("HunterBuddy product demo", "Starting from one hiring brief, follow HunterBuddy through a complete senior technical search: client research, org mapping, multi-source sourcing, two-way job matching, identity checks and the talent pool.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4", "2026-10-25T00:00:00+08:00", "PT2M33S"),
+        film=("HunterBuddy product demo", "Starting from one hiring brief, follow HunterBuddy through a complete senior technical search in three steps and eight capabilities: see clearly (industry primer, client research, org mapping), find the right person (multi-source sourcing, two-way job matching, identity checks) and keep them close (referrals, talent pool).", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4", "2026-11-22T00:00:00+08:00", "PT3M5S"),
     ),
 }
 
@@ -155,8 +155,8 @@ r('<h2 class="n-display" id="n-intro-title">从一个需求，到一份能交付
 r('<p>HunterBuddy 是一款面向 HR 与专业猎头的 AI 人才工作台。<br />它不替你去沟通，而是让你在开口之前，就知道这个人做过什么、做到什么程度、该从哪里切入。</p>',
   '<p>HunterBuddy is an AI talent workbench for HR teams and professional headhunters.<br />It doesn’t reach out for you. Instead, before you say a word, you already know what this person has done, how far they took it, and where to begin.</p>')
 r('<p class="n-film-title">一条高阶技术岗位的完整寻访链路</p>', '<p class="n-film-title">One senior technical search, from start to finish</p>')
-r('poster="../assets/film-poster.jpg?v=15"', 'poster="../assets/film-poster-en.jpg?v=10"')
-r('src="../assets/hunterbuddy-film.mp4?v=15"', 'src="../assets/hunterbuddy-film-en.mp4?v=10"')
+r('poster="../assets/film-poster.jpg?v=15"', 'poster="../assets/film-poster-en.jpg?v=11"')
+r('src="../assets/hunterbuddy-film.mp4?v=15"', 'src="../assets/hunterbuddy-film-en.mp4?v=11"')
 r('aria-label="HunterBuddy 产品演示短片"', 'aria-label="HunterBuddy product demo"')
 
 # ---------- eight capabilities: heading ----------
