@@ -33,14 +33,15 @@ LANGS = {
         app_sub="高阶技术人才寻访的 AI 工作台", audience="HR 与专业猎头",
         # the share card (1200×630, the film's last scene): what Feishu, LinkedIn and the like show when the link is pasted
         share="assets/share-card.jpg",
-        film=("HunterBuddy 产品演示", "从一个职位需求出发，跟着 HunterBuddy 走完一条高阶技术岗位的寻访链路：客户研判、组织架构 Mapping、多源寻访、人岗双向匹配、身份核实和人才库。", "assets/film-poster.jpg", "assets/hunterbuddy-film.mp4"),
+        # 11-22 第三版短片（三步八件事，3 分 05 秒）；英文短片还是旧版，等英文版做好再换
+        film=("HunterBuddy 产品演示", "从一个职位需求出发，跟着 HunterBuddy 走完一条高阶技术岗位的寻访链路，三步八件事：看清楚（行业入门、客户研判、组织架构 Mapping）、找到人（多源寻访、人岗双向匹配、身份核实）、留得住（人选转介绍、人才库）。", "assets/film-poster.jpg", "assets/hunterbuddy-film.mp4", "2026-11-22T00:00:00+08:00", "PT3M5S"),
     ),
     "en": dict(
         home=f"{SITE}en/", lang="en", og="en_US", og_alt="zh_CN", site_name="Boseek", title_cut=" | Boseek", baidu=False,
         app="HunterBuddy is the AI workbench for senior tech talent search, built for HR teams and professional headhunters: industry primers, client research, org mapping, multi-source sourcing, two-way job matching, identity checks, referrals and talent pools. Every finding names its source, and anything uncertain is marked “To confirm”. Recommendations, outreach and business decisions are yours. Invitation-only trial.",
         app_sub="AI workbench for senior tech talent search", audience="HR teams and professional headhunters",
         share="assets/share-card-en.jpg",
-        film=("HunterBuddy product demo", "Starting from one hiring brief, follow HunterBuddy through a complete senior technical search: client research, org mapping, multi-source sourcing, two-way job matching, identity checks and the talent pool.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4"),
+        film=("HunterBuddy product demo", "Starting from one hiring brief, follow HunterBuddy through a complete senior technical search: client research, org mapping, multi-source sourcing, two-way job matching, identity checks and the talent pool.", "assets/film-poster-en.jpg", "assets/hunterbuddy-film-en.mp4", "2026-10-25T00:00:00+08:00", "PT2M33S"),
     ),
 }
 
@@ -63,7 +64,7 @@ def seo_block(html, key):
          "applicationSubCategory": L["app_sub"], "operatingSystem": "Web", "url": SITE, "inLanguage": ["zh-CN", "en"],
          "audience": {"@type": "BusinessAudience", "audienceType": L["audience"]}, "publisher": {"@id": f"{SITE}#organization"}, "creator": {"@id": f"{SITE}#organization"}},
         {"@type": "VideoObject", "@id": f"{home}#film", "name": L["film"][0], "description": L["film"][1], "thumbnailUrl": SITE + L["film"][2], "contentUrl": SITE + L["film"][3],
-         "uploadDate": "2026-10-25T00:00:00+08:00", "duration": "PT2M33S", "inLanguage": L["lang"], "publisher": {"@id": f"{SITE}#organization"}},
+         "uploadDate": L["film"][4], "duration": L["film"][5], "inLanguage": L["lang"], "publisher": {"@id": f"{SITE}#organization"}},
         {"@type": "FAQPage", "@id": f"{home}#faq", "inLanguage": L["lang"], "isPartOf": {"@id": f"{home}#webpage"},
          "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]},
     ]
@@ -154,8 +155,8 @@ r('<h2 class="n-display" id="n-intro-title">从一个需求，到一份能交付
 r('<p>HunterBuddy 是一款面向 HR 与专业猎头的 AI 人才工作台。<br />它不替你去沟通，而是让你在开口之前，就知道这个人做过什么、做到什么程度、该从哪里切入。</p>',
   '<p>HunterBuddy is an AI talent workbench for HR teams and professional headhunters.<br />It doesn’t reach out for you. Instead, before you say a word, you already know what this person has done, how far they took it, and where to begin.</p>')
 r('<p class="n-film-title">一条高阶技术岗位的完整寻访链路</p>', '<p class="n-film-title">One senior technical search, from start to finish</p>')
-r('poster="../assets/film-poster.jpg?v=14"', 'poster="../assets/film-poster-en.jpg?v=10"')
-r('src="../assets/hunterbuddy-film.mp4?v=14"', 'src="../assets/hunterbuddy-film-en.mp4?v=10"')
+r('poster="../assets/film-poster.jpg?v=15"', 'poster="../assets/film-poster-en.jpg?v=10"')
+r('src="../assets/hunterbuddy-film.mp4?v=15"', 'src="../assets/hunterbuddy-film-en.mp4?v=10"')
 r('aria-label="HunterBuddy 产品演示短片"', 'aria-label="HunterBuddy product demo"')
 
 # ---------- eight capabilities: heading ----------
