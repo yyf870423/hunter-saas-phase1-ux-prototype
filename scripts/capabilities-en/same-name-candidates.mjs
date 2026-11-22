@@ -2,12 +2,12 @@
 export default {
   slug: "same-name-candidates",
   no: "06",
-  group: "Find",
+  group: "Find the right person",
   name: "Identity checks",
   title: "Identity checks: from one ID to one real person | HunterBuddy",
   description:
     "Identity checks work back from an alias, a handle or an English name to a real person, ruling out namesakes by cross-checking sources, never by guessing from pinyin.",
-  kicker: "Capability 06 · Find",
+  kicker: "Capability 06 · Find the right person",
   h1: "Identity checks: from one ID to one real person",
   definition:
     "Identity checks are a capability that works back from an alias, an English name, a community handle or a platform username to a person’s real name and identity. They rule out namesakes by cross-checking several sources, and never guess Chinese characters from pinyin.",

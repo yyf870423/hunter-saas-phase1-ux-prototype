@@ -2,12 +2,12 @@
 export default {
   slug: "industry-primer",
   no: "01",
-  group: "Know",
+  group: "See clearly",
   name: "Industry primer",
   title: "Industry primer: from an unfamiliar sector to a confident first call | HunterBuddy",
   description:
     "The industry primer maps a value chain’s products, companies and roles into an industry map you can talk from, calibrated against real JDs and exported as an editable mind map.",
-  kicker: "Capability 01 · Know",
+  kicker: "Capability 01 · See clearly",
   h1: "Industry primer: from an unfamiliar sector to a confident first call",
   definition:
     "The industry primer is a capability that organizes how a value chain, its products, companies and roles fit together into an industry map you can talk from. It calibrates its understanding of roles against real JDs, and produces an editable mind map.",

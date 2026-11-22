@@ -163,7 +163,7 @@ const LOCALES = {
         "HunterBuddy’s eight capabilities and three practical guides: industry primers, client research, org mapping, multi-source sourcing, two-way job matching, identity checks, referrals and talent pools. Each explains the problem, how it works and where its limits are.",
       kicker: "Use cases",
       h1: "Use cases",
-      lead: "Eight capabilities in three steps: know, find, keep. Each page explains where the work gets hard, how HunterBuddy handles it, and what is still yours to judge.",
+      lead: "Eight capabilities in three steps: see clearly, find the right person, keep them close. Each page explains where the work gets hard, how HunterBuddy handles it, and what is still yours to judge.",
     },
     footerCases: [
       ["industry-primer", "Industry primer"],
@@ -192,7 +192,7 @@ const LOCALES = {
     capBound: "Where it stops",
     capNext: "Next capability",
     capBack: "Back to all capabilities",
-    capBackLine: "Eight capabilities in three steps: know, find, keep.",
+    capBackLine: "Eight capabilities in three steps: see clearly, find the right person, keep them close.",
     trialTitle: "Request a HunterBuddy trial",
     trialBody: "Trials are by invitation for now. Leave your details, and we’ll arrange your trial around the roles you hire for, the kinds of positions you work on and how your team works.",
     example: COMMON.en.example,

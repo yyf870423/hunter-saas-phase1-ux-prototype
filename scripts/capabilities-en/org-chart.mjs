@@ -2,12 +2,12 @@
 export default {
   slug: "org-chart",
   no: "03",
-  group: "Know",
+  group: "See clearly",
   name: "Org mapping",
   title: "Org mapping: from a group of people to an org chart | HunterBuddy",
   description:
     "Org mapping turns public clues into a traceable org chart, separating current core members, dual appointments, joint training and leavers, and checking each lead is still in post.",
-  kicker: "Capability 03 · Know",
+  kicker: "Capability 03 · See clearly",
   h1: "Org mapping: from a group of people to an org chart",
   definition:
     "Org mapping is a capability that turns public clues into a traceable org chart. It separates current core members, people with dual appointments, joint-training students and people who have left, and checks that each lead is still in post.",

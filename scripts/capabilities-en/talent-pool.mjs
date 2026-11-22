@@ -2,12 +2,12 @@
 export default {
   slug: "talent-pool",
   no: "08",
-  group: "Keep",
+  group: "Keep them close",
   name: "Talent pool",
   title: "Talent pool: one profile per person, kept current | HunterBuddy",
   description:
     "The talent pool merges one person’s identities, career history and conversations into a single profile, de-duplicating automatically and tracking changes on one timeline.",
-  kicker: "Capability 08 · Keep",
+  kicker: "Capability 08 · Keep them close",
   h1: "Talent pool: one profile per person, kept current",
   definition:
     "The talent pool is a capability that merges one person’s identities, career history and conversation records from different platforms into a single profile. It de-duplicates automatically, tracks changes, and keeps every conversation on the same timeline.",

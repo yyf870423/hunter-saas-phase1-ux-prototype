@@ -2,12 +2,12 @@
 export default {
   slug: "finding-candidates",
   no: "04",
-  group: "Find",
+  group: "Find the right person",
   name: "Multi-source sourcing",
   title: "Multi-source sourcing: scattered leads, gathered into one list | HunterBuddy",
   description:
     "Multi-source sourcing searches the public web, papers and patents, open-source footprints and your talent pool together, then checks, merges and ranks each person’s records.",
-  kicker: "Capability 04 · Find",
+  kicker: "Capability 04 · Find the right person",
   h1: "Multi-source sourcing: scattered leads, gathered into one list",
   definition:
     "Multi-source sourcing is a capability that searches the public web, papers and patents, open-source footprints and your authorized talent pool together. Records of the same person from different sources are checked first, then merged, then ranked.",

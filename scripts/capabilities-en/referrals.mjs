@@ -2,12 +2,12 @@
 export default {
   slug: "referrals",
   no: "07",
-  group: "Keep",
+  group: "Keep them close",
   name: "Referrals",
   title: "Referrals: who is most likely to know them | HunterBuddy",
   description:
     "Referrals connects colleagues, lab mates, co-authors, shared patents and past interactions into a network, then finds and ranks bridges within one to three steps.",
-  kicker: "Capability 07 · Keep",
+  kicker: "Capability 07 · Keep them close",
   h1: "Referrals: who is most likely to know them",
   definition:
     "Referrals is a capability that connects colleagues, classmates from the same lab, paper co-authors, shared patents and past interactions into a network. It looks for bridges within one to three steps, and ranks them by relationship strength and how reachable they are.",
