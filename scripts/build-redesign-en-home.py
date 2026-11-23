@@ -155,7 +155,7 @@ r('<h2 class="n-display" id="n-intro-title">从一个需求，到一份能交付
 r('<p>HunterBuddy 是一款面向 HR 与专业猎头的 AI 人才工作台。<br />它不替你去沟通，而是让你在开口之前，就知道这个人做过什么、做到什么程度、该从哪里切入。</p>',
   '<p>HunterBuddy is an AI talent workbench for HR teams and professional headhunters.<br />It doesn’t reach out for you. Instead, before you say a word, you already know what this person has done, how far they took it, and where to begin.</p>')
 r('<p class="n-film-title">一条高阶技术岗位的完整寻访链路</p>', '<p class="n-film-title">One senior technical search, from start to finish</p>')
-r('poster="../assets/film-poster.jpg?v=15"', 'poster="../assets/film-poster-en.jpg?v=11"')
+r('poster="../assets/film-poster.jpg?v=16"', 'poster="../assets/film-poster-en.jpg?v=11"')
 r('src="../assets/hunterbuddy-film.mp4?v=15"', 'src="../assets/hunterbuddy-film-en.mp4?v=11"')
 r('aria-label="HunterBuddy 产品演示短片"', 'aria-label="HunterBuddy product demo"')
 
