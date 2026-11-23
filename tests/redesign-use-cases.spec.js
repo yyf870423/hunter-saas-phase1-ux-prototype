@@ -183,6 +183,7 @@ for (const [path, home, lang] of [["./landing-redesign/", "https://www.boseekai.
     await page.goto(path);
     await expect(page.locator("link[rel=canonical]")).toHaveAttribute("href", home);
     await expect(page.locator('meta[name="baidu-site-verification"]')).toHaveCount(lang === "zh-CN" ? 1 : 0);
+    await expect(page.locator(".n-film-title")).toHaveCount(0);
     const graph = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())["@graph"];
     expect(graph.map((node) => node["@type"])).toEqual(["Organization", "WebSite", "WebPage", "SoftwareApplication", "VideoObject", "FAQPage"]);
     const visible = await page
