@@ -330,7 +330,7 @@ export function EmailDraftReview({
             disabled={!valid}
             onClick={send}
           >
-            确认并发送
+            确认发送
           </Button>
         </div>
       </footer>

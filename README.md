@@ -81,6 +81,8 @@ E2E 覆盖桌面、iPad、iPhone、亮暗主题、导航、搜索、通知、浮
 - `docs/stage-2-interaction-coverage.md`：阶段二交互覆盖清单。
 - `docs/stage-2-design-system-extension.md`：阶段二公共组件扩展。
 - [导入任务逐项明细原型](docs/import-task-detail-prototype-20261123.md)：已验收交互、验收入口、公共组件、测试证据及后端对接缺口。
+- [任务本次操作确认原型](docs/task-execution-approval-prototype-20261124.md)：已验收，业务按钮、范围差异、快速确认及后端请求绑定要求。
+- [任务确认与授权文案规范](docs/task-approval-copy-spec-20261124.md)：已确认的内容顺序、动作模板、完整示例、状态与安全边界；对应详细设计02 §7.17。
 - `docs/stage-6-operations-plan.md`：运营端范围、模块和审批门禁。
 - `docs/stage-6-component-boundary.md`：运营端组件和隐私数据边界。
 - `docs/stage-6-interaction-coverage.md`：运营端交互与关键状态覆盖。

@@ -20,7 +20,7 @@ async function readyClient(page) {
   await confirmClientOpportunity(page);
   await replyToAsset(page, "保存陈雨、周琪为联系人");
   await replyToAsset(page, "确认");
-  await button(page, "确认并发送").click();
+  await button(page, "确认发送").click();
   await expect(page.getByRole("heading", { name: "等待陈雨回复招聘合作邮件" })).toBeVisible();
   await replyToAsset(page, "招聘需求摘要：客户已回复，新增机器人测试团队\n需求依据：陈雨确认需要进一步核对 JD");
   await expect(page.getByRole("heading", { name: "待确认的招聘机会", exact: true })).toBeVisible();
@@ -49,7 +49,7 @@ for (const [device, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 
     await replyToAsset(page, "跟进时间：2099-09-11 11:00");
     await expect(article).toContainText("2099-09-11 11:00");
     await capture(page, device + "-client-followup-confirm");
-    await replyToAsset(page, "是");
+    await button(page, "保存跟进安排").click();
     expect((await snapshot(page)).followups).toHaveLength(1);
     await replyToAsset(page, "是");
     expect((await snapshot(page)).followups).toHaveLength(1);
@@ -86,7 +86,7 @@ test("普通机会任务复用跟进确认，改期建议、取消和仅分析�
   await replyToAsset(page, "否");
   expect((await snapshot(page)).followups[0].version).toBe(1);
   await replyToAsset(page, "取消安排");
-  await replyToAsset(page, "是");
+  await button(page, "取消这次安排").click();
   expect((await snapshot(page)).followups[0].status).toBe("cancelled");
   await replyToAsset(page, "记录跟进\n跟进内容：客户确认已收到问题清单\n实际跟进时间：2026-09-01 10:00");
   const beforeRecords = (await snapshot(page)).opportunities.at(-1).records.length;

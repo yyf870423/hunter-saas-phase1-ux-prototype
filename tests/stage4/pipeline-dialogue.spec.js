@@ -41,7 +41,7 @@ test("对话中一句话推进多位候选人：先出整批草稿，可逐项�
   await expect(draft).toContainText("陈楚宁：已推荐 → 一面，备注“约了一面”");
   await expect(draft).toContainText("梁辰：二面 → 谈薪，备注“二面过了、进谈薪”");
   await expect(draft).toContainText("周明远：一面 → 已落选，备注“客户没通过”");
-  await expect(draft).toContainText("是否执行？请回复“是”“否”，或单独调整某一位。");
+  await expect(draft).toContainText("是否执行？可点击下方确认按钮，或在原对话单独调整某一位。");
 
   await input.fill("周明远先不动，其他是");
   await input.press("Enter");

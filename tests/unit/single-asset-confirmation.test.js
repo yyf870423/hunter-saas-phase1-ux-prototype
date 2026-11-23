@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { singleAssetDecision, draftFailureText } from "../../src/stage4/single-asset-confirmation.js";
+import { singleAssetDecision, draftFailureText, displayDraftConfirmation } from "../../src/stage4/single-asset-confirmation.js";
 
 test("只有完整明确的肯定答复才允许确认", () => {
   for (const text of ["是", "是的。", "确认入库", "确认修改", " 可以！ "]) assert.equal(singleAssetDecision(text), "confirm");
@@ -11,4 +11,8 @@ test("否定和混合建议不能触发确认", () => {
 });
 test("字段校验错误保留具体原因", () => {
   assert.match(draftFailureText({ message: "字段缺失", details: { fields: { evidence: "请说明发现依据" } } }), /尚未写入：字段缺失[\s\S]*请说明发现依据/);
+});
+test("历史自然语言回复保留原文，不伪装成点击或改写成确认", () => {
+  const message = { id: "m1", role: "user", content: "是", sourceKind: "decision" };
+  assert.equal(displayDraftConfirmation({ id: "client-xinglan", messages: [message] }, message), "是");
 });

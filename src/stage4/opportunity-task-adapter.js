@@ -182,7 +182,7 @@ export async function respondToTaskFollowupFiles(taskId, text, files) {
   return respondToTaskFollowup(taskId, text, await collectTaskAttachments(files));
 }
 
-export function respondToTaskFollowup(taskId, text, collected) {
+export function respondToTaskFollowup(taskId, text, collected, decisionEvent) {
   const state = getOpportunitySnapshot();
   const task = state.tasks.find((item) => item.id === taskId && !item.deletedAt);
   if (!task || task.kind !== "opportunity" || task.phase !== "result" || !task.opportunityId || Object.keys(explicitInputFields(text)).length) return null;
@@ -192,7 +192,7 @@ export function respondToTaskFollowup(taskId, text, collected) {
     if (draft.action === "record") draft.fileIds = [...new Set([...(draft.fileIds || []), ...collected.fileIds])];
     else { draft.feedback = "附件已保留在对话中；当前安排或取消操作不引用附件。请先核对操作摘要。"; draft.stage = "collect"; }
   }
-  runOpportunityCommand("task.update", { id: taskId, patch: {}, message: { role: "user", content: [text, collected?.material, ...(collected?.warnings || [])].filter(Boolean).join("\n\n"), fileIds: collected?.fileIds || [], sourceKind: "followup" } });
+  runOpportunityCommand("task.update", { id: taskId, patch: {}, message: { role: "user", content: [decisionEvent ? `已点击：${decisionEvent.label}` : text, collected?.material, ...(collected?.warnings || [])].filter(Boolean).join("\n\n"), fileIds: collected?.fileIds || [], sourceKind: "followup", ...(decisionEvent ? { decisionEvent } : {}) } });
   if (!collected && task.followupDraft?.stage === "review" && singleAssetDecision(text) === "confirm") {
     try {
       runOpportunityCommand("task.followup.confirm", { id: taskId, draftId: task.followupDraft.id }, { commandId: "confirm-" + task.followupDraft.id });
@@ -204,7 +204,7 @@ export function respondToTaskFollowup(taskId, text, collected) {
   return { handled: true };
 }
 
-export function respondToSingleAssetDraft(taskId, text) {
+export function respondToSingleAssetDraft(taskId, text, decisionEvent) {
   const task = getOpportunitySnapshot().tasks.find((item) => item.id === taskId && !item.deletedAt);
   if (!task || !["opportunity", "position-create"].includes(task.kind)) return null;
   const decision = singleAssetDecision(text);
@@ -233,7 +233,7 @@ export function respondToSingleAssetDraft(taskId, text) {
     runOpportunityCommand("task.update", { id: taskId, patch: {}, message: { role: "user", content: text, sourceKind: "decision" } });
     return remember("尚未修改或写入。当前原型未能可靠解析这条建议，请明确需要修改的字段及内容，例如“机会名称：新的名称”或“岗位名称：新的名称”；正式语义理解仍由后续 Agent 实现。");
   }
-  runOpportunityCommand("task.update", { id: taskId, patch: {}, message: { role: "user", content: text, sourceKind: "decision" } });
+  runOpportunityCommand("task.update", { id: taskId, patch: {}, message: { role: "user", content: decisionEvent ? `已点击：${decisionEvent.label}` : text, sourceKind: "decision", ...(decisionEvent ? { decisionEvent } : {}) } });
   if (!pending) return remember(task.phase === "result" ? "这份资料已经写入，没有新的待确认修改，不会重复入库。" : "资料仍在整理，尚未生成可确认的草稿。");
   if (decision === "decline") return remember("暂不写入，草稿已保留。", { phase: "cancelled", status: "可继续" });
   const draft = task.draft;

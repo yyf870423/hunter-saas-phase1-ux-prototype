@@ -10,6 +10,18 @@ const initial = () => ({ ...createOpportunitySeed(), clock: "2026-09-08T01:00:00
 const patch = { title: "新一轮研发扩建", companyId: "company-xinglan", contactId: "", summary: "客户确认需要研发工程师", evidence: "电话确认真实需求" };
 const positionPatch = { name: "机器人学习工程师", jd: "负责操作策略研发与真机部署。要求具备机器人学习项目经验。", skills: [] };
 const command = (state, type, data, options = {}) => applyOpportunityCommand(state, { type, data, ...options }, context);
+test("点击确认事件与用户文字分开保存，非法动作和按钮映射被拒绝", () => {
+  const task = command(initial(), "task.create", { kind: "opportunity", title: "核实需求", prompt: "核实需求" });
+  const event = { requestKey: "request-v1", action: "opportunity", decision: "approve", label: "确认入库" };
+  const data = { id: task.result.taskId, patch: {}, message: { role: "user", content: "已点击：确认入库", sourceKind: "decision", decisionEvent: { ...event, extra: "ignored" } } };
+  const result = command(task.state, "task.update", data);
+  assert.deepEqual(result.state.tasks[0].messages.at(-1).decisionEvent, event);
+  assert.equal(result.state.tasks[0].messages.at(-1).content, "已点击：确认入库");
+  for (const invalid of [{ action: "toString" }, { action: "unknown" }, { label: "自动发送邮件" }, { requestKey: "" }, { decision: "maybe" }]) {
+    assert.throws(() => command(task.state, "task.update", { ...data, message: { ...data.message, decisionEvent: { ...event, ...invalid } } }), /确认事件结构不合法/);
+  }
+  assert.equal(task.state.tasks[0].messages.some(message => message.decisionEvent), false);
+});
 function create(state = initial()) { return command(state, "opportunity.save", { patch }); }
 function direction(state, opportunityId, name = "机器人学习工程师") {
   return command(state, "direction.save", { opportunityId, patch: { name, requirement: "真机部署" } });

@@ -372,7 +372,7 @@ test("客户开发回复保留原文、联系人、任务来源和唯一跟进�
   await expect(page.getByText("公司与联系人结果可以审核")).toBeVisible({ timeout: 15000 });
   await button(page, "打开公司与联系人审核").click();
   await button(page, "保存审核结果").click();
-  await button(page, "确认并发送").click();
+  await button(page, "确认发送").click();
   await expect(page.getByText("等待陈雨回复招聘合作邮件")).toBeVisible();
   const reply = "公司：星澜机器人\n机会名称：邮件确认的算法团队\n招聘需求摘要：客户确认新增两个算法研发方向\n需求依据：陈雨邮件明确确认需要猎头协助，薪酬尚未明确";
   await page.getByPlaceholder("输入补充信息、决定或新的要求").fill(reply);

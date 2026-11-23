@@ -91,7 +91,7 @@ export function draftMarkdown(draft, positionName) {
   const heldText = draft.held?.length
     ? `\n\n${draft.held.map((item) => `${item.name}保持${stageName(item.from)}`).join("，")}，不改。`
     : "";
-  return `将更新「${positionName}」的流程：\n\n${lines.join("\n")}${heldText}\n\n是否执行？请回复“是”“否”，或单独调整某一位。`;
+  return `将更新「${positionName}」的流程：\n\n${lines.join("\n")}${heldText}\n\n是否执行？可点击下方确认按钮，或在原对话单独调整某一位。`;
 }
 
 // The user's reply to a pending draft: confirm all, decline, hold some people, or change someone's target.

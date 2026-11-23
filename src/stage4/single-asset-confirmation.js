@@ -11,6 +11,5 @@ export function draftFailureText(error) {
 }
 
 export function displayDraftConfirmation(task, message) {
-  const first = task.id === "client-xinglan" && task.messages.find((item) => item.role === "user" && item.sourceKind === "decision" && singleAssetDecision(item.content) === "confirm");
-  return first?.id === message.id && message.content.trim() === "是" ? "确认" : message.content;
+  return message.content;
 }

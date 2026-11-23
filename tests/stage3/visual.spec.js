@@ -237,7 +237,7 @@ test("截取阶段三等待、冲突和资料回流状态", async ({ page }) => 
       if (file === "client-waiting") {
         await page.getByRole("button", { name: "打开公司与联系人审核" }).click();
         await page.getByRole("button", { name: "保存审核结果" }).click();
-        await page.getByRole("button", { name: "确认并发送" }).click();
+        await page.getByRole("button", { name: "确认发送" }).click();
       } else if (file === "client-reply") {
         await page.getByPlaceholder("输入补充信息、决定或新的要求").fill("招聘需求摘要：客户回复确认算法方向有招聘计划，完整 JD 下周补充。\n发现依据：用户补充客户回复原文。");
         await page.getByRole("button", { name: "发送", exact: true }).click();

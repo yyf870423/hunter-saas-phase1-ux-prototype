@@ -22,7 +22,8 @@ import { InspectionPanel } from "./ReviewWorkspace";
 import { TaskReadingWorkspace } from "./TaskReadingWorkspace";
 import { TaskResultReader, candidateReadingRows } from "./TaskResultReader";
 import { TaskAreaNav } from "./TaskAreaNav";
-import { runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
+import { getOpportunityPermission, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
+import { executionApprovalKey, TaskExecutionApproval } from "./TaskExecutionApproval";
 import { dialogueActor, stageNameById } from "../stage4/pipeline-relations";
 import { sourcingCandidates } from "./recruiting-review-data";
 import { draftMarkdown, parsePipelineMessage, replyToDraft, resultMarkdown } from "./pipeline-dialogue";
@@ -338,8 +339,8 @@ export function AutomationWorkspace() {
     notify("已从第一条输入重新演示", "info");
   };
 
-  const completeDecision = (text, result) => {
-    setUserDecisions((items) => [...items, { text, result }]);
+  const completeDecision = (text, result, decisionEvent) => {
+    setUserDecisions((items) => [...items, { text: decisionEvent ? `已点击：${decisionEvent.label}` : text, result, decisionEvent }]);
     setPhase(5);
     setReviewOpen(false);
     setInspection(null);
@@ -349,27 +350,28 @@ export function AutomationWorkspace() {
     setContactStage("scope");
   };
 
-  const applyCandidateReview = (selected, text, summary) => {
+  const applyCandidateReview = (selected, text, summary, event) => {
     try {
       const result = runOpportunityCommand("recruiting.legacy-review", { positionId: "position-vla", taskId: "position-vla", reviewIds: selected, authMode, expectedVersion: reviewPositionVersion });
-      completeDecision(text, `已应用审核决定：${summary || `${result.candidateIds.length} 位候选人已加入或保留在岗位流程`}，岗位人才梳理同步更新为 v${result.talentMapVersion}。已有推进阶段不会回退；未选择的人选继续保留在本轮审核结果中，尚未对外联系。\n\n[查看岗位储备](#/positions/position-vla?tab=pipeline) · [查看人才梳理](#/positions/position-vla?tab=talent-map)`);
-    } catch (error) { notify(error.message, "danger"); }
+      completeDecision(text, `已应用审核决定：${summary || `${result.candidateIds.length} 位候选人已加入或保留在岗位流程`}，岗位人才梳理同步更新为 v${result.talentMapVersion}。已有推进阶段不会回退；未选择的人选继续保留在本轮审核结果中，尚未对外联系。\n\n[查看岗位储备](#/positions/position-vla?tab=pipeline) · [查看人才梳理](#/positions/position-vla?tab=talent-map)`, event);
+      return true;
+    } catch (error) { notify(error.message, "danger"); return false; }
   };
 
-  const reply = (text, result) => {
-    setUserDecisions((items) => [...items, { text, result }]);
+  const reply = (text, result, decisionEvent) => {
+    setUserDecisions((items) => [...items, { text: decisionEvent ? `已点击：${decisionEvent.label}` : text, result, decisionEvent }]);
     setComposer("");
     setAttachments([]);
   };
 
   // Stage moves said in the conversation: draft first, write only after the user confirms (02 §7.14).
-  const handlePipelineMessage = (text) => {
+  const handlePipelineMessage = (text, throwErrors = false, event) => {
     const position = opportunityState.positions.find((item) => item.id === "position-vla");
     if (pipelineDraft) {
       const answer = replyToDraft(text, pipelineDraft);
       if (answer.action === "decline") {
         setPipelineDraft(null);
-        reply(text, "好的，这次不改，岗位流程保持原样。");
+        reply(text, "好的，这次不改，岗位流程保持原样。", event);
         return true;
       }
       if (answer.action === "redraft") {
@@ -385,6 +387,7 @@ export function AutomationWorkspace() {
       if (answer.action === "apply") {
         const items = answer.items.filter((item) => item.add || item.from !== item.stage);
         try {
+          if (authMode === "analysis") throw Error("当前仅分析，没有执行岗位流程更新。");
           const additions = items.filter((item) => item.add).map((item) => item.candidateId);
           if (additions.length)
             runOpportunityCommand("pipeline.add", { positionId: position.id, candidateIds: additions });
@@ -397,13 +400,14 @@ export function AutomationWorkspace() {
             });
         } catch (error) {
           notify(error.message, "danger");
+          if (throwErrors) throw error;
           return true;
         }
         setPipelineDraft(null);
-        reply(text, resultMarkdown(items, answer.held, position.id, position.name));
+        reply(text, resultMarkdown(items, answer.held, position.id, position.name), event);
         return true;
       }
-      reply(text, "这批推进还没执行。请回复“是”整批执行、“否”不改，或说明要调整哪一位（如“周明远先不动”）。");
+      reply(text, "这批推进还没执行。可点击下方确认按钮，或在原对话说明要调整哪一位（如“周明远先不动”）。");
       return true;
     }
     const items = parsePipelineMessage(text, position);
@@ -414,12 +418,12 @@ export function AutomationWorkspace() {
     return true;
   };
 
-  const send = (text, files) => {
+  const send = (text, files, event) => {
     if (forcedState === "candidate-ingestion" && !ingestionDecision && !files.length) {
       if (ingestionDraft) {
         if (/^(确认|是|是的)[。 ]*$/.test(text.trim()) && authMode !== "analysis") {
-          setIngestionDecision(ingestionDraft); reply(text, "本版本地演示范围已确认，身份未明确的记录仍保留。真实写入、匹配与逐对象回执尚未接入。");
-        } else reply(text, authMode === "analysis" ? "当前仅分析，没有写入或匹配；切换授权后请重新核对范围。" : "旧草稿未执行，请重新明确本版范围。");
+          setIngestionDecision(ingestionDraft); reply(text, "本版本地演示范围已确认，身份未明确的记录仍保留。真实写入、匹配与逐对象回执尚未接入。", event);
+        } else reply(text, authMode === "analysis" ? "当前仅分析，没有写入或匹配；切换授权后请重新核对范围。" : "旧草稿未执行，请重新明确本版范围。", event);
         setIngestionDraft(null); return;
       }
       const option = { "仅写入": "write-only", "本批仅写入": "write-only", "写入后匹配全部招聘中岗位": "all", "写入后匹配具身智能VLA算法负责人岗位": "selected" }[text.replace(/\s+/g, "").replace(/[。！!]+$/, "")];
@@ -432,19 +436,18 @@ export function AutomationWorkspace() {
       : "";
     if (reserveDraft) {
       if (/^(是|是的|好|确认|可以|执行)[。！!，, ]*$/.test(text.trim())) {
-        setReserveDraft(null);
-        applyCandidateReview(reserveDraft.ids, text, reserveDraft.summary);
+        if (applyCandidateReview(reserveDraft.ids, text, reserveDraft.summary)) setReserveDraft(null);
         setComposer("");
         return;
       }
       if (/^(否|不用|取消|算了)[。！!，, ]*$/.test(text.trim())) {
         setReserveDraft(null);
-        reply(text, "好的，这次不加入，审核结果保持原样。");
+        reply(text, "好的，这次不加入，审核结果保持原样。", event);
         return;
       }
       setReserveDraft(null);
     }
-    if (!files.length && handlePipelineMessage(text)) return;
+    if (!files.length && handlePipelineMessage(text, false, event)) return;
     if (phase < 4) {
       setUserDecisions((items) => [
         ...items,
@@ -471,9 +474,10 @@ export function AutomationWorkspace() {
       const exclusion = omitted ? "未选择赵星羽，" : "";
       setReserveDraft({
         ids: people.map((person) => person.id),
-        summary: `${exclusion}${people.length} 位候选人已加入岗位储备或保留原阶段（${kept} 位已在流程中，阶段不变）`,
+        excludedNames: omitted ? ["赵星羽"] : [],
+        summary: `${exclusion}新增 ${people.length - kept} 位岗位储备并同步人才梳理，${kept} 位保持原阶段；未发送联系消息`,
       });
-      reply(`${text}${attachmentText}`, `将把 85 分以上的 ${people.length} 位候选人加入「${position?.name || "具身智能 VLA 算法负责人"}」的岗位储备${omitted ? "（未选择赵星羽）" : ""}：\n\n${lines.join("\n")}\n\n已在流程中的人不会退回储备。是否执行？请回复“是”“否”，或调整名单。`);
+      reply(`${text}${attachmentText}`, `已核对 85 分以上的 ${people.length} 位人选${omitted ? "（未选择赵星羽）" : ""}：\n\n${lines.join("\n")}\n\n本次新增 ${people.length - kept} 位储备，${kept} 位保持原阶段。可点击下方确认按钮，或在原对话调整名单。`);
       return;
     } else if (contactStage === "waiting") {
       setUserDecisions((items) => [
@@ -595,6 +599,17 @@ export function AutomationWorkspace() {
                   tone: "info",
                 }
               : null;
+
+  const reservePosition = opportunityState.positions.find(item => item.id === "position-vla");
+  const reservePeople = (reserveDraft?.ids || []).map(id => {
+    const person = candidates.find(item => item.id === id);
+    const assetId = sourcingCandidates.find(item => item.reviewId === id)?.id;
+    return { name: person?.name || id, stage: reservePosition?.pipeline.find(item => item.candidateId === assetId)?.stage };
+  });
+  const reserveNew = reservePeople.filter(person => !person.stage);
+  const reserveKept = reservePeople.filter(person => person.stage);
+  const approvalDraft = ingestionDraft ? { kind: "ingestion", action: ingestionDraft === "write-only" ? "import" : "import-match", value: ingestionDraft, scope: ["新建 9 位候选人，补充 2 位已有候选人的资料；1 位身份冲突资料不写入、不参与匹配。", ingestionDraft === "write-only" ? "仅写入候选人资产，不启动匹配。" : ingestionDraft === "all" ? "成功写入的 11 位匹配全部 8 个招聘中岗位。" : "成功写入的 11 位匹配当前具身智能 VLA 算法负责人岗位。"] } : reserveDraft ? { kind: "reserve", action: "reserve", value: reserveDraft, title: reserveNew.length === 1 ? `将${reserveNew[0].name}加入岗位储备？` : undefined, scope: ["目标岗位：星澜机器人 · " + reservePosition.name, `新增 ${reserveNew.length} 位：${reserveNew.map(person => person.name).join("、") || "无"}。`, `保持 ${reserveKept.length} 位原阶段：${reserveKept.map(person => `${person.name}（${stageNameById[person.stage] || person.stage}）`).join("、") || "无"}。`, ...(reserveDraft.excludedNames?.length ? [reserveDraft.excludedNames.join("、") + "不在本次范围；未列出的人选不变。"] : []), "新增储备关系同步到该岗位人才梳理，不发送联系消息。"] } : pipelineDraft ? { kind: "pipeline", action: "pipeline", value: pipelineDraft, scope: pipelineDraft.items.map(item => `${item.name}：${stageNameById[item.from] || "未加入"} → ${stageNameById[item.stage] || item.stage}`) } : null;
+  const approvalKey = approvalDraft ? executionApprovalKey("position-vla", [approvalDraft.kind, approvalDraft.value, reviewPositionVersion]) : null;
 
   if (forcedState === "loading") {
     return (
@@ -967,6 +982,18 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
                 />
               </>
             ) : null}
+            {approvalDraft && !terminated ? <TaskExecutionApproval key={approvalKey} requestKey={approvalKey}
+              action={approvalDraft.action} title={approvalDraft.title}
+              scope={approvalDraft.scope} authMode={authMode} hasUnsentChanges={Boolean(composer.trim() || attachments.length)}
+              disabledReason={getOpportunityPermission() ? "当前工作空间不能执行写入，请先确认访问权限。" : reservePosition.version !== reviewPositionVersion ? "岗位版本已变化，请先重新核对范围。" : approvalDraft.kind === "reserve" && !reserveNew.length ? "这些人选已在岗位流程中，没有新增储备关系需要确认。" : ""}
+              boundary="只执行本版列出的操作，未列出的人选不变；不对外联系，不改变任务授权模式。"
+              onApprove={(_, event) => {
+                if (reserveDraft) {
+                  if (!applyCandidateReview(reserveDraft.ids, "确认", reserveDraft.summary, event)) throw Error("本次操作未完成，原范围已保留，请核对提示后重试。");
+                  setReserveDraft(null);
+                } else if (pipelineDraft) handlePipelineMessage("确认", true, event);
+                else send("确认", [], event);
+              }} onDecline={(_, event) => send("否", [], event)} /> : null}
             {terminated ? (
               <HunterReply markdown={"### 任务已终止\n\n对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建任务。"} />
             ) : null}

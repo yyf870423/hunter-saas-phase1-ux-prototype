@@ -94,7 +94,7 @@ test("资产操作保留：候选人写入、找人审核与邮件确认仍使�
   await button(page, "打开公司与联系人审核").click();
   await button(page, "保存审核结果").click();
   await expect(page.getByLabel("收件人")).toBeVisible();
-  await expect(button(page, "确认并发送")).toBeVisible();
+  await expect(button(page, "确认发送")).toBeVisible();
   await page.locator(".s2-conversation").evaluate((element) => element.scrollTo({ top: element.scrollHeight, behavior: "instant" }));
   await page.locator(".s2-email-review").scrollIntoViewIfNeeded();
   await capture(page, "audit-03-email-confirmation-retained");

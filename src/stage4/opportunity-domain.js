@@ -1,4 +1,5 @@
 import { updatePositionTalentMap } from "./position-talent-results.js";
+import { executionApprovalCopy } from "../stage2/execution-approval-copy.js";
 
 export const OPPORTUNITY_STATUSES = ["跟进中", "已完成", "已关闭"];
 export const DIRECTION_STATUSES = ["待处理", "已形成或关联岗位", "不再推进"];
@@ -868,12 +869,20 @@ export function applyOpportunityCommand(current, command, context = {}) {
         (draft.fileIds != null && (!Array.isArray(draft.fileIds) || draft.fileIds.some((id) => typeof id !== "string" || !state.files.some((file) => file.id === id)))))
         fail("跟进草稿结构不合法。", "SCHEMA");
     }
+    const decisionEvent = data.message?.decisionEvent;
+    if (decisionEvent) {
+      const copy = Object.hasOwn(executionApprovalCopy, decisionEvent.action) ? executionApprovalCopy[decisionEvent.action] : null;
+      if (!copy || typeof decisionEvent.requestKey !== "string" || !decisionEvent.requestKey ||
+        !["approve", "decline"].includes(decisionEvent.decision) ||
+        decisionEvent.label !== (decisionEvent.decision === "approve" ? copy.approve : copy.decline)) fail("确认事件结构不合法。", "SCHEMA");
+    }
     Object.assign(task, data.patch);
     if (data.message) task.messages.push({
       id: crypto.randomUUID(), role: data.message.role === "assistant" ? "assistant" : "user",
       content: String(data.message.content || ""), fileIds: data.message.fileIds || [], at: now,
       sourceKind: ["reply", "decision", "followup"].includes(data.message.sourceKind) ? data.message.sourceKind : "task",
       contactId: typeof data.message.contactId === "string" ? data.message.contactId : "",
+      ...(decisionEvent ? { decisionEvent: { requestKey: decisionEvent.requestKey, action: decisionEvent.action, decision: decisionEvent.decision, label: decisionEvent.label } } : {}),
     });
     task.version += 1;
     task.updatedAt = now;

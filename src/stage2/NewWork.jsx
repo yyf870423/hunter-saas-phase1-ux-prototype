@@ -11,6 +11,7 @@ import {
 } from "./automation-ui";
 import { workItems } from "./data";
 import { TaskAreaNav } from "./TaskAreaNav";
+import { executionApprovalKey, TaskExecutionApproval } from "./TaskExecutionApproval";
 import { StateBanner } from "../stage4/asset-ui";
 import { createOpportunityTask } from "../stage4/opportunity-task-adapter";
 import { singleAssetDecision } from "../stage4/single-asset-confirmation";
@@ -208,7 +209,7 @@ export function NewWork() {
     return () => window.clearTimeout(timer);
   }, [forcedState, navigate, status, submittedPrompt]);
 
-  const begin = async (text, files = []) => {
+  const begin = async (text, files = [], decisionEvent) => {
     const fileNames = files.map((file) => file.name).join("、");
     const prompt = status === "organization" && !organizationTargets(submittedPrompt).length
       ? submittedPrompt + "\n目标公司：" + text.trim() : text.trim() || `请处理附件：${fileNames}`;
@@ -236,7 +237,7 @@ export function NewWork() {
         setPeriodicDeclined(false);
         result = "已更新下方周期计划草稿，尚未执行。是否按更新后的计划创建或保存？";
       } else result = "尚未修改。当前原型无法可靠解析这条建议，请明确任务目标或执行周期，例如“执行周期：每周三 10:00”，再核对摘要。";
-      setPeriodicReplies((items) => [...items, { text, result }]);
+      setPeriodicReplies((items) => [...items, { text: decisionEvent ? `已点击：${decisionEvent.label}` : text, result, decisionEvent }]);
       setValue(""); setAttachments([]);
       return;
     }
@@ -357,7 +358,14 @@ export function NewWork() {
                 {periodicReplies.map((reply, index) => <div key={index}><UserMessage>{reply.text}</UserMessage><HunterReply markdown={reply.result} /></div>)}
                 <OutcomeReply outcome={status} prompt={submittedPrompt} periodicPlan={periodicPlan} />
                 {status === "periodic" ? (
-                  <HunterReply markdown={(periodicDeclined ? "计划暂未执行。\n\n" : "") + "### 是否" + (editingPeriodic ? "保存这次周期计划调整" : "按此计划创建周期性任务") + "？\n\n请回复“是”“否”，或提出修改建议。"} />
+                  <TaskExecutionApproval key={executionApprovalKey(editingPeriodic || "new-periodic", [periodicPlan, periodicDeclined])}
+                    requestKey={executionApprovalKey(editingPeriodic || "new-periodic", [periodicPlan, periodicDeclined])}
+                    action={editingPeriodic ? "periodic-update" : "periodic"}
+                    scope={["任务目标：" + (periodicPlan.prompt || submittedPrompt), "执行周期：" + periodicPlan.schedule, "时间显示时区：" + Intl.DateTimeFormat().resolvedOptions().timeZone, "此计划将持续运行，可在周期任务中暂停或调整；下次运行时间以调度结果为准。"]}
+                    boundary="本原型仅保存本地计划，未接通调度。正式执行仍保留单资产、身份核实和邮件逐封确认门禁，不自动对外发送。"
+                    authMode={authMode} hasUnsentChanges={Boolean(value.trim() || attachments.length)}
+                    onApprove={async (_, event) => { const before = JSON.stringify(readPeriodicDrafts()); await begin("确认", [], event); if (before === JSON.stringify(readPeriodicDrafts())) throw Error("周期计划尚未保存，请检查提示后重试。"); }}
+                    onDecline={(_, event) => begin("否", [], event)} />
                 ) : null}
                 {status === "clarify" ? (
                   <HunterReply>

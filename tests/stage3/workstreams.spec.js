@@ -72,7 +72,7 @@ test("客户开发完成联系人审核、联系授权、外部等待和招聘�
   await expect(page.getByLabel("主题")).toHaveValue(
     "星澜机器人具身智能团队招聘合作",
   );
-  await page.getByRole("button", { name: "确认并发送" }).click();
+  await page.getByRole("button", { name: "确认发送" }).click();
   await expect(page.getByText("等待陈雨回复招聘合作邮件")).toBeVisible();
   const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
   await input.fill("公司：星澜机器人\n机会名称：邮件确认的新一轮团队招聘\n招聘需求摘要：两个岗位正在招聘，稍后补完整 JD。\n需求依据：陈雨回复邮件，确认两个方向存在招聘需求。");
@@ -205,7 +205,7 @@ test("岗位招聘在入岗位储备后单独确认联系并接收新简历", as
   await expect(page.getByLabel("主题")).toHaveValue(
     "北京具身智能 VLA 算法负责人机会",
   );
-  await page.getByRole("button", { name: "确认并发送" }).click();
+  await page.getByRole("button", { name: "确认发送" }).click();
   await expect(page.getByText("等待 3 位候选人回复邮件")).toBeVisible();
   await input.fill("林昊回复并发来一份新简历，只考虑北京或远程。");
   await input.press("Enter");
@@ -305,7 +305,7 @@ test("客户开发邮件草稿使用独立编辑组件且需要逐次确认", as
       expect(control.fontFamily.toLowerCase()).toContain("sans-serif");
     }
     await expect(
-      page.getByRole("button", { name: "确认并发送" }),
+      page.getByRole("button", { name: "确认发送" }),
     ).toBeEnabled();
     await expectNoHorizontalOverflow(page);
   }

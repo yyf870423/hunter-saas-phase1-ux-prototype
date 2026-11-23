@@ -16,8 +16,10 @@ import { displayDraftConfirmation } from "./single-asset-confirmation";
 import { TaskReadingWorkspace } from "../stage2/TaskReadingWorkspace";
 import { TaskResultReader } from "../stage2/TaskResultReader";
 import { InspectionPanel } from "../stage2/ReviewWorkspace";
+import { executionApprovalKey, TaskExecutionApproval } from "../stage2/TaskExecutionApproval";
+import { validateOpportunity, validatePosition } from "./opportunity-domain";
 
-export function TaskOpportunityFollowup({ task }) {
+export function TaskOpportunityFollowup({ task, hasUnsentChanges = false }) {
   const state = useOpportunityState();
   const opportunity = state.opportunities.find((item) => item.id === task.opportunityId);
   const plan = activeTaskPlan(state, task);
@@ -36,9 +38,24 @@ export function TaskOpportunityFollowup({ task }) {
     if (draft.feedback) lines.push("> " + markdownText(draft.feedback));
     if (draft.fileIds?.length) lines.push("附件：" + draft.fileIds.map((id) => markdownText(state.files.find((file) => file.id === id)?.name || "已保留附件")).join("、"));
     const question = { subject: "下次需要跟进什么事项？", dueAt: "安排在什么时间？", content: "这次实际跟进了什么内容？", occurredAt: "这次实际跟进发生在什么时间？" }[missingFollowupField(draft)];
-    lines.push(question || "是否执行以上操作？请回复“是”“否”，或提出修改建议。");
+    lines.push(question || "可点击下方业务确认按钮，或在原对话提出修改建议。");
   } else lines.push(draft?.stage === "applied" ? "可以继续补充新的跟进记录，或提出改期、取消安排。" : plan ? "可以提出修改下次跟进、记录本次跟进或取消安排；确认前不会改变已有记录。" : opportunity ? "是否安排一次后续跟进？请回复“是”“否”，或提出建议。" : "需要取消保留的安排时，请说明取消安排。");
-  return <HunterReply markdown={lines.join("\n\n")} />;
+  const ready = draft?.stage === "review" && !missingFollowupField(draft);
+  const key = executionApprovalKey(task.id, draft);
+  const decide = (decision, requestKey, event) => {
+    const latest = getOpportunitySnapshot().tasks.find(item => item.id === task.id);
+    if (!latest || executionApprovalKey(task.id, latest.followupDraft) !== requestKey) throw Error("跟进范围已变化，请先核对新版摘要。");
+    respondToTaskFollowup(task.id, decision === "approve" ? "确认" : "否", undefined, event);
+    const after = getOpportunitySnapshot().tasks.find(item => item.id === task.id);
+    if (decision === "approve" && after?.followupDraft?.stage !== "applied") throw Error(after?.followupDraft?.feedback || "本次安排未能执行，请核对后重试。");
+  };
+  return <><HunterReply markdown={lines.join("\n\n")} />{ready ? <TaskExecutionApproval key={key} requestKey={key}
+    action={({ schedule: "followup", record: "followup-record", cancel: "followup-cancel" })[draft.action]}
+    scope={["所属招聘机会：" + (opportunity?.name || "已删除的机会"), ({ schedule: `事项：${draft.subject}；时间：${displayDateTime(draft.dueAt)}（${Intl.DateTimeFormat().resolvedOptions().timeZone}）。`, record: "保存以上跟进记录" + (draft.complete ? "，并完成当前跟进事项。" : "，不改变当前安排。"), cancel: `取消‘${plan?.subject || "已失效的安排"}’${plan?.dueAt ? `（${displayDateTime(plan.dueAt)}）` : ""}，保留历史记录。` })[draft.action]]}
+    boundary="仅更新所属任务内的跟进安排或记录，不自动联系客户。"
+    authMode={task.authMode} hasUnsentChanges={hasUnsentChanges}
+    disabledReason={getOpportunityPermission() ? "当前工作空间不能执行写入。" : ""}
+    onApprove={(requestKey, event) => decide("approve", requestKey, event)} onDecline={(requestKey, event) => decide("decline", requestKey, event)} /> : null}</>;
 }
 
 export function OpportunityWriteResult({ result, taskId }) {
@@ -53,10 +70,35 @@ export function RecruitingCandidateReview({ task, onOpen }) {
   return <HunterReply markdown={`## 人选结果已整理\n\n基于岗位v${task.positionVersion}；${task.positionVersion !== position.version ? `当前岗位已更新为v${position.version}，旧确认不能用于新要求。` : "没有自动加入岗位储备或联系。"}\n\n可在原对话说明要保留或核实哪些人。`}><Button icon="users" onClick={onOpen}>查看人选结果</Button></HunterReply>;
 }
 
-export function SingleAssetTaskSummary({ task, askConfirmation = true, confirmationReply = "是" }) {
+export function SingleAssetTaskSummary({ task, askConfirmation = true, confirmationReply = "是", hasUnsentChanges = false }) {
   const state = useOpportunityState();
+  const [recheckError, setRecheckError] = useState("");
+  const key = executionApprovalKey(task.id, [task.phase, task.draft]);
+  const validation = task.draft ? (task.kind === "position-create" ? validatePosition(task.draft.patch || {}, { ...state, ...getOpportunityContext() }, Boolean(task.opportunityId)) : validateOpportunity(task.draft.patch || {}, { ...state, ...getOpportunityContext() })) : {};
+  const previous = task.kind === "position-create" ? state.positions.find(item => item.id === task.draft?.positionId) : state.opportunities.find(item => item.id === task.draft?.opportunityId);
+  const stale = previous && task.draft?.expectedVersion !== previous.version;
+  const decide = (decision, requestKey, event) => {
+    const latest = getOpportunitySnapshot().tasks.find(item => item.id === task.id);
+    if (!latest || executionApprovalKey(task.id, [latest.phase, latest.draft]) !== requestKey || latest.phase !== "review") throw Error("草稿已变化或本次请求已处理，请先核对当前摘要。");
+    const outcome = respondToSingleAssetDraft(task.id, decision === "approve" ? "确认" : "否", event);
+    const after = getOpportunitySnapshot().tasks.find(item => item.id === task.id);
+    if (decision === "approve" && after?.phase !== "result") throw Error(after?.draft?.feedback || outcome?.content || "本次写入未完成，请核对摘要后重试。");
+  };
   return <>
-    {["review", "cancelled"].includes(task.phase) ? <HunterReply markdown={draftSummaryMarkdown(task, { ...state, ...getOpportunityContext() }, askConfirmation, confirmationReply)} /> : null}
+    {["review", "cancelled"].includes(task.phase) ? <HunterReply markdown={draftSummaryMarkdown(task, { ...state, ...getOpportunityContext() }, false, confirmationReply)} /> : null}
+    {askConfirmation && task.phase === "review" && task.draft ? <TaskExecutionApproval key={key} requestKey={key}
+      action={task.draft.expectedVersion ? "update" : task.kind === "position-create" ? "position" : "opportunity"}
+      scope={[`${task.kind === "position-create" ? "岗位" : "招聘机会"}：${task.draft.patch?.name || task.draft.patch?.title || "待补充名称"}`, task.draft.expectedVersion ? `基于原资料 v${task.draft.expectedVersion} 应用上方修改。` : "按以上摘要创建一份正式资料。"]}
+      authMode={task.authMode} hasUnsentChanges={hasUnsentChanges}
+      boundary={task.kind === "position-create" ? "保存到岗位列表，不自动启动找人或匹配，不发送邮件。" : "保存到招聘机会列表；未核实的 HC、预算、合作意愿与完整 JD 仍待核实，不创建岗位、联系人或发送邮件。"}
+      disabledReason={getOpportunityPermission() ? "当前工作空间不能执行写入。" : stale ? "资料版本已变化，请先重新核对草稿。" : task.draft.companyConflict || Object.values(validation)[0] || (task.draft.invalidDirections ? "招聘方向结构不完整，请先补充有效资料。" : "")}
+      onApprove={(requestKey, event) => decide("approve", requestKey, event)} onDecline={(requestKey, event) => decide("decline", requestKey, event)} /> : null}
+    {task.phase === "cancelled" || stale ? <Button icon="refresh" disabled={getOpportunityPermission() || hasUnsentChanges} onClick={() => {
+      setRecheckError("");
+      try { respondToSingleAssetDraft(task.id, "重新核对"); }
+      catch (failure) { setRecheckError(failure.message || "草稿重新核对失败，请稍后重试。"); }
+    }}>重新核对草稿</Button> : null}
+    {recheckError ? <StateBanner tone="danger" title={recheckError} /> : null}
   </>;
 }
 
@@ -97,19 +139,20 @@ export function OpportunityTaskWorkspace({ taskId }) {
     return () => clearTimeout(timer);
   }, [taskId, task?.phase]);
 
-  async function send(text, files) {
+  async function send(text, files, { approval = false, decisionEvent } = {}) {
     if (busy || (!text.trim() && !files.length)) return;
     setBusy(true); setError("");
     try {
       if (task.kind === "recruiting" && task.phase !== "input" && !files.length) {
         const message = content => runOpportunityCommand("task.update", { id: task.id, patch: {}, message: { role: "assistant", content } });
-        runOpportunityCommand("task.update", { id: task.id, patch: {}, message: { role: "user", content: text } });
+        runOpportunityCommand("task.update", { id: task.id, patch: {}, message: { role: "user", content: decisionEvent ? `已点击：${decisionEvent.label}` : text, ...(decisionEvent ? { decisionEvent } : {}) } });
         if (reserveDraft) {
-          const draft = reserveDraft; setReserveDraft(null);
+          const draft = reserveDraft;
           if (/^(确认|是|是的)[。 ]*$/.test(text.trim())) {
             if (draft.positionVersion !== sourcePosition?.version) throw Error("岗位版本已变化，请重新核对范围；没有加入储备。");
             runOpportunityCommand("recruiting.review", { taskId: task.id, positionId: task.positionId, candidateIds: draft.ids });
           } else message("这版范围未执行；请重新明确人选，取消或修改都不会沿用旧确认。");
+          setReserveDraft(null);
         } else if (text.trim() === "采用当前JD") {
           runOpportunityCommand("task.refresh-position", { id: task.id }); message("已采用当前岗位版本，请重新核对人选和依据；尚未加入储备。");
         } else {
@@ -118,7 +161,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
           if (!people?.length || people.some(person => !person)) message("此本地示例请明确姓名，例如‘将林昊、赵星羽加入岗位储备’；未知对象不跳过。本轮未写入。版本变化时可说‘采用当前JD’，再核对范围。");
           else {
             setReserveDraft({ ids: [...new Set(people.map(person => person.id))], positionVersion: sourcePosition?.version });
-            message(`### 待确认的岗位储备范围\n\n${people.map(person => `- ${person.name} · ${person.company} · ${person.title}`).join("\n")}\n\n岗位v${sourcePosition?.version}。确认后才写入本地演示的储备与人才梳理；不联系。回复‘确认’或修改要求。`);
+            message(`### 待确认的岗位储备范围\n\n${people.map(person => `- ${person.name} · ${person.company} · ${person.title}`).join("\n")}\n\n岗位v${sourcePosition?.version}。授权后才写入本地演示的储备与人才梳理；不联系。可点击下方确认按钮或修改要求。`);
           }
         }
         setValue(""); return;
@@ -133,7 +176,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
       runOpportunityCommand("task.update", { id: task.id, patch: { phase: "input", followupDraft: null, status: "运行中", ...(task.phase === "result" ? { draft: null } : {}) },
         message: { role: "user", content: [text, collected.material, ...collected.warnings].filter(Boolean).join("\n\n"), fileIds: collected.fileIds } });
       setValue(""); setAttachments([]);
-    } catch (failure) { setError(failure.message); }
+    } catch (failure) { setError(failure.message); if (approval) throw failure; }
     finally { setBusy(false); }
   }
   const updateAuthorization = (mode) => {
@@ -157,9 +200,15 @@ export function OpportunityTaskWorkspace({ taskId }) {
         {task.phase === "input" ? <HunterReply streaming markdown="正在整理输入与来源资料。" /> : null}
         {task.kind === "recruiting" && ["candidate-review", "result"].includes(task.phase) ? <RecruitingCandidateReview task={task} onOpen={() => { setInspection(null); setResultOpen(true); }} /> : null}
         {actualResults.map((result, index) => <OpportunityWriteResult key={result.type + result.id + index} result={result} />)}
-        {["opportunity", "position-create"].includes(task.kind) ? <SingleAssetTaskSummary task={task} /> : null}
+        {["opportunity", "position-create"].includes(task.kind) ? <SingleAssetTaskSummary task={task} hasUnsentChanges={Boolean(value.trim() || attachments.length)} /> : null}
+        {reserveDraft ? <TaskExecutionApproval key={executionApprovalKey(task.id, reserveDraft)} requestKey={executionApprovalKey(task.id, reserveDraft)}
+          action="reserve"
+          scope={["本次人选：" + reserveDraft.ids.map(id => candidates.find(candidate => candidate.id === id)?.name || id).join("、"), `加入当前岗位 v${reserveDraft.positionVersion} 的储备。`]}
+          authMode={task.authMode} hasUnsentChanges={Boolean(value.trim() || attachments.length)}
+          disabledReason={getOpportunityPermission() ? "当前工作空间不能执行写入。" : sourcePosition?.version !== reserveDraft.positionVersion ? "岗位版本已变化，请采用当前 JD 并重新核对人选。" : ""}
+          onApprove={(_, event) => send("确认", [], { approval: true, decisionEvent: event })} onDecline={(_, event) => send("否", [], { approval: true, decisionEvent: event })} /> : null}
         {pipelineResults.map((result, index) => <HunterReply key={index} markdown={"已将 " + result.candidateIds.map((id) => candidates.find((candidate) => candidate.id === id)?.name || id).join("、") + " 加入岗位储备，并同步更新岗位人才梳理。未发送联系消息。\n\n[查看人才梳理](#/positions/" + encodeURIComponent(result.id) + "?tab=talent-map)"} />)}
-        {task.opportunityId && task.kind === "opportunity" && task.phase === "result" ? <TaskOpportunityFollowup task={task} /> : null}
+        {task.opportunityId && task.kind === "opportunity" && task.phase === "result" ? <TaskOpportunityFollowup task={task} hasUnsentChanges={Boolean(value.trim() || attachments.length)} /> : null}
         {error ? <><HunterReply markdown={"> " + markdownText(error)} />{task.phase === "input" ? <Button icon="refresh" onClick={prepare}>重试整理</Button> : null}</> : null}
       </div><div className="s2-task-composer-dock"><RuntimeBar open={planOpen} onToggle={() => setPlanOpen(!planOpen)} plan={plan} tasks={plan.map(step => ({ id: `${task.id}-${step.id}`, stepId: step.id, kind: "task", title: step.title, action: step.detail || "核对当前本地任务资料与确认范围", status: step.status === "done" ? "完成" : "等待用户", duration: "本地示例", resultDestination: "当前任务；正式资产仅在本版确认和检查后更新" }))} onInspectTask={setInspection} docked />
         <Composer value={value} onChange={setValue} onSend={send} authMode={task.authMode === "analyze" ? "analysis" : task.authMode} onAuthChange={updateAuthorization}
@@ -168,7 +217,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
   </TaskReadingWorkspace>;
 }
 
-export function LegacyOpportunityResult({ taskId, showFollowup = true, awaitingContinuation = false }) {
+export function LegacyOpportunityResult({ taskId, showFollowup = true, awaitingContinuation = false, hasUnsentChanges = false }) {
   const state = useOpportunityState();
   const task = state.tasks.find((item) => item.id === taskId);
   const [error, setError] = useState("");
@@ -186,8 +235,8 @@ export function LegacyOpportunityResult({ taskId, showFollowup = true, awaitingC
       {message.fileIds?.length ? <OpportunityFiles ids={message.fileIds} readOnly /> : null}</div> : <HunterReply key={message.id} markdown={message.content} />)}
     {task.phase === "input" ? <HunterReply streaming markdown="正在整理招聘需求与来源资料。" /> : null}
     {task.results.filter((result, index, items) => result.type === "opportunity" && items.findLastIndex((item) => item.type === "opportunity" && item.id === result.id) === index).map((result) => <OpportunityWriteResult key={result.id + "-" + result.version} result={result} />)}
-    <SingleAssetTaskSummary task={task} askConfirmation={!(awaitingContinuation && task.phase === "cancelled")} confirmationReply="确认" />
-    {showFollowup && task.opportunityId && task.phase === "result" ? <TaskOpportunityFollowup task={task} /> : null}
+    <SingleAssetTaskSummary task={task} askConfirmation={!(awaitingContinuation && task.phase === "cancelled")} confirmationReply="确认" hasUnsentChanges={hasUnsentChanges} />
+    {showFollowup && task.opportunityId && task.phase === "result" ? <TaskOpportunityFollowup task={task} hasUnsentChanges={hasUnsentChanges} /> : null}
     {error ? <HunterReply markdown={"> " + markdownText(error)} /> : null}
   </>;
 }

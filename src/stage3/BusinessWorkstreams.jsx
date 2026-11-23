@@ -13,6 +13,7 @@ import {
 import { InspectionPanel } from "../stage2/ReviewWorkspace";
 import { WorkstreamHeader } from "../stage2/Workstreams";
 import { TaskReadingWorkspace } from "../stage2/TaskReadingWorkspace";
+import { executionApprovalKey, TaskExecutionApproval } from "../stage2/TaskExecutionApproval";
 import { TaskResultReader, contactReadingRows, organizationReadingRows, positionReadingRows } from "../stage2/TaskResultReader";
 import {
   businessScenarios,
@@ -246,7 +247,7 @@ ${createMarkdownTable(
       {phase >= 2 && phase < 6 && (!opportunityDecided || draftDeferred || phase <= 3) ? <>
         <HunterReply markdown={(phase >= 6 && opportunityDecided ? "## 补充本轮招聘机会" : opportunityDecided && !draftDeferred ? "## 招聘机会已记录" : "## 是否记录这条潜在招聘机会？\n\n公开招聘变化提供了跟进依据，实际 HC、预算、猎头合作意愿和完整 JD 仍待核实。记录入库不表示客户已确认合作。") + (forcedState === "no-contact" && !opportunityDecided ? "\n\n尚未找到可直接联系的负责人；可以先记录机会，联系人后续补充。" : "")} />
         {opportunityResult}
-        {opportunityDecided && phase === 2 ? <HunterReply markdown="是否继续核实联系人？请回复“是”“否”，或提出建议。联系人核实与对外发送分别确认。" /> : null}
+        {opportunityDecided && phase === 2 ? <HunterReply markdown="是否继续核实联系人？可点击下方按钮，或在原对话提出建议。联系人核实与对外发送分别确认。" /> : null}
       </> : null}
       {phase >= 3 && opportunityDecided && forcedState === "no-contact" ? (
         <HunterReply
@@ -580,7 +581,8 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
       const outcome = organizationOutcome(organizationCompanies);
       setMessages((items) => [...(confirmationText ? items : items.filter((item) => !/摸排报告|3 个.*图谱|人才地图已更新/.test(item.result))), { ...outcome, text: confirmationText || outcome.text }]);
       setPhase(5);
-    } catch (error) { setMappingSaveError(error.message); setPhase(4); }
+      return true;
+    } catch (error) { setMappingSaveError(error.message); setPhase(4); return false; }
   };
   useEffect(() => {
     if (scenarioId !== "mapping-embodied") return;
@@ -708,10 +710,10 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
     notify("已从第一条输入重新演示", "info");
   };
 
-  const send = async (text, files) => {
+  const send = async (text, files, decisionEvent) => {
     // A finite, local confirmation demonstration, not a production NLP/Agent executor.
     const resultReply = result => {
-      setMessages(items => [...items, { text, result }]);
+      setMessages(items => [...items, { text: decisionEvent ? `已点击：${decisionEvent.label}` : text, result, decisionEvent }]);
       setComposer("");
     };
     if (files.length && resultDraft) {
@@ -725,7 +727,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
       }
       if (/^(确认|是|是的|确认保存)[。！! ]*$/.test(text.trim())) {
         if (authMode === "analysis") { resultReply("当前仅分析，没有执行保存。请切换授权后重新核对并确认本版草稿。"); setResultDraft(null); return; }
-        if (resultDraft.kind === "mapping") saveOrganizationResult({}, text);
+        if (resultDraft.kind === "mapping") { if (!saveOrganizationResult({}, text)) return; }
         else { setSavedContactNames(resultDraft.names); setPhase(4); resultReply(`本地演示已确认${resultDraft.names.join("、")}的建档范围，未自动发送消息。真实联系人写入与逐对象回执尚未接入。`); }
         setResultDraft(null); setComposer(""); return;
       }
@@ -735,7 +737,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
     if (!files.length && scenarioId === "mapping-embodied" && phase >= 4 && /保存|更新.{0,6}地图/.test(text)) {
       if (!/^(?:请)?(?:保存|更新)(?:当前|本批|这些|全部)(?:整批|的)?人才地图(?:[，,]保留(?:全部)?待核实项)?[。！! ]*$/.test(text.trim())) { resultReply("本地演示目前只支持完整当前批次保存；这次没有写入。请明确是否保存当前整批并保留全部待核实项。"); return; }
       setResultDraft({ kind: "mapping" });
-      resultReply(`### 待确认的人才地图更新\n\n范围：${organizationCompanies.map(company => company.name).join("、")}；包含${organizationCompanies.flatMap(company => company.roles).length}个关键岗位。保留身份冲突、未知任职人与关系缺口，不关联候选人或加入岗位储备。\n\n这是本地模拟。确认这版本后才更新本地人才地图；回复“确认”或“取消”。`); return;
+      resultReply(`### 待确认的人才地图更新\n\n范围：${organizationCompanies.map(company => company.name).join("、")}；包含${organizationCompanies.flatMap(company => company.roles).length}个关键岗位。保留身份冲突、未知任职人与关系缺口，不关联候选人或加入岗位储备。\n\n这是本地模拟。可点击下方确认按钮，或在原对话修改要求。`); return;
     }
     if (!files.length && scenarioId === "client-xinglan" && phase === 3 && /保存|建档/.test(text)) {
       const request = text.trim().match(/^保存(.+)为联系人[。！! ]*$/);
@@ -743,14 +745,14 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
       const people = names.map(name => contactReviewRows.find(person => person.name === name));
       if (!people.length || people.some(person => !person || person.category === "联系人线索")) { resultReply("本地演示请按“保存陈雨、周琪为联系人”明确姓名；未知或身份不明的线索不能建为正式联系人。本轮没有保存或发送。"); return; }
       setResultDraft({ kind: "contacts", names: people.map(person => person.name) });
-      resultReply(`### 待确认的联系人范围\n\n${people.map(person => `- ${person.name} · ${person.company} · ${person.role}`).join("\n")}\n\n仅确认建档，不对外联系，未提到的人保持原样。本地演示尚未接入真实联系人写入；回复“确认”或“取消”。`); return;
+      resultReply(`### 待确认的联系人范围\n\n${people.map(person => `- ${person.name} · ${person.company} · ${person.role}`).join("\n")}\n\n仅确认建档，不对外联系，未提到的人保持原样。本地演示尚未接入真实联系人写入；可点击下方确认按钮或修改要求。`); return;
     }
     if (!files.length && phase >= (scenarioId === "mapping-embodied" ? 4 : 3) && (scenarioId !== "client-xinglan" || phase === 3 && !Object.keys(explicitInputFields(text)).length) && /比较|核实|调研/.test(text)) {
       resultReply("要求已保留，本次没有启动真实调研或改写业务数据。此任务原型尚未模拟该自然语言意图；可以查看现有结果和缺口，候选人调研示例中可验收点名、比较及部分失败重试。"); return;
     }
     if (scenarioId === "client-xinglan" && phase === 2 && opportunityDecided && !files.length && !Object.keys(explicitInputFields(text)).length && text.trim() !== "重新核对") {
       const confirmed = singleAssetDecision(text) === "confirm";
-      setMessages((items) => [...items, { text, result: confirmed ? "继续核实联系人，尚未对外联系。" : singleAssetDecision(text) === "decline" ? "暂不继续核实联系人，招聘机会或草稿已保留。" : "建议已保留，尚未开始核实，也未改写招聘机会。当前原型无法可靠解析新的核实范围；是否继续按已有公开来源核实联系人？" }]);
+      resultReply(confirmed ? "继续核实联系人，尚未对外联系。" : singleAssetDecision(text) === "decline" ? "暂不继续核实联系人，招聘机会或草稿已保留。" : "建议已保留，尚未开始核实，也未改写招聘机会。当前原型无法可靠解析新的核实范围；是否继续按已有公开来源核实联系人？");
       if (confirmed) setPhase(3);
       setComposer("");
       return;
@@ -882,7 +884,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 openReview={() => { setInspection(null); setReviewOpen(true); }}
                 setPhase={setPhase}
                 notify={notify}
-                opportunityResult={<LegacyOpportunityResult taskId={scenarioId} showFollowup={phase >= 6} awaitingContinuation={phase === 2} />}
+                opportunityResult={<LegacyOpportunityResult taskId={scenarioId} showFollowup={phase >= 6} awaitingContinuation={phase === 2} hasUnsentChanges={Boolean(composer.trim() || attachments.length)} />}
                 opportunityDecided={opportunityDecided}
                 draftDeferred={lifecycleTask?.phase === "cancelled"}
                 savedContactNames={savedContactNames}
@@ -958,7 +960,25 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 {scenarioId === "mapping-embodied" && phase >= 5 && message.result.startsWith("## 人才地图已更新") ? <HunterReply markdown={organizationRemainingWork(organizationCompanies)} /> : null}
               </div>
             ))}
-            {scenarioId === "client-xinglan" && phase >= 6 ? <LegacyOpportunityResult taskId={scenarioId} /> : null}
+            {scenarioId === "client-xinglan" && phase === 2 && opportunityDecided && !terminated ? <TaskExecutionApproval
+              key={executionApprovalKey(scenarioId, ["research-contacts", lifecycleTask?.opportunityId])}
+              requestKey={executionApprovalKey(scenarioId, ["research-contacts", lifecycleTask?.opportunityId])}
+              action="research-contacts" scope={["通过已有公开来源核实招聘联系人及联系方式。"]}
+              boundary="本次只核实资料，不建档、不写入正式资料、不发送邮件。" authMode={authMode}
+              hasUnsentChanges={Boolean(composer.trim() || attachments.length)}
+              onApprove={(_, event) => send("是", [], event)} onDecline={(_, event) => send("否", [], event)} /> : null}
+            {resultDraft && !terminated ? <TaskExecutionApproval
+              key={executionApprovalKey(scenarioId, resultDraft)} requestKey={executionApprovalKey(scenarioId, resultDraft)}
+              action={resultDraft.kind === "mapping" ? "mapping" : "contacts"}
+              scope={resultDraft.kind === "mapping" ? ["公司范围：" + organizationCompanies.map(company => company.name).join("、"), "更新‘具身智能目标公司人才地图’，按公司分图页；保留已有手工修改。", "保留未知任职人、身份冲突与关系缺口，不把未知岗位认定为空缺。"] : ["本次建档联系人：" + resultDraft.names.join("、"), "保存到联系人资产；机会入库和邮件发送分别确认。"]}
+              authMode={authMode} hasUnsentChanges={Boolean(composer.trim() || attachments.length)}
+              onApprove={(_, event) => {
+                if (resultDraft.kind === "mapping") {
+                  if (!saveOrganizationResult({}, `已点击：${event.label}`)) throw Error("人才地图未能保存，原范围已保留，请核对提示后重试。");
+                  setResultDraft(null);
+                } else return send("确认", [], event);
+              }} onDecline={(_, event) => send("否", [], event)} /> : null}
+            {scenarioId === "client-xinglan" && phase >= 6 ? <LegacyOpportunityResult taskId={scenarioId} hasUnsentChanges={Boolean(composer.trim() || attachments.length)} /> : null}
             {terminated ? (
               <HunterReply markdown={"### 任务已终止\n\n对话、任务、审核结果和正式资产引用已保留。"} />
             ) : null}

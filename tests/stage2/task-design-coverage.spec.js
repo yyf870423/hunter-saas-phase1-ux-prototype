@@ -50,7 +50,7 @@ for (const width of [1440, 390]) for (const [id, title, route, text] of taskDesi
     if (id === "client-contacts") await page.getByRole("button", { name: "查看联系人结果", exact: true }).click();
     else if (id !== "client-no-contact") {
       await send(page, "保存陈雨、周琪为联系人"); await send(page, "确认");
-      await page.getByRole("button", { name: "确认并发送", exact: true }).click();
+      await page.getByRole("button", { name: "确认发送", exact: true }).click();
       await expect(page.getByRole("heading", { name: "等待陈雨回复招聘合作邮件", exact: true })).toBeVisible();
       if (id !== "client-waiting") {
         await send(page, "招聘需求摘要：客户已回复，新增机器人测试团队\n需求依据：陈雨确认需要进一步核对JD");

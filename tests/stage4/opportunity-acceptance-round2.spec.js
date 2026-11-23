@@ -26,7 +26,7 @@ for (const [device, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 
     await page.goto("#/tasks/client-xinglan?state=no-contact");
     await expect(page.getByRole("heading", { name: "待确认的招聘机会", exact: true })).toBeVisible();
     await expect(button(page, "打开公司与联系人审核")).toHaveCount(0);
-    await expect(button(page, "确认并发送")).toHaveCount(0);
+    await expect(button(page, "确认发送")).toHaveCount(0);
     await expect(page.locator(".s2-runtime")).toContainText("确认是否记录潜在招聘机会");
     expect((await state(page)).opportunities).toHaveLength(4);
     await page.getByRole("heading", { name: "是否记录这条潜在招聘机会？", exact: true }).scrollIntoViewIfNeeded();
