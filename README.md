@@ -32,6 +32,7 @@
 - 工作台权限受限态：`#/home?state=limited`
 - 阶段一公共组件：`#/components`
 - 业务资产审核入口：`#/review`
+- 数据导入及逐项任务详情：`#/data/imports`（可直接打开 `?detail=import-papers`）
 - 设置中心审核入口：`#/review/settings`
 - 运营端审核入口：`#/review/operations`
 - 运营概况：`#/ops/overview`
@@ -79,6 +80,7 @@ E2E 覆盖桌面、iPad、iPhone、亮暗主题、导航、搜索、通知、浮
 - `docs/stage-2-plan.md`：阶段二实施、状态和审批边界。
 - `docs/stage-2-interaction-coverage.md`：阶段二交互覆盖清单。
 - `docs/stage-2-design-system-extension.md`：阶段二公共组件扩展。
+- [导入任务逐项明细原型](docs/import-task-detail-prototype-20261123.md)：已验收交互、验收入口、公共组件、测试证据及后端对接缺口。
 - `docs/stage-6-operations-plan.md`：运营端范围、模块和审批门禁。
 - `docs/stage-6-component-boundary.md`：运营端组件和隐私数据边界。
 - `docs/stage-6-interaction-coverage.md`：运营端交互与关键状态覆盖。

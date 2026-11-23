@@ -22,14 +22,24 @@ import {
   TextInput,
   useToast,
 } from "./asset-ui";
-import { companies, exportTasks, importTasks, recycleItems } from "./data";
+import { companies, exportTasks, recycleItems } from "./data";
+import { ImportTaskDetail } from "./ImportTaskDetail";
+import {
+  advanceImportSample,
+  createImportDetailSamples,
+  createUploadedImportSample,
+  retryImportSample,
+} from "./import-task-details";
 import {
   useCompanyContacts,
   restoreCompanyContact,
 } from "./company-contact-store";
 import { restoreGraph, useTopicGraphs } from "./topic-graph-store";
 import { graphTypeLabel } from "./graph-types";
-import { runOpportunityCommand, useOpportunityState } from "./opportunity-store";
+import {
+  runOpportunityCommand,
+  useOpportunityState,
+} from "./opportunity-store";
 import { opportunityNow } from "./opportunity-domain";
 import { OpportunityImportDetail } from "./OpportunityImport";
 import { displayDateTime } from "./OpportunityComponents";
@@ -56,10 +66,13 @@ function DataManagementNav({ value }) {
 export function ImportsPage() {
   const navigate = useNavigate();
   const notify = useToast();
-  const [params] = useSearchParams();
-  const [wizardOpen, setWizardOpen] = useState(Boolean(params.get("type")) && params.get("type") !== "opportunities");
+  const [params, setParams] = useSearchParams();
+  const [wizardOpen, setWizardOpen] = useState(
+    Boolean(params.get("type")) && params.get("type") !== "opportunities",
+  );
   useEffect(() => {
-    if (params.get("type") === "opportunities") navigate("/data/imports", { replace: true });
+    if (params.get("type") === "opportunities")
+      navigate("/data/imports", { replace: true });
   }, [params, navigate]);
   const [step, setStep] = useState("file");
   const [type, setType] = useState(
@@ -75,7 +88,18 @@ export function ImportsPage() {
   );
   const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
-  const [detail, setDetail] = useState(null);
+  const [localTasks, setLocalTasks] = useState(createImportDetailSamples);
+  const [createdTask, setCreatedTask] = useState(null);
+  const [typeFilter, setTypeFilter] = useState([]);
+  const [statusFilter, setStatusFilter] = useState([]);
+  const setDetail = (task) =>
+    setParams((current) => {
+      const next = new URLSearchParams(current);
+      if (task) next.set("detail", task.id);
+      else next.delete("detail");
+      next.delete("importView");
+      return next;
+    });
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [duplicateChoice, setDuplicateChoice] = useState("replace");
@@ -95,23 +119,50 @@ export function ImportsPage() {
   const lifecycle = useOpportunityState();
   const visibleTasks = useMemo(
     () =>
-      [...lifecycle.imports.map((batch) => {
-        const task = lifecycle.tasks.find((item) => item.id === batch.taskId);
-        const written = batch.rows.filter((row) => row.status === "written").length;
-        const failed = batch.rows.filter((row) => row.status === "error").length;
-        return { ...batch, lifecycle: true, type: "招聘机会", progress: batch.rows.length ? Math.round(written / batch.rows.length * 100) : 0,
-          status: task?.results.length ? "已完成" : batch.status, time: displayDateTime(batch.createdAt),
-          result: batch.taskId ? (task?.results.length ? "已写入 " + task.results.length + " 项结果" : "等待任务审核") : "已写入 " + written + " 行，需修正 " + failed + " 行" };
-      }), ...importTasks].filter((task) =>
-        `${task.name}${task.file}${task.type}`
-          .toLowerCase()
-          .includes(query.trim().toLowerCase()),
+      [
+        ...lifecycle.imports.map((batch) => {
+          const task = lifecycle.tasks.find((item) => item.id === batch.taskId);
+          const written = batch.rows.filter(
+            (row) => row.status === "written",
+          ).length;
+          const failed = batch.rows.filter(
+            (row) => row.status === "error",
+          ).length;
+          return {
+            ...batch,
+            lifecycle: true,
+            type: "招聘机会",
+            progress: batch.rows.length
+              ? Math.round((written / batch.rows.length) * 100)
+              : 0,
+            status: task?.results.length ? "已完成" : batch.status,
+            time: displayDateTime(batch.createdAt),
+            result: batch.taskId
+              ? task?.results.length
+                ? "已写入 " + task.results.length + " 项结果"
+                : "等待任务审核"
+              : "已写入 " + written + " 行，需修正 " + failed + " 行",
+          };
+        }),
+        ...localTasks,
+      ].filter(
+        (task) =>
+          `${task.name}${task.file}${task.type}`
+            .toLowerCase()
+            .includes(query.trim().toLowerCase()) &&
+          (!typeFilter.length || typeFilter.includes(task.type)) &&
+          (!statusFilter.length || statusFilter.includes(task.status)),
       ),
-    [query, lifecycle],
+    [query, lifecycle, localTasks, typeFilter, statusFilter],
   );
-  const taskPages = Math.max(1, Math.ceil(visibleTasks.length / 2));
-  const taskRows = visibleTasks.slice((page - 1) * 2, page * 2);
-  useEffect(() => setPage(1), [query]);
+  const detailId = params.get("detail");
+  const detail = detailId
+    ? localTasks.find((task) => task.id === detailId) ||
+      visibleTasks.find((task) => task.id === detailId) || { id: detailId }
+    : null;
+  const taskPages = Math.max(1, Math.ceil(visibleTasks.length / 50));
+  const taskRows = visibleTasks.slice((page - 1) * 50, page * 50);
+  useEffect(() => setPage(1), [query, typeFilter, statusFilter]);
   useEffect(() => {
     if (params.get("type") === "mappings" || params.get("type") === "mapping") {
       navigate("/mappings/mapping-embodied?panel=import", { replace: true });
@@ -145,6 +196,9 @@ export function ImportsPage() {
     setBusy(true);
     window.setTimeout(() => {
       setBusy(false);
+      const task = createUploadedImportSample(type, files);
+      setLocalTasks((current) => [task, ...current]);
+      setCreatedTask(task);
       setStep("success");
       notify("导入处理已开始，当前页面会持续更新状态", "info");
     }, 750);
@@ -153,6 +207,7 @@ export function ImportsPage() {
     setWizardOpen(false);
     setStep("file");
     setFiles([]);
+    setCreatedTask(null);
   };
   return (
     <div className="s4-page">
@@ -165,6 +220,9 @@ export function ImportsPage() {
         onPrimary={() => setWizardOpen(true)}
       />
       <DataManagementNav value="imports" />
+      <p className="s4-import-prototype-note">
+        【原型说明，正式实现不展示】本页导入明细使用本地虚构样例，不连接真实导入接口。
+      </p>
       <FilterBar
         query={query}
         setQuery={setQuery}
@@ -172,13 +230,23 @@ export function ImportsPage() {
         filters={[
           {
             label: "资产类型",
-            value: [],
-            options: ["候选人", "公司", "岗位", ...(lifecycle.imports.length ? ["招聘机会"] : []), "论文", "专利"],
+            value: typeFilter,
+            onChange: setTypeFilter,
+            options: [
+              "候选人",
+              "公司",
+              "岗位",
+              ...(lifecycle.imports.length ? ["招聘机会"] : []),
+              "知识图谱",
+              "论文",
+              "专利",
+            ],
             multiple: true,
           },
           {
             label: "处理状态",
-            value: [],
+            value: statusFilter,
+            onChange: setStatusFilter,
             options: ["处理中", "已完成", "需要处理", "失败"],
             multiple: true,
           },
@@ -215,7 +283,19 @@ export function ImportsPage() {
           </article>
         ))}
       </div>
-      <Pagination page={page} pages={taskPages} pageSize={2} onChange={setPage} />
+      {!taskRows.length ? (
+        <StateBanner
+          title="没有符合条件的导入任务"
+          description="调整搜索词或筛选条件后再试。"
+        />
+      ) : null}
+      <Pagination
+        page={page}
+        pages={taskPages}
+        pageSize={50}
+        total={visibleTasks.length}
+        onChange={setPage}
+      />
       <Modal
         open={wizardOpen}
         close={closeWizard}
@@ -225,7 +305,7 @@ export function ImportsPage() {
           step === "file"
             ? "导入业务数据"
             : step === "confirm"
-              ? "确认导入结果"
+              ? "确认导入任务"
               : step === "duplicate"
                 ? "发现同名知识图谱"
                 : step === "error"
@@ -236,7 +316,7 @@ export function ImportsPage() {
           step === "file"
             ? "选择资产类型和文件，系统会先校验格式再解析内容"
             : step === "confirm"
-              ? "本次解析发现新建、补充、待确认和失败结果"
+              ? "确认文件和导入设置；开始后可在任务详情查看处理结果"
               : step === "duplicate"
                 ? "“具身智能 VLA 核心知识图谱”已存在于当前工作空间"
                 : step === "error"
@@ -279,8 +359,14 @@ export function ImportsPage() {
               </Button>
             </>
           ) : (
-            <Button tone="primary" onClick={closeWizard}>
-              查看导入记录
+            <Button
+              tone="primary"
+              onClick={() => {
+                closeWizard();
+                if (createdTask) setDetail(createdTask);
+              }}
+            >
+              查看任务详情
             </Button>
           )
         }
@@ -291,14 +377,7 @@ export function ImportsPage() {
               <SelectMenu
                 label="选择类型"
                 value={type}
-                options={[
-                  "候选人",
-                  "公司",
-                  "岗位",
-                  "知识图谱",
-                  "论文",
-                  "专利",
-                ]}
+                options={["候选人", "公司", "岗位", "知识图谱", "论文", "专利"]}
                 onChange={(nextType) => {
                   setType(nextType);
                   setMatchError("");
@@ -355,27 +434,25 @@ export function ImportsPage() {
           <div className="s4-import-summary">
             <dl>
               <div>
-                <dt>新建</dt>
-                <dd>18</dd>
+                <dt>待处理文件</dt>
+                <dd>{files.length}</dd>
               </div>
               <div>
-                <dt>补充已有</dt>
-                <dd>7</dd>
+                <dt>已处理</dt>
+                <dd>0</dd>
               </div>
               <div>
-                <dt>待身份确认</dt>
-                <dd>2</dd>
+                <dt>成功</dt>
+                <dd>0</dd>
               </div>
               <div>
                 <dt>失败</dt>
-                <dd>1</dd>
+                <dd>0</dd>
               </div>
             </dl>
             <StateBanner
-              tone="warning"
-              icon="warning"
-              title="2 条资料需要后续身份审核"
-              description="只有姓名、身份依据不足的行不会创建候选人，留在本次导入结果里并写明原因；补齐公司、职位、手机或邮箱后可以重新导入。"
+              title="确认后开始导入"
+              description="当前仅确认所选文件。具体记录数量、成功、失败及待确认结果在处理后更新，不提前计入成功。"
             />
             {matchEnabled && (type === "候选人" || type === "岗位") ? (
               <StateBanner
@@ -392,27 +469,10 @@ export function ImportsPage() {
               />
             ) : null}
             <div className="s4-import-result-list">
-              <article>
-                <StatusBadge tone="success">新建</StatusBadge>
-                <span>
-                  <b>陈若凡</b>
-                  <small>智源研究院 · 多模态算法研究员</small>
-                </span>
-              </article>
-              <article>
-                <StatusBadge tone="info">补充</StatusBadge>
-                <span>
-                  <b>林昊</b>
-                  <small>发现 3 项更新，进入字段变化审核</small>
-                </span>
-              </article>
-              <article>
-                <StatusBadge tone="warning">待确认</StatusBadge>
-                <span>
-                  <b>王奕</b>
-                  <small>同名候选人和论文单位时间线冲突</small>
-                </span>
-              </article>
+              {files.map((file, index) => <article key={`${file.name}-${index}`}>
+                <StatusBadge tone="neutral">待处理</StatusBadge>
+                <span><b>{file.name}</b><small>{type} · 文件结构校验后进入解析与导入</small></span>
+              </article>)}
             </div>
           </div>
         ) : null}
@@ -466,51 +526,46 @@ export function ImportsPage() {
               Hunter
               将继续完成查重、身份分析和写入门禁；遇到需要用户决定的内容会发送通知。
             </p>
-            <ProgressBar value={18} label="正在解析文件结构" />
+            <ProgressBar value={createdTask?.progress || 0} label={`已接收 ${createdTask?.items.length || 0} 份文件，等待处理结果`} />
           </div>
         ) : null}
       </Modal>
-      {detail?.lifecycle ? <OpportunityImportDetail batchId={detail.id} close={() => setDetail(null)} /> : null}
-      <Modal
-        open={Boolean(detail) && !detail?.lifecycle}
-        close={() => setDetail(null)}
-        size="lg"
-        title={detail?.name || "导入详情"}
-        description={detail?.file}
-        footer={<Button onClick={() => setDetail(null)}>关闭</Button>}
-      >
-        <div className="s4-import-detail">
-          <ProgressBar
-            value={detail?.progress || 0}
-            label={detail?.result || ""}
-          />
-          <div className="s4-process-log">
-            <article>
-              <Icon name="check" />
-              <span>
-                <b>文件格式校验</b>
-                <small>通过 · 0.4 秒</small>
-              </span>
-            </article>
-            <article>
-              <Icon name="check" />
-              <span>
-                <b>解析与标准化</b>
-                <small>已处理文件内容</small>
-              </span>
-            </article>
-            <article>
-              <Icon name={detail?.status === "处理中" ? "clock" : "check"} />
-              <span>
-                <b>身份查重与写入</b>
-                <small>
-                  {detail?.status === "处理中" ? "正在处理" : detail?.result}
-                </small>
-              </span>
-            </article>
-          </div>
-        </div>
-      </Modal>
+      {detail?.lifecycle ? (
+        <OpportunityImportDetail
+          batchId={detail.id}
+          close={() => setDetail(null)}
+        />
+      ) : null}
+      {detail && !detail.lifecycle ? (
+        <ImportTaskDetail
+          key={`${detail.id}-${params.get("importView") || "ready"}`}
+          task={localTasks.find((task) => task.id === detail.id)}
+          taskId={detail.id}
+          view={params.get("importView") || "ready"}
+          close={() => setDetail(null)}
+          onOpenTask={(id) => setDetail({ id })}
+          onRefresh={(task) =>
+            setLocalTasks((current) =>
+              current.map((item) =>
+                item.id === task.id ? advanceImportSample(item) : item,
+              ),
+            )
+          }
+          onRetry={(task) => {
+            if (task.retryTaskId) return;
+            const retry = retryImportSample(task);
+            if (retry)
+              setLocalTasks((current) => current.some((item) => item.id === retry.id) ? current : [
+                retry,
+                ...current.map((item) =>
+                  item.id === task.id
+                    ? { ...item, retryTaskId: retry.id }
+                    : item,
+                ),
+              ]);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

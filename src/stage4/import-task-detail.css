@@ -1,0 +1,182 @@
+.s4-import-task-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.s4-import-prototype-note {
+  margin: 0;
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s4-import-task-meta,
+.s4-import-items-actions,
+.s4-import-task-parent {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.s4-import-task-meta > span:not(.s1-status),
+.s4-import-muted,
+.s4-import-task-progress > p {
+  color: var(--s1-muted);
+  font-size: 12px;
+}
+.s4-import-task-progress > p {
+  margin: 8px 0 0;
+}
+.s4-import-task-parent,
+.s4-import-muted {
+  margin: 0;
+}
+.s4-import-task-progress {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--s1-line);
+}
+.s4-import-items-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.s4-import-items-toolbar .s1-search-field {
+  flex: 1 1 260px;
+  max-width: 400px;
+}
+.s4-import-items-actions {
+  gap: 8px;
+}
+.s4-import-status-tabs {
+  min-width: 0;
+  overflow-x: auto;
+}
+.s4-import-status-tabs .s1-tabs {
+  width: max-content;
+  min-width: 100%;
+}
+.s4-import-status-tabs button {
+  white-space: nowrap;
+}
+.s4-import-items-scroll {
+  overflow: auto;
+  min-width: 0;
+}
+.s4-import-items-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+.s4-import-items-table th,
+.s4-import-items-table td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+.s4-import-task-detail .s4-import-items-table th:nth-child(1) {
+  width: 25%;
+}
+.s4-import-items-table th:nth-child(2) {
+  width: 18%;
+}
+.s4-import-items-table th:nth-child(3) {
+  width: 13%;
+}
+.s4-import-items-table th:nth-child(4) {
+  width: 34%;
+}
+.s4-import-items-table th:nth-child(5) {
+  width: 10%;
+}
+.s4-import-items-table td {
+  font-size: 12px;
+}
+.s4-import-items-table td > small {
+  display: block;
+  margin-top: 5px;
+  color: var(--s1-muted);
+}
+.s4-import-items-table .s1-button {
+  min-width: 0;
+  padding-inline: 7px;
+}
+.s4-import-items-table tr.is-expanded > td {
+  background: var(--s1-canvas);
+}
+.s4-import-items-table .s4-import-expanded-row > td {
+  padding: 16px;
+  background: var(--s1-canvas);
+}
+.s4-import-item-detail dl {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+}
+.s4-import-item-detail dl > div {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 10px;
+}
+.s4-import-item-detail dt {
+  color: var(--s1-muted);
+}
+.s4-import-item-detail dd {
+  margin: 0;
+}
+.s4-import-asset-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  color: var(--s1-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.s4-import-asset-link > svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+.s4-import-read-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 180px;
+  color: var(--s1-muted);
+}
+@media (max-width: 760px) {
+  .s1-modal:has(.s4-import-task-detail) {
+    max-height: 92dvh;
+  }
+  .s1-modal:has(.s4-import-task-detail) > header > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .s4-import-items-toolbar .s1-search-field {
+    max-width: none;
+  }
+  .s4-import-task-detail
+    .s4-import-items-table
+    td:first-child:not(.s4-select-cell) {
+    width: 100%;
+  }
+  /* The shared mobile table enforces a label/value grid; expanded details span it. */
+  .s4-import-task-detail .s4-import-items-table .s4-import-expanded-row > td {
+    display: block !important;
+    padding: 8px;
+  }
+  .s4-import-task-detail
+    .s4-import-items-table
+    .s4-import-expanded-row
+    > td::before {
+    content: none;
+  }
+  .s4-import-task-detail > .s4-state-banner {
+    flex-wrap: wrap;
+  }
+}
