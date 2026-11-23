@@ -1183,6 +1183,20 @@ export function DataTable({
   );
 }
 
+// 页码窗口（参考本地版 Hunter 翻页逻辑）：首页、末页常驻，当前页前后各 2 页，中间跳开的用省略号。
+export function paginationWindow(page, pages) {
+  const visible = new Set([1, pages]);
+  for (let item = Math.max(1, page - 2); item <= Math.min(pages, page + 2); item += 1)
+    visible.add(item);
+  const sorted = [...visible].filter((item) => item >= 1).sort((x, y) => x - y);
+  const items = [];
+  sorted.forEach((item, index) => {
+    if (index && item - sorted[index - 1] > 1) items.push(`gap-${item}`);
+    items.push(item);
+  });
+  return items;
+}
+
 export function Pagination({
   page,
   pages,
@@ -1190,51 +1204,88 @@ export function Pagination({
   pageSize = 20,
   pageSizeOptions,
   onPageSizeChange,
+  total,
 }) {
+  const [jump, setJump] = useState("");
+  const go = (next) => onChange(Math.max(1, Math.min(pages, next)));
+  const submitJump = () => {
+    const target = Math.floor(Number(jump));
+    setJump("");
+    if (Number.isInteger(target) && target > 0) go(target);
+  };
+  const from = total ? (page - 1) * pageSize + 1 : 0;
+  const to = total ? Math.min(total, page * pageSize) : 0;
   return (
     <nav className="s4-pagination" aria-label="分页">
-      <span>
-        第 {page} / {pages} 页
+      <span className="s4-pagination-summary">
+        {typeof total === "number"
+          ? total
+            ? `共 ${total} 条 · 第 ${from}–${to} 条`
+            : "共 0 条"
+          : `第 ${page} / ${pages} 页`}
       </span>
-      <div>
+      <div className="s4-pagination-pages">
         <IconButton
           icon="chevronLeft"
           label="上一页"
-          disabled={page === 1}
-          onClick={() => onChange(page - 1)}
+          disabled={page <= 1}
+          onClick={() => go(page - 1)}
         />
-        {Array.from(
-          { length: Math.min(pages, 5) },
-          (_, index) => index + 1,
-        ).map((item) => (
-          <button
-            type="button"
-            className={page === item ? "is-active" : ""}
-            key={item}
-            onClick={() => onChange(item)}
-          >
-            {item}
-          </button>
-        ))}
+        {paginationWindow(page, pages).map((item) =>
+          typeof item === "number" ? (
+            <button
+              type="button"
+              className={page === item ? "is-active" : ""}
+              aria-current={page === item ? "page" : undefined}
+              key={item}
+              onClick={() => go(item)}
+            >
+              {item}
+            </button>
+          ) : (
+            <span className="s4-pagination-gap" key={item} aria-hidden="true">
+              …
+            </span>
+          ),
+        )}
         <IconButton
           icon="chevronRight"
           label="下一页"
-          disabled={page === pages}
-          onClick={() => onChange(page + 1)}
+          disabled={page >= pages}
+          onClick={() => go(page + 1)}
         />
       </div>
-      {pageSizeOptions?.length && onPageSizeChange ? (
-        // 产品决策 2026-11-22：列表可切换每页条数（表格 20 / 50 / 100，论文专利卡片 5 / 10 / 20）。
-        <SelectMenu
-          ariaLabel="每页条数"
-          className="s4-pagination-size"
-          value={`每页 ${pageSize} 条`}
-          options={pageSizeOptions.map((size) => `每页 ${size} 条`)}
-          onChange={(next) => onPageSizeChange(Number(String(next).replace(/\D/g, "")))}
-        />
-      ) : (
-        <span>每页 {pageSize} 条</span>
-      )}
+      <div className="s4-pagination-tools">
+        <label className="s4-pagination-jump">
+          <span>跳至</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            min="1"
+            max={pages}
+            value={jump}
+            aria-label={`跳至第几页，共 ${pages} 页`}
+            onChange={(event) => setJump(event.target.value)}
+            onKeyDown={(event) => {
+              if ([".", "e", "E", "+", "-"].includes(event.key)) event.preventDefault();
+              else if (event.key === "Enter") submitJump();
+            }}
+          />
+          <span>页</span>
+        </label>
+        {pageSizeOptions?.length && onPageSizeChange ? (
+          // 产品决策 2026-11-22：列表可切换每页条数（表格 20 / 50 / 100，论文专利卡片 5 / 10 / 20）。
+          <SelectMenu
+            ariaLabel="每页条数"
+            className="s4-pagination-size"
+            value={`每页 ${pageSize} 条`}
+            options={pageSizeOptions.map((size) => `每页 ${size} 条`)}
+            onChange={(next) => onPageSizeChange(Number(String(next).replace(/\D/g, "")))}
+          />
+        ) : (
+          <span>每页 {pageSize} 条</span>
+        )}
+      </div>
     </nav>
   );
 }

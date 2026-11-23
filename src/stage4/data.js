@@ -315,9 +315,22 @@ const candidateSeed = [
     "硕士",
     "10 年",
   ],
+  // 用户 11-23：补足示例候选人到 25 位，让列表翻页、跳页在原型里可见。
+  ["candidate-hejing", "何静", "优必选", "人形机器人运控工程师", "深圳", "硕士", "6 年"],
+  ["candidate-luzhen", "陆震", "宇树科技", "足式机器人控制负责人", "杭州", "博士", "10 年"],
+  ["candidate-songyi", "宋怡", "智元机器人", "具身数据平台工程师", "上海", "硕士", "5 年"],
+  ["candidate-fanyu", "范宇", "傅利叶智能", "康复机器人算法专家", "上海", "博士", "9 年"],
+  ["candidate-qianmo", "钱默", "华为诺亚方舟", "多模态大模型研究员", "北京", "博士", "7 年"],
+  ["candidate-dengxin", "邓昕", "大疆创新", "视觉感知算法工程师", "深圳", "硕士", "6 年"],
+  ["candidate-yaoqing", "姚晴", "小米机器人", "机器人仿真工程师", "北京", "硕士", "4 年"],
+  ["candidate-guowei", "郭巍", "地平线", "端侧推理优化专家", "北京", "硕士", "8 年"],
+  ["candidate-jiangtao", "江涛", "追觅科技", "机械臂控制工程师", "苏州", "本科", "7 年"],
+  ["candidate-xiaoran", "肖然", "商汤科技", "具身智能研究员", "上海", "博士", "5 年"],
+  ["candidate-weilan", "魏岚", "云鲸智能", "SLAM 算法工程师", "深圳", "硕士", "6 年"],
+  ["candidate-penghao", "彭昊", "银河通用", "灵巧手控制算法工程师", "北京", "硕士", "4 年"],
 ];
 
-const candidateAges = [37, 35, 34, 40, 33, 31, 36, 39, 38, 35, 32, 30, 36];
+const candidateAges = [37, 35, 34, 40, 33, 31, 36, 39, 38, 35, 32, 30, 36, 31, 38, 29, 37, 34, 32, 28, 35, 33, 30, 32, 27];
 
 // One source for “具身智能 VLA 算法负责人” (design review 2026-10-28): the position board, the candidate list’s
 // 流程 column, candidate details and the position talent map all read these relations (through the

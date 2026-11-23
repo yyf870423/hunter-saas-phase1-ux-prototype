@@ -685,7 +685,8 @@ export function CandidateFilterBar({
   favoriteTree,
   onManageFavorites,
 }) {
-  const [expanded, setExpanded] = useState(true);
+  // 用户 11-23：表格区域要更高，筛选区默认收起；已选条件以标签显示，点“筛选”展开。
+  const [expanded, setExpanded] = useState(false);
   const update = (key, value) =>
     setValues((current) => ({ ...current, [key]: value }));
   const active = [

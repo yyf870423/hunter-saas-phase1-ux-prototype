@@ -32,6 +32,7 @@ for (const width of [1440, 390]) {
     for (const [route, name] of surfaces) {
       await page.goto(`#/${route}`);
       if (route === "candidates") {
+        await page.locator(".s4-candidate-filter-toggle").click(); // 11-23：候选人筛选区默认收起
         await expect(page.locator(".s4-candidate-filter-area")).toBeVisible();
         if (width === 390)
           await expect(
@@ -128,6 +129,7 @@ test("详情表格紧凑筛选统一 36px，深色选择浮层继承主题", asy
     await expect(control).toHaveCSS("height", "36px");
   }
   await page.goto("#/candidates");
+  await page.locator(".s4-candidate-filter-toggle").click(); // 11-23：候选人筛选区默认收起
   await expect(page.locator(".s4-candidate-filter-area")).toBeVisible();
   await page.getByRole("button", { name: "切换深色模式", exact: true }).click();
   for (const [trigger, panel] of [

@@ -58,6 +58,7 @@ test("阶段四关键页面生成桌面、平板和手机截图", async ({ page 
 test("阶段四公共筛选与数据管理生成桌面验收截图", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("#/candidates");
+  await page.locator(".s4-candidate-filter-toggle").click(); // 11-23：候选人筛选区默认收起
   await page.getByRole("button", { name: "收藏夹", exact: true }).click();
   await page.screenshot({
     path: "artifacts/stage4-candidate-favorites.png",

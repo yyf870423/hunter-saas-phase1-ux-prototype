@@ -6535,16 +6535,67 @@
   width: 30px;
   height: 30px;
 }
-/* 每页条数切换（产品决策 2026-11-22）：靠右、紧凑，不受 .s4-pagination > div 的翻页按钮样式影响。 */
-.s4-pagination > .s4-select.s4-pagination-size {
-  display: block;
+/* 翻页条（产品决策 2026-11-22 / 11-23，参考本地版 Hunter）：左侧总数与范围，中间页码窗口，右侧“跳至 X 页”和每页条数。 */
+.s4-pagination > .s4-pagination-tools {
   justify-self: end;
-  width: 124px;
+  gap: 12px;
 }
-.s4-pagination > .s4-select.s4-pagination-size > button {
+.s4-pagination-gap {
+  display: inline-grid;
+  width: 22px;
+  place-items: center;
+  color: var(--s1-muted);
+}
+.s4-pagination-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.s4-pagination-jump input {
+  width: 52px;
+  height: 30px;
+  padding: 0 6px;
+  color: var(--s1-ink, inherit);
+  font: inherit;
+  text-align: center;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line);
+  border-radius: 6px;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.s4-pagination-jump input::-webkit-outer-spin-button,
+.s4-pagination-jump input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+.s4-pagination-jump input:focus-visible {
+  border-color: var(--s1-accent);
+  outline: 2px solid color-mix(in srgb, var(--s1-accent) 24%, transparent);
+}
+.s4-pagination .s4-select.s4-pagination-size {
+  display: block;
+  width: 132px;
+}
+.s4-pagination .s4-select.s4-pagination-size > button {
+  display: flex;
   width: 100%;
   min-height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
   font-size: 12px;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .s4-pagination {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .s4-pagination > .s4-pagination-tools {
+    justify-self: center;
+  }
 }
 
 .s4-bulk-bar,
@@ -12804,16 +12855,16 @@
     flex-wrap: wrap;
     overflow: visible;
   }
+  /* 新翻页条（11-23）：窄屏三块上下排列、居中；页码窗口已限制数量，不再按序号隐藏页码。 */
   .s4-pagination {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 8px;
     min-height: 58px;
     padding: 9px;
   }
-  .s4-pagination > span:last-child {
-    display: none;
-  }
-  .s4-pagination > div > button:nth-of-type(n + 5):not(.s1-icon-button) {
-    display: none;
+  .s4-pagination > .s4-pagination-tools {
+    justify-self: center;
   }
   .s4-detail-tabs,
   .nav-expanded .s4-detail-tabs {
@@ -15201,22 +15252,31 @@
   top: 56px;
   z-index: 8;
 }
-@media (min-width: 1024px) and (min-height: 640px) {
-  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table)) {
+@media (min-width: 768px) and (min-height: 600px) {
+  /* 用户 11-23：表格区域要更高——列表页底部留白收紧，表格至少 360px，窗口太矮时页面整体滚动。 */
+  .s1-main-list:has(> .s4-page > :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table, .s4-academic-list, .tg-graph-grid)) {
+    padding-bottom: 12px;
+  }
+  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table, .s4-academic-list, .tg-graph-grid)) {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 56px - 70px);
-    min-height: 560px;
+    height: calc(100dvh - 56px - 28px - 12px);
+    min-height: 0;
   }
-  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table)) > * {
+  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table, .s4-academic-list, .tg-graph-grid)) > * {
     flex: none;
   }
-  .s1-main-list > .s4-page > :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table) {
+  .s1-main-list > .s4-page > :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table, .s4-academic-list, .tg-graph-grid) {
     flex: 1 1 auto;
-    min-height: 220px;
+    min-height: 360px;
     overflow: auto;
   }
-  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table)) :is(.s4-filter-bar, .s4-candidate-filter-shell) {
+  /* 卡片列表（论文、专利、知识图谱）同样在卡片区域内滚动。 */
+  .s1-main-list > .s4-page > :is(.s4-academic-list, .tg-graph-grid) {
+    align-content: start;
+    padding-bottom: 4px;
+  }
+  .s1-main-list > .s4-page:has(> :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table, .s4-academic-list, .tg-graph-grid)) :is(.s4-filter-bar, .s4-candidate-filter-shell) {
     position: static;
   }
   .s1-main-list > .s4-page > .s4-table-wrap thead th {
@@ -15233,6 +15293,19 @@
     top: 0;
     z-index: 5;
     background: color-mix(in srgb, var(--s1-canvas) 75%, var(--s1-surface));
+  }
+}
+
+/* 表格往下滚时收起页头说明（用户 11-23）：只留操作按钮、筛选和表头，让表格区域更大；滚回顶部恢复。 */
+@media (min-width: 768px) and (min-height: 600px) {
+  .s1-main-list > .s4-page.is-list-scrolled > .s4-page-header {
+    min-height: 0;
+    margin-bottom: 10px;
+    justify-content: flex-end;
+  }
+  .s1-main-list > .s4-page.is-list-scrolled > .s4-page-header > :not(.s4-page-actions),
+  .s1-main-list > .s4-page.is-list-scrolled > :is(.s4-pending-filter, .s4-data-management-nav, .s4-recycle-guidance) {
+    display: none;
   }
 }
 

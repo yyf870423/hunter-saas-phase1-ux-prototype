@@ -645,6 +645,7 @@ export function AssetListPage({ type }) {
           pageSize={paging.pageSize}
           pageSizeOptions={paging.sizeOptions}
           onPageSizeChange={paging.setPageSize}
+          total={listed.length}
           onChange={controller.setPage}
         />
       </AssetListState>

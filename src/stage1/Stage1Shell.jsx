@@ -357,6 +357,25 @@ export function Stage1Shell() {
   const navigate = useNavigate();
   const location = useLocation();
   const listPage = LIST_PAGE_PATHS.has(location.pathname);
+  // 用户 11-23：列表表格往下滚时，页面顶部只留操作按钮、筛选和表头（标题说明、待审核提示等先收起），滚回顶部恢复。
+  // 只在表格内容明显超出时收起，避免收起后表格放得下又自动展开来回跳。
+  useEffect(() => {
+    if (!listPage) return undefined;
+    const bodySelector = ".s1-main-list > .s4-page > :is(.s4-table-wrap, .s4-task-table, .s4-recycle-table, .s4-academic-list, .tg-graph-grid)";
+    const onScroll = (event) => {
+      const body = event.target;
+      if (!(body instanceof Element) || !body.matches(bodySelector)) return;
+      const page = body.parentElement;
+      if (body.scrollTop <= 0) page.classList.remove("is-list-scrolled");
+      else if (body.scrollTop > 24 && body.scrollHeight - body.clientHeight > 200)
+        page.classList.add("is-list-scrolled");
+    };
+    document.addEventListener("scroll", onScroll, true);
+    return () => {
+      document.removeEventListener("scroll", onScroll, true);
+      document.querySelectorAll(".s4-page.is-list-scrolled").forEach((page) => page.classList.remove("is-list-scrolled"));
+    };
+  }, [listPage, location.pathname]);
   const notify = useToast();
   const [theme, setTheme] = useState(
     () => localStorage.getItem("hunter-theme") || "light",

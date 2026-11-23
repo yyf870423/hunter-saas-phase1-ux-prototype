@@ -9,6 +9,7 @@ import {
 test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/candidates");
+  await page.locator(".s4-candidate-filter-toggle").click(); // 11-23：候选人筛选区默认收起
   const tableDeleteButton = page
     .locator(".s4-row-actions .s1-table-delete-button")
     .first();
@@ -181,6 +182,7 @@ test("候选人列表支持搜索、筛选、列设置和详情跳转", async ({
 test("候选人收藏夹支持单人加入和多层目录管理", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/candidates");
+  await page.locator(".s4-candidate-filter-toggle").click(); // 11-23：候选人筛选区默认收起
 
   await page.getByRole("button", { name: "收藏夹", exact: true }).click();
   await expect(page.getByRole("button", { name: "管理收藏夹" })).toBeVisible();
@@ -226,6 +228,7 @@ test("候选人收藏夹支持单人加入和多层目录管理", async ({ page 
 
 test("公共筛选浮层不被容器裁切且行业统一使用两级多选", async ({ page }) => {
   await page.goto("#/candidates");
+  await page.locator(".s4-candidate-filter-toggle").click(); // 11-23：候选人筛选区默认收起
   await page.getByRole("button", { name: "行业", exact: true }).click();
   const cascade = page.locator(".s1-app > .s4-cascade-panel");
   await expect(cascade).toBeVisible();

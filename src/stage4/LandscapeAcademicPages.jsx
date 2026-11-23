@@ -1206,6 +1206,7 @@ function AcademicCardList({ kind }) {
         pageSize={paging.pageSize}
         pageSizeOptions={paging.sizeOptions}
         onPageSizeChange={paging.setPageSize}
+        total={filteredItems.length}
         onChange={controller.setPage}
       />
       <DeleteAssetModal
