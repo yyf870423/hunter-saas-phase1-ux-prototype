@@ -420,6 +420,11 @@ test("只看未处理、忽略、取消忽略和撤销标记", async ({ page }) 
   await page.getByRole("tab", { name: /已忽略/ }).click();
   await expect(feed).toContainText("云脉芯能正在组建机器人芯片团队");
   await page.getByRole("button", { name: "取消忽略" }).click();
+  await expect(feed).not.toContainText("云脉芯能正在组建机器人芯片团队");
+  await expect(page.locator(".s2-signal-detail h2")).toHaveText("周明远近期连续转发具身智能招聘内容");
+  await page.getByRole("tab", { name: /全部/ }).click();
+  await expect(page.locator(".s2-signal-detail h2")).toHaveText("周明远近期连续转发具身智能招聘内容");
+  await feed.getByRole("button", { name: /云脉芯能正在组建机器人芯片团队/ }).click();
   await expect(page.locator(".s2-signal-detail > footer").getByRole("button", { name: "忽略", exact: true })).toBeVisible();
   await page.goto("#/signals?signal=signal-tuoji");
   await expect(page.locator(".s2-signal-detail")).toContainText("9/3 已处理：约了 9 月 17 日复查");

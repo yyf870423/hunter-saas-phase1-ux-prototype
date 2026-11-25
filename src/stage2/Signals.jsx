@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import {
   Button,
+  EmptyState,
   Modal,
   SearchField,
   StatusBadge,
@@ -185,15 +186,15 @@ export function SignalsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [version],
   );
-  const requestedFilter = signalFilters.some(([value]) => value === params.get("filter"))
+  const filter = signalFilters.some(([value]) => value === params.get("filter"))
     ? params.get("filter")
     : "all";
-  const [filter, setFilter] = useState(requestedFilter);
   const [query, setQuery] = useState("");
-  const initialSelectedId = signals.some((signal) => signal.id === params.get("signal"))
-    ? params.get("signal")
+  const requestedId = params.get("signal");
+  const initialSelectedId = signals.some((signal) => signal.id === requestedId)
+    ? requestedId
     : "signal-cloudchip";
-  const [selectedId, setSelectedId] = useState(initialSelectedId);
+  const [selection, setSelection] = useState({ requestedId, id: initialSelectedId });
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [sourcePreview, setSourcePreview] = useState(null);
   const visible = useMemo(() => {
@@ -209,22 +210,33 @@ export function SignalsPage() {
       )
       .sort((a, b) => Number(b.isOpen) - Number(a.isOpen));
   }, [filter, query, signals]);
+  // A new deep link may request a selection, but filtering must not revive an old one.
+  const selectedId = selection.requestedId === requestedId ? selection.id : requestedId;
   const selected =
-    signals.find((signal) => signal.id === selectedId) || visible[0] || signals[0];
+    visible.find((signal) => signal.id === selectedId) ||
+    visible[0] ||
+    null;
 
   useEffect(() => {
-    setFilter(requestedFilter);
-  }, [requestedFilter]);
+    const nextId = selected?.id || null;
+    setSelection((current) =>
+      current.id === nextId && current.requestedId === requestedId
+        ? current
+        : { requestedId, id: nextId },
+    );
+    if (!nextId) setMobileDetailOpen(false);
+  }, [selected?.id, requestedId]);
+
+  useEffect(() => setSourcePreview(null), [selected?.id]);
 
   useEffect(() => {
     const requested = params.get("signal");
     if (!requested || !signals.some((signal) => signal.id === requested)) return;
-    setSelectedId(requested);
     setMobileDetailOpen(true);
   }, [params, signals]);
 
   const selectSignal = (id) => {
-    setSelectedId(id);
+    setSelection({ requestedId: id, id });
     setMobileDetailOpen(true);
     const next = new URLSearchParams(params);
     next.set("signal", id);
@@ -232,7 +244,6 @@ export function SignalsPage() {
   };
 
   const changeFilter = (value) => {
-    setFilter(value);
     const next = new URLSearchParams(params);
     if (value === "all") next.delete("filter");
     else next.set("filter", value);
@@ -258,7 +269,7 @@ export function SignalsPage() {
     notify("已撤销“已处理”标记；已经写入的资料不会撤回", "info");
   };
 
-  const badge = signalBadge(selected);
+  const badge = selected ? signalBadge(selected) : null;
 
   return (
     <div className="s2-page s2-signals-page">
@@ -309,9 +320,9 @@ export function SignalsPage() {
               return (
                 <button
                   type="button"
-                  className={selected.id === signal.id ? "is-active" : ""}
+                  className={selected?.id === signal.id ? "is-active" : ""}
                   key={signal.id}
-                  aria-pressed={selected.id === signal.id}
+                  aria-pressed={selected?.id === signal.id}
                   aria-controls="selected-signal-detail"
                   onClick={() => selectSignal(signal.id)}
                 >
@@ -469,20 +480,28 @@ export function SignalsPage() {
               )}
             </footer>
           </aside>
-        ) : null}
+        ) : (
+          <aside id="selected-signal-detail" className="s2-signal-detail">
+            <EmptyState
+              icon="signal"
+              title="没有符合条件的洞察"
+              description="可以清空搜索或切换筛选。"
+            />
+          </aside>
+        )}
       </section>
       <Modal
-        open={Boolean(sourcePreview)}
+        open={Boolean(sourcePreview && selected)}
         close={() => setSourcePreview(null)}
         title="来源与证据"
-        description={`查看“${selected.title}”引用的来源内容和支持结论。`}
+        description={selected ? `查看“${selected.title}”引用的来源内容和支持结论。` : undefined}
         footer={
           <Button tone="secondary" onClick={() => setSourcePreview(null)}>
             关闭
           </Button>
         }
       >
-        {sourcePreview ? (
+        {sourcePreview && selected ? (
           <div className="s2-signal-source-preview">
             <header>
               <span>
