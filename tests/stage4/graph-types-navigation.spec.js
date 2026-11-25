@@ -1,6 +1,11 @@
 import { mkdir } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
-import { graphTypes, defaultGraphTypeIds } from "../../src/stage4/graph-types";
+import {
+  graphTypes,
+  defaultGraphTypeIds,
+  isGraphType,
+  isKnownGraphType,
+} from "../../src/stage4/graph-types";
 import { topicGraphs } from "../../src/stage4/topic-graph-data";
 import {
   graphStorageKey,
@@ -78,20 +83,23 @@ const saveSettings = (page) =>
 const typeSwitch = (page, label) =>
   page.getByRole("switch", { name: `快捷显示${label}`, exact: true });
 
-test("类型目录为八类且人才地图替代组织架构，边界不接受多类型或未知值", () => {
+test("当前仅四类可选，旧类型只用于兼容且不接受多类型或未知值", () => {
   expect(graphTypes.map((type) => type.label)).toEqual([
     "人才地图",
     "公司关系",
     "候选人关系",
-    "岗位人才",
-    "岗位知识",
     "行业知识",
-    "技术与人才",
-    "人才流动",
   ]);
-  expect(topicGraphs.map((graph) => graph.typeId)).toEqual(
-    graphTypes.map((type) => type.id),
-  );
+  expect(topicGraphs.map((graph) => graph.typeId)).toEqual([
+    "talent-map",
+    "company-relations",
+    "candidate-relations",
+    "position-pool",
+    "position-context",
+    "industry-chain",
+    "technology-talent",
+    "talent-flow",
+  ]);
   const draft = { name: "新的图谱", description: "", typeId: "talent-map" };
   expect(validateGraphMetadata(draft)).toEqual({});
   expect(
@@ -124,7 +132,23 @@ test("类型目录为八类且人才地图替代组织架构，边界不接受�
       version: 1,
       graphTypeIds: ["talent-flow", "unknown", "talent-flow"],
     }),
-  ).toEqual(["talent-flow"]);
+  ).toEqual(defaultGraphTypeIds);
+  for (const graph of topicGraphs.filter((item) => !isGraphType(item.typeId))) {
+    expect(isKnownGraphType(graph.typeId)).toBe(true);
+    expect(
+      normalizeTopicGraphs({ version: 1, graphs: [graph] })[0].typeId,
+    ).toBe(graph.typeId);
+    expect(
+      validateGraphMetadata({ ...draft, typeId: graph.typeId }).typeId,
+    ).toBeTruthy();
+    expect(
+      validateGraphMetadata(
+        { ...graph, name: "保留旧类型" },
+        [graph],
+        graph.id,
+      ),
+    ).toEqual({});
+  }
 });
 
 test("默认快捷类型直接筛选，父导航返回全部图谱", async ({ page }) => {
@@ -151,10 +175,10 @@ test("默认快捷类型直接筛选，父导航返回全部图谱", async ({ pa
     .getByRole("button", { name: "知识图谱", exact: true })
     .click();
   await expect(page).toHaveURL(/#\/mappings$/);
-  await expect(cards(page)).toHaveCount(6);
+  await expect(cards(page)).toHaveCount(4);
   await expect(typeNav(page).locator('[aria-current="page"]')).toHaveCount(0);
   await page.locator(".s4-filter-bar .s4-select > button").click();
-  await expect(page.locator(".s4-select-options > button")).toHaveCount(9);
+  await expect(page.locator(".s4-select-options > button")).toHaveCount(5);
   await expect(
     page
       .locator(".s4-select-options")
@@ -163,14 +187,115 @@ test("默认快捷类型直接筛选，父导航返回全部图谱", async ({ pa
   await check();
 });
 
-test("八类图谱卡片显式显示类型标签，桌面手机与深色不裁切", async ({ page }) => {
+test("历史类型和旧快捷偏好不会重现，数据仍可读且新建仅四个选项", async ({
+  page,
+}) => {
+  const check = trackConsoleErrors(page);
+  await mkdir("artifacts/graph-scope-four", { recursive: true });
+  await page.addInitScript(
+    ({ graphKey, navKey, graphs }) => {
+      localStorage.setItem(graphKey, JSON.stringify({ version: 1, graphs }));
+      localStorage.setItem(
+        navKey,
+        JSON.stringify({
+          version: 1,
+          visibleIds: ["mappings"],
+          graphTypeIds: [
+            "talent-map",
+            "industry-chain",
+            "talent-flow",
+            "position-pool",
+          ],
+        }),
+      );
+    },
+    {
+      graphKey: graphStorageKey,
+      navKey: assetNavigationKey,
+      graphs: topicGraphs,
+    },
+  );
+  await page.goto("#/settings/navigation");
+  await expandNav(page);
+  await expect(typeNav(page).getByRole("button")).toHaveText([
+    "人才地图",
+    "行业知识",
+  ]);
+  await expect(page.getByRole("switch", { name: /^快捷显示/ })).toHaveCount(4);
+  await page.screenshot({
+    path: "artifacts/graph-scope-four/settings-desktop.png",
+    fullPage: true,
+  });
+  await page.goto("#/mappings?type=position-pool");
+  await expect(cards(page)).toHaveCount(4);
+  await expect(
+    page.getByText("该图谱类型不存在，已显示全部类型", { exact: true }),
+  ).toBeVisible();
+  await page.goto("#/mappings/new?type=talent-flow");
+  await expect(formType(page)).toHaveText("选择图谱类型");
+  await formType(page).click();
+  await expect(page.locator(".s4-select-options > button")).toHaveText(
+    graphTypes.map((type) => type.label),
+  );
+  await page.screenshot({
+    path: "artifacts/graph-scope-four/create-types-desktop.png",
+    fullPage: true,
+  });
+  await page.keyboard.press("Escape");
+  await page.goto("#/mappings/mapping-position-pool");
+  await expect(
+    page.getByRole("heading", { name: topicGraphs[3].name, exact: true }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      (key) =>
+        JSON.parse(localStorage.getItem(key)).graphs.map(
+          (graph) => graph.typeId,
+        ),
+      graphStorageKey,
+    ),
+  ).toEqual(topicGraphs.map((graph) => graph.typeId));
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("#/mappings");
+    await expect(cards(page)).toHaveCount(4);
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `artifacts/graph-scope-four/list-${width}.png`,
+      fullPage: true,
+    });
+    await page.locator(".s4-filter-bar .s4-select > button").click();
+    await expect(page.locator(".s4-select-options > button")).toHaveText([
+      "全部类型",
+      ...graphTypes.map((type) => type.label),
+    ]);
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `artifacts/graph-scope-four/filter-${width}.png`,
+      fullPage: true,
+    });
+    await page.keyboard.press("Escape");
+    await page.goto("#/settings/navigation");
+    await expect(page.getByRole("switch", { name: /^快捷显示/ })).toHaveCount(
+      4,
+    );
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      path: `artifacts/graph-scope-four/settings-${width}.png`,
+      fullPage: true,
+    });
+  }
+  await check();
+});
+
+test("四类图谱卡片显式显示类型标签，桌面手机与深色不裁切", async ({ page }) => {
   const check = trackConsoleErrors(page);
   await mkdir("artifacts/graph-card-types", { recursive: true });
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const number of [1, 2]) {
+    for (const number of [1]) {
       await page.goto(`#/mappings?page=${number}`);
-      const expected = topicGraphs.slice((number - 1) * 6, number * 6);
+      const expected = topicGraphs.filter((graph) => isGraphType(graph.typeId));
       await expect(cards(page)).toHaveCount(expected.length);
       for (const graph of expected) {
         const card = cards(page).filter({
@@ -226,7 +351,7 @@ test("类型与搜索取交集，刷新、清除和未知类型回退正常", as
     page.getByText("没有匹配的知识图谱", { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "清除筛选", exact: true }).click();
-  await expect(cards(page)).toHaveCount(6);
+  await expect(cards(page)).toHaveCount(4);
   await page.goto("#/mappings?type=unknown");
   await expect(
     page.getByText("该图谱类型不存在，已显示全部类型", { exact: true }),
@@ -346,6 +471,22 @@ test("详情编辑保存并保留图页，选择浮层 Escape 不关闭编辑器
 });
 
 test("返回列表保留搜索和分页，类型切换复位分页", async ({ page }) => {
+  await page.addInitScript(
+    ({ key, graphs }) => {
+      localStorage.setItem(key, JSON.stringify({ version: 1, graphs }));
+    },
+    {
+      key: graphStorageKey,
+      graphs: [
+        ...topicGraphs,
+        ...Array.from({ length: 4 }, (_, index) => ({
+          ...topicGraphs[0],
+          id: `pagination-${index}`,
+          name: `分页图谱${index}`,
+        })),
+      ],
+    },
+  );
   await page.goto("#/mappings?q=图谱&page=2");
   await expect(cards(page)).toHaveCount(2);
   const title = await cards(page).first().getByRole("heading").textContent();
@@ -360,7 +501,7 @@ test("返回列表保留搜索和分页，类型切换复位分页", async ({ pa
   await expect(page.getByPlaceholder("搜索图谱名称或内容")).toHaveValue("图谱");
   await expect(page.getByText("第 2 / 2 页", { exact: true })).toBeVisible();
   await chooseType(page, "人才地图");
-  await expect(cards(page)).toHaveCount(1);
+  await expect(cards(page)).toHaveCount(5);
   await expect(page.getByText("第 1 / 1 页", { exact: true })).toBeVisible();
   await expect(page).not.toHaveURL(/page=/);
 });
@@ -417,7 +558,7 @@ test("图谱资料在同源页面间同步", async ({ page, context }) => {
   await editor(page)
     .getByLabel(/图谱名称/)
     .fill("同步后的图谱名称");
-  await chooseType(page, "人才流动", editor(page));
+  await chooseType(page, "行业知识", editor(page));
   await saveEditor(page);
   await expect(
     second.getByRole("heading", { name: "同步后的图谱名称", exact: true }),
@@ -425,7 +566,7 @@ test("图谱资料在同源页面间同步", async ({ page, context }) => {
   await expect(
     second
       .locator(".s4-detail-header .s1-status")
-      .filter({ hasText: "人才流动" }),
+      .filter({ hasText: "行业知识" }),
   ).toBeVisible();
   await second.close();
 });
@@ -487,7 +628,7 @@ test("永久删除不会在刷新后复活示例图谱", async ({ page }) => {
 });
 
 test("筛选中的拖拽只调整命中项，隐藏图谱不会丢失", async ({ page }) => {
-  await page.goto("#/mappings?q=VLA");
+  await page.goto("#/mappings?q=具身智能");
   const firstTitle = await cards(page)
     .nth(0)
     .getByRole("heading")
@@ -510,7 +651,7 @@ test("筛选中的拖拽只调整命中项，隐藏图谱不会丢失", async ({
   );
   expect(new Set(ids).size).toBe(8);
   expect(ids[0]).toBe(topicGraphs[0].id);
-  expect(ids[1]).toBe(topicGraphs[1].id);
+  expect(ids[1]).toBe(topicGraphs[5].id);
 });
 
 test("快捷类型可配置、全部隐藏、恢复默认，父入口隐藏不留孤立子项", async ({
@@ -518,9 +659,9 @@ test("快捷类型可配置、全部隐藏、恢复默认，父入口隐藏不�
 }) => {
   await page.goto("#/settings/navigation");
   await expandNav(page);
-  await expect(page.getByRole("switch", { name: /^快捷显示/ })).toHaveCount(8);
+  await expect(page.getByRole("switch", { name: /^快捷显示/ })).toHaveCount(4);
   await typeSwitch(page, "人才地图").click();
-  await typeSwitch(page, "人才流动").click();
+  await typeSwitch(page, "行业知识").click();
   await expect(typeNav(page).getByRole("button")).toHaveText([
     "人才地图",
     "公司关系",
@@ -530,13 +671,13 @@ test("快捷类型可配置、全部隐藏、恢复默认，父入口隐藏不�
   await expect(typeNav(page).getByRole("button")).toHaveText([
     "公司关系",
     "候选人关系",
-    "人才流动",
+    "行业知识",
   ]);
   await page.reload();
   await expect(typeNav(page).getByRole("button")).toHaveText([
     "公司关系",
     "候选人关系",
-    "人才流动",
+    "行业知识",
   ]);
   await page
     .getByRole("switch", { name: "平铺显示知识图谱", exact: true })
@@ -559,9 +700,9 @@ test("快捷类型可配置、全部隐藏、恢复默认，父入口隐藏不�
   await expect(typeNav(page).getByRole("button")).toHaveText([
     "公司关系",
     "候选人关系",
-    "人才流动",
+    "行业知识",
   ]);
-  for (const label of ["公司关系", "候选人关系", "人才流动"])
+  for (const label of ["公司关系", "候选人关系", "行业知识"])
     await typeSwitch(page, label).click();
   await saveSettings(page);
   await expect(typeNav(page)).toHaveCount(0);
@@ -600,13 +741,13 @@ test("旧导航偏好升级保留资产显隐，快捷项与资产原子保存�
   ]);
   const second = await context.newPage();
   await second.goto("#/mappings");
-  await typeSwitch(page, "人才流动").click();
+  await typeSwitch(page, "行业知识").click();
   await page.getByRole("switch", { name: "平铺显示论文", exact: true }).click();
   await simulateWriteFailure(page, assetNavigationKey);
   await saveSettings(page);
   await expect(page.getByText(/导航设置保存失败/)).toBeVisible();
   await expect(
-    typeNav(page).getByRole("button", { name: "人才流动", exact: true }),
+    typeNav(page).getByRole("button", { name: "行业知识", exact: true }),
   ).toHaveCount(0);
   await expect(
     assetNav(page).getByRole("button", { name: "论文", exact: true }),
@@ -614,7 +755,7 @@ test("旧导航偏好升级保留资产显隐，快捷项与资产原子保存�
   await restoreWrites(page);
   await saveSettings(page);
   await expect(
-    typeNav(second).getByRole("button", { name: "人才流动", exact: true }),
+    typeNav(second).getByRole("button", { name: "行业知识", exact: true }),
   ).toBeVisible();
   await expect(
     assetNav(second).getByRole("button", { name: "论文", exact: true }),
@@ -660,7 +801,7 @@ test("损坏的图谱数据安全回退，合法空数组保持为空", async ({
     graphStorageKey,
   );
   await page.reload();
-  await expect(cards(page)).toHaveCount(6);
+  await expect(cards(page)).toHaveCount(4);
   await page.evaluate(
     (key) =>
       localStorage.setItem(key, JSON.stringify({ version: 1, graphs: [] })),
@@ -707,7 +848,10 @@ test("默认桌面导航免滚动，子项层级及用户菜单用量符合公�
   });
   await expect(selected).toHaveCSS("font-size", "13px");
   await expect(normal).toHaveCSS("font-size", "13px");
-  await expect(selected).toHaveCSS("color", await themeColor(page, "--s1-nav-active-ink", "color"));
+  await expect(selected).toHaveCSS(
+    "color",
+    await themeColor(page, "--s1-nav-active-ink", "color"),
+  );
   await expect(normal).toHaveCSS(
     "color",
     await page
@@ -740,9 +884,19 @@ test("默认桌面导航免滚动，子项层级及用户菜单用量符合公�
     page.getByRole("dialog", { name: "Credits 用量", exact: true }),
   ).toBeVisible();
   const usage = page.getByRole("dialog", { name: "Credits 用量", exact: true });
-  await expect(usage.locator("dt")).toHaveText(["可用余额", "本月套餐已用", "刷新日期", "存储"]);
+  await expect(usage.locator("dt")).toHaveText([
+    "可用余额",
+    "本月套餐已用",
+    "刷新日期",
+    "存储",
+  ]);
   // Pricing doc 2026-09-28: one Credits balance, this month's plan share, refresh date and storage.
-  await expect(usage.locator("dd")).toHaveText(["12,000 Credits", "64%", "2026-09-01", "8.2 / 30 GB"]);
+  await expect(usage.locator("dd")).toHaveText([
+    "12,000 Credits",
+    "64%",
+    "2026-09-01",
+    "8.2 / 30 GB",
+  ]);
   await expect(usage.getByText("本月任务")).toHaveCount(0);
   await page.screenshot({
     path: "artifacts/graph-types/after/usage-summary.png",
@@ -786,7 +940,7 @@ test("窄屏和深色的类型筛选、新建、编辑、设置截图", async ({
     });
     await page.goto("#/settings/navigation");
     await expect(page.getByRole("switch", { name: /^快捷显示/ })).toHaveCount(
-      8,
+      4,
     );
     await expectNoHorizontalOverflow(page);
     await page.screenshot({
@@ -819,10 +973,10 @@ test("手机端可以完成创建与类型修改，不增加底部导航入口",
   await page.setViewportSize({ width: 390, height: 844 });
   await createGraph(page, "手机创建图谱", "人才地图");
   await page.getByRole("button", { name: "编辑资料", exact: true }).click();
-  await chooseType(page, "人才流动", editor(page));
+  await chooseType(page, "行业知识", editor(page));
   await saveEditor(page);
   await page.getByRole("button", { name: "返回列表", exact: true }).click();
-  await chooseType(page, "人才流动");
+  await chooseType(page, "行业知识");
   await expect(cards(page).filter({ hasText: "手机创建图谱" })).toBeVisible();
   await expect(page.locator(".s1-mobile-tabs > button")).toHaveCount(5);
   await expect(typeNav(page)).toHaveCount(0);

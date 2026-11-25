@@ -9,7 +9,12 @@ import {
   TextInput,
   useToast,
 } from "./asset-ui";
-import { graphTypes } from "./graph-types";
+import {
+  graphTypeLabel,
+  graphTypes,
+  isGraphType,
+  isKnownGraphType,
+} from "./graph-types";
 import {
   saveGraphMetadata,
   useTopicGraphs,
@@ -24,7 +29,13 @@ export function GraphTypeSelect({
 }) {
   return (
     <EntitySelect
-      label={all ? "全部类型" : "选择图谱类型"}
+      label={
+        all
+          ? "全部类型"
+          : isKnownGraphType(value) && !isGraphType(value)
+            ? graphTypeLabel(value)
+            : "选择图谱类型"
+      }
       value={value}
       onChange={onChange}
       disabled={disabled}

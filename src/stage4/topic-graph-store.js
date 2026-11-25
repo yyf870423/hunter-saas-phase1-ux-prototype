@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { isGraphType } from "./graph-types";
+import { isGraphType, isKnownGraphType } from "./graph-types";
 import { topicGraphs } from "./topic-graph-data";
 import { organizationBatchId, organizationGraphPages, organizationScope } from "../stage3/organization-mapping-data";
 
@@ -30,7 +30,7 @@ export function normalizeTopicGraphs(value) {
       typeof graph.name !== "string" ||
       !graph.name.trim() ||
       typeof graph.description !== "string" ||
-      !isGraphType(graph.typeId) ||
+      !isKnownGraphType(graph.typeId) ||
       !Array.isArray(graph.pageIds) ||
       graph.pageIds.some((id) => typeof id !== "string") ||
       (graph.deletedAt != null && typeof graph.deletedAt !== "string")
@@ -158,7 +158,10 @@ export function validateGraphMetadata(draft, records = graphs, id) {
     )
   )
     errors.name = "已存在同名知识图谱，请使用其他名称";
-  if (!isGraphType(draft.typeId)) errors.typeId = "请选择图谱类型";
+  const unchangedLegacyType = isKnownGraphType(draft.typeId) &&
+    records.some((graph) => graph.id === id && graph.typeId === draft.typeId);
+  if (!isGraphType(draft.typeId) && !unchangedLegacyType)
+    errors.typeId = "请选择图谱类型";
   if (typeof draft.description !== "string" || draft.description.length > 2000)
     errors.description = "图谱说明不能超过 2000 个字符";
   return errors;

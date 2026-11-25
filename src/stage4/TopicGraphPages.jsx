@@ -348,7 +348,7 @@ export function MappingsListPage() {
     return () => window.removeEventListener("storage", onStorage);
   }, [graphs]);
   const controller = useListController(
-    orderedGraphs.filter((graph) => !typeId || graph.typeId === typeId),
+    orderedGraphs.filter((graph) => isGraphType(graph.typeId) && (!typeId || graph.typeId === typeId)),
     ["name", "description"],
     6,
     {
@@ -414,7 +414,7 @@ export function MappingsListPage() {
     <div className="s4-page tg-list-page">
       <AssetPageHeader
         title="知识图谱"
-        description="用图页整理组织、人物、公司生态、岗位人才和其他需要持续维护的关系内容。"
+        description="用图页整理人才地图、公司关系、候选人关系和行业知识。"
         count={controller.filtered.length}
         primaryLabel={limited ? undefined : "新建知识图谱"}
         onPrimary={createGraph}

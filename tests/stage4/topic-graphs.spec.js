@@ -487,7 +487,7 @@ test("知识图谱卡片和分页保持清晰间距", async ({ page }) => {
 
 test("不同关系主题在列表中作为独立知识图谱资产展示", async ({ page }) => {
   await page.goto("#/mappings");
-  await expect(page.getByText("8 条", { exact: true })).toBeVisible();
+  await expect(page.getByText("4 条", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "具身智能公司关系知识图谱" }),
   ).toBeVisible();
@@ -496,7 +496,7 @@ test("不同关系主题在列表中作为独立知识图谱资产展示", async
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "VLA 岗位上下游知识图谱" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "具身智能行业上下游知识图谱" }),
   ).toBeVisible();
