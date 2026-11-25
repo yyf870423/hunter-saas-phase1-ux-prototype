@@ -1,0 +1,28 @@
+{
+  "phase": "after",
+  "errors": [],
+  "consoleErrors": [],
+  "failedResponses": [],
+  "writes": [],
+  "external": [],
+  "captures": [
+    "after-1440-initial.png",
+    "after-1440-summary.png",
+    "after-1440-excluded-source.png",
+    "after-1024-initial.png",
+    "after-1024-summary.png",
+    "after-1024-excluded-source.png"
+  ],
+  "comparisons": [
+    {
+      "width": 1440,
+      "changedPixels": 0,
+      "changedRatio": 0
+    },
+    {
+      "width": 1024,
+      "changedPixels": 0,
+      "changedRatio": 0
+    }
+  ]
+}

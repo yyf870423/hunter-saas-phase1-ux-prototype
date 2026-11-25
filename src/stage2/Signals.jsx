@@ -10,6 +10,7 @@ import {
   useToast,
 } from "../stage1/ui";
 import { signals as initialSignals } from "./data";
+import { matchesSignalSearch } from "./signal-search";
 import { pendingGroup, pendingUpdatesEvent } from "../stage4/pending-updates";
 import {
   markerText,
@@ -198,15 +199,11 @@ export function SignalsPage() {
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [sourcePreview, setSourcePreview] = useState(null);
   const visible = useMemo(() => {
-    const keyword = query.trim().toLowerCase();
     return signals
       .filter(
         (signal) =>
           matchesFilter(signal, filter) &&
-          (!keyword ||
-            `${signal.title} ${signal.object} ${signal.type}`
-              .toLowerCase()
-              .includes(keyword)),
+          matchesSignalSearch(signal, query),
       )
       .sort((a, b) => Number(b.isOpen) - Number(a.isOpen));
   }, [filter, query, signals]);

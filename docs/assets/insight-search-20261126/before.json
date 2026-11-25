@@ -1,0 +1,13 @@
+{
+  "phase": "before",
+  "errors": [],
+  "consoleErrors": [],
+  "failedResponses": [],
+  "writes": [],
+  "external": [],
+  "captures": [
+    "before-1440-initial.png",
+    "before-1024-initial.png"
+  ],
+  "comparisons": []
+}
