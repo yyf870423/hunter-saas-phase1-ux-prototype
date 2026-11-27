@@ -1,0 +1,9 @@
+.s4-import-prototype-note.s4-candidate-batch-note {
+  margin-bottom: 12px;
+}
+.s4-candidate-batch-import .s4-import-result-list b {
+  overflow-wrap: anywhere;
+}
+.s4-candidate-batch-import .s4-file-error {
+  white-space: pre-line;
+}

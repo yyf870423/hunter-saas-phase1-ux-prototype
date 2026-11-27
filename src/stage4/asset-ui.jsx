@@ -1597,13 +1597,14 @@ export function FileDrop({
       {shownError ? <p className="s4-file-error">{shownError}</p> : null}
       {files.length ? (
         <div className="s4-uploaded-files">
-          {files.map((file) => (
-            <span key={file.name || file}>
+          {files.map((file, index) => (
+            <span key={`${file.name || file}-${index}`}>
               <Icon name="file" />
               <b>{file.name || file}</b>
               <small>准备上传</small>
               <button
                 type="button"
+                aria-label={`移除 ${file.name || file}`}
                 onClick={() => onFiles(files.filter((item) => item !== file))}
               >
                 <Icon name="close" />

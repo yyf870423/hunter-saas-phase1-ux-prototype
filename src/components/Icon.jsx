@@ -1,6 +1,6 @@
-import { AlignHorizontalDistributeCenter, AlignVerticalDistributeCenter, CornerDownRight, Maximize2, Minimize2, Redo2, Spline, Undo2 } from "lucide-react";
+import { AlignHorizontalDistributeCenter, AlignVerticalDistributeCenter, CornerDownRight, FileInput, Maximize2, Minimize2, Redo2, Spline, Undo2 } from "lucide-react";
 
-const libraryIcons = { maximize2: Maximize2, minimize2: Minimize2, curve: Spline, orthogonal: CornerDownRight, layoutHorizontal: AlignHorizontalDistributeCenter, layoutVertical: AlignVerticalDistributeCenter, undo: Undo2, redo: Redo2 };
+const libraryIcons = { fileInput: FileInput, maximize2: Maximize2, minimize2: Minimize2, curve: Spline, orthogonal: CornerDownRight, layoutHorizontal: AlignHorizontalDistributeCenter, layoutVertical: AlignVerticalDistributeCenter, undo: Undo2, redo: Redo2 };
 
 const paths = {
   home: ["M3 10.5 12 3l9 7.5", "M5 9.5V21h14V9.5", "M9 21v-7h6v7"],

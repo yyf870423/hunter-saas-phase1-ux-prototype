@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { RelationshipCanvas } from "../stage3/RelationshipCanvas";
+import { CandidateBatchImport } from "./CandidateBatchImport";
 import {
   ActivityTimeline,
   AssetPageHeader,
@@ -2714,7 +2715,7 @@ export function CandidateCreatePage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params] = useSearchParams();
-  const [mode, setMode] = useState(params.get("mode") || "manual");
+  const [mode, setMode] = useState(["manual", "upload", "batch"].includes(params.get("mode")) ? params.get("mode") : "manual");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [title, setTitle] = useState("");
@@ -2768,6 +2769,10 @@ export function CandidateCreatePage() {
               <b>上传简历</b>
               <small>解析后确认写入</small>
             </span>
+          </button>
+          <button type="button" className={mode === "batch" ? "is-active" : ""} onClick={() => setMode("batch")}>
+            <Icon name="fileInput" />
+            <span><b>批量导入</b><small>多份简历或候选人表格</small></span>
           </button>
         </aside>
         <section className="s4-create-workspace">
@@ -2854,7 +2859,7 @@ export function CandidateCreatePage() {
                 </Button>
               </footer>
             </>
-          ) : (
+          ) : mode === "batch" ? <CandidateBatchImport /> : (
             <UploadCandidate files={files} setFiles={setFiles} />
           )}
         </section>

@@ -159,6 +159,14 @@ export function ImportTaskDetail({
             <p className="s4-import-prototype-note">
               【原型说明，正式实现不展示】本地虚构数据；刷新模拟进度，不上传文件或写入业务库。
             </p>
+            {task.matching ? <StateBanner
+              title={task.matching.enabled ? "正式写入后自动开始人岗匹配" : "未开启自动人岗匹配"}
+              description={task.matching.enabled
+                ? task.matching.scope === "selected"
+                  ? `匹配岗位：${task.matching.positions.join("、")}。待身份确认和失败条目不会启动。`
+                  : "匹配全部招聘中岗位；待身份确认和失败条目不会启动。"
+                : "导入本身不会自动启动人岗匹配。"}
+            /> : null}
             <div className="s4-import-task-meta">
               <StatusBadge
               tone={

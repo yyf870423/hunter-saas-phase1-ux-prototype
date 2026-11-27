@@ -26,10 +26,11 @@ import { companies, exportTasks, recycleItems } from "./data";
 import { ImportTaskDetail } from "./ImportTaskDetail";
 import {
   advanceImportSample,
-  createImportDetailSamples,
   createUploadedImportSample,
   retryImportSample,
 } from "./import-task-details";
+import { useImportTasks } from "./import-task-store";
+import { CandidateImportExampleLink } from "./CandidateImportExampleLink";
 import {
   useCompanyContacts,
   restoreCompanyContact,
@@ -88,7 +89,7 @@ export function ImportsPage() {
   );
   const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
-  const [localTasks, setLocalTasks] = useState(createImportDetailSamples);
+  const [localTasks, setLocalTasks] = useImportTasks();
   const [createdTask, setCreatedTask] = useState(null);
   const [typeFilter, setTypeFilter] = useState([]);
   const [statusFilter, setStatusFilter] = useState([]);
@@ -419,7 +420,7 @@ export function ImportsPage() {
                 error={matchError}
               />
             ) : null}
-            <a
+            {type === "候选人" ? <CandidateImportExampleLink /> : <a
               href="#sample"
               onClick={(event) => {
                 event.preventDefault();
@@ -427,7 +428,7 @@ export function ImportsPage() {
               }}
             >
               下载 {type} 导入示例
-            </a>
+            </a>}
           </div>
         ) : null}
         {step === "confirm" ? (
