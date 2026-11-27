@@ -443,10 +443,8 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
             pressedOnNodeRef.current = Boolean(event.target.closest(".tg-node"));
         }} onPointerDown={(event) => {
             const target = event.target;
-            if (event.button !== 0 ||
-                target.closest(".tg-node") ||
-                target.closest(".tg-edge-label-button") ||
-                target.closest(".tg-edge-hit, .graph-edge-handle"))
+            if (event.button !== 0 || target.closest(".tg-collapse-node, .graph-edge-handle") ||
+                !readingOnly && target.closest(".tg-node, .tg-edge-label-button, .tg-edge-hit"))
                 return;
             edgeHover.reset();
             panGesture.start(event);

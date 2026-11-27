@@ -5,6 +5,7 @@ import { useCanvasFullscreen } from "../components/useCanvasFullscreen";
 import { createDenseGraphPage } from "./graph-dense-sample";
 import { GraphCanvas as TopicGraphCanvas } from "../components/TopicGraphCanvas";
 import { GraphHistoryControls } from "../components/GraphHistoryControls";
+import { GraphCameraControls } from "../components/GraphCameraControls";
 import { GraphImportDialog } from "../components/GraphImportDialog";
 import { useGraphHistory } from "../components/useGraphHistory";
 import { getDescendantIds, graphCanvasMinimumBounds, expandGraphCanvasBounds, placeMovedGraphNodes } from "../components/topic-graph-geometry";
@@ -1896,6 +1897,7 @@ function GraphAiWorkspace({ page, close, onApply }) {
 }
 
 function GraphReviewWorkspace({ pages, reviewItems, onLocate, onResolve }) {
+  const canvasApi = useRef(null);
   const [items, setItems] = useState(reviewItems);
   const [selectedId, setSelectedId] = useState(items[0]?.id);
   const [evidencePreview, setEvidencePreview] = useState(null);
@@ -1966,14 +1968,8 @@ function GraphReviewWorkspace({ pages, reviewItems, onLocate, onResolve }) {
             <i className="is-review" />
             待确认内容已定位
           </span>
-          <button
-            type="button"
-            className="tg-review-fullscreen-button"
-            aria-label={isFullscreen ? "退出审核画布全屏" : "进入审核画布全屏"}
-            onClick={toggleFullscreen}
-          >
-            <Icon name={isFullscreen ? "minimize2" : "maximize2"} />
-          </button>
+          <GraphCameraControls zoom={zoom} onZoom={setZoom} onFit={() => canvasApi.current?.fit()} isFullscreen={isFullscreen} onFullscreen={toggleFullscreen}
+            labels={{ out: "缩小审核画布", in: "放大审核画布", fit: "自适应审核画布", enter: "进入审核画布全屏", exit: "退出审核画布全屏" }} />
         </header>
         <GraphCanvas
           key={page.id}
@@ -1990,6 +1986,7 @@ function GraphReviewWorkspace({ pages, reviewItems, onLocate, onResolve }) {
           focusNodeId={selected.nodeId}
           onContextMenu={() => {}}
           reviewMode
+          apiRef={canvasApi}
         />
       </div>
       <aside className="tg-review-detail">
@@ -2595,51 +2592,7 @@ function GraphContent({
         </div>
         <div className="tg-toolbar-divider" />
         {view === "canvas" ? (
-          <div className="graph-camera-controls"><div className="tg-zoom-controls">
-            <button
-              type="button"
-              aria-label="缩小"
-              onClick={() =>
-                setZoom((value) =>
-                  Math.max(0.1, Number((value - 0.1).toFixed(1))),
-                )
-              }
-            >
-              <Icon name="minus" />
-            </button>
-            <button type="button" onClick={() => setZoom(1)}>
-              {Math.round(zoom * 100)}%
-            </button>
-            <button
-              type="button"
-              aria-label="放大"
-              onClick={() =>
-                setZoom((value) =>
-                  Math.min(1.5, Number((value + 0.1).toFixed(1))),
-                )
-              }
-            >
-              <Icon name="plus" />
-            </button>
-            <TooltipText tip="自适应全部内容" trigger="always" className="s4-action-tooltip">
-            <button
-              type="button"
-              aria-label="自适应全部内容"
-              onClick={() => canvasApi.current?.fit()}
-            >
-              <Icon name="maximize" />
-            </button>
-            </TooltipText>
-            <TooltipText tip={isFullscreen ? "退出图谱全屏" : "进入图谱全屏"} trigger="always" className="s4-action-tooltip">
-            <button
-              type="button"
-              aria-label={isFullscreen ? "退出图谱全屏" : "进入图谱全屏"}
-              onClick={toggleFullscreen}
-            >
-              <Icon name={isFullscreen ? "minimize2" : "maximize2"} />
-            </button>
-            </TooltipText>
-          </div><GraphHistoryControls history={history} /></div>
+          <div className="graph-camera-controls"><GraphCameraControls zoom={zoom} onZoom={setZoom} onFit={() => canvasApi.current?.fit()} isFullscreen={isFullscreen} onFullscreen={toggleFullscreen} /><GraphHistoryControls history={history} /></div>
         ) : null}
         <div className="tg-toolbar-actions"><div ref={setCanvasToolbarTarget} />
         <Button size="sm" icon="plus" onClick={() => setNodeEditor({})}>
