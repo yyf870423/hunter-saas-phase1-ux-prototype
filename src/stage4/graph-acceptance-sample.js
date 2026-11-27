@@ -1,3 +1,17 @@
+export const stressGraphSample = {
+    id: "mapping-stress",
+    name: "1201 节点压力测试图谱",
+    description: "【原型说明，正式实现不展示】1201 个节点、1280 条连线的虚构测试数据。",
+    typeId: "talent-map",
+    pageIds: ["stress-1201"],
+    pageCount: 1,
+    nodeCount: 1201,
+    linkedAssets: 0,
+    pending: 0,
+    updatedAt: "今天",
+    pages: [{ id: "stress-1201", name: "压力测试", type: "人才地图", description: "虚构压力测试数据", ...createGraphStressSample() }],
+};
+
 export function createGraphInteractionSample() {
     const rows = [
         ["org-xinglan", "星澜机器人（样例）", "company", null, 60, 220],

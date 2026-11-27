@@ -66,9 +66,15 @@ export function normalizeTopicGraphs(value) {
 function readGraphs() {
   if (typeof window === "undefined") return topicGraphs;
   try {
-    return normalizeTopicGraphs(
+    const records = normalizeTopicGraphs(
       JSON.parse(localStorage.getItem(graphStorageKey)),
     );
+    // Existing prototype sessions keep their data; add the new seed only when absent.
+    const seed = topicGraphs.find(graph => graph.id === "mapping-stress");
+    if (!records.some(graph => graph.id === seed.id) && records.some(graph => topicGraphs.some(initial => initial.id === graph.id))) {
+      return [...records, seed];
+    }
+    return records;
   } catch {
     return topicGraphs;
   }

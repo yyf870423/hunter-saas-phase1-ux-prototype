@@ -1,3 +1,5 @@
+import { stressGraphSample } from "./graph-acceptance-sample";
+
 export const topicGraphs = [
   {
     id: "mapping-embodied",
@@ -104,6 +106,7 @@ export const topicGraphs = [
     related: "1 个岗位",
     updatedAt: "8 月 28 日",
   },
+  stressGraphSample,
 ];
 
 const node = (data) => ({

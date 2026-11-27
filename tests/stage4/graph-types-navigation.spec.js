@@ -24,6 +24,8 @@ import {
 
 test.use({ reducedMotion: "reduce" });
 const cards = (page) => page.locator(".tg-graph-card");
+const visibleSeedGraphs = topicGraphs.filter(graph => isGraphType(graph.typeId));
+const talentSeedGraphs = topicGraphs.filter(graph => graph.typeId === "talent-map");
 const typeNav = (page) =>
   page.getByRole("group", { name: "知识图谱类型", exact: true });
 const assetNav = (page) =>
@@ -99,6 +101,7 @@ test("当前仅四类可选，旧类型只用于兼容且不接受多类型或�
     "industry-chain",
     "technology-talent",
     "talent-flow",
+    "talent-map",
   ]);
   const draft = { name: "新的图谱", description: "", typeId: "talent-map" };
   expect(validateGraphMetadata(draft)).toEqual({});
@@ -164,9 +167,9 @@ test("默认快捷类型直接筛选，父导航返回全部图谱", async ({ pa
     .getByRole("button", { name: "人才地图", exact: true })
     .click();
   await expect(page).toHaveURL(/#\/mappings\?type=talent-map$/);
-  await expect(cards(page)).toHaveCount(1);
+  await expect(cards(page)).toHaveCount(talentSeedGraphs.length);
   await expect(cards(page).getByRole("heading")).toHaveText(
-    topicGraphs[0].name,
+    talentSeedGraphs.map(graph => graph.name),
   );
   await expect(
     typeNav(page).getByRole("button", { name: "人才地图", exact: true }),
@@ -175,7 +178,7 @@ test("默认快捷类型直接筛选，父导航返回全部图谱", async ({ pa
     .getByRole("button", { name: "知识图谱", exact: true })
     .click();
   await expect(page).toHaveURL(/#\/mappings$/);
-  await expect(cards(page)).toHaveCount(4);
+  await expect(cards(page)).toHaveCount(visibleSeedGraphs.length);
   await expect(typeNav(page).locator('[aria-current="page"]')).toHaveCount(0);
   await page.locator(".s4-filter-bar .s4-select > button").click();
   await expect(page.locator(".s4-select-options > button")).toHaveCount(5);
@@ -227,7 +230,7 @@ test("历史类型和旧快捷偏好不会重现，数据仍可读且新建仅�
     fullPage: true,
   });
   await page.goto("#/mappings?type=position-pool");
-  await expect(cards(page)).toHaveCount(4);
+  await expect(cards(page)).toHaveCount(visibleSeedGraphs.length);
   await expect(
     page.getByText("该图谱类型不存在，已显示全部类型", { exact: true }),
   ).toBeVisible();
@@ -258,7 +261,8 @@ test("历史类型和旧快捷偏好不会重现，数据仍可读且新建仅�
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("#/mappings");
-    await expect(cards(page)).toHaveCount(4);
+    await expect(cards(page)).toHaveCount(visibleSeedGraphs.length);
+    await expect.poll(() => page.evaluate(() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth))).toBeLessThanOrEqual(width + 1);
     await expectNoHorizontalOverflow(page);
     await page.screenshot({
       path: `artifacts/graph-scope-four/list-${width}.png`,
@@ -351,7 +355,7 @@ test("类型与搜索取交集，刷新、清除和未知类型回退正常", as
     page.getByText("没有匹配的知识图谱", { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "清除筛选", exact: true }).click();
-  await expect(cards(page)).toHaveCount(4);
+  await expect(cards(page)).toHaveCount(visibleSeedGraphs.length);
   await page.goto("#/mappings?type=unknown");
   await expect(
     page.getByText("该图谱类型不存在，已显示全部类型", { exact: true }),
@@ -394,7 +398,7 @@ test("新建校验必填与重名，从类型入口带入并真实保存", async
   ).toBeVisible();
   await page.getByRole("button", { name: "返回列表", exact: true }).click();
   await expect(page).toHaveURL(/type=talent-map$/);
-  await expect(cards(page)).toHaveCount(2);
+  await expect(cards(page)).toHaveCount(talentSeedGraphs.length + 1);
   await expect(
     cards(page)
       .filter({ hasText: "机器人核心团队人才地图" })
@@ -414,7 +418,7 @@ test("卡片编辑能取消，保存类型后在分类间移动", async ({ page 
     .fill("未保存的名称");
   await editor(page).getByRole("button", { name: "取消", exact: true }).click();
   await expect(cards(page).getByRole("heading")).toHaveText(
-    topicGraphs[0].name,
+    talentSeedGraphs.map(graph => graph.name),
   );
   await openEditor(page, topicGraphs[0].name);
   await editor(page)
@@ -423,9 +427,8 @@ test("卡片编辑能取消，保存类型后在分类间移动", async ({ page 
   await chooseType(page, "公司关系", editor(page));
   await saveEditor(page);
   await expect(editor(page)).toHaveCount(0);
-  await expect(
-    page.getByText("暂无人才地图图谱", { exact: true }),
-  ).toBeVisible();
+  await expect(cards(page)).toHaveCount(talentSeedGraphs.length - 1);
+  await expect(cards(page).getByRole("heading")).toHaveText("1201 节点压力测试图谱");
   await chooseType(page, "公司关系");
   await expect(cards(page)).toHaveCount(2);
   const card = cards(page).filter({ hasText: "星澜机器人公司关系" });
@@ -488,7 +491,7 @@ test("返回列表保留搜索和分页，类型切换复位分页", async ({ pa
     },
   );
   await page.goto("#/mappings?q=图谱&page=2");
-  await expect(cards(page)).toHaveCount(2);
+  await expect(cards(page)).toHaveCount(visibleSeedGraphs.length + 4 - 6);
   const title = await cards(page).first().getByRole("heading").textContent();
   await cards(page)
     .first()
@@ -501,7 +504,7 @@ test("返回列表保留搜索和分页，类型切换复位分页", async ({ pa
   await expect(page.getByPlaceholder("搜索图谱名称或内容")).toHaveValue("图谱");
   await expect(page.getByText("第 2 / 2 页", { exact: true })).toBeVisible();
   await chooseType(page, "人才地图");
-  await expect(cards(page)).toHaveCount(5);
+  await expect(cards(page)).toHaveCount(talentSeedGraphs.length + 4);
   await expect(page.getByText("第 1 / 1 页", { exact: true })).toBeVisible();
   await expect(page).not.toHaveURL(/page=/);
 });
@@ -517,7 +520,7 @@ test("编辑保存失败不改原图谱，保留草稿后可重试", async ({ pa
   await saveEditor(page);
   await expect(editor(page).getByText(/图谱保存失败/)).toBeVisible();
   await expect(cards(page).getByRole("heading")).toHaveText(
-    topicGraphs[0].name,
+    talentSeedGraphs.map(graph => graph.name),
   );
   await expect(editor(page).getByLabel(/图谱名称/)).toHaveValue(
     "保存失败后重试的图谱",
@@ -525,7 +528,7 @@ test("编辑保存失败不改原图谱，保留草稿后可重试", async ({ pa
   await restoreWrites(page);
   await saveEditor(page);
   await expect(editor(page)).toHaveCount(0);
-  await expect(cards(page)).toHaveCount(0);
+  await expect(cards(page)).toHaveCount(talentSeedGraphs.length - 1);
 });
 
 test("新建存储失败不生成半成品，重试只新增一条", async ({ page }) => {
@@ -547,7 +550,7 @@ test("新建存储失败不生成半成品，重试只新增一条", async ({ pa
       (key) => JSON.parse(localStorage.getItem(key)).graphs.length,
       graphStorageKey,
     ),
-  ).toBe(9);
+  ).toBe(topicGraphs.length + 1);
 });
 
 test("图谱资料在同源页面间同步", async ({ page, context }) => {
@@ -620,7 +623,7 @@ test("永久删除不会在刷新后复活示例图谱", async ({ page }) => {
   await page.reload();
   await expect(row).toHaveCount(0);
   await page.goto("#/mappings?type=talent-map");
-  await expect(cards(page)).toHaveCount(0);
+  await expect(cards(page)).toHaveCount(talentSeedGraphs.length - 1);
   await page.goto("#/mappings/mapping-embodied");
   await expect(
     page.getByRole("button", { name: "编辑资料", exact: true }),
@@ -649,7 +652,7 @@ test("筛选中的拖拽只调整命中项，隐藏图谱不会丢失", async ({
   const ids = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("hunter-topic-graph-order")),
   );
-  expect(new Set(ids).size).toBe(8);
+  expect(new Set(ids).size).toBe(topicGraphs.length);
   expect(ids[0]).toBe(topicGraphs[0].id);
   expect(ids[1]).toBe(topicGraphs[5].id);
 });
@@ -769,7 +772,7 @@ test("加载、读取失败、空状态和权限受限路径可恢复", async ({
   await page.goto("#/mappings?type=talent-map&state=error");
   await page.getByRole("button", { name: "重新加载", exact: true }).click();
   await expect(page).toHaveURL(/type=talent-map$/);
-  await expect(cards(page)).toHaveCount(1);
+  await expect(cards(page)).toHaveCount(talentSeedGraphs.length);
   await page.goto("#/mappings?state=permission-limited");
   await expect(page.getByText("当前账号只能查看摘要")).toBeVisible();
   await expect(
@@ -801,7 +804,7 @@ test("损坏的图谱数据安全回退，合法空数组保持为空", async ({
     graphStorageKey,
   );
   await page.reload();
-  await expect(cards(page)).toHaveCount(4);
+  await expect(cards(page)).toHaveCount(visibleSeedGraphs.length);
   await page.evaluate(
     (key) =>
       localStorage.setItem(key, JSON.stringify({ version: 1, graphs: [] })),
@@ -915,7 +918,7 @@ test("窄屏和深色的类型筛选、新建、编辑、设置截图", async ({
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("#/mappings?type=talent-map");
-    await expect(cards(page)).toHaveCount(1);
+    await expect(cards(page)).toHaveCount(talentSeedGraphs.length);
     await page.screenshot({
       path: `artifacts/graph-types/after/list-${width}.png`,
       fullPage: true,
