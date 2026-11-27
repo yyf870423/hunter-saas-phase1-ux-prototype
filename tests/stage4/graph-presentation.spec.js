@@ -4,8 +4,14 @@ import { createOpportunitySeed } from "../../src/stage4/opportunity-seed.js";
 import { candidates } from "../../src/stage4/data.js";
 
 async function choose(canvas, label, option) {
-  await canvas.getByRole("button", { name: label, exact: true }).click();
-  await canvas.page().locator(".s4-select-panel").getByRole("button", { name: option, exact: true }).click();
+  const page = canvas.page();
+  if (label === "自动布局") {
+    await page.getByRole("button", { name: "布局", exact: true }).click();
+    await page.getByRole("menuitem", { name: option === "左右布局" ? "左右重排" : "上下重排", exact: true }).click();
+  } else {
+    await page.getByRole("button", { name: label, exact: true }).click();
+    await page.locator(".s4-select-panel").getByRole("button", { name: option, exact: true }).click();
+  }
 }
 async function positions(canvas, selector) {
   return canvas.locator(selector).evaluateAll(nodes => nodes.map(node => ({ id: node.dataset.nodeId, x: Number.parseFloat(node.style.left), y: Number.parseFloat(node.style.top), width: node.offsetWidth, height: node.offsetHeight })));
@@ -34,7 +40,7 @@ for (const width of [1440, 390]) test(`${width}px 密集图双侧展开、两种
   const noErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width, height: 1000 });
   await page.goto("#/mappings/mapping-embodied?tab=content&sample=dense");
-  await page.getByRole("button", { name: "关闭详情", exact: true }).click();
+  await expect(page.locator(".tg-detail-panel")).toHaveCount(0);
   const canvas = page.locator(".tg-canvas-frame");
   await expect(canvas.locator(".tg-node")).toHaveCount(85);
   await expect(canvas.locator(".tg-edge")).toHaveCount(100);
@@ -68,7 +74,7 @@ for (const width of [1440, 390]) test(`${width}px 密集图双侧展开、两种
 test("知识图谱只悬停显示一条关系，选中、键盘或移开不使标注常驻", async ({ page }) => {
   const noErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content");
-  await page.getByRole("button", { name: "关闭详情", exact: true }).click();
+  await expect(page.locator(".tg-detail-panel")).toHaveCount(0);
   const canvas = page.locator(".tg-canvas-frame");
   const edge = canvas.locator(".tg-edge-hit").first();
   await hoverStroke(page, edge);
@@ -189,9 +195,19 @@ test("触屏点击连线查看关系详情，不残留悬停标注", async ({ br
   try {
     const page = await context.newPage(), noErrors = trackConsoleErrors(page);
     await page.goto("#/mappings/mapping-embodied?tab=content");
-    await page.getByRole("button", { name: "关闭详情", exact: true }).tap();
+    await expect(page.locator(".tg-detail-panel")).toHaveCount(0);
     const canvas = page.locator(".tg-canvas-frame"), line = canvas.locator(".tg-edge-hit").first();
-    const point = await line.evaluate(path => { const p = path.getPointAtLength(path.getTotalLength() / 2).matrixTransform(path.getScreenCTM()); return { x: p.x, y: p.y }; });
+    await page.getByRole("button", { name: "进入图谱全屏", exact: true }).click();
+    await expect(canvas.locator(".tg-node").first()).toBeVisible();
+    await line.scrollIntoViewIfNeeded();
+    const point = await line.evaluate(path => {
+      for (const fraction of [.5, .3, .7, .15, .85]) {
+        const p = path.getPointAtLength(path.getTotalLength() * fraction).matrixTransform(path.getScreenCTM());
+        if (document.elementFromPoint(p.x, p.y)?.closest(".tg-edge") === path.closest(".tg-edge")) return { x: p.x, y: p.y };
+      }
+      return null;
+    });
+    expect(point).not.toBeNull();
     await page.touchscreen.tap(point.x, point.y);
     await expect(page.locator(".tg-detail-panel")).toBeVisible();
     await expect(canvas.locator(".tg-edge-label-button")).toHaveCount(0);

@@ -19,7 +19,11 @@ for (const width of [1440, 390]) {
     await expect(page.locator(".tg-content-shell")).toHaveClass(/is-fullscreen/);
     await expect(page.getByRole("button", { name: "退出图谱全屏" }).locator("svg")).toHaveAttribute("data-icon", "minimize2");
     await fit.click();
-    await expect(page.locator(".tg-zoom-controls > button").nth(1)).toHaveText("76%");
+    const fits = await page.locator(".tg-canvas-scroll").evaluate(viewport => {
+      const box = viewport.getBoundingClientRect();
+      return [...viewport.querySelectorAll(".tg-node")].every(node => { const n = node.getBoundingClientRect(); return n.left >= box.left - 1 && n.top >= box.top - 1 && n.right <= box.right + 1 && n.bottom <= box.bottom + 1; });
+    });
+    expect(fits).toBe(true);
     await page.keyboard.press("Escape");
     await expect(page.locator(".tg-content-shell")).not.toHaveClass(/is-fullscreen/);
     await noErrors();
@@ -30,7 +34,7 @@ test("拖动重设父节点后首帧起节点与新连线连续八帧对齐", as
   const noErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#/mappings/mapping-embodied?tab=content&page=organization");
-  await page.getByRole("button", { name: "关闭详情", exact: true }).click();
+  await expect(page.locator(".tg-detail-panel")).toHaveCount(0);
   const child = page.locator('.tg-node[data-node-id="org-vla"]');
   const parent = page.locator('.tg-node[data-node-id="org-xinglan"]');
   const childBox = await child.boundingBox(), parentBox = await parent.boundingBox();

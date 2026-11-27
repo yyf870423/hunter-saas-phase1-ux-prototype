@@ -5,7 +5,10 @@
 .s3-relationship-stage,
 .s3-relationship-edges { transition-property: none; }
 .tg-canvas-scroll,
-.s3-relationship-viewport { overflow-anchor: none; }
+.s3-relationship-viewport { overflow-anchor: none; user-select: none; -webkit-user-select: none; touch-action: none; }
+.tg-canvas-scroll img, .s3-relationship-viewport img { -webkit-user-drag: none; }
+.tg-canvas-scroll.is-panning, .s3-relationship-viewport.is-panning { cursor: grabbing; }
+.tg-canvas-stage, .s3-relationship-stage { will-change: transform; }
 
 .graph-presentation-controls {
   display: flex;
@@ -15,7 +18,8 @@
   gap: 6px;
   min-width: 0;
 }
-.graph-presentation-controls .s4-select > button {
+.graph-presentation-controls .s4-select > button,
+.graph-presentation-controls .graph-layout-trigger {
   height: 28px;
   min-height: 28px;
   padding: 0 8px;
@@ -24,6 +28,43 @@
 }
 .graph-presentation-controls .s1-icon-button { width: 28px; height: 28px; }
 .graph-presentation-controls .s4-select-value-icon { width: 14px; height: 14px; }
+.graph-layout-trigger svg { width: 14px; height: 14px; flex-shrink: 0; }
+.graph-layout-menu {
+  padding: 5px;
+  overflow: auto;
+  background: var(--s1-surface);
+  border: 1px solid var(--s1-line-strong);
+  border-radius: 7px;
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--s1-ink) 17%, transparent);
+}
+.graph-layout-menu > button {
+  display: flex;
+  width: 100%;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  color: var(--s1-ink);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+}
+.graph-layout-menu > button:hover,
+.graph-layout-menu > button:focus-visible { background: var(--s1-surface-strong); }
+.graph-layout-menu > button svg { width: 14px; height: 14px; }
+.tg-canvas-toolbar-controls { display: flex; min-width: 0; }
+.graph-camera-controls { display: flex; flex: 0 0 auto; align-items: center; gap: 12px; }
+.graph-history-controls { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; }
+.tg-toolbar-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-left: auto; }
+.graph-presentation-controls.is-toolbar { flex-wrap: wrap; }
+.graph-presentation-controls.is-toolbar .s4-select > button,
+.graph-presentation-controls.is-toolbar .graph-layout-trigger {
+  height: 34px;
+  min-height: 34px;
+}
 .tg-presentation-controls {
   position: absolute;
   top: 10px;
@@ -46,7 +87,7 @@
   background: var(--s1-surface);
 }
 .s3-relationship-toolstrip > .s3-relationship-actionbar,
-.s3-relationship-toolstrip > .s3-relationship-controls {
+.s3-relationship-toolstrip .s3-relationship-controls {
   position: static;
   max-width: none;
   box-shadow: none;
@@ -54,7 +95,7 @@
   padding: 0;
   background: transparent;
 }
-.s3-relationship-toolstrip > .s3-relationship-controls { margin-left: auto; }
+.s3-relationship-toolstrip > .graph-camera-controls { margin-right: auto; }
 .s3-relationship-canvas-shell:has(> .s3-relationship-toolstrip) { display: flex; flex-direction: column; }
 .s3-relationship-toolstrip + .s3-relationship-viewport { flex: 1; height: auto; min-height: 0; }
 .s3-relationship-viewport { position: relative; }

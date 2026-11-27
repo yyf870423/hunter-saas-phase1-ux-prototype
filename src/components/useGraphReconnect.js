@@ -24,12 +24,12 @@ export function reconnectError(nodes, edges, edge, pair) {
     }
     return null;
 }
-export function useGraphReconnect({ nodes, edges, scopeKey, stageRef, zoom, width = 180, height = 86, options, setPorts, onCommit, onError, messages }) {
+export function useGraphReconnect({ nodes, edges, scopeKey, stageRef, zoom, width = 180, height = 86, options, setPorts, onCommit, onBeforeCommit, onError, messages }) {
     const [draft, setDraft] = useState(null), [pending, setPending] = useState(false);
     const draftRef = useRef(null), pendingRef = useRef(false), generation = useRef(0);
     const suppressClickUntil = useRef(0);
-    const latest = useRef({ nodes, edges, scopeKey, stageRef, zoom, width, height, options, setPorts, onCommit, onError, messages });
-    latest.current = { nodes, edges, scopeKey, stageRef, zoom, width, height, options, setPorts, onCommit, onError, messages };
+    const latest = useRef({ nodes, edges, scopeKey, stageRef, zoom, width, height, options, setPorts, onCommit, onBeforeCommit, onError, messages });
+    latest.current = { nodes, edges, scopeKey, stageRef, zoom, width, height, options, setPorts, onCommit, onBeforeCommit, onError, messages };
     const cancel = () => { draftRef.current = null; setDraft(null); };
     useEffect(() => { generation.current++; cancel(); pendingRef.current = false; setPending(false); return () => { generation.current++; }; }, [scopeKey]);
     useEffect(() => {
@@ -56,6 +56,9 @@ export function useGraphReconnect({ nodes, edges, scopeKey, stageRef, zoom, widt
             state.onError(state.messages.unavailable);
             return;
         }
+        if (!changed && pair.sourcePort === current.ports.sourcePort && pair.targetPort === current.ports.targetPort)
+            return;
+        state.onBeforeCommit?.();
         const operation = generation.current;
         pendingRef.current = true;
         setPending(true);
@@ -116,7 +119,7 @@ export function useGraphReconnect({ nodes, edges, scopeKey, stageRef, zoom, widt
             event.preventDefault();
             cancel();
         } };
-        const click = (event) => { if (performance.now() < suppressClickUntil.current) {
+        const click = (event) => { if (performance.now() < suppressClickUntil.current && event.target instanceof Node && latest.current.stageRef.current?.contains(event.target)) {
             event.preventDefault();
             event.stopPropagation();
         } };

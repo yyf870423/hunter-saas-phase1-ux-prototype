@@ -22,6 +22,9 @@
   border-radius: 50%;
   background: var(--s1-surface);
 }
+/* Keep the focusable port, but skip painting its invisible decorations. */
+.graph-node-port::before,
+.graph-node-port::after { visibility: hidden; transition: visibility 0s linear 120ms; }
 .graph-node-port[data-port="top"] { top: -1px; left: calc(50% + var(--graph-port-center-offset, 0px)); }
 .graph-node-port[data-port="right"] { top: 50%; left: calc(100% + 1px); }
 .graph-node-port[data-port="bottom"] { top: calc(100% + 1px); left: calc(50% + var(--graph-port-center-offset, 0px)); }
@@ -37,6 +40,10 @@
   opacity: 1;
   pointer-events: auto;
 }
+.tg-node:hover > .graph-node-port::before,
+.s3-relationship-node:hover > .graph-node-port::before,
+.graph-node-port:focus-visible::before,
+.graph-node-port.is-connecting::before { visibility: visible; transition-delay: 0s; }
 .graph-node-port:hover::before,
 .graph-node-port:focus-visible::before,
 .graph-node-port.is-connecting::before { background: var(--s1-accent); }
@@ -63,13 +70,17 @@
   transform: translateX(-50%);
 }
 .graph-node-port:hover::after,
-.graph-node-port:focus-visible::after { opacity: 1; }
+.graph-node-port:focus-visible::after { opacity: 1; visibility: visible; transition-delay: 0s; }
 @media (hover: none) and (pointer: coarse) {
   .tg-node:focus-within > .graph-node-port,
   .s3-relationship-node:focus-within > .graph-node-port { opacity: 1; pointer-events: auto; }
+  .tg-node:focus-within > .graph-node-port::before,
+  .s3-relationship-node:focus-within > .graph-node-port::before { visibility: visible; transition-delay: 0s; }
 }
 @media (prefers-reduced-motion: reduce) {
   .graph-node-port { transition: none; }
+  .graph-node-port::before,
+  .graph-node-port::after { transition: none; }
 }
 .tg-canvas-stage .graph-edge-handle,
 .s3-relationship-stage .graph-edge-handle {
@@ -101,5 +112,6 @@
 .graph-edge-handle:disabled { cursor: wait; opacity: 0.5; }
 @media (pointer: coarse) { .tg-canvas-stage .graph-edge-handle, .s3-relationship-stage .graph-edge-handle { width: 40px; height: 40px; } }
 .is-reconnecting .graph-node-port { opacity: 1; pointer-events: auto; }
+.is-reconnecting .graph-node-port::before { visibility: visible; transition-delay: 0s; }
 .is-reconnecting .graph-edge-handle { pointer-events: none; }
 .graph-reconnect-draft { fill: none; stroke: var(--s1-accent); stroke-width: 2; stroke-dasharray: 6 4; pointer-events: none; }

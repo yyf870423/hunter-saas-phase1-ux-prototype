@@ -8,9 +8,14 @@ import { GraphEdgeHandles } from "../components/GraphEdgeHandles";
 import { useGraphReconnect } from "../components/useGraphReconnect";
 import { graphConnectionPreview, graphPortHit } from "../components/graph-connection-preview";
 import { useGraphWheelZoom } from "../components/useGraphWheelZoom";
+import { useGraphPan } from "../components/useGraphPan";
+import { useGraphHistory } from "../components/useGraphHistory";
+import { useGraphUndoShortcut } from "../components/useGraphUndoShortcut";
+import { useGraphEdgeHover } from "../components/useGraphEdgeHover";
+import { GraphHistoryControls } from "../components/GraphHistoryControls";
 import { readGraphPresentation, writeGraphPresentation } from "../components/graph-presentation-storage";
 import { useGraphEdgePorts } from "../components/useGraphEdgePorts";
-import { expandCanvasBounds, graphEdgeGeometry, graphFitZoom, graphLayoutPan, graphPortPoint, graphPositions, layoutGraph, projectGraphPositions } from "../components/graph-presentation";
+import { expandCanvasBounds, graphEdgeGeometry, graphFitZoom, graphLayoutPan, graphPortPoint, layoutGraph } from "../components/graph-presentation";
 import { Button, IconButton, Modal, StatusBadge, useToast } from "../stage1/ui";
 import {
   FormField,
@@ -574,15 +579,22 @@ export function RelationshipCanvas({
   const [connectionDraft, setConnectionDraft] = useState(null);
   const { isFullscreen, toggleFullscreen } = useCanvasFullscreen();
   const dragRef = useRef(null);
-  const panRef = useRef(null);
   const connectionRef = useRef(null);
   const stageRef = useRef(null);
   const viewportRef = useRef(null);
   const [presentationByView, setPresentationByView] = useState(() => Object.fromEntries(views.map(view => [view.id, readGraphPresentation(!readingOnly && storageKey ? `${storageKey}.presentation.${view.id}` : undefined)])));
-  const [hoveredEdgeId, setHoveredEdgeId] = useState(null);
+  const edgeHover = useGraphEdgeHover(`${storageKey}:${activeView.id}`);
+  const { hoveredEdgeId } = edgeHover;
+  const undoHistory = useGraphHistory(`${storageKey}:${activeView.id}`,
+    () => ({ view: cloneRelationshipView(activeView), presentation: { ...presentation }, ports: portLocks.capture(), zoom, pan: panGesture.getPan() }),
+    snapshot => { updateActiveView(() => cloneRelationshipView(snapshot.view)); updatePresentation(snapshot.presentation); portLocks.restore(snapshot.ports); updateActivePan(snapshot.pan); setZoom(snapshot.zoom); },
+    () => notify("无法恢复上一步"));
+  useGraphUndoShortcut(readingOnly ? undefined : undoHistory, () => Boolean(dragRef.current || connectionRef.current || reconnect.active));
+
   const presentation = presentationByView[activeView.id] || { lineStyle: "curve", direction: "LR", undo: null };
   const portLocks = useGraphEdgePorts({ nodes: activeView.nodes, edges: activeView.edges, direction: presentation.direction, scopeKey: `${storageKey ?? ""}:${activeView.id}`, storageKey: !readingOnly && storageKey ? `${storageKey}.ports.${activeView.id}` : undefined, width: NODE_WIDTH, height: NODE_HEIGHT });
   const reconnect = useGraphReconnect({ nodes: activeView.nodes, edges: activeView.edges, scopeKey: `${storageKey ?? ""}:${activeView.id}:${readingOnly}`, stageRef, zoom, width: NODE_WIDTH, height: NODE_HEIGHT, options: portLocks.options, setPorts: portLocks.set,
+    onBeforeCommit: () => undoHistory.record("reconnect"),
     onCommit: async (edge, pair) => updateActiveView(view => ({ ...view, edges: view.edges.map(item => item.id === edge.id ? { ...item, ...pair, userEdited: true } : item) })),
     onError: message => notify(message), messages: { self: "不能连接到同一个节点。", duplicate: "这两个节点之间已经存在同方向连接。", cycle: "不能改接成循环层级。", unavailable: "当前关系的改接保存接口尚未接通（B05），原连接保持不变。", failed: "连线改接保存失败，原连接保持不变。" } });
   useEffect(() => {
@@ -596,6 +608,7 @@ export function RelationshipCanvas({
   const viewSignature = views.map((view) => view.id).join("|");
   const completeConnection = (connection, targetId, targetPort) => {
     if (!connection || !targetId || targetId === connection.sourceId) return;
+    undoHistory.record("create-relation");
     const edge = { id: `manual-edge-${Date.now()}`, source: connection.sourceId, target: targetId, sourcePort: connection.sourcePort, targetPort, label: "", status: "用户维护", tone: "info", observedAt: "刚刚", evidence: ["用户维护"] };
     setViewStateById(current => {
       const view = current[connection.viewId];
@@ -664,7 +677,7 @@ export function RelationshipCanvas({
         const dx = (event.clientX - drag.startX) / zoom;
         const dy = (event.clientY - drag.startY) / zoom;
         if (Math.abs(dx) + Math.abs(dy) > 4) {
-          if (!drag.moved) setPresentationByView(current => current[drag.viewId]?.undo ? { ...current, [drag.viewId]: { ...current[drag.viewId], undo: null } } : current);
+          if (!drag.moved) undoHistory.record("move");
           drag.moved = true;
           suppressClickRef.current = true;
         }
@@ -802,7 +815,7 @@ export function RelationshipCanvas({
     setDetailOpen(true);
     setEditor(null);
     setContextMenu(null);
-    setHoveredEdgeId(null);
+    edgeHover.reset();
   };
   const updateActivePan = (next) =>
     setPanByView((current) => ({
@@ -817,27 +830,22 @@ export function RelationshipCanvas({
       ...current,
       [activeView.id]: updater(current[activeView.id] || activeView),
     }));
-  useGraphWheelZoom({ viewportRef, zoom, pan: activePan, onZoom: setZoom, onPan: updateActivePan, scopeKey: `${storageKey ?? ""}:${activeView.id}` });
+  const panGesture = useGraphPan({ viewportRef, stageRef, pan: activePan, zoom, originX, originY, onPan: updateActivePan, scopeKey: `${storageKey ?? ""}:${activeView.id}` });
+  useGraphWheelZoom({ viewportRef, zoom, pan: activePan, getPan: panGesture.getPan, onZoom: setZoom, onPan: updateActivePan, scopeKey: `${storageKey ?? ""}:${activeView.id}`, onGestureStart: () => { panGesture.cancel(); dragRef.current = null; connectionRef.current = null; setConnectionDraft(null); reconnect.cancel(); } });
   const applyLayout = (direction) => {
+    if (!readingOnly) undoHistory.record("layout");
     reconnect.cancel();
     const next = layoutGraph(activeView.nodes, activeView.edges, direction, { width: NODE_WIDTH, height: NODE_HEIGHT });
-    updatePresentation({ direction, undo: { positions: graphPositions(activeView.nodes), direction: presentation.direction, zoom, pan: activePan } });
+    updatePresentation({ direction });
     updateActiveView(view => ({ ...view, nodes: next, edges: view.edges.map(edge => ({ ...edge, sourcePort: undefined, targetPort: undefined })) }));
     portLocks.reset(next, direction);
     const nextZoom = graphFitZoom(next, viewportRef.current, { width: NODE_WIDTH, height: NODE_HEIGHT });
     updateActivePan(graphLayoutPan(next, viewportRef.current, nextZoom, direction, { width: NODE_WIDTH, height: NODE_HEIGHT }));
     setZoom(nextZoom);
-    setHoveredEdgeId(null);
-  };
-  const restoreLayout = () => {
-    const undo = presentation.undo;
-    if (!undo) return;
-    updateActiveView(view => ({ ...view, nodes: projectGraphPositions(view.nodes, undo.positions) }));
-    updatePresentation({ direction: undo.direction, undo: null });
-    updateActivePan(undo.pan);
-    setZoom(undo.zoom);
+    edgeHover.reset();
   };
   const saveEditor = (draft) => {
+    undoHistory.record("edit-content");
     const now = Date.now();
     if (editor.mode === "add-node") {
       const parentNode = editor.parentId
@@ -930,6 +938,7 @@ export function RelationshipCanvas({
   };
   const confirmDelete = () => {
     if (!deleteTarget) return;
+    undoHistory.record("delete");
     updateActiveView((view) =>
       deleteTarget.kind === "node"
         ? {
@@ -953,6 +962,202 @@ export function RelationshipCanvas({
     setDeleteTarget(null);
     notify(deleteTarget.kind === "node" ? "节点已删除" : "关系已删除");
   };
+  const sceneActions = useRef({});
+  sceneActions.current = { select, completeConnection, portLocks, reconnect, edgeHover };
+  const edgeElements = useMemo(() => activeView.edges.slice().sort((a, b) => Number(a.id === hoveredEdgeId) - Number(b.id === hoveredEdgeId)).map((edge) => {
+                    const source = nodesById[edge.source];
+                    const target = nodesById[edge.target];
+                    if (!source || !target) return null;
+                    const { path, x, y } = graphEdgeGeometry(source, target, { direction: presentation.direction, style: presentation.lineStyle, width: NODE_WIDTH, height: NODE_HEIGHT, ...portLocks.options(edge) });
+                    const active =
+                      (selection.kind === "edge" && selection.id === edge.id) ||
+                      connectedEdges.has(edge.id);
+                    return (
+                      <g
+                        className={`s3-relationship-edge is-${edge.tone} ${active ? "is-active" : ""}`}
+                        data-edge-id={edge.id}
+                        data-source={edge.source}
+                        data-target={edge.target}
+                        onPointerEnter={(event) => { if (event.pointerType !== "touch" && !window.matchMedia?.("(pointer: coarse)")?.matches) sceneActions.current.edgeHover.enterEdge(edge.id); }}
+                        onPointerLeave={() => sceneActions.current.edgeHover.leaveEdge(edge.id)}
+                        key={edge.id}
+                        role="button"
+                        tabIndex="0"
+                        aria-label={`${nodesById[edge.source].label}到${nodesById[edge.target].label}：${edge.label || "未命名关系"}`}
+                        onClick={() => sceneActions.current.select("edge", edge.id)}
+                        onDoubleClick={() => {
+                          if (editable) {
+                            setEditor({ mode: "edit-edge", item: edge });
+                          }
+                        }}
+                        onContextMenu={(event) => {
+                          if (!editable) return;
+                          event.preventDefault();
+                          event.stopPropagation();
+                          sceneActions.current.select("edge", edge.id);
+                          setContextMenu({
+                            x: event.clientX,
+                            y: event.clientY,
+                            kind: "edge",
+                            item: edge,
+                          });
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            sceneActions.current.select("edge", edge.id);
+                          }
+                        }}
+                      >
+                        <path className="s3-edge-hit" d={path} />
+                        <path
+                          className="s3-edge-line"
+                          d={path}
+                          markerEnd={`url(#s3-arrow-${edge.tone})`}
+                          style={{
+                            "--s3-edge-width": `${edge.width || 1.5}px`,
+                          }}
+                        />
+                        {edge.label && hoveredEdgeId === edge.id ? (
+                          <g
+                            className="s3-relationship-edge-label"
+                            transform={`translate(${x}, ${y})`}
+                          >
+                            <rect
+                              x={-Math.max(96, edge.label.length * 12 + 20) / 2}
+                              y="-10"
+                              width={Math.max(96, edge.label.length * 12 + 20)}
+                              height="20"
+                              rx="4"
+                            />
+                            <text
+                              textAnchor="middle"
+                              dominantBaseline="central"
+                            >
+                              {edge.label}
+                            </text>
+                          </g>
+                        ) : null}
+                      </g>
+                    );
+                  }), [activeView, nodesById, presentation.lineStyle, presentation.direction, portLocks.options, selection, hoveredEdgeId, editable]);
+  const nodeElements = useMemo(() => activeView.nodes.map((node) => {
+                  const active =
+                    selection.kind === "node" && selection.id === node.id;
+                  const assetType = relationshipAssetType(node);
+                  return (
+                    <button
+                      type="button"
+                      data-node-id={node.id}
+                      className={`s3-relationship-node is-${node.kind} is-${node.tone} ${active ? "is-active" : ""} ${draggable || editable ? "is-draggable" : ""}`}
+                      aria-pressed={active}
+                      key={node.id}
+                      data-world-x={node.x}
+                      data-world-y={node.y}
+                      style={{ left: node.x - originX, top: node.y - originY }}
+                      onPointerDown={(event) => {
+                        if (
+                          (!draggable && !editable) ||
+                          event.button !== 0 ||
+                          event.target.closest(
+                            ".s3-relationship-node-connector",
+                          )
+                        )
+                          return;
+                        event.preventDefault();
+                        if (event.pointerType === "touch") event.currentTarget.focus({ preventScroll: true });
+                        sceneActions.current.portLocks.freeze();
+                        sceneActions.current.select("node", node.id);
+                        dragRef.current = {
+                          viewId: activeView.id,
+                          nodeId: node.id,
+                          startX: event.clientX,
+                          startY: event.clientY,
+                          originX: node.x,
+                          originY: node.y,
+                          moved: false,
+                        };
+                      }}
+                      onClick={() => {
+                        if (suppressClickRef.current) return;
+                        sceneActions.current.select("node", node.id);
+                      }}
+                      onDoubleClick={() => {
+                        if (editable) {
+                          setEditor({ mode: "edit-node", item: node });
+                        }
+                      }}
+                      onKeyDown={event => {
+                        const connection = connectionRef.current;
+                        if (!connection?.keyboard || event.key !== "Enter" && event.key !== " ") return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        sceneActions.current.completeConnection(connection, node.id);
+                        connectionRef.current = null;
+                        setConnectionDraft(null);
+                      }}
+                      onContextMenu={(event) => {
+                        if (!editable) return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        sceneActions.current.select("node", node.id);
+                        setContextMenu({
+                          x: event.clientX,
+                          y: event.clientY,
+                          kind: "node",
+                          item: node,
+                        });
+                      }}
+                    >
+                      <span className="s3-relationship-node-copy">
+                        <TooltipText
+                          tip={node.label}
+                          className="s3-relationship-node-title"
+                          clampLines={1}
+                        >
+                          {node.label}
+                        </TooltipText>
+                        <TooltipText
+                          tip={node.meta}
+                          className="s3-relationship-node-subtitle"
+                          clampLines={1}
+                        >
+                          {node.meta}
+                        </TooltipText>
+                        {assetType ? (
+                          <span className="s3-relationship-node-asset">
+                            <Icon name="link" />
+                            已关联 · {assetType}
+                          </span>
+                        ) : null}
+                      </span>
+                      {node.tone === "warning" ? <Icon name="warning" /> : null}
+                      {editable ? (
+                        <GraphNodePorts label={node.label} className="s3-relationship-node-connector" destination={sceneActions.current.reconnect.active} activeSide={connectionDraft?.sourceId === node.id ? connectionDraft.sourcePort : undefined}
+                          onStart={(sourcePort, keyboard) => {
+                            if (sceneActions.current.reconnect.active) { void sceneActions.current.reconnect.choose(node.id, sourcePort); return; }
+                            if (sceneActions.current.reconnect.pending) return;
+                            const point = graphPortPoint(node, sourcePort, { width: NODE_WIDTH, height: NODE_HEIGHT });
+                            connectionRef.current = {
+                              viewId: activeView.id,
+                              sourceId: node.id,
+                              sourcePort,
+                              keyboard,
+                            };
+                            setConnectionDraft({
+                              sourceId: node.id,
+                              sourcePort,
+                              x1: point.x,
+                              y1: point.y,
+                              x2: point.x + (sourcePort === "left" ? -24 : sourcePort === "right" ? 24 : 0),
+                              y2: point.y + (sourcePort === "top" ? -24 : sourcePort === "bottom" ? 24 : 0),
+                            });
+                          }}
+                        />
+                      ) : null}
+                    </button>
+                  );
+                }), [activeView, selection, editable, draggable, originX, originY, reconnect.active, reconnect.pending, connectionDraft?.sourceId, connectionDraft?.sourcePort]);
   return (
     <>
       <section
@@ -996,20 +1201,7 @@ export function RelationshipCanvas({
         >
           <div className="s3-relationship-canvas-shell">
             <div className="s3-relationship-toolstrip">
-            {editable ? (
-              <div className="s3-relationship-actionbar">
-                <Button
-                  size="xs"
-                  icon="plus"
-                  data-tooltip="添加节点；选中节点后按 Tab 可添加子节点"
-                  onClick={() => setEditor({ mode: "add-node" })}
-                >
-                  添加节点
-                </Button>
-              </div>
-            ) : null}
-            <GraphPresentationControls lineStyle={presentation.lineStyle} direction={presentation.direction} onLineStyle={lineStyle => updatePresentation({ lineStyle })} onLayout={applyLayout} onUndo={restoreLayout} canUndo={Boolean(presentation.undo)} disabled={activeView.nodes.length < 2 || reconnect.pending} />
-            <div className="s3-relationship-controls">
+              <div className="graph-camera-controls">            <div className="s3-relationship-controls">
               <IconButton
                 icon="plus"
                 label="放大关系画布"
@@ -1044,7 +1236,21 @@ export function RelationshipCanvas({
                 onClick={toggleFullscreen}
               />
               <span>{Math.round(zoom * 100)}%</span>
-            </div>
+            </div>{!readingOnly ? <GraphHistoryControls history={undoHistory} /> : null}</div>
+            {editable ? (
+              <div className="s3-relationship-actionbar">
+                <Button
+                  size="xs"
+                  icon="plus"
+                  data-tooltip="添加节点；选中节点后按 Tab 可添加子节点"
+                  onClick={() => setEditor({ mode: "add-node" })}
+                >
+                  添加节点
+                </Button>
+              </div>
+            ) : null}
+            <GraphPresentationControls lineStyle={presentation.lineStyle} onLineStyle={lineStyle => { if (lineStyle !== presentation.lineStyle) { if (!readingOnly) undoHistory.record("line-style"); updatePresentation({ lineStyle }); } }} onLayout={applyLayout} disabled={activeView.nodes.length < 2 || reconnect.pending} />
+
             </div>
             <div
               ref={viewportRef}
@@ -1058,42 +1264,15 @@ export function RelationshipCanvas({
                   event.target.closest(".s3-relationship-actionbar")
                 )
                   return;
-                panRef.current = {
-                  pointerId: event.pointerId,
-                  startX: event.clientX,
-                  startY: event.clientY,
-                  originX: activePan.x,
-                  originY: activePan.y,
-                };
-                event.currentTarget.setPointerCapture(event.pointerId);
+                edgeHover.reset();
+                panGesture.start(event);
               }}
-              onPointerMove={(event) => {
-                if (panRef.current?.pointerId !== event.pointerId) return;
-                updateActivePan({
-                  x:
-                    panRef.current.originX +
-                    event.clientX -
-                    panRef.current.startX,
-                  y:
-                    panRef.current.originY +
-                    event.clientY -
-                    panRef.current.startY,
-                });
-              }}
-              onPointerUp={(event) => {
-                if (panRef.current?.pointerId !== event.pointerId) return;
-                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-                  event.currentTarget.releasePointerCapture(event.pointerId);
-                }
-                panRef.current = null;
-              }}
-              onPointerCancel={(event) => {
-                if (panRef.current?.pointerId !== event.pointerId) return;
-                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-                  event.currentTarget.releasePointerCapture(event.pointerId);
-                }
-                panRef.current = null;
-              }}
+              onPointerMove={panGesture.move}
+              onPointerUp={panGesture.end}
+              onPointerCancel={panGesture.cancelEvent}
+              onLostPointerCapture={panGesture.cancelEvent}
+              onDragStartCapture={event => event.preventDefault()}
+              onClickCapture={event => { if (panGesture.suppressClick()) { event.preventDefault(); event.stopPropagation(); } }}
             >
               <div
                 ref={stageRef}
@@ -1134,206 +1313,14 @@ export function RelationshipCanvas({
                       markerEnd="url(#s3-arrow-info)"
                     />
                   ) : null}
-                  {activeView.edges.slice().sort((a, b) => Number(a.id === hoveredEdgeId) - Number(b.id === hoveredEdgeId)).map((edge) => {
-                    const source = nodesById[edge.source];
-                    const target = nodesById[edge.target];
-                    if (!source || !target) return null;
-                    const { path, x, y } = graphEdgeGeometry(source, target, { direction: presentation.direction, style: presentation.lineStyle, width: NODE_WIDTH, height: NODE_HEIGHT, ...portLocks.options(edge) });
-                    const active =
-                      (selection.kind === "edge" && selection.id === edge.id) ||
-                      connectedEdges.has(edge.id);
-                    return (
-                      <g
-                        className={`s3-relationship-edge is-${edge.tone} ${active ? "is-active" : ""}`}
-                        data-edge-id={edge.id}
-                        data-source={edge.source}
-                        data-target={edge.target}
-                        onPointerEnter={(event) => { if (event.pointerType !== "touch" && !window.matchMedia?.("(pointer: coarse)")?.matches) setHoveredEdgeId(edge.id); }}
-                        onPointerLeave={() => setHoveredEdgeId(null)}
-                        key={edge.id}
-                        role="button"
-                        tabIndex="0"
-                        aria-label={`${nodesById[edge.source].label}到${nodesById[edge.target].label}：${edge.label || "未命名关系"}`}
-                        onClick={() => select("edge", edge.id)}
-                        onDoubleClick={() => {
-                          if (editable) {
-                            setEditor({ mode: "edit-edge", item: edge });
-                          }
-                        }}
-                        onContextMenu={(event) => {
-                          if (!editable) return;
-                          event.preventDefault();
-                          event.stopPropagation();
-                          select("edge", edge.id);
-                          setContextMenu({
-                            x: event.clientX,
-                            y: event.clientY,
-                            kind: "edge",
-                            item: edge,
-                          });
-                        }}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            select("edge", edge.id);
-                          }
-                        }}
-                      >
-                        <path className="s3-edge-hit" d={path} />
-                        <path
-                          className="s3-edge-line"
-                          d={path}
-                          markerEnd={`url(#s3-arrow-${edge.tone})`}
-                          style={{
-                            "--s3-edge-width": `${edge.width || 1.5}px`,
-                          }}
-                        />
-                        {edge.label && hoveredEdgeId === edge.id ? (
-                          <g
-                            className="s3-relationship-edge-label"
-                            transform={`translate(${x}, ${y})`}
-                          >
-                            <rect
-                              x={-Math.max(96, edge.label.length * 12 + 20) / 2}
-                              y="-10"
-                              width={Math.max(96, edge.label.length * 12 + 20)}
-                              height="20"
-                              rx="4"
-                            />
-                            <text
-                              textAnchor="middle"
-                              dominantBaseline="central"
-                            >
-                              {edge.label}
-                            </text>
-                          </g>
-                        ) : null}
-                      </g>
-                    );
-                  })}
+                  {edgeElements}
                 </svg>
                 {reconnect.draft ? <svg className="s3-relationship-edges" style={{ width: canvasSize.width, height: canvasSize.height, pointerEvents: "none" }} viewBox={`${originX} ${originY} ${canvasSize.width} ${canvasSize.height}`} aria-hidden="true"><path className="graph-reconnect-draft" d={reconnect.preview(presentation.lineStyle)?.path} markerEnd="url(#s3-arrow-info)" /></svg> : null}
-                {activeView.nodes.map((node) => {
-                  const active =
-                    selection.kind === "node" && selection.id === node.id;
-                  const assetType = relationshipAssetType(node);
-                  return (
-                    <button
-                      type="button"
-                      data-node-id={node.id}
-                      className={`s3-relationship-node is-${node.kind} is-${node.tone} ${active ? "is-active" : ""} ${draggable || editable ? "is-draggable" : ""}`}
-                      aria-pressed={active}
-                      key={node.id}
-                      data-world-x={node.x}
-                      data-world-y={node.y}
-                      style={{ left: node.x - originX, top: node.y - originY }}
-                      onPointerDown={(event) => {
-                        if (
-                          (!draggable && !editable) ||
-                          event.button !== 0 ||
-                          event.target.closest(
-                            ".s3-relationship-node-connector",
-                          )
-                        )
-                          return;
-                        event.preventDefault();
-                        if (event.pointerType === "touch") event.currentTarget.focus({ preventScroll: true });
-                        portLocks.freeze();
-                        select("node", node.id);
-                        dragRef.current = {
-                          viewId: activeView.id,
-                          nodeId: node.id,
-                          startX: event.clientX,
-                          startY: event.clientY,
-                          originX: node.x,
-                          originY: node.y,
-                          moved: false,
-                        };
-                      }}
-                      onClick={() => {
-                        if (suppressClickRef.current) return;
-                        select("node", node.id);
-                      }}
-                      onDoubleClick={() => {
-                        if (editable) {
-                          setEditor({ mode: "edit-node", item: node });
-                        }
-                      }}
-                      onKeyDown={event => {
-                        const connection = connectionRef.current;
-                        if (!connection?.keyboard || event.key !== "Enter" && event.key !== " ") return;
-                        event.preventDefault();
-                        event.stopPropagation();
-                        completeConnection(connection, node.id);
-                        connectionRef.current = null;
-                        setConnectionDraft(null);
-                      }}
-                      onContextMenu={(event) => {
-                        if (!editable) return;
-                        event.preventDefault();
-                        event.stopPropagation();
-                        select("node", node.id);
-                        setContextMenu({
-                          x: event.clientX,
-                          y: event.clientY,
-                          kind: "node",
-                          item: node,
-                        });
-                      }}
-                    >
-                      <span className="s3-relationship-node-copy">
-                        <TooltipText
-                          tip={node.label}
-                          className="s3-relationship-node-title"
-                          clampLines={1}
-                        >
-                          {node.label}
-                        </TooltipText>
-                        <TooltipText
-                          tip={node.meta}
-                          className="s3-relationship-node-subtitle"
-                          clampLines={1}
-                        >
-                          {node.meta}
-                        </TooltipText>
-                        {assetType ? (
-                          <span className="s3-relationship-node-asset">
-                            <Icon name="link" />
-                            已关联 · {assetType}
-                          </span>
-                        ) : null}
-                      </span>
-                      {node.tone === "warning" ? <Icon name="warning" /> : null}
-                      {editable ? (
-                        <GraphNodePorts label={node.label} className="s3-relationship-node-connector" destination={reconnect.active} activeSide={connectionDraft?.sourceId === node.id ? connectionDraft.sourcePort : undefined}
-                          onStart={(sourcePort, keyboard) => {
-                            if (reconnect.active) { void reconnect.choose(node.id, sourcePort); return; }
-                            if (reconnect.pending) return;
-                            const point = graphPortPoint(node, sourcePort, { width: NODE_WIDTH, height: NODE_HEIGHT });
-                            connectionRef.current = {
-                              viewId: activeView.id,
-                              sourceId: node.id,
-                              sourcePort,
-                              keyboard,
-                            };
-                            setConnectionDraft({
-                              sourceId: node.id,
-                              sourcePort,
-                              x1: point.x,
-                              y1: point.y,
-                              x2: point.x + (sourcePort === "left" ? -24 : sourcePort === "right" ? 24 : 0),
-                              y2: point.y + (sourcePort === "top" ? -24 : sourcePort === "bottom" ? 24 : 0),
-                            });
-                          }}
-                        />
-                      ) : null}
-                    </button>
-                  );
-                })}
-                {editable && !readingOnly && selection.kind === "edge" ? (() => {
-                  const edge = activeView.edges.find(item => item.id === selection.id);
-                  return edge ? <GraphEdgeHandles points={reconnect.endpoints(edge)} originX={originX} originY={originY} zoom={zoom} pending={reconnect.pending} labels={{ source: "调整连线起点", target: "调整连线终点" }} onStart={(end, keyboard, pointerId) => {
-                    connectionRef.current = null; setConnectionDraft(null); dragRef.current = null; panRef.current = null; reconnect.start(edge, end, keyboard, pointerId);
+                {nodeElements}
+                {editable && !readingOnly ? (() => {
+                  const edge = activeView.edges.find(item => item.id === (reconnect.draft?.edge.id ?? edgeHover.handleEdgeId ?? (selection.kind === "edge" ? selection.id : null)));
+                  return edge ? <GraphEdgeHandles edgeId={edge.id} onEnter={() => edgeHover.hold(edge.id)} onLeave={() => edgeHover.release(edge.id)} points={reconnect.endpoints(edge)} originX={originX} originY={originY} zoom={zoom} pending={reconnect.pending} labels={{ source: "调整连线起点", target: "调整连线终点" }} onStart={(end, keyboard, pointerId) => {
+                    connectionRef.current = null; setConnectionDraft(null); dragRef.current = null; panGesture.cancel(); reconnect.start(edge, end, keyboard, pointerId);
                   }} /> : null;
                 })() : null}
               </div>

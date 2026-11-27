@@ -2,16 +2,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { useCanvasFullscreen } from "../components/useCanvasFullscreen";
-import { GraphPresentationControls } from "../components/GraphPresentationControls";
-import { GraphNodePorts } from "../components/GraphNodePorts";
-import { GraphEdgeHandles } from "../components/GraphEdgeHandles";
-import { useGraphReconnect } from "../components/useGraphReconnect";
-import { graphConnectionPreview, graphPortHit } from "../components/graph-connection-preview";
-import { useGraphWheelZoom } from "../components/useGraphWheelZoom";
-import { readGraphPresentation, writeGraphPresentation } from "../components/graph-presentation-storage";
-import { useGraphEdgePorts } from "../components/useGraphEdgePorts";
-import { expandCanvasBounds, graphEdgeGeometry, graphFitZoom, graphLayoutPan, graphPortPoint, graphPositions, layoutGraph, projectGraphPositions } from "../components/graph-presentation";
 import { createDenseGraphPage } from "./graph-dense-sample";
+import { GraphCanvas as TopicGraphCanvas } from "../components/TopicGraphCanvas";
+import { GraphHistoryControls } from "../components/GraphHistoryControls";
+import { GraphImportDialog } from "../components/GraphImportDialog";
+import { useGraphHistory } from "../components/useGraphHistory";
+import { getDescendantIds, graphCanvasMinimumBounds, expandGraphCanvasBounds, placeMovedGraphNodes } from "../components/topic-graph-geometry";
+import { createGraphStressSample, createGraphInteractionSample } from "./graph-acceptance-sample";
 import { contactRoute, useCompanyContacts } from "./company-contact-store";
 import {
   AssetListState,
@@ -1009,781 +1006,12 @@ function GraphSearch({ pages, activePageId, onLocate }) {
   );
 }
 
-function getDescendantIds(nodes, parentId) {
-  const direct = nodes
-    .filter((node) => node.parentId === parentId)
-    .map((node) => node.id);
-  return direct.flatMap((id) => [id, ...getDescendantIds(nodes, id)]);
-}
-
-const graphCanvasMinimumBounds = { width: 1240, height: 650 };
-const graphCanvasExpansionPadding = 240;
-const graphCanvasExpansionStep = 320;
-const graphNodeHeight = 86;
-const graphNodeGap = 18;
-
-function expandGraphCanvasBounds(bounds, nodes) {
-  return expandCanvasBounds(bounds, nodes, { minWidth: graphCanvasMinimumBounds.width, minHeight: graphCanvasMinimumBounds.height, height: graphNodeHeight, padding: graphCanvasExpansionPadding, step: graphCanvasExpansionStep });
-}
-
-function graphNodesOverlap(left, right) {
-  const leftWidth = left.width || 180;
-  const rightWidth = right.width || 180;
-  return !(
-    left.x + leftWidth + graphNodeGap <= right.x ||
-    right.x + rightWidth + graphNodeGap <= left.x ||
-    left.y + graphNodeHeight + graphNodeGap <= right.y ||
-    right.y + graphNodeHeight + graphNodeGap <= left.y
-  );
-}
-
-function clampGraphNode(node, bounds = graphCanvasMinimumBounds) {
-  const width = node.width || 180;
-  return {
-    ...node,
-    x: Math.min((bounds.minX || 0) + bounds.width - width - 16, Math.max(bounds.minX || 0, node.x)),
-    y: Math.min((bounds.minY || 0) + bounds.height - graphNodeHeight - 16, Math.max(bounds.minY || 0, node.y)),
-  };
-}
-
-function placeGraphNodeWithoutOverlap(
-  node,
-  occupied,
-  bounds = graphCanvasMinimumBounds,
-) {
-  const desired = clampGraphNode(node, bounds);
-  if (!occupied.some((item) => graphNodesOverlap(desired, item))) {
-    return desired;
-  }
-  const step = 24;
-  for (let ring = 1; ring <= 12; ring += 1) {
-    const offsets = [];
-    for (let axis = -ring; axis <= ring; axis += 1) {
-      offsets.push(
-        [axis * step, -ring * step],
-        [axis * step, ring * step],
-        [-ring * step, axis * step],
-        [ring * step, axis * step],
-      );
-    }
-    for (const [dx, dy] of offsets) {
-      const candidate = clampGraphNode(
-        {
-          ...node,
-          x: node.x + dx,
-          y: node.y + dy,
-        },
-        bounds,
-      );
-      if (!occupied.some((item) => graphNodesOverlap(candidate, item))) {
-        return candidate;
-      }
-    }
-  }
-  return desired;
-}
-
-function placeMovedGraphNodes(
-  nodes,
-  ids,
-  desiredById,
-  bounds = graphCanvasMinimumBounds,
-) {
-  const occupied = nodes.filter((node) => !ids.includes(node.id));
-  const placed = [];
-  const positions = {};
-  ids.forEach((id) => {
-    const current = nodes.find((node) => node.id === id);
-    if (!current || !desiredById[id]) return;
-    const next = placeGraphNodeWithoutOverlap(
-      { ...current, ...desiredById[id] },
-      [...occupied, ...placed],
-      bounds,
-    );
-    placed.push(next);
-    positions[id] = { x: next.x, y: next.y };
-  });
-  return nodes.map((node) =>
-    positions[node.id]
-      ? { ...node, ...positions[node.id], userMoved: true }
-      : node,
-  );
-}
-
-function GraphCanvas({
-  page: sourcePage,
-  selectedIds,
-  setSelectedIds,
-  selectedEdgeId,
-  setSelectedEdgeId,
-  onNodesChange,
-  collapsed,
-  setCollapsed,
-  zoom,
-  focusNodeId,
-  onContextMenu,
-  onEditRelation,
-  onCreateRelation,
-  onReconnectRelation,
-  onReparentNodes,
-  onZoom,
-  connectionMode = false,
-  reviewMode = false,
-  allowPan = false,
-}) {
-  const scrollRef = useRef(null);
-  const notify = useToast();
-  const stageRef = useRef(null);
-  const dragRef = useRef(null);
-  const panRef = useRef(null);
-  const connectionRef = useRef(null);
-  const [connectionDraft, setConnectionDraft] = useState(null);
-  const [dropTargetId, setDropTargetId] = useState(null);
-  const [shortcutOpen, setShortcutOpen] = useState(true);
-  const [canvasPan, setCanvasPan] = useState({ x: 0, y: 0 });
-  const presentationKey = `hunter.graph.presentation.${sourcePage.id}`;
-  const [presentationOwner, setPresentationOwner] = useState(presentationKey);
-  const [lineStyle, setLineStyle] = useState(() => readGraphPresentation(reviewMode ? undefined : presentationKey).lineStyle);
-  const [layoutDirection, setLayoutDirection] = useState(() => readGraphPresentation(reviewMode ? undefined : presentationKey).direction);
-  const [hoveredEdgeId, setHoveredEdgeId] = useState(null);
-  const [previewPositions, setPreviewPositions] = useState(null);
-  const [undoLayout, setUndoLayout] = useState(null);
-  const page = reviewMode ? { ...sourcePage, nodes: projectGraphPositions(sourcePage.nodes, previewPositions) } : sourcePage;
-  const [storedBounds, setCanvasBounds] = useState(() =>
-    expandGraphCanvasBounds(graphCanvasMinimumBounds, page.nodes),
-  );
-  const canvasBounds = useMemo(() => expandGraphCanvasBounds(storedBounds, page.nodes), [storedBounds, page.nodes]);
-  const originX = canvasBounds.minX || 0, originY = canvasBounds.minY || 0;
-  useGraphWheelZoom({ viewportRef: scrollRef, zoom, pan: canvasPan, onZoom, onPan: setCanvasPan, scopeKey: page.id, enabled: Boolean(onZoom) });
-  const hiddenByCollapse = useMemo(() => {
-    const ids = new Set();
-    collapsed.forEach((id) =>
-      getDescendantIds(page.nodes, id).forEach((child) => ids.add(child)),
-    );
-    return ids;
-  }, [collapsed, page.nodes]);
-  const visibleNodes = useMemo(() => page.nodes.filter(
-    (node) => !node.hidden && !hiddenByCollapse.has(node.id),
-  ), [page.nodes, hiddenByCollapse]);
-  const nodeMap = new Map(visibleNodes.map((node) => [node.id, node]));
-  const visibleEdges = page.edges.filter(
-    (edge) =>
-      !edge.hidden && nodeMap.has(edge.source) && nodeMap.has(edge.target),
-  );
-  const portLocks = useGraphEdgePorts({ nodes: page.nodes, edges: page.edges, direction: layoutDirection, scopeKey: presentationKey, storageKey: reviewMode ? undefined : `${presentationKey}.ports` });
-  const reconnect = useGraphReconnect({ nodes: visibleNodes, edges: visibleEdges, scopeKey: presentationKey, stageRef, zoom, options: portLocks.options, setPorts: portLocks.set,
-    onCommit: onReconnectRelation, onError: message => notify(message), messages: { self: "不能连接到同一个节点。", duplicate: "这两个节点之间已经存在同方向连接。", cycle: "不能改接成循环层级。", unavailable: "当前关系的改接保存接口尚未接通（B05），原连接保持不变。", failed: "连线改接保存失败，原连接保持不变。" } });
-  const reconnectEdge = visibleEdges.find(edge => edge.id === selectedEdgeId);
-
-  useEffect(() => {
-    const bounds = expandGraphCanvasBounds(graphCanvasMinimumBounds, page.nodes);
-    setCanvasBounds(bounds);
-    setCanvasPan({ x: -(bounds.minX || 0) * zoom, y: -(bounds.minY || 0) * zoom });
-    setPreviewPositions(null);
-    setUndoLayout(null);
-    const saved = readGraphPresentation(reviewMode ? undefined : presentationKey);
-    setLineStyle(saved.lineStyle);
-    setLayoutDirection(saved.direction);
-    setPresentationOwner(presentationKey);
-    setHoveredEdgeId(null);
-  }, [page.id]);
-
-  useEffect(() => {
-    if (!reviewMode && presentationOwner === presentationKey) writeGraphPresentation(presentationKey, { lineStyle, direction: layoutDirection, adaptiveNodes: [] });
-  }, [reviewMode, presentationOwner, presentationKey, lineStyle, layoutDirection]);
-
-  const applyLayout = (direction) => {
-    reconnect.cancel();
-    const next = layoutGraph(page.nodes, page.edges, direction);
-    connectionRef.current = null;
-    setConnectionDraft(null);
-    portLocks.reset(next, direction);
-    setUndoLayout({ positions: graphPositions(page.nodes), direction: layoutDirection, zoom, pan: canvasPan });
-    setLayoutDirection(direction);
-    if (reviewMode) setPreviewPositions(graphPositions(next));
-    else onNodesChange(next);
-    setCanvasBounds(expandGraphCanvasBounds(graphCanvasMinimumBounds, next));
-    const nextZoom = onZoom ? graphFitZoom(next, scrollRef.current) : zoom;
-    setCanvasPan(graphLayoutPan(next, scrollRef.current, nextZoom, direction, { focusId: reviewMode ? focusNodeId : undefined }));
-    scrollRef.current?.scrollTo({ left: 0, top: 0 });
-    onZoom?.(nextZoom);
-    setHoveredEdgeId(null);
-  };
-  const restoreLayout = () => {
-    if (!undoLayout) return;
-    const next = projectGraphPositions(page.nodes, undoLayout.positions);
-    if (reviewMode) setPreviewPositions(undoLayout.positions);
-    else onNodesChange(next);
-    setLayoutDirection(undoLayout.direction);
-    setCanvasBounds(expandGraphCanvasBounds(graphCanvasMinimumBounds, next));
-    setCanvasPan(undoLayout.pan);
-    onZoom?.(undoLayout.zoom);
-    setUndoLayout(null);
-  };
-
-  useEffect(() => {
-    if (!focusNodeId || !scrollRef.current) return;
-    const target = page.nodes.find((node) => node.id === focusNodeId);
-    if (!target) return;
-    setCanvasPan(graphLayoutPan(page.nodes, scrollRef.current, zoom, layoutDirection, { focusId: target.id }));
-    scrollRef.current.scrollTo({ left: 0, top: 0 });
-    // Only explicit search/review focus changes reposition the viewport, not hover or reflow.
-  }, [focusNodeId, page.id]);
-
-  useEffect(() => {
-    const move = (event) => {
-      if (dragRef.current) {
-        const { startX, startY, original, ids } = dragRef.current;
-        const dx = (event.clientX - startX) / zoom;
-        const dy = (event.clientY - startY) / zoom;
-        if (Math.abs(dx) + Math.abs(dy) > 4) setUndoLayout(null);
-        const desiredById = Object.fromEntries(
-          ids.map((id) => [
-            id,
-            { x: original[id].x + dx, y: original[id].y + dy },
-          ]),
-        );
-        const desiredNodes = page.nodes.map((node) =>
-          desiredById[node.id] ? { ...node, ...desiredById[node.id] } : node,
-        );
-        const nextBounds = expandGraphCanvasBounds(canvasBounds, desiredNodes);
-        if (nextBounds !== canvasBounds) setCanvasBounds(nextBounds);
-        onNodesChange((nodes) =>
-          nodes.map((node) =>
-            desiredById[node.id]
-              ? {
-                  ...node,
-                  ...clampGraphNode(
-                    { ...node, ...desiredById[node.id] },
-                    nextBounds,
-                  ),
-                  userMoved: true,
-                }
-              : node,
-          ),
-        );
-        if (stageRef.current) {
-          const stageRect = stageRef.current.getBoundingClientRect();
-          const pointerX = (event.clientX - stageRect.left) / zoom + originX;
-          const pointerY = (event.clientY - stageRect.top) / zoom + originY;
-          const blockedIds = new Set(
-            ids.flatMap((id) => [id, ...getDescendantIds(page.nodes, id)]),
-          );
-          const target = page.nodes.find((node) => {
-            if (node.hidden || blockedIds.has(node.id)) return false;
-            const width = node.width || 180;
-            return (
-              pointerX >= node.x &&
-              pointerX <= node.x + width &&
-              pointerY >= node.y &&
-              pointerY <= node.y + 70
-            );
-          });
-          const nextTargetId = target?.id || null;
-          dragRef.current.dropTargetId = nextTargetId;
-          setDropTargetId(nextTargetId);
-        }
-      }
-      if (connectionRef.current && stageRef.current) {
-        const rect = stageRef.current.getBoundingClientRect();
-        setConnectionDraft((current) =>
-          current
-            ? {
-                ...current,
-                x2: (event.clientX - rect.left) / zoom + originX,
-                y2: (event.clientY - rect.top) / zoom + originY,
-                hit: graphPortHit(stageRef.current, event.clientX, event.clientY),
-              }
-            : current,
-        );
-      }
-    };
-    const up = (event) => {
-      if (connectionRef.current) {
-        const hit = graphPortHit(stageRef.current, event.clientX, event.clientY);
-        const preview = graphConnectionPreview(page.nodes, connectionRef.current.sourceId, connectionRef.current.sourcePort, { x: 0, y: 0 }, hit, { direction: layoutDirection, style: lineStyle });
-        if (preview?.targetId) {
-          onCreateRelation?.({
-            source: connectionRef.current.sourceId,
-            target: preview.targetId,
-            sourcePort: connectionRef.current.sourcePort,
-            targetPort: preview.targetPort,
-          });
-        }
-        connectionRef.current = null;
-        setConnectionDraft(null);
-      }
-      if (dragRef.current?.dropTargetId) {
-        onReparentNodes?.(dragRef.current.ids, dragRef.current.dropTargetId);
-      } else if (dragRef.current) {
-        const { ids } = dragRef.current;
-        onNodesChange((nodes) => {
-          const desiredById = Object.fromEntries(
-            nodes
-              .filter((node) => ids.includes(node.id))
-              .map((node) => [node.id, { x: node.x, y: node.y }]),
-          );
-          return placeMovedGraphNodes(nodes, ids, desiredById, canvasBounds);
-        });
-      }
-      dragRef.current = null;
-      setDropTargetId(null);
-      panRef.current = null;
-    };
-    const cancel = () => { connectionRef.current = null; setConnectionDraft(null); };
-    const escape = event => { if (event.key === "Escape" && connectionRef.current) { event.preventDefault(); cancel(); } };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-    window.addEventListener("pointercancel", cancel);
-    window.addEventListener("blur", cancel);
-    window.addEventListener("keydown", escape);
-    return () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-      window.removeEventListener("pointercancel", cancel);
-      window.removeEventListener("blur", cancel);
-      window.removeEventListener("keydown", escape);
-    };
-  }, [
-    canvasBounds,
-    onCreateRelation,
-    onNodesChange,
-    onReparentNodes,
-    page.nodes,
-    zoom,
-    layoutDirection,
-    lineStyle,
-    originX,
-    originY,
-  ]);
-
-  return (
-    <div
-      className={`tg-canvas-frame ${reviewMode ? "is-review-mode" : ""} ${allowPan ? "is-pan-enabled" : ""} ${connectionMode ? "is-connection-mode" : ""} ${reconnect.active ? "is-reconnecting" : ""}`}
-    >
-      <div className="tg-presentation-controls">
-        <GraphPresentationControls lineStyle={lineStyle} direction={layoutDirection} onLineStyle={setLineStyle} onLayout={applyLayout} onUndo={restoreLayout} canUndo={Boolean(undoLayout)} disabled={page.nodes.length < 2 || reconnect.pending} />
-      </div>
-      {connectionMode ? (
-        <div className="tg-connection-mode-hint">
-          <Icon name="link" />
-          从节点右侧连接点拖到另一个节点，松开后直接建立连接
-        </div>
-      ) : null}
-      {!reviewMode ? (
-        <div className={`tg-shortcut-panel ${shortcutOpen ? "is-open" : ""}`}>
-          <button
-            type="button"
-            aria-label={shortcutOpen ? "收起图谱快捷键" : "查看图谱快捷键"}
-            onClick={() => setShortcutOpen((value) => !value)}
-          >
-            <Icon name="keyboard" />
-            {shortcutOpen ? "快捷键" : null}
-            <Icon name={shortcutOpen ? "chevronDown" : "chevronUp"} />
-          </button>
-          {shortcutOpen ? (
-            <dl>
-              <div>
-                <dt>新增子节点</dt>
-                <dd>
-                  <kbd>Tab</kbd>
-                </dd>
-              </div>
-              <div>
-                <dt>新增同级节点</dt>
-                <dd>
-                  <kbd>Enter</kbd>
-                </dd>
-              </div>
-              <div>
-                <dt>编辑节点或关系</dt>
-                <dd>
-                  <kbd>E</kbd>
-                  <kbd>F2</kbd>
-                </dd>
-              </div>
-              <div>
-                <dt>删除</dt>
-                <dd>
-                  <kbd>Del</kbd>
-                  <kbd>Backspace</kbd>
-                </dd>
-              </div>
-              <div>
-                <dt>缩放</dt>
-                <dd>滚轮</dd>
-              </div>
-              <div>
-                <dt>平移</dt>
-                <dd>拖动画布</dd>
-              </div>
-              <div>
-                <dt>移动节点</dt>
-                <dd>拖动节点</dd>
-              </div>
-              <div>
-                <dt>调整层级</dt>
-                <dd>拖到目标节点</dd>
-              </div>
-              <div>
-                <dt>更多操作</dt>
-                <dd>右键</dd>
-              </div>
-            </dl>
-          ) : null}
-        </div>
-      ) : null}
-      <div
-        ref={scrollRef}
-        className="tg-canvas-scroll is-pan-mode"
-        onPointerDown={(event) => {
-          if (
-            (reviewMode && !allowPan) ||
-            event.button !== 0 ||
-            event.target.closest(".tg-node") ||
-            event.target.closest(".tg-edge-label-button") ||
-            event.target.closest(".tg-edge-hit, .graph-edge-handle")
-          )
-            return;
-          panRef.current = {
-            pointerId: event.pointerId,
-            x: event.clientX,
-            y: event.clientY,
-            offsetX: canvasPan.x,
-            offsetY: canvasPan.y,
-          };
-          event.currentTarget.setPointerCapture(event.pointerId);
-        }}
-        onPointerMove={(event) => {
-          if (panRef.current?.pointerId !== event.pointerId) return;
-          setCanvasPan({
-            x: panRef.current.offsetX + event.clientX - panRef.current.x,
-            y: panRef.current.offsetY + event.clientY - panRef.current.y,
-          });
-        }}
-        onPointerUp={(event) => {
-          if (panRef.current?.pointerId !== event.pointerId) return;
-          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-            event.currentTarget.releasePointerCapture(event.pointerId);
-          }
-          panRef.current = null;
-        }}
-        onPointerCancel={(event) => {
-          if (panRef.current?.pointerId !== event.pointerId) return;
-          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-            event.currentTarget.releasePointerCapture(event.pointerId);
-          }
-          panRef.current = null;
-        }}
-        onClick={(event) => {
-          if (
-            event.target.closest(".tg-node") ||
-            event.target.closest(".tg-edge-hit, .graph-edge-handle")
-          )
-            return;
-          setSelectedIds([]);
-          setSelectedEdgeId(null);
-        }}
-      >
-        <div
-          className="tg-canvas-size"
-          style={{
-            width: canvasBounds.width * zoom,
-            height: canvasBounds.height * zoom,
-          }}
-        >
-          <div
-            ref={stageRef}
-            data-origin-x={originX}
-            data-origin-y={originY}
-            className={`tg-canvas-stage ${zoom < 0.8 ? "is-compact" : ""}`}
-            style={{
-              width: canvasBounds.width,
-              height: canvasBounds.height,
-              transform: `translate(${canvasPan.x + originX * zoom}px, ${canvasPan.y + originY * zoom}px) scale(${zoom})`,
-            }}
-          >
-            <svg
-              className="tg-edge-layer"
-              width={canvasBounds.width}
-              height={canvasBounds.height}
-              style={{ width: canvasBounds.width, height: canvasBounds.height }}
-              viewBox={`${originX} ${originY} ${canvasBounds.width} ${canvasBounds.height}`}
-              aria-label="图谱关系"
-            >
-              <defs>
-                <marker
-                  id="tg-arrow"
-                  markerWidth="8"
-                  markerHeight="8"
-                  refX="7"
-                  refY="4"
-                  orient="auto"
-                >
-                  <path d="M0 0 L8 4 L0 8 Z" />
-                </marker>
-              </defs>
-              {connectionDraft ? (
-                <path
-                  className="tg-connection-draft"
-                  d={graphConnectionPreview(visibleNodes, connectionDraft.sourceId, connectionDraft.sourcePort, { x: connectionDraft.x2, y: connectionDraft.y2 }, connectionDraft.hit, { direction: layoutDirection, style: lineStyle })?.path}
-                  markerEnd="url(#tg-arrow)"
-                />
-              ) : null}
-              {visibleEdges.slice().sort((a, b) => Number(a.id === hoveredEdgeId) - Number(b.id === hoveredEdgeId)).map((relation) => {
-                const source = nodeMap.get(relation.source);
-                const target = nodeMap.get(relation.target);
-                const { path, x: labelX, y: labelY } = graphEdgeGeometry(source, target, { direction: layoutDirection, style: lineStyle, ...portLocks.options(relation) });
-                return (
-                  <g
-                    key={relation.id}
-                    data-source={relation.source}
-                    data-target={relation.target}
-                    onPointerEnter={(event) => { if (event.pointerType !== "touch" && !window.matchMedia?.("(pointer: coarse)")?.matches) setHoveredEdgeId(relation.id); }}
-                    onPointerLeave={() => setHoveredEdgeId(null)}
-                    className={`tg-edge is-${relation.kind} ${selectedEdgeId === relation.id ? "is-selected" : ""} ${relation.status === "review" ? "is-review" : ""}`}
-                  >
-                    <path
-                      d={path}
-                      className="tg-edge-line"
-                      markerEnd="url(#tg-arrow)"
-                    />
-                    <path
-                      d={path}
-                      className="tg-edge-hit"
-                      data-edge-id={relation.id}
-                      data-edge-label={relation.label || "未命名关系"}
-                      role="button"
-                      tabIndex="0"
-                      aria-label={`查看关系：${relation.label || "未命名关系"}`}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          setSelectedEdgeId(relation.id);
-                          setSelectedIds([]);
-                        }
-                      }}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setSelectedEdgeId(relation.id);
-                        setSelectedIds([]);
-                      }}
-                      onDoubleClick={(event) => {
-                        event.stopPropagation();
-                        onEditRelation?.(relation);
-                      }}
-                    />
-                    {relation.label && hoveredEdgeId === relation.id
-                      ? (() => {
-                          const labelWidth = Math.max(
-                            54,
-                            Math.min(132, relation.label.length * 11 + 22),
-                          );
-                          return (
-                            <g
-                              className="tg-edge-label-button"
-                              role="button"
-                              tabIndex="0"
-                              aria-label={`编辑关系：${relation.label}`}
-                              transform={`translate(${labelX - labelWidth / 2} ${labelY - 13})`}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                setSelectedEdgeId(relation.id);
-                                setSelectedIds([]);
-                              }}
-                              onDoubleClick={(event) => {
-                                event.stopPropagation();
-                                onEditRelation?.(relation);
-                              }}
-                              onKeyDown={(event) => {
-                                if (event.key !== "Enter" && event.key !== " ")
-                                  return;
-                                event.preventDefault();
-                                setSelectedEdgeId(relation.id);
-                                setSelectedIds([]);
-                              }}
-                            >
-                              <title>单击查看关系，双击编辑名称</title>
-                              <rect width={labelWidth} height="26" rx="5" />
-                              <text
-                                x={labelWidth / 2}
-                                y="17"
-                                textAnchor="middle"
-                              >
-                                {relation.label}
-                              </text>
-                            </g>
-                          );
-                        })()
-                      : null}
-                  </g>
-                );
-              })}
-            </svg>
-            {reconnect.draft ? <svg className="tg-edge-layer" width={canvasBounds.width} height={canvasBounds.height} viewBox={`${originX} ${originY} ${canvasBounds.width} ${canvasBounds.height}`} aria-hidden="true" style={{ pointerEvents: "none" }}><path className="graph-reconnect-draft" d={reconnect.preview(lineStyle)?.path} markerEnd="url(#tg-arrow)" /></svg> : null}
-            {visibleNodes.map((item) => {
-              const selected = selectedIds.includes(item.id);
-              const hasChildren = page.nodes.some(
-                (node) => node.parentId === item.id && !node.hidden,
-              );
-              return (
-                <button
-                  type="button"
-                  key={item.id}
-                  className={`tg-node is-${item.kind} is-${item.status} ${selected ? "is-selected" : ""} ${focusNodeId === item.id ? "is-focused" : ""} ${dropTargetId === item.id ? "is-drop-target" : ""}`}
-                  data-node-id={item.id}
-                  data-world-x={item.x}
-                  data-world-y={item.y}
-                  style={{
-                    left: item.x - originX,
-                    top: item.y - originY,
-                    width: item.width || 180,
-                  }}
-                  aria-pressed={selected}
-                  onPointerDown={(event) => {
-                    if (
-                      reviewMode ||
-                      event.button !== 0 ||
-                      event.target.closest(".tg-node-connector")
-                    )
-                      return;
-                    event.stopPropagation();
-                    if (event.pointerType === "touch") event.currentTarget.focus({ preventScroll: true });
-                    portLocks.freeze();
-                    const nextIds =
-                      event.shiftKey || event.metaKey || event.ctrlKey
-                        ? selected
-                          ? selectedIds.filter((id) => id !== item.id)
-                          : [...selectedIds, item.id]
-                        : selectedIds.includes(item.id) &&
-                            selectedIds.length > 1
-                          ? selectedIds
-                          : [item.id];
-                    setSelectedIds(nextIds);
-                    setSelectedEdgeId(null);
-                    dragRef.current = {
-                      startX: event.clientX,
-                      startY: event.clientY,
-                      ids: nextIds,
-                      original: Object.fromEntries(
-                        page.nodes
-                          .filter((node) => nextIds.includes(node.id))
-                          .map((node) => [node.id, { x: node.x, y: node.y }]),
-                      ),
-                    };
-                  }}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    if (!selectedIds.includes(item.id))
-                      setSelectedIds([item.id]);
-                    setSelectedEdgeId(null);
-                  }}
-                  onDoubleClick={(event) => {
-                    event.stopPropagation();
-                    onContextMenu({
-                      x: event.clientX,
-                      y: event.clientY,
-                      node: item,
-                      action: "edit",
-                    });
-                  }}
-                  onContextMenu={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setSelectedIds([item.id]);
-                    onContextMenu({
-                      x: event.clientX,
-                      y: event.clientY,
-                      node: item,
-                    });
-                  }}
-                  onKeyDown={event => {
-                    const connection = connectionRef.current;
-                    if (!connection?.keyboard || event.key !== "Enter" && event.key !== " ") return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (connection.sourceId !== item.id) onCreateRelation?.({ source: connection.sourceId, target: item.id, sourcePort: connection.sourcePort });
-                    connectionRef.current = null;
-                    setConnectionDraft(null);
-                  }}
-                >
-                  <span className="tg-node-kind">
-                    <Icon name={getNodeIcon(item)} />
-                  </span>
-                  <span className="tg-node-copy">
-                    <TooltipText
-                      tip={item.label}
-                      className="tg-node-title"
-                      clampLines={1}
-                    >
-                      {item.label}
-                    </TooltipText>
-                    <TooltipText
-                      tip={item.subtitle || nodeKindLabel[item.kind]}
-                      className="tg-node-subtitle"
-                      clampLines={1}
-                    >
-                      {item.subtitle || nodeKindLabel[item.kind]}
-                    </TooltipText>
-                    {item.assetPath ? (
-                      <span className="tg-node-asset">
-                        <Icon name="link" />
-                        已关联 · {item.assetType || nodeKindLabel[item.kind]}
-                      </span>
-                    ) : null}
-                  </span>
-                  <NodeStatus node={item} />
-                  {!reviewMode ? (
-                    <GraphNodePorts label={item.label} className="tg-node-connector" destination={reconnect.active} activeSide={connectionDraft?.sourceId === item.id ? connectionDraft.sourcePort : undefined}
-                      onStart={(sourcePort, keyboard) => {
-                        if (reconnect.active) { void reconnect.choose(item.id, sourcePort); return; }
-                        if (reconnect.pending) return;
-                        const point = graphPortPoint(item, sourcePort);
-                        connectionRef.current = { sourceId: item.id, sourcePort, keyboard };
-                        setConnectionDraft({
-                          sourceId: item.id,
-                          sourcePort,
-                          x1: point.x,
-                          y1: point.y,
-                          x2: point.x + (sourcePort === "left" ? -24 : sourcePort === "right" ? 24 : 0),
-                          y2: point.y + (sourcePort === "top" ? -24 : sourcePort === "bottom" ? 24 : 0),
-                        });
-                      }}
-                    />
-                  ) : null}
-                  {hasChildren ? (
-                    <span
-                      role="button"
-                      tabIndex="0"
-                      className="tg-collapse-node"
-                      aria-label={
-                        collapsed.has(item.id) ? "展开子节点" : "收起子节点"
-                      }
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setCollapsed((current) => {
-                          const next = new Set(current);
-                          if (next.has(item.id)) next.delete(item.id);
-                          else next.add(item.id);
-                          return next;
-                        });
-                      }}
-                    >
-                      <Icon name={collapsed.has(item.id) ? "plus" : "minus"} />
-                    </span>
-                  ) : null}
-                </button>
-              );
-            })}
-            {!reviewMode && reconnectEdge ? <GraphEdgeHandles points={reconnect.endpoints(reconnectEdge)} originX={originX} originY={originY} zoom={zoom} pending={reconnect.pending} labels={{ source: "调整连线起点", target: "调整连线终点" }} onStart={(end, keyboard, pointerId) => {
-              connectionRef.current = null; setConnectionDraft(null); dragRef.current = null; panRef.current = null;
-              reconnect.start(reconnectEdge, end, keyboard, pointerId);
-            }} /> : null}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+function GraphCanvas({ page, reviewMode = false, ...props }) {
+  const [previewNodes, setPreviewNodes] = useState(page.nodes);
+  useEffect(() => setPreviewNodes(page.nodes), [page.id, page.nodes]);
+  return <TopicGraphCanvas {...props} pageKey={page.id} nodes={reviewMode ? previewNodes : page.nodes} edges={page.edges}
+    readingOnly={reviewMode} onNodesChange={reviewMode ? setPreviewNodes : props.onNodesChange}
+    onMoveCommit={() => {}} />;
 }
 
 function flattenTree(nodes) {
@@ -2247,6 +1475,7 @@ function NodeEditor({ open, node, pages, close, onSave, onCreateAsset }) {
 function AssetLinkDialog({ open, close, onSelect }) {
   const { contacts } = useCompanyContacts();
   const [query, setQuery] = useState("");
+  if (!open) return null;
   const options = [
     ...contacts
       .filter((contact) => !contact.deletedAt)
@@ -2480,260 +1709,6 @@ function HiddenContentPanel({ pages, close, onRestore }) {
   );
 }
 
-function ImportGraphPage({ open, close, onImported, scenario = "" }) {
-  const [step, setStep] = useState(1);
-  const [files, setFiles] = useState([]);
-  const [smart, setSmart] = useState(true);
-  const [duplicateMode, setDuplicateMode] = useState("rename");
-  const useDemo = () =>
-    setFiles([{ name: "星澜机器人组织架构.mm", size: 24812 }]);
-  useEffect(() => {
-    if (!open) {
-      setStep(1);
-      setFiles([]);
-      setSmart(true);
-      return;
-    }
-    if (scenario === "multi-root" || scenario === "partial") {
-      setFiles([{ name: "机器人产业关系.xlsx", size: 43124 }]);
-      setStep(2);
-    }
-  }, [open, scenario]);
-  const validationError =
-    scenario === "unsupported"
-      ? {
-          title: "不支持该文件格式",
-          description:
-            "请选择 XLSX、MM、FreeMind、OPML、XMind、Markdown 或 JSON 文件；当前文件没有被导入。",
-        }
-      : scenario === "corrupt"
-        ? {
-            title: "文件无法读取",
-            description:
-              "文件可能已损坏或内容不完整。当前知识图谱没有产生任何半成品图页。",
-          }
-        : null;
-  return (
-    <Modal
-      open={open}
-      close={close}
-      size="xl"
-      title={
-        step === 1 ? "导入图页" : step === 2 ? "确认图页结构" : "图页已导入"
-      }
-      description={
-        step === 1
-          ? "文件只会在当前知识图谱中创建图页。"
-          : step === 2
-            ? "结构先落地；智能分析在导入后继续运行。"
-            : "可以立即查看图页，智能分析不会阻塞使用。"
-      }
-      footer={
-        step === 1 ? (
-          <>
-            <Button onClick={close}>取消</Button>
-            <Button
-              tone="primary"
-              disabled={!files.length || Boolean(validationError)}
-              onClick={() => setStep(2)}
-            >
-              校验并预览
-            </Button>
-          </>
-        ) : step === 2 ? (
-          <>
-            <Button onClick={() => setStep(1)}>上一步</Button>
-            <Button
-              tone="primary"
-              onClick={() => {
-                setStep(3);
-                onImported({ smart });
-              }}
-            >
-              确认导入
-            </Button>
-          </>
-        ) : (
-          <Button tone="primary" onClick={close}>
-            查看图页
-          </Button>
-        )
-      }
-    >
-      {step === 1 ? (
-        <div className="tg-import-step">
-          <FileDrop
-            files={files}
-            onFiles={setFiles}
-            accept="XLSX、MM、FreeMind、OPML、XMind、Markdown、JSON"
-            multiple={false}
-          />
-          <button type="button" className="tg-demo-file" onClick={useDemo}>
-            <Icon name="file" />
-            <span>
-              <b>使用演示文件验收</b>
-              <small>星澜机器人组织架构.mm · 24 KB</small>
-            </span>
-          </button>
-          <p>格式校验失败、文件损坏或无法识别根结构时不会产生半成品图页。</p>
-          {validationError ? (
-            <StateBanner
-              tone="danger"
-              icon="warning"
-              title={validationError.title}
-              description={validationError.description}
-            />
-          ) : null}
-        </div>
-      ) : null}
-      {step === 2 ? (
-        <div className="tg-import-preview">
-          <section>
-            <header>
-              <span>
-                <small>结构预览</small>
-                <h3>星澜机器人组织架构</h3>
-              </span>
-              <StatusBadge tone="success">格式校验通过</StatusBadge>
-            </header>
-            {scenario === "multi-root" ? (
-              <div className="tg-import-groups">
-                <StateBanner
-                  tone="warning"
-                  icon="warning"
-                  title="文件中没有共同的第一层结构"
-                  description="系统识别出 3 组互不隶属的内容。本次会在当前知识图谱中分别创建 3 个图页，不会强行给它们增加同一个父节点。"
-                />
-                <div className="tg-import-group-preview">
-                  {[
-                    [
-                      "星澜机器人组织",
-                      "星澜机器人 → 具身智能中心 → VLA 算法组",
-                      "10 个节点 · 9 条连线",
-                    ],
-                    [
-                      "具身智能产业链",
-                      "上游供应商 → 核心厂商 → 场景客户",
-                      "5 个节点 · 4 条连线",
-                    ],
-                    [
-                      "核心人物关系",
-                      "关键人物 → 合作人 → 共同成果",
-                      "3 个节点 · 4 条连线",
-                    ],
-                  ].map(([name, structure, meta], index) => (
-                    <article key={name}>
-                      <i>{index + 1}</i>
-                      <span>
-                        <small>将新建图页</small>
-                        <b>{name}</b>
-                        <p>{structure}</p>
-                      </span>
-                      <em>{meta}</em>
-                    </article>
-                  ))}
-                </div>
-                <p className="tg-import-groups-result">
-                  导入后可以分别维护这 3
-                  个图页；如果它们之间确实存在关系，再由用户手动连线或让 AI
-                  提出关系建议。
-                </p>
-              </div>
-            ) : null}
-            {scenario === "partial" ? (
-              <StateBanner
-                tone="warning"
-                icon="warning"
-                title="2 个节点只能保留原文"
-                description="其余 16 个节点已完整解析；无法识别的内容会以自由节点保留并标记待确认。"
-              />
-            ) : null}
-            {scenario !== "multi-root" ? (
-              <div className="tg-import-tree">
-                <b>星澜机器人</b>
-                <span>具身智能中心</span>
-                <span className="is-child">VLA 算法组 · 8 个节点</span>
-                <span className="is-child">机器人学习组 · 6 个节点</span>
-              </div>
-            ) : null}
-            <dl>
-              <div>
-                <dt>
-                  {scenario === "multi-root" ? "将创建图页" : "顶层内容组"}
-                </dt>
-                <dd>{scenario === "multi-root" ? "3 个" : 1}</dd>
-              </div>
-              <div>
-                <dt>节点</dt>
-                <dd>18</dd>
-              </div>
-              <div>
-                <dt>连线</dt>
-                <dd>17</dd>
-              </div>
-              <div>
-                <dt>无标签连线</dt>
-                <dd>5</dd>
-              </div>
-            </dl>
-          </section>
-          <aside>
-            <div className="tg-duplicate-box">
-              <Icon name="warning" />
-              <span>
-                <b>发现同名图页</b>
-                <p>当前图谱已经有“星澜机器人组织”。</p>
-              </span>
-            </div>
-            <div className="tg-radio-stack">
-              {[
-                ["rename", "保留两个图页", "新图页命名为“星澜机器人组织（2）”"],
-                ["replace", "替换现有图页", "原图页进入当前图谱的版本历史"],
-              ].map(([value, title, detail]) => (
-                <button
-                  type="button"
-                  key={value}
-                  className={duplicateMode === value ? "is-active" : ""}
-                  onClick={() => setDuplicateMode(value)}
-                >
-                  <i>{duplicateMode === value ? <span /> : null}</i>
-                  <span>
-                    <b>{title}</b>
-                    <small>{detail}</small>
-                  </span>
-                </button>
-              ))}
-            </div>
-            <CustomCheckbox
-              checked={smart}
-              onChange={setSmart}
-              label="智能分析节点与连线关系"
-              description="导入后识别可能的资产和业务关系；只依据图形结构的判断保留为建议。"
-            />
-          </aside>
-        </div>
-      ) : null}
-      {step === 3 ? (
-        <div className="tg-import-complete">
-          <i>
-            <Icon name="check" />
-          </i>
-          <h3>图页已经可以查看</h3>
-          <p>
-            18 个节点和 17 条连线已完整写入。
-            {smart
-              ? "智能分析正在后台处理，当前已完成 4 / 18 个节点。"
-              : "本次没有启动智能分析。"}
-          </p>
-          <div>
-            <StatusBadge tone="success">结构已保存</StatusBadge>
-            {smart ? <StatusBadge tone="info">分析中</StatusBadge> : null}
-          </div>
-        </div>
-      ) : null}
-    </Modal>
-  );
-}
 
 function AnalysisProgress({ state, onPause, onResume, onReview }) {
   const paused = state === "paused";
@@ -3344,7 +2319,16 @@ function GraphContent({
     [params.get("node") || page?.nodes[0]?.id].filter(Boolean),
   );
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
-  const [detailOpen, setDetailOpen] = useState(initialView === "canvas");
+  const [detailOpen, setDetailOpen] = useState(false);
+  const canvasApi = useRef(null);
+  const [canvasToolbarTarget, setCanvasToolbarTarget] = useState(null);
+  const history = useGraphHistory(page?.id,
+    () => ({ page: structuredClone(page), camera: canvasApi.current?.capture() }),
+    snapshot => {
+      setPages(items => items.map(item => item.id === snapshot.page.id ? structuredClone(snapshot.page) : item));
+      if (snapshot.camera) canvasApi.current?.restore(snapshot.camera);
+      setSelectedIds([]); setSelectedEdgeId(null); setDetailOpen(false); setCollapsed(new Set());
+    }, error => notify(error?.message || "无法恢复上一步", "danger"));
   const [connectionMode, setConnectionMode] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [focusNodeId, setFocusNodeId] = useState(null);
@@ -3392,6 +2376,7 @@ function GraphContent({
   useEffect(() => {
     if (view !== "canvas") return undefined;
     const onKeyDown = (event) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
       const target = event.target;
       if (
         target instanceof HTMLElement &&
@@ -3456,6 +2441,7 @@ function GraphContent({
       setConnectionMode(false);
       return;
     }
+    history.record("create-relation");
     const id = `edge-${Date.now()}`;
     updateActiveEdges((edges) => [
       ...edges,
@@ -3515,7 +2501,7 @@ function GraphContent({
   };
   const selectNodes = (ids) => {
     setSelectedIds(ids);
-    if (ids.length) setDetailOpen(true);
+    if (ids.length) setDetailOpen(false);
   };
   const selectRelation = (id) => {
     setSelectedEdgeId(id);
@@ -3609,7 +2595,7 @@ function GraphContent({
         </div>
         <div className="tg-toolbar-divider" />
         {view === "canvas" ? (
-          <div className="tg-zoom-controls">
+          <div className="graph-camera-controls"><div className="tg-zoom-controls">
             <button
               type="button"
               aria-label="缩小"
@@ -3639,7 +2625,7 @@ function GraphContent({
             <button
               type="button"
               aria-label="自适应全部内容"
-              onClick={() => setZoom(0.76)}
+              onClick={() => canvasApi.current?.fit()}
             >
               <Icon name="maximize" />
             </button>
@@ -3653,7 +2639,7 @@ function GraphContent({
               <Icon name={isFullscreen ? "minimize2" : "maximize2"} />
             </button>
             </TooltipText>
-          </div>
+          </div><GraphHistoryControls history={history} /></div>
         ) : null}
         <button
           type="button"
@@ -3675,29 +2661,11 @@ function GraphContent({
           <Icon name={collapsed.size ? "plus" : "minus"} />
           {collapsed.size ? "全部展开" : "全部收起"}
         </button>
-        <button
-          type="button"
-          className="tg-toolbar-button"
-          onClick={() => updateParams(params, setParams, { panel: "hidden" })}
-        >
-          <Icon name="folder" />
-          隐藏内容
-        </button>
-        <button
-          type="button"
-          className={`tg-toolbar-button ${connectionMode ? "is-active" : ""}`}
-          aria-pressed={connectionMode}
-          onClick={() => {
-            setConnectionMode((current) => !current);
-            if (!connectionMode) notify("请从任一节点右侧连接点拖到目标节点");
-          }}
-        >
-          <Icon name="link" />
-          {connectionMode ? "退出连线" : "添加关系"}
-        </button>
+        <div className="tg-toolbar-actions"><div ref={setCanvasToolbarTarget} />
         <Button size="sm" icon="plus" onClick={() => setNodeEditor({})}>
           添加节点
         </Button>
+        </div>
       </div>
       {selectedIds.length > 1 ? (
         <div className="tg-batch-toolbar">
@@ -3753,6 +2721,11 @@ function GraphContent({
               onReparentNodes={reparentNodes}
               onZoom={setZoom}
               connectionMode={connectionMode}
+              apiRef={canvasApi}
+              history={history}
+              onBeforeChange={history.record}
+              presentationControlsTarget={canvasToolbarTarget}
+              onCreateNode={position => setNodeEditor({ position })}
             />
           ) : (
             <GraphTable
@@ -3761,6 +2734,7 @@ function GraphContent({
               setSelectedIds={selectNodes}
               onOpenNode={(node) => {
                 setSelectedIds([node.id]);
+                setSelectedEdgeId(null);
                 setDetailOpen(true);
               }}
             />
@@ -3838,16 +2812,6 @@ function GraphContent({
           </button>
           <button
             type="button"
-            onClick={() => {
-              hideNode(contextMenu.node);
-              setContextMenu(null);
-            }}
-          >
-            <Icon name="folder" />
-            从当前图页隐藏
-          </button>
-          <button
-            type="button"
             className="is-danger"
             onClick={() => {
               setNodeDelete(contextMenu.node);
@@ -3866,6 +2830,7 @@ function GraphContent({
         close={() => setNodeEditor(null)}
         onCreateAsset={() => setAssetPicker(true)}
         onSave={(next) => {
+          history.record(next.id ? "edit-node" : "create-node");
           if (next.id)
             updateActiveNodes((nodes) =>
               nodes.map((node) => (node.id === next.id ? next : node)),
@@ -3879,8 +2844,8 @@ function GraphContent({
                 id,
                 sourceType: "local",
                 status: "normal",
-                x: 520,
-                y: 250,
+                x: nodeEditor?.position?.x ?? 520,
+                y: nodeEditor?.position?.y ?? 250,
                 width: 180,
                 evidence: [],
               },
@@ -3895,6 +2860,7 @@ function GraphContent({
         open={assetPicker}
         close={() => setAssetPicker(false)}
         onSelect={(asset) => {
+          history.record("link-asset");
           if (nodeEditor?.id)
             updateActiveNodes((nodes) =>
               nodes.map((node) =>
@@ -3946,6 +2912,7 @@ function GraphContent({
         page={page}
         close={() => setRelationEditor(null)}
         onSave={(payload) => {
+          history.record("edit-relation");
           const sourceNode = page.nodes.find(
             (node) => node.label === payload.source,
           );
@@ -4041,9 +3008,11 @@ function GraphContent({
         impact={`将同时删除当前图页中的该节点、${nodeDelete ? getDescendantIds(page.nodes, nodeDelete.id).length : 0} 个下级节点及相连关系；正式业务资产不会删除，可通过版本历史恢复图谱。`}
         onConfirm={() => {
           const ids = new Set([
+            // One deletion, including descendants and their edges, is one undo step.
             nodeDelete.id,
             ...getDescendantIds(page.nodes, nodeDelete.id),
           ]);
+          history.record("delete-node");
           updateActiveNodes((nodes) =>
             nodes.filter((node) => !ids.has(node.id)),
           );
@@ -4066,6 +3035,7 @@ function GraphContent({
         confirmLabel="删除"
         impact="只删除当前图页中的这条关系；关系来源、正式业务记录和两端节点不会删除，可通过版本历史恢复图谱。"
         onConfirm={() => {
+          history.record("delete-relation");
           updateActiveEdges((edges) =>
             edges.filter((edge) => edge.id !== relationDelete.id),
           );
@@ -4106,11 +3076,14 @@ export function MappingDetailPage() {
   const panel = params.get("panel") || "";
   const requestedPageId = params.get("page");
   const denseSample = params.get("sample") === "dense";
+  const stressSample = params.get("sample") === "stress";
+  const demoSample = denseSample || stressSample;
+  const samplePage = () => stressSample ? { id: "stress-1201", name: "1201 节点压力测试", type: "人才地图", description: "虚构交互样例", ...createGraphStressSample() } : createDenseGraphPage();
   const graph =
     graphs.find((item) => item.id === mappingId) ||
     (mappingId === "graph-empty" ? emptyGraphDemo : null);
   const [pages, setPages] = useState(() =>
-    denseSample ? [createDenseGraphPage()] : mappingId === "graph-empty" ? [] : deepClonePages(mappingId),
+    demoSample ? [samplePage()] : mappingId === "graph-empty" ? [] : deepClonePages(mappingId),
   );
   const [pagesOwner, setPagesOwner] = useState(mappingId);
   const availableTabs = detailTabs.filter(
@@ -4135,22 +3108,22 @@ export function MappingDetailPage() {
 
   useEffect(() => {
     const nextPages =
-      denseSample ? [createDenseGraphPage()] : mappingId === "graph-empty" ? [] : deepClonePages(mappingId);
+      demoSample ? [samplePage()] : mappingId === "graph-empty" ? [] : deepClonePages(mappingId);
     setPages(nextPages);
     setPagesOwner(mappingId);
     setActivePageId(params.get("page") || nextPages[0]?.id);
     setNewPageOpen(false);
     setImportOpen(panel === "import");
-  }, [mappingId, denseSample]);
+  }, [mappingId, denseSample, stressSample]);
   useEffect(() => {
     if (requestedPageId) setActivePageId(requestedPageId);
   }, [requestedPageId]);
   useEffect(() => setImportOpen(panel === "import"), [panel]);
   useEffect(() => {
-    if (denseSample || limited || !graph?.pages || pagesOwner !== mappingId) return;
+    if (demoSample || limited || !graph?.pages || pagesOwner !== mappingId) return;
     try { saveGraphPages(mappingId, pages); }
     catch (error) { notify(error.message, "danger"); }
-  }, [mappingId, pages, pagesOwner, limited, denseSample]);
+  }, [mappingId, pages, pagesOwner, limited, demoSample]);
   const analysisActive = ["running", "paused"].includes(analysisState);
   const activeReviewItems = useMemo(
     () =>
@@ -4260,6 +3233,7 @@ export function MappingDetailPage() {
         }
       />
       {denseSample ? <p className="s2-research-prototype-note">【原型说明，正式实现不展示】85个节点、100条连线的虚构密集样例，仅保留本次页面操作，不写入已保存图谱。</p> : null}
+      {stressSample ? <p className="s2-research-prototype-note">【原型说明，正式实现不展示】1201 个节点、1280 条连线的虚构压力测试样例，不写入已保存图谱。</p> : null}
       {!pages.length && tab === "content" ? (
         <GraphEmptyState
           onCreatePage={() => setNewPageOpen(true)}
@@ -4337,25 +3311,24 @@ export function MappingDetailPage() {
           }}
         />
       ) : null}
-      <ImportGraphPage
+      <GraphImportDialog
         open={importOpen}
+        names={pages.map(page => page.name)}
         scenario={params.get("case") || ""}
         close={() => {
           setImportOpen(false);
           updateParams(params, setParams, { panel: null });
         }}
-        onImported={({ smart }) => {
-          if (!pages.length) {
-            const imported =
-              deepClonePages(mappingId)[0] ||
-              deepClonePages("mapping-embodied")[0];
-            setPages([imported]);
-            setActivePageId(imported.id);
-          }
-          if (smart) setAnalysisState("running");
-          updateParams(params, setParams, {
-            state: smart ? "analyzing" : null,
-          });
+        onImported={({ name }) => {
+          setImportOpen(false);
+          const id = `import-${Date.now()}`;
+          const sample = createGraphInteractionSample();
+          const imported = { id, name, type: "自由图页", description: "原型虚构导入结果", updatedAt: "刚刚",
+            nodes: sample.nodes.map(node => ({ ...node, id: `${id}-${node.id}`, parentId: node.parentId ? `${id}-${node.parentId}` : null, x: node.x + 5000, y: node.y + 3000 })),
+            edges: sample.edges.map(edge => ({ ...edge, id: `${id}-${edge.id}`, source: `${id}-${edge.source}`, target: `${id}-${edge.target}` })) };
+          setPages(current => [...current, imported]);
+          setActivePageId(id);
+          updateParams(params, setParams, { page: id, tab: "content", panel: null });
         }}
       />
       <EmptyGraphAiDialog

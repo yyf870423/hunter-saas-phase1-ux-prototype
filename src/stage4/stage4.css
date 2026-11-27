@@ -1838,9 +1838,11 @@
   position: absolute;
   z-index: 6;
   right: 12px;
-  bottom: 12px;
+  top: 12px;
   width: max-content;
-  max-width: 250px;
+  max-width: 320px;
+  max-height: calc(100% - 24px);
+  overflow: auto;
   color: var(--s1-ink);
   background: color-mix(in srgb, var(--s1-surface) 92%, transparent);
   border: 1px solid var(--s1-line);
@@ -1849,6 +1851,7 @@
   backdrop-filter: blur(12px);
 }
 .tg-shortcut-panel > button {
+  margin-left: auto;
   display: flex;
   min-height: 34px;
   align-items: center;

@@ -83,6 +83,7 @@ E2E 覆盖桌面、iPad、iPhone、亮暗主题、导航、搜索、通知、浮
 - [导入任务逐项明细原型](docs/import-task-detail-prototype-20261123.md)：已验收交互、验收入口、公共组件、测试证据及后端对接缺口。
 - [任务本次操作确认原型](docs/task-execution-approval-prototype-20261124.md)：已验收，业务按钮、范围差异、快速确认及后端请求绑定要求。
 - [任务确认与授权文案规范](docs/task-approval-copy-spec-20261124.md)：已确认的内容顺序、动作模板、完整示例、状态与安全边界；对应详细设计02 §7.17。
+- [图谱交互原型同步](docs/graph-interaction-prototype-20261127.md)：2026-11-27 图谱交互、撤销重做、导入命名与千节点手势验证，含公网测试入口。
 - `docs/stage-6-operations-plan.md`：运营端范围、模块和审批门禁。
 - `docs/stage-6-component-boundary.md`：运营端组件和隐私数据边界。
 - `docs/stage-6-interaction-coverage.md`：运营端交互与关键状态覆盖。

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { graphEdgeGeometry } from "./graph-presentation.js";
 const keyOf = (edge) => JSON.stringify([edge.origin === "hierarchy" ? "hierarchy" : edge.id, edge.source, edge.target]);
 export function freezeGraphPorts(nodes, edges, direction, previous = {}, dimensions = {}, reset = false) {
@@ -45,10 +45,13 @@ export function useGraphEdgePorts({ nodes, edges, direction, scopeKey, storageKe
             }
             catch { /* Layout persistence reports storage failures separately. */ }
     }, [storageKey, owner, scopeKey, current]);
+    const options = useCallback((edge) => { const fixed = current[keyOf(edge)]; return { ...(fixed?.explicit ? { sourcePort: fixed.sourcePort, targetPort: fixed.targetPort } : {}), fixedPorts: fixed }; }, [current]);
     return {
+        capture: () => ({ ...current }),
+        restore: (saved) => setLocks(saved),
         set: (edge, ports) => setLocks(previous => ({ ...current, ...previous, [keyOf(edge)]: { ...ports, explicit: true } })),
         freeze: () => setLocks(current),
         reset: (nextNodes, nextDirection) => setLocks(freezeGraphPorts(nextNodes, edges, nextDirection, {}, { width, height }, true)),
-        options: (edge) => { const fixed = current[keyOf(edge)]; return { ...(fixed?.explicit ? { sourcePort: fixed.sourcePort, targetPort: fixed.targetPort } : {}), fixedPorts: fixed }; },
+        options,
     };
 }

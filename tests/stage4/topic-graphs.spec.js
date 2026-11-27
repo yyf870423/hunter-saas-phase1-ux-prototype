@@ -78,7 +78,7 @@ test("知识图谱支持真实拖动、图内搜索和画布表格切换", async
   ).toBeVisible();
   await expect(page.locator(".tg-detail-panel")).toHaveCount(0);
   await expect(page.locator(".tg-graph-main")).toHaveClass(/is-detail-closed/);
-  await expect(page.getByRole("button", { name: "添加关系" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "添加关系" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "退出连线" })).toHaveCount(0);
   const hierarchyScroll = page.getByTestId("topic-graph-table-scroll");
   await expect(hierarchyScroll).toBeVisible();
@@ -137,7 +137,7 @@ test("知识图谱支持真实拖动、图内搜索和画布表格切换", async
     .first()
     .click();
   await expect(page.locator(".tg-detail-panel")).toBeVisible();
-  await page.getByRole("button", { name: "关闭详情" }).click();
+  if (await page.getByRole("button", { name: "关闭详情", exact: true }).isVisible()) await page.getByRole("button", { name: "关闭详情", exact: true }).click();
   await expect(page.locator(".tg-detail-panel")).toHaveCount(0);
   await page.getByRole("button", { name: "画布" }).click();
   await expect(page.locator(".tg-canvas-frame")).toBeVisible();
@@ -172,7 +172,7 @@ test("公司、候选人、岗位和行业关系分别作为独立知识图谱",
 test("知识图谱缩小后可继续扩展画布且节点信息保持完整", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content&page=organization");
-  await page.getByRole("button", { name: "关闭详情" }).click();
+  if (await page.getByRole("button", { name: "关闭详情", exact: true }).isVisible()) await page.getByRole("button", { name: "关闭详情", exact: true }).click();
 
   const linkedNode = page.locator(".tg-node", { hasText: "赵星羽" }).first();
   await expect(linkedNode.locator(".tg-node-title")).toHaveText("赵星羽");
@@ -245,56 +245,47 @@ test("知识图谱缩小后可继续扩展画布且节点信息保持完整", as
   assertNoConsoleErrors();
 });
 
-test("图页导入、同名处理、智能分析和审核可操作", async ({ page }) => {
+test("图页导入命名、同名拦截与审核可操作", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?panel=import");
-  await expect(page.getByRole("dialog", { name: "导入图页" })).toBeVisible();
-  await page.getByRole("button", { name: /使用演示文件验收/ }).click();
-  await page.getByRole("button", { name: "校验并预览" }).click();
-  await expect(page.getByText("发现同名图页")).toBeVisible();
-  await page.getByRole("button", { name: /替换现有图页/ }).click();
-  await page.getByRole("button", { name: "确认导入" }).click();
-  await expect(page.getByText("图页已经可以查看")).toBeVisible();
-  await page.getByRole("button", { name: "查看图页" }).click();
-  await expect(page.getByText("正在分析节点与连线关系")).toBeVisible();
-
+  const dialog = page.getByRole("dialog", { name: "导入图页", exact: true });
+  await dialog.getByRole("button", { name: "使用示例文件", exact: true }).click();
+  await dialog.getByRole("textbox", { name: "图页名称", exact: true }).fill("星澜机器人组织");
+  await dialog.getByRole("button", { name: "导入", exact: true }).click();
+  await expect(dialog.getByText("已有同名图页，请换一个名称。")).toBeVisible();
+  await dialog.getByRole("textbox", { name: "图页名称", exact: true }).fill("导入验收图页");
+  await dialog.getByRole("button", { name: "导入", exact: true }).click();
+  await expect(page.locator(".tg-page-strip span.is-active")).toContainText("导入验收图页");
+  await expect(page.locator(".tg-node")).toHaveCount(7);
   await page.goto("#/mappings/mapping-embodied?tab=reviews");
   await expect(page.getByText("AI 建议")).toBeVisible();
   await page.getByRole("button", { name: "论文作者单位 · 2025-11" }).click();
   const evidenceDialog = page.getByRole("dialog", { name: "来源与证据" });
   await expect(evidenceDialog).toBeVisible();
   await expect(page.getByText("证据摘录")).toBeVisible();
-  await evidenceDialog
-    .locator("footer")
-    .getByRole("button", { name: "关闭", exact: true })
-    .click();
+  await evidenceDialog.locator("footer").getByRole("button", { name: "关闭", exact: true }).click();
   await page.getByRole("button", { name: "作为本图备注保留" }).click();
   await expect(page.locator(".tg-review-list > button")).toHaveCount(1);
   assertNoConsoleErrors();
 });
 
-test("图页导入与分析异常均可恢复且不产生半成品", async ({ page }) => {
+test("图页格式、大小、异常拦截和分析重试", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
-  await page.goto("#/mappings/mapping-embodied?panel=import&case=unsupported");
-  await expect(page.getByText("不支持该文件格式")).toBeVisible();
-  await expect(page.getByRole("button", { name: "校验并预览" })).toBeDisabled();
-
-  await page.goto("#/mappings/mapping-embodied?panel=import&case=corrupt");
-  await expect(page.getByText("文件无法读取")).toBeVisible();
-  await expect(page.getByText(/没有产生任何半成品图页/)).toBeVisible();
-
-  await page.goto("#/mappings/mapping-embodied?panel=import&case=multi-root");
-  await expect(page.getByText("文件中没有共同的第一层结构")).toBeVisible();
-  const importBox = await page
-    .getByRole("dialog", { name: "确认图页结构" })
-    .boundingBox();
-  expect(importBox.width).toBeGreaterThan(960);
-  await expect(page.getByText("将新建图页", { exact: true })).toHaveCount(3);
-  await expect(page.getByText("具身智能产业链", { exact: true })).toBeVisible();
-
-  await page.goto("#/mappings/mapping-embodied?panel=import&case=partial");
-  await expect(page.getByText("2 个节点只能保留原文")).toBeVisible();
-
+  for (const [scenario, text] of [["unsupported", "不支持该文件格式"], ["corrupt", "文件无法读取"]]) {
+    await page.goto("#/mappings/mapping-embodied?panel=import&case=" + scenario);
+    const dialog = page.getByRole("dialog", { name: "导入图页", exact: true });
+    await dialog.getByRole("button", { name: "使用示例文件", exact: true }).click();
+    await expect(dialog.getByText(text, { exact: false })).toBeVisible();
+    await dialog.getByRole("button", { name: "导入", exact: true }).click();
+    await expect(dialog).toBeVisible();
+    await expect(page.locator(".tg-page-strip [role='tab']")).toHaveCount(1);
+  }
+  await page.goto("#/mappings/mapping-embodied?panel=import");
+  const dialog = page.getByRole("dialog", { name: "导入图页", exact: true });
+  await dialog.locator('input[type="file"]').setInputFiles({ name: "not-graph.txt", mimeType: "text/plain", buffer: Buffer.from("test") });
+  await expect(dialog.getByText("不支持此文件格式。", { exact: true })).toBeVisible();
+  await dialog.locator('input[type="file"]').setInputFiles({ name: "oversize.mm", mimeType: "application/xml", buffer: Buffer.alloc(10 * 1024 * 1024 + 1, 32) });
+  await expect(dialog.getByText("文件不能超过10MB。", { exact: true })).toBeVisible();
   await page.goto("#/mappings/mapping-embodied?state=analysis-error");
   await expect(page.getByText("智能分析未完成")).toBeVisible();
   await page.getByRole("button", { name: "重新分析" }).click();
@@ -332,7 +323,7 @@ test("空图谱、图谱内 AI、版本预览与关联入口有完整路径", as
   await expect(
     page.locator(".tg-detail-panel").getByRole("heading", { name: "赵星羽" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "关闭详情" }).click();
+  if (await page.getByRole("button", { name: "关闭详情", exact: true }).isVisible()) await page.getByRole("button", { name: "关闭详情", exact: true }).click();
 
   const initialZoomLabel = await page
     .locator(".tg-history-viewer-toolbar .tg-zoom-controls > button")
@@ -356,7 +347,7 @@ test("空图谱、图谱内 AI、版本预览与关联入口有完整路径", as
       name: "下属组织",
     }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "关闭详情" }).click();
+  if (await page.getByRole("button", { name: "关闭详情", exact: true }).isVisible()) await page.getByRole("button", { name: "关闭详情", exact: true }).click();
   const historyStage = page.locator(
     ".tg-history-preview-canvas .tg-canvas-stage",
   );
@@ -548,7 +539,7 @@ test("图谱空状态与节点资产关联可维护", async ({ page }) => {
   await editor.getByRole("button", { name: "解除关联" }).click();
   await expect(editor.getByText("将转为图谱本地节点")).toBeVisible();
   await editor.getByRole("button", { name: "保存修改" }).click();
-  await expect(page.getByText("未关联正式资产")).toBeVisible();
+  await expect(page.locator('.tg-node[data-node-id="org-xinglan"] .tg-node-asset')).toHaveCount(0);
   await expect(
     page
       .locator(".tg-node", { hasText: "星澜机器人" })
@@ -584,8 +575,9 @@ test("图谱关系可编辑且来源证据可查看", async ({ page }) => {
   await relationEditor.getByRole("button", { name: "保存关系" }).click();
   await expect(page.getByText("本图关系已更新")).toBeVisible();
 
-  await page.locator(".tg-node", { hasText: "星澜机器人" }).click();
-  await page.getByRole("button", { name: "公司官网" }).click();
+  await page.getByRole("button", { name: "层级表格", exact: true }).click();
+  await page.locator(".tg-table-node", { hasText: "星澜机器人" }).first().click();
+  await page.getByRole("button", { name: "公司官网", exact: true }).click();
   const evidenceDialog = page.getByRole("dialog", { name: "来源与证据" });
   await expect(evidenceDialog).toBeVisible();
   const sourcePopupPromise = page.waitForEvent("popup");
@@ -604,8 +596,8 @@ test("图谱关系可编辑且来源证据可查看", async ({ page }) => {
 test("图谱支持先连线、后命名并调整节点层级", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content");
-  await page.getByRole("button", { name: "关闭详情" }).click();
-  await page.getByRole("button", { name: "添加关系" }).click();
+  if (await page.getByRole("button", { name: "关闭详情", exact: true }).isVisible()) await page.getByRole("button", { name: "关闭详情", exact: true }).click();
+  await expect(page.getByRole("button", { name: "添加关系", exact: true })).toHaveCount(0);
   const source = page.locator(".tg-node", { hasText: "具身智能中心" }).first();
   const target = page.locator(".tg-node", { hasText: "星澜机器人" }).first();
   await source.hover();
@@ -674,7 +666,9 @@ test("图谱支持先连线、后命名并调整节点层级", async ({ page }) 
 test("图谱快捷键与删除操作沿用本地人才地图语义", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content");
+  await page.getByRole("button", { name: "查看图谱快捷键", exact: true }).click();
   await expect(page.getByText("新增子节点")).toBeVisible();
+  await page.getByRole("button", { name: "收起图谱快捷键", exact: true }).click();
   const node = page.locator(".tg-node", { hasText: "星澜机器人" }).first();
   await node.click();
   await page.keyboard.press("Tab");
