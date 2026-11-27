@@ -46,6 +46,7 @@ import {
 import { IndustryCascade } from "./CandidateFilters";
 import { ContactFiles } from "./ContactFiles";
 import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import { isAssetDetailTabVisible } from "./asset-detail-visibility";
 import {
   useCompanyContacts,
   saveContact,
@@ -1028,7 +1029,7 @@ export function CompanyDetailPage() {
   const notify = useToast();
   const [params, setParams] = useSearchParams();
   const requestedTab = params.get("tab");
-  const tab = requestedTab || "profile";
+  const tab = isAssetDetailTabVisible(requestedTab) ? requestedTab || "profile" : "profile";
   const isDraft = params.get("state") === "draft";
   const aiState = params.get("ai") || "idle";
   const aiPanel = params.get("panel") || "";
@@ -1113,7 +1114,7 @@ export function CompanyDetailPage() {
     { value: "mappings", label: "公司关系" },
     { value: "work", label: "关联任务" },
     { value: "history", label: "处理与记录" },
-  ];
+  ].filter(entry => isAssetDetailTabVisible(entry.value));
   const aiRecord = buildCompanyAiRecord(
     ["running", "review", "failed"].includes(aiState) ? aiState : "complete",
   );
@@ -1763,7 +1764,7 @@ export function ContactDetailPage() {
   const notify = useToast();
   const [params, setParams] = useSearchParams();
   const requestedTab = params.get("tab");
-  const tab = ["business", "related"].includes(requestedTab)
+  const tab = ["business", "related"].includes(requestedTab) || !isAssetDetailTabVisible(requestedTab)
     ? "profile"
     : requestedTab || "profile";
   const { contacts: records, deletedCompanies } = useCompanyContacts();
@@ -1805,7 +1806,7 @@ export function ContactDetailPage() {
     { value: "files", label: "文件", count: (profile.files || []).length },
     { value: "contact-path", label: "联系路径" },
     { value: "work", label: "关联任务" },
-  ];
+  ].filter(entry => isAssetDetailTabVisible(entry.value));
   return (
     <div className="s4-detail-page">
       <DetailHeader

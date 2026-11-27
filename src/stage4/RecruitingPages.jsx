@@ -52,6 +52,7 @@ import {
 } from "./PositionInterviewMaterials";
 import { candidates as assetCandidates, matchResults, positionDetail, positions } from "./data";
 import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import { isAssetDetailTabVisible } from "./asset-detail-visibility";
 import { runOpportunityCommand, useOpportunityState } from "./opportunity-store";
 import { PositionTalentMap } from "./PositionTalentMap";
 import { CreatedPositionWorkspace } from "./CreatedPositionWorkspace";
@@ -67,7 +68,7 @@ const tabs = [
   { value: "interview", label: "面试资料" },
   { value: "work", label: "关联任务" },
   { value: "history", label: "处理与记录" },
-];
+].filter(entry => isAssetDetailTabVisible(entry.value));
 
 const positionAiSupplement =
   "客户强调这是能直接参与技术路线决策的负责人岗位，需要同时判断候选人的技术深度、真机落地经验和团队管理跨度。";
@@ -2972,7 +2973,7 @@ function LegacyPositionDetailPage() {
   const notify = useToast();
   const [params, setParams] = useSearchParams();
   const requestedTab = params.get("tab");
-  const tab = requestedTab || "profile";
+  const tab = isAssetDetailTabVisible(requestedTab) ? requestedTab || "profile" : "profile";
   const profileView = params.get("profile") || "information";
   const aiState = params.get("ai") || "idle";
   const aiPanel = params.get("panel") || "";

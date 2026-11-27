@@ -203,7 +203,7 @@ test("公共时间选择器展开态符合统一设计语言", async ({ page }) 
   await assertNoConsoleErrors();
 });
 
-test("知识图谱创建、画布、审核与导入视觉完整", async ({ page }) => {
+test("知识图谱创建、画布、旧审核回落与导入视觉完整", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 900 });
 
@@ -226,14 +226,15 @@ test("知识图谱创建、画布、审核与导入视觉完整", async ({ page 
   });
 
   await page.goto("#/mappings/mapping-embodied?tab=reviews");
+  await expect(page.locator(".tg-review-workspace")).toHaveCount(0);
+  await expect(page.locator(".tg-content-shell")).toBeVisible();
   await page.screenshot({
-    path: `${output}/topic-graph-review.png`,
+    path: `${output}/topic-graph-review-fallback.png`,
     fullPage: true,
   });
 
   await page.goto("#/mappings/mapping-embodied?panel=import");
-  await page.getByRole("button", { name: /使用演示文件验收/ }).click();
-  await page.getByRole("button", { name: "校验并预览" }).click();
+  await page.getByRole("button", { name: "使用示例文件", exact: true }).click();
   await page.screenshot({
     path: `${output}/topic-graph-import-preview.png`,
     fullPage: true,

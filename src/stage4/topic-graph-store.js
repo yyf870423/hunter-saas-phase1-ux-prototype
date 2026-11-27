@@ -49,6 +49,7 @@ export function normalizeTopicGraphs(value) {
     ...(Array.isArray(graph.pages) && graph.pages.every((page) => page && typeof page.id === "string" && Array.isArray(page.nodes) && Array.isArray(page.edges)) ? { pages: graph.pages } : {}),
     batchIds: Array.isArray(graph.batchIds) ? graph.batchIds : [],
     versions: Array.isArray(graph.versions) ? graph.versions : [],
+    reviewRecords: Array.isArray(graph.reviewRecords) ? graph.reviewRecords.filter(record => record && typeof record.id === "string" && ["pending", "accepted", "rejected", "already"].includes(record.state)) : [],
     sourceTaskId: typeof graph.sourceTaskId === "string" ? graph.sourceTaskId : "",
     ...Object.fromEntries(
       ["pageCount", "nodeCount", "linkedAssets", "pending"].map((key) => [
@@ -118,6 +119,17 @@ export function saveGraphPages(id, pages) {
   });
   commit(graphs.map((item) => item.id === id ? { ...item, pages: editedPages, pageIds: pages.map((page) => page.id), pageCount: pages.length,
     nodeCount: pages.reduce((count, page) => count + page.nodes.length, 0), updatedAt: "刚刚" } : item));
+}
+
+// Prototype-only local transaction: review result and formal graph change persist together.
+export function saveGraphReview(id, pages, reviewRecords, changed = false, previousPages = pages) {
+  const graph = graphs.find(item => item.id === id && !item.deletedAt);
+  if (!graph) throw new Error("图谱已不存在，审核结果未保存。");
+  const next = { ...graph, pages, pageIds: pages.map(page => page.id), pageCount: pages.length,
+    nodeCount: pages.reduce((total, page) => total + page.nodes.length, 0),
+    pending: reviewRecords.filter(item => item.state === "pending").length, reviewRecords,
+    ...(changed ? { updatedAt: "刚刚", versions: [...(graph.versions || []), { at: new Date().toISOString(), name: "审核采纳前", pages: structuredClone(previousPages), pageIds: graph.pageIds }] } : {}) };
+  commit(graphs.map(item => item.id === id ? next : item));
 }
 
 export function publishOrganizationMap(decisions = {}, scope = organizationScope) {

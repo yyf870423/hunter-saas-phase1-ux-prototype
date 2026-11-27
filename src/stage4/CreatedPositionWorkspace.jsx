@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, DataTable, DefinitionGrid, DetailHeader, DetailTabs, EntitySelect,
   FieldGroup, FormField, Modal, SourceList, StateBanner, StatusBadge, TagList, TextArea } from "./asset-ui";
 import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import { isAssetDetailTabVisible } from "./asset-detail-visibility";
 import { displayDateTime, PositionFields, useOpportunityAction } from "./OpportunityComponents";
 import { getOpportunityPermission, runOpportunityCommand, useOpportunityState } from "./opportunity-store";
 import { candidates } from "./data";
@@ -96,7 +97,7 @@ export function CreatedPositionWorkspace({ position }) {
   const [versions, setVersions] = useState(false);
   const [status, setStatus] = useState("");
   const action = useOpportunityAction();
-  const tab = params.get("tab") || "profile";
+  const tab = isAssetDetailTabVisible(params.get("tab")) ? params.get("tab") || "profile" : "profile";
   const profile = params.get("profile") || "information";
   const currentOpportunity = state.opportunities.find((item) => !item.deletedAt && item.directions.some((direction) => !direction.archived && direction.positionId === position.id));
   const originOpportunity = state.opportunities.find((item) => item.id === position.origin.opportunityId && !item.deletedAt);
@@ -107,7 +108,7 @@ export function CreatedPositionWorkspace({ position }) {
     <Button icon="users" onClick={() => changeTab("matching")}>人岗匹配</Button><Button icon="sparkles" disabled={position.status !== "招聘中" || getOpportunityPermission()} onClick={() => setStart(true)}>开始找人</Button>
   </DetailHeader>
     <DetailTabs value={tab} onChange={changeTab} tabs={[{ value: "profile", label: "岗位资料" }, { value: "pipeline", label: "候选人流程", count: position.pipeline.length },
-      { value: "matching", label: "匹配结果", count: position.matches.length }, { value: "talent-map", label: "人才梳理", count: position.talentMap?.rows.length || 0 }, { value: "interview", label: "面试资料" }, { value: "work", label: "关联任务" }, { value: "history", label: "处理与记录" }]} />
+      { value: "matching", label: "匹配结果", count: position.matches.length }, { value: "talent-map", label: "人才梳理", count: position.talentMap?.rows.length || 0 }, { value: "interview", label: "面试资料" }, { value: "work", label: "关联任务" }, { value: "history", label: "处理与记录" }].filter(entry => isAssetDetailTabVisible(entry.value))} />
     {tab === "profile" ? <div className="s4-detail-stack"><DetailTabs value={profile} onChange={(value) => setParams({ tab, profile: value })} tabs={[{ value: "information", label: "岗位信息" }, { value: "analysis", label: "招聘分析" }]} />
       {profile === "analysis" ? <FieldGroup title="岗位解析"><StateBanner title="尚无已确认招聘分析" /></FieldGroup> : <>
         <FieldGroup title="岗位基本资料" action={<div className="s4-command-actions"><Button size="sm" icon="edit" disabled={getOpportunityPermission()} onClick={() => setEdit("base")}>编辑资料</Button>

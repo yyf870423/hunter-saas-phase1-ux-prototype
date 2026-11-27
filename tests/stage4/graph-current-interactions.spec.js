@@ -88,8 +88,10 @@ test("导入自动命名、手填保护、间距、标签名称与远坐标自�
   const field = dialog.getByRole("textbox", { name: "图页名称", exact: true });
   await dialog.locator('input[type="file"]').setInputFiles({ name: "研发组织.v2.mm", mimeType: "application/xml", buffer: Buffer.from("<map/>") });
   await expect(field).toHaveValue("研发组织.v2");
-  const fieldBox = await field.boundingBox(), uploadBox = await dialog.locator(".s4-file-drop").boundingBox();
-  expect(uploadBox.y - fieldBox.y - fieldBox.height).toBeGreaterThanOrEqual(11.5);
+  await expect.poll(async () => {
+    const fieldBox = await field.boundingBox(), uploadBox = await dialog.locator(".s4-file-drop").boundingBox();
+    return uploadBox.y - fieldBox.y - fieldBox.height;
+  }).toBeGreaterThanOrEqual(11.5);
   await field.fill("我指定的图页");
   await dialog.locator('input[type="file"]').setInputFiles({ name: "其他文件.md", mimeType: "text/markdown", buffer: Buffer.from("# 示例") });
   await expect(field).toHaveValue("我指定的图页");
@@ -98,11 +100,10 @@ test("导入自动命名、手填保护、间距、标签名称与远坐标自�
   await expect(dialog).toHaveCount(0);
   await expect(page.locator(".tg-page-strip span.is-active")).toContainText("我指定的图页");
   await expect(page.locator(".tg-node")).toHaveCount(7);
-  const visible = await page.locator(".tg-canvas-scroll").evaluate(viewport => {
+  await expect.poll(() => page.locator(".tg-canvas-scroll").evaluate(viewport => {
     const box = viewport.getBoundingClientRect();
     return [...viewport.querySelectorAll(".tg-node")].every(node => { const n = node.getBoundingClientRect(); return n.left >= box.left && n.top >= box.top && n.right <= box.right && n.bottom <= box.bottom; });
-  });
-  expect(visible).toBe(true);
+  })).toBe(true);
   await page.screenshot({ path: info.outputPath("imported.png") });
   expect(writes).toEqual([]);
   await noErrors();
@@ -185,7 +186,7 @@ test("资产关系画布的布局撤销重做与左侧工具栏", async ({ page 
   await noErrors();
 });
 
-for (const width of [1440, 390]) test(width + "px 千节点平移、连续手势缩放、标签切回可见", async ({ page }, info) => {
+for (const width of [1440, 390]) test(width + "px 千节点平移、连续手势缩放、视图切回可见", async ({ page }, info) => {
   const noErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width, height: 1000 });
   await page.goto(route + "&sample=stress");
@@ -212,8 +213,9 @@ for (const width of [1440, 390]) test(width + "px 千节点平移、连续手势
   await expect(page.locator(".tg-zoom-controls > button").nth(1)).not.toHaveText(zoomBefore);
   await page.screenshot({ path: info.outputPath("stress.png") });
   await page.getByRole("button", { name: "自适应全部内容", exact: true }).click();
-  await page.getByRole("tab", { name: /版本记录/, exact: true }).click();
-  await page.getByRole("tab", { name: "图谱内容", exact: true }).click();
+  await page.getByRole("button", { name: "层级表格", exact: true }).click();
+  await page.getByRole("button", { name: "画布", exact: true }).click();
+  await expect(page.locator(".tg-content-shell")).toBeVisible();
   await expect(page.locator(".tg-node")).toHaveCount(1201);
   await expectNoHorizontalOverflow(page);
   await noErrors();

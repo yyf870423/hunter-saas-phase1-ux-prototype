@@ -58,6 +58,7 @@ import {
 } from "./data";
 
 import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import { isAssetDetailTabVisible } from "./asset-detail-visibility";
 import { openFilePreview } from "./file-preview";
 
 const candidateTabs = [
@@ -69,7 +70,7 @@ const candidateTabs = [
   { value: "relations", label: "关联信息" },
   { value: "contact-path", label: "联系路径" },
   { value: "work", label: "关联任务" },
-];
+].filter(entry => isAssetDetailTabVisible(entry.value));
 
 const academicRelationNames = [
   "陈松",
@@ -2362,7 +2363,7 @@ export function CandidateDetailPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") || "profile";
+  const tab = isAssetDetailTabVisible(params.get("tab")) ? params.get("tab") || "profile" : "profile";
   const state = params.get("state") || "normal";
   const aiState = params.get("ai") || "idle";
   const aiPanel = params.get("panel") || "";

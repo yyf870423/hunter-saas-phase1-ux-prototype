@@ -1093,7 +1093,7 @@ test("公司文件草稿、联系人和招聘机会形成岗位交互闭环", as
   expect(state.opportunities.find((item) => item.id === "opportunity-xinglan").directions.some((item) => item.positionId === position.id)).toBe(true);
 });
 
-test("知识图谱内容、关系详情与写入决定可用", async ({ page }) => {
+test("知识图谱内容可用，旧审核入口回落", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/new");
   await expect(page.getByLabel("图谱名称")).toBeVisible();
@@ -1112,9 +1112,8 @@ test("知识图谱内容、关系详情与写入决定可用", async ({ page }) 
   await expect(page.getByText("身份待确认", { exact: true })).toBeVisible();
 
   await page.goto("#/mappings/mapping-embodied?tab=reviews");
-  await expect(page.getByRole("heading", { name: "待处理事项" })).toBeVisible();
-  await page.getByRole("button", { name: "作为本图备注保留" }).click();
-  await expect(page.locator(".tg-review-list > button")).toHaveCount(1);
+  await expect(page.locator(".tg-content-shell")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "待处理事项" })).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
   await assertNoConsoleErrors();
 });

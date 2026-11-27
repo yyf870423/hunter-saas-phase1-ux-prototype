@@ -113,12 +113,11 @@ test("待审核、失败重试和处理历史均有独立状态", async ({ page 
   await expect(page.getByRole("heading", { name: "关联任务" })).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "AI 处理记录" }),
-  ).toBeVisible();
-  await expect(page.getByText("不创建独立任务")).toBeVisible();
-  await expect(page.getByText("重新解析具身智能 VLA 算法负责人")).toBeVisible();
+  ).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "岗位资料", exact: true })).toHaveAttribute("aria-selected", "true");
   await page.waitForTimeout(220);
   await page.screenshot({
-    path: `${output}/history-desktop.png`,
+    path: `${output}/history-fallback-desktop.png`,
     fullPage: true,
   });
 
@@ -235,8 +234,8 @@ test("已有公司调研留在公司详情并共享同一套审核交互", async
   await page.goto("#/companies/company-xinglan?tab=history&ai=review");
   await expect(
     page.getByRole("heading", { name: "AI 处理记录" }),
-  ).toBeVisible();
-  await expect(page.getByText("更新星澜机器人公司资料")).toBeVisible();
+  ).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "公司资料", exact: true })).toHaveAttribute("aria-selected", "true");
   await assertNoConsoleErrors();
 });
 

@@ -17,7 +17,7 @@ import { readGraphPresentation, writeGraphPresentation } from "./graph-presentat
 import { useGraphEdgePorts } from "./useGraphEdgePorts";
 import { graphEdgeGeometry, graphFitCamera, graphFitZoom, graphLayoutPan, graphPortPoint, layoutGraph } from "./graph-presentation.js";
 import { clampGraphNode, expandGraphCanvasBounds, findGraphReparentTarget, getDescendantIds, graphCanvasMinimumBounds, graphNodeWidth, graphNodeHeight, nodeKindIcon, placeMovedGraphNodes, } from "./topic-graph-geometry.js";
-export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds, selectedEdgeId, setSelectedEdgeId, onNodesChange, onMoveCommit, collapsed, setCollapsed, zoom, focusNodeId, onContextMenu, onEditRelation, onCreateRelation, onReconnectRelation, onReparentNodes, onZoom, connectionMode = false, presentationControlsTarget, onCreateNode, apiRef, history, onBeforeChange, readingOnly = false, }) {
+export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds, selectedEdgeId, setSelectedEdgeId, onNodesChange, onMoveCommit, collapsed, setCollapsed, zoom, focusNodeId, onContextMenu, onEditRelation, onCreateRelation, onReconnectRelation, onReparentNodes, onZoom, connectionMode = false, presentationControlsTarget, onCreateNode, apiRef, history, onBeforeChange, readingOnly = false, previewNodeDrag = false, initialView, onViewChange, }) {
     const t = graphText;
     const notify = useToast();
     const scrollRef = useRef(null);
@@ -36,6 +36,9 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
     const shortcutId = useId();
     const lastPanRef = useRef(Number.NEGATIVE_INFINITY);
     const [canvasPan, setCanvasPan] = useState({ x: 0, y: 0 });
+    const initialViewRef = useRef(initialView);
+    const viewChangeRef = useRef(onViewChange);
+    viewChangeRef.current = onViewChange;
     const presentationKey = readingOnly ? undefined : `hunter.graph.presentation.${pageKey}`;
     const [presentationOwner, setPresentationOwner] = useState(presentationKey);
     const [lineStyle, setLineStyle] = useState(() => readGraphPresentation(presentationKey).lineStyle);
@@ -108,13 +111,24 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
             if (done || !viewport.clientWidth || !viewport.clientHeight)
                 return;
             done = true;
-            fitRef.current();
+            if (initialViewRef.current) {
+                const saved = initialViewRef.current;
+                initialViewRef.current = null;
+                setCanvasPan(saved.pan);
+                onZoom(saved.zoom);
+                setLineStyle(saved.lineStyle);
+                setLayoutDirection(saved.layoutDirection);
+                portLocks.restore(saved.ports || {});
+            } else fitRef.current();
         };
         const frame = requestAnimationFrame(apply);
         const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(apply);
         observer?.observe(viewport);
         return () => { cancelAnimationFrame(frame); observer?.disconnect(); };
     }, [pageKey, nodes.length > 0]);
+    useEffect(() => {
+        viewChangeRef.current?.({ lineStyle, layoutDirection, ports: portLocks.capture(), zoom, pan: canvasPan });
+    }, [canvasPan, zoom, lineStyle, layoutDirection]);
     useEffect(() => {
         const bounds = expandGraphCanvasBounds(graphCanvasMinimumBounds, nodes);
         setCanvasBounds(bounds);
@@ -155,8 +169,9 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
         portLocks.reset(next, direction);
         setLayoutDirection(direction);
         setCanvasBounds(expandGraphCanvasBounds(graphCanvasMinimumBounds, next));
-        const nextZoom = graphFitZoom(next, scrollRef.current);
-        setCanvasPan(graphLayoutPan(next, scrollRef.current, nextZoom, direction, { focusId: readingOnly ? focusNodeId : undefined }));
+        const previewCamera = readingOnly && previewNodeDrag ? graphFitCamera(next, scrollRef.current) : null;
+        const nextZoom = previewCamera?.zoom ?? graphFitZoom(next, scrollRef.current);
+        setCanvasPan(previewCamera?.pan ?? graphLayoutPan(next, scrollRef.current, nextZoom, direction, { focusId: readingOnly ? focusNodeId : undefined }));
         scrollRef.current?.scrollTo?.({ left: 0, top: 0 });
         onZoom(nextZoom);
         edgeHover.reset();
@@ -180,7 +195,7 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
                 onNodesChange((current) => current.map((node) => desiredById[node.id]
                     ? { ...node, ...clampGraphNode({ ...node, ...desiredById[node.id] }, nextBounds), userMoved: true }
                     : node));
-                if (stageRef.current) {
+                if (!readingOnly && stageRef.current) {
                     const target = findGraphReparentTarget(nodes, ids, desiredById);
                     const nextTargetId = target?.id || null;
                     dragRef.current.dropTargetId = nextTargetId;
@@ -207,6 +222,11 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
             }
             if (dragRef.current?.moved)
                 lastPanRef.current = performance.now();
+            if (readingOnly && previewNodeDrag) {
+                dragRef.current = null;
+                setDropTargetId(null);
+                return;
+            }
             if (dragRef.current?.moved && dragRef.current.dropTargetId) {
                 onReparentNodes(dragRef.current.ids, dragRef.current.dropTargetId);
             }
@@ -230,8 +250,16 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
             dragRef.current = null;
             setDropTargetId(null);
         };
-        const cancel = () => { connectionRef.current = null; setConnectionDraft(null); };
-        const escape = (event) => { if (event.key === "Escape" && connectionRef.current) {
+        const cancel = () => {
+            connectionRef.current = null; setConnectionDraft(null);
+            if (readingOnly && previewNodeDrag && dragRef.current) {
+                const original = dragRef.current.original;
+                onNodesChange(current => current.map(node => original[node.id] ? { ...node, ...original[node.id] } : node));
+                dragRef.current = null;
+                setDropTargetId(null);
+            }
+        };
+        const escape = (event) => { if (event.key === "Escape" && (connectionRef.current || readingOnly && previewNodeDrag && dragRef.current)) {
             event.preventDefault();
             cancel();
         } };
@@ -247,7 +275,7 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
             window.removeEventListener("blur", cancel);
             window.removeEventListener("keydown", escape);
         };
-    }, [canvasBounds, nodes, onCreateRelation, onMoveCommit, onNodesChange, onReparentNodes, zoom, originX, originY, layoutDirection, lineStyle]);
+    }, [canvasBounds, nodes, onCreateRelation, onMoveCommit, onNodesChange, onReparentNodes, zoom, originX, originY, layoutDirection, lineStyle, readingOnly, previewNodeDrag]);
     const connectionPreview = connectionDraft ? graphConnectionPreview(visibleNodes, connectionDraft.sourceId, connectionDraft.sourcePort, { x: connectionDraft.x2, y: connectionDraft.y2 }, connectionDraft.hit, { direction: layoutDirection, style: lineStyle }) : null;
     // Camera-only renders retain the scene; cached event handlers still read current actions.
     const sceneActions = useRef({ portLocks, reconnect, edgeHover, setSelectedIds, setSelectedEdgeId, setCollapsed, onContextMenu, onCreateRelation, onEditRelation });
@@ -258,8 +286,9 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
         const { path, x: labelX, y: labelY } = graphEdgeGeometry(source, target, { direction: layoutDirection, style: lineStyle, ...portLocks.options(relation) });
         const labelWidth = Math.max(54, Math.min(132, relation.label.length * 11 + 22));
         return (<g key={relation.id} data-source={relation.source} data-target={relation.target} onPointerEnter={event => { if (event.pointerType !== "touch" && !window.matchMedia?.("(pointer: coarse)")?.matches)
-            sceneActions.current.edgeHover.enterEdge(relation.id); }} onPointerLeave={() => sceneActions.current.edgeHover.leaveEdge(relation.id)} className={`tg-edge is-${relation.kind} ${selectedEdgeId === relation.id ? "is-selected" : ""} ${relation.status === "review" ? "is-review" : ""}`}>
+            sceneActions.current.edgeHover.enterEdge(relation.id); }} onPointerLeave={() => sceneActions.current.edgeHover.leaveEdge(relation.id)} className={`tg-edge is-${relation.kind} ${selectedEdgeId === relation.id ? "is-selected" : ""} ${relation.status === "review" ? "is-review" : ""} ${relation.reviewDelta ? `is-delta-${relation.reviewDelta}` : ""}`} data-review-delta={relation.reviewDelta}>
         <path d={path} className="tg-edge-line" markerEnd="url(#tg-arrow)"/>
+        {relation.reviewDelta ? <g className="tg-edge-delta" transform={`translate(${labelX} ${labelY + 17})`} aria-label={{ add: "拟新增", update: "拟修改", remove: "拟移除" }[relation.reviewDelta]}><rect x="-25" y="-10" width="50" height="19" rx="4"/><text textAnchor="middle" y="3">{{ add: "拟新增", update: "拟修改", remove: "拟移除" }[relation.reviewDelta]}</text></g> : null}
         <path d={path} className="tg-edge-hit" data-edge-id={relation.id} data-edge-label={relation.label || t("graph.unnamedRelation")} role="button" tabIndex={0} aria-label={t("graphPresentation.edge", { label: relation.label || t("graph.unnamedRelation") })} onKeyDown={event => {
                 if (event.key !== "Enter" && event.key !== " ")
                     return;
@@ -299,8 +328,8 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
         const selected = selectedIds.includes(item.id);
         const hasChildren = parentIds.has(item.id);
         const kindLabel = t(`graph.kind.${item.kind}`);
-        return (<button type="button" key={item.id} className={`tg-node is-${item.kind} is-${item.status} ${selected ? "is-selected" : ""} ${focusNodeId === item.id ? "is-focused" : ""} ${dropTargetId === item.id ? "is-drop-target" : ""}`} data-node-id={item.id} data-world-x={item.x} data-world-y={item.y} style={{ left: item.x - originX, top: item.y - originY, width: item.width || graphNodeWidth }} aria-pressed={selected} onPointerDown={(event) => {
-                if (readingOnly || event.button !== 0 || event.target.closest(".tg-node-connector"))
+        return (<button type="button" key={item.id} className={`tg-node is-${item.kind} is-${item.status} ${selected ? "is-selected" : ""} ${focusNodeId === item.id ? "is-focused" : ""} ${dropTargetId === item.id ? "is-drop-target" : ""} ${item.reviewDelta ? `is-delta-${item.reviewDelta}` : ""}`} data-review-delta={item.reviewDelta} data-node-id={item.id} data-world-x={item.x} data-world-y={item.y} style={{ left: item.x - originX, top: item.y - originY, width: item.width || graphNodeWidth }} aria-pressed={selected} onPointerDown={(event) => {
+                if (readingOnly && !previewNodeDrag || event.button !== 0 || event.target.closest(".tg-node-connector, .tg-collapse-node"))
                     return;
                 sceneActions.current.portLocks.freeze();
                 event.stopPropagation();
@@ -362,9 +391,9 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
               {t("graph.assetLinked", { type: item.assetType || t("graph.assetCandidate") })}
             </span>) : null}
         </span>
-        {item.status === "review" ? (<span className="tg-node-marker is-review">
+        {item.status === "review" || item.reviewDelta ? (<span className="tg-node-marker is-review">
             <ProtoIcon name="warning"/>
-            {item.marker || t(item.markerKey ?? "graph.markerReview")}
+            {item.reviewDelta ? { add: "拟新增", update: "拟修改", remove: "拟移除" }[item.reviewDelta] : item.marker || t(item.markerKey ?? "graph.markerReview")}
           </span>) : null}
         {!readingOnly ? <GraphNodePorts label={item.label} className="tg-node-connector" destination={reconnect.active} activeSide={connectionDraft?.sourceId === item.id ? connectionDraft.sourcePort : undefined} onStart={(sourcePort, keyboard) => {
                 if (sceneActions.current.reconnect.active) {
@@ -398,7 +427,7 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
             <ProtoIcon name={collapsed.has(item.id) ? "plus" : "minus"}/>
           </span>) : null}
       </button>);
-    }), [visibleNodes, nodes, selectedIds, focusNodeId, dropTargetId, parentIds, collapsed, reconnect.active, reconnect.pending, connectionDraft?.sourceId, connectionDraft?.sourcePort, originX, originY, readingOnly, t]);
+    }), [visibleNodes, nodes, selectedIds, focusNodeId, dropTargetId, parentIds, collapsed, reconnect.active, reconnect.pending, connectionDraft?.sourceId, connectionDraft?.sourcePort, originX, originY, readingOnly, previewNodeDrag, t]);
     const shortcuts = [
         [t("graphUndo.label"), ["Ctrl+Z", "⌘Z"]],
         [t("graphUndo.redoLabel"), ["Ctrl+Y", "Ctrl+Shift+Z", "⌘Shift+Z"]],
@@ -444,7 +473,7 @@ export function GraphCanvas({ pageKey, nodes, edges, selectedIds, setSelectedIds
         }} onPointerDown={(event) => {
             const target = event.target;
             if (event.button !== 0 || target.closest(".tg-collapse-node, .graph-edge-handle") ||
-                !readingOnly && target.closest(".tg-node, .tg-edge-label-button, .tg-edge-hit"))
+                (!readingOnly || previewNodeDrag) && target.closest(".tg-node, .tg-edge-label-button, .tg-edge-hit"))
                 return;
             edgeHover.reset();
             panGesture.start(event);

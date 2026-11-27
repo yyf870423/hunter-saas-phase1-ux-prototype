@@ -245,7 +245,7 @@ test("知识图谱缩小后可继续扩展画布且节点信息保持完整", as
   assertNoConsoleErrors();
 });
 
-test("图页导入命名、同名拦截与审核可操作", async ({ page }) => {
+test("图页导入命名、同名拦截及旧审核地址回落", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?panel=import");
   const dialog = page.getByRole("dialog", { name: "导入图页", exact: true });
@@ -258,14 +258,22 @@ test("图页导入命名、同名拦截与审核可操作", async ({ page }) => 
   await expect(page.locator(".tg-page-strip span.is-active")).toContainText("导入验收图页");
   await expect(page.locator(".tg-node")).toHaveCount(7);
   await page.goto("#/mappings/mapping-embodied?tab=reviews");
+  await expect(page.locator(".tg-content-shell")).toBeVisible();
+  await expect(page.locator(".tg-review-workspace")).toHaveCount(0);
+  assertNoConsoleErrors();
+});
+
+test.skip("暂缓：图谱审核与证据操作，后续重新设计", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
+  await page.goto("#/mappings/mapping-embodied?tab=reviews");
   await expect(page.getByText("AI 建议")).toBeVisible();
   await page.getByRole("button", { name: "论文作者单位 · 2025-11" }).click();
   const evidenceDialog = page.getByRole("dialog", { name: "来源与证据" });
   await expect(evidenceDialog).toBeVisible();
   await expect(page.getByText("证据摘录")).toBeVisible();
   await evidenceDialog.locator("footer").getByRole("button", { name: "关闭", exact: true }).click();
-  await page.getByRole("button", { name: "作为本图备注保留" }).click();
-  await expect(page.locator(".tg-review-list > button")).toHaveCount(1);
+  await page.getByRole("button", { name: "拒绝建议", exact: true }).click();
+  await expect(page.locator(".tg-review-list > button")).toHaveCount(2);
   assertNoConsoleErrors();
 });
 
@@ -293,7 +301,7 @@ test("图页格式、大小、异常拦截和分析重试", async ({ page }) => 
   assertNoConsoleErrors();
 });
 
-test("空图谱、图谱内 AI、版本预览与关联入口有完整路径", async ({ page }) => {
+test("空图谱与图谱内 AI 保持完整路径", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/graph-empty");
   await expect(page.getByText("还没有图页")).toBeVisible();
@@ -308,7 +316,11 @@ test("空图谱、图谱内 AI、版本预览与关联入口有完整路径", as
   await expect(
     page.getByText("3 项可信变化已写入当前图页，1 项待确认"),
   ).toBeVisible();
+  assertNoConsoleErrors();
+});
 
+test.skip("暂缓：版本预览与历史只读操作，后续重新设计", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=history");
   await expect(
     page.getByRole("heading", { name: "v12 当时视图" }),
@@ -685,7 +697,7 @@ test("图谱快捷键与删除操作沿用本地人才地图语义", async ({ pa
   assertNoConsoleErrors();
 });
 
-test("知识图谱、历史视图和审核视图均可进入并退出全屏", async ({ page }) => {
+test("知识图谱内容可进入并退出全屏", async ({ page }) => {
   const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=content");
   await page.getByRole("button", { name: "进入图谱全屏" }).click();
@@ -697,7 +709,11 @@ test("知识图谱、历史视图和审核视图均可进入并退出全屏", as
   await expect(page.locator(".tg-content-shell")).not.toHaveClass(
     /is-fullscreen/,
   );
+  assertNoConsoleErrors();
+});
 
+test.skip("暂缓：历史和审核画布全屏，后续重新设计", async ({ page }) => {
+  const assertNoConsoleErrors = trackConsoleErrors(page);
   await page.goto("#/mappings/mapping-embodied?tab=history");
   await page.getByRole("button", { name: "进入历史画布全屏" }).click();
   await expect(page.locator("aside.is-history-preview")).toHaveClass(
@@ -730,8 +746,8 @@ test("相关资产和运营页体现知识图谱决策", async ({ page }) => {
     ["#/companies/company-xinglan?tab=mappings", "公司关系与人才流动"],
     ["#/patents/patent-manipulation", "关系同步"],
     ["#/tasks/mapping-embodied", "具身智能目标公司组织梳理"],
-    // Graph relation changes stay in the graph review, not in the insight center (design review topic 14).
-    ["#/mappings/mapping-company-relations?tab=reviews", "陈松从小鹏汽车加入星澜机器人"],
+    // The old review link now falls back to the graph content.
+    ["#/mappings/mapping-company-relations?tab=reviews", "公司关系与人才流动知识图谱"],
     ["#/ops/tasks?view=background", "图谱后台运行"],
   ];
   for (const [url, text] of cases) {

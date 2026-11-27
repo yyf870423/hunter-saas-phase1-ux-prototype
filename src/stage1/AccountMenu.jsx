@@ -167,20 +167,6 @@ export function AccountMenu({ mobileEntry = false, onUsage, onActiveChange }) {
         <button
           type="button"
           role="menuitem"
-          onClick={() => {
-            setOpen(false);
-            notify("当前没有需要切换的工作空间", "info");
-          }}
-        >
-          <Icon name="swap" />
-          <span>
-            <b>切换工作空间</b>
-            <small>当前仅有 1 个工作空间</small>
-          </span>
-        </button>
-        <button
-          type="button"
-          role="menuitem"
           className="is-danger"
           onClick={() => {
             setOpen(false);

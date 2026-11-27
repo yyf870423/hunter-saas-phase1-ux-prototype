@@ -5,6 +5,7 @@ import { Icon } from "../components/Icon";
 import { ActivityTimeline, AssetPageHeader, Button, DefinitionGrid, DetailHeader, DetailTabs, FieldGroup,
   Modal, NotFoundState, SelectMenu, SourceList, StateBanner, StatusBadge, useToast } from "./asset-ui";
 import { AssetRelatedTasks } from "./AssetRelatedTasks";
+import { isAssetDetailTabVisible } from "./asset-detail-visibility";
 import { OpportunityDirections, OpportunityStatusAction } from "./OpportunityDirections";
 import { displayDateTime, emptyOpportunity, FollowupRecordEditor, InitialOpportunityFollowup, localDateTime, OpportunityFields,
   OpportunityFollowupSummary, OpportunityProfileEditor, useOpportunityAction } from "./OpportunityComponents";
@@ -95,7 +96,7 @@ export function OpportunityDetailPage() {
   const [source, setSource] = useState(null);
   const action = useOpportunityAction();
   const opportunity = state.opportunities.find((item) => item.id === opportunityId && !item.deletedAt);
-  const tab = ["profile", "directions", "work", "history"].includes(params.get("tab")) ? params.get("tab") : "profile";
+  const tab = ["profile", "directions", "work", "history"].includes(params.get("tab")) && isAssetDetailTabVisible(params.get("tab"), true) ? params.get("tab") : "profile";
   const stateMode = params.get("state");
   const retry = () => { const next = new URLSearchParams(params); next.delete("state"); setParams(next); };
   if (!opportunity) return <NotFoundState label="招聘机会" onBack={() => navigate("/opportunities")} />;
@@ -113,7 +114,7 @@ export function OpportunityDetailPage() {
   </DetailHeader>
     {getOpportunityStoreError() ? <StateBanner tone="danger" title={getOpportunityStoreError()} /> : null}
     {getOpportunityPermission() ? <StateBanner tone="warning" icon="lock" title="当前为只读权限" /> : null}
-    <DetailTabs value={tab} onChange={changeTab} tabs={[{ value: "profile", label: "机会资料" }, { value: "directions", label: "招聘方向", count: summary.directions }, { value: "work", label: "关联任务" }, { value: "history", label: "活动记录" }]} />
+    <DetailTabs value={tab} onChange={changeTab} tabs={[{ value: "profile", label: "机会资料" }, { value: "directions", label: "招聘方向", count: summary.directions }, { value: "work", label: "关联任务" }, { value: "history", label: "活动记录" }].filter(entry => isAssetDetailTabVisible(entry.value, true))} />
     {tab === "profile" ? <div className="s4-detail-stack">
       <FieldGroup title="机会资料" action={<Button size="sm" icon="edit" disabled={getOpportunityPermission()} onClick={() => setSection("basic")}>编辑资料</Button>}>
         <DefinitionGrid items={[["所属公司", company ? <span className="s4-company-with-assessment"><button type="button" className="s4-inline-link" onClick={() => navigate("/companies/" + company.id)}>{company.name}</button>

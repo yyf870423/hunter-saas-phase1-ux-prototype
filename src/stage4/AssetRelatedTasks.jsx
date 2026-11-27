@@ -3,8 +3,13 @@ import { getAssetTasks } from "../stage2/task-asset-references";
 import { workItems } from "../stage2/data";
 import { useOpportunityState } from "./opportunity-store";
 import { Button, FieldGroup, SourceList, StateBanner } from "./asset-ui";
+import { assetRelatedTasksVisible } from "./asset-detail-visibility";
 
-export function AssetRelatedTasks({ assetType, assetId, companyId }) {
+export function AssetRelatedTasks(props) {
+  return assetRelatedTasksVisible ? <DeferredAssetRelatedTasks {...props} /> : null;
+}
+
+function DeferredAssetRelatedTasks({ assetType, assetId, companyId }) {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const state = params.get("tasks") || "normal";

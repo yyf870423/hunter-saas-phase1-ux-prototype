@@ -1,5 +1,6 @@
 import { mkdir } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
+test.skip(true, "2026-11-27 资产关联任务入口暂时隐藏，保留用例待重新设计");
 import { getAssetTasks } from "../../src/stage2/task-asset-references";
 import {
   expectNoHorizontalOverflow,

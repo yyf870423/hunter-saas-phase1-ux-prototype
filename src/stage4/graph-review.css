@@ -1,0 +1,105 @@
+.tg-review-list > .s4-detail-tabs {
+  padding-inline: 12px;
+}
+.tg-review-list > button:disabled {
+  cursor: wait;
+}
+.tg-review-empty {
+  grid-column: 2 / -1;
+  padding: 24px;
+}
+.tg-review-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--s1-surface);
+  border-bottom: 1px solid var(--s1-line);
+  font-size: 11px;
+}
+.tg-review-legend > span {
+  padding: 2px 6px;
+  border: 1px solid var(--s1-line);
+  border-radius: 4px;
+}
+.tg-review-legend > span:first-child {
+  color: var(--s1-success);
+}
+.tg-review-legend > span:nth-child(2) {
+  color: var(--s1-accent);
+}
+.tg-review-legend > span:nth-child(3) {
+  color: var(--tg-review);
+  border-style: dashed;
+}
+.tg-review-legend > button {
+  margin-left: auto;
+}
+.tg-review-diff {
+  display: grid;
+  gap: 16px;
+}
+.tg-review-diff > div {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+.tg-review-diff > div > b {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.tg-review-detail dd,
+.tg-review-detail p,
+.tg-review-detail a {
+  overflow-wrap: anywhere;
+}
+.tg-review-detail .s4-state-banner {
+  margin-top: 16px;
+}
+.tg-review-detail .s4-state-banner b {
+  font-size: 12px;
+}
+.tg-review-detail > footer {
+  justify-content: flex-start;
+}
+.tg-review-original-action {
+  margin-top: 10px;
+}
+.tg-review-canvas .tg-node.is-delta-add {
+  border-color: var(--s1-success);
+}
+.tg-review-canvas .tg-node.is-delta-update {
+  border-color: var(--s1-accent);
+}
+.tg-review-canvas .tg-node.is-delta-remove {
+  border-style: dashed;
+  border-color: var(--tg-review);
+}
+.tg-review-canvas .tg-edge.is-delta-add .tg-edge-line {
+  stroke: var(--s1-success);
+  stroke-dasharray: 6 4;
+}
+.tg-review-canvas .tg-edge.is-delta-update .tg-edge-line {
+  stroke: var(--s1-accent);
+}
+.tg-review-canvas .tg-edge.is-delta-remove .tg-edge-line {
+  stroke: var(--tg-review);
+  stroke-dasharray: 2 5;
+}
+.tg-edge-delta {
+  pointer-events: none;
+}
+.tg-edge-delta rect {
+  fill: var(--s1-surface);
+  stroke: var(--s1-line);
+}
+.tg-edge-delta text {
+  fill: var(--s1-ink);
+  font-size: 10px;
+}
+@media (max-width: 820px) {
+  .tg-review-empty {
+    grid-column: 1;
+  }
+}

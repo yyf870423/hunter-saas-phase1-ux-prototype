@@ -43,24 +43,28 @@ for (const [name, route] of surfaces) {
   });
 }
 
-test("旧业务链接回到有效页面，AI 处理与活动历史仍可查看", async ({ page }) => {
+test("旧业务链接回落，处理记录隐藏但机会活动历史保留", async ({ page }) => {
   const check = trackConsoleErrors(page);
   for (const [route, activeTab, heading] of [
-    ["companies/company-xinglan?tab=history", "处理与记录", "AI 处理记录"],
-    ["positions/position-vla?tab=history", "处理与记录", "AI 处理记录"],
+    ["companies/company-xinglan?tab=history", "公司资料", "公司基本资料"],
+    ["positions/position-vla?tab=history", "岗位资料", null],
     ["opportunities/opportunity-xinglan?tab=history", "活动记录", "活动记录"],
     [
       "companies/company-xinglan/contacts/contact-chenyu?tab=business",
       "联系人资料",
       "基本资料",
     ],
-    ["mappings/mapping-embodied?tab=business", "图谱内容", null],
-    ["mappings/mapping-embodied?tab=related", "图谱内容", null],
+    ["mappings/mapping-embodied?tab=business", null, null],
+    ["mappings/mapping-embodied?tab=related", null, null],
   ]) {
     await page.goto(`#/${route}`);
-    await expect(
+    if (activeTab) await expect(
       page.getByRole("tab", { name: activeTab, exact: true }),
     ).toHaveAttribute("aria-selected", "true");
+    else {
+      await expect(page.locator(".tg-content-shell")).toBeVisible();
+      await expect(page.locator(".tg-detail-page > .s4-detail-tabs")).toHaveCount(0);
+    }
     if (heading)
       await expect(
         page.getByRole("heading", { name: heading, exact: true }),
@@ -71,11 +75,8 @@ test("旧业务链接回到有效页面，AI 处理与活动历史仍可查看",
   }
   for (const route of ["companies/company-xinglan", "positions/position-vla"]) {
     await page.goto(`#/${route}?tab=history`);
-    await page.locator(".s4-ai-process-history > button").first().click();
-    await expect(
-      page.getByRole("dialog", { name: "AI 处理详情" }),
-    ).toBeVisible();
-    await expect(page.getByRole("dialog")).not.toContainText("关联任务");
+    await expect(page.locator(".s4-ai-process-history")).toHaveCount(0);
+    await expect(page.getByRole("tab", { name: "处理与记录", exact: true })).toHaveCount(0);
   }
   await check();
 });

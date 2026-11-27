@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+test.skip(true, "2026-11-27 审核画布暂时隐藏，保留历史用例待重新设计");
 import { expectNoHorizontalOverflow, trackConsoleErrors } from "../stage1/helpers";
 
 const route = "#/mappings/mapping-embodied?tab=reviews";
@@ -25,7 +26,7 @@ async function anchor(stage, point) {
   return stage.evaluate((node, p) => { const r = node.getBoundingClientRect(), z = new DOMMatrix(getComputedStyle(node).transform).a; return { x: (p.x - r.left) / z + Number(node.dataset.originX || 0), y: (p.y - r.top) / z + Number(node.dataset.originY || 0) }; }, point);
 }
 
-for (const width of [1440, 926]) test(width + "px 审核画布从空白和节点平移，滚轮与触控板保持鼠标锚点且不写入", async ({ page }, info) => {
+for (const width of [1440, 926]) test(width + "px 审核画布空白平移、节点独立拖动，滚轮与触控板保持鼠标锚点且不写入", async ({ page }, info) => {
   const noErrors = trackConsoleErrors(page), writes = [];
   page.on("request", request => { if (!["GET", "HEAD"].includes(request.method())) writes.push(request.url()); });
   await page.setViewportSize({ width, height: 1100 });
@@ -37,11 +38,14 @@ for (const width of [1440, 926]) test(width + "px 审核画布从空白和节点
   let before = await transform(stage);
   await drag(page, await blank(viewport));
   await expect.poll(() => transform(stage)).not.toEqual(before);
-  const node = page.locator('.tg-node[data-node-id="org-xinglan"]');
+  const node = page.locator('.tg-node[data-node-id="org-wang"]');
   const box = await node.boundingBox(), point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   before = await transform(stage);
   await drag(page, point);
-  await expect.poll(() => transform(stage)).not.toEqual(before);
+  await expect.poll(() => coordinates(page)).not.toEqual(initialCoordinates);
+  expect(await transform(stage)).toEqual(before);
+  const movedCoordinates = await coordinates(page);
+  await page.getByRole("button", { name: "自适应审核画布", exact: true }).click();
   const current = await node.boundingBox(), wheelPoint = { x: Math.round(current.x + current.width / 2), y: Math.round(current.y + current.height / 2) };
   const a = await anchor(stage, wheelPoint), oldZoom = (await transform(stage)).zoom;
   await page.mouse.move(wheelPoint.x, wheelPoint.y); await page.mouse.wheel(0, -100);
@@ -55,7 +59,7 @@ for (const width of [1440, 926]) test(width + "px 审核画布从空白和节点
   await page.getByRole("button", { name: "放大审核画布", exact: true }).click();
   await page.getByRole("button", { name: "缩小审核画布", exact: true }).click();
   await page.getByRole("button", { name: "自适应审核画布", exact: true }).click();
-  expect(await coordinates(page)).toEqual(initialCoordinates);
+  expect(await coordinates(page)).toEqual(movedCoordinates);
   expect(await page.evaluate(() => JSON.stringify(localStorage))).toBe(stored);
   const frameBox = await page.locator(".tg-review-canvas").boundingBox(), viewBox = await viewport.boundingBox();
   expect(viewBox.y + viewBox.height).toBeLessThanOrEqual(frameBox.y + frameBox.height + 1);
@@ -68,7 +72,7 @@ for (const width of [1440, 926]) test(width + "px 审核画布从空白和节点
   await expect.poll(() => transform(stage)).not.toEqual(before);
   await page.screenshot({ path: info.outputPath("review-fullscreen.png") });
   await page.getByRole("button", { name: "退出审核画布全屏", exact: true }).click();
-  expect(await coordinates(page)).toEqual(initialCoordinates);
+  expect(await coordinates(page)).toEqual(movedCoordinates);
   expect(await page.evaluate(() => JSON.stringify(localStorage))).toBe(stored);
   await expectNoHorizontalOverflow(page); expect(writes).toEqual([]); await noErrors();
 });
@@ -76,7 +80,7 @@ for (const width of [1440, 926]) test(width + "px 审核画布从空白和节点
 test("审核切换目标后仍可平移和缩放，历史画布只读能力不退化", async ({ page }) => {
   const noErrors = trackConsoleErrors(page);
   await page.setViewportSize({ width: 1440, height: 1100 }); await page.goto(route);
-  await page.locator(".tg-review-list > button").last().click();
+  await page.locator(".tg-review-list > button").filter({ hasText: "何静" }).click();
   const canvas = page.locator(".tg-review-canvas"), viewport = canvas.locator(".tg-canvas-scroll"), stage = canvas.locator(".tg-canvas-stage");
   await expect(page.locator(".tg-review-detail h2")).toContainText("何静");
   const stored = await page.evaluate(() => JSON.stringify(localStorage));

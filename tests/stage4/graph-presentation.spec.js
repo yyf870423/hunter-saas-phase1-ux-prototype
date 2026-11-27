@@ -89,6 +89,7 @@ test("知识图谱只悬停显示一条关系，选中、键盘或移开不使�
 });
 
 for (const tab of ["reviews", "history"]) test(`${tab} 只读画布可以预览布局，不改原始图页或存储`, async ({ page }, testInfo) => {
+  test.skip(true, "2026-11-27 审核与版本入口暂时隐藏，保留用例待重新设计");
   const noErrors = trackConsoleErrors(page);
   await page.goto(`#/mappings/mapping-embodied?tab=${tab}`);
   const before = await page.evaluate(() => JSON.stringify(localStorage));

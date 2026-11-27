@@ -8,7 +8,7 @@ export const topicGraphs = [
     pageCount: 1,
     nodeCount: 9,
     linkedAssets: 3,
-    pending: 1,
+    pending: 3,
     related: "1 家公司 · 3 位候选人",
     updatedAt: "今天 11:20",
   },

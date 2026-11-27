@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { useCanvasFullscreen } from "../components/useCanvasFullscreen";
+import { GraphReviewWorkspace } from "./GraphReviewWorkspace";
+import { createReviewItems, resolveReview } from "./graph-review-model";
 import { createDenseGraphPage } from "./graph-dense-sample";
 import { GraphCanvas as TopicGraphCanvas } from "../components/TopicGraphCanvas";
 import { GraphHistoryControls } from "../components/GraphHistoryControls";
@@ -39,7 +41,6 @@ import {
 } from "./asset-ui";
 import {
   graphHistory,
-  graphReviewItems,
   initialGraphPages,
   topicGraphs,
 } from "./topic-graph-data";
@@ -65,6 +66,7 @@ import {
   recycleGraph,
   saveGraphMetadata,
   saveGraphPages,
+  saveGraphReview,
   getTopicGraphSnapshot,
   saveGraphOrder,
   useTopicGraphs,
@@ -1896,178 +1898,6 @@ function GraphAiWorkspace({ page, close, onApply }) {
   );
 }
 
-function GraphReviewWorkspace({ pages, reviewItems, onLocate, onResolve }) {
-  const canvasApi = useRef(null);
-  const [items, setItems] = useState(reviewItems);
-  const [selectedId, setSelectedId] = useState(items[0]?.id);
-  const [evidencePreview, setEvidencePreview] = useState(null);
-  const [zoom, setZoom] = useState(0.72);
-  const { isFullscreen, toggleFullscreen } = useCanvasFullscreen();
-  const selected = items.find((item) => item.id === selectedId) || items[0];
-  const page = pages.find((item) => item.id === selected?.pageId) || pages[0];
-  useEffect(() => {
-    setItems(reviewItems);
-    setSelectedId(reviewItems[0]?.id);
-  }, [reviewItems]);
-  useEffect(() => {
-    if (selected) onLocate(selected.pageId, selected.nodeId);
-  }, [selectedId]);
-  const resolve = (action) => {
-    const current = selected;
-    setItems((list) => list.filter((item) => item.id !== current.id));
-    const remaining = items.filter((item) => item.id !== current.id);
-    setSelectedId(remaining[0]?.id);
-    onResolve(action, current);
-  };
-  if (!selected)
-    return (
-      <div className="tg-review-empty">
-        <Icon name="check" />
-        <h2>全部待处理事项已完成</h2>
-        <p>图上标记、通知和待处理数量已经同步更新。</p>
-      </div>
-    );
-  return (
-    <section
-      className={`tg-review-workspace ${isFullscreen ? "is-fullscreen" : ""}`}
-    >
-      <aside className="tg-review-list">
-        <header>
-          <span>
-            <small>分析审核模式</small>
-            <h2>待处理事项</h2>
-          </span>
-          <StatusBadge tone="warning">{items.length}</StatusBadge>
-        </header>
-        {items.map((item) => (
-          <button
-            type="button"
-            key={item.id}
-            className={selected.id === item.id ? "is-active" : ""}
-            onClick={() => setSelectedId(item.id)}
-          >
-            <span>
-              <small>
-                {item.type} ·{" "}
-                {pages.find((page) => page.id === item.pageId)?.name}
-              </small>
-              <b>{item.title}</b>
-              <p>{item.summary}</p>
-            </span>
-            <Icon name="chevronRight" />
-          </button>
-        ))}
-      </aside>
-      <div className="tg-review-canvas">
-        <header>
-          <span>
-            <small>对应图页</small>
-            <b>{page.name}</b>
-          </span>
-          <span className="tg-review-location-state">
-            <i className="is-review" />
-            待确认内容已定位
-          </span>
-          <GraphCameraControls zoom={zoom} onZoom={setZoom} onFit={() => canvasApi.current?.fit()} isFullscreen={isFullscreen} onFullscreen={toggleFullscreen}
-            labels={{ out: "缩小审核画布", in: "放大审核画布", fit: "自适应审核画布", enter: "进入审核画布全屏", exit: "退出审核画布全屏" }} />
-        </header>
-        <GraphCanvas
-          key={page.id}
-          page={page}
-          selectedIds={[selected.nodeId]}
-          setSelectedIds={() => {}}
-          selectedEdgeId={null}
-          setSelectedEdgeId={() => {}}
-          onNodesChange={() => {}}
-          collapsed={new Set()}
-          setCollapsed={() => {}}
-          zoom={zoom}
-          onZoom={setZoom}
-          focusNodeId={selected.nodeId}
-          onContextMenu={() => {}}
-          reviewMode
-          apiRef={canvasApi}
-        />
-      </div>
-      <aside className="tg-review-detail">
-        <header>
-          <small>{selected.type}</small>
-          <h2>{selected.title}</h2>
-          <p>{selected.summary}</p>
-        </header>
-        <section>
-          <h3>AI 建议</h3>
-          <p>{selected.suggestion}</p>
-        </section>
-        {selected.foundBy ? (
-          <section>
-            <h3>发现于</h3>
-            <p>
-              <a href={`#${selected.foundBy.route}`}>{selected.foundBy.label}</a>
-              。关系变化只在这里审核，不进洞察中心。
-            </p>
-          </section>
-        ) : null}
-        <section>
-          <h3>节点与候选资产对比</h3>
-          <dl>
-            <div>
-              <dt>图中名称</dt>
-              <dd>
-                {page.nodes.find((node) => node.id === selected.nodeId)?.label}
-              </dd>
-            </div>
-            <div>
-              <dt>图中上下文</dt>
-              <dd>
-                {
-                  page.nodes.find((node) => node.id === selected.nodeId)
-                    ?.subtitle
-                }
-              </dd>
-            </div>
-            <div>
-              <dt>候选资产</dt>
-              <dd>
-                {selected.id === "review-wang"
-                  ? "王奕 · 上海 · 机器人学习研究员"
-                  : selected.id === "review-import"
-                    ? "何静 · 杭州 · 强化学习算法"
-                    : selected.id === "review-chensong-flow"
-                      ? "陈松 · 候选人（资料更新在候选人里单独审核）"
-                      : "暂无明确资产"}
-              </dd>
-            </div>
-          </dl>
-        </section>
-        <section>
-          <h3>证据</h3>
-          {selected.evidence.map((item) => (
-            <button
-              type="button"
-              key={item}
-              onClick={() => setEvidencePreview(item)}
-            >
-              {item}
-              <Icon name="chevronRight" />
-            </button>
-          ))}
-        </section>
-        <footer>
-          <Button onClick={() => resolve("ignore")}>忽略建议</Button>
-          <Button onClick={() => resolve("local")}>作为本图备注保留</Button>
-          <Button tone="primary" onClick={() => resolve("confirm")}>
-            确认并同步到正式资料
-          </Button>
-        </footer>
-      </aside>
-      <EvidencePreviewModal
-        evidence={evidencePreview}
-        close={() => setEvidencePreview(null)}
-      />
-    </section>
-  );
-}
 
 function GraphHistoryTab({ notify, sourcePage }) {
   const navigate = useNavigate();
@@ -2306,6 +2136,7 @@ function GraphContent({
   params,
   setParams,
   notify,
+  contentSession,
 }) {
   const navigate = useNavigate();
   const { isFullscreen, toggleFullscreen } = useCanvasFullscreen();
@@ -2313,9 +2144,9 @@ function GraphContent({
   const initialView = params.get("view") || "canvas";
   const [view, setView] = useState(initialView);
   const [selectedIds, setSelectedIds] = useState(
-    [params.get("node") || page?.nodes[0]?.id].filter(Boolean),
+    contentSession.current[page?.id]?.selectedIds || [params.get("node") || page?.nodes[0]?.id].filter(Boolean),
   );
-  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState(contentSession.current[page?.id]?.selectedEdgeId || null);
   const [detailOpen, setDetailOpen] = useState(false);
   const canvasApi = useRef(null);
   const [canvasToolbarTarget, setCanvasToolbarTarget] = useState(null);
@@ -2327,7 +2158,7 @@ function GraphContent({
       setSelectedIds([]); setSelectedEdgeId(null); setDetailOpen(false); setCollapsed(new Set());
     }, error => notify(error?.message || "无法恢复上一步", "danger"));
   const [connectionMode, setConnectionMode] = useState(false);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(contentSession.current[page?.id]?.camera?.zoom || 1);
   const [focusNodeId, setFocusNodeId] = useState(null);
   const [collapsed, setCollapsed] = useState(new Set());
   const [contextMenu, setContextMenu] = useState(null);
@@ -2352,6 +2183,10 @@ function GraphContent({
   const selectedRelation = page?.edges.find(
     (edge) => edge.id === selectedEdgeId,
   );
+
+  useEffect(() => {
+    contentSession.current[page.id] = { ...contentSession.current[page.id], selectedIds, selectedEdgeId };
+  }, [selectedIds, selectedEdgeId, page.id]);
 
   useEffect(() => {
     if (!page) return;
@@ -2655,6 +2490,8 @@ function GraphContent({
               onZoom={setZoom}
               connectionMode={connectionMode}
               apiRef={canvasApi}
+              initialView={contentSession.current[page.id]?.camera}
+              onViewChange={camera => { contentSession.current[page.id] = { ...contentSession.current[page.id], camera }; }}
               history={history}
               onBeforeChange={history.record}
               presentationControlsTarget={canvasToolbarTarget}
@@ -3015,16 +2852,25 @@ export function MappingDetailPage() {
   const graph =
     graphs.find((item) => item.id === mappingId) ||
     (mappingId === "graph-empty" ? emptyGraphDemo : null);
+  // Deferred sections cannot be reopened (or mutate demo data) via old query parameters.
+  const reviewScenario = "";
+  const preparePages = () => {
+    const initial = demoSample ? [samplePage()] : mappingId === "graph-empty" ? [] : deepClonePages(mappingId);
+    if (!reviewScenario || !initial.some(page => page.id === "organization")) return initial;
+    const first = createReviewItems(initial).find(item => item.pageId === "organization");
+    if (reviewScenario === "already") return resolveReview(initial, [first], first.id, "accept").pages;
+    return initial.map(page => page.id !== "organization" ? page : { ...page,
+      nodes: reviewScenario === "missing" ? page.nodes.filter(node => node.id !== "org-wang") : page.nodes.map(node => node.id === "org-wang" && reviewScenario === "conflict" ? { ...node, summary: "用户已手动补充新的任职核对结果，旧建议不能覆盖。" } : node.id === "org-xinglan" && reviewScenario === "unrelated" ? { ...node, x: node.x + 90 } : node),
+      edges: reviewScenario === "missing" ? page.edges.filter(edge => edge.source !== "org-wang" && edge.target !== "org-wang") : page.edges });
+  };
   const [pages, setPages] = useState(() =>
-    demoSample ? [samplePage()] : mappingId === "graph-empty" ? [] : deepClonePages(mappingId),
+    preparePages(),
   );
+  const [reviewItems, setReviewItems] = useState(() => createReviewItems(pages, reviewScenario ? [] : graph?.reviewRecords));
+  const reviewSession = useRef({ views: {} });
+  const contentSession = useRef({});
   const [pagesOwner, setPagesOwner] = useState(mappingId);
-  const availableTabs = detailTabs.filter(
-    (item) => pages.length || ["content", "work"].includes(item.value),
-  );
-  const tab = availableTabs.some((item) => item.value === params.get("tab"))
-    ? params.get("tab")
-    : "content";
+  const tab = "content";
   const [activePageId, setActivePageId] = useState(
     () => params.get("page") || pages[0]?.id,
   );
@@ -3040,30 +2886,32 @@ export function MappingDetailPage() {
   const activePage = pages.find((page) => page.id === activePageId) || pages[0];
 
   useEffect(() => {
-    const nextPages =
-      demoSample ? [samplePage()] : mappingId === "graph-empty" ? [] : deepClonePages(mappingId);
+    const nextPages = preparePages();
     setPages(nextPages);
+    setReviewItems(createReviewItems(nextPages, reviewScenario ? [] : graph?.reviewRecords));
+    reviewSession.current = { views: {} };
+    contentSession.current = {};
     setPagesOwner(mappingId);
     setActivePageId(params.get("page") || nextPages[0]?.id);
     setNewPageOpen(false);
     setImportOpen(panel === "import");
-  }, [mappingId, denseSample, stressSample]);
+  }, [mappingId, denseSample, stressSample, reviewScenario]);
   useEffect(() => {
     if (requestedPageId) setActivePageId(requestedPageId);
   }, [requestedPageId]);
   useEffect(() => setImportOpen(panel === "import"), [panel]);
   useEffect(() => {
-    if (demoSample || limited || !graph?.pages || pagesOwner !== mappingId) return;
+    if (demoSample || reviewScenario || limited || !graph?.pages || pagesOwner !== mappingId) return;
     try { saveGraphPages(mappingId, pages); }
     catch (error) { notify(error.message, "danger"); }
   }, [mappingId, pages, pagesOwner, limited, demoSample]);
   const analysisActive = ["running", "paused"].includes(analysisState);
   const activeReviewItems = useMemo(
     () =>
-      graphReviewItems.filter((item) =>
-        pages.some((page) => page.id === item.pageId),
+      reviewItems.filter((item) =>
+        item.state === "pending" && pages.some((page) => page.id === item.pageId),
       ),
-    [pages],
+    [pages, reviewItems],
   );
   const startImport = () => {
     if (analysisActive) {
@@ -3106,9 +2954,31 @@ export function MappingDetailPage() {
         }}
       />
     );
-  const locateFromReview = (pageId) => {
+  const locateFromReview = (pageId, nodeId) => {
     setActivePageId(pageId);
-    updateParams(params, setParams, { page: pageId });
+    updateParams(params, setParams, { tab: "content", page: pageId, node: nodeId });
+  };
+  const commitReview = (id, action) => {
+    if (limited) throw new Error("暂无权限处理审核项。");
+    const stored = getTopicGraphSnapshot().find(item => item.id === mappingId);
+    const latestPages = reviewScenario || demoSample ? pages : stored?.pages || pages;
+    const latestItems = reviewScenario || demoSample ? reviewItems : createReviewItems(latestPages, stored?.reviewRecords);
+    if (latestPages !== pages) setPages(latestPages);
+    const next = resolveReview(latestPages, latestItems, id, action);
+    if (!reviewScenario && !demoSample) saveGraphReview(mappingId, next.pages, next.items, action === "accept", latestPages);
+    setPages(next.pages); setReviewItems(next.items);
+    notify(action === "accept" ? "本项变化已应用到本浏览器中的图页，原始资产未改变" : action === "reject" ? "已拒绝建议，原图未改变" : "已记录，无需重复处理");
+  };
+  const saveSuggestion = item => {
+    if (limited) throw new Error("暂无权限修改审核建议。");
+    const stored = getTopicGraphSnapshot().find(row => row.id === mappingId);
+    const latestPages = reviewScenario || demoSample ? pages : stored?.pages || pages;
+    const latestItems = reviewScenario || demoSample ? reviewItems : createReviewItems(latestPages, stored?.reviewRecords);
+    if (latestItems.find(row => row.id === item.id)?.state !== "pending") throw new Error("本项已处理，请重新打开审核记录。");
+    const next = latestItems.map(row => row.id === item.id ? item : row);
+    if (!reviewScenario && !demoSample) saveGraphReview(mappingId, latestPages, next);
+    if (latestPages !== pages) setPages(latestPages);
+    setReviewItems(next);
   };
 
   return (
@@ -3123,8 +2993,8 @@ export function MappingDetailPage() {
             ? [
                 { label: `${pages.length} 个图页`, tone: "info" },
                 {
-                  label: `${graph.pending ?? 0} 项待确认`,
-                  tone: graph.pending ? "warning" : "neutral",
+                  label: `${activeReviewItems.length} 项待确认`,
+                  tone: activeReviewItems.length ? "warning" : "neutral",
                 },
               ]
             : [{ label: "空图谱", tone: "neutral" }]),
@@ -3154,17 +3024,6 @@ export function MappingDetailPage() {
         close={() => setMetadataOpen(false)}
         disabled={limited}
       />
-      <DetailTabs
-        tabs={availableTabs.map((item) =>
-          item.value === "reviews"
-            ? { ...item, count: activeReviewItems.length }
-            : item,
-        )}
-        value={tab}
-        onChange={(value) =>
-          updateParams(params, setParams, { tab: value, panel: null })
-        }
-      />
       {denseSample ? <p className="s2-research-prototype-note">【原型说明，正式实现不展示】85个节点、100条连线的虚构密集样例，仅保留本次页面操作，不写入已保存图谱。</p> : null}
       {stressSample ? <p className="s2-research-prototype-note">【原型说明，正式实现不展示】1201 个节点、1280 条连线的虚构压力测试样例，不写入已保存图谱。</p> : null}
       {!pages.length && tab === "content" ? (
@@ -3184,23 +3043,21 @@ export function MappingDetailPage() {
           params={params}
           setParams={setParams}
           notify={notify}
+          contentSession={contentSession}
         />
       ) : null}
       {pages.length && tab === "reviews" ? (
         <GraphReviewWorkspace
           key={`${mappingId}:${denseSample}`}
           pages={pages}
-          reviewItems={activeReviewItems}
+          reviewItems={reviewItems}
+          session={reviewSession}
+          limited={limited}
+          scenario={reviewScenario}
           onLocate={locateFromReview}
-          onResolve={(action, item) =>
-            notify(
-              action === "confirm"
-                ? `“${item.title}”已写入对应数据所有者并同步图谱`
-                : action === "local"
-                  ? "建议已作为当前图页备注保留"
-                  : "建议已忽略并保留处理记录",
-            )
-          }
+          onResolve={commitReview}
+          onSaveSuggestion={saveSuggestion}
+          EvidencePreview={EvidencePreviewModal}
         />
       ) : null}
       {pages.length && tab === "history" ? (
