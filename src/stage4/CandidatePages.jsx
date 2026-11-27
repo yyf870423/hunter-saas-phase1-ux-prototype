@@ -769,7 +769,7 @@ function ProfileTab({
       <FieldGroup
         title="职业概览"
         action={
-          <>
+          <div className="s4-field-actions">
             <Button
               size="sm"
               icon="refresh"
@@ -786,7 +786,7 @@ function ProfileTab({
             >
               编辑职业概览
             </Button>
-          </>
+          </div>
         }
       >
         <p className="s4-long-copy">{candidate.summary}</p>
