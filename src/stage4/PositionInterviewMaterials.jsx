@@ -523,18 +523,18 @@ export function PositionInterviewMaterials() {
                 options={["仍适用", "待核实", "已失效"]}
                 onChange={setStatusFilter}
               />
+              {(roundFilter || statusFilter) && (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setRoundFilter("");
+                    setStatusFilter("");
+                  }}
+                >
+                  清空筛选
+                </Button>
+              )}
             </div>
-            {(roundFilter || statusFilter) && (
-              <Button
-                size="sm"
-                onClick={() => {
-                  setRoundFilter("");
-                  setStatusFilter("");
-                }}
-              >
-                清空筛选
-              </Button>
-            )}
           </div>
           {filteredRecords.length ? (
             <div className="s4-interview-record-list">
