@@ -169,11 +169,16 @@ for (const surface of ["company", "candidate", "position"]) for (const width of 
     await page.getByRole("tab", { name: "关系图", exact: true }).click();
   } else {
     await page.goto(surface === "company" ? "#/companies/company-xinglan?tab=mappings" : "#/candidates/candidate-linhao?tab=contact-path");
-    const title = surface === "company" ? "创建公司关系与人才流动" : "创建联系路径";
+    const title = surface === "company" ? "创建公司关系与人才流动" : "寻找联系路径";
     await page.getByRole("button", { name: title, exact: true }).click();
-    const dialog = page.getByRole("dialog", { name: title, exact: true });
-    await dialog.getByPlaceholder(/说明目标、关注范围/).fill("仅为本地原型验证展示效果，不联系任何人。");
-    await dialog.getByRole("button", { name: "开始创建", exact: true }).click();
+    if (surface === "company") {
+      const dialog = page.getByRole("dialog", { name: title, exact: true });
+      await dialog.getByPlaceholder(/说明目标、关注范围/).fill("仅为本地原型验证展示效果，不联系任何人。");
+      await dialog.getByRole("button", { name: "开始创建", exact: true }).click();
+    } else {
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(page.getByText("正在寻找联系路径", { exact: true })).toBeVisible();
+    }
   }
   const canvas = page.locator(".s3-relationship-workspace");
   await expect(canvas).toBeVisible();

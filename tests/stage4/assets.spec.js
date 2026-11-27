@@ -378,16 +378,10 @@ test("候选人详情覆盖分区编辑、版本变化、沟通和匹配操作",
   await expect(
     page.getByRole("heading", { name: "可执行联系路径" }),
   ).toBeVisible();
-  await expect(page.getByText("尚未创建联系路径")).toBeVisible();
-  await page.getByRole("button", { name: "创建联系路径" }).click();
-  const contactPathDialog = page.getByRole("dialog", {
-    name: "创建联系路径",
-  });
-  await contactPathDialog
-    .getByPlaceholder(/说明目标、关注范围/)
-    .fill("优先使用已有同事关系，最多三段，不使用仅有邮箱的直接路径。");
-  await contactPathDialog.getByRole("button", { name: "开始创建" }).click();
-  await expect(page.getByText("正在创建联系路径")).toBeVisible();
+  await expect(page.getByText("暂无联系路径")).toBeVisible();
+  await page.getByRole("button", { name: "寻找联系路径", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByText("正在寻找联系路径")).toBeVisible();
   await expect(
     page.locator(".s3-relationship-node", { hasText: "林昊" }),
   ).toBeVisible({ timeout: 5000 });

@@ -26,7 +26,6 @@ import {
   Pagination,
   PostWriteMatchingOptions,
   ProgressBar,
-  RelationshipAiDialog,
   RelationshipAiEmptyState,
   RelationshipAiProcessingState,
   SelectMenu,
@@ -2125,27 +2124,36 @@ function CandidateEmploymentRelationsTable() {
 function ContactPathTab() {
   const notify = useToast();
   const [status, setStatus] = useState("idle");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [lastPrompt, setLastPrompt] = useState("");
   const timerRef = useRef(null);
   const generated = status === "ready";
   useEffect(
     () => () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+      timerRef.current = null;
     },
     [],
   );
+  const startFinding = () => {
+    if (timerRef.current !== null) return;
+    const updating = generated;
+    setStatus("running");
+    timerRef.current = window.setTimeout(() => {
+      timerRef.current = null;
+      setStatus("ready");
+      notify(updating ? "联系路径已更新" : "联系路径已生成");
+    }, 2400);
+  };
   return (
     <div className="s4-detail-stack">
       <FieldGroup
         title="可执行联系路径"
-        description="联系路径不会自动生成。用户可以说明希望优先使用的人脉、关系层数和需要排除的路径。"
+        description="基于当前候选人资料和已有关系寻找可执行路径，不会自动联系任何人。"
         action={
           generated ? (
             <Button
               size="sm"
               icon="refresh"
-              onClick={() => setDialogOpen(true)}
+              onClick={startFinding}
             >
               更新联系路径
             </Button>
@@ -2154,9 +2162,8 @@ function ContactPathTab() {
       >
         {status === "running" ? (
           <RelationshipAiProcessingState
-            title="正在创建联系路径"
+            title="正在寻找联系路径"
             description="正在核对候选人的任职、合作、学术与已有沟通关系。"
-            prompt={lastPrompt}
             steps={["读取候选人关系", "查找可用联系链路", "生成联系路径图"]}
             activeStep={1}
           />
@@ -2171,32 +2178,13 @@ function ContactPathTab() {
           />
         ) : (
           <RelationshipAiEmptyState
-            title="尚未创建联系路径"
+            title="暂无联系路径"
             description="Hunter 会基于系统中的人物、任职、合作和沟通关系，整理一条或多条可解释路径；不会自动联系任何人。"
-            actionLabel="创建联系路径"
-            onAction={() => setDialogOpen(true)}
+            actionLabel="寻找联系路径"
+            onAction={startFinding}
           />
         )}
       </FieldGroup>
-      <RelationshipAiDialog
-        open={dialogOpen}
-        close={() => setDialogOpen(false)}
-        title={generated ? "更新联系路径" : "创建联系路径"}
-        description="用自然语言说明目标和限制，Hunter 会据此生成可审核的关系图。"
-        initialPrompt={lastPrompt}
-        submitLabel={generated ? "开始更新" : "开始创建"}
-        onSubmit={(prompt) => {
-          const updating = generated;
-          setLastPrompt(prompt);
-          setStatus("running");
-          setDialogOpen(false);
-          if (timerRef.current) window.clearTimeout(timerRef.current);
-          timerRef.current = window.setTimeout(() => {
-            setStatus("ready");
-            notify(updating ? "联系路径已按新要求更新" : "联系路径已创建");
-          }, 2400);
-        }}
-      />
     </div>
   );
 }
