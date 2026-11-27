@@ -2641,26 +2641,6 @@ function GraphContent({
             </TooltipText>
           </div><GraphHistoryControls history={history} /></div>
         ) : null}
-        <button
-          type="button"
-          className="tg-toolbar-button"
-          onClick={() =>
-            setCollapsed(
-              collapsed.size
-                ? new Set()
-                : new Set(
-                    page.nodes
-                      .filter((node) =>
-                        page.nodes.some((child) => child.parentId === node.id),
-                      )
-                      .map((node) => node.id),
-                  ),
-            )
-          }
-        >
-          <Icon name={collapsed.size ? "plus" : "minus"} />
-          {collapsed.size ? "全部展开" : "全部收起"}
-        </button>
         <div className="tg-toolbar-actions"><div ref={setCanvasToolbarTarget} />
         <Button size="sm" icon="plus" onClick={() => setNodeEditor({})}>
           添加节点

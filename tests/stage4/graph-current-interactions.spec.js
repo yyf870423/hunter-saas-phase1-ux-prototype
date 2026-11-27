@@ -25,6 +25,7 @@ test("节点选中、双击编辑、空白新增、撤销重做与快捷键", as
   const root = page.locator('.tg-node[data-node-id="org-xinglan"]');
   await root.click();
   await expect(page.locator(".tg-detail-panel")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /全部收起|全部展开/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "隐藏内容", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "添加关系", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "查看图谱快捷键", exact: true }).click();
@@ -55,6 +56,24 @@ test("节点选中、双击编辑、空白新增、撤销重做与快捷键", as
   await page.keyboard.press("Meta+Shift+z");
   await expect(page.locator(".tg-node")).toHaveCount(9);
   await page.screenshot({ path: info.outputPath("interaction.png") });
+  await noErrors();
+});
+
+test("无全部收起展开入口，节点局部收起展开与表格视图不受影响", async ({ page }, info) => {
+  const noErrors = trackConsoleErrors(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(route);
+  const rootToggle = page.locator('.tg-node[data-node-id="org-xinglan"] .tg-collapse-node');
+  await expect(page.getByRole("button", { name: /全部收起|全部展开/ })).toHaveCount(0);
+  await expect(page.locator(".tg-node")).toHaveCount(8);
+  await rootToggle.click();
+  await expect(page.locator(".tg-node")).toHaveCount(1);
+  await expect(page.getByRole("button", { name: /全部收起|全部展开/ })).toHaveCount(0);
+  await rootToggle.click();
+  await expect(page.locator(".tg-node")).toHaveCount(8);
+  await page.screenshot({ path: info.outputPath("toolbar-without-collapse-all.png") });
+  await page.getByRole("button", { name: "层级表格", exact: true }).click();
+  await expect(page.getByRole("button", { name: /全部收起|全部展开/ })).toHaveCount(0);
   await noErrors();
 });
 
