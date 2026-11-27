@@ -6606,6 +6606,7 @@
 .s4-pagination .s4-select.s4-pagination-size > button {
   display: flex;
   width: 100%;
+  height: 30px;
   min-height: 30px;
   align-items: center;
   justify-content: space-between;
@@ -7114,6 +7115,7 @@
   gap: 16px 18px;
 }
 .s4-form-field {
+  --s1-field-height: 38px;
   display: grid;
   min-width: 0;
   align-content: start;
@@ -12939,6 +12941,10 @@
   .s4-state-banner > .s1-button {
     grid-column: 2;
     justify-self: start;
+  }
+  .s4-state-banner > .s4-field-actions {
+    grid-column: 2;
+    justify-content: flex-start;
   }
   .s4-form-grid {
     grid-template-columns: 1fr;

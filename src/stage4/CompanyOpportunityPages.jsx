@@ -1896,7 +1896,7 @@ export function ContactDetailPage() {
                   : "当前未关联候选人档案"
               }
               action={
-                <>
+                <div className="s4-field-actions">
                   {profile.candidateId ? (
                     <Button
                       size="sm"
@@ -1916,7 +1916,7 @@ export function ContactDetailPage() {
                   >
                     {profile.candidateId ? "修改关联" : "关联候选人"}
                   </Button>
-                </>
+                </div>
               }
             />
           </FieldGroup>

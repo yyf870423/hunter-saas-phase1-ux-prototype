@@ -71,7 +71,7 @@ function OpportunityActivity({ opportunity }) {
   }));
   const history = opportunity.history.map((event) => ({ ...event, time: displayDateTime(event.at), sort: event.at, type: "系统变更", source: "Hunter", editable: false }));
   const items = [...records, ...history].filter((item) => type === "全部记录" || item.type === type).sort((a, b) => b.sort.localeCompare(a.sort));
-  return <FieldGroup title="活动记录" action={<div className="s4-command-actions"><SelectMenu value={type} options={["全部记录", "跟进记录", "系统变更"]} onChange={setType} />
+  return <FieldGroup title="活动记录" action={<div className="s4-command-actions is-compact"><SelectMenu value={type} options={["全部记录", "跟进记录", "系统变更"]} onChange={setType} />
     <Button size="sm" icon="edit" disabled={getOpportunityPermission()} onClick={() => setEdit({})}>记录跟进</Button></div>}>
     {!items.length ? <StateBanner title="暂无活动记录" /> : <ActivityTimeline items={items}
       onEdit={getOpportunityPermission() ? undefined : (id) => setEdit(opportunity.records.find((record) => record.id === id))}
