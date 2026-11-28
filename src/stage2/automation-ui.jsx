@@ -434,9 +434,6 @@ export function HunterReply({ children, markdown, streaming = false, elapsedMs }
       {conversation && !streaming && isLastReply && Number.isFinite(elapsed) ? <TaskTurnSummary elapsed={elapsed} /> : null}
       {markdown ? <HunterMarkdown content={markdown} /> : null}
       {children}
-      {streaming ? (
-        <i className="s2-stream-caret" aria-label="正在生成" />
-      ) : null}
     </article>
   );
 }

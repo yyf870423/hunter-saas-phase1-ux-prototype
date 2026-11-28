@@ -574,22 +574,6 @@
   line-height: 18px;
 }
 
-.s2-stream-caret {
-  display: inline-block;
-  width: 7px;
-  height: 16px;
-  margin-left: 3px;
-  vertical-align: -3px;
-  background: var(--s1-accent);
-  animation: s2-blink 700ms steps(1) infinite;
-}
-
-@keyframes s2-blink {
-  50% {
-    opacity: 0;
-  }
-}
-
 .s2-runtime {
   margin: -8px 0 28px;
   overflow: hidden;

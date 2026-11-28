@@ -48,6 +48,7 @@ for (const [id, title, route] of taskDesignScenarios)
     await expect(page.locator(".s2-runtime, .s2-plan-step-toggle")).toHaveCount(
       0,
     );
+    await expect(page.locator(".s2-stream-caret")).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth + 1,

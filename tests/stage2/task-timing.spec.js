@@ -74,6 +74,8 @@ test("首轮客户调研按实际推进计时，不填固定十二秒", async ({
 }, testInfo) => {
   await page.goto("#/tasks/client-xinglan");
   await expect(page.locator(".s2-agent-work.is-working")).toBeVisible();
+  await expect(page.locator(".s2-hunter-reply.is-streaming").first()).toBeVisible();
+  await expect(page.locator(".s2-stream-caret")).toHaveCount(0);
   const started = await page.evaluate(() => performance.now());
   await expect(
     page.getByRole("heading", { name: "保存这条潜在招聘机会？", exact: true }),
