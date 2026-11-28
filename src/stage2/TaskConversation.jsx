@@ -267,7 +267,7 @@ export function TaskActivity({
             : waiting
               ? waitingLabel
                 ? "等待你的确认"
-                : "等待你的回复"
+                : ""
               : running
                 ? operationLabels[0]
                 : "本轮处理已完成，可以继续提出要求";
@@ -290,6 +290,7 @@ export function TaskWorkStatus({ label, running = false, operationLabels, operat
     const timer = setTimeout(() => setProgress({ key: operationKey, stage: 1 }), TASK_DEMO_STAGE_MS);
     return () => clearTimeout(timer);
   }, [running, operationLabels, operationKey]);
+  if (!label) return null;
   return (
     <p className={`s2-agent-work ${running ? "is-working" : ""}`} role="status">
       {running ? (

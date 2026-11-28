@@ -47,6 +47,7 @@ for (const [id, title, route] of taskDesignScenarios)
     await expect(page.locator("main").first()).toBeVisible();
     await expect(page.locator('[data-output-busy="true"]')).toHaveCount(0);
     await expect(page.locator("body")).not.toContainText("执行计划");
+    await expect(page.locator("body")).not.toContainText("等待你的回复");
     await expect(page.locator(".s2-runtime, .s2-plan-step-toggle")).toHaveCount(
       0,
     );
