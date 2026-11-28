@@ -15,6 +15,7 @@ import { activeTaskPlan, missingFollowupField } from "./task-followup";
 import { displayDraftConfirmation } from "./single-asset-confirmation";
 import { TaskReadingWorkspace } from "../stage2/TaskReadingWorkspace";
 import { TaskTimeline } from "../stage2/TaskConversation";
+import { TASK_DEMO_TURN_MS } from "../stage2/task-timing";
 import { TaskResultReader } from "../stage2/TaskResultReader";
 import { InspectionPanel } from "../stage2/ReviewWorkspace";
 import { executionApprovalKey, TaskExecutionApproval } from "../stage2/TaskExecutionApproval";
@@ -116,6 +117,8 @@ export function OpportunityTaskWorkspace({ taskId }) {
   const [resultOpen, setResultOpen] = useState(false);
   const [reserveDraft, setReserveDraft] = useState(null);
   const preparing = useRef(false);
+  const initialPreparation = useRef(null);
+  if (task && initialPreparation.current?.id !== taskId) initialPreparation.current = { id: taskId, pending: task.phase === "input" };
   const timelineRef = useRef(null);
   const opportunity = state.opportunities.find((item) => item.id === task?.opportunityId && !item.deletedAt);
   const sourcePosition = state.positions.find((item) => item.id === task?.positionId && !item.deletedAt);
@@ -131,11 +134,11 @@ export function OpportunityTaskWorkspace({ taskId }) {
     try {
       setError(advanceLifecycleTask(taskId));
     } catch (failure) { setError(failure.message); }
-    finally { preparing.current = false; }
+    finally { preparing.current = false; initialPreparation.current.pending = false; }
   };
   useEffect(() => {
     if (task?.phase !== "input") return undefined;
-    const timer = setTimeout(prepare, 500);
+    const timer = setTimeout(prepare, initialPreparation.current?.pending ? TASK_DEMO_TURN_MS : 0);
     return () => clearTimeout(timer);
   }, [taskId, task?.phase]);
 
@@ -188,7 +191,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
   const pipelineResults = task.results.filter((result) => result.type === "pipeline");
   const plan = [{ id: "input", title: "读取任务输入与来源", status: "done", detail: "原始文字与附件已保留" },
     { id: "draft", title: task.kind === "recruiting" ? "整理人选与证据" : "核对并整理资料草稿", status: task.phase === "input" ? "running" : "done" },
-    { id: "write", title: "核对本版范围与正式结果", status: task.results.length ? "done" : "waiting-user" }];
+    { id: "write", title: "核对本版范围与正式结果", status: task.phase === "input" ? "pending" : task.results.length ? "done" : "waiting-user" }];
   return <TaskReadingWorkspace taskId={task.id} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : resultOpen ? <TaskResultReader title="人选结果" version={task.positionVersion} rows={candidates.map(candidate => ({ id: candidate.id, title: candidate.name, subtitle: `${candidate.company} · ${candidate.title}`, details: { 已有技能: candidate.skills.join("、"), 所在地: candidate.location, 评分与证据: "当前样例未提供任务初筛分或独立证据，不能据此断言已核实。" }, href: `#/candidates/${candidate.id}` }))} onClose={() => setResultOpen(false)} /> : null} header={<><TaskAreaNav value="tasks" />
       <header className="s2-detail-header"><button type="button" onClick={() => navigate("/tasks")}><Icon name="chevronLeft" />返回全部任务</button>
         <div><h1>{task.title}</h1><p>{opportunity?.title || sourcePosition?.name || "招聘需求处理"}</p></div><StatusBadge tone={task.phase === "result" ? "success" : "warning"}>{task.status}</StatusBadge></header></>}>
@@ -210,7 +213,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
         {pipelineResults.map((result, index) => <HunterReply key={index} markdown={"已将 " + result.candidateIds.map((id) => candidates.find((candidate) => candidate.id === id)?.name || id).join("、") + " 加入岗位储备，并同步更新岗位人才梳理。未发送联系消息。\n\n[查看人才梳理](#/positions/" + encodeURIComponent(result.id) + "?tab=talent-map)"} />)}
         {task.opportunityId && task.kind === "opportunity" && task.phase === "result" ? <TaskOpportunityFollowup task={task} hasUnsentChanges={Boolean(value.trim() || attachments.length)} /> : null}
         {error ? <><HunterReply markdown={"> " + markdownText(error)} />{task.phase === "input" ? <Button icon="refresh" onClick={prepare}>重试整理</Button> : null}</> : null}
-      </TaskTimeline><div className="s2-task-composer-dock"><TaskActivity plan={plan} />
+      </TaskTimeline><div className="s2-task-composer-dock"><TaskActivity plan={plan} state={error ? "error" : undefined} />
         <Composer value={value} onChange={setValue} onSend={send} authMode={task.authMode === "analyze" ? "analysis" : task.authMode} onAuthChange={updateAuthorization}
           attachments={attachments} onAttachmentsChange={setAttachments} disabled={busy || getOpportunityPermission()} placeholder="补充需求、客户回复或新的依据" />
       </div></section></div>
@@ -226,7 +229,7 @@ export function LegacyOpportunityResult({ taskId, showFollowup = true, awaitingC
     const timer = setTimeout(() => {
       try { setError(advanceLifecycleTask(taskId)); }
       catch (failure) { setError(failure.message); }
-    }, 300);
+    }, 0);
     return () => clearTimeout(timer);
   }, [taskId, task?.phase]);
   if (!task) return <HunterReply markdown="尚无可整理的客户回复。" />;

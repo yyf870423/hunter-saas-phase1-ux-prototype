@@ -11,7 +11,8 @@ import { createResearchState, finishResearch, researchCommand } from "./candidat
 import { initialResearchResult, personById, researchPlanSteps } from "./candidate-research-data";
 import "./candidate-research.css";
 import { TaskHeaderActions, TaskReadingActionsContext } from "./TaskWorkspaceControls";
-import { TaskConversationProvider, TaskTimeline } from "./TaskConversation";
+import { TaskConversationProvider, TaskTimeline, useTaskConversation } from "./TaskConversation";
+import { TASK_DEMO_RESEARCH_MS, taskElapsedMs } from "./task-timing";
 
 const initialMessages = [
   { id: "intro-user", role: "user", body: "为星澜机器人的具身智能 VLA 算法负责人岗位找人。先给我值得进一步判断的人选，不要联系。" },
@@ -25,6 +26,9 @@ export function CandidateResearchDemo() {
 }
 
 function CandidateResearchConversation() {
+  const conversation = useTaskConversation();
+  const timing = useRef(conversation);
+  timing.current = conversation;
   const navigate = useNavigate();
   const [state, setState] = useState(createResearchState);
   const [messages, setMessages] = useState(initialMessages);
@@ -80,16 +84,16 @@ function CandidateResearchConversation() {
   useEffect(() => {
     const job = state.job;
     if (!job) return undefined;
-    const started = performance.now();
+    const started = job.startedAt ?? performance.now();
     const timer = setTimeout(() => {
       const fail = new URLSearchParams(location.hash.split("?")[1]).get("scenario") === "error" && !failureUsed.current;
       const outcome = finishResearch(model.current, job.id, fail);
       if (!outcome) return;
       failureUsed.current = true;
       update(outcome.state);
-      append({ role: "assistant", body: outcome.body, resultId: outcome.result?.id, elapsedMs: performance.now() - started });
+      append({ role: "assistant", body: outcome.body, resultId: outcome.result?.id, elapsedMs: taskElapsedMs(started) });
       if (outcome.result) { setInspection(null); setViewId(outcome.result.id); setReferencedId(outcome.result.id); }
-    }, 1400);
+    }, TASK_DEMO_RESEARCH_MS);
     return () => clearTimeout(timer);
   }, [state.job?.id]);
 
@@ -102,6 +106,9 @@ function CandidateResearchConversation() {
       return;
     }
     const outcome = researchCommand(model.current, body, context);
+    if (outcome.state.job && outcome.state.job.id !== model.current.job?.id) {
+      outcome.state = { ...outcome.state, job: { ...outcome.state.job, startedAt: timing.current.turn?.started ?? performance.now() } };
+    }
     update(outcome.state);
     if (!outcome.running) append({ role: "assistant", body: outcome.body, resultId: outcome.result?.id });
     if (outcome.result) { setInspection(null); setViewId(outcome.result.id); setReferencedId(outcome.result.id); }

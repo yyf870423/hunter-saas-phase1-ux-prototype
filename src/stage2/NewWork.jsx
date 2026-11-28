@@ -50,6 +50,15 @@ function classifyWork(prompt) {
   return "mainline";
 }
 
+function requestedLifecycleKind(prompt, params, editingPeriodic) {
+  const kind = params.get("kind") || (params.get("positionId") ? "recruiting" :
+    /招聘机会|招聘需求|客户开发|团队扩建|团队扩张/.test(prompt) ? "opportunity" :
+    /创建岗位|解析.*JD|整理.*岗位资料/.test(prompt) ? "position-create" : "");
+  const type = classifyWork(prompt);
+  if (editingPeriodic || type === "periodic" || type === "organization" && !params.get("positionId")) return "";
+  return ["opportunity", "position-create", "recruiting"].includes(kind) ? kind : "";
+}
+
 // Follow-up scope is stated with the current count when it is known (design 02 §7.12).
 // e.g. “每月核对‘VLA 储备’收藏夹里的人” → 收藏夹“VLA 储备”（当前 23 人）
 function periodicScope(text = "") {
@@ -187,7 +196,7 @@ function NewWorkConversation() {
             ? "periodic"
             : classifyWork(submittedPrompt),
         ),
-      850,
+      0,
     );
     return () => window.clearTimeout(timer);
   }, [editingPeriodic, forcedState, status, submittedPrompt]);
@@ -215,10 +224,13 @@ function NewWorkConversation() {
     return () => window.clearTimeout(timer);
   }, [forcedState, navigate, status, submittedPrompt]);
 
-  const begin = async (text, files = [], decisionEvent) => {
+  const makePrompt = (text, files = []) => {
     const fileNames = files.map((file) => file.name).join("、");
-    const prompt = status === "organization" && !organizationTargets(submittedPrompt).length
+    return status === "organization" && !organizationTargets(submittedPrompt).length
       ? submittedPrompt + "\n目标公司：" + text.trim() : text.trim() || `请处理附件：${fileNames}`;
+  };
+  const begin = async (text, files = [], decisionEvent) => {
+    const prompt = makePrompt(text, files);
     if (!prompt) return;
     if (status === "periodic") {
       const decision = singleAssetDecision(text);
@@ -247,11 +259,8 @@ function NewWorkConversation() {
       setValue(""); setAttachments([]);
       return;
     }
-    const kind = params.get("kind") || (params.get("positionId") ? "recruiting" :
-      /招聘机会|招聘需求|客户开发|团队扩建|团队扩张/.test(prompt) ? "opportunity" :
-      /创建岗位|解析.*JD|整理.*岗位资料/.test(prompt) ? "position-create" : "");
-    const periodicRequest = Boolean(editingPeriodic) || classifyWork(prompt) === "periodic";
-    if (["opportunity", "position-create", "recruiting"].includes(kind) && !periodicRequest && !(classifyWork(prompt) === "organization" && !params.get("positionId"))) {
+    const kind = requestedLifecycleKind(prompt, params, editingPeriodic);
+    if (kind) {
       if (lifecycleBusy) return;
       setLifecycleBusy(true); setLifecycleError("");
       try {
@@ -411,6 +420,7 @@ function NewWorkConversation() {
               value={value}
               onChange={setValue}
               onSend={begin}
+              processingDelayMs={requestedLifecycleKind(makePrompt(value, attachments), params, editingPeriodic) ? 0 : undefined}
               authMode={authMode}
               onAuthChange={setAuthMode}
               attachments={attachments}

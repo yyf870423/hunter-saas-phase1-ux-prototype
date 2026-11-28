@@ -14,6 +14,7 @@ import { InspectionPanel } from "../stage2/ReviewWorkspace";
 import { WorkstreamHeader } from "../stage2/Workstreams";
 import { TaskReadingWorkspace } from "../stage2/TaskReadingWorkspace";
 import { TaskQuestion, TaskTimeline } from "../stage2/TaskConversation";
+import { taskInitialStepMs } from "../stage2/task-timing";
 import { executionApprovalKey, TaskExecutionApproval } from "../stage2/TaskExecutionApproval";
 import { TaskResultReader, contactReadingRows, organizationReadingRows, positionReadingRows } from "../stage2/TaskResultReader";
 import {
@@ -624,7 +625,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
       return undefined;
     const timer = window.setTimeout(
       () => setPhase((current) => current + 1),
-      phase === 0 ? 650 : 1250,
+      taskInitialStepMs(phase, scenario.autoStopPhase),
     );
     return () => window.clearTimeout(timer);
   }, [

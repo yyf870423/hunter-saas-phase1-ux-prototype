@@ -114,6 +114,7 @@ export function Composer({
   streaming = false,
   onStop,
   disabled = false,
+  processingDelayMs,
 }) {
   const conversation = useTaskConversation();
   disabled = disabled || Boolean(conversation?.turn);
@@ -161,7 +162,7 @@ export function Composer({
     if (disabled || streaming || conversation?.turn || !value.trim() && !attachments.length) return;
     const text = value.trim(), files = [...attachments];
     if (conversation) {
-      if (conversation.run(text, files, () => onSend(text, files))) {
+      if (conversation.run(text, files, () => onSend(text, files), { delayMs: processingDelayMs })) {
         onChange("");
         onAttachmentsChange?.([]);
       }
@@ -423,13 +424,14 @@ export function HunterReply({ children, markdown, streaming = false, elapsedMs }
   }, [conversation?.registerReply, id, streaming]);
   if (generation.current && conversation?.result.generation === generation.current && conversation.result.elapsed) completed.current = conversation.result;
   const isLastReply = conversation?.replies.filter(reply => reply.generation === generation.current).at(-1)?.id === id;
+  const elapsed = elapsedMs ?? completed.current?.elapsed ?? (generation.current === 0 ? conversation?.initialElapsed : null);
   if (generation.current && conversation?.turn?.id === generation.current) return null;
   return (
     <article
       className={`s2-hunter-reply ${streaming ? "is-streaming" : ""}`}
       data-renderer={markdown ? "markdown" : "controlled"}
     >
-      {conversation && !streaming && isLastReply ? <TaskTurnSummary elapsed={elapsedMs ?? completed.current?.elapsed ?? 12000} example={!elapsedMs && !completed.current} /> : null}
+      {conversation && !streaming && isLastReply && Number.isFinite(elapsed) ? <TaskTurnSummary elapsed={elapsed} /> : null}
       {markdown ? <HunterMarkdown content={markdown} /> : null}
       {children}
       {streaming ? (

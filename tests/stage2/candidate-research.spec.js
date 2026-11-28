@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { TASK_DEMO_RESEARCH_MS } from "../../src/stage2/task-timing";
 import { mkdir } from "node:fs/promises";
 
 const route = "#/tasks/candidate-research-demo";
@@ -75,7 +76,7 @@ test("条件筛选、未知人选、模糊范围和未接入写入不返回假�
 test("停止后不出现迟到结果，恢复仍处理原对象", async ({ page }) => {
   await send(page, "调研前三位，核实预训练经历");
   await page.getByRole("button", { name: "停止", exact: true }).click();
-  await page.waitForTimeout(1600);
+  await page.waitForTimeout(TASK_DEMO_RESEARCH_MS + 300);
   await expect(pane(page)).toHaveCount(0);
   await send(page, "继续刚才的调研");
   await expect(pane(page).locator(".s2-result-comparison > article")).toHaveCount(3);

@@ -13,6 +13,11 @@ import { Button } from "../stage1/ui";
 import { CustomCheckbox, CustomRadio, TextInput } from "../stage4/asset-ui";
 import "./task-conversation.css";
 import { TaskFeedback, useTaskFeedback } from "./TaskFeedback";
+import {
+  TASK_DEMO_STAGE_MS,
+  TASK_DEMO_TURN_MS,
+  taskElapsedMs,
+} from "./task-timing";
 
 const ConversationContext = createContext(null);
 export const useTaskConversation = () => useContext(ConversationContext);
@@ -49,6 +54,7 @@ export function TaskConversationProvider({ children }) {
   const [turn, setTurn] = useState(null);
   const [receipt, setReceipt] = useState(null);
   const [result, setResult] = useState({ generation: 0, elapsed: null });
+  const [initialElapsed, setInitialElapsed] = useState(null);
   const [replies, setReplies] = useState([]);
   const [waiting, setWaiting] = useState([]);
   const registerWait = useCallback((id, label) => {
@@ -64,6 +70,19 @@ export function TaskConversationProvider({ children }) {
   const active = useRef(null),
     sequence = useRef(0),
     mounted = useRef(true);
+  const automaticStarted = useRef(null);
+  useEffect(() => {
+    if (turn || sequence.current > 0) {
+      automaticStarted.current = null;
+      return;
+    }
+    if (work?.status === "running" && waiting.length === 0) {
+      automaticStarted.current ??= performance.now();
+    } else if (work && automaticStarted.current !== null) {
+      setInitialElapsed(taskElapsedMs(automaticStarted.current));
+      automaticStarted.current = null;
+    }
+  }, [work?.status, waiting.length, Boolean(turn)]);
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -86,7 +105,7 @@ export function TaskConversationProvider({ children }) {
       message: "已停止本轮处理，尚未执行后续操作。你可以继续补充要求。",
     });
   };
-  const run = (text, files, process) => {
+  const run = (text, files, process, { delayMs = TASK_DEMO_TURN_MS } = {}) => {
     if (active.current) return false;
     feedback?.clear();
     const job = {
@@ -105,38 +124,43 @@ export function TaskConversationProvider({ children }) {
     job.timer = setTimeout(async () => {
       if (active.current !== job || !mounted.current) return;
       setTurn((current) => current && { ...current, stage: 1 });
-      job.timer = setTimeout(async () => {
-        if (active.current !== job || !mounted.current) return;
-        try {
-          job.executing = true;
-          setTurn((current) => current && { ...current, executing: true });
-          await job.process();
+      job.timer = setTimeout(
+        async () => {
           if (active.current !== job || !mounted.current) return;
-          setResult({
-            generation: job.id,
-            elapsed: performance.now() - job.started,
-          });
-          setTurn(null);
-          active.current = null;
-          job.resolve({ completed: true });
-        } catch (error) {
-          if (active.current !== job || !mounted.current) return;
-          setReceipt({
-            text: job.text,
-            files: job.files,
-            message: "这轮处理没有完成，输入已保留。请重试或调整要求。",
-            failed: true,
-          });
-          setTurn(null);
-          active.current = null;
-          job.resolve({
-            failed: true,
-            message:
-              error instanceof Error ? error.message : "处理未能完成，请重试。",
-          });
-        }
-      }, 900);
-    }, 650);
+          try {
+            job.executing = true;
+            setTurn((current) => current && { ...current, executing: true });
+            await job.process();
+            if (active.current !== job || !mounted.current) return;
+            setResult({
+              generation: job.id,
+              elapsed: taskElapsedMs(job.started),
+            });
+            setTurn(null);
+            active.current = null;
+            job.resolve({ completed: true });
+          } catch (error) {
+            if (active.current !== job || !mounted.current) return;
+            setReceipt({
+              text: job.text,
+              files: job.files,
+              message: "这轮处理没有完成，输入已保留。请重试或调整要求。",
+              failed: true,
+            });
+            setTurn(null);
+            active.current = null;
+            job.resolve({
+              failed: true,
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "处理未能完成，请重试。",
+            });
+          }
+        },
+        Math.max(0, delayMs - taskElapsedMs(job.started)),
+      );
+    }, Math.min(TASK_DEMO_STAGE_MS, delayMs));
     return completion;
   };
   return (
@@ -147,6 +171,7 @@ export function TaskConversationProvider({ children }) {
         turn,
         receipt,
         result,
+        initialElapsed,
         run,
         stop,
         location,
@@ -211,13 +236,14 @@ export function TaskWorkStatus({ label, running = false }) {
   );
 }
 
-export function TaskTurnSummary({ elapsed, example = false }) {
+export function TaskTurnSummary({ elapsed }) {
   return (
     <p
       className="s2-agent-duration"
-      data-elapsed-kind={example ? "example" : "measured"}
+      data-elapsed-kind="measured"
+      data-elapsed-ms={Math.round(elapsed)}
     >
-      {example ? "示例处理用时" : "处理用时"} {formatTaskDuration(elapsed)}
+      处理用时 {formatTaskDuration(elapsed)}
     </p>
   );
 }

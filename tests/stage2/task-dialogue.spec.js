@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { taskDesignScenarios } from "../../src/stage2/task-design-scenarios";
+import { TASK_DEMO_TURN_MS } from "../../src/stage2/task-timing";
 
 const input = (page) => page.getByRole("textbox", { name: "任务对话输入" });
 const question = (page) => page.locator(".s2-task-question").last();
@@ -160,7 +161,7 @@ test("停止前未执行的操作不会迟到，之后可继续新一轮", async
   await expect(page.locator(".s2-turn-receipt")).toContainText(
     "已停止本轮处理",
   );
-  await page.waitForTimeout(1800);
+  await page.waitForTimeout(TASK_DEMO_TURN_MS + 300);
   await expect(
     page.locator('.s2-agent-duration[data-elapsed-kind="measured"]'),
   ).toHaveCount(0);
@@ -192,7 +193,7 @@ test("切换任务清理运行和草稿，不串入旧回复", async ({ page }) 
   await input(page).press("Enter");
   await page.locator('[data-task-id="career-linhao"] .s2-history-item').click();
   await expect(page).not.toHaveURL(/task-interview-summary/);
-  await page.waitForTimeout(1800);
+  await page.waitForTimeout(TASK_DEMO_TURN_MS + 300);
   await expect(page.locator("#research-dialogue")).not.toContainText(
     "本轮唯一标记A",
   );

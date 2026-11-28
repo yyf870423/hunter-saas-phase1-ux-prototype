@@ -21,6 +21,7 @@ import {
 import { InspectionPanel } from "./ReviewWorkspace";
 import { TaskReadingWorkspace } from "./TaskReadingWorkspace";
 import { TaskQuestion, TaskTimeline } from "./TaskConversation";
+import { taskInitialStepMs } from "./task-timing";
 import { TaskResultReader, candidateReadingRows } from "./TaskResultReader";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { getOpportunityPermission, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
@@ -251,10 +252,9 @@ export function AutomationWorkspace() {
     if (forcedState && forcedState !== "stream-error") return undefined;
     if (paused || terminated || streamStopped || streamError || phase >= 4)
       return undefined;
-    const delays = [700, 1200, 1450, 1750];
     const timer = window.setTimeout(
       () => setPhase((current) => current + 1),
-      delays[phase] || 1200,
+      taskInitialStepMs(phase, 4),
     );
     return () => window.clearTimeout(timer);
   }, [forcedState, paused, phase, streamError, streamStopped, terminated]);
