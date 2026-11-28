@@ -3,9 +3,9 @@ import {
   TASK_DEMO_TURN_MS,
   TASK_DEMO_RESEARCH_MS,
 } from "../../src/stage2/task-timing";
-const expect = baseExpect.configure({ timeout: TASK_DEMO_TURN_MS + 5000 });
+const expect = baseExpect.configure({ timeout: 45000 });
 
-test.describe.configure({ mode: "parallel" });
+test.describe.configure({ mode: "parallel", timeout: 120000 });
 const input = (page) => page.getByRole("textbox", { name: "任务对话输入" });
 const duration = (page) =>
   page.locator('.s2-agent-duration[data-elapsed-kind="measured"]').last();
@@ -32,7 +32,9 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => expect(page.__errors).toEqual([]));
 
 async function checkElapsed(page, started, minimum) {
-  await expect(duration(page)).toBeVisible({ timeout: minimum + 8000 });
+  await expect(duration(page)).toBeVisible({ timeout: minimum + 30000 });
+  await expect(page.locator('[data-output-busy="true"]')).toHaveCount(0);
+  await page.waitForTimeout(150);
   const reported = Number(await duration(page).getAttribute("data-elapsed-ms"));
   const observed = await page.evaluate(
     (start) => performance.now() - start,
@@ -74,13 +76,13 @@ test("首轮客户调研按实际推进计时，不填预置秒数", async ({
   page,
 }, testInfo) => {
   await page.goto("#/tasks/client-xinglan");
+  const started = await page.evaluate(() => performance.now());
   await expect(page.locator(".s2-agent-work.is-working")).toBeVisible();
   await expect(page.locator(".s2-hunter-reply.is-streaming").first()).toBeVisible();
   await expect(page.locator(".s2-stream-caret")).toHaveCount(0);
-  const started = await page.evaluate(() => performance.now());
   await expect(
     page.getByRole("heading", { name: "保存这条潜在招聘机会？", exact: true }),
-  ).toBeVisible({ timeout: TASK_DEMO_TURN_MS + 3000 });
+  ).toBeVisible({ timeout: TASK_DEMO_TURN_MS + 30000 });
   const measured = await checkElapsed(page, started, TASK_DEMO_TURN_MS);
   await testInfo.attach("initial-research-time", {
     body: JSON.stringify(measured),

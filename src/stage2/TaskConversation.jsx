@@ -30,7 +30,7 @@ export function formatTaskDuration(milliseconds) {
     : `${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒`;
 }
 
-export function TaskConversationProvider({ children }) {
+export function TaskConversationProvider({ children, onOutputBusyChange }) {
   const location = useLocation();
   const feedback = useTaskFeedback();
   const [work, setWork] = useState(null);
@@ -40,6 +40,26 @@ export function TaskConversationProvider({ children }) {
   const [initialElapsed, setInitialElapsed] = useState(null);
   const [replies, setReplies] = useState([]);
   const [waiting, setWaiting] = useState([]);
+  const [outputs, setOutputs] = useState([]);
+  const [outputCancel, setOutputCancel] = useState(0);
+  const [outputStopped, setOutputStopped] = useState(false);
+  const outputBusy = outputs.length > 0;
+  const queueOutput = useCallback((item) => {
+    setOutputs((current) => [...current.filter((entry) => entry.id !== item.id), item]);
+  }, []);
+  const removeOutput = useCallback((id, key) => {
+    setOutputs((current) => current.filter((item) => item.id !== id || item.key !== key));
+  }, []);
+  const finishOutput = removeOutput;
+  const stopOutput = useCallback(() => {
+    setOutputs([]);
+    setOutputCancel((value) => value + 1);
+    setOutputStopped(true);
+  }, []);
+  useEffect(() => {
+    onOutputBusyChange?.(outputBusy);
+    return () => onOutputBusyChange?.(false);
+  }, [outputBusy, onOutputBusyChange]);
   const registerWait = useCallback((id, label) => {
     setWaiting((current) => [...current, { id, label }]);
     return () =>
@@ -61,11 +81,28 @@ export function TaskConversationProvider({ children }) {
     }
     if (work?.status === "running" && waiting.length === 0) {
       automaticStarted.current ??= performance.now();
-    } else if (work && automaticStarted.current !== null) {
+    } else if (work && !outputBusy && automaticStarted.current !== null) {
       setInitialElapsed(taskElapsedMs(automaticStarted.current));
       automaticStarted.current = null;
     }
-  }, [work?.status, waiting.length, Boolean(turn)]);
+  }, [work?.status, waiting.length, Boolean(turn), outputBusy]);
+  const resultRef = useRef(result);
+  resultRef.current = result;
+  useEffect(() => {
+    if (!outputBusy) return;
+    const tick = () => {
+      if (resultRef.current.started) setResult((current) => ({ ...current, elapsed: taskElapsedMs(current.started) }));
+      else if (automaticStarted.current !== null && work?.status !== "running") setInitialElapsed(taskElapsedMs(automaticStarted.current));
+    };
+    tick();
+    const timer = setInterval(tick, 150);
+    return () => { clearInterval(timer); tick(); };
+  }, [outputBusy, work?.status]);
+  const previousStatus = useRef(null);
+  useEffect(() => {
+    if (work?.status === "running" && previousStatus.current !== "running") setOutputStopped(false);
+    previousStatus.current = work?.status;
+  }, [work?.status]);
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -89,8 +126,9 @@ export function TaskConversationProvider({ children }) {
     });
   };
   const run = (text, files, process, { delayMs = TASK_DEMO_TURN_MS } = {}) => {
-    if (active.current) return false;
+    if (active.current || outputBusy) return false;
     feedback?.clear();
+    setOutputStopped(false);
     const job = {
       id: ++sequence.current,
       text,
@@ -118,6 +156,7 @@ export function TaskConversationProvider({ children }) {
             setResult({
               generation: job.id,
               elapsed: taskElapsedMs(job.started),
+              started: job.started,
             });
             setTurn(null);
             active.current = null;
@@ -162,6 +201,14 @@ export function TaskConversationProvider({ children }) {
         registerReply,
         waiting,
         registerWait,
+        outputs,
+        outputBusy,
+        outputCancel,
+        outputStopped,
+        queueOutput,
+        removeOutput,
+        finishOutput,
+        stopOutput,
       }}
     >
       {children}
@@ -244,20 +291,41 @@ export function TaskTurnSummary({ elapsed }) {
 export function TaskTimeline({
   children,
   className = "s2-timeline",
+  ref: externalRef,
   ...props
 }) {
   const conversation = useTaskConversation();
   const { turn, receipt, work, waiting = [] } = conversation || {};
   const bottom = useRef(null);
+  const timeline = useRef(null);
+  const attachTimeline = useCallback((node) => {
+    timeline.current = node;
+    if (typeof externalRef === "function") externalRef(node);
+    else if (externalRef) externalRef.current = node;
+  }, [externalRef]);
   useEffect(() => {
-    if (!turn && !conversation?.result.generation && !receipt) return;
+    if (!turn) return;
     const scroller = bottom.current?.closest(
       ".s2-conversation, .s2-task-timeline, .s2-run-timeline, .s2-new-work-conversation",
     );
     if (scroller) scroller.scrollTop = scroller.scrollHeight;
-  }, [turn?.id, turn?.stage, conversation?.result.generation, receipt]);
+  }, [turn?.id]);
+  useEffect(() => {
+    const scroller = timeline.current?.closest(".s2-conversation, .s2-task-timeline, .s2-run-timeline, .s2-new-work-conversation");
+    if (!scroller) return;
+    let follow = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 100;
+    const scroll = () => { follow = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 100; };
+    scroller.addEventListener("scroll", scroll, { passive: true });
+    let frame;
+    const observer = new MutationObserver(() => {
+      if (!follow || frame) return;
+      frame = requestAnimationFrame(() => { frame = null; if (follow) scroller.scrollTop = scroller.scrollHeight; });
+    });
+    observer.observe(timeline.current, { subtree: true, childList: true, characterData: true });
+    return () => { observer.disconnect(); cancelAnimationFrame(frame); scroller.removeEventListener("scroll", scroll); };
+  }, []);
   return (
-    <div className={className} {...props}>
+    <div className={className} {...props} ref={attachTimeline} data-output-busy={conversation?.outputBusy ? "true" : "false"}>
       {children}
       {turn || receipt ? (
         <div className="s2-user-message s2-pending-message">
@@ -279,7 +347,8 @@ export function TaskTimeline({
         </p>
       ) : null}
       <TaskFeedback />
-      {turn ? (
+      {conversation?.outputStopped ? <p className="s2-turn-receipt" role="status">已停止生成，已显示的内容保留。可以继续补充要求。</p> : null}
+      {conversation?.outputBusy ? null : turn ? (
         <TaskWorkStatus
           running
           label={taskOperationLabels(conversation.location.pathname)[turn.stage]}
@@ -335,7 +404,7 @@ export function TaskQuestion({
       mounted.current = false;
     };
   }, []);
-  const busy = status === "submitting" || Boolean(conversation?.turn),
+  const busy = status === "submitting" || Boolean(conversation?.turn) || Boolean(conversation?.outputBusy || conversation?.outputStopped),
     finished = ["answered", "skipped", "superseded"].includes(status);
   useEffect(() => {
     if (!finished) return conversation?.registerWait(id, "等待你的回答");

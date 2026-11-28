@@ -1,6 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { rehypeReplyStream } from "./task-streaming";
+import { useTaskReplyStream } from "./useTaskReplyStream";
 import { Icon } from "../components/Icon";
 import { TaskActivity, TaskQuestion, TaskTurnSummary, useTaskConversation } from "./TaskConversation";
 import {
@@ -117,7 +119,7 @@ export function Composer({
   processingDelayMs,
 }) {
   const conversation = useTaskConversation();
-  disabled = disabled || Boolean(conversation?.turn);
+  disabled = disabled || Boolean(conversation?.turn) || Boolean(conversation?.outputBusy);
   const fileRef = useRef(null);
   const textareaRef = useRef(null);
   const [attachmentError, setAttachmentError] = useState("");
@@ -249,8 +251,8 @@ export function Composer({
             disabled={disabled}
           />
         </div>
-        {streaming || conversation?.turn ? (
-          <Button tone="secondary" icon="pause" disabled={conversation?.turn?.executing} onClick={conversation?.turn ? conversation.stop : onStop}>
+        {streaming || conversation?.turn || conversation?.outputBusy ? (
+          <Button tone="secondary" icon="pause" disabled={conversation?.turn?.executing} onClick={conversation?.turn ? conversation.stop : conversation?.outputBusy ? () => { conversation.stopOutput(); onStop?.(); } : onStop}>
             停止
           </Button>
         ) : (
@@ -274,11 +276,13 @@ export function EmailDraftReview({
   onSend,
   onCancel,
 }) {
+  const conversation = useTaskConversation();
+  const outputBusy = Boolean(conversation?.outputBusy || conversation?.outputStopped);
   const [recipients, setRecipients] = useState(initialRecipients);
   const [subject, setSubject] = useState(initialSubject);
   const [body, setBody] = useState(initialBody);
   const [sending, setSending] = useState(false);
-  const valid = recipients.trim() && subject.trim() && body.trim();
+  const valid = !outputBusy && recipients.trim() && subject.trim() && body.trim();
 
   const send = () => {
     if (!valid || sending) return;
@@ -382,10 +386,11 @@ export function createMarkdownTable(headers, rows) {
   ].join("\n");
 }
 
-export function HunterMarkdown({ content }) {
+export function HunterMarkdown({ content, budget = Infinity }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
+      rehypePlugins={Number.isFinite(budget) ? [[rehypeReplyStream, { budget }]] : []}
       skipHtml
       components={{
         table: ({ node: _node, ...props }) => (
@@ -395,6 +400,7 @@ export function HunterMarkdown({ content }) {
           <blockquote className="s2-markdown-note" {...props} />
         ),
         a: ({ node: _node, href, ...props }) => {
+          if (Number.isFinite(budget)) return <span {...props} />;
           const safeHref = safeMarkdownHref(href);
           if (!safeHref) return <span {...props} />;
           const external = /^https?:/i.test(safeHref);
@@ -414,26 +420,34 @@ export function HunterMarkdown({ content }) {
   );
 }
 
-export function HunterReply({ children, markdown, streaming = false, elapsedMs }) {
+export function HunterReply({ children, markdown, streaming = false, elapsedMs, historical = false }) {
   const conversation = useTaskConversation();
   const id = useId();
   const generation = useRef(conversation?.turn?.id || conversation?.result.generation || 0);
+  const live = Boolean(!historical && conversation && !conversation.outputStopped && (streaming || generation.current || conversation.work?.status === "running"));
+  const output = useTaskReplyStream(id, markdown || "", conversation, live);
   const completed = useRef(null);
   useEffect(() => {
     if (!streaming) return conversation?.registerReply(id, generation.current);
   }, [conversation?.registerReply, id, streaming]);
   if (generation.current && conversation?.result.generation === generation.current && conversation.result.elapsed) completed.current = conversation.result;
   const isLastReply = conversation?.replies.filter(reply => reply.generation === generation.current).at(-1)?.id === id;
-  const elapsed = elapsedMs ?? completed.current?.elapsed ?? (generation.current === 0 ? conversation?.initialElapsed : null);
+  const isTimingReply = generation.current ? conversation?.replies.find(reply => reply.generation === generation.current)?.id === id : isLastReply;
+  const outputElapsed = output.queuedAt ? (output.finishedAt || performance.now()) - output.queuedAt : 0;
+  const elapsed = Number.isFinite(elapsedMs) ? elapsedMs + outputElapsed : completed.current?.elapsed ?? (generation.current === 0 ? conversation?.initialElapsed : null);
   if (generation.current && conversation?.turn?.id === generation.current) return null;
+  if (output.pending && conversation?.outputs[0]?.key !== output.key) return null;
   return (
     <article
       className={`s2-hunter-reply ${streaming ? "is-streaming" : ""}`}
       data-renderer={markdown ? "markdown" : "controlled"}
+      data-output-state={output.stopped ? "stopped" : output.complete ? "complete" : "streaming"}
+      data-reply-generation={generation.current}
+      aria-busy={output.pending}
     >
-      {conversation && !streaming && isLastReply && Number.isFinite(elapsed) ? <TaskTurnSummary elapsed={elapsed} /> : null}
-      {markdown ? <HunterMarkdown content={markdown} /> : null}
-      {children}
+      {conversation && !streaming && isTimingReply && Number.isFinite(elapsed) ? <TaskTurnSummary elapsed={elapsed} /> : null}
+      {markdown ? <HunterMarkdown content={output.source} budget={output.complete ? Infinity : output.budget} /> : null}
+      {output.complete ? children : null}
     </article>
   );
 }

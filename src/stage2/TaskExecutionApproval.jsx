@@ -38,6 +38,8 @@ export function TaskExecutionApproval({
     );
   const [status, setStatus] = useState("ready");
   if (conversation?.turn && status === "ready") disabledReason = "正在处理你的新要求，旧确认暂不可用。";
+  if (conversation?.outputBusy && status === "ready") disabledReason = "回复正在输出，请读完本版范围后再确认。";
+  if (conversation?.outputStopped && status === "ready") disabledReason = "本轮输出已停止，请先在原对话重新明确本次要求。";
   useEffect(() => {
     if (status === "ready") return conversation?.registerWait(id, "等待你的确认");
   }, [conversation?.registerWait, id, status]);

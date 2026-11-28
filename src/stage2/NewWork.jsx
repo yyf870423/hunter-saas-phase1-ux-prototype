@@ -68,6 +68,7 @@ function periodicScope(text = "") {
 }
 
 function OutcomeReply({ outcome, prompt, periodicPlan }) {
+  if (outcome === "clarify") return <HunterReply markdown="目前还不能确定你希望了解公司现状，还是持续寻找招聘机会。这两种目标需要的资料和后续处理不同，请先明确本轮目标；也可以直接在对话中补充。" />;
   if (outcome === "organization") return <HunterReply markdown={organizationTargets(prompt).length
     ? "本轮整理“" + organizationTargets(prompt).map((company) => company.name).join("、") + "”的组织、团队、关键岗位与任职人，交付人才地图。未知项保留待核实，不针对招聘岗位找人。\n\n正在创建公司组织梳理任务。"
     : "请补充明确的目标公司名称。\n\n【原型说明，正式实现不展示】当前可交互样例包含星澜机器人、拓界机器人、穹顶智能和灵跃科技，可指定一家或多家公司。"} />;
@@ -156,6 +157,7 @@ function NewWorkConversation() {
     forcedPrompts[forcedState] || "",
   );
   const [status, setStatus] = useState(initialStatus);
+  const [stoppedOutcome, setStoppedOutcome] = useState(null);
   const [historyCollapsed, setHistoryCollapsed] = useState(false);
   const [lifecycleBusy, setLifecycleBusy] = useState(false);
   const [lifecycleError, setLifecycleError] = useState("");
@@ -202,7 +204,7 @@ function NewWorkConversation() {
   }, [editingPeriodic, forcedState, status, submittedPrompt]);
 
   useEffect(() => {
-    if (forcedState || !["mainline", "task", "direct", "organization"].includes(status) || status === "organization" && !organizationTargets(submittedPrompt).length)
+    if (forcedState || conversation.outputBusy || !["mainline", "task", "direct", "organization"].includes(status) || status === "organization" && !organizationTargets(submittedPrompt).length)
       return undefined;
     const timer = window.setTimeout(() => {
       if (status === "organization") {
@@ -222,7 +224,7 @@ function NewWorkConversation() {
       }
     }, 1_250);
     return () => window.clearTimeout(timer);
-  }, [forcedState, navigate, status, submittedPrompt]);
+  }, [forcedState, navigate, status, submittedPrompt, conversation.outputBusy]);
 
   const makePrompt = (text, files = []) => {
     const fileNames = files.map((file) => file.name).join("、");
@@ -232,6 +234,7 @@ function NewWorkConversation() {
   const begin = async (text, files = [], decisionEvent) => {
     const prompt = makePrompt(text, files);
     if (!prompt) return;
+    setStoppedOutcome(null);
     if (status === "periodic") {
       const decision = singleAssetDecision(text);
       const schedule = periodicSchedule(text);
@@ -284,12 +287,6 @@ function NewWorkConversation() {
   const chooseOutcome = (outcome) => {
     if (forcedState) setParams({}, { replace: true });
     setStatus(outcome);
-  };
-
-  const reset = () => {
-    if (forcedState) setParams({}, { replace: true });
-    setSubmittedPrompt("");
-    setStatus("idle");
   };
 
   // 产品决策 2026-11-22（1-29）：没订阅、试用到期或 Credits 用完时也不能新建任务，和权限受限共用同一提示样式。
@@ -366,7 +363,8 @@ function NewWorkConversation() {
                 {submittedPrompt ? <UserMessage time="刚刚">{submittedPrompt}</UserMessage> : null}
                 {status === "classifying" ? <TaskActivity plan={[{ title: "正在分析任务目标和资料范围…", status: "running" }]} /> : null}
                 {periodicReplies.map((reply, index) => <div key={index}><UserMessage>{reply.text}</UserMessage><HunterReply markdown={reply.result} /></div>)}
-                <OutcomeReply outcome={status} prompt={submittedPrompt} periodicPlan={periodicPlan} />
+                <OutcomeReply outcome={status === "stopped" ? stoppedOutcome : status} prompt={submittedPrompt} periodicPlan={periodicPlan} />
+                {status === "stopped" && !conversation.outputStopped ? <p role="status">本轮处理已停止，输入和已经显示的内容保留。</p> : null}
                 {status === "periodic" ? (
                   <TaskExecutionApproval key={executionApprovalKey(editingPeriodic || "new-periodic", [periodicPlan, periodicDeclined])}
                     requestKey={executionApprovalKey(editingPeriodic || "new-periodic", [periodicPlan, periodicDeclined])}
@@ -427,7 +425,7 @@ function NewWorkConversation() {
               onAttachmentsChange={setAttachments}
               placeholder="例如：为星澜机器人的 VLA 算法负责人岗位持续寻找合适候选人"
               streaming={status === "classifying"}
-              onStop={reset}
+              onStop={() => { setStoppedOutcome(status); setStatus("stopped"); }}
               disabled={
                 isLimited || lifecycleBusy || ["mainline", "task", "direct"].includes(status)
               }

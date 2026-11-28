@@ -1,3 +1,7 @@
+.s2-research-dialogue .s2-conversation {
+  scroll-behavior: auto;
+}
+
 .s2-agent-work,
 .s2-agent-duration {
   display: flex;

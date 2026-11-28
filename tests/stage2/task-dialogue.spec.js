@@ -1,7 +1,7 @@
 import { expect as baseExpect, test } from "@playwright/test";
 import { taskDesignScenarios } from "../../src/stage2/task-design-scenarios";
 import { TASK_DEMO_TURN_MS } from "../../src/stage2/task-timing";
-const expect = baseExpect.configure({ timeout: TASK_DEMO_TURN_MS + 5000 });
+const expect = baseExpect.configure({ timeout: 45000 });
 
 const input = (page) => page.getByRole("textbox", { name: "任务对话输入" });
 const question = (page) => page.locator(".s2-task-question").last();
@@ -11,7 +11,7 @@ const send = async (page, text) => {
   await expect(input(page)).toBeEnabled();
 };
 const capture = process.env.TASK_DIALOGUE_CAPTURE_DIR;
-test.describe.configure({ mode: "parallel", timeout: 90000 });
+test.describe.configure({ mode: "parallel", timeout: 150000 });
 
 test.beforeEach(async ({ page }) => {
   page.__errors = [];
@@ -45,6 +45,7 @@ for (const [id, title, route] of taskDesignScenarios)
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`#${route}`);
     await expect(page.locator("main").first()).toBeVisible();
+    await expect(page.locator('[data-output-busy="true"]')).toHaveCount(0);
     await expect(page.locator("body")).not.toContainText("执行计划");
     await expect(page.locator(".s2-runtime, .s2-plan-step-toggle")).toHaveCount(
       0,
@@ -111,6 +112,7 @@ for (const width of [795, 1440])
     const completed = await page.evaluate(() => performance.now());
     expect(completed - second).toBeGreaterThan(5600);
     await expect(page.locator(".s2-hunter-reply").filter({ hasText: "预算仍未确认" }).first()).toBeVisible();
+    await expect(page.locator('[data-output-busy="true"]')).toHaveCount(0);
     await expect(status).toHaveCount(0);
     await expect(page.locator(".s2-stream-caret, .s2-runtime, .s1-toast")).toHaveCount(0);
     await page.screenshot({ path: testInfo.outputPath("conclusion.png") });
@@ -128,12 +130,13 @@ test("岗位寻访六个具体操作依次停留，阶段结论保留但操作�
     "读取内容 · 人选资料、简历与原始来源",
     "调用人选匹配工具 · 核对身份、岗位要求与证据缺口",
   ]) {
-    await expect(status).toHaveText(text, { timeout: 8000 });
+    await expect(status).toHaveText(text, { timeout: 30000 });
     await expect(status).toHaveCount(1);
   }
   await expect(page.getByRole("heading", { name: "首批候选人已经可以审核" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "本轮检索范围已确定" })).toBeVisible();
-  await expect(page.locator(".s2-agent-duration")).toContainText(/36 秒|37 秒/);
+  await expect(page.locator('[data-output-busy="true"]')).toHaveCount(0);
+  expect(Number(await page.locator(".s2-agent-duration").getAttribute("data-elapsed-ms"))).toBeGreaterThanOrEqual(36000);
   await expect(page.locator(".s2-runtime, .s2-plan-step-toggle")).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath("recruiting-result.png") });
 });

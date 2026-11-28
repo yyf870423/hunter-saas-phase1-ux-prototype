@@ -724,6 +724,7 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
                   </span>
                 </div>
                 <HunterReply
+                  historical
                   streaming={round.status === "正在运行"}
                   markdown={`## ${round.status === "正在运行" ? "当前执行进度" : "本轮运行结果"}
 

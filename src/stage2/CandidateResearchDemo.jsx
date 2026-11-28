@@ -83,7 +83,7 @@ function CandidateResearchConversation() {
   }, []);
   useEffect(() => {
     const job = state.job;
-    if (!job) return undefined;
+    if (!job || conversation.outputBusy) return undefined;
     const started = job.startedAt ?? performance.now();
     const timer = setTimeout(() => {
       const fail = new URLSearchParams(location.hash.split("?")[1]).get("scenario") === "error" && !failureUsed.current;
@@ -95,7 +95,7 @@ function CandidateResearchConversation() {
       if (outcome.result) { setInspection(null); setViewId(outcome.result.id); setReferencedId(outcome.result.id); }
     }, TASK_DEMO_RESEARCH_MS);
     return () => clearTimeout(timer);
-  }, [state.job?.id]);
+  }, [state.job?.id, conversation.outputBusy]);
 
   const send = body => {
     if (!body.trim() && !attachments.length) return;

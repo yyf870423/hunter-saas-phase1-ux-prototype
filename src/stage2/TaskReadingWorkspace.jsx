@@ -9,7 +9,7 @@ import "./candidate-research.css";
 import { TaskHeaderControlPortal, TaskReadingActionsContext } from "./TaskWorkspaceControls";
 
 // Same reading layout and live collapse thresholds as the approved research demo.
-export function TaskReadingWorkspace({ taskId, header, result, inspection = false, children }) {
+export function TaskReadingWorkspace({ taskId, header, result, inspection = false, children, onOutputBusyChange }) {
   const navigate = useNavigate();
   const [historyWidth, setHistoryWidth] = useState(252);
   const [maxHistoryWidth, setMaxHistoryWidth] = useState(420);
@@ -39,12 +39,12 @@ export function TaskReadingWorkspace({ taskId, header, result, inspection = fals
     <div id="research-main" className="s2-page s2-research-workspace s2-task-reading-workspace">
       {header}
       <p className="s2-research-prototype-note">【原型说明，正式实现不展示】本地虚构资料与有限规则演示；未接入真实 Agent、搜索或业务写入。</p>
-      <TaskReadingColumns result={result} inspection={inspection}>{children}</TaskReadingColumns>
+      <TaskReadingColumns result={result} inspection={inspection} onOutputBusyChange={onOutputBusyChange}>{children}</TaskReadingColumns>
     </div>
   </div>;
 }
 
-export function TaskReadingColumns({ result, inspection = false, conversationKey, children }) {
+export function TaskReadingColumns({ result, inspection = false, conversationKey, children, onOutputBusyChange }) {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const identity = conversationKey || [location.pathname, params.get("state"), params.get("run"), params.get("report"), params.get("companies")].join("|");
@@ -55,7 +55,7 @@ export function TaskReadingColumns({ result, inspection = false, conversationKey
   };
   useEffect(() => { if (result) setRatio(current => current === 100 ? lastRatio.current : current); }, [Boolean(result)]);
   const restore = result && (ratio === 0 || ratio === 100) ? <IconButton icon="panelRight" label="恢复对话与结果分栏" title="恢复分栏" onClick={() => commitRatio(lastRatio.current)} /> : null;
-  return <TaskConversationProvider key={identity}><TaskReadingActionsContext.Provider value={ratio === 0 ? restore : null}><div className={`s2-research-columns ${result ? "has-result" : ""} ${inspection ? "has-inspection" : ""} ${result && ratio === 0 ? "is-result-wide" : ""} ${result && ratio === 100 ? "is-dialogue-wide" : ""}`} ref={columns} style={{ "--research-dialogue-track": `${ratio}fr`, "--research-result-track": `${100 - ratio}fr` }}>
+  return <TaskConversationProvider key={identity} onOutputBusyChange={onOutputBusyChange}><TaskReadingActionsContext.Provider value={ratio === 0 ? restore : null}><div className={`s2-research-columns ${result ? "has-result" : ""} ${inspection ? "has-inspection" : ""} ${result && ratio === 0 ? "is-result-wide" : ""} ${result && ratio === 100 ? "is-dialogue-wide" : ""}`} ref={columns} style={{ "--research-dialogue-track": `${ratio}fr`, "--research-result-track": `${100 - ratio}fr` }}>
     <section id="research-dialogue" className="s2-research-dialogue" aria-label="任务对话">{children}</section>
     {result ? <><ConversationSplitHandle ratio={ratio} onChange={setRatio} onCommit={commitRatio} containerRef={columns} /><div id="research-result" className="s2-research-inspection-slot">{result}</div></> : null}
     {ratio === 100 ? <TaskHeaderControlPortal>{restore}</TaskHeaderControlPortal> : null}

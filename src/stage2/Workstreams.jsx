@@ -135,6 +135,7 @@ export function WorkstreamHeader({
 const pipelineDialogueExample = "陈楚宁约了一面，梁辰二面过了、进谈薪，周明远客户没通过";
 
 export function AutomationWorkspace() {
+  const [outputBusy, setOutputBusy] = useState(false);
   const opportunityState = useOpportunityState();
   const talentResult = opportunityState.positions.find((item) => item.id === "position-vla")?.talentMap;
   const reviewPositionVersion = useRef(opportunityState.positions.find((item) => item.id === "position-vla")?.version).current;
@@ -214,6 +215,7 @@ export function AutomationWorkspace() {
   const [ingestionDraft, setIngestionDraft] = useState(null);
   const [localError, setLocalError] = useState(forcedState === "error");
   const scrollRef = useRef(null);
+  const initialScroll = useRef(null);
   const prompt =
     sessionStorage.getItem("hunter-new-workstream-prompt") || defaultPrompt;
 
@@ -250,14 +252,14 @@ export function AutomationWorkspace() {
 
   useEffect(() => {
     if (forcedState && forcedState !== "stream-error") return undefined;
-    if (paused || terminated || streamStopped || streamError || phase >= 4)
+    if (paused || terminated || streamStopped || streamError || outputBusy || phase >= 4)
       return undefined;
     const timer = window.setTimeout(
       () => setPhase((current) => current + 1),
       taskInitialStepMs(phase),
     );
     return () => window.clearTimeout(timer);
-  }, [forcedState, paused, phase, streamError, streamStopped, terminated]);
+  }, [forcedState, paused, phase, streamError, streamStopped, terminated, outputBusy]);
 
   useEffect(() => {
     if (!forcedState)
@@ -302,12 +304,15 @@ export function AutomationWorkspace() {
   }, [forcedState, latestPlanRequirement, paused, planAdjusted]);
 
   useEffect(() => {
-    if (phase > 0)
+    const key = forcedState || "initial";
+    if (phase > 0 && initialScroll.current !== key) {
+      initialScroll.current = key;
       scrollRef.current?.scrollTo({
         top: scrollRef.current.scrollHeight,
-        behavior: forcedState ? "auto" : "smooth",
+        behavior: "instant",
       });
-  }, [contactStage, forcedState, phase, userDecisions]);
+    }
+  }, [forcedState, phase]);
 
   const resetDemo = () => {
     setPhase(0);
@@ -634,7 +639,7 @@ export function AutomationWorkspace() {
 
   return (
     <>
-      <TaskReadingWorkspace taskId="position-vla" inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : reviewOpen ? <TaskResultReader title="候选人结果" rows={candidateReadingRows(candidates)} onClose={() => setReviewOpen(false)} /> : null} header={<WorkstreamHeader
+      <TaskReadingWorkspace taskId="position-vla" onOutputBusyChange={setOutputBusy} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : reviewOpen ? <TaskResultReader title="候选人结果" rows={candidateReadingRows(candidates)} onClose={() => setReviewOpen(false)} /> : null} header={<WorkstreamHeader
           status={
             contactStage === "waiting"
               ? "等待外部"

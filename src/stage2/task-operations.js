@@ -59,10 +59,15 @@ const operations = {
     "读取内容 · 本轮运行记录与连续上下文",
     "调用增量核对工具 · 比较已有结果与本轮变化",
   ],
+  report: [
+    "读取内容 · 岗位、候选人资料与当前报告",
+    "调用报告整理工具 · 根据修改要求核对推荐依据与风险",
+  ],
 };
 
 // These labels describe local demonstration operations, not live API calls.
 export function taskOperationLabels(pathname, stepId) {
+  if (pathname.startsWith("/positions/")) return operations.report;
   if (pathname.includes("client-"))
     return stepId === "verify" ? operations.company
       : stepId === "contacts" ? operations.contacts : operations.companyFollowup;

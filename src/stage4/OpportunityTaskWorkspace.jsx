@@ -118,6 +118,8 @@ export function OpportunityTaskWorkspace({ taskId }) {
   const [reserveDraft, setReserveDraft] = useState(null);
   const preparing = useRef(false);
   const initialPreparation = useRef(null);
+  const [outputBusy, setOutputBusy] = useState(false);
+  const [generationStopped, setGenerationStopped] = useState(false);
   if (task && initialPreparation.current?.id !== taskId) initialPreparation.current = { id: taskId, pending: task.phase === "input" };
   const timelineRef = useRef(null);
   const opportunity = state.opportunities.find((item) => item.id === task?.opportunityId && !item.deletedAt);
@@ -137,13 +139,15 @@ export function OpportunityTaskWorkspace({ taskId }) {
     finally { preparing.current = false; initialPreparation.current.pending = false; }
   };
   useEffect(() => {
-    if (task?.phase !== "input") return undefined;
+    if (task?.phase !== "input" || outputBusy || generationStopped) return undefined;
     const timer = setTimeout(prepare, initialPreparation.current?.pending ? TASK_DEMO_TURN_MS : 0);
     return () => clearTimeout(timer);
-  }, [taskId, task?.phase]);
+  }, [taskId, task?.phase, outputBusy, generationStopped]);
 
   async function send(text, files, { approval = false, decisionEvent } = {}) {
     if (busy || (!text.trim() && !files.length)) return;
+    if (task.phase === "input") initialPreparation.current.pending = false;
+    setGenerationStopped(false);
     setBusy(true); setError("");
     try {
       if (task.kind === "recruiting" && task.phase !== "input" && !files.length) {
@@ -192,7 +196,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
   const plan = [{ id: "input", title: "读取任务输入与来源", status: "done", detail: "原始文字与附件已保留" },
     { id: "draft", title: task.kind === "recruiting" ? "整理人选与证据" : "核对并整理资料草稿", status: task.phase === "input" ? "running" : "done" },
     { id: "write", title: "核对本版范围与正式结果", status: task.phase === "input" ? "pending" : task.results.length ? "done" : "waiting-user" }];
-  return <TaskReadingWorkspace taskId={task.id} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : resultOpen ? <TaskResultReader title="人选结果" version={task.positionVersion} rows={candidates.map(candidate => ({ id: candidate.id, title: candidate.name, subtitle: `${candidate.company} · ${candidate.title}`, details: { 已有技能: candidate.skills.join("、"), 所在地: candidate.location, 评分与证据: "当前样例未提供任务初筛分或独立证据，不能据此断言已核实。" }, href: `#/candidates/${candidate.id}` }))} onClose={() => setResultOpen(false)} /> : null} header={<><TaskAreaNav value="tasks" />
+  return <TaskReadingWorkspace taskId={task.id} onOutputBusyChange={setOutputBusy} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : resultOpen ? <TaskResultReader title="人选结果" version={task.positionVersion} rows={candidates.map(candidate => ({ id: candidate.id, title: candidate.name, subtitle: `${candidate.company} · ${candidate.title}`, details: { 已有技能: candidate.skills.join("、"), 所在地: candidate.location, 评分与证据: "当前样例未提供任务初筛分或独立证据，不能据此断言已核实。" }, href: `#/candidates/${candidate.id}` }))} onClose={() => setResultOpen(false)} /> : null} header={<><TaskAreaNav value="tasks" />
       <header className="s2-detail-header"><button type="button" onClick={() => navigate("/tasks")}><Icon name="chevronLeft" />返回全部任务</button>
         <div><h1>{task.title}</h1><p>{opportunity?.title || sourcePosition?.name || "招聘需求处理"}</p></div><StatusBadge tone={task.phase === "result" ? "success" : "warning"}>{task.status}</StatusBadge></header></>}>
       <div className="s2-task-detail-layout"><section className="s2-task-conversation"><TaskTimeline className="s2-task-timeline" ref={timelineRef}>
@@ -213,8 +217,9 @@ export function OpportunityTaskWorkspace({ taskId }) {
         {pipelineResults.map((result, index) => <HunterReply key={index} markdown={"已将 " + result.candidateIds.map((id) => candidates.find((candidate) => candidate.id === id)?.name || id).join("、") + " 加入岗位储备，并同步更新岗位人才梳理。未发送联系消息。\n\n[查看人才梳理](#/positions/" + encodeURIComponent(result.id) + "?tab=talent-map)"} />)}
         {task.opportunityId && task.kind === "opportunity" && task.phase === "result" ? <TaskOpportunityFollowup task={task} hasUnsentChanges={Boolean(value.trim() || attachments.length)} /> : null}
         {error ? <><HunterReply markdown={"> " + markdownText(error)} />{task.phase === "input" ? <Button icon="refresh" onClick={prepare}>重试整理</Button> : null}</> : null}
-      </TaskTimeline><div className="s2-task-composer-dock"><TaskActivity plan={plan} state={error ? "error" : undefined} />
+      </TaskTimeline><div className="s2-task-composer-dock"><TaskActivity plan={plan} paused={generationStopped} state={error ? "error" : undefined} />
         <Composer value={value} onChange={setValue} onSend={send} authMode={task.authMode === "analyze" ? "analysis" : task.authMode} onAuthChange={updateAuthorization}
+          streaming={task.phase === "input" && !generationStopped} onStop={() => setGenerationStopped(true)}
           attachments={attachments} onAttachmentsChange={setAttachments} disabled={busy || getOpportunityPermission()} placeholder="补充需求、客户回复或新的依据" />
       </div></section></div>
   </TaskReadingWorkspace>;
