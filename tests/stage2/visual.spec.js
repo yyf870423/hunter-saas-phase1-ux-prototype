@@ -49,12 +49,11 @@ test("截取候选人审核、任务运行和洞察中心", async ({ page }) => 
   await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
     timeout: 10_000,
   });
-  await page.getByRole("button", { name: /执行计划/ }).click();
+  await expect(page.getByRole("button", { name: /执行计划/ })).toHaveCount(0);
   await page.screenshot({
     path: `${output}/desktop-workstream-plan.png`,
     fullPage: true,
   });
-  await page.getByRole("button", { name: /执行计划/ }).click();
   await page.getByRole("button", { name: /打开候选人审核/ }).click();
   await page.screenshot({
     path: `${output}/desktop-candidate-review.png`,
@@ -66,7 +65,7 @@ test("截取候选人审核、任务运行和洞察中心", async ({ page }) => 
     fullPage: true,
   });
   await page.goto("#/tasks/task-hand-team");
-  await page.getByRole("button", { name: /执行计划/ }).click();
+  await expect(page.getByRole("button", { name: /执行计划/ })).toHaveCount(0);
   await page.screenshot({
     path: `${output}/desktop-side-task-plan.png`,
     fullPage: true,

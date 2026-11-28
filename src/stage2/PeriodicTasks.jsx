@@ -17,12 +17,13 @@ import {
   Composer,
   DecisionRequest,
   HunterReply,
-  PlanList,
-  RuntimeBar,
+  TaskActivity,
   UserMessage,
 } from "./automation-ui";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { TaskReadingColumns } from "./TaskReadingWorkspace";
+import { TaskTimeline } from "./TaskConversation";
+import { executionApprovalKey, TaskExecutionApproval } from "./TaskExecutionApproval";
 import { InspectionPanel } from "./ReviewWorkspace";
 import { singleAssetDecision } from "../stage4/single-asset-confirmation";
 import { signals as seedSignals } from "./data";
@@ -547,7 +548,7 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
   const authMode = run.authMode || "confirm";
-  const [planOpen, setPlanOpen] = useState(false);
+  const [identityChoice, setIdentityChoice] = useState(null);
   const [, setHandledVersion] = useState(0);
   const notify = useToast();
   const rounds = useMemo(
@@ -566,7 +567,7 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
   useEffect(() => {
     setComposer("");
     setAttachments([]);
-    setPlanOpen(false);
+    setIdentityChoice(null);
     const messageId = params.get("msg");
     const target =
       (messageId && document.getElementById(`msg-${messageId}`)) ||
@@ -646,7 +647,6 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
     setComposer("");
     setAttachments([]);
     if (quoted) removeQuote();
-    notify(signal ? "已收到，正在按你的话处理这条洞察" : "补充要求已加入这一轮对话", "success");
   };
   const resolveUpdate = (message, option) => {
     if (option.value === "suggest") {
@@ -695,8 +695,8 @@ function RunDetail({ run, runs, onBack, onUpdate }) {
         </div>
         <StatusBadge tone={run.tone}>{run.status}</StatusBadge>
       </header>
-      <TaskReadingColumns result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : null} inspection={Boolean(inspection)}>
-        <div className="s2-run-timeline">
+      <TaskReadingColumns conversationKey={run.id} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : null} inspection={Boolean(inspection)}>
+        <TaskTimeline className="s2-run-timeline">
           <HunterReply
             markdown={`## 周期任务对话
 
@@ -792,7 +792,7 @@ ${round.summary}
                   <HunterReply>
                     <DecisionRequest
                       title="确认当前两份候选人资料的身份关系"
-                      description="确认后会继续这一轮运行；本次决定不会自动成为后续长期规则。"
+                      description="先选择本轮处理方式，提交后再核对并确认操作；不会自动成为后续长期规则。"
                       options={[
                         { value: "merge", label: "按较新资料合并", description: "保留两个来源和冲突记录，继续更新受影响的匹配结果。" },
                         { value: "separate", label: "保留为不同人物", description: "不合并档案，并继续处理剩余岗位。" },
@@ -801,18 +801,20 @@ ${round.summary}
                       ]}
                       onSelect={(option) => {
                         if (option.value === "custom") {
+                          if (option.text) return send(option.text, []);
                           setComposer("关于当前身份冲突，请按以下要求处理：");
                           return;
                         }
-                        if (authMode === "analysis" && option.value !== "skip") {
-                          notify("当前仅分析，尚未修改身份关系；可跳过冲突项或调整授权。", "warning");
-                          return;
-                        }
-                        if (!onUpdate(round.id, { decision: option.label, status: "正在运行", tone: "info",
-                          followUps: [...roundFollowUps, { id: crypto.randomUUID(), text: option.label, files: [], decision: true }] })) return;
-                        notify("已记录决定，并从当前检查点继续运行", "success");
+                        setIdentityChoice({ roundId: round.id, option });
                       }}
                     />
+                    {identityChoice?.roundId === round.id ? <TaskExecutionApproval requestKey={executionApprovalKey(round.id, identityChoice)} action="identity" authMode={authMode}
+                      scope={["对象：本轮展示的两份候选人资料。", "本次判断：" + identityChoice.option.label, "只处理这一轮身份关系，不形成后续长期规则。"]}
+                      hasUnsentChanges={Boolean(composer.trim() || attachments.length)}
+                      onApprove={() => {
+                        if (!onUpdate(round.id, { decision: identityChoice.option.label, status: "正在运行", tone: "info", followUps: [...roundFollowUps, { id: crypto.randomUUID(), text: identityChoice.option.label, files: [], decision: true }] })) throw Error("本轮决定未能保存，请重试。");
+                        setIdentityChoice(null);
+                      }} onDecline={() => setIdentityChoice(null)} /> : null}
                   </HunterReply>
                 ) : null}
                 {roundFollowUps.map((message) => {
@@ -846,16 +848,11 @@ ${round.summary}
                       {message.quote ? (
                         <HunterReply markdown={quoteReply(message, signal)}>
                           {message.kind === "outbound" && !message.resolution ? (
-                            <DecisionRequest
-                              title="确认发出这封邮件？"
-                              description="是 / 否 / 建议；确认后从你连接的邮箱发出。"
-                              options={[
-                                { value: "yes", label: "是", description: "从你的邮箱发出这封邮件。" },
-                                { value: "no", label: "否", description: "保留草稿，不发送。" },
-                                { value: "suggest", label: "建议", description: "在下方说明要怎么改，我会出新的草稿。" },
-                              ]}
-                              onSelect={(option) => resolveUpdate(message, option)}
-                            />
+                            <TaskExecutionApproval action="email" requestKey={executionApprovalKey(round.id, message)} authMode={authMode}
+                              scope={["收件人：" + (signal?.object || "当前联系人") + "（已有联系方式）。", "标题：关于近期的合作机会。", "正文：您好，注意到" + (signal?.summary || "贵司近期的变化") + "，想约 15 分钟交流一下招聘方面的合作。", "附件：无。"]}
+                              boundary="只确认当前这一封邮件。可以在原对话提出修改，自动执行也不能跳过逐封确认。本原型不实际发送。"
+                              hasUnsentChanges={Boolean(composer.trim() || attachments.length)}
+                              onApprove={() => resolveUpdate(message, { value: "yes" })} onDecline={() => resolveUpdate(message, { value: "no" })} />
                           ) : null}
                           {message.kind === "update" && !message.resolution ? <p>是否按本版草稿更新资料？请在原对话确认、拒绝或提出修改建议；查看不会写入。</p> : null}
                           {message.resolution === "yes" ? (
@@ -882,9 +879,9 @@ ${round.summary}
               </section>
             );
           })}
-        </div>
+        </TaskTimeline>
         <div className="s2-run-composer-dock">
-          <RuntimeBar open={planOpen} onToggle={() => setPlanOpen(value => !value)} plan={plan} paused={stopped} docked tasks={plan.map(step => ({ id: `${run.id}-${step.id}`, stepId: step.id, kind: "task", title: step.title, action: step.detail, status: step.status === "done" ? "完成" : run.status, duration: "本轮示例", resultDestination: `${run.task} · ${run.startedAt}这一轮` }))} onInspectTask={setInspection} />
+          <TaskActivity plan={plan} paused={stopped} />
           {quoted ? (
             <div className="s2-quote-chip" role="note">
               <Icon name="signal" />

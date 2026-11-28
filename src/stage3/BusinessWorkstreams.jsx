@@ -7,12 +7,13 @@ import {
   createMarkdownTable,
   EmailDraftReview,
   HunterReply,
-  RuntimeBar,
+  TaskActivity,
   UserMessage,
 } from "../stage2/automation-ui";
 import { InspectionPanel } from "../stage2/ReviewWorkspace";
 import { WorkstreamHeader } from "../stage2/Workstreams";
 import { TaskReadingWorkspace } from "../stage2/TaskReadingWorkspace";
+import { TaskQuestion, TaskTimeline } from "../stage2/TaskConversation";
 import { executionApprovalKey, TaskExecutionApproval } from "../stage2/TaskExecutionApproval";
 import { TaskResultReader, contactReadingRows, organizationReadingRows, positionReadingRows } from "../stage2/TaskResultReader";
 import {
@@ -545,7 +546,6 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   });
   const [paused, setPaused] = useState(forcedState === "limited");
   const [terminated, setTerminated] = useState(false);
-  const [runtimeOpen, setRuntimeOpen] = useState(false);
   const [inspection, setInspection] = useState(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [authMode, setAuthMode] = useState(() => {
@@ -694,7 +694,6 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
     setPhase(0);
     setPaused(false);
     setTerminated(false);
-    setRuntimeOpen(false);
     setInspection(null);
     setReviewOpen(false);
     setComposer("");
@@ -874,7 +873,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
           onDelete={() => setDeleteOpen(true)}
         />}>
         <div className="s2-conversation" ref={scrollRef}>
-          <div className="s2-timeline">
+          <TaskTimeline>
             <UserMessage>{scenarioId === "mapping-embodied" && companyIds ? sessionStorage.getItem("hunter-organization-prompt-" + companyIds.join(",")) || "整理" + organizationCompanies.map((company) => company.name).join("、") + "的组织架构、关键岗位及任职人信息，保留待核实项，不进行岗位找人。" : scenario.prompt}</UserMessage>
             {scenarioId === "client-xinglan" ? (
               <ClientTimeline
@@ -909,6 +908,15 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
                 notify={notify}
               />
             ) : null}
+            {scenarioId === "mapping-embodied" && forcedState === "gaps" ? <TaskQuestion questionKey="mapping-gap-priorities" mode="multiple" title="下一轮先核实哪些内容？" description="可以选择多项，也可以补充要求。本次只明确核实范围，不保存地图或合并人物。"
+              options={[
+                { value: "identity", label: "任职人身份", description: "先核实未知任职人与同名冲突。" },
+                { value: "tenure", label: "当前任职与起止时间", description: "区分历史任职和当前职责。" },
+                { value: "reporting", label: "团队与汇报关系", description: "关系缺口保留待核实。" },
+              ]} onAnswer={({ labels, text }) => {
+                const scope = [...labels, text].filter(Boolean).join("、");
+                setMessages(items => [...items, { text: "下一轮优先核实：" + scope, result: "已明确下一轮核实重点：" + scope + "。\n\n已有结果和待核实项保留。这是本地原型，尚未启动真实调研，没有保存地图、合并人物或对外联系。" }]);
+              }} /> : null}
             {mappingSaveError ? <div role="alert"><HunterReply markdown={"### 人才地图尚未保存\n\n" + mappingSaveError} /><Button icon="refresh" onClick={() => saveOrganizationResult()}>重试保存人才地图</Button></div> : null}
             {streamError ? (
               <div role="alert">
@@ -982,28 +990,11 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
             {terminated ? (
               <HunterReply markdown={"### 任务已终止\n\n对话、任务、审核结果和正式资产引用已保留。"} />
             ) : null}
-          </div>
+          </TaskTimeline>
         </div>
         <div className="s2-composer-wrap">
           {phase >= 1 ? (
-            <RuntimeBar
-              key={scenarioId}
-              open={runtimeOpen}
-              onToggle={() => setRuntimeOpen((value) => !value)}
-              plan={plan}
-              waitingLabel={scenarioId === "client-xinglan" ? plan.find((step) => step.status === "waiting-user")?.title : undefined}
-              planUpdate={planUpdate}
-              tasks={scenario.tasks}
-              paused={paused}
-              docked
-              onInspectTask={(task) =>
-                setInspection({
-                  ...task,
-                  kind: "task",
-                  ...inspectionContexts[scenarioId],
-                })
-              }
-            />
+            <TaskActivity plan={plan} paused={paused || streamStopped} state={terminated ? "stopped" : streamError || localError ? "error" : undefined} waitingLabel={scenarioId === "client-xinglan" ? "本次范围" : undefined} />
           ) : null}
           <Composer
             value={composer}

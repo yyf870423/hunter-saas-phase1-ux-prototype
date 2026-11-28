@@ -18,86 +18,29 @@ test.beforeEach(async ({ page }) => {
   await page.goto("#/tasks/position-vla");
 });
 
-test("持续任务从第一条输入渐进推进到审核节点", async ({ page }) => {
-  const assertNoConsoleErrors = trackConsoleErrors(page);
-  await expect(
-    page.getByText(/为星澜机器人“具身智能 VLA 算法负责人”岗位做多渠道找人/),
-  ).toBeVisible();
-  await expect(page.getByText("首批候选人已经可以审核")).toHaveCount(0);
+
+test("持续任务渐进交付结果，不再显示计划和处理回查", async ({ page }) => {
+  const noErrors = trackConsoleErrors(page);
+  await expect(page.getByText(/为星澜机器人“具身智能 VLA 算法负责人”岗位做多渠道找人/)).toBeVisible();
   await waitForReview(page);
-  await expect(page.getByRole("button", { name: /执行计划/ })).toHaveAttribute(
-    "aria-expanded",
-    "false",
-  );
-  await expect(page.locator(".s2-timeline .s2-runtime")).toHaveCount(0);
-  const planDock = await page
-    .locator(".s2-composer-wrap > .s2-runtime")
-    .boundingBox();
-  const composer = await page
-    .locator(".s2-composer-wrap > .s2-composer")
-    .boundingBox();
-  expect(planDock).not.toBeNull();
-  expect(composer).not.toBeNull();
-  expect(planDock.y + planDock.height).toBeLessThanOrEqual(composer.y);
-  await expect(
-    page.locator(".s2-runtime-summary > svg path").first(),
-  ).toHaveAttribute("d", "m18 15-6-6-6 6");
-  await page.getByRole("button", { name: /执行计划/ }).click();
-  await expect(
-    page.locator(".s2-runtime-summary > svg path").first(),
-  ).toHaveAttribute("d", "m6 9 6 6 6-6");
-  await expect(page.getByText("当前进度", { exact: true })).toBeVisible();
-  await expect(page.getByText("计划依据", { exact: true })).toHaveCount(0);
-  await expect(
-    page.locator(".s2-runtime .s2-plan-list li.is-complete"),
-  ).toHaveCount(4);
-  await expect(
-    page.locator(".s2-runtime .s2-plan-list li.is-waiting"),
-  ).toHaveCount(1);
-  await expect(page.locator(".s2-runtime-tasks")).toHaveCount(0);
-  await page.getByRole("button", { name: /并行检索并接收补充资料/ }).click();
-  const relatedTasks = page.getByRole("group", { name: "并行检索并接收补充资料的相关处理" });
-  await expect(relatedTasks.locator(".s2-internal-tasks > button")).toHaveCount(3);
-  await expect(relatedTasks).not.toContainText("补全、查重与匹配");
-  await expect(
-    page.locator(".s2-runtime .s2-plan-list li").filter({
-      hasText: "按决定继续后续动作",
-    }),
-  ).toContainText("等待用户");
-  await page.getByRole("button", { name: /读取用户上传的候选人资料/ }).click();
-  await expect(
-    page.getByRole("heading", { name: "读取用户上传的候选人资料" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "关闭检查区" }).click();
+  await expect(page.getByRole("button", { name: /执行计划/ })).toHaveCount(0);
+  await expect(page.locator(".s2-runtime, .s2-step-processes")).toHaveCount(0);
+  await expect(page.locator(".s2-agent-work")).toContainText("等待");
+  await expect(page.locator(".s2-agent-duration")).toBeVisible();
   await expectNoHorizontalOverflow(page);
-  await assertNoConsoleErrors();
+  await noErrors();
 });
 
-test("执行计划持续标记进度并显示新信息造成的调整", async ({ page }) => {
-  const runtimeButton = page.getByRole("button", { name: /执行计划/ });
-  await expect(runtimeButton).toBeVisible({ timeout: 6_000 });
-  await runtimeButton.click();
-  await expect(
-    page.locator(".s2-runtime .s2-plan-list li.is-active"),
-  ).toHaveCount(1);
-
-  const input = page.getByPlaceholder("输入补充信息、决定或新的要求");
+test("补充要求保留在对话，完成后仍可继续，不恢复计划面板", async ({ page }) => {
+  await page.goto("#/tasks/position-vla?state=review");
+  const input = page.getByRole("textbox", { name: "任务对话输入" });
   await input.fill("补充：最近加入北京团队的候选人也要纳入本轮判断。");
   await input.press("Enter");
-
-  await expect(page.getByText("计划已根据新信息调整")).toBeVisible();
-  await expect(
-    page.locator(".s2-runtime .s2-plan-list li.is-adjusted"),
-  ).toHaveCount(1);
-  await expect(page.locator(".s2-runtime .s2-plan-list")).toContainText(
-    "已完成步骤和已有结果继续保留",
-  );
-
-  await page.reload();
-  await expect(page.getByText("计划已根据新信息调整")).toBeVisible();
-  await expect(
-    page.locator(".s2-runtime .s2-plan-list li.is-adjusted"),
-  ).toHaveCount(1);
+  await expect(input).toBeEnabled();
+  await expect(page.locator(".s2-decision-thread").last()).toContainText("北京团队");
+  await expect(page.locator('.s2-agent-duration[data-elapsed-kind="measured"]')).toHaveCount(1);
+  await expect(page.locator(".s2-runtime, .s2-step-processes")).toHaveCount(0);
+  await expect(page.locator(".s1-toast")).toHaveCount(0);
 });
 
 test("对话输入框随内容自动增高并在上限后内部滚动", async ({ page }) => {
@@ -210,7 +153,7 @@ test("新建任务自动规划后进入统一任务区", async ({ page }) => {
   const input = page.getByPlaceholder(/例如：为星澜机器人/);
   await input.fill("为星澜机器人 VLA 算法负责人岗位持续寻找合适候选人");
   await input.press("Enter");
-  await expect(page.getByText(/我会先制定执行计划/)).toBeVisible();
+  await expect(page.getByText(/我会持续汇总系统候选人/)).toBeVisible();
   await expect(page).toHaveURL(/#\/tasks\/position-vla$/, {
     timeout: 5_000,
   });

@@ -4,7 +4,7 @@ import { confirmClientOpportunity } from "../stage3/client-helpers";
 
 const out = process.env.RESEARCH_CAPTURE_DIR || "/Users/eric.yu/job_hunting/docs/hb-test-20261104/round4/local-align/agent-result-design-20261118";
 const input = page => page.getByRole("textbox", { name: "任务对话输入" });
-const send = async (page, text) => { await input(page).fill(text); await input(page).press("Enter"); };
+const send = async (page, text) => { await input(page).fill(text); await input(page).press("Enter"); await expect(input(page)).toBeEnabled(); };
 const cases = [
   ["position-vla?state=review", "查看候选人结果（18）", "候选人结果", "林昊"],
   ["mapping-embodied?state=conflict", "查看组织梳理结果", "组织梳理结果", "星澜机器人 · VLA 算法负责人"],

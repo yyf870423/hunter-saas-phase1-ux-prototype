@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, IconButton, StatusBadge } from "../stage1/ui";
-import { Composer, HunterReply, UserMessage, WorkHistory, RuntimeBar } from "./automation-ui";
+import { Composer, HunterReply, UserMessage, WorkHistory, TaskActivity } from "./automation-ui";
 import { workItems } from "./data";
 import { InspectionPanel } from "./ReviewWorkspace";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { ConversationResultView } from "./ConversationResultView";
 import { ConversationSplitHandle, TaskListSplitHandle } from "./ConversationSplitHandle";
 import { createResearchState, finishResearch, researchCommand } from "./candidate-research-model";
-import { initialResearchResult, personById, researchPlanSteps, researchProcesses } from "./candidate-research-data";
+import { initialResearchResult, personById, researchPlanSteps } from "./candidate-research-data";
 import "./candidate-research.css";
 import { TaskHeaderActions, TaskReadingActionsContext } from "./TaskWorkspaceControls";
+import { TaskConversationProvider, TaskTimeline } from "./TaskConversation";
 
 const initialMessages = [
   { id: "intro-user", role: "user", body: "为星澜机器人的具身智能 VLA 算法负责人岗位找人。先给我值得进一步判断的人选，不要联系。" },
@@ -20,6 +21,10 @@ const timeLabel = () => new Date().toLocaleTimeString("zh-CN", { hour: "2-digit"
 const historyItems = [{ id: "candidate-research-demo", title: "具身智能 VLA 算法负责人", type: "岗位招聘", scenarios: ["岗位招聘", "候选人调研"], object: "星澜机器人 · 本地演示", status: "等待用户", tone: "neutral", time: "本轮", pinned: true }, ...workItems];
 
 export function CandidateResearchDemo() {
+  return <TaskConversationProvider><CandidateResearchConversation /></TaskConversationProvider>;
+}
+
+function CandidateResearchConversation() {
   const navigate = useNavigate();
   const [state, setState] = useState(createResearchState);
   const [messages, setMessages] = useState(initialMessages);
@@ -33,7 +38,6 @@ export function CandidateResearchDemo() {
   const [historyWidth, setHistoryWidth] = useState(252);
   const [maxHistoryWidth, setMaxHistoryWidth] = useState(420);
   const taskLayout = useRef(null), lastHistoryWidth = useRef(252);
-  const [runtimeOpen, setRuntimeOpen] = useState(false);
   const [inspection, setInspection] = useState(null);
   const scroller = useRef(null), origin = useRef(null), sequence = useRef(1);
   const model = useRef(state);
@@ -42,7 +46,6 @@ export function CandidateResearchDemo() {
   const columns = useRef(null);
   const view = state.results.find(result => result.id === viewId);
   const rightOpen = Boolean(view || inspection);
-  const activeProcess = state.job ? { id: `demo-followup-${state.job.id}`, stepId: "followup", kind: "task", title: "按本轮要求核实人选", action: `正在模拟核实${state.job.ids.length}位人选：${state.job.requirement}`, status: "进行中", tone: "info", duration: "模拟中", resultDestination: "本任务 · 下一版调研结果", checkpoints: [{ title: "人选范围已明确", detail: "来自本轮对话指定的人选，没有勾选或业务写入。", done: true }, { title: "模拟证据核实", detail: "完成后在本任务交付新结果。", done: false }] } : state.results.length > 1 ? { id: `demo-followup-result-${state.results.at(-1).id}`, stepId: "followup", kind: "task", title: "交付本轮人选处理结果", action: state.results.at(-1).requirement, status: state.failedIds.length ? "部分完成" : "完成", tone: state.failedIds.length ? "warning" : "success", duration: "示例", resultDestination: `本任务 · ${state.results.at(-1).title} v${state.results.at(-1).version}`, checkpoints: [{ title: "结果已交付", detail: "查看分数、理由和待核实项；本次没有真实调研或写入。", done: true }] } : null;
   const plan = researchPlanSteps.map(step => step.id === "followup" ? { ...step, status: state.job ? "running" : state.stopped ? "paused" : state.pending || state.failedIds.length || state.results.length === 1 ? "waiting-user" : "done", detail: state.job ? state.job.requirement : state.pending ? "等待在原对话澄清同名人选。" : step.detail } : step);
   const commitHistoryWidth = width => {
     const next = Math.min(width, maxHistoryWidth);
@@ -77,13 +80,14 @@ export function CandidateResearchDemo() {
   useEffect(() => {
     const job = state.job;
     if (!job) return undefined;
+    const started = performance.now();
     const timer = setTimeout(() => {
       const fail = new URLSearchParams(location.hash.split("?")[1]).get("scenario") === "error" && !failureUsed.current;
       const outcome = finishResearch(model.current, job.id, fail);
       if (!outcome) return;
       failureUsed.current = true;
       update(outcome.state);
-      append({ role: "assistant", body: outcome.body, resultId: outcome.result?.id });
+      append({ role: "assistant", body: outcome.body, resultId: outcome.result?.id, elapsedMs: performance.now() - started });
       if (outcome.result) { setInspection(null); setViewId(outcome.result.id); setReferencedId(outcome.result.id); }
     }, 1400);
     return () => clearTimeout(timer);
@@ -99,15 +103,14 @@ export function CandidateResearchDemo() {
     }
     const outcome = researchCommand(model.current, body, context);
     update(outcome.state);
-    append({ role: "assistant", body: outcome.body, resultId: outcome.result?.id });
+    if (!outcome.running) append({ role: "assistant", body: outcome.body, resultId: outcome.result?.id });
     if (outcome.result) { setInspection(null); setViewId(outcome.result.id); setReferencedId(outcome.result.id); }
   };
 
   const reset = () => {
-    update(createResearchState()); setMessages(initialMessages); setViewId(null); setInspection(null); setRuntimeOpen(false); setReferencedId(initialResearchResult.id); setDraft(""); setAttachments([]); setRatio(50); lastSplitRatio.current = 50; failureUsed.current = false;
+    update(createResearchState()); setMessages(initialMessages); setViewId(null); setInspection(null); setReferencedId(initialResearchResult.id); setDraft(""); setAttachments([]); setRatio(50); lastSplitRatio.current = 50; failureUsed.current = false;
   };
   const newTab = path => window.open(`${location.pathname}${location.search}#${path}`, "_blank", "noopener,noreferrer");
-  const inspectProcess = item => { setInspection(item); if (ratio === 100) setRatio(lastSplitRatio.current); requestAnimationFrame(() => document.querySelector(".s2-inspector button")?.focus()); };
   return <div className="s2-research-task-layout" ref={taskLayout} style={{ "--research-history-width": `${historyWidth}px` }}>
     <div id="research-history" className="s2-research-history-rail" role="region" aria-label="任务列表">
       <WorkHistory items={historyItems} collapsed={historyWidth === 58} currentId="candidate-research-demo" drawerBreakpoint={900} onToggle={() => commitHistoryWidth(historyWidth === 58 ? lastHistoryWidth.current : 58)} onSelect={item => { if (item.id !== "candidate-research-demo") navigate(`/tasks/${item.id}`); }} onCreate={() => newTab("/new")} />
@@ -123,20 +126,19 @@ export function CandidateResearchDemo() {
     <TaskReadingActionsContext.Provider value={inspection && ratio === 0 ? <IconButton icon="panelRight" label="恢复对话与结果分栏" title="恢复分栏" onClick={() => commitRatio(lastSplitRatio.current)} /> : null}><div className={`s2-research-columns ${rightOpen ? "has-result" : ""} ${inspection ? "has-inspection" : ""} ${rightOpen && ratio === 0 ? "is-result-wide" : ""} ${rightOpen && ratio === 100 ? "is-dialogue-wide" : ""}`} ref={columns} style={{ "--research-dialogue-track": `${ratio}fr`, "--research-result-track": `${100 - ratio}fr` }}>
       <section id="research-dialogue" className="s2-research-dialogue" aria-label="候选人调研对话">
         <div className="s2-conversation" ref={scroller} onScroll={event => { const node = event.currentTarget; followBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < 80; }}>
-          <div className="s2-timeline">
-            {messages.map(message => message.role === "user" ? <UserMessage key={message.id} time={message.time || "本轮开始"}>{message.body}</UserMessage> : <HunterReply key={message.id} markdown={message.body}>
+          <TaskTimeline>
+            {messages.map(message => message.role === "user" ? <UserMessage key={message.id} time={message.time || "本轮开始"}>{message.body}</UserMessage> : <HunterReply key={message.id} markdown={message.body} elapsedMs={message.elapsedMs}>
               {message.resultId ? <button type="button" className="s2-research-result-entry" onClick={() => open(message.resultId)}><span><b>{state.results.find(result => result.id === message.resultId)?.title}</b><small>v{state.results.find(result => result.id === message.resultId)?.version} · {state.results.find(result => result.id === message.resultId)?.ids.length} 位人选</small></span><span>查看结果</span></button> : null}
             </HunterReply>)}
-            {state.job ? <p className="s2-research-working" role="status">正在模拟核实 {state.job.ids.length} 位人选的资料…</p> : null}
-          </div>
+          </TaskTimeline>
         </div>
         <div className="s2-research-composer-wrap" onKeyDownCapture={event => { if (event.key === "Enter" && event.nativeEvent.isComposing) event.stopPropagation(); }}>
           <div className="s2-research-context"><span>{view && !inspection ? "正在查看" : "本轮引用"}：{context.title} · v{context.version}</span>{!view ? <Button size="sm" icon="file" onClick={() => open(context.id)}>查看结果</Button> : null}</div>
-          <RuntimeBar open={runtimeOpen} onToggle={() => setRuntimeOpen(value => !value)} plan={plan} tasks={[...researchProcesses, ...(activeProcess ? [activeProcess] : [])]} paused={Boolean(state.stopped)} waitingLabel="新的要求" docked onInspectTask={inspectProcess} />
-          <Composer value={draft} onChange={setDraft} onSend={send} authMode={authMode} onAuthChange={setAuthMode} attachments={attachments} onAttachmentsChange={setAttachments} placeholder="说明要调研谁，以及想核实什么" />
+          <TaskActivity plan={plan} paused={Boolean(state.stopped)} waitingLabel="新的要求" message={state.job ? `正在核实 ${state.job.ids.length} 位人选的资料…` : undefined} />
+          <Composer value={draft} onChange={setDraft} onSend={send} authMode={authMode} onAuthChange={setAuthMode} attachments={attachments} onAttachmentsChange={setAttachments} streaming={Boolean(state.job)} onStop={() => send("停止")} placeholder="说明要调研谁，以及想核实什么" />
         </div>
       </section>
-      {rightOpen ? <><ConversationSplitHandle ratio={ratio} onChange={setRatio} onCommit={commitRatio} containerRef={columns} />{inspection ? <div id="research-result" className="s2-research-inspection-slot"><InspectionPanel item={inspection} onClose={() => { setInspection(null); requestAnimationFrame(() => document.querySelector(".s2-runtime-summary")?.focus()); }} /></div> : <ConversationResultView result={view} results={state.results} onVersion={id => { setViewId(id); setReferencedId(id); }} onClose={close} wide={ratio === 0} onToggleWide={() => commitRatio(ratio === 0 ? lastSplitRatio.current : 0)} />}</> : null}
+      {rightOpen ? <><ConversationSplitHandle ratio={ratio} onChange={setRatio} onCommit={commitRatio} containerRef={columns} />{inspection ? <div id="research-result" className="s2-research-inspection-slot"><InspectionPanel item={inspection} onClose={() => { setInspection(null); requestAnimationFrame(() => document.querySelector(".s2-research-workspace textarea")?.focus()); }} /></div> : <ConversationResultView result={view} results={state.results} onVersion={id => { setViewId(id); setReferencedId(id); }} onClose={close} wide={ratio === 0} onToggleWide={() => commitRatio(ratio === 0 ? lastSplitRatio.current : 0)} />}</> : null}
     </div></TaskReadingActionsContext.Provider>
   </div></div>;
 }

@@ -18,6 +18,7 @@ import { singleAssetDecision } from "../stage4/single-asset-confirmation";
 import { markdownText } from "../stage4/opportunity-task-markdown";
 import { periodicDraftKey, periodicGoal, periodicSchedule, readPeriodicDrafts } from "./periodic-draft";
 import { organizationScope } from "../stage3/organization-mapping-data";
+import { TaskActivity, TaskConversationProvider, TaskTimeline, useTaskConversation } from "./TaskConversation";
 
 const organizationTargets = (prompt) => organizationScope.filter((company) => prompt.includes(company.name.slice(0, 2)));
 
@@ -64,7 +65,7 @@ function OutcomeReply({ outcome, prompt, periodicPlan }) {
   if (outcome === "mainline") {
     return (
       <HunterReply
-        markdown={`我会先制定执行计划，再持续汇总系统候选人、知识图谱、公开资料和用户主动上传的简历；遇到审核、邮件联系和等待回复时，会保留上下文并在条件满足后继续推进。新资料上传后会先经过身份判断、查重和匹配，再进入审核。
+        markdown={`我会持续汇总系统候选人、知识图谱、公开资料和用户主动上传的简历；遇到审核、邮件联系和等待回复时，会保留上下文并在条件满足后继续推进。新资料上传后会先经过身份判断、查重和匹配，再进入审核。
 
 > 正在创建任务，并保留当前输入、附件和授权方式。`}
       />
@@ -122,6 +123,11 @@ ${details.map((item) => `- ${item}`).join("\n")}
 }
 
 export function NewWork() {
+  return <TaskConversationProvider><NewWorkConversation /></TaskConversationProvider>;
+}
+
+function NewWorkConversation() {
+  const conversation = useTaskConversation();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const forcedState = params.get("state");
@@ -280,7 +286,7 @@ export function NewWork() {
   // 产品决策 2026-11-22（1-29）：没订阅、试用到期或 Credits 用完时也不能新建任务，和权限受限共用同一提示样式。
   const isUnsubscribed = forcedState === "unsubscribed";
   const isLimited = forcedState === "limited" || isUnsubscribed;
-  const hasConversation = status !== "idle" && !isLimited;
+  const hasConversation = !isLimited && (status !== "idle" || Boolean(conversation.turn || conversation.receipt));
 
   return (
     <div className="s2-page s2-workspace s2-task-create-workspace">
@@ -347,14 +353,9 @@ export function NewWork() {
             ) : null}
 
             {hasConversation ? (
-              <div className="s2-new-work-conversation" aria-live="polite">
-                <UserMessage time="刚刚">{submittedPrompt}</UserMessage>
-                {status === "classifying" ? (
-                  <HunterReply
-                    streaming
-                    markdown="我正在判断这项任务的范围、持续时间，以及是否需要等待外部反馈或组织多步处理。"
-                  />
-                ) : null}
+              <TaskTimeline className="s2-new-work-conversation">
+                {submittedPrompt ? <UserMessage time="刚刚">{submittedPrompt}</UserMessage> : null}
+                {status === "classifying" ? <TaskActivity plan={[{ title: "正在分析任务目标和资料范围…", status: "running" }]} /> : null}
                 {periodicReplies.map((reply, index) => <div key={index}><UserMessage>{reply.text}</UserMessage><HunterReply markdown={reply.result} /></div>)}
                 <OutcomeReply outcome={status} prompt={submittedPrompt} periodicPlan={periodicPlan} />
                 {status === "periodic" ? (
@@ -394,15 +395,16 @@ export function NewWork() {
                       ]}
                       onSelect={(option) => {
                         if (option.value === "custom") {
-                          setValue("我的具体目标是：");
+                          setPeriodicReplies(items => [...items, { text: option.text, result: "已收到补充目标：" + option.text + "。\n\n当前原型只演示预设任务，尚未据此发起真实调研或业务操作。你可以继续在这里补充要求。" }]);
                           return;
                         }
+                        if (option.text) setSubmittedPrompt(prompt => prompt + "\n补充要求：" + option.text);
                         chooseOutcome(option.value);
                       }}
                     />
                   </HunterReply>
                 ) : null}
-              </div>
+              </TaskTimeline>
             ) : null}
 
             <Composer
@@ -442,7 +444,7 @@ export function NewWork() {
             <footer>
               <Icon name="info" />
               示例只会填入输入框。Hunter
-              会说明执行计划、等待点和结束条件；如不符合预期，可以直接在对话中纠正。
+              会说明当前工作、等待点和结果；如不符合预期，可以直接在对话中纠正。
             </footer>
           </section>
         </div>

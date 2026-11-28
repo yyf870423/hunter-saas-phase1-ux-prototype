@@ -1,0 +1,117 @@
+.s2-agent-work,
+.s2-agent-duration {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+  color: var(--s1-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+.s2-agent-work svg {
+  flex: 0 0 auto;
+}
+.s2-agent-work.is-working svg {
+  animation: s2-work-spin 1.4s linear infinite;
+}
+.s2-agent-work-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+.s2-agent-duration {
+  display: block;
+  margin: 0 0 12px;
+}
+.s2-pending-message small {
+  display: block;
+  margin-top: 8px;
+}
+.s2-turn-receipt {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.s2-task-inline-feedback {
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 12px 0;
+  color: var(--s1-muted);
+  overflow-wrap: anywhere;
+}
+.s2-task-inline-feedback.is-problem {
+  color: var(--s1-danger);
+}
+.s2-task-question {
+  border: 1px solid var(--s1-line);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px 0;
+  min-width: 0;
+}
+.s2-task-question header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.s2-task-question h3 {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+.s2-task-question header > span {
+  color: var(--s1-muted);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.s2-task-question > p {
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 8px 0 12px;
+}
+.s2-question-options {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+}
+.s2-question-options .s4-radio {
+  width: 100%;
+  text-align: left;
+}
+.s2-question-options > div > small {
+  display: block;
+  padding-left: 26px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--s1-muted);
+}
+.s2-task-question .s4-form-field {
+  margin-top: 16px;
+}
+.s2-task-question footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.s2-question-error {
+  color: var(--s1-danger);
+}
+.s2-question-receipt {
+  overflow-wrap: anywhere;
+}
+@keyframes s2-work-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s2-agent-work.is-working svg {
+    animation: none;
+  }
+}

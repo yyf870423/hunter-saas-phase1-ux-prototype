@@ -47,13 +47,17 @@ const readers = [
 for (const [kind, path, entry, closeName] of readers) for (const width of [320, 390, 871, 1440]) test(`${kind} ${width}px 全宽恢复、关闭及标题不重叠`, async ({ page }) => {
   await page.setViewportSize({ width: Math.max(width, 871), height: 866 }); await page.goto(`#${path}`);
   if (kind === "contacts") await confirmClientOpportunity(page);
+  if (!entry && kind !== "report") {
+    await expect(page.locator(".s2-runtime, .s2-step-processes")).toHaveCount(0);
+    await expect(page.locator(".s2-task-question").last()).toBeVisible();
+    await page.setViewportSize({ width, height: 866 });
+    await expect(page.getByRole("textbox", { name: "任务对话输入" })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    await capture(page, `${kind}-lightweight-dialogue-${width}`);
+    return;
+  }
   if (entry) await page.getByRole("button", { name: entry, exact: true }).click();
   else if (kind === "report") await page.locator(".recommendation-report-file").last().getByRole("button", { name: "在线查看", exact: true }).click();
-  else {
-    await page.getByRole("button", { name: /^执行计划/ }).click();
-    await page.locator(".s2-plan-step-toggle").first().click();
-    await page.locator(".s2-step-processes .s2-internal-tasks > button").first().click();
-  }
   const input = page.getByRole("textbox", { name: "任务对话输入" });
   await input.fill("保留这段未发送的补充要求");
   await page.getByRole("separator", { name: "调整对话与结果宽度" }).press("Home");

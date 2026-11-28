@@ -19,9 +19,7 @@ import { SelectMenu } from "../stage4/asset-ui";
 import {
   Composer,
   HunterReply,
-  PlanList,
-  PlanUpdate,
-  RuntimeBar,
+  TaskActivity,
   UserMessage,
   WorkHistory,
 } from "./automation-ui";
@@ -34,6 +32,7 @@ import { TaskAreaNav } from "./TaskAreaNav";
 import { mergeLifecycleTasks, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
 import { OpportunityTaskWorkspace } from "../stage4/OpportunityTaskWorkspace";
 import { TaskReadingColumns, TaskReadingWorkspace } from "./TaskReadingWorkspace";
+import { TaskQuestion, TaskTimeline } from "./TaskConversation";
 import { TaskHeaderActions } from "./TaskWorkspaceControls";
 import { InspectionPanel } from "./ReviewWorkspace";
 
@@ -328,17 +327,12 @@ function IdentityReviewTask({ taskId }) {
   const [attachments, setAttachments] = useState([]);
   const [authMode, setAuthMode] = useState("confirm");
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [planOpen, setPlanOpen] = useState(false);
   const [inspection, setInspection] = useState(null);
   const send = (text, files) => {
     setReplies((items) => [...items, { text, files: files.map((file) => file.name) }]);
     setResolved(!files.length && /^(?:暂不合并|保留为不同人物|跳过本轮冲突项)[。 ]*$/.test(text.trim()));
     setComposer("");
     setAttachments([]);
-    notify(
-      "补充内容已保留；本地演示没有核实新资料或合并人物",
-      "info",
-    );
   };
   const visiblePlan = identityReviewPlan.map((step, index) => ({
     ...step,
@@ -401,7 +395,7 @@ function IdentityReviewTask({ taskId }) {
       </header>}>
       <div className="s2-task-detail-layout">
         <section className="s2-task-conversation">
-          <div className="s2-task-timeline">
+          <TaskTimeline className="s2-task-timeline">
             <UserMessage time="今天 08:54">
               {sessionStorage.getItem("hunter-new-task-prompt") ||
                 "核验知识图谱中两位“周明远”是不是同一个人，只给身份建议，不要自动合并。"}
@@ -426,13 +420,14 @@ function IdentityReviewTask({ taskId }) {
 
 可以直接在下方输入你掌握的任职信息，或上传相关文件。`}
             />
+            <TaskQuestion questionKey="identity-latest-evidence" mode="input" title="你掌握哪些最新任职信息？" description="补充来源、时间或尚不确定的内容；没有新信息可以暂不回答，不会据此合并人物。" inputLabel="最新任职信息或核实要求" onAnswer={({ text }) => send(text, [])} />
             {replies.map((reply, index) => <div key={index}>
               <UserMessage>{[reply.text, ...reply.files].filter(Boolean).join("\n")}</UserMessage>
               <HunterReply markdown="补充内容已保留。原有冲突和证据仍保留，当前没有合并人物；本地示例未实际解析附件或核实新的任职资料。" />
             </div>)}
-          </div>
+          </TaskTimeline>
           <div className="s2-task-composer-dock">
-            <RuntimeBar open={planOpen} onToggle={() => setPlanOpen(value => !value)} plan={visiblePlan} planUpdate={planUpdate} paused={paused} docked tasks={visiblePlan.map(step => ({ id: `identity-${step.id}`, stepId: step.id, title: step.title, action: step.detail, status: step.status === "done" ? "完成" : "等待用户", kind: "task", duration: "本地示例", resultDestination: "当前身份核验任务；没有合并人物" }))} onInspectTask={setInspection} />
+            <TaskActivity plan={visiblePlan} paused={paused} />
             <Composer
               value={composer}
               onChange={setComposer}
@@ -504,7 +499,7 @@ function OneStepSummaryTask({ taskId }) {
       </header>}>
       <div className="s2-task-detail-layout">
         <section className="s2-task-conversation">
-          <div className="s2-task-timeline">
+          <TaskTimeline className="s2-task-timeline">
             <UserMessage time="今天 09:30">
               {sessionStorage.getItem("hunter-new-task-prompt") ||
                 "把这三条面试反馈整理为候选人跟进摘要。"}
@@ -524,7 +519,7 @@ function OneStepSummaryTask({ taskId }) {
               <UserMessage>{[reply.text, ...reply.files].filter(Boolean).join("\n")}</UserMessage>
               <HunterReply markdown="补充要求已保留在当前摘要任务中，尚未写入候选人跟进记录，也未发起对外联系。" />
             </div>)}
-          </div>
+          </TaskTimeline>
           <div className="s2-task-composer-dock">
             <Composer
               value={composer}
@@ -533,7 +528,6 @@ function OneStepSummaryTask({ taskId }) {
                 setReplies((items) => [...items, { text, files: files.map((file) => file.name) }]);
                 setComposer("");
                 setAttachments([]);
-                notify("补充要求已保留，未实际重写摘要", "info");
               }}
               authMode={authMode}
               onAuthChange={setAuthMode}
@@ -565,7 +559,6 @@ export function RecommendationReportWorkspace({ onClose }) {
         `hunter-recommendation-report-version-${candidateId}`,
       ) === "v3",
   );
-  const [planOpen, setPlanOpen] = useState(false);
   const candidateName =
     sessionStorage.getItem("hunter-recommendation-candidate") || "林昊";
   const reportRequirement =
@@ -636,7 +629,7 @@ export function RecommendationReportWorkspace({ onClose }) {
       </header>
       <TaskReadingColumns inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : previewArtifact ? <TaskArtifactPreview artifact={previewArtifact} artifacts={taskArtifacts} onSelect={setPreviewArtifactId} onClose={() => setPreviewArtifactId(null)} /> : null}>
         <section className="s2-task-conversation">
-          <div className="s2-task-timeline">
+          <TaskTimeline className="s2-task-timeline">
             <UserMessage time="今天 10:08">{reportRequirement}</UserMessage>
             <HunterReply
               markdown={`推荐报告初稿已经生成。
@@ -681,9 +674,9 @@ export function RecommendationReportWorkspace({ onClose }) {
                 />
               </>
             ) : null}
-          </div>
+          </TaskTimeline>
           <div className="s2-task-composer-dock">
-            <RuntimeBar open={planOpen} onToggle={() => setPlanOpen(value => !value)} plan={plan} docked tasks={plan.map(step => ({ id: `report-${step.id}`, stepId: step.id, title: step.title, action: step.detail, kind: "task", duration: "本地示例", status: step.status === "done" ? "完成" : "等待用户", resultDestination: "本资产推荐报告；未对外发送" }))} onInspectTask={setInspection} />
+            <TaskActivity plan={plan} />
             <Composer
               value={composer}
               onChange={setComposer}
@@ -701,7 +694,6 @@ export function RecommendationReportWorkspace({ onClose }) {
                 }
                 setComposer("");
                 setAttachments([]);
-                notify("报告已按补充要求更新", "success");
               }}
               authMode={authMode}
               onAuthChange={setAuthMode}

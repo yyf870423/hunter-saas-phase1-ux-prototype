@@ -6,7 +6,7 @@ const out = process.env.RESEARCH_CAPTURE_DIR || "/Users/eric.yu/job_hunting/docs
 const resultDivider = page => page.getByRole("separator", { name: "调整对话与结果宽度" });
 const pane = page => page.getByRole("complementary", { name: "候选人调研结果" });
 const input = page => page.getByRole("textbox", { name: "任务对话输入" });
-async function send(page, text) { await input(page).fill(text); await input(page).press("Enter"); }
+async function send(page, text) { await input(page).fill(text); await input(page).press("Enter"); await expect(input(page)).toBeEnabled(); }
 async function open(page) { await page.getByRole("button", { name: /首批候选人.*查看结果/ }).click(); }
 
 test.beforeEach(async ({ page }) => {
@@ -74,7 +74,7 @@ test("条件筛选、未知人选、模糊范围和未接入写入不返回假�
 });
 test("停止后不出现迟到结果，恢复仍处理原对象", async ({ page }) => {
   await send(page, "调研前三位，核实预训练经历");
-  await send(page, "停止");
+  await page.getByRole("button", { name: "停止", exact: true }).click();
   await page.waitForTimeout(1600);
   await expect(pane(page)).toHaveCount(0);
   await send(page, "继续刚才的调研");
@@ -85,7 +85,7 @@ test("部分失败保留结果，对话只重试失败项", async ({ page }) => 
   await send(page, "调研前三位，核实预训练经历");
   await expect(pane(page)).toContainText("调研待重试");
   await send(page, "重试失败的");
-  await expect(page.locator(".s2-research-working")).toContainText("1 位");
+  await expect(page.locator(".s2-agent-work.is-working")).toContainText("1 位");
   await expect(pane(page)).not.toContainText("调研待重试");
   await expect(pane(page).locator(".s2-result-comparison > article")).toHaveCount(3);
 });
@@ -202,38 +202,17 @@ test("对话与结果在鼠标松开前收起，同一次拖拽可反向恢复",
 });
 
 for (const [name, width, height] of [["desktop", 1440, 1000], ["mobile", 390, 844]]) {
-  test(`${name}保留上一版计划：逐步骤相关处理与右侧详情`, async ({ page }) => {
+  test(`${name}不再显示计划或处理回查，结果仍可阅读且草稿保留`, async ({ page }) => {
     await mkdir(out, { recursive: true });
     await page.setViewportSize({ width, height }); await open(page);
     await input(page).fill("下一步先检查任职时间");
-    const summary = page.getByRole("button", { name: /^执行计划/ });
-    await summary.click();
-    await expect(page.locator(".s2-runtime-tasks")).toHaveCount(0);
-    const step = page.getByRole("button", { name: /并行检索并接收补充资料/, includeHidden: true });
-    await step.click();
-    const group = page.getByRole("group", { name: "并行检索并接收补充资料的相关处理" });
-    await expect(group.locator(".s2-internal-tasks > button")).toHaveCount(1);
-    await group.getByRole("button", { name: /汇总本轮候选人线索/ }).click();
-    await expect(page.locator(".s2-inspector h2")).toHaveText("汇总本轮候选人线索");
-    await expect(step).toHaveAttribute("aria-expanded", "true");
-    await expect(input(page)).toHaveValue("下一步先检查任职时间");
-    if (width <= 760) {
-      const slot = await page.locator(".s2-research-inspection-slot").boundingBox();
-      const content = await page.locator(".s2-inspector-content").boundingBox();
-      const composer = await page.locator(".s2-research-composer-wrap").boundingBox();
-      expect(slot.y + slot.height).toBeLessThanOrEqual(composer.y + 1);
-      expect(content.y + content.height).toBeLessThanOrEqual(slot.y + slot.height + 1);
-    }
-    await page.screenshot({ path: `${out}/${name}-plan-inspection.png` });
-    await page.getByRole("button", { name: "关闭检查区", exact: true }).click();
+    await expect(page.getByRole("button", { name: /^执行计划/ })).toHaveCount(0);
+    await expect(page.locator(".s2-runtime, .s2-step-processes")).toHaveCount(0);
     await expect(pane(page)).toContainText("首批候选人");
-    await expect(step).toHaveAttribute("aria-expanded", "true");
-    await expect(summary).toHaveAttribute("aria-expanded", "true");
-    await page.getByRole("button", { name: /持续合并并执行匹配门禁/ }).click();
-    await expect(group).toHaveCount(0);
-    await expect(page.getByRole("group", { name: "持续合并并执行匹配门禁的相关处理" })).toContainText("整理匹配依据与资料缺口");
-    await summary.click();
+    await page.getByRole("button", { name: "关闭结果视图" }).click();
+    await expect(input(page)).toHaveValue("下一步先检查任职时间");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    await page.screenshot({ path: `${out}/${name}-lightweight-dialogue.png` });
   });
 }
 

@@ -9,7 +9,7 @@ import {
   EmailDraftReview,
   HunterReply,
   IdentityConflictReview,
-  RuntimeBar,
+  TaskActivity,
   UserMessage,
 } from "./automation-ui";
 import {
@@ -20,6 +20,7 @@ import {
 } from "./data";
 import { InspectionPanel } from "./ReviewWorkspace";
 import { TaskReadingWorkspace } from "./TaskReadingWorkspace";
+import { TaskQuestion, TaskTimeline } from "./TaskConversation";
 import { TaskResultReader, candidateReadingRows } from "./TaskResultReader";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { getOpportunityPermission, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
@@ -159,14 +160,12 @@ export function AutomationWorkspace() {
       sessionStorage.getItem("hunter-workstream-paused") === "1",
   );
   const [terminated, setTerminated] = useState(false);
-  const [runtimeOpen, setRuntimeOpen] = useState(
-    () => sessionStorage.getItem("hunter-runtime-open") === "1",
-  );
   const [inspection, setInspection] = useState(() => {
     try {
-      return JSON.parse(
+      const saved = JSON.parse(
         sessionStorage.getItem("hunter-workstream-inspection") || "null",
       );
+      return saved?.kind === "task" ? null : saved;
     } catch {
       return null;
     }
@@ -266,10 +265,6 @@ export function AutomationWorkspace() {
   }, [forcedState, phase]);
 
   useEffect(() => {
-    sessionStorage.setItem("hunter-runtime-open", runtimeOpen ? "1" : "0");
-  }, [runtimeOpen]);
-
-  useEffect(() => {
     sessionStorage.setItem("hunter-workstream-draft", composer);
   }, [composer]);
 
@@ -318,7 +313,6 @@ export function AutomationWorkspace() {
     setPhase(0);
     setPaused(false);
     setTerminated(false);
-    setRuntimeOpen(false);
     setInspection(null);
     setReviewOpen(false);
     setUserDecisions([]);
@@ -667,7 +661,7 @@ export function AutomationWorkspace() {
           onDelete={() => setDeleteOpen(true)}
         />}>
         <div className="s2-conversation" ref={scrollRef}>
-          <div className="s2-timeline">
+          <TaskTimeline>
             <UserMessage>{prompt}</UserMessage>
             {phase >= 1 ? (
               <HunterReply
@@ -778,6 +772,12 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
 本批资料将新建 9 位候选人、补充 2 位已有候选人，另有 1 位需要先完成人工身份确认。匹配只会在正式写入成功后启动；待确认记录不会进入匹配。`}
               >
                 <p>本批尚未写入。请在原对话说明仅写入、写入后匹配全部招聘中岗位，或指定要匹配的岗位；先核对本版范围，再确认。</p>
+                {!ingestionDraft ? <TaskQuestion questionKey="resume-batch-scope" title="这批简历接下来怎样处理？" description="先明确处理范围，提交回答不会直接导入。随后仍需核对并确认。" allowCustom={false}
+                  options={[
+                    { value: "write-only", label: "仅写入", description: "不启动岗位匹配。" },
+                    { value: "all", label: "写入后匹配全部招聘中岗位", description: "仅匹配成功写入、身份明确的人选。" },
+                    { value: "selected", label: "写入后匹配具身智能VLA算法负责人岗位", description: "只匹配当前岗位。" },
+                  ]} onAnswer={({ values }) => send({ "write-only": "仅写入", all: "写入后匹配全部招聘中岗位", selected: "写入后匹配具身智能VLA算法负责人岗位" }[values[0]], [])} /> : null}
               </HunterReply>
             ) : null}
             {forcedState === "candidate-ingestion" && ingestionDecision ? (
@@ -874,25 +874,23 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
                   note="如果确认合并，Hunter 会保留两个原始来源；一致字段直接复用，补充字段按较新资料更新，项目时间冲突保留在变化记录中。"
                 />
                 <DecisionRequest
-                  title="林昊的资料存在冲突，确认后才能合并"
-                  description="请根据上方资料来源和字段差异，确认这两份记录是否属于同一人。"
+                  title="这两份林昊的资料属于同一个人吗？"
+                  description="请先明确身份判断。回答不会直接合并档案，实际修改仍需核对本版范围并确认。"
                   options={[
                     {
                       value: "merge",
-                      label: "确认为同一人并合并",
-                      description: "保留两个来源和冲突字段，按较新资料更新。",
+                      label: "判断为同一个人",
+                      description: "合并前仍需保留来源并核对冲突字段。",
                     },
                     {
                       value: "separate",
-                      label: "保留为两个人",
-                      description: "不合并档案，并记录本次判断避免重复询问。",
+                      label: "判断为不同的人",
+                      description: "先保留不同身份，不据此自动改写档案。",
                     },
                   ]}
                   onSelect={(option) =>
                     notify(
-                      option.value === "merge"
-                        ? "已合并林昊的资料，并保留来源与变化记录"
-                        : "已保留为两个人，并记录本次身份判断",
+                      "已记录本轮身份判断；尚未合并档案或改写人物资料。",
                       "success",
                     )
                   }
@@ -927,7 +925,7 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
               <HunterReply
                 markdown={`## 已从当前检查点继续
 
-审核结果和岗位储备关系已经保存，执行计划已更新。下一步可以直接告诉我需要给哪些候选人发邮件；发送前仍会逐项确认收件人、主题、正文和附件。`}
+审核结果和岗位储备关系已经保存。下一步可以直接告诉我需要给哪些候选人发邮件；发送前仍会逐项确认收件人、主题、正文和附件。`}
               />
             ) : null}
             {contactStage === "authorization" ? (
@@ -997,20 +995,11 @@ Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网�
             {terminated ? (
               <HunterReply markdown={"### 任务已终止\n\n对话、任务、审核结果和正式资产引用已保留。需要新目标时请新建任务。"} />
             ) : null}
-          </div>
+          </TaskTimeline>
         </div>
         <div className="s2-composer-wrap">
           {phase >= 1 ? (
-            <RuntimeBar
-              open={runtimeOpen}
-              onToggle={() => setRuntimeOpen((value) => !value)}
-              plan={plan}
-              planUpdate={planUpdate}
-              tasks={internalTasks}
-              paused={paused}
-              docked
-              onInspectTask={(task) => setInspection({ ...task, kind: "task" })}
-            />
+            <TaskActivity plan={plan} paused={paused || streamStopped} state={terminated ? "stopped" : streamError ? "error" : undefined} />
           ) : null}
           <Composer
             value={composer}

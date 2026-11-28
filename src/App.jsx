@@ -8,6 +8,7 @@ import { ReviewPage } from "./stage1/ReviewPage";
 import { Stage1Shell } from "./stage1/Stage1Shell";
 import { FilePreviewPage } from "./stage4/FilePreviewPage";
 import { TaskHeaderControlsProvider } from "./stage2/TaskWorkspaceControls";
+import { TaskFeedbackProvider } from "./stage2/TaskFeedback";
 import { NewWork } from "./stage2/NewWork";
 import { PeriodicTasksPage } from "./stage2/PeriodicTasks";
 import { SignalsPage } from "./stage2/Signals";
@@ -107,7 +108,7 @@ export default function App() {
         <Route path="/ops/support" element={<SupportPage />} />
       </Route>
       <Route path="/not-activated" element={<NotActivatedPage />} />
-      <Route element={<TaskHeaderControlsProvider><Stage1Shell /></TaskHeaderControlsProvider>}>
+      <Route element={<TaskFeedbackProvider><TaskHeaderControlsProvider><Stage1Shell /></TaskHeaderControlsProvider></TaskFeedbackProvider>}>
         <Route path="/demo/opportunities" element={<OpportunityDemoPage />} />
         <Route path="/demo/opportunity-source/:caseId" element={<OpportunityDemoSourcePage />} />
         <Route path="/home" element={<Dashboard />} />

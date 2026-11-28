@@ -6,7 +6,7 @@ import { confirmClientOpportunity } from "../stage3/client-helpers";
 const out = "/Users/eric.yu/job_hunting/docs/hb-test-20261104/round4/local-align/task-design-all-20261118";
 const input = page => page.getByRole("textbox", { name: "任务对话输入" });
 const latestResultScenes = new Set(["recruiting-source", "recruiting-ingestion", "identity-conflict", "recruiting-none", "recruiting-wait", "recruiting-reply", "pipeline", "recruiting-reserve-draft", "recruiting-reserve-saved", "stream-error", "source-limited", "source-error", "client", "client-opportunity-draft", "client-no-contact", "career-none", "career-new-resume", "periodic-wait", "periodic-running", "periodic-partial", "periodic-graph", "periodic-mail", "periodic-stopped", "periodic-empty"]);
-async function send(page, text) { await input(page).fill(text); await input(page).press("Enter"); }
+async function send(page, text) { await input(page).fill(text); await input(page).press("Enter"); await expect(input(page)).toBeEnabled(); }
 test.beforeEach(async ({ page }) => {
   page.__failures = [];
   page.on("pageerror", error => page.__failures.push(error.message));
@@ -38,13 +38,7 @@ for (const width of [1440, 390]) for (const [id, title, route, text] of taskDesi
     }
   }
   if (id === "report-preview") await page.locator(".recommendation-report-file").last().getByRole("button", { name: "在线查看", exact: true }).click();
-  if (["plan-detail", "periodic-plan-detail"].includes(id)) {
-    await page.getByRole("button", { name: /^执行计划/ }).click();
-    if (id === "plan-detail") await page.getByRole("button", { name: /并行检索并接收补充资料/ }).click();
-    else await page.locator(".s2-plan-step-toggle").first().click();
-    await page.locator(".s2-step-processes .s2-internal-tasks > button").first().click();
-    await expect(page.getByRole("complementary", { name: "当前检查内容" })).toBeVisible();
-  }
+  await expect(page.locator(".s2-runtime, .s2-plan-step-toggle")).toHaveCount(0);
   if (["client-no-contact", "client-contacts", "client-waiting", "client-reply", "client-followup"].includes(id)) {
     await confirmClientOpportunity(page);
     if (id === "client-contacts") await page.getByRole("button", { name: "查看联系人结果", exact: true }).click();
@@ -107,14 +101,11 @@ test("候选人写入范围不用纵向选择，修改/分析不执行", async (
   await send(page, "确认");
   await expect(page.locator(".s2-timeline")).toContainText("真实写入、匹配与逐对象回执尚未接入");
 });
-test("独立身份核验自由补充不伪称已核实，计划可按步骤检查", async ({ page }) => {
+test("独立身份核验自由补充不伪称已核实，不显示计划或回查入口", async ({ page }) => {
   await page.goto("#/tasks/task-hand-team");
   await send(page, "请继续核实最近任职，不要合并");
   await expect(page.locator(".s2-task-timeline")).toContainText("未实际解析附件或核实新的任职资料");
-  await page.getByRole("button", { name: /^执行计划/ }).click();
-  await page.getByRole("button", { name: /比较身份与任职证据/ }).click();
-  await page.locator(".s2-step-processes .s2-internal-tasks > button").first().click();
-  await expect(page.getByRole("complementary", { name: "当前检查内容" })).toBeVisible();
+  await expect(page.locator(".s2-runtime, .s2-step-processes")).toHaveCount(0);
   await expect(input(page)).toBeVisible();
 });
 test("周期身份决定可在原对话表达，普通文字不解决冲突", async ({ page }) => {

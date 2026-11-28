@@ -132,9 +132,10 @@ test("所有周期运行状态都使用可继续对话的完整详情", async ({
 
   for (const index of [0, 2, 3, 4, 5, 6, 7, 8]) {
     await page.locator(".s2-periodic-list > button").nth(index).click();
-    await expect(page.locator(".s2-run-conversation")).toBeVisible();
+    await expect(page.locator(".s2-run-timeline")).toBeVisible();
     await expect(page.getByLabel("任务对话输入")).toBeVisible();
-    await expect(page.getByText("执行计划", { exact: true })).toBeVisible();
+    await expect(page.getByText("执行计划", { exact: true })).toHaveCount(0);
+    await expect(page.locator(".s2-agent-work")).toBeVisible();
   }
 });
 
@@ -154,46 +155,18 @@ test("统一任务相关页面在 320 像素宽度下无页面级溢出", async 
   await expect(page.getByLabel("任务对话输入")).toBeVisible();
 });
 
-test("直接核验任务详情支持补充资料、恢复和结果回流", async ({ page }) => {
+
+test("独立核验只收集补充信息，不伪称已经核实或合并", async ({ page }) => {
   await page.goto("#/tasks/task-hand-team");
-  await expect(page.getByText("工作上下文", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "当前判断" })).toBeVisible();
   await expect(page.locator(".s2-markdown-table")).toBeVisible();
-  await expect(page.getByText("查看技术信息")).toHaveCount(0);
-  await expect(page.locator(".s2-task-timeline .s2-task-plan")).toHaveCount(0);
-  const planDock = await page.locator(".s2-task-plan").boundingBox();
-  const composer = await page
-    .locator(".s2-task-composer-dock > .s2-composer")
-    .boundingBox();
-  expect(planDock).not.toBeNull();
-  expect(composer).not.toBeNull();
-  expect(planDock.y + planDock.height).toBeLessThanOrEqual(composer.y);
-  await expect(
-    page.locator(".s2-task-plan > button > svg:last-child path").first(),
-  ).toHaveAttribute("d", "m18 15-6-6-6 6");
-  await page.getByRole("button", { name: /执行计划/ }).click();
-  await expect(
-    page.locator(".s2-task-plan > button > svg:last-child path").first(),
-  ).toHaveAttribute("d", "m6 9 6 6 6-6");
-  await expect(page.getByText("计划已调整为等待用户")).toBeVisible();
-  await expect(page.getByText("计划依据", { exact: true })).toHaveCount(0);
-  await expect(
-    page.locator(".s2-task-plan .s2-plan-list li.is-complete"),
-  ).toHaveCount(2);
-  await expect(
-    page.locator(".s2-task-plan .s2-plan-list li.is-waiting"),
-  ).toHaveCount(1);
-  const input = page.getByPlaceholder(/输入你掌握的信息/);
-  await input.fill("这是同一个人，2025 年 12 月加入穹顶智能。");
+  await expect(page.locator(".s2-runtime, .s2-task-plan")).toHaveCount(0);
+  const input = page.getByRole("textbox", { name: "任务对话输入" });
+  await input.fill("请继续核实最近任职，不要合并人物");
   await input.press("Enter");
-  await expect(
-    page.getByText(/已回流“星澜机器人知识图谱”的更新与审核区/),
-  ).toBeVisible();
-  await expect(page.getByText("完成", { exact: true }).first()).toBeVisible();
-  await expect(
-    page.locator(".s2-task-plan .s2-plan-list li.is-complete"),
-  ).toHaveCount(3);
-  await expect(page.getByText("计划已完成", { exact: true })).toBeVisible();
+  await expect(input).toBeEnabled();
+  await expect(page.locator(".s2-task-timeline")).toContainText("未实际解析附件或核实新的任职资料");
+  await expect(page.locator(".s1-toast")).toHaveCount(0);
 });
 
 test("推荐报告资产 AI 处理按对话过程保留每次生成的文件", async ({ page }) => {

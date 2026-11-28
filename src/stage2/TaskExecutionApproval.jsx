@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Button, StatusBadge } from "../stage1/ui";
 import "./task-execution-approval.css";
 import { executionApprovalCopy } from "./execution-approval-copy";
+import { useTaskConversation } from "./TaskConversation";
 
 export const executionApprovalKey = (taskId, scope) =>
   JSON.stringify([taskId, scope]);
@@ -18,6 +19,8 @@ export function TaskExecutionApproval({
   onApprove,
   onDecline,
 }) {
+  const conversation = useTaskConversation();
+  const id = useId();
   const copy = Object.hasOwn(executionApprovalCopy, action)
     ? executionApprovalCopy[action]
     : null;
@@ -34,6 +37,10 @@ export function TaskExecutionApproval({
       authMode,
     );
   const [status, setStatus] = useState("ready");
+  if (conversation?.turn && status === "ready") disabledReason = "正在处理你的新要求，旧确认暂不可用。";
+  useEffect(() => {
+    if (status === "ready") return conversation?.registerWait(id, "等待你的确认");
+  }, [conversation?.registerWait, id, status]);
   const [error, setError] = useState("");
   const lock = useRef(false);
   const latest = useRef(null);
@@ -74,12 +81,16 @@ export function TaskExecutionApproval({
     setError("");
     setStatus(decision === "approve" ? "submitting" : "declining");
     try {
-      await (decision === "approve" ? onApprove : onDecline)(requestKey, {
+      const event = {
         requestKey,
         action,
         decision,
         label: decision === "approve" ? copy.approve : copy.decline,
-      });
+      };
+      const execute = () => (decision === "approve" ? onApprove : onDecline)(requestKey, event);
+      const result = conversation ? await conversation.run(`已点击：${event.label}`, [], execute) : await execute();
+      if (result?.stopped) throw Error("处理已停止，本次确认尚未执行。请核对后重新确认。");
+      if (result?.failed) throw Error(result.message || "本次操作未完成，请核对结果后重试。");
       if (latest.current.requestKey === requestKey)
         setStatus(decision === "approve" ? "submitted" : "declined");
     } catch (failure) {

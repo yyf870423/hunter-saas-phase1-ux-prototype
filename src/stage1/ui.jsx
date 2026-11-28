@@ -56,6 +56,10 @@ export function ToastProvider({ children }) {
 
 export const useToast = () => useContext(ToastContext);
 
+export function ToastScope({ notify, children }) {
+  return <ToastContext.Provider value={notify}>{children}</ToastContext.Provider>;
+}
+
 export function Button({
   children,
   icon,

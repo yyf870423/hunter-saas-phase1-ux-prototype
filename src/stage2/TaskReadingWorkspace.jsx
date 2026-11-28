@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { TaskConversationProvider } from "./TaskConversation";
 import { IconButton } from "../stage1/ui";
 import { WorkHistory } from "./automation-ui";
 import { workItems } from "./data";
@@ -43,7 +44,10 @@ export function TaskReadingWorkspace({ taskId, header, result, inspection = fals
   </div>;
 }
 
-export function TaskReadingColumns({ result, inspection = false, children }) {
+export function TaskReadingColumns({ result, inspection = false, conversationKey, children }) {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const identity = conversationKey || [location.pathname, params.get("state"), params.get("run"), params.get("report"), params.get("companies")].join("|");
   const [ratio, setRatio] = useState(50), lastRatio = useRef(50), columns = useRef(null);
   const commitRatio = value => {
     if (value >= 22 && value <= 78) lastRatio.current = value;
@@ -51,9 +55,9 @@ export function TaskReadingColumns({ result, inspection = false, children }) {
   };
   useEffect(() => { if (result) setRatio(current => current === 100 ? lastRatio.current : current); }, [Boolean(result)]);
   const restore = result && (ratio === 0 || ratio === 100) ? <IconButton icon="panelRight" label="恢复对话与结果分栏" title="恢复分栏" onClick={() => commitRatio(lastRatio.current)} /> : null;
-  return <TaskReadingActionsContext.Provider value={ratio === 0 ? restore : null}><div className={`s2-research-columns ${result ? "has-result" : ""} ${inspection ? "has-inspection" : ""} ${result && ratio === 0 ? "is-result-wide" : ""} ${result && ratio === 100 ? "is-dialogue-wide" : ""}`} ref={columns} style={{ "--research-dialogue-track": `${ratio}fr`, "--research-result-track": `${100 - ratio}fr` }}>
+  return <TaskConversationProvider key={identity}><TaskReadingActionsContext.Provider value={ratio === 0 ? restore : null}><div className={`s2-research-columns ${result ? "has-result" : ""} ${inspection ? "has-inspection" : ""} ${result && ratio === 0 ? "is-result-wide" : ""} ${result && ratio === 100 ? "is-dialogue-wide" : ""}`} ref={columns} style={{ "--research-dialogue-track": `${ratio}fr`, "--research-result-track": `${100 - ratio}fr` }}>
     <section id="research-dialogue" className="s2-research-dialogue" aria-label="任务对话">{children}</section>
     {result ? <><ConversationSplitHandle ratio={ratio} onChange={setRatio} onCommit={commitRatio} containerRef={columns} /><div id="research-result" className="s2-research-inspection-slot">{result}</div></> : null}
     {ratio === 100 ? <TaskHeaderControlPortal>{restore}</TaskHeaderControlPortal> : null}
-  </div></TaskReadingActionsContext.Provider>;
+  </div></TaskReadingActionsContext.Provider></TaskConversationProvider>;
 }

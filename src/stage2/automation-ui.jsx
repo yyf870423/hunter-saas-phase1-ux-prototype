@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Icon } from "../components/Icon";
+import { TaskActivity, TaskQuestion, TaskTurnSummary, useTaskConversation } from "./TaskConversation";
 import {
   Button,
   Drawer,
@@ -114,6 +115,8 @@ export function Composer({
   onStop,
   disabled = false,
 }) {
+  const conversation = useTaskConversation();
+  disabled = disabled || Boolean(conversation?.turn);
   const fileRef = useRef(null);
   const textareaRef = useRef(null);
   const [attachmentError, setAttachmentError] = useState("");
@@ -126,6 +129,7 @@ export function Composer({
     textarea.style.overflowY = textarea.scrollHeight > 150 ? "auto" : "hidden";
   }, [value]);
   const addFiles = (incoming) => {
+    if (disabled) return;
     const allowed = incoming.filter((file) => {
       const extension = file.name.split(".").pop()?.toLowerCase();
       return (
@@ -154,11 +158,17 @@ export function Composer({
     if (allowed.length) onAttachmentsChange([...attachments, ...allowed]);
   };
   const submit = () => {
-    if (!value.trim() && !attachments.length) return;
-    onSend(value.trim(), attachments);
+    if (disabled || streaming || conversation?.turn || !value.trim() && !attachments.length) return;
+    const text = value.trim(), files = [...attachments];
+    if (conversation) {
+      if (conversation.run(text, files, () => onSend(text, files))) {
+        onChange("");
+        onAttachmentsChange?.([]);
+      }
+    } else onSend(text, files);
   };
   return (
-    <div className={`s2-composer ${disabled ? "is-disabled" : ""}`}>
+    <div className={`s2-composer ${disabled && !conversation?.turn ? "is-disabled" : ""}`}>
       {attachments.length ? (
         <div className="s2-attachments">
           {attachments.map((file, index) => (
@@ -202,7 +212,7 @@ export function Composer({
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={(event) => {
-          if (event.key === "Enter" && !event.shiftKey) {
+          if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
             event.preventDefault();
             submit();
           }
@@ -238,8 +248,8 @@ export function Composer({
             disabled={disabled}
           />
         </div>
-        {streaming ? (
-          <Button tone="secondary" icon="pause" onClick={onStop}>
+        {streaming || conversation?.turn ? (
+          <Button tone="secondary" icon="pause" disabled={conversation?.turn?.executing} onClick={conversation?.turn ? conversation.stop : onStop}>
             停止
           </Button>
         ) : (
@@ -403,12 +413,23 @@ export function HunterMarkdown({ content }) {
   );
 }
 
-export function HunterReply({ children, markdown, streaming = false }) {
+export function HunterReply({ children, markdown, streaming = false, elapsedMs }) {
+  const conversation = useTaskConversation();
+  const id = useId();
+  const generation = useRef(conversation?.turn?.id || conversation?.result.generation || 0);
+  const completed = useRef(null);
+  useEffect(() => {
+    if (!streaming) return conversation?.registerReply(id, generation.current);
+  }, [conversation?.registerReply, id, streaming]);
+  if (generation.current && conversation?.result.generation === generation.current && conversation.result.elapsed) completed.current = conversation.result;
+  const isLastReply = conversation?.replies.filter(reply => reply.generation === generation.current).at(-1)?.id === id;
+  if (generation.current && conversation?.turn?.id === generation.current) return null;
   return (
     <article
       className={`s2-hunter-reply ${streaming ? "is-streaming" : ""}`}
       data-renderer={markdown ? "markdown" : "controlled"}
     >
+      {conversation && !streaming && isLastReply ? <TaskTurnSummary elapsed={elapsedMs ?? completed.current?.elapsed ?? 12000} example={!elapsedMs && !completed.current} /> : null}
       {markdown ? <HunterMarkdown content={markdown} /> : null}
       {children}
       {streaming ? (
@@ -418,252 +439,9 @@ export function HunterReply({ children, markdown, streaming = false }) {
   );
 }
 
-const planStatus = {
-  done: { label: "完成", icon: "check", className: "is-complete" },
-  running: { label: "进行中", className: "is-active" },
-  "waiting-user": {
-    label: "等待用户",
-    icon: "clock",
-    className: "is-waiting",
-  },
-  paused: { label: "已暂停", icon: "pause", className: "is-paused" },
-  adjusted: {
-    label: "需调整",
-    icon: "refresh",
-    className: "is-adjusted",
-  },
-  pending: { label: "待开始", className: "is-pending" },
-};
 
-export function PlanList({
-  steps,
-  tasks = [],
-  expandedStepId,
-  onToggleStep,
-  onInspectTask,
-}) {
-  const groupId = useId();
-  const interactive = typeof onToggleStep === "function";
-  return (
-    <ol className={`s2-plan-list${interactive ? " is-interactive" : ""}`}>
-      {steps.map((step, index) => {
-        const status = planStatus[step.status] || planStatus.pending;
-        const expanded = interactive && expandedStepId === step.id;
-        const related = tasks.filter((task) => task.stepId === step.id);
-        const detailsId = `${groupId}-${step.id}`;
-        const content = (
-          <>
-            <i aria-hidden="true">
-              {step.status === "running" ? (
-                <span />
-              ) : status.icon ? (
-                <Icon name={status.icon} />
-              ) : (
-                index + 1
-              )}
-            </i>
-            <span>
-              <b>{step.title}</b>
-              <small>{step.detail}</small>
-              {step.statusDetail ? <small>{step.statusDetail}</small> : null}
-            </span>
-            <em>{step.statusLabel || status.label}</em>
-          </>
-        );
-        return (
-          <li
-            className={`${status.className}${expanded ? " is-expanded" : ""}`}
-            key={step.id}
-            data-step-id={step.id}
-          >
-            {interactive ? (
-              <button
-                type="button"
-                className="s2-plan-step-toggle"
-                aria-expanded={expanded}
-                aria-controls={detailsId}
-                onClick={() => onToggleStep(step.id)}
-              >
-                {content}
-                <Icon name={expanded ? "chevronDown" : "chevronRight"} />
-              </button>
-            ) : (
-              content
-            )}
-            {expanded ? (
-              <div
-                id={detailsId}
-                className="s2-step-processes"
-                role="group"
-                aria-label={`${step.title}的相关处理`}
-              >
-                <header>
-                  <b>相关处理</b>
-                  <span>{related.length} 项</span>
-                </header>
-                {related.length ? (
-                  <div className="s2-internal-tasks">
-                    {related.map((task) => (
-                      <button
-                        type="button"
-                        key={task.id}
-                        onClick={() => onInspectTask(task)}
-                      >
-                        <span>
-                          <b>{task.title}</b>
-                          <small>{task.action}</small>
-                        </span>
-                        <StatusBadge tone={task.tone}>
-                          {task.status}
-                        </StatusBadge>
-                        <time>{task.duration}</time>
-                        <Icon name="chevronRight" />
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="s2-step-processes-empty">
-                    此步骤暂无独立处理记录
-                  </p>
-                )}
-              </div>
-            ) : null}
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
-export function PlanUpdate({ update, detailed = false }) {
-  if (!update) return null;
-  return (
-    <div className={`s2-plan-update tone-${update.tone || "info"}`}>
-      <Icon name={update.tone === "warning" ? "refresh" : "info"} />
-      <span>
-        <b>{update.title}</b>
-        <small>{update.detail}</small>
-        {detailed && update.requirement ? (
-          <q className="s2-plan-update-requirement">
-            <span>你的补充要求</span>
-            {update.requirement}
-          </q>
-        ) : null}
-        {detailed && update.changes?.length ? (
-          <ul className="s2-plan-update-changes">
-            {update.changes.map((change) => (
-              <li key={change.title}>
-                <b>{change.title}</b>
-                <span>{change.detail}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        {detailed && update.unchanged ? (
-          <small className="s2-plan-update-unchanged">
-            <b>保持不变</b>
-            {update.unchanged}
-          </small>
-        ) : null}
-      </span>
-      <time>{update.time}</time>
-    </div>
-  );
-}
-
-export function RuntimeBar({
-  open,
-  onToggle,
-  plan,
-  planUpdate,
-  tasks,
-  onInspectTask,
-  paused = false,
-  docked = false,
-  waitingLabel = "本轮确认",
-}) {
-  const [expandedStepId, setExpandedStepId] = useState(null);
-  const done = plan.filter((step) => step.status === "done").length;
-  const waiting = plan.some((step) => step.status === "waiting-user");
-  const adjusted = plan.some((step) => step.status === "adjusted");
-  const running = plan.some((step) => step.status === "running");
-  const summary = adjusted
-    ? `${done} 项已完成，1 项根据新信息调整`
-    : paused
-      ? `${done} 项已完成，当前步骤已暂停`
-      : waiting
-        ? `${done} 项已完成，等待${waitingLabel}`
-        : running
-          ? `已完成 ${done} / ${plan.length} 项`
-          : `${done} / ${plan.length} 项已完成`;
-  const badge = paused
-    ? adjusted
-      ? "计划调整"
-      : "已暂停"
-    : waiting
-      ? "等待用户"
-      : done === plan.length
-        ? "已完成"
-        : "推进中";
-  return (
-    <section
-      className={`s2-runtime ${docked ? "is-docked" : ""} ${open ? "is-open" : ""}`}
-    >
-      <button
-        type="button"
-        className="s2-runtime-summary"
-        aria-expanded={open}
-        onClick={onToggle}
-      >
-        <span className="s2-runtime-icon">
-          <Icon name="task" />
-        </span>
-        <span>
-          <b>执行计划</b>
-          <small>{summary}</small>
-        </span>
-        <StatusBadge
-          tone={
-            done === plan.length
-              ? "success"
-              : adjusted || waiting
-                ? "warning"
-                : paused
-                  ? "neutral"
-                  : "info"
-          }
-        >
-          {badge}
-        </StatusBadge>
-        <Icon name={open ? "chevronDown" : "chevronUp"} />
-      </button>
-      {open ? (
-        <div className="s2-runtime-body">
-          <div className="s2-runtime-plan">
-            <header className="s2-runtime-plan-header">
-              <span>
-                <b>当前进度</b>
-                <small>
-                  {done} / {plan.length} 项已完成
-                </small>
-              </span>
-            </header>
-            <PlanUpdate update={planUpdate} />
-            <PlanList
-              steps={plan}
-              tasks={tasks}
-              expandedStepId={expandedStepId}
-              onToggleStep={(id) =>
-                setExpandedStepId((current) => (current === id ? null : id))
-              }
-              onInspectTask={onInspectTask}
-            />
-          </div>
-        </div>
-      ) : null}
-    </section>
-  );
-}
+// Existing scenario state still determines work status; no plan is rendered.
+export { TaskActivity };
 
 export function WorkHistory({
   items,
@@ -829,36 +607,8 @@ export function WorkHistory({
 }
 
 export function DecisionRequest({ title, description, options, onSelect }) {
-  return (
-    <section className="s2-decision-request">
-      <header>
-        <Icon name="warning" />
-        <span>
-          <b>{title}</b>
-          <small>{description}</small>
-        </span>
-      </header>
-      <div>
-        {options.map((option, index) => (
-          <button
-            type="button"
-            key={option.value}
-            onClick={() => onSelect(option)}
-          >
-            <span className="s2-decision-index" aria-hidden="true">
-              {index + 1}
-            </span>
-            <span className="s2-decision-copy">
-              <b>{option.label}</b>
-              <small>{option.description}</small>
-            </span>
-            <Icon name="chevronRight" />
-          </button>
-        ))}
-      </div>
-      <p>也可以直接在下方输入其他处理意见。</p>
-    </section>
-  );
+  return <TaskQuestion questionKey={title} title={title} description={description} options={options}
+    onAnswer={({ values, text }) => onSelect({ ...(options.find(option => option.value === values[0]) || { value: "custom", label: text }), text })} />;
 }
 
 export function IdentityConflictReview({

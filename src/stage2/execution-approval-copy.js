@@ -1,4 +1,14 @@
 export const executionApprovalCopy = Object.freeze({
+  identity: {
+    title: "按本次判断处理这两份人物资料？",
+    approve: "确认处理身份关系",
+    decline: "暂不处理",
+  },
+  email: {
+    title: "确认发出这封邮件？",
+    approve: "确认发送",
+    decline: "暂不发送",
+  },
   reserve: {
     title: "将这些人选加入岗位储备？",
     approve: "确认加入储备",

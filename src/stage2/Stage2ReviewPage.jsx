@@ -46,7 +46,7 @@ export function Stage2ReviewPage() {
       <section className="s1-review-section">
         <div>
           <small>02</small>
-          <h2>本轮审批重点</h2>
+          <h2>本轮审批重点：轻量任务对话</h2>
           <p>
             验证用户是否能用同一套交互创建、继续和管理不同复杂度的猎头任务。
           </p>
@@ -68,7 +68,7 @@ export function Stage2ReviewPage() {
             <Icon name="message" />
             <b>交互一致性</b>
             <p>
-              自然语言、必要确认、授权与失败恢复共用业务规则；独立资产页手工操作保留。
+              当前工作只显示一次，不固定、不回查；完成后显示处理用时和回复。澄清支持单选、多选和输入，操作授权仍用确认框。
             </p>
           </article>
           <article>

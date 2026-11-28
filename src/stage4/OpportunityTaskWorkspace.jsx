@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
-import { Composer, HunterReply, RuntimeBar, UserMessage } from "../stage2/automation-ui";
+import { Composer, HunterReply, TaskActivity, UserMessage } from "../stage2/automation-ui";
 import { TaskAreaNav } from "../stage2/TaskAreaNav";
 import { workItems } from "../stage2/data";
 import { Button, DataTable, DefinitionGrid, FieldGroup, Modal, StateBanner, StatusBadge, TagList } from "./asset-ui";
@@ -14,6 +14,7 @@ import { draftSummaryMarkdown, markdownText, writeResultMarkdown } from "./oppor
 import { activeTaskPlan, missingFollowupField } from "./task-followup";
 import { displayDraftConfirmation } from "./single-asset-confirmation";
 import { TaskReadingWorkspace } from "../stage2/TaskReadingWorkspace";
+import { TaskTimeline } from "../stage2/TaskConversation";
 import { TaskResultReader } from "../stage2/TaskResultReader";
 import { InspectionPanel } from "../stage2/ReviewWorkspace";
 import { executionApprovalKey, TaskExecutionApproval } from "../stage2/TaskExecutionApproval";
@@ -111,7 +112,6 @@ export function OpportunityTaskWorkspace({ taskId }) {
   const [attachments, setAttachments] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [planOpen, setPlanOpen] = useState(false);
   const [inspection, setInspection] = useState(null);
   const [resultOpen, setResultOpen] = useState(false);
   const [reserveDraft, setReserveDraft] = useState(null);
@@ -192,7 +192,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
   return <TaskReadingWorkspace taskId={task.id} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : resultOpen ? <TaskResultReader title="人选结果" version={task.positionVersion} rows={candidates.map(candidate => ({ id: candidate.id, title: candidate.name, subtitle: `${candidate.company} · ${candidate.title}`, details: { 已有技能: candidate.skills.join("、"), 所在地: candidate.location, 评分与证据: "当前样例未提供任务初筛分或独立证据，不能据此断言已核实。" }, href: `#/candidates/${candidate.id}` }))} onClose={() => setResultOpen(false)} /> : null} header={<><TaskAreaNav value="tasks" />
       <header className="s2-detail-header"><button type="button" onClick={() => navigate("/tasks")}><Icon name="chevronLeft" />返回全部任务</button>
         <div><h1>{task.title}</h1><p>{opportunity?.title || sourcePosition?.name || "招聘需求处理"}</p></div><StatusBadge tone={task.phase === "result" ? "success" : "warning"}>{task.status}</StatusBadge></header></>}>
-      <div className="s2-task-detail-layout"><section className="s2-task-conversation"><div className="s2-task-timeline" ref={timelineRef}>
+      <div className="s2-task-detail-layout"><section className="s2-task-conversation"><TaskTimeline className="s2-task-timeline" ref={timelineRef}>
         <p>【原型说明，正式实现不展示】使用本地输入与显式字段演示资料整理；未调用生产 Agent，不读取外部邮箱或发送邮件。</p>
         {task.source?.kind === "signal" ? <HunterReply markdown={"[查看来源洞察](#/signals?signal=" + encodeURIComponent(task.source.id) + ")"} /> : null}
         {task.messages.map((message) => message.role === "user" ? <div key={message.id}><UserMessage time={displayDateTime(message.at)}>{message.content}</UserMessage>
@@ -210,7 +210,7 @@ export function OpportunityTaskWorkspace({ taskId }) {
         {pipelineResults.map((result, index) => <HunterReply key={index} markdown={"已将 " + result.candidateIds.map((id) => candidates.find((candidate) => candidate.id === id)?.name || id).join("、") + " 加入岗位储备，并同步更新岗位人才梳理。未发送联系消息。\n\n[查看人才梳理](#/positions/" + encodeURIComponent(result.id) + "?tab=talent-map)"} />)}
         {task.opportunityId && task.kind === "opportunity" && task.phase === "result" ? <TaskOpportunityFollowup task={task} hasUnsentChanges={Boolean(value.trim() || attachments.length)} /> : null}
         {error ? <><HunterReply markdown={"> " + markdownText(error)} />{task.phase === "input" ? <Button icon="refresh" onClick={prepare}>重试整理</Button> : null}</> : null}
-      </div><div className="s2-task-composer-dock"><RuntimeBar open={planOpen} onToggle={() => setPlanOpen(!planOpen)} plan={plan} tasks={plan.map(step => ({ id: `${task.id}-${step.id}`, stepId: step.id, kind: "task", title: step.title, action: step.detail || "核对当前本地任务资料与确认范围", status: step.status === "done" ? "完成" : "等待用户", duration: "本地示例", resultDestination: "当前任务；正式资产仅在本版确认和检查后更新" }))} onInspectTask={setInspection} docked />
+      </TaskTimeline><div className="s2-task-composer-dock"><TaskActivity plan={plan} />
         <Composer value={value} onChange={setValue} onSend={send} authMode={task.authMode === "analyze" ? "analysis" : task.authMode} onAuthChange={updateAuthorization}
           attachments={attachments} onAttachmentsChange={setAttachments} disabled={busy || getOpportunityPermission()} placeholder="补充需求、客户回复或新的依据" />
       </div></section></div>
