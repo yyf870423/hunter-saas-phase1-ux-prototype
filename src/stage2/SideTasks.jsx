@@ -32,7 +32,7 @@ import { TaskAreaNav } from "./TaskAreaNav";
 import { mergeLifecycleTasks, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
 import { OpportunityTaskWorkspace } from "../stage4/OpportunityTaskWorkspace";
 import { TaskReadingColumns, TaskReadingWorkspace } from "./TaskReadingWorkspace";
-import { TaskQuestion, TaskTimeline } from "./TaskConversation";
+import { TaskPresentationGate, TaskQuestion, TaskTimeline } from "./TaskConversation";
 import { TaskHeaderActions } from "./TaskWorkspaceControls";
 import { InspectionPanel } from "./ReviewWorkspace";
 
@@ -640,24 +640,24 @@ export function RecommendationReportWorkspace({ onClose }) {
 
 你可以继续在对话中提出修改意见，每次修改都会生成一个新的报告文件。`}
             />
-            <RecommendationReportFile
+            <TaskPresentationGate gateKey={`report-${initialReport.version}`}><RecommendationReportFile
               candidateName={candidateName}
               report={initialReport}
               onPreview={(item) =>
                 setPreviewArtifactId(`report-${item.version}`)
               }
-            />
+            /></TaskPresentationGate>
             <UserMessage time="今天 10:20">
               把开头改得更适合直接发给客户，并补充团队规模，但不要删除风险提示。
             </UserMessage>
             <HunterReply markdown="已按要求调整：开头改为客户可直接阅读的推荐摘要，并在核心证据中补充当前管理的团队规模；原有风险提示和待核实项均保留。" />
-            <RecommendationReportFile
+            <TaskPresentationGate gateKey={`report-${reviewedReport.version}`}><RecommendationReportFile
               candidateName={candidateName}
               report={reviewedReport}
               onPreview={(item) =>
                 setPreviewArtifactId(`report-${item.version}`)
               }
-            />
+            /></TaskPresentationGate>
             {replies.map((reply, index) => <div key={index}>
               <UserMessage>{[reply.text, ...reply.files].filter(Boolean).join("\n")}</UserMessage>
               <HunterReply markdown="修改要求已保留。风险提示和待核实信息仍保留，报告没有对外发送。" />
@@ -665,13 +665,13 @@ export function RecommendationReportWorkspace({ onClose }) {
             {revised ? (
               <>
                 <HunterReply markdown="【原型说明，正式实现不展示】以下为预置修订示例文件，尚未调用 Agent 按本次输入生成报告。" />
-                <RecommendationReportFile
+                <TaskPresentationGate gateKey={`report-${latestReport.version}`}><RecommendationReportFile
                   candidateName={candidateName}
                   report={latestReport}
                   onPreview={(item) =>
                     setPreviewArtifactId(`report-${item.version}`)
                   }
-                />
+                /></TaskPresentationGate>
               </>
             ) : null}
           </TaskTimeline>

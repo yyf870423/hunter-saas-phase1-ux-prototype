@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Button, StatusBadge } from "../stage1/ui";
 import "./task-execution-approval.css";
 import { executionApprovalCopy } from "./execution-approval-copy";
-import { useTaskConversation } from "./TaskConversation";
+import { useTaskConversation, useTaskPresentationGate } from "./TaskConversation";
 
 export const executionApprovalKey = (taskId, scope) =>
   JSON.stringify([taskId, scope]);
@@ -20,6 +20,7 @@ export function TaskExecutionApproval({
   onDecline,
 }) {
   const conversation = useTaskConversation();
+  const presentationReady = useTaskPresentationGate(requestKey);
   const id = useId();
   const copy = Object.hasOwn(executionApprovalCopy, action)
     ? executionApprovalCopy[action]
@@ -107,6 +108,7 @@ export function TaskExecutionApproval({
       }
     }
   };
+  if (!presentationReady) return null;
   return (
     <section
       className="s2-execution-approval"

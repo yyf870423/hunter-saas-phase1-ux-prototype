@@ -15,6 +15,7 @@ import { WorkstreamHeader } from "../stage2/Workstreams";
 import { TaskReadingWorkspace } from "../stage2/TaskReadingWorkspace";
 import { TaskQuestion, TaskTimeline } from "../stage2/TaskConversation";
 import { taskInitialStepMs } from "../stage2/task-timing";
+import { clearTaskPlayback, readCompletedTaskPhase, useTaskPlaybackState } from "../stage2/task-playback";
 import { executionApprovalKey, TaskExecutionApproval } from "../stage2/TaskExecutionApproval";
 import { TaskResultReader, contactReadingRows, organizationReadingRows, positionReadingRows } from "../stage2/TaskResultReader";
 import {
@@ -53,7 +54,8 @@ function forcedPhase(scenarioId, state) {
   return null;
 }
 
-function readMappingMessages(storageKey, forcedState) {
+function readMappingMessages(storageKey, forcedState, completedPhase) {
+  if (!forcedState && completedPhase === null) return [];
   try {
     const messages = JSON.parse(sessionStorage.getItem(`${storageKey}-messages`) || "null");
     if (Array.isArray(messages) && messages.every((item) => item && typeof item.text === "string" && typeof item.result === "string") && (!forcedState || forcedState === "completed" && messages.some((item) => Object.values(mappingSaveOutcomes).some((outcome) => item.result.startsWith("## 人才地图已更新"))))) return messages;
@@ -538,15 +540,15 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   const organizationCompanies = companyIds ? organizationScope.filter((company) => companyIds.includes(company.id)) : organizationScope;
   const organizationMapSaved = graphs.some((graph) => graph.id === "mapping-embodied" && !graph.deletedAt && graph.batchIds?.includes(organizationBatchId(organizationCompanies)));
   const storageKey = `hunter-stage3-${scenarioId}${companyIds ? "-" + companyIds.join("-") : ""}`;
+  const completedOnOpen = useRef(readCompletedTaskPhase(storageKey, scenario.maxPhase));
   const requestedPhase = forcedPhase(scenarioId, forcedState);
   const directPhase = scenarioId === "client-xinglan" && requestedPhase !== null ? Math.min(requestedPhase, 2) : requestedPhase;
   const [phase, setPhase] = useState(() => {
     if (directPhase !== null) return scenarioId === "mapping-embodied" && directPhase === 5 ? 4 : directPhase;
-    const stored = Number(sessionStorage.getItem(`${storageKey}-phase`));
-    return Number.isFinite(stored) ? scenarioId === "client-xinglan" && !getOpportunitySnapshot().tasks.some((task) => task.id === scenarioId) ? Math.min(stored, 2) : stored : 0;
+    const stored = completedOnOpen.current ?? 0;
+    return scenarioId === "client-xinglan" && !getOpportunitySnapshot().tasks.some((task) => task.id === scenarioId) ? Math.min(stored, 2) : stored;
   });
   const [paused, setPaused] = useState(forcedState === "limited");
-  const [outputBusy, setOutputBusy] = useState(false);
   const [terminated, setTerminated] = useState(false);
   const [inspection, setInspection] = useState(null);
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -557,7 +559,10 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   });
   const [composer, setComposer] = useState("");
   const [attachments, setAttachments] = useState([]);
-  const [messages, setMessages] = useState(() => scenarioId === "mapping-embodied" ? readMappingMessages(storageKey, forcedState) : []);
+  const [messages, setMessages] = useState(() => scenarioId === "mapping-embodied" ? readMappingMessages(storageKey, forcedState, completedOnOpen.current) : []);
+  const [outputBusy, onOutputBusyChange] = useTaskPlaybackState(storageKey, phase, !forcedState, () => {
+    if (scenarioId === "mapping-embodied") sessionStorage.setItem(`${storageKey}-messages`, JSON.stringify(messages));
+  });
   const [resultDraft, setResultDraft] = useState(null);
   const [savedContactNames, setSavedContactNames] = useState([]);
   const [planAdjusted, setPlanAdjusted] = useState(false);
@@ -610,7 +615,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   }, [directPhase, forcedState, scenarioId, storageKey]);
 
   useEffect(() => {
-    if (scenarioId !== "mapping-embodied" || (forcedState && forcedState !== "completed")) return;
+    if (scenarioId !== "mapping-embodied" || forcedState !== "completed") return;
     sessionStorage.setItem(`${storageKey}-messages`, JSON.stringify(messages));
   }, [scenarioId, forcedState, storageKey, messages]);
 
@@ -644,8 +649,6 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
   ]);
 
   useEffect(() => {
-    if (!forcedState)
-      sessionStorage.setItem(`${storageKey}-phase`, String(phase));
     const key = `${storageKey}:${forcedState || ""}`;
     if (phase > 0 && initialScroll.current !== key) {
       initialScroll.current = key;
@@ -698,6 +701,8 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
         : "warning";
 
   const reset = () => {
+    clearTaskPlayback(storageKey);
+    completedOnOpen.current = null;
     sessionStorage.removeItem(`${storageKey}-phase`);
     setPhase(0);
     setPaused(false);
@@ -859,7 +864,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
 
   return (
     <>
-      <TaskReadingWorkspace taskId={scenarioId} onOutputBusyChange={setOutputBusy} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : reviewOpen ? <TaskResultReader key={scenarioId} title={scenarioId === "client-xinglan" ? "联系人结果" : scenarioId === "mapping-embodied" ? "组织梳理结果" : "岗位匹配结果"} rows={scenarioId === "client-xinglan" ? contactReadingRows(contactReviewRows) : scenarioId === "mapping-embodied" ? organizationReadingRows(organizationCompanies) : positionReadingRows(careerMatches)} companies={scenarioId === "mapping-embodied" ? organizationCompanies : undefined} onClose={() => setReviewOpen(false)} /> : null} header={<WorkstreamHeader
+      <TaskReadingWorkspace taskId={scenarioId} onOutputBusyChange={onOutputBusyChange} resumeHistory={!forcedState && completedOnOpen.current !== null} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : reviewOpen ? <TaskResultReader key={scenarioId} title={scenarioId === "client-xinglan" ? "联系人结果" : scenarioId === "mapping-embodied" ? "组织梳理结果" : "岗位匹配结果"} rows={scenarioId === "client-xinglan" ? contactReadingRows(contactReviewRows) : scenarioId === "mapping-embodied" ? organizationReadingRows(organizationCompanies) : positionReadingRows(careerMatches)} companies={scenarioId === "mapping-embodied" ? organizationCompanies : undefined} onClose={() => setReviewOpen(false)} /> : null} header={<WorkstreamHeader
           type={scenario.type}
           phase={phase}
           title={scenario.title}

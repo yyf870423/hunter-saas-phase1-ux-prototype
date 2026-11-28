@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import { rehypeReplyStream } from "./task-streaming";
 import { useTaskReplyStream } from "./useTaskReplyStream";
 import { Icon } from "../components/Icon";
-import { TaskActivity, TaskQuestion, TaskTurnSummary, useTaskConversation } from "./TaskConversation";
+import { TaskActivity, TaskQuestion, TaskTurnSummary, useTaskConversation, useTaskPresentationGate } from "./TaskConversation";
 import {
   Button,
   Drawer,
@@ -424,8 +424,10 @@ export function HunterReply({ children, markdown, streaming = false, elapsedMs, 
   const conversation = useTaskConversation();
   const id = useId();
   const generation = useRef(conversation?.turn?.id || conversation?.result.generation || 0);
-  const live = Boolean(!historical && conversation && !conversation.outputStopped && (streaming || generation.current || conversation.work?.status === "running"));
+  const resuming = conversation?.resumeHistory && !conversation.work && generation.current === 0;
+  const live = Boolean(!historical && !resuming && conversation && !conversation.outputStopped && (streaming || generation.current || conversation.work?.status === "running" || conversation.outputBusy));
   const output = useTaskReplyStream(id, markdown || "", conversation, live);
+  const presentationReady = useTaskPresentationGate(`${id}:${output.key || "initial"}`);
   const completed = useRef(null);
   useEffect(() => {
     if (!streaming) return conversation?.registerReply(id, generation.current);
@@ -437,6 +439,7 @@ export function HunterReply({ children, markdown, streaming = false, elapsedMs, 
   const elapsed = Number.isFinite(elapsedMs) ? elapsedMs + outputElapsed : completed.current?.elapsed ?? (generation.current === 0 ? conversation?.initialElapsed : null);
   if (generation.current && conversation?.turn?.id === generation.current) return null;
   if (output.pending && conversation?.outputs[0]?.key !== output.key) return null;
+  if (!markdown && !presentationReady) return null;
   return (
     <article
       className={`s2-hunter-reply ${streaming ? "is-streaming" : ""}`}
@@ -447,7 +450,7 @@ export function HunterReply({ children, markdown, streaming = false, elapsedMs, 
     >
       {conversation && !streaming && isTimingReply && Number.isFinite(elapsed) ? <TaskTurnSummary elapsed={elapsed} /> : null}
       {markdown ? <HunterMarkdown content={output.source} budget={output.complete ? Infinity : output.budget} /> : null}
-      {output.complete ? children : null}
+      {output.complete && presentationReady ? children : null}
     </article>
   );
 }

@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -30,7 +31,7 @@ export function formatTaskDuration(milliseconds) {
     : `${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒`;
 }
 
-export function TaskConversationProvider({ children, onOutputBusyChange }) {
+export function TaskConversationProvider({ children, onOutputBusyChange, resumeHistory = false }) {
   const location = useLocation();
   const feedback = useTaskFeedback();
   const [work, setWork] = useState(null);
@@ -57,9 +58,9 @@ export function TaskConversationProvider({ children, onOutputBusyChange }) {
     setOutputStopped(true);
   }, []);
   useEffect(() => {
-    onOutputBusyChange?.(outputBusy);
-    return () => onOutputBusyChange?.(false);
-  }, [outputBusy, onOutputBusyChange]);
+    onOutputBusyChange?.(outputBusy, { stopped: outputStopped });
+  }, [outputBusy, outputStopped, onOutputBusyChange]);
+  useEffect(() => () => onOutputBusyChange?.(false, { unmounted: true }), [onOutputBusyChange]);
   const registerWait = useCallback((id, label) => {
     setWaiting((current) => [...current, { id, label }]);
     return () =>
@@ -209,11 +210,36 @@ export function TaskConversationProvider({ children, onOutputBusyChange }) {
         removeOutput,
         finishOutput,
         stopOutput,
+        resumeHistory,
       }}
     >
       {children}
     </ConversationContext.Provider>
   );
+}
+
+export function useTaskPresentationGate(key) {
+  const conversation = useTaskConversation();
+  const [gate, setGate] = useState({ key, visible: false, cancelled: false });
+  const visible = gate.key === key && gate.visible;
+  const cancelled = gate.key === key && gate.cancelled;
+  const busy = Boolean(conversation?.outputBusy);
+  const stopped = Boolean(conversation?.outputStopped);
+  useLayoutEffect(() => {
+    if (gate.key !== key) setGate({ key, visible: false, cancelled: stopped });
+    else if (stopped && !visible && !cancelled) setGate({ key, visible: false, cancelled: true });
+  }, [key, stopped, visible, cancelled, gate.key]);
+  useEffect(() => {
+    if (!conversation || visible || cancelled || busy || stopped) return;
+    // Let sibling replies register their output before exposing a new card.
+    const timer = setTimeout(() => setGate({ key, visible: true, cancelled: false }), 0);
+    return () => clearTimeout(timer);
+  }, [key, visible, cancelled, busy, stopped, Boolean(conversation)]);
+  return !conversation || visible;
+}
+
+export function TaskPresentationGate({ gateKey, children }) {
+  return useTaskPresentationGate(gateKey) ? children : null;
 }
 
 export function TaskActivity({
@@ -383,6 +409,7 @@ export function TaskQuestion({
 }) {
   const conversation = useTaskConversation();
   const id = useId();
+  const presentationReady = useTaskPresentationGate(questionKey);
   const [values, setValues] = useState([]),
     [text, setText] = useState("");
   const [status, setStatus] = useState("ready"),
@@ -470,6 +497,7 @@ export function TaskQuestion({
       }
     }
   };
+  if (!presentationReady) return null;
   return (
     <section
       className="s2-task-question"

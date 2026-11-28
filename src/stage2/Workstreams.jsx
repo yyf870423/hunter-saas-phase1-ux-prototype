@@ -22,6 +22,7 @@ import { InspectionPanel } from "./ReviewWorkspace";
 import { TaskReadingWorkspace } from "./TaskReadingWorkspace";
 import { TaskQuestion, TaskTimeline } from "./TaskConversation";
 import { taskInitialStepMs } from "./task-timing";
+import { clearTaskPlayback, readCompletedTaskPhase, useTaskPlaybackState } from "./task-playback";
 import { TaskResultReader, candidateReadingRows } from "./TaskResultReader";
 import { TaskAreaNav } from "./TaskAreaNav";
 import { getOpportunityPermission, runOpportunityCommand, useOpportunityState } from "../stage4/opportunity-store";
@@ -135,7 +136,6 @@ export function WorkstreamHeader({
 const pipelineDialogueExample = "陈楚宁约了一面，梁辰二面过了、进谈薪，周明远客户没通过";
 
 export function AutomationWorkspace() {
-  const [outputBusy, setOutputBusy] = useState(false);
   const opportunityState = useOpportunityState();
   const talentResult = opportunityState.positions.find((item) => item.id === "position-vla")?.talentMap;
   const reviewPositionVersion = useRef(opportunityState.positions.find((item) => item.id === "position-vla")?.version).current;
@@ -143,6 +143,7 @@ export function AutomationWorkspace() {
   const [params] = useSearchParams();
   const notify = useToast();
   const forcedState = params.get("state");
+  const completedOnOpen = useRef(readCompletedTaskPhase("hunter-workstream", 5));
   const [phase, setPhase] = useState(() => {
     if (forcedState === "stream-error") return 1;
     if (forcedState === "limited") return 2;
@@ -153,16 +154,18 @@ export function AutomationWorkspace() {
     if (forcedState === "no-candidate") return 4;
     if (forcedState === "waiting" || forcedState === "candidate-reply")
       return 5;
-    const restored = Number(sessionStorage.getItem("hunter-workstream-phase"));
-    return Number.isFinite(restored) ? restored : 0;
+    return completedOnOpen.current ?? 0;
   });
+  const [outputBusy, onOutputBusyChange] = useTaskPlaybackState("hunter-workstream", phase, !forcedState);
   const [paused, setPaused] = useState(
     () =>
       !forcedState &&
+      completedOnOpen.current !== null &&
       sessionStorage.getItem("hunter-workstream-paused") === "1",
   );
   const [terminated, setTerminated] = useState(false);
   const [inspection, setInspection] = useState(() => {
+    if (!forcedState && completedOnOpen.current === null) return null;
     try {
       const saved = JSON.parse(
         sessionStorage.getItem("hunter-workstream-inspection") || "null",
@@ -173,7 +176,7 @@ export function AutomationWorkspace() {
     }
   });
   const [reviewOpen, setReviewOpen] = useState(
-    () => sessionStorage.getItem("hunter-review-open") === "1",
+    () => (forcedState || completedOnOpen.current !== null) && sessionStorage.getItem("hunter-review-open") === "1",
   );
   const [authMode, setAuthMode] = useState(
     () => sessionStorage.getItem("hunter-workstream-auth") || "confirm",
@@ -192,6 +195,7 @@ export function AutomationWorkspace() {
   const [planAdjusted, setPlanAdjusted] = useState(
     () =>
       !forcedState &&
+      completedOnOpen.current !== null &&
       sessionStorage.getItem("hunter-workstream-plan-adjusted") === "1",
   );
   const [latestPlanRequirement, setLatestPlanRequirement] = useState(
@@ -209,7 +213,7 @@ export function AutomationWorkspace() {
   const [contactStage, setContactStage] = useState(() => {
     if (forcedState === "waiting") return "waiting";
     if (forcedState === "candidate-reply") return "reply";
-    return sessionStorage.getItem("hunter-workstream-contact-stage") || "idle";
+    return completedOnOpen.current >= 5 ? sessionStorage.getItem("hunter-workstream-contact-stage") || "idle" : "idle";
   });
   const [ingestionDecision, setIngestionDecision] = useState("");
   const [ingestionDraft, setIngestionDraft] = useState(null);
@@ -262,11 +266,6 @@ export function AutomationWorkspace() {
   }, [forcedState, paused, phase, streamError, streamStopped, terminated, outputBusy]);
 
   useEffect(() => {
-    if (!forcedState)
-      sessionStorage.setItem("hunter-workstream-phase", String(phase));
-  }, [forcedState, phase]);
-
-  useEffect(() => {
     sessionStorage.setItem("hunter-workstream-draft", composer);
   }, [composer]);
 
@@ -315,6 +314,8 @@ export function AutomationWorkspace() {
   }, [forcedState, phase]);
 
   const resetDemo = () => {
+    clearTaskPlayback("hunter-workstream");
+    completedOnOpen.current = null;
     setPhase(0);
     setPaused(false);
     setTerminated(false);
@@ -639,7 +640,7 @@ export function AutomationWorkspace() {
 
   return (
     <>
-      <TaskReadingWorkspace taskId="position-vla" onOutputBusyChange={setOutputBusy} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : reviewOpen ? <TaskResultReader title="候选人结果" rows={candidateReadingRows(candidates)} onClose={() => setReviewOpen(false)} /> : null} header={<WorkstreamHeader
+      <TaskReadingWorkspace taskId="position-vla" onOutputBusyChange={onOutputBusyChange} resumeHistory={!forcedState && completedOnOpen.current !== null} inspection={Boolean(inspection)} result={inspection ? <InspectionPanel item={inspection} onClose={() => setInspection(null)} /> : reviewOpen ? <TaskResultReader title="候选人结果" rows={candidateReadingRows(candidates)} onClose={() => setReviewOpen(false)} /> : null} header={<WorkstreamHeader
           status={
             contactStage === "waiting"
               ? "等待外部"
@@ -916,7 +917,7 @@ export function AutomationWorkspace() {
 > 可以补充新的渠道或调整岗位边界后重做受影响步骤；Hunter 不会为了凑数量放宽已经确认的硬门槛。`}
               />
             ) : null}
-            {talentResult && !userDecisions.length ? <HunterReply markdown={`## 岗位找人结果已保存\n\n岗位人才梳理 v${talentResult.version} 已保留 ${talentResult.rows.length} 位已审核人选的匹配依据、风险和来源；岗位流程状态同步显示。\n\n[查看岗位储备](#/positions/position-vla?tab=pipeline) · [查看人才梳理](#/positions/position-vla?tab=talent-map)`} /> : null}
+            {phase >= 4 && talentResult && !userDecisions.length ? <HunterReply markdown={`## 岗位找人结果已保存\n\n岗位人才梳理 v${talentResult.version} 已保留 ${talentResult.rows.length} 位已审核人选的匹配依据、风险和来源；岗位流程状态同步显示。\n\n[查看岗位储备](#/positions/position-vla?tab=pipeline) · [查看人才梳理](#/positions/position-vla?tab=talent-map)`} /> : null}
             {userDecisions.map((decision, index) => (
               <div
                 className="s2-decision-thread"

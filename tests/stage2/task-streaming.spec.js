@@ -71,7 +71,7 @@ test("公司调研多条回复顺序流式，期间不能提前确认，表格�
   await expect(page.getByRole("heading", { name: "公司值得继续核实招聘需求" })).toBeVisible();
   await expect(output(page)).toHaveCount(1);
   const approval = page.getByRole("region", { name: "本次操作确认", exact: true });
-  await expect(approval.getByRole("button", { name: "确认入库" })).toBeDisabled();
+  await expect(approval).toHaveCount(0);
   await page.screenshot({ path: info.outputPath("queued-replies.png") });
   await idle(page);
   await expect(page.locator(".s2-markdown-table").first()).toBeVisible();
