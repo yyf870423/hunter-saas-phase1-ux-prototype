@@ -13,6 +13,7 @@ import { Button } from "../stage1/ui";
 import { CustomCheckbox, CustomRadio, TextInput } from "../stage4/asset-ui";
 import "./task-conversation.css";
 import { TaskFeedback, useTaskFeedback } from "./TaskFeedback";
+import { taskOperationLabels } from "./task-operations";
 import {
   TASK_DEMO_STAGE_MS,
   TASK_DEMO_TURN_MS,
@@ -21,24 +22,6 @@ import {
 
 const ConversationContext = createContext(null);
 export const useTaskConversation = () => useContext(ConversationContext);
-
-const workLabels = (pathname) => {
-  if (pathname.includes("client-"))
-    return ["正在核对公司资料与本轮要求…", "正在整理招聘信号和待确认事项…"];
-  if (pathname.includes("mapping-"))
-    return ["正在核对组织、任职人与来源…", "正在整理组织关系和待核实项…"];
-  if (pathname.includes("career-"))
-    return ["正在读取候选人经历与岗位条件…", "正在整理匹配依据和信息缺口…"];
-  if (pathname.includes("task-hand-"))
-    return ["正在读取你补充的身份线索…", "正在整理冲突与待核实信息…"];
-  if (pathname.includes("summary"))
-    return ["正在读取本轮反馈与补充要求…", "正在整理摘要与待确认事项…"];
-  if (pathname.includes("periodic"))
-    return ["正在读取本轮记录与连续上下文…", "正在核对本轮结果和处理范围…"];
-  if (pathname.includes("position-") || pathname.includes("research"))
-    return ["正在核对岗位要求与人选资料…", "正在整理人选结果、匹配依据和缺口…"];
-  return ["正在读取本轮要求与相关资料…", "正在核对结果与处理范围…"];
-};
 
 export function formatTaskDuration(milliseconds) {
   const seconds = Math.max(1, Math.round(milliseconds / 1000));
@@ -196,6 +179,8 @@ export function TaskActivity({
   const conversation = useTaskConversation();
   const running = plan.find((step) => step.status === "running");
   const waiting = plan.find((step) => step.status === "waiting-user");
+  const operationLabels = taskOperationLabels(conversation?.location.pathname || "", running?.id);
+  const operationKey = `${conversation?.location.pathname}:${running?.id || running?.title || ""}`;
   const external = waiting?.statusDetail?.includes("等待外部");
   const label =
     state === "error"
@@ -211,19 +196,27 @@ export function TaskActivity({
                 ? "等待你的确认"
                 : "等待你的回复"
               : running
-                ? running.title
+                ? operationLabels[0]
                 : "本轮处理已完成，可以继续提出要求";
   const status =
     state ||
     (paused ? "paused" : waiting ? "waiting" : running ? "running" : "done");
   useEffect(() => {
-    conversation?.setWork({ label: message || label, status });
+    conversation?.setWork({ label: message || label, status, operationLabels: message ? null : operationLabels, operationKey });
     return () => conversation?.setWork(null);
-  }, [conversation?.setWork, label, status, message]);
+  }, [conversation?.setWork, label, status, message, operationLabels, operationKey]);
   return null;
 }
 
-export function TaskWorkStatus({ label, running = false }) {
+export function TaskWorkStatus({ label, running = false, operationLabels, operationKey }) {
+  const [progress, setProgress] = useState(null);
+  const stage = progress && progress.key === operationKey ? progress.stage : 0;
+  useEffect(() => {
+    if (!running || !operationLabels || operationLabels.length < 2) return;
+    setProgress({ key: operationKey, stage: 0 });
+    const timer = setTimeout(() => setProgress({ key: operationKey, stage: 1 }), TASK_DEMO_STAGE_MS);
+    return () => clearTimeout(timer);
+  }, [running, operationLabels, operationKey]);
   return (
     <p className={`s2-agent-work ${running ? "is-working" : ""}`} role="status">
       {running ? (
@@ -231,7 +224,7 @@ export function TaskWorkStatus({ label, running = false }) {
       ) : (
         <span className="s2-agent-work-dot" aria-hidden="true" />
       )}
-      <span>{label}</span>
+      <span>{running && operationLabels ? operationLabels[stage] : label}</span>
     </p>
   );
 }
@@ -289,7 +282,7 @@ export function TaskTimeline({
       {turn ? (
         <TaskWorkStatus
           running
-          label={workLabels(conversation.location.pathname)[turn.stage]}
+          label={taskOperationLabels(conversation.location.pathname)[turn.stage]}
         />
       ) : waiting.length &&
         !["paused", "stopped", "error"].includes(work?.status) ? (
@@ -298,6 +291,8 @@ export function TaskTimeline({
         <TaskWorkStatus
           running={work.status === "running"}
           label={work.label}
+          operationLabels={work.operationLabels}
+          operationKey={work.operationKey}
         />
       ) : null}
       <span ref={bottom} />

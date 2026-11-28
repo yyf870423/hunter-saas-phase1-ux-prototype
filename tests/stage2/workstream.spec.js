@@ -6,11 +6,11 @@ import {
 } from "../stage1/helpers";
 
 async function waitForReview(page) {
-  await expect(page.getByText("云端检索已开始")).toBeVisible({
-    timeout: 10_000,
+  await expect(page.getByText("本轮检索范围已确定")).toBeVisible({
+    timeout: 18_000,
   });
   await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
-    timeout: 10_000,
+    timeout: 45_000,
   });
 }
 
@@ -169,7 +169,7 @@ test("加载、流式中断和公开来源受限状态都可恢复", async ({ pa
   await page.goto("#/tasks/position-vla?state=stream-error");
   await expect(page.getByText("回复生成中断")).toBeVisible();
   await page.getByRole("button", { name: "继续生成" }).click();
-  await expect(page.getByText("云端检索已开始")).toBeVisible({
+  await expect(page.getByText("本轮检索范围已确定")).toBeVisible({
     timeout: 8_000,
   });
 

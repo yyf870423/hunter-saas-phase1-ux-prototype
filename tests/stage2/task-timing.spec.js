@@ -1,8 +1,9 @@
-import { expect, test } from "@playwright/test";
+import { expect as baseExpect, test } from "@playwright/test";
 import {
   TASK_DEMO_TURN_MS,
   TASK_DEMO_RESEARCH_MS,
 } from "../../src/stage2/task-timing";
+const expect = baseExpect.configure({ timeout: TASK_DEMO_TURN_MS + 5000 });
 
 test.describe.configure({ mode: "parallel" });
 const input = (page) => page.getByRole("textbox", { name: "任务对话输入" });
@@ -48,7 +49,7 @@ async function checkElapsed(page, started, minimum) {
 }
 
 for (const width of [795, 1440])
-  test(`${width}px普通处理真实等待约六秒，显示值来自同一次计时`, async ({
+  test(`${width}px普通处理真实等待约十二秒，显示值来自同一次计时`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize({ width, height: 865 });
@@ -58,7 +59,7 @@ for (const width of [795, 1440])
     const started = await page.evaluate(() => performance.now());
     await input(page).press("Enter");
     await expect(page.locator(".s2-agent-work.is-working")).toContainText(
-      "正在读取本轮反馈",
+      "读取内容 · 本轮反馈与补充要求",
     );
     await page.screenshot({ path: testInfo.outputPath("working.png") });
     const measured = await checkElapsed(page, started, TASK_DEMO_TURN_MS);
@@ -69,7 +70,7 @@ for (const width of [795, 1440])
     });
   });
 
-test("首轮客户调研按实际推进计时，不填固定十二秒", async ({
+test("首轮客户调研按实际推进计时，不填预置秒数", async ({
   page,
 }, testInfo) => {
   await page.goto("#/tasks/client-xinglan");
@@ -87,7 +88,7 @@ test("首轮客户调研按实际推进计时，不填固定十二秒", async ({
   });
 });
 
-test("深入调研显示累计十二秒，包含前置处理和核实阶段", async ({
+test("深入调研显示累计二十四秒，包含前置处理和核实阶段", async ({
   page,
 }, testInfo) => {
   await page.goto("#/tasks/candidate-research-demo");

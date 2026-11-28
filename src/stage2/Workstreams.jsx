@@ -254,7 +254,7 @@ export function AutomationWorkspace() {
       return undefined;
     const timer = window.setTimeout(
       () => setPhase((current) => current + 1),
-      taskInitialStepMs(phase, 4),
+      taskInitialStepMs(phase),
     );
     return () => window.clearTimeout(timer);
   }, [forcedState, paused, phase, streamError, streamStopped, terminated]);
@@ -666,7 +666,7 @@ export function AutomationWorkspace() {
             {phase >= 1 ? (
               <HunterReply
                 streaming={phase === 1 && !streamStopped}
-                markdown={`我会复用已确认的岗位资料，先检查硬要求与可放宽条件，再并行处理系统候选人、知识图谱、论文专利和公开网络资料。用户主动上传的新简历也可以随时并入本任务。${
+                markdown={`已读取已确认的岗位资料，硬要求与可放宽条件需要分别判断。本轮查找系统候选人、知识图谱、论文专利和公开网络资料；你主动上传的新简历也会进入同一套身份核验与匹配流程。${
                   phase >= 2
                     ? `
 
@@ -713,9 +713,9 @@ export function AutomationWorkspace() {
             ) : null}
             {phase >= 2 ? (
               <HunterReply
-                markdown={`## 云端检索已开始
+                markdown={`## 本轮检索范围已确定
 
-Hunter 正在检查系统候选人、知识图谱、论文、专利和公开网络资料。Hunter 不会登录或自动操作需要认证的人才网站；你可以随时在下方上传整理好的简历文件，上传内容会进入同一套身份判断、查重和匹配流程。`}
+本轮覆盖系统候选人、知识图谱、论文、专利和公开网络资料，不包含需要登录的人才网站。后续按来源核实人物身份、查重和匹配；你上传的简历会进入同一流程，不作为额外一份重复人选。`}
               />
             ) : null}
             {forcedState === "resume-batch" ? (

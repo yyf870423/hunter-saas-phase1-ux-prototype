@@ -141,7 +141,7 @@ function CandidateResearchConversation() {
         </div>
         <div className="s2-research-composer-wrap" onKeyDownCapture={event => { if (event.key === "Enter" && event.nativeEvent.isComposing) event.stopPropagation(); }}>
           <div className="s2-research-context"><span>{view && !inspection ? "正在查看" : "本轮引用"}：{context.title} · v{context.version}</span>{!view ? <Button size="sm" icon="file" onClick={() => open(context.id)}>查看结果</Button> : null}</div>
-          <TaskActivity plan={plan} paused={Boolean(state.stopped)} waitingLabel="新的要求" message={state.job ? `正在核实 ${state.job.ids.length} 位人选的资料…` : undefined} />
+          <TaskActivity plan={plan} paused={Boolean(state.stopped)} waitingLabel="新的要求" />
           <Composer value={draft} onChange={setDraft} onSend={send} authMode={authMode} onAuthChange={setAuthMode} attachments={attachments} onAttachmentsChange={setAttachments} streaming={Boolean(state.job)} onStop={() => send("停止")} placeholder="说明要调研谁，以及想核实什么" />
         </div>
       </section>

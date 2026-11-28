@@ -203,7 +203,7 @@ function ClientTimeline({
       {phase >= 1 ? (
         <HunterReply
           streaming={phase === 1}
-          markdown={`我会先核验公司身份和招聘信号，整理潜在招聘机会并请你确认是否记录，再继续核实联系人与联系方式。融资或扩张新闻只作为线索，不会直接当成客户已确认的招聘需求。${
+          markdown={`已明确本轮目标：先判断星澜机器人的招聘信号是否值得跟进，再请你确认是否记录机会。融资或扩张新闻还不是已确认的招聘需求；本轮不会直接创建岗位或对外联系。${
             phase >= 2
               ? `
 
@@ -343,7 +343,7 @@ ${savedContactNames.length ? `本版确认：${savedContactNames.join("、")}。
 function MappingTimeline({ scope = organizationScope, phase, forcedState, setInspection, openReview }) {
   const roles = scope.flatMap((company) => company.roles.map((role) => ({ ...role, company: company.name })));
   return <>
-    {phase >= 1 ? <HunterReply streaming={phase === 1} markdown={`我会按公司整理组织架构，再定位关键岗位与任职人。先核实组织归属、职责、任职时间和来源；任职人未知时保留岗位，不能把合作关系当作上下级关系。
+    {phase >= 1 ? <HunterReply streaming={phase === 1} markdown={`已将目标拆成公司、组织、关键岗位与任职人四类信息。任职人未知的位置会保留；合作关系不能当作上下级关系，缺少来源的关系也不会作为确定事实。
 
 - 目标公司：${scope.map((company) => company.name).join("、")}。
 - 关注范围：具身智能相关组织、方向团队与关键岗位。
@@ -385,7 +385,7 @@ function CareerTimeline({
       {phase >= 1 ? (
         <HunterReply
           streaming={phase === 1}
-          markdown={`我会先核验动向信号和林昊档案的新鲜度，再与 Hunter 中正在招聘的岗位做增量匹配。不会搜索公开市场岗位，也不会替你联系候选人。${
+          markdown={`已明确本轮匹配范围：只比较 Hunter 中正在招聘的岗位。林昊的动向信号还不能代表求职意愿，需要结合档案新鲜度和最近跟进判断；本轮不搜索公开市场岗位，也不联系候选人。${
             phase >= 2
               ? `
 
@@ -625,7 +625,7 @@ export function BusinessWorkstreamWorkspace({ scenarioId }) {
       return undefined;
     const timer = window.setTimeout(
       () => setPhase((current) => current + 1),
-      taskInitialStepMs(phase, scenario.autoStopPhase),
+      taskInitialStepMs(phase),
     );
     return () => window.clearTimeout(timer);
   }, [

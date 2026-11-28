@@ -12,11 +12,11 @@ test.beforeAll(async () => {
 });
 
 async function waitForCandidateReview(page) {
-  await expect(page.getByText("云端检索已开始")).toBeVisible({
-    timeout: 10_000,
+  await expect(page.getByText("本轮检索范围已确定")).toBeVisible({
+    timeout: 18_000,
   });
   await expect(page.getByText("首批候选人已经可以审核")).toBeVisible({
-    timeout: 10_000,
+    timeout: 45_000,
   });
 }
 

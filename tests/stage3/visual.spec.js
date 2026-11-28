@@ -40,7 +40,7 @@ for (const scenario of [
       await page.setViewportSize(viewport);
       await page.goto(`#/tasks/${scenario[0]}`);
       await expect(page.getByText(scenario[1])).toBeVisible({
-        timeout: 10_000,
+        timeout: 45_000,
       });
       if (scenario[0] === "client-xinglan") await page.getByRole("heading", { name: "待确认的招聘机会", exact: true }).scrollIntoViewIfNeeded();
       else await expectConversationAtLatest(page);

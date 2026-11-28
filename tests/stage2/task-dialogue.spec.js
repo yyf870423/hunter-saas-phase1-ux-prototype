@@ -1,6 +1,7 @@
-import { expect, test } from "@playwright/test";
+import { expect as baseExpect, test } from "@playwright/test";
 import { taskDesignScenarios } from "../../src/stage2/task-design-scenarios";
 import { TASK_DEMO_TURN_MS } from "../../src/stage2/task-timing";
+const expect = baseExpect.configure({ timeout: TASK_DEMO_TURN_MS + 5000 });
 
 const input = (page) => page.getByRole("textbox", { name: "任务对话输入" });
 const question = (page) => page.locator(".s2-task-question").last();
@@ -10,7 +11,7 @@ const send = async (page, text) => {
   await expect(input(page)).toBeEnabled();
 };
 const capture = process.env.TASK_DIALOGUE_CAPTURE_DIR;
-test.describe.configure({ mode: "parallel" });
+test.describe.configure({ mode: "parallel", timeout: 90000 });
 
 test.beforeEach(async ({ page }) => {
   page.__errors = [];
@@ -68,7 +69,7 @@ test("工作状态只在对话末尾一次性显示，完成后显示实测耗�
   await input(page).fill("先单独列出尚未确认的事项，不要保存");
   await input(page).press("Enter");
   await expect(page.locator(".s2-agent-work.is-working")).toContainText(
-    "正在读取本轮反馈",
+    "读取内容 · 本轮反馈与补充要求",
   );
   expect(
     await page
@@ -76,7 +77,7 @@ test("工作状态只在对话末尾一次性显示，完成后显示实测耗�
       .evaluate((element) => getComputedStyle(element).fontFamily),
   ).toContain("monospace");
   await expect(page.locator(".s2-agent-work.is-working")).toContainText(
-    "正在整理摘要",
+    "调用摘要整理工具",
   );
   await expect(
     page.locator('.s2-agent-duration[data-elapsed-kind="measured"]'),
@@ -90,6 +91,51 @@ test("工作状态只在对话末尾一次性显示，完成后显示实测耗�
   await expect(
     page.locator('.s2-agent-duration[data-elapsed-kind="measured"]'),
   ).toHaveCount(2);
+});
+
+for (const width of [795, 1440])
+  test(`${width}px公司调研分开呈现检索、读取与阶段结论，每项可阅读六秒`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 865 });
+    await page.goto("#/tasks/client-xinglan");
+    const status = page.locator(".s2-agent-work.is-working");
+    await expect(status).toHaveText("检索公开资料 · 公司官网与招聘页面");
+    await expect(page.locator(".s2-hunter-reply").first()).toContainText("已明确本轮目标");
+    const first = await page.evaluate(() => performance.now());
+    await page.screenshot({ path: testInfo.outputPath("search.png") });
+    await expect(status).toHaveText("读取来源内容 · 核对公司身份、招聘变化与发布时间");
+    const second = await page.evaluate(() => performance.now());
+    expect(second - first).toBeGreaterThan(5700);
+    await expect(page.locator(".s2-agent-work")).toHaveCount(1);
+    await page.screenshot({ path: testInfo.outputPath("read.png") });
+    await expect(page.getByRole("heading", { name: "公司值得继续核实招聘需求" })).toBeVisible();
+    const completed = await page.evaluate(() => performance.now());
+    expect(completed - second).toBeGreaterThan(5600);
+    await expect(page.locator(".s2-hunter-reply").filter({ hasText: "预算仍未确认" }).first()).toBeVisible();
+    await expect(status).toHaveCount(0);
+    await expect(page.locator(".s2-stream-caret, .s2-runtime, .s1-toast")).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath("conclusion.png") });
+    await testInfo.attach("stage-timing", { body: JSON.stringify({ firstOperationMs: second - first, secondOperationMs: completed - second }), contentType: "application/json" });
+  });
+
+test("岗位寻访六个具体操作依次停留，阶段结论保留但操作记录不堆叠", async ({ page }, testInfo) => {
+  await page.goto("#/tasks/position-vla");
+  const status = page.locator(".s2-agent-work.is-working");
+  for (const text of [
+    "读取内容 · 岗位 JD、硬要求与可放宽条件",
+    "调用需求解析工具 · 核对找人范围与本轮边界",
+    "检索人选 · 候选人库、知识图谱与论文专利",
+    "检索公开资料 · 项目记录、公开履历与关联来源",
+    "读取内容 · 人选资料、简历与原始来源",
+    "调用人选匹配工具 · 核对身份、岗位要求与证据缺口",
+  ]) {
+    await expect(status).toHaveText(text, { timeout: 8000 });
+    await expect(status).toHaveCount(1);
+  }
+  await expect(page.getByRole("heading", { name: "首批候选人已经可以审核" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "本轮检索范围已确定" })).toBeVisible();
+  await expect(page.locator(".s2-agent-duration")).toContainText(/36 秒|37 秒/);
+  await expect(page.locator(".s2-runtime, .s2-plan-step-toggle")).toHaveCount(0);
+  await page.screenshot({ path: testInfo.outputPath("recruiting-result.png") });
 });
 
 test("单选提交后仅生成待确认范围，不等同导入授权", async ({ page }) => {

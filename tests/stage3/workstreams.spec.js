@@ -156,7 +156,7 @@ test("公司组织梳理从结果入口阅读，不再从计划回查", async ({
 test("候选人求职只匹配系统岗位并由猎头本人联系", async ({ page }) => {
   await page.goto("#/tasks/career-linhao");
   await expect(page.getByText("系统内有 3 个岗位值得查看")).toBeVisible({
-    timeout: 10_000,
+    timeout: 45_000,
   });
   await page.getByRole("button", { name: "查看完整岗位匹配" }).click();
   await expect(
